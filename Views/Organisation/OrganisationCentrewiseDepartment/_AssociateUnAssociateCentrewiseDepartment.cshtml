@@ -1,0 +1,56 @@
+﻿@using Coditech.Admin.Utilities;
+@model OrganisationCentrewiseDepartmentViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+}
+<!-- Page Content-->
+<div class="modal-header">
+    @if (Model.OrganisationCentrewiseDepartmentId > 0)
+    {
+        <h6 class="modal-title m-0" id="exampleModalDefaultLabel">UnAssociate Centre From Department</h6>
+    }
+    else
+    {
+        <h6 class="modal-title m-0" id="exampleModalDefaultLabel">Associate Centre To Department</h6>
+    }
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div><!--end modal-header-->
+@using (Html.BeginForm("AssociateUnAssociateCentrewiseDepartment", controllerName, FormMethod.Post, new { id = "frmAssociateUnAssociateCentrewiseDepartment" }))
+{
+    @Html.AntiForgeryToken();
+    @Html.HiddenFor(x => x.OrganisationCentrewiseDepartmentId)
+    @Html.HiddenFor(x => x.GeneralDepartmentMasterId)
+    @Html.HiddenFor(x => x.CentreCode)
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    @if (Model.OrganisationCentrewiseDepartmentId > 0)
+                    {
+                        <span>
+                            Are you sure that you want to deallocate <span class="font-15"> @Model.DepartmentName</span> Department from <span class="font-15">@Model.CentreName</span> Centre?
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            Are you sure that you want to allocate <span class="font-15">
+                                @Model.DepartmentName Department
+                            </span> to <span class="font-15">
+                                @Model.CentreName
+                            </span> Centre?
+                        </span>
+                    }
+                </div>
+            </div>
+        </div><!--end row-->
+    </div>
+
+    <!--end modal-body-->
+    <div class="modal-footer">
+        <button type="submit" id="saveDraft" class="btn btn-success" data-test-selector="linkSave" onclick="OrganisationCentrewiseDepartment.AssociateUnAssociateCentrewiseDepartment(); return false;">@AdminResources.LabelSave</button>
+        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+    </div>
+}
+@Html.Partial("_ValidationScriptsPartial")

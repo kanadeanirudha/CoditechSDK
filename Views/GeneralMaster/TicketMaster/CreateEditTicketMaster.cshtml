@@ -1,0 +1,149 @@
+﻿@model TicketMasterViewModel
+@{
+    ViewBag.Title = Model.TicketMasterId > 0 ? "Update Ticket" : "Raise Ticket";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.TicketMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update Raised Ticket: @Model.TicketNumber</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Raise Ticket</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.TicketMasterId)
+                            @if (Model.TicketMasterId > 0)
+                            {
+                                @Html.HiddenFor(m => m.IsTicketReplied)
+                            }
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Subject, new { @class = "form-label required" })
+                                        @if (Model.TicketMasterId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.Subject, new { @class = "form-control", @readonly = "readonly" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.Subject, new { @class = "form-control" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.Subject)
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Details, new { @class = "form-label required" })
+                                        @Html.TextAreaFor(x => x.Details, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.Details)
+                                    </div>
+                                </div>
+                                @if (Model.TicketMasterId > 0)
+                                {
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            @Html.LabelFor(x => x.TicketStatusEnumId, new { @class = "form-label" })
+                                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.TicketStatusEnumId.ToString(),
+                                   DropdownName = "TicketStatusEnumId",
+                                   GroupCode = DropdownTypeEnum.TicketStatus.ToString(),
+                                   IsDisabled = !Model.IsTicketReplied
+                               })
+                                            @Html.ValidationMessageFor(x => x.TicketStatusEnumId)
+                                        </div>
+                                    </div>
+                                }
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TicketPriorityEnumId, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.TicketPriorityEnumId.ToString(),
+                                   DropdownName = "TicketPriorityEnumId",
+                                   GroupCode = DropdownTypeEnum.TicketPriority.ToString()
+                               })
+                                        @Html.ValidationMessageFor(x => x.TicketPriorityEnumId)
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12" hidden>
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AddCc, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.AddCc, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.AddCc)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-12">
+                                    <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                                    <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.TicketMasterId > 0)
+                        {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <table class="table table-bordered table-sm" id="makeEditable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Requested/Responsed Date</th>
+                                                    <th>Requested/Responsed By</th>
+                                                    <th>Request/Response</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model?.TicketDetailsList?.Count > 0)
+                                                {
+                                                    foreach (var item in Model?.TicketDetailsList)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.CreatedDate.ToCoditechDateWithTimeFormat()</td>
+                                                            <td>@item.FirstName @item.LastName</td>
+                                                            <td>@item.Details</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

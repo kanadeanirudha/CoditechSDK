@@ -1,0 +1,125 @@
+﻿@using Coditech.Admin.Utilities;
+@model AdminRoleViewModel
+@{
+    ViewBag.Title = "Update Admin Role";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/Admin/AdminRoleMaster/_AdminRoleMasterSidePannel.cshtml", Model.AdminRoleMasterId.ToString())
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="col">
+                            <h4 class="card-title"><span>Update Admin Role</span></h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.AdminRoleMasterId)
+                            ;
+                            @Html.HiddenFor(m => m.SelectedCentreCode)
+                            ;
+                            @Html.HiddenFor(m => m.SelectedDepartmentId)
+                            ;
+                            @Html.HiddenFor(m => m.SelectedCentreCodeForSelf)
+                            ;
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AdminRoleCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.AdminRoleCode, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SanctionPostName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.SanctionPostName, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MonitoringLevel, new { @class = "form-label required" })
+                                        @Html.DropDownListFor(m => m.MonitoringLevel, new SelectList(Model.MonitoringLevelList, "Value", "Text"), new { @class = "form-select" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3  multiselect-dropdown">
+                                        @Html.LabelFor(x => x.SelectedRoleWiseCentres, new { @class = "form-label required" })
+                                        @if (Model.MonitoringLevel == AdminConstants.Self)
+                                        {
+                                            <div id="SelectedCentreNameForSelfDivId">
+                                                @Html.DisplayFor(m => m.SelectedCentreNameForSelf)
+                                            </div>
+                                            <div id="SelectedRoleWiseCentresDivId" style="display:none">
+                                                @Html.ListBoxFor(m => m.SelectedRoleWiseCentres, new SelectList(Model.AllCentreList, "CentreCode", "CentreName"), new { @class = "selectpicker form-control" })
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div id="SelectedCentreNameForSelfDivId" style="display:none">
+                                                @Html.DisplayFor(m => m.SelectedCentreNameForSelf)
+                                            </div>
+                                            <div id="SelectedRoleWiseCentresDivId">
+                                                @Html.ListBoxFor(m => m.SelectedRoleWiseCentres, new SelectList(Model.AllCentreList, "CentreCode", "CentreName"), new { @class = "selectpicker form-control " })
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.DashboardFormEnumId, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.DashboardFormEnumId.ToString(),
+                                   DropdownName = "DashboardFormEnumId",
+                                   GroupCode = DropdownTypeEnum.DashboardForm.ToString(),
+                                   IsRequired=false
+                               })
+                                        @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsAttendaceAllowFromOutside, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsAttendaceAllowFromOutside, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsLoginAllowFromOutside, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsLoginAllowFromOutside, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&SelectedDepartmentId=@Model.SelectedDepartmentId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script src="~/js/coditech/admin/adminrolemaster.js"></script>
+}

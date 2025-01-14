@@ -1,0 +1,207 @@
+﻿ @model MediaManagerFolderListViewModel
+@{
+    UserModel userInfo = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+    AdminRoleMediaFolderActionModel adminRoleMediaFolderActionModel = new AdminRoleMediaFolderActionModel();
+    if (!userInfo.IsAdminUser)
+    {
+        if (userInfo?.AdminRoleMediaFolderActionList?.Count > 0)
+        {
+            adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList
+                .Where(x => x.AdminRoleMasterId == userInfo.SelectedAdminRoleMasterId)
+                .FirstOrDefault();
+        }
+    }
+    else
+    {
+        adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.FirstOrDefault();
+    }
+    bool isDeleteAllowed = userInfo.IsAdminUser ? true : adminRoleMediaFolderActionModel != null && adminRoleMediaFolderActionModel.SelectedMediaActions
+        .Any(x => x.Equals(MediaFolderActionEnum.DeleteFile.ToString()));
+    bool isDownloadAllowed = userInfo.IsAdminUser ? true : adminRoleMediaFolderActionModel != null && adminRoleMediaFolderActionModel.SelectedMediaActions
+        .Any(x => x.Equals(MediaFolderActionEnum.DownloadFile.ToString()));
+}
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+<div class="card-body">
+    @Html.HiddenFor(x => x.SelectedParameter1)
+    <!-- Grid View -->
+    <div id="fileBoxContainer" class="file-box-content grid-view">
+        @foreach (var media in Model.MediaFiles)
+        {
+            <div class="file-box">
+                <div class="align-items-center card-action-block d-flex flex-row-reverse justify-content-between mb-2">
+                    @if (isDeleteAllowed)
+                    {
+                        <a title="Delete" class="download-icon-link" data-media-id="@media.MediaId"
+                           onclick="openDeleteFileModal('@media.MediaId', '@Model.ActiveFolderId')">
+                            <i class="dripicons-cross file-download-icon"></i>
+                        </a>
+                    }
+                    @if (isDownloadAllowed)
+                    {
+                        <a target="_blank" href="@media.DownloadPath" title="Download" class="download-icon-link" download>
+                            <i class="dripicons-download file-download-icon"></i>
+                        </a>
+                    }
+                </div>
+                <a href="../MediaManager/GetMediaDetails?mediaId=@media.MediaId">
+                    <div class="d-flex align-items-center justify-content-center flex-column">
+                        <div class="card-image-info">
+                            <img src="@media.Path" alt="@media.FileName" class="img-thumbnail">
+                        </div>
+                        <h6 class="text-truncate" title="@media.FileName">@media.FileName</h6>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <div class="row" id="fileTableContainer">
+        <div class="col-sm-12 table-responsive">
+            <!-- List View -->
+            <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+                @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+                <tbody>
+                    @foreach (var media in Model.MediaFiles)
+                    {
+                        <tr>
+                            <td style="text-align: center; width: 0px">
+                                <img src="@media.Path" class="thumb-xs">
+                            </td>
+                            <td><a href="../MediaManager/GetMediaDetails?mediaId=@media.MediaId">@media.FileName</a></td>
+                            <td>@media.FolderName</td>
+                            <td>@media.Size KB</td>
+                            <td class="text-center">
+                                @if (isDownloadAllowed)
+                                {
+                                    <a target="_blank" href="@media.DownloadPath" title="Download" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                }
+                                @if (isDeleteAllowed)
+                                {
+                                    @if (isDownloadAllowed)
+                                    {
+                                        <span class="m-2">|</span>
+                                    }
+                                    <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-media-id="@media.MediaId"
+                                       onclick="openDeleteFileModal('@media.MediaId', '@Model.ActiveFolderId')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                }
+                                @if (isDownloadAllowed || isDeleteAllowed)
+                                {
+                                    <span class="m-2">|</span>
+                                }
+                                <a href="../MediaManager/GetMediaDetails?mediaId=@media.MediaId" title="View" class="btn btn-sm btn-soft-warning btn-circle me-2"> <i class="fas fa-eye" style="color: orange;"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div style="padding-top:20px;">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize toggle and view when the page loads
+        initializeToggleAndView();
+
+        // Observe pagination clicks and reinitialize view after DOM updates
+        document.body.addEventListener('click', function (event) {
+            if (event.target.matches('.pagination a')) {
+                const observer = new MutationObserver(() => {
+                    initializeToggleAndView(); // Reinitialize toggle and view after pagination
+                    observer.disconnect();
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                });
+            }
+        });
+
+        // Also observe changes when the folder changes (e.g., on page load)
+        const observer = new MutationObserver(initializeToggleAndView);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    });
+
+    // Function to initialize toggle state and view
+    function initializeToggleAndView() {
+        // Ensure the toggle is in the parent window
+        const toggle = window.parent.document.getElementById('viewToggle');
+        if (!toggle) {
+            console.error('Toggle element not found in parent!');
+            return;
+        }
+
+        // Initialize the view based on session storage (keeps the view consistent after page reload or pagination)
+        const isGridView = sessionStorage.getItem('isGridView') !== 'false'; // Default to true (grid view)
+        toggle.checked = isGridView; // Set the initial toggle state from session storage
+        setView(isGridView);
+
+        // Attach or re-attach the event listener to the toggle
+        toggle.removeEventListener('change', toggleChangeHandler); // Remove old event listener if present
+        toggle.addEventListener('change', toggleChangeHandler);
+
+        function toggleChangeHandler() {
+            // When the toggle is changed, update the session storage and view
+            const isGridView = toggle.checked;
+            sessionStorage.setItem('isGridView', isGridView); // Store the toggle state in session storage
+            setView(isGridView);
+        }
+
+        // Function to set the grid or list view based on the toggle state
+        function setView(isGridView) {
+            const gridContainer = document.getElementById('fileBoxContainer');
+            const tableContainer = document.getElementById('fileTableContainer');
+
+            if (isGridView) {
+                gridContainer.classList.remove('d-none');
+                tableContainer.classList.add('d-none');
+            } else {
+                gridContainer.classList.add('d-none');
+                tableContainer.classList.remove('d-none');
+            }
+        }
+    }
+
+</script>
+
+<style>
+    .grid-view {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+    }
+
+    .file-box {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        background-color: #f9f9f9;
+    }
+
+        .file-box img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: contain;
+        }
+
+    .list-view table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+</style>

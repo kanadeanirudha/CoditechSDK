@@ -1,0 +1,52 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@{
+    ViewBag.Title = "Dashboard";
+    UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+}
+<div class="page-content">
+    <div class="container-fluid">
+        <!-- Page-Title -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <div class="row">
+                        <div class="col">
+                            @*    <h4 class="page-title">Dasboard</h4> *@
+                            @* <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Dastone</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Analytics</li>
+                            </ol> *@
+                        </div><!--end col-->
+                    </div><!--end row-->
+                </div><!--end page-title-box-->
+            </div><!--end col-->
+        </div><!--end row-->
+        <!-- end page title end breadcrumb -->
+        <div class="row justify-content-center">
+            @foreach (UserModuleModel item in userData?.ModuleList?.OrderBy(x => x.ModuleSeqNumber))
+            {
+                <div class="col-md-6 col-lg-3">
+                    <a href="/@item.DefaultMenuLink">
+                        <div class="card report-card">
+                            <div class="card-body">
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col">
+                                        <p class="text-dark mb-0 fw-semibold">&nbsp;</p>
+                                        <h5 class="m-0">@item.ModuleName</h5>
+                                    </div>
+                                    <div class="col-auto align-self-center">
+                                        <div class="report-main-icon bg-light-alt">
+                                            <i class="@item.ModuleIconName"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!--end card-body-->
+                        </div><!--end card-->
+                    </a>
+                </div> <!--end col-->
+            }
+        </div><!--end row-->
+    </div><!-- container -->
+</div>

@@ -1,0 +1,143 @@
+﻿@model GeneralNotificationViewModel
+@{
+    ViewBag.Title = Model?.GeneralNotificationId > 0 ? "Update Notification " : "Add Notification";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.GeneralNotificationId > 0)
+                                {
+                                    <h4 class="card-title">Update Notification</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Notification</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.GeneralNotificationId)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.FromDate, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                        @Html.ValidationMessageFor(x => x.FromDate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.UptoDate, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.UptoDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                        @Html.ValidationMessageFor(x => x.UptoDate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.NotificationDetails, new { @class = "form-label required" })
+                                        @Html.TextAreaFor(x => x.NotificationDetails, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.NotificationDetails)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts 
+{
+    <script type="text/javascript">
+        $(function () {
+             $("#FromDate").val('');
+             $("#UptoDate").val('');
+            // Initialize FromDate datepicker
+            $("#FromDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()", // Use actual date format
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    // Check if the Clear button is clicked
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                onSelect: function (selectedDate) {
+                    var fromDate = $(this).datepicker("getDate");
+
+                    if (fromDate) {
+                        // Set UptoDate's min date to selected FromDate
+                        var minUptoDate = new Date(fromDate.getTime());
+                        var maxUptoDate = new Date(fromDate.getTime());
+                        maxUptoDate.setFullYear(fromDate.getFullYear() + 2); // Max 2 years after
+
+                        $("#UptoDate").datepicker("option", "minDate", minUptoDate);
+                        $("#UptoDate").datepicker("option", "maxDate", maxUptoDate);
+                    }
+                }
+            });
+
+            // Initialize UptoDate datepicker
+            $("#UptoDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()", // Use actual date format
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    // Check if the Clear button is clicked
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                onSelect: function (selectedDate) {
+                    var uptoDate = new Date(selectedDate);
+
+                    if (uptoDate) {
+                        // Set FromDate's max date to selected UptoDate
+                        var maxFromDate = new Date(uptoDate.getTime());
+                        var minFromDate = new Date(uptoDate.getTime());
+                        minFromDate.setFullYear(uptoDate.getFullYear() - 2); // Min 2 years before
+
+                        $("#FromDate").datepicker("option", "minDate", minFromDate);
+                        $("#FromDate").datepicker("option", "maxDate", uptoDate);
+                    }
+                }
+            });
+        });
+    </script>
+}

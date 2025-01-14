@@ -1,0 +1,34 @@
+﻿@model GeneralPersonAddressListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+}
+@foreach (GeneralPersonAddressViewModel item in Model?.GeneralPersonAddressList)
+{
+    item.EntityId = Model.EntityId;
+    item.EntityType = Model.EntityType;
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    @if (item.AddressTypeEnum == AddressTypeEnum.PermanentAddress.ToString())
+                    {
+                        <span class="card-title">Permanent Address: @Model.FirstName @Model.LastName</span>
+                    }
+                    else if (item.AddressTypeEnum == AddressTypeEnum.CorrespondanceAddress.ToString())
+                    {
+                        <span class="card-title">Correspondance Address: @Model.FirstName @Model.LastName</span>
+                    }
+                    else if (item.AddressTypeEnum == AddressTypeEnum.BusinessAddress.ToString())
+                    {
+                        <span class="card-title">Business Address: @Model.FirstName @Model.LastName</span>
+                    }
+                </div>
+                <div class="card-body">
+                    @Html.Partial("~/Views/Shared/GeneralPerson/_CreateEditGeneralPersonAddress.cshtml", item)
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@Html.Partial("_ValidationScriptsPartial")

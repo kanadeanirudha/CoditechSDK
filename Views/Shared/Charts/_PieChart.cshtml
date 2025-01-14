@@ -1,0 +1,36 @@
+﻿@model PieChartViewModel
+@{
+    Layout = null;
+}
+<canvas id="@Model.PieChartId"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var xValues = @Html.Raw(Model.XValues);
+    var yValues = @Html.Raw(Model.YValues);
+    new Chart("@Model.PieChartId", {
+        type: "pie",
+        data: {
+            labels: xValues,
+            datasets: [{
+                data: yValues,
+                backgroundColor: @Html.Raw(Model.BackgroundColor),
+                display: true,
+            }]
+        },
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: '@Html.Raw(@Model.Title)'
+                },
+                labels: {
+                    render: 'label',
+                    arc: true,
+                    fontColor: '#000',
+                    position: 'outside'
+                }
+
+            }
+        }
+    });
+</script>

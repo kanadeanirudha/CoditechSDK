@@ -1,0 +1,141 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@model AdminRoleApplicableDetailsViewModel
+@{
+    ViewBag.Title = "Assign Role To User";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/Admin/AdminRoleMaster/_AdminRoleMasterSidePannel.cshtml", Convert.ToString(Model.AdminRoleMasterId))
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="col">
+                            <h4 class="card-title"><span>Assign Role To User</span></h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm("AssociateUnAssociateAdminRoleToUser", controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.AdminRoleMasterId)
+                            @Html.HiddenFor(m => m.AdminRoleApplicableDetailId)
+                            @Html.HiddenFor(m => m.RoleType)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AdminRoleCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.AdminRoleCode, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SanctionPostName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.SanctionPostName, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmployeeId, new { @class = "form-label required" })
+                                        @if (Model.AdminRoleApplicableDetailId > 0)
+                                        {
+                                            @Html.DropDownList("EmployeeId", ViewData["EmployeeList"] as List<SelectListItem>, new { @class = "form-select", @readonly = "readonly" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownList("EmployeeId", ViewData["EmployeeList"] as List<SelectListItem>, new { @class = "form-select" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.EmployeeId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.WorkFromDate, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.WorkFromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.WorkToDate, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.WorkToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Reason, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.Reason, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/RoleAllocatedToUserList?SelectedParameter1=@Model.AdminRoleMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(function () {
+            var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
+
+            // Initialize WorkFromDate Datepicker
+            $("#WorkFromDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: dateFormat,
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                onSelect: function (selectedDate) {
+                    // Set WorkToDate's minimum date to the selected WorkFromDate
+                    $("#WorkToDate").datepicker("option", "minDate", selectedDate);
+                }
+            });
+
+            // Initialize WorkToDate Datepicker
+            $("#WorkToDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: dateFormat,
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                }
+            });
+        });
+    </script>
+}
+

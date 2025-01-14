@@ -1,0 +1,100 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@model AdminRoleMenuDetailsViewModel
+@{
+    ViewBag.Title = "Allocate Access Rights";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel moduleDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.ModuleList.ToString(), DropdownName = "ModuleCode", DropdownSelectedValue = Convert.ToString(Model.ModuleCode), ChangeEvent = "" };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/Admin/AdminRoleMaster/_AdminRoleMasterSidePannel.cshtml", Model.AdminRoleMasterId.ToString())
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="col">
+                            <h4 class="card-title"><span>Allocate Access Rights</span></h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.AdminRoleMasterId)
+                            @Html.HiddenFor(m => m.SelectedMenuList)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AdminRoleCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.AdminRoleCode, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SanctionPostName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.SanctionPostName, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuList, new { @class = "form-label" })
+                                        <div id="jstree">
+                                            <ul>
+                                                @foreach (UserMainMenuModel item in Model?.MenuList?.Where(x => x.ParentMenuCode == null))
+                                                {
+                                                    <li id="@item.MenuCode" data-jstree='{"opened":true,"selected":@Convert.ToString(@item.IsAssociatedToAdminRole).ToLower()}'>
+                                                        @item.MenuName
+                                                        <ul>
+                                                            @foreach (UserMainMenuModel childNode in Model?.MenuList?.Where(x => x.ParentMenuCode != null && x.ParentMenuCode == item.MenuCode))
+                                                            {
+                                                                <li id="@childNode.MenuCode" data-jstree='{"selected":@Convert.ToString(@childNode.IsAssociatedToAdminRole).ToLower()}'>@childNode.MenuName</li>
+                                                            }
+                                                        </ul>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" id="SaveAdminRoleMenuDetailsId" disabled class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&SelectedDepartmentId=@Model.SelectedDepartmentId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/coditech/admin/adminrolemaster.js"></script>
+    <script src="~/js/layout/jstree.min.js"></script>
+    <script>
+        $(function () {
+            $("#jstree").jstree({
+                "checkbox": {
+                    "three_state": false,
+                    "keep_selected_style": false
+                },
+                "plugins": ["checkbox"]
+            });
+            $('#jstree').on("changed.jstree", function (e, data) {
+                if (data.selected != "" && data.selected != null) {
+                    $("#SaveAdminRoleMenuDetailsId").removeAttr('disabled');
+                }
+                $('#SelectedMenuList').val(data.selected);
+            });
+        });
+    </script>
+}

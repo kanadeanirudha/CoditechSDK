@@ -1,0 +1,59 @@
+﻿@model LineChartViewModel
+@{
+    Layout = null;
+}
+<canvas id="@Model.LineChartId"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script>
+    var xValues = @Html.Raw(@Model.XValues);
+    var yValues = @Html.Raw(Model.YValues);
+    new Chart("@Model.LineChartId", {
+        type: "line",
+        data: {
+            labels: xValues,
+            datasets: [{
+                backgroundColor: backgroundColor,
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+                data: yValues
+            }]
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: '@Model.Title'
+            },
+            scales: {
+                xAxes: [{
+                    beginAtZero: true,
+                    display: true,
+                    gridLines: {
+                        display: false,
+                        drawBorder: true
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: '@Model.XAxisLabel'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    beginAtZero: true,
+                    gridLines: {
+                        display: false,
+                        drawBorder: true
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: '@Model.YAxisLabel'
+                    }
+                }]
+            },
+            // title: {
+            //     display: true,
+            //     text: 'Inspection Requests Per day'
+            // }
+        }
+    });
+</script>

@@ -1,27 +1,26 @@
+using Coditech.Admin;
+
+/// <summary>
+/// Creates a WebApplication Builder with the given arguments.
+/// </summary>
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+/// <summary>
+/// Registers common services.
+/// </summary>
+builder.RegisterCommonServices();
 
+/// <summary>
+/// Builds the application.
+/// </summary>
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+/// <summary>
+/// Registers application services with the specified builder.
+/// </summary>
+app.RegisterApplicationServices(builder);
+/// <summary>
+/// Executes the application's startup logic. 
+/// </summary>
 app.Run();
+
+

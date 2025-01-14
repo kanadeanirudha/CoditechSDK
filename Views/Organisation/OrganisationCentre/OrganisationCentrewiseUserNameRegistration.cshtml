@@ -1,0 +1,73 @@
+﻿@model OrganisationCentrewiseUserNameRegistrationViewModel
+@{
+    ViewBag.Title = "Organisation Centrewise UserName Registration";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/Organisation/OrganisationCentre/_OrganisationCentreSidePannel.cshtml", Model.OrganisationCentreMasterId.ToString())
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Organisation Centrewise UserName Registration</h4>
+                            </div><!--end col-->
+                        </div><!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.OrganisationCentrewiseUserNameRegistrationId)
+                            @Html.HiddenFor(m => m.OrganisationCentreMasterId)
+                            @if (Model.OrganisationCentrewiseUserNameRegistrationId > 0)
+                            {
+                                @Html.HiddenFor(m => m.UserType)
+                            }
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreName, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.CentreName, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.CentreCode, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    @Html.LabelFor(x => x.UserType, new { @class = "form-label required" })
+                                    @if (Model.OrganisationCentrewiseUserNameRegistrationId > 0)
+                                    {
+                                        @Html.DropDownList("UserType", ViewData["UserType"] as List<SelectListItem>, new { @class = "form-select", @disabled = "disabled" })
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownList("UserType", ViewData["UserType"] as List<SelectListItem>, new { @class = "form-select" })
+                                    }
+                                    @Html.ValidationMessageFor(x => x.UserType)
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.UserNameBasedOn, new { @class = "form-label required" })
+                                        @Html.DropDownList("UserNameBasedOn", ViewData["UserNameBasedOn"] as List<SelectListItem>, new { @class = "form-select" })
+                                        @Html.ValidationMessageFor(x => x.UserNameBasedOn)
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/CentrewiseUserNameRegistrationList?organisationCentreId=@Model.OrganisationCentreMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+

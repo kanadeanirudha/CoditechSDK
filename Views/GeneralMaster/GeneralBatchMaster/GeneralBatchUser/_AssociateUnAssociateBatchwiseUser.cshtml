@@ -1,0 +1,56 @@
+﻿@using Coditech.Admin.Utilities;
+@model GeneralBatchUserViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+}
+<!-- Page Content-->
+<div class="modal-header">
+    @if (Model.GeneralBatchUserId > 0)
+    {
+        <h6 class="modal-title m-0" id="exampleModalDefaultLabel">UnAssociate Batch From User</h6>
+    }
+    else
+    {
+        <h6 class="modal-title m-0" id="exampleModalDefaultLabel">Associate Batch To User</h6>
+    }
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div><!--end modal-header-->
+@using (Html.BeginForm("AssociateUnAssociateBatchwiseUser", controllerName, FormMethod.Post, new { id = "frmAssociateUnAssociateBatchwiseUser" }))
+{
+    @Html.AntiForgeryToken();
+    @Html.HiddenFor(x => x.GeneralBatchUserId)
+    @Html.HiddenFor(x => x.GeneralBatchMasterId)
+    @Html.HiddenFor(x => x.EntityId) 
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    @if (Model.GeneralBatchUserId > 0)
+                    {
+                        <span>
+                            Are you sure that you want to unassociate <span class="font-15"> @Model.BatchName</span> Batch from <span class="font-15">@Model.FirstName @Model.LastName</span>?
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            Are you sure that you want to associate <span class="font-15">
+                                @Model.BatchName Batch
+                            </span> to <span class="font-15">
+                                @Model.FirstName @Model.LastName 
+                            </span>?
+                        </span>
+                    }
+                </div>
+            </div>
+        </div><!--end row-->
+    </div>
+
+    <!--end modal-body-->
+    <div class="modal-footer">
+        <button type="submit" id="saveDraft" class="btn btn-success" data-test-selector="linkSave" onclick="GeneralBatchMaster.AssociateUnAssociateBatchwiseUser(); return false;">@AdminResources.LabelSave</button>
+        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+    </div>
+}
+@Html.Partial("_ValidationScriptsPartial")

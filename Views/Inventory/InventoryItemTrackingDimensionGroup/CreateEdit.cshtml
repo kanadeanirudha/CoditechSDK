@@ -1,0 +1,250 @@
+﻿@model InventoryItemTrackingDimensionGroupViewModel
+@{
+    ViewBag.Title = Model.InventoryItemTrackingDimensionGroupId > 0 ? "Update Inventory ItemTracking Dimension Group" : "Add Inventory ItemTracking Dimension Group";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.InventoryItemTrackingDimensionGroupId > 0)
+                                {
+                                    <h4 class="card-title">Update Inventory ItemTracking Dimension Group</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Inventory ItemTracking Dimension Group</h4>
+                                }
+                            </div><!--end col-->
+                        </div> <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = "frmInventoryItemTrackingDimensionGroup" }))
+                        {
+                            @Html.HiddenFor(m => m.InventoryItemTrackingDimensionGroupId)
+                            @Html.HiddenFor(m => m.ItemTrackingDimensionGroupMapperData)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ItemTrackingDimensionGroupName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ItemTrackingDimensionGroupName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ItemTrackingDimensionGroupName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ItemTrackingDimensionGroupCode, new { @class = "form-label required" })
+                                        @{
+                                            if (!string.IsNullOrEmpty(Model.ItemTrackingDimensionGroupCode))
+                                            {
+                                                @Html.TextBoxFor(x => x.ItemTrackingDimensionGroupCode, new { @class = "form-control", @readonly = "readonly"})
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(x => x.ItemTrackingDimensionGroupCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                            }
+                                        }
+                                        @Html.ValidationMessageFor(x => x.ItemTrackingDimensionGroupCode)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">ItemTracking Dimension Groups</h4>
+                                        </div><!--end card-header-->
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm" id="makeEditable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="col">Item Tracking Dimension Name</th>
+                                                            <th class="col">Active</th>
+                                                            <th class="col">Active In Sales Process</th>
+                                                            <th class="col">Primary Stocking</th>
+                                                            <th class="col">Blank Receipt Allowed</th>
+                                                            <th class="col">Blank Issue Allowed</th>
+                                                            <th class="col">Physical Inventory</th>
+                                                            <th class="col">Financial Inventory</th>
+                                                            <th class="col">Coverage Plan By Dimension</th>
+                                                            <th class="col">For Purchase Prices</th>
+                                                            <th class="col">For Sale Prices</th>
+                                                            <th class="col">Transfer</th>
+                                                            <th class="col">Display Order</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if (Model?.InventoryItemTrackingDimensionGroupMapperList?.Count > 0)
+                                                        {
+                                                            @foreach (InventoryItemTrackingDimensionGroupMapperModel item in Model.InventoryItemTrackingDimensionGroupMapperList)
+                                                            {
+                                                                <tr id="row_@item.InventoryItemTrackingDimensionId">
+                                                                    <td class="col">
+                                                                        <input type="hidden" id="InventoryItemTrackingDimensionGroupMapperId_@item.InventoryItemTrackingDimensionGroupMapperId" value="@item.InventoryItemTrackingDimensionGroupMapperId" />
+                                                                        <input type="hidden" id="InventoryItemTrackingDimensionId_@item.InventoryItemTrackingDimensionId" value="@item.InventoryItemTrackingDimensionId">
+                                                                        @item.ItemTrackingDimensionName
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.Active)
+                                                                            {
+                                                                                <input class="form-check-input" id="Active_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="Active_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.ActiveInSalesProcess)
+                                                                            {
+                                                                                <input class="form-check-input" id="ActiveInSalesProcess_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="ActiveInSalesProcess_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.PrimaryStocking)
+                                                                            {
+                                                                                <input class="form-check-input" id="PrimaryStocking_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="PrimaryStocking_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.BlankReceiptAllowed)
+                                                                            {
+                                                                                <input class="form-check-input" id="BlankReceiptAllowed_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="BlankReceiptAllowed_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.BlankIssueAllowed)
+                                                                            {
+                                                                                <input class="form-check-input" id="BlankIssueAllowed_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="BlankIssueAllowed_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.PhysicalInventory)
+                                                                            {
+                                                                                <input class="form-check-input" id="PhysicalInventory_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="PhysicalInventory_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.FinancialInventory)
+                                                                            {
+                                                                                <input class="form-check-input" id="FinancialInventory_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="FinancialInventory_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.CoveragePlanByDimension)
+                                                                            {
+                                                                                <input class="form-check-input" id="CoveragePlanByDimension_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="CoveragePlanByDimension_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.ForPurchasePrices)
+                                                                            {
+                                                                                <input class="form-check-input" id="ForPurchasePrices_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="ForPurchasePrices_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.ForSalePrices)
+                                                                            {
+                                                                                <input class="form-check-input" id="ForSalePrices_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="ForSalePrices_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.Transfer)
+                                                                            {
+                                                                                <input class="form-check-input" id="Transfer_@item.InventoryItemTrackingDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="Transfer_@item.InventoryItemTrackingDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <input class="form-control" id="DisplayOrder_@item.InventoryItemTrackingDimensionId" type="text" value="@item.DisplayOrder" onkeypress="return CoditechCommon.ValidNumeric()" maxlength="999">
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div><!--end card-body-->
+                                    </div><!--end card-->
+                                </div><!--end col-12-->
+                            </div>
+                            <button type="submit" class="btn btn-success" onclick="InventoryItemTrackingDimensionGroup.SaveData()">@AdminResources.LabelSave</button>
+
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div> <!-- End of card-body div -->
+                </div> <!-- End of card div -->
+            </div> <!-- End of col-lg-12 div -->
+        </div> <!-- End of row div -->
+    </div> <!-- End of container-fluid div -->
+</div> <!-- End of page-content div -->
+<script src="/js/coditech/inventory/inventoryItemTrackingdimensiongroup.js"></script>

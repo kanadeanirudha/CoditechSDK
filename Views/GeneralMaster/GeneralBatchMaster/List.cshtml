@@ -1,0 +1,41 @@
+﻿@model GeneralBatchListViewModel
+@{
+    ViewBag.Title = "All Batch Details List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                            <span class="card-title">All Batch Details List</span>
+                        
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

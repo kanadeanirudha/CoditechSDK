@@ -1,0 +1,146 @@
+﻿@model InventoryProductDimensionGroupViewModel
+@{
+    ViewBag.Title = Model.InventoryProductDimensionGroupId > 0 ? "Update Inventory Product Dimension Group" : "Add Inventory Product Dimension Group";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.InventoryProductDimensionGroupId > 0)
+                                {
+                                    <h4 class="card-title">Update Inventory Product Dimension Group</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Inventory Product Dimension Group</h4>
+                                }
+                            </div><!--end col-->
+                        </div> <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = "frmInventoryProductDimensionGroup" }))
+                        {
+                            @Html.HiddenFor(m => m.InventoryProductDimensionGroupId)
+                            @Html.HiddenFor(m => m.ProductDimensionGroupMapperData)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ProductDimensionGroupName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ProductDimensionGroupName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ProductDimensionGroupName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ProductDimensionGroupCode, new { @class = "form-label required" })
+                                        @{
+                                            if (!string.IsNullOrEmpty(Model.ProductDimensionGroupCode))
+                                            {
+                                                @Html.TextBoxFor(x => x.ProductDimensionGroupCode, new { @class = "form-control", @readonly = "readonly" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(x => x.ProductDimensionGroupCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                            }
+                                        }
+                                        @Html.ValidationMessageFor(x => x.ProductDimensionGroupCode)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Product Dimension Groups</h4>
+                                        </div><!--end card-header-->
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm" id="makeEditable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="col">Product Dimension Name</th>
+                                                            <th class="col">For Purchase</th>
+                                                            <th class="col">For Sale</th>
+                                                            <th class="col">Active</th>
+                                                            <th class="col">Display Order</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if (Model?.InventoryProductDimensionGroupMapperList?.Count > 0)
+                                                        {
+                                                            @foreach (InventoryProductDimensionGroupMapperModel item in Model.InventoryProductDimensionGroupMapperList)
+                                                            {
+                                                                <tr id="row_@item.InventoryProductDimensionId">
+                                                                    <td class="col">
+                                                                        <input type="hidden" id="InventoryProductDimensionGroupMapperId_@item.InventoryProductDimensionGroupMapperId" value="@item.InventoryProductDimensionGroupMapperId" />
+                                                                        <input type="hidden" id="InventoryProductDimensionId_@item.InventoryProductDimensionId" value="@item.InventoryProductDimensionId">
+                                                                        @item.ProductDimensionName
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+
+                                                                            @if (item.ForPurchase)
+                                                                            {
+                                                                                <input class="form-check-input" id="ForPurchase_@item.InventoryProductDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="ForPurchase_@item.InventoryProductDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.ForSale)
+                                                                            {
+                                                                                <input class="form-check-input" id="ForSale_@item.InventoryProductDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="ForSale_@item.InventoryProductDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <div class="form-check">
+                                                                            @if (item.IsActive)
+                                                                            {
+                                                                                <input class="form-check-input" id="IsActive_@item.InventoryProductDimensionId" type="checkbox" checked="checked">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" id="IsActive_@item.InventoryProductDimensionId" type="checkbox">
+                                                                            }
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="col-auto">
+                                                                        <input class="form-control" id="DisplayOrder_@item.InventoryProductDimensionId" type="text" value="@item.DisplayOrder" onkeypress="return CoditechCommon.ValidNumeric()" maxlength="999">
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div><!--end card-body-->
+                                    </div><!--end card-->
+                                </div><!--end col-12-->
+                            </div>
+                            <button type="submit" class="btn btn-success" onclick="InventoryProductDimensionGroup.SaveData()">@AdminResources.LabelSave</button>
+
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div> <!-- End of card-body div -->
+                </div> <!-- End of card div -->
+            </div> <!-- End of col-lg-12 div -->
+        </div> <!-- End of row div -->
+    </div> <!-- End of container-fluid div -->
+</div> <!-- End of page-content div -->
+<script src="/js/coditech/inventory/inventoryproductdimensiongroup.js"></script>

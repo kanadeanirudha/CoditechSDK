@@ -1,0 +1,129 @@
+﻿@model EmployeeMasterViewModel
+@{
+    ViewBag.Title = Model.EmployeeId > 0 ? "Update Employee" : "Add Employee";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("EmployeeId", Model.EmployeeId.ToString());
+    keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/EmployeeMaster/_EmployeeDetailsSidePannel.cshtml", keyValuePairs)
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.EmployeeId > 0)
+                                {
+                                    <h4 class="card-title"><span>Update Employee Other Details : @Model.FirstName @Model.LastName</span></h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Employee</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm("UpdateEmployeeOtherDetail", controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.EmployeeId)
+                            @Html.HiddenFor(m => m.PersonId)
+                            @Html.HiddenFor(m => m.EmployeeDesignationMasterId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PersonCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.PersonCode, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(x => x.PersonCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PANCardNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.PANCardNumber, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.PANCardNumber)
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.UANNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.UANNumber, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.UANNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PassportNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.PassportNumber, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.PassportNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AdharCardNumber, new { @class = "form-label"})
+                                        @Html.TextBoxFor(x => x.AdharCardNumber, new { @class = "form-control",@onkeypress="return CoditechCommom"})
+                                        @Html.ValidationMessageFor(x => x.AdharCardNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.BankName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BankName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankAccountNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.BankAccountNumber, new { @class = "form-control", type = "number" })
+                                        @Html.ValidationMessageFor(x => x.BankAccountNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankIFSCCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.BankIFSCCode, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BankIFSCCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsEmployeeSmoker, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsEmployeeSmoker, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List?SelectedCentreCode=@Model.CentreCode&SelectedDepartmentId=@Model.GeneralDepartmentMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

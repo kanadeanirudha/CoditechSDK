@@ -1,0 +1,97 @@
+﻿@model GeneralEmailTemplateViewModel
+@{
+    ViewBag.Title = Model.GeneralEmailTemplateId > 0 ? "Update WhatsApp Template" : "Add WhatsApp Template";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel moduleDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.ModuleList.ToString(), DropdownName = "ModuleCode", DropdownSelectedValue = Model.ModuleCode, ChangeEvent = "UserMainMenu.GetParentMemuCodeByModuleCode()" };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.GeneralEmailTemplateId > 0)
+                                {
+                                    <h4 class="card-title">Update WhatsApp Template</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create WhatsApp Template</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.GeneralEmailTemplateId)
+                            @Html.HiddenFor(m => m.IsWhatsAppTemplate)
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmailTemplateName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.EmailTemplateName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.EmailTemplateName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmailTemplateCode, new { @class = "form-label required" })
+                                        @if (Model.GeneralEmailTemplateId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.EmailTemplateCode, new { @class = "form-control", @readonly = "readonly" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.EmailTemplateCode, new { @class = "form-control" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.EmailTemplateCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
+                                        @Html.ValidationMessageFor(x => x.ModuleCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Subject, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.Subject, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.Subject)
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmailTemplate, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_HTMLEditor.cshtml", new HTMLEditorViewModel()
+                               {
+                                   EditorName = "EmailTemplate",
+                                   EditorValue = Model.EmailTemplate
+                               })
+                                        @Html.ValidationMessageFor(x => x.EmailTemplate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

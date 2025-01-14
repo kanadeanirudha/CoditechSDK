@@ -1,0 +1,61 @@
+﻿@model InventoryUoMMasterListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            <tbody>
+                @if (Model?.InventoryUoMMasterList?.Count > 0)
+                {
+                    foreach (var item in Model?.InventoryUoMMasterList)
+                    {
+                        <tr>
+                            <td>@item.UomCode</td>
+                            <td>@item.UomDescription</td>
+                            <td>@item.CommercialDescription</td>
+                            <td>@item.MeasurementUnitDisplayName</td>
+                            <td>@item.ConvertionFactor</td>
+                            <td>@item.AdditiveConstant</td>
+                            <td>@item.DecimalPlacesUpto</td>
+                            <td>@item.DecimalRounding</td>
+                            <td class="text-center">
+                                <a href="../@controllerName/Edit?InventoryUoMMasterId=@item.InventoryUoMMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <!-- Delete Button Triggering Modal -->
+                                <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.InventoryUoMMasterId"><i class="fas fa-trash-alt"></i></a>
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="confirmDeleteModal_@item.InventoryUoMMasterId" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body" style="text-align: left;">
+                                                <span style="font-size: 24px; margin-right: 10px;"><i class="fas fa-exclamation-triangle text-danger"></i></span>
+                                                <span style="font-size: 16px;">Are you sure you want to delete this record?</span>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <!-- Delete action with GeneralNotificationId parameter -->
+                                                <a href="../@controllerName/Delete?InventoryUoMMasterIds=@item.InventoryUoMMasterId" class="btn btn-outline-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)

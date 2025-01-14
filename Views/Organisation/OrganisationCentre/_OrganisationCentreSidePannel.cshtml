@@ -1,0 +1,53 @@
+﻿@model string 
+@{
+    Layout = null;
+}
+<div class="card sidebar-card">
+    <div class="card-body">
+        <div class="files-nav">
+            <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
+                <a class="nav-link" href="/OrganisationCentreMaster/Edit?organisationCentreId=@Model" aria-selected="true">
+                    <i class="ti-menu"></i> 
+                    <h5 class="m-0 ps-2">Centre Details</h5>
+                   
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/PrintingFormat?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fa fa-print"></i>
+                    <h5 class="m-0 ps-2">Centre Printing Format</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseGSTSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fas fa-rupee-sign"></i>
+                    <h5 class="m-0 ps-2">Centre GST Setting</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseSMTPSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fa fa-envelope-square"></i>
+                    <h5 class="m-0 ps-2">Centre SMTP Setting</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseSMSSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fa fa-comments"></i>
+                    <h5 class="m-0 ps-2">Centre SMS Setting</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseWhatsAppSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="mdi mdi-whatsapp"></i>
+                    <h5 class="m-0 ps-2">Centre WhatsApp Setting</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseEmailTemplateSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fas fa-envelope"></i>
+                    <h5 class="m-0 ps-2">Centre Email Template</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseSMSTemplateSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fa fa-comments"></i>
+                    <h5 class="m-0 ps-2">Centre SMS Template</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseWhatsAppTemplateSetup?organisationCentreId=@Model" aria-selected="true">
+                    <i class="mdi mdi-whatsapp"></i>
+                    <h5 class="m-0 ps-2">Centre WhatsApp Template</h5>
+                </a>
+                <a class="nav-link" href="/OrganisationCentreMaster/CentrewiseUserNameRegistrationList?organisationCentreId=@Model" aria-selected="true">
+                    <i class="fas fa-user-tie"></i>
+                    <h5 class="m-0 ps-2">Centre UserName Registration</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

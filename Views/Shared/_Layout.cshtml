@@ -1,49 +1,157 @@
-﻿<!DOCTYPE html>
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@{
+    string messageData = Convert.ToString(TempData["Notifications"]);
+    UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+    string applicationLogoPath = CoditechAdminSettings.ApplicationLogoPath;
+    string applicationLogoBackground = CoditechAdminSettings.ApplicationLogoBackground;
+    string applicationLayoutBackground = CoditechAdminSettings.ApplicationLayoutBackground;
+    string applicationTitle = CoditechAdminSettings.ApplicationTitle;
+    TempData.Remove("Notifications");
+}
+<!DOCTYPE html>
+<!-- saved from url=(0081)# -->
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CoditechSDK</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/CoditechSDK.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CoditechSDK</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>@ViewData["Title"] | @applicationTitle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - CoditechSDK - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/favicon.ico">
+
+    <!-- App css -->
+    <link href="~/css/layout/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/metisMenu.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/daterangepicker.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/app.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/layout/datatables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/buttons.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/css/layout/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/css/layout/site.css" rel="stylesheet" />
+    <link href="~/css/layout/jstree.css" rel="stylesheet" />
+    @if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
+    {
+        <link href="~/css/layout/@CoditechAdminSettings.ThemeColor-theme.css" rel="stylesheet" />
+    }
+</head>
+
+<body data-layout="horizontal" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
+    @Html.Partial("~/Views/Shared/_Loader.cshtml")
+
+    @if (userData != null)
+    {
+        <!-- Top Bar Start -->
+        <div class="topbar">
+            <!-- LOGO -->
+            <div class="brand" style="background-color:@applicationLogoBackground !important">
+                <a href="~/Dashboard/Index" class="logo">
+                    <span>
+                        <img src="@applicationLogoPath" alt="logo-small" class="logo-sm">
+                    </span>
+                    <span>
+                        <img src="@applicationLogoPath" alt="logo-large" class="logo-lg logo-dark">
+                    </span>
+                </a>
+            </div>
+            <!--end logo-->
+            <!-- Navbar -->
+            <nav class="navbar-custom">
+                <ul class="list-unstyled topbar-nav float-end mb-0">
+                    @*  <li class="dropdown hide-phone">
+                <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-bs-toggle="dropdown" role="button" aria-haspopup="false" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search topbar-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-end dropdown-lg p-0">
+                <!-- Top Search Bar -->
+                <div class="app-search-topbar">
+                <form action="" method="get">
+                <input type="search" name="search" class="from-control top-search mb-0" placeholder="Type text...">
+                <button type="submit"><i class="ti-search"></i></button>
+                </form>
+                </div>
+                </div>
+                </li> *@
+                    @* @Html.Partial("~/Views/Shared/_NotificationCount.cshtml", userData.UserMasterId) *@
+                    @Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
+                    <li class="menu-item">
+                        <!-- Mobile menu toggle-->
+                        <a class="navbar-toggle nav-link" id="mobileToggle">
+                            <div class="lines">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </a><!-- End mobile menu toggle-->
+                    </li> <!--end menu item-->
+                </ul><!--end topbar-nav-->
+
+                <div class="navbar-custom-menu">
+                    <div id="navigation">
+                        <!-- Navigation Menu-->
+                        <ul class="navigation-menu">
+                            @Html.Partial("~/Views/Shared/_ModuleList.cshtml", userData)
+
+                            <!-- END: Main Menu-->
+                        </ul><!-- End navigation menu -->
+                    </div> <!-- end navigation -->
+                </div>
+                <!-- Navbar -->
+            </nav>
+            <!-- end navbar-->
+        </div>
+        <!-- Top Bar End -->
+        <div class="page-wrapper">
+            @Html.Partial("~/Views/Shared/_NotificationMessage.cshtml", @messageData)
+            <!-- Page Content-->
+            @RenderBody()
+            <!-- end page content -->
+        </div>
+    }
+    <!-- end page-wrapper -->
+    <footer class="footer text-center text-sm-start">
+        <div class="boxed-footer">
+            Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
+            @*<span class="text-muted d-none d-sm-inline-block float-end">Crafted with <i class="mdi mdi-heart text-danger"></i> by Mannatthemes</span>*@
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!-- jQuery  -->
+    <script src="~/js/layout/jquery.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/layout/bootstrap.bundle.min.js"></script>
+    <script src="~/js/layout/metismenu.min.js"></script>
+    <script src="~/js/layout/waves.js"></script>
+    <script src="~/js/layout/feather.min.js"></script>
+    <script src="~/js/layout/simplebar.min.js"></script>
+    <script src="~/js/layout/moment.js"></script>
+    <script src="~/js/layout/daterangepicker.js"></script>
+    <script src="~/js/layout/app.js"></script>
+    <script src="~/js/layout/bootstrap-select.min.js"></script>
+    <!-- coditech script-->
+    <script src="~/js/coditech/common/coditechcommon.js"></script>
+    <script src="~/js/coditech/common/coditechdatatable.js"></script>
+    <script src="~/js/coditech/common/coditechnotification.js"></script>
+    <script src="~/js/coditech/user.js"></script>
 </body>
+@await RenderSectionAsync("Scripts", required: false)
 </html>
+<script>
+    if (performance.navigation.type == 2) {
+        location.reload();
+    }
+
+    window.onbeforeunload = function () {
+        var inputs = document.getElementsByTagName("button");
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].type == "button" || inputs[i].type == "submit") {
+                inputs[i].disabled = true;
+            }
+        }
+    };
+</script>

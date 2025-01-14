@@ -1,0 +1,31 @@
+﻿@using Coditech.Admin.Utilities;
+@model GeneralPersonAddressListViewModel
+@{
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    ViewBag.Title = "Person Address";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("EmployeeId", Model.EntityId.ToString());
+    keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/EmployeeMaster/_EmployeeDetailsSidePannel.cshtml", keyValuePairs)
+            </div>
+            <div class="col-lg-10">
+                <div id="generalPersonAddressDivId"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/layout/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        User.GetGeneralPersonAddressess(@Model.PersonId, @Model.EntityId, '@Model.EntityType');
+    });
+</script>
+
+

@@ -1,0 +1,41 @@
+﻿@model GeneralBatchListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string css = "";
+}
+
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="action-set table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            <tbody>
+                @if (Model?.GeneralBatchList?.Count > 0)
+                {
+                    foreach (var item in Model?.GeneralBatchList)
+                    {
+                        <tr>
+                            <td>@item.BatchName</td>
+                            <td>@item.BatchTime</td>
+                            <td>@item.BatchStartTime</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
+                            </td>
+                            <td class="text-center data-action">
+                                <a href="../@controllerName/UpdateGeneralBatch?generalBatchMasterId=@item.GeneralBatchMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a>@* <span class="m-2">|</span> *@
+                               @*  <a href="../@controllerName/Delete?generalBatchMasterIds=@item.GeneralBatchMasterId&selectedCentreCode=@Model.SelectedCentreCode" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)

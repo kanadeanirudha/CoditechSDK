@@ -1,0 +1,53 @@
+﻿@model OrganisationCentrewiseBuildingRoomsListViewModel
+@{
+    ViewBag.Title = "Organisation Centrewise Building Rooms List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "OrganisationCentrewiseBuildingRooms.GetOrganisationCentrewiseBuildingByCentreCode()" };
+    DropdownViewModel bulidingDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseBuilding.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.OrganisationCentrewiseBuildingMasterId), ChangeEvent = "OrganisationCentrewiseBuildingRooms.GetBuildingRoomsByBuildingMasterId('" + @controllerName + "','" + @actionName + "')" };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">@AdminResources.LabelOrganisationCentrewiseBuildingRoomsList</span>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Building Room</a>
+
+                    </div>
+
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>Building Name</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", bulidingDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="OrganisationCentrewiseBuildingRooms.GetBuildingRoomsByBuildingMasterId('@controllerName','@actionName')"        />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/Organisation/OrganisationCentrewiseBuildingRooms/_List.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- end page content -->
+<script src="~/js/coditech/Organisation/OrganisationCentrewiseBuildingRooms.js"></script>

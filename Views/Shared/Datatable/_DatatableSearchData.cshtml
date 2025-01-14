@@ -1,0 +1,23 @@
+﻿@model string
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="col-sm-12 col-md-6">
+    <div id="datatable_filter" class="dataTables_filter">
+        <div class="align-items-center d-inline-flex gap-2 justify-content-center search-wrapper">
+            <label>
+                Search:
+            </label>
+            <div class="search-field position-relative">
+                <input id="DataTables_SearchById" type="text" onkeyup="CoditechCommon.SearchDatatableData()" class="form-control form-control-sm" value="@Model">
+                <a id="DataTables_SearchButton" onclick="CoditechDataTable.LoadList('@controllerName','@actionName')" class="position-absolute search-icon"><i class="fas fa-search" title="Search"></i></a>
+            </div>
+            @if (!string.IsNullOrEmpty(@Model))
+            {
+                <a onclick="CoditechDataTable.ReloadLoadList('@controllerName','@actionName')"><i class="fas fa-times-circle" title="Clear"></i></a>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@model OrganisationCentrewiseDepartmentListViewModel
+@{
+    ViewBag.Title = "Organisation Centrewise Department List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <span class="card-title">@AdminResources.LabelOrganisationCentrewiseDepartmentList</span>
+                        </div>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/Organisation/OrganisationCentrewiseDepartment/_List.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->
+<script src="~/js/coditech/Organisation/OrganisationCentrewiseDepartment.js"></script>

@@ -1,0 +1,21 @@
+﻿@using Coditech.Admin.Utilities;
+@model Dictionary<string, string>
+@{
+    Layout = null;
+    int generalBatchMasterId = Convert.ToInt32(Model?.FirstOrDefault(x => x.Key == "GeneralBatchMasterId").Value);
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="card sidebar-card">
+    <div class="card-body">
+        <div class="files-nav">
+            <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
+                <a class="nav-link" href="/GeneralBatchMaster/UpdateGeneralBatch?generalBatchMasterId=@generalBatchMasterId" aria-selected="true">
+                    <i class="ti-menu"></i><h5 class="m-0 ps-2">Batch Details</h5>
+                </a>
+                <a class="nav-link" href="/GeneralBatchMaster/GetGeneralBatchUserList?SelectedParameter1=@generalBatchMasterId" aria-selected="true">
+                    <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Batch User</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

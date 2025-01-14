@@ -1,0 +1,115 @@
+﻿@model MediaFolderStructureModel
+
+@{
+    string active = Model.IsActiveFolder ? "active" : "";
+    UserModel userInfo = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+    AdminRoleMediaFolderActionModel adminRoleMediaFolderActionModel = new AdminRoleMediaFolderActionModel();
+    if (!userInfo.IsAdminUser)
+    {
+        if (userInfo?.AdminRoleMediaFolderActionList?.Count > 0)
+        {
+            adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.Where(x => x.AdminRoleMasterId == userInfo.SelectedAdminRoleMasterId).FirstOrDefault();
+        }
+    }
+    else
+    {
+        adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.FirstOrDefault();
+    }
+}
+
+@if (userInfo.IsAdminUser || Model.adminRoleMediaFolders.Contains(Model.RootFolderId))
+{
+    <div class="nav-link d-flex align-items-center @active folder-container"
+         data-folder-id="@Model.RootFolderId"
+         id="files-@Model.RootFolderId-tab"
+         role="button"
+         aria-expanded="true"
+         aria-controls="collapseFolder-@Model.RootFolderId"
+         oncontextmenu="showContextMenu(event, '@Model.RootFolderId', '@Model.RootFolderName')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder align-self-center icon-dual-file icon-xs me-3 folder-click">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <div class="d-inline-block align-self-center flex-grow-1 folder-click">
+            <h5 class="m-0">@Model.RootFolderName</h5>
+        </div>
+        <i class="mdi mdi-chevron-up text-muted me-2 collapse-icon" style="display: none;"></i>
+        <i class="mdi mdi-chevron-down text-muted me-2 collapse-icon"></i>
+    </div>
+}
+
+<!-- Context Menu -->
+@if ((userInfo?.IsAdminUser ?? false) || adminRoleMediaFolderActionModel.SelectedMediaActions.Count > 0)
+{
+    bool hasRequiredActions = adminRoleMediaFolderActionModel.SelectedMediaActions
+        .Any(x => new[]
+        {
+            MediaFolderActionEnum.CreateFolder.ToString(),
+            MediaFolderActionEnum.DeleteFolder.ToString(),
+            MediaFolderActionEnum.RenameFolder.ToString(),
+            MediaFolderActionEnum.MoveFolder.ToString()
+                                }.Contains(x));
+
+    @if (hasRequiredActions)
+    {
+        <div id="contextMenu" class="dropdown-menu-md" style="display: none; position: absolute;">
+            @if (adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.CreateFolder.ToString())))
+            {
+                <a class="dropdown-item" id="createFolder">Create Folder</a>
+            }
+            else
+            {
+                <div id="createFolder" style="display:none;"></div>
+            }
+            @if (adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.DeleteFolder.ToString())))
+            {
+                <a class="dropdown-item" id="deleteFolder">Delete</a>
+            }
+            else
+            {
+                <div id="deleteFolder" style="display:none;"></div>
+            }
+            @if (adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.RenameFolder.ToString())))
+            {
+                <a class="dropdown-item" id="renameFolder" onclick="openRenameFolderModal('@Model.RootFolderId', '@Model.RootFolderName')">Rename</a>
+            }
+            else
+            {
+                <div id="renameFolder" style="display:none;"></div>
+            }
+            @if (adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.MoveFolder.ToString())))
+            {
+                <a class="dropdown-item" id="moveFolder" onclick="openMoveFolderModal('@Model.RootFolderId')">Move</a>
+            }
+            else
+            {
+                <div id="moveFolder" style="display:none;"></div>
+            }
+        </div>
+    }
+}
+
+@if (userInfo.IsAdminUser || Model.adminRoleMediaFolders.Contains(Model.RootFolderId))
+{
+    <div class="collapse show" id="collapseFolder-@Model.RootFolderId">
+        @if (Model.SubFolders.Any())
+        {
+            <div class="ms-4">
+                @foreach (var subFolder in Model.SubFolders)
+                {
+                    @Html.Partial("~/Views/MediaManager/MediaManagerDetails/_FolderStructure.cshtml", subFolder)
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    @if (Model.SubFolders.Any())
+    {
+        @foreach (var subFolder in Model.SubFolders)
+        {
+            @Html.Partial("~/Views/MediaManager/MediaManagerDetails/_FolderStructure.cshtml", subFolder)
+        }
+    }
+}

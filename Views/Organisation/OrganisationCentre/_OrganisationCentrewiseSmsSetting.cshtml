@@ -1,0 +1,26 @@
+﻿@model OrganisationCentrewiseSmsSettingViewModel
+@{
+    Layout = null;
+}
+@Html.HiddenFor(m => m.OrganisationCentrewiseSmsSettingId)
+<div class="col-lg-4">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.SmsPortalAccountId, new { @class = "form-label" })
+        @Html.TextBoxFor(x => x.SmsPortalAccountId, new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.SmsPortalAccountId)
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.AuthToken, new { @class = "form-label" })
+        @Html.TextBoxFor(x => x.AuthToken, new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.AuthToken)
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.FromMobileNumber, new { @class = "form-label" })
+        @Html.TextBoxFor(x => x.FromMobileNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.FromMobileNumber)
+    </div>
+</div>

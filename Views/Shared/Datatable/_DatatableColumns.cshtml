@@ -1,0 +1,27 @@
+﻿@using Coditech.Common.Helper;
+@model PageListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<thead>
+    <tr role="row">
+        @foreach (DatatableColumns datatableColumn in Model?.DatatableColumnList)
+        {
+            if (datatableColumn.IsSortable)
+            {
+                string sortBy = Model.SortByColumn == datatableColumn.ColumnCode ? "sorting_" + Model.SortBy : "";
+                <th class="sorting @sortBy" onclick="CoditechDataTable.LoadListSortBy('@controllerName','@actionName','@datatableColumn.ColumnCode','@Model.SortBy')">@datatableColumn.ColumnName</th>
+            }
+            else
+            {
+                <th>@datatableColumn.ColumnName</th>
+            }
+        }
+        @if (Model.IsActionColumn)
+        {
+            <th class="text-center" style="width:10%;">@AdminResources.LabelAction</th>
+        }
+    </tr>
+</thead>

@@ -1,0 +1,34 @@
+﻿@using Coditech.Admin.Utilities;
+@model GeneralTraineeAssociatedToTrainerListViewModel
+@{
+    ViewBag.Title = "Associate Trainer List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId.ToString());
+    keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/DBTM/DBTMTraineeDetails/_DBTMTraineeDetailsSidePannel.cshtml", keyValuePairs)
+            </div>
+            <div class="col-10">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Associate Trainer List : @Model.FirstName @Model.LastName</span>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/InsertAssociatedTrainer?dBTMTraineeDetailId=@Model.DBTMTraineeDetailId&personId=@Model.PersonId" role="button"><i class="fas fa-plus me-2"></i>Associate Trainer</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/_AssociatedTrainerList.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->

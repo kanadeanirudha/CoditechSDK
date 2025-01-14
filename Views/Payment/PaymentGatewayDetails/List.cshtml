@@ -1,0 +1,47 @@
+﻿@model PaymentGatewayDetailsListViewModel
+@{
+    ViewBag.Title = "Payment Gateway Details List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()"};
+    DropdownViewModel paymentGatewayDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.PaymentGateway.ToString(), DropdownName = "SelectedParameter1", DropdownSelectedValue = Model.SelectedParameter1.ToString(), Parameter = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCodeAndDepartmentId('" + @controllerName + "','" + @actionName + "')" };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Payment Gateway Details List</span>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelPaymentGateway</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", paymentGatewayDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCodeAndDepartmentId('@controllerName','@actionName')" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/Payment/PaymentGatewayDetails/_List.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->

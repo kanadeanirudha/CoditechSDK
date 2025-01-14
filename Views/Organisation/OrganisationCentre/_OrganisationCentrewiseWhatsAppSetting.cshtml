@@ -1,0 +1,26 @@
+﻿@model OrganisationCentrewiseWhatsAppSettingViewModel
+@{
+    Layout = null;
+}
+@Html.HiddenFor(m => m.OrganisationCentrewiseWhatsAppSettingId)
+<div class="col-lg-4">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.WhatsAppPortalAccountId, new { @class = "form-label" })
+        @Html.TextBoxFor(x => x.WhatsAppPortalAccountId, new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.WhatsAppPortalAccountId)
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.AuthToken, new { @class = "form-label" })
+        @Html.TextBoxFor(x => x.AuthToken, new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.AuthToken)
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.FromMobileNumber, new { @class = "form-label" })
+        @Html.TextBoxFor(x => x.FromMobileNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.FromMobileNumber)
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@model GeneralEmailTemplateListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            <tbody>
+                @if (Model?.GeneralEmailTemplateList?.Count > 0)
+                {
+                    foreach (var item in Model?.GeneralEmailTemplateList)
+                    {
+                        <tr>
+                            <td>@item.EmailTemplateName</td>
+                            <td>@item.EmailTemplateCode</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
+                            </td>
+                            <td class="text-center">
+                                <a href="../@controllerName/Edit?generalEmailTemplateId=@item.GeneralEmailTemplateId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="../@controllerName/Delete?generalEmailTemplateIds=@item.GeneralEmailTemplateId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
+

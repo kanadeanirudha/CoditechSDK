@@ -1,0 +1,82 @@
+﻿@using Coditech.Admin.Utilities;
+@model EmployeeCreateEditViewModel
+@{
+    ViewBag.Title = Model.EmployeeId > 0 ? "Update Employee" : "Create Employee";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string css = Model.PersonId > 0 ? "col-lg-10" : "col-lg-12";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("EmployeeId", Model.EmployeeId.ToString());
+    keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()", IsDisabled = Model.EmployeeId > 0 };
+    DropdownViewModel departmentDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(), DropdownName = "SelectedDepartmentId", DropdownSelectedValue = Convert.ToString(Model.SelectedDepartmentId), Parameter = Model.SelectedCentreCode, IsDisabled = Model.EmployeeId > 0 };
+    DropdownViewModel designationDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Designation.ToString(), DropdownName = "EmployeeDesignationMasterId", DropdownSelectedValue = Convert.ToString(Model.EmployeeDesignationMasterId), IsDisabled = Model.EmployeeId > 0 };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            @if (Model.EmployeeId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/EmployeeMaster/_EmployeeDetailsSidePannel.cshtml", keyValuePairs)
+                </div>
+            }
+            <div class="@css">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.EmployeeId > 0)
+                                {
+                                    <h4 class="card-title"><span>Update Employee : @Model.FirstName @Model.LastName</span></h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Employee</h4>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.EmployeeId)
+                            @if (Model.EmployeeId > 0)
+                            {
+                                @Html.HiddenFor(m => m.SelectedCentreCode)
+                                @Html.HiddenFor(m => m.SelectedDepartmentId)
+                            }
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SelectedCentreCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                        @Html.ValidationMessageFor(x => x.SelectedCentreCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SelectedDepartmentId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", departmentDropdown)
+                                        @Html.ValidationMessageFor(x => x.SelectedDepartmentId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmployeeDesignationMasterId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", designationDropdown)
+                                        @Html.ValidationMessageFor(x => x.EmployeeDesignationMasterId)
+                                    </div>
+                                </div>
+                            </div>
+                            @Html.Partial("~/Views/Shared/GeneralPerson/_CreateEditGeneralPerson.cshtml", Model)
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&SelectedDepartmentId=@Model.SelectedDepartmentId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

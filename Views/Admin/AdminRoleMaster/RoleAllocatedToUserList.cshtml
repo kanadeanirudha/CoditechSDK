@@ -1,0 +1,49 @@
+﻿@model AdminRoleApplicableDetailsListViewModel
+@{
+    ViewBag.Title = "Allocate Role To User";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/Admin/AdminRoleMaster/_AdminRoleMasterSidePannel.cshtml", Model.AdminRoleMasterId.ToString())
+            </div>
+            <div class="col-10">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Role Allocated To User</span>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/GetAssociateUnAssociateAdminRoleToUser?adminRoleMasterId=@Model.AdminRoleMasterId" role="button"><i class="fas fa-plus me-2"></i>Allocate Role To User</a>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Admin Role Code</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.TextBoxFor(x => x.AdminRoleCode, new { @class = "form-control", @disabled = "disabled" })
+                            </div>
+                            <div class="col-md-2">
+                                <label>Role Description</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(x => x.SanctionPostName, new { @class = "form-control", @disabled = "disabled" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" id="SelectedParameter1" value="@Model.SelectedParameter1" />
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/Admin/AdminRoleMaster/_RoleAllocatedToUserList.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->
+
+

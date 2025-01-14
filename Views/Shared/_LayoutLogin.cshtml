@@ -1,0 +1,79 @@
+﻿@using Coditech.Admin.Utilities;
+@{
+    string messageData = Convert.ToString(TempData["Notifications"]);
+    string applicationLogoPath = CoditechAdminSettings.ApplicationLogoPath;
+    string applicationLayoutBackground = CoditechAdminSettings.ApplicationLayoutBackground;
+    string applicationTitle = CoditechAdminSettings.ApplicationTitle;
+    string formSizeClass = "col-lg-4";
+    if (!string.IsNullOrEmpty(Convert.ToString(TempData["FormSizeClass"])))
+    {
+        formSizeClass = Convert.ToString(TempData["FormSizeClass"]);
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>@ViewData["Title"] | @applicationTitle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/favicon.ico">
+    <!-- App css -->
+    <link href="~/css/login/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/login/icons.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/login/app.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/layout/site.css" rel="stylesheet" />
+    @if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
+    {
+        <link href="~/css/layout/@CoditechAdminSettings.ThemeColor-theme.css" rel="stylesheet" />
+    }
+
+</head>
+<body data-layout="horizontal" class="account-body accountbg" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
+    <!-- Log In page -->
+    <div class="container login-page-wrapper">
+        @Html.Partial("~/Views/Shared/_NotificationMessage.cshtml", @messageData)
+        <div class="row vh-100 d-flex justify-content-center">
+            <div class="col-12 align-self-center">
+                <div class="row">
+                    <div class="@formSizeClass mx-auto">
+                        <div class="card">
+                            <div class="card-body p-0 auth-header-box">
+                                <div class="text-center p-3">
+                                    <a href="#" class="logo logo-admin">
+                                        <img src="@applicationLogoPath" height="50" alt="logo" class="auth-logo">
+                                    </a>
+                                    @* <h4 class="fw-semibold text-white font-18">Reset Password</h4> *@
+                                    @* <p class="text-muted  mb-0">Instructions will be sent to you on your email address or no mobile number!</p> *@
+                                </div>
+                            </div>
+                            <!-- Page Content-->
+                            @RenderBody()
+                            <!-- end page content -->
+                            <div class="card-body bg-light-alt text-center auth-footer">
+                                <span class="text-muted d-none d-sm-inline-block">
+                                    Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Log In page -->
+    <!-- jQuery  -->
+    <script src="~/js/login/jquery.min.js"></script>
+    <script src="~/js/login/bootstrap.bundle.min.js"></script>
+    <script src="~/js/login/waves.js"></script>
+    <script src="~/js/login/feather.min.js"></script>
+    <script src="~/js/login/simplebar.min.js"></script>
+    <script src="~/js/coditech/common/coditechnotification.js"></script>
+
+</body>
+@await RenderSectionAsync("Scripts", required: false)
+</html>

@@ -1,0 +1,69 @@
+﻿@model GeneralSystemGlobleSettingViewModel
+@{
+    ViewBag.Title = Model.GeneralSystemGlobleSettingMasterId > 0 ? "Update Globle Setting" : "Add Globle Setting";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                        <div class="col">
+                            @if (Model.GeneralSystemGlobleSettingMasterId > 0)
+                            {
+                                <h4 class="card-title">Update Globle Setting</h4>
+                            }
+                            else
+                            {
+                                <h4 class="card-title">Create Globle Setting</h4>
+                            }
+                        </div><!--end col-->
+                    </div><!--end row-->
+                </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.GeneralSystemGlobleSettingMasterId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.FeatureName, new { @class = "form-label required"})
+                                        @if (Model.GeneralSystemGlobleSettingMasterId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.FeatureName, new { @class = "form-control", @readonly = "true" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.FeatureName, new { @class = "form-control" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.FeatureName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.FeatureDefaultValue, new { @class = "form-label required"})
+                                        @Html.TextBoxFor(x => x.FeatureDefaultValue, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.FeatureDefaultValue)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.FeatureValue, new { @class = "form-label"})
+                                        @Html.TextBoxFor(x => x.FeatureValue, new { @class = "form-control"})
+                                        @Html.ValidationMessageFor(x => x.FeatureValue)
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

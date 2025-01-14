@@ -1,0 +1,22 @@
+﻿@model DataTableStatusViewModel
+@{
+    var cssClass = string.Empty;
+    if (@Model != null && !string.IsNullOrEmpty(Model.Key))
+        cssClass = Model.Key.ToLower().Replace(" ","") switch
+        {
+            "inprogress" => "warning",
+            "open" => "warning",
+            "submittedforapproval" => "primary",
+            "submitted" => "primary",
+            "inreview" => "info",
+            "needchanges" => "danger",
+            "completed" => "success",
+            "closed" => "success",
+            "reopened" => "dark",
+            _ => "muted"
+        };
+}
+@if (@Model != null && !string.IsNullOrEmpty(Model.Key))
+{
+    <span class="badge badge-soft-@cssClass">@Model.Value</span>
+}

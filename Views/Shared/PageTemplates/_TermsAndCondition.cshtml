@@ -1,0 +1,21 @@
+﻿@using Coditech.Admin.Helpers
+@model List<TermsAndConditionsViewModel>
+@{
+    Layout = null;
+}
+<div class="modal-header">
+    <h5 class="modal-title" id="termsAndConditionsModalLabel">Terms And Conditions</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-top: -3px; padding: 10px;"></button>
+</div>
+<div class="modal-body">
+    @foreach (var item in Model)
+    {
+        <p>
+            @item.TermConditions
+        </p>
+    }
+</div>
+<div class="modal-footer">
+    <a id="AcceptedTermsAndConditions" class="btn btn-success" data-test-selector="AcceptedTermsAndConditions" data-bs-dismiss="modal" onclick="CoditechCommon.AcceptedTermsAndConditions()">I Agree</a>
+    <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">CANCEL</button>
+</div>

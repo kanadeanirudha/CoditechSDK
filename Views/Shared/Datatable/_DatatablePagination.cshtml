@@ -1,0 +1,50 @@
+﻿@using Coditech.Common.Helper;
+@model PageListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    int a = Model.Page == 1 ? Model.Page : ((Model.RecordPerPage * (Model.Page - 1)) + 1);
+    int b = Model.Page == 1 ? Model.TotalRecordCount : ((Model.RecordPerPage * (Model.Page - 1)) + Model.TotalRecordCount);
+    string pointerEventFirstPrevious = Model.Page == 1 ? "pointer-events: none" : "";
+    string pointerEventNextLast = Model.TotalPages == Model.Page ? "pointer-events: none" : "";
+    int nextpage = Model.Page + 1;
+    int previouspage = Model.Page - 1;
+}
+<div class="row">
+    @if (Model.TotalResults > 0)
+    {
+        <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Showing @a to @b of @Model.TotalResults entries</div>
+        </div>
+        <div class="col-sm-12 col-md-7">
+            <div class="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
+                <ul class="pagination">
+                    <li class="paginate_button page-item previous">
+                        <a onclick="CoditechDataTable.LoadListFirst('@controllerName','@actionName')" style="@pointerEventFirstPrevious" aria-controls="datatable" class="page-link">First</a>
+                    </li>
+                    <li class="paginate_button page-item previous">
+                        <a onclick="CoditechDataTable.LoadListPrevious('@controllerName','@actionName','@previouspage')" style="@pointerEventFirstPrevious" aria-controls="datatable" class="page-link">Previous</a>
+                    </li>
+                    <li class ="paginate_button page-item">
+                        <input id="DataTables_PageIndexId" onchange="CoditechDataTable.LoadList('@controllerName','@actionName')" type="number" class="form-control form-control-sm" value="@Model.Page" style="height: 30px; width: 60px; padding: 0px; text-align: center; border-left: 0; border-radius: 0px;" max="@Model.TotalPages" min="1">
+                    </li>
+                    <li class="paginate_button page-item next">
+                        <a onclick="CoditechDataTable.LoadListNext('@controllerName','@actionName','@nextpage')" style="@pointerEventNextLast" aria-controls="datatable" class="page-link">Next</a>
+                    </li>
+                    <li class="paginate_button page-item next">
+                        <a onclick="CoditechDataTable.LoadListLast('@controllerName','@actionName','@Model.TotalPages')" style="@pointerEventNextLast" aria-controls="datatable" class="page-link">Last</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        @Html.Hidden("DataTables_SortColumn",@Model.SortByColumn)
+        @Html.Hidden("DataTables_SortBy",@Model.SortBy)
+    }
+    else
+    {
+        <div class="col-sm-12 col-md-5">
+            <strong class="text-danger">No Result Found</strong>
+        </div>
+    }
+</div>

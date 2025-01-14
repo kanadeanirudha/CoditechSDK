@@ -1,0 +1,55 @@
+﻿@model GeneralMeasurementUnitViewModel
+@{
+    ViewBag.Title = Model.GeneralMeasurementUnitMasterId > 0 ? "Update Measurement Unit" : "Add Measurement Unit";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.GeneralMeasurementUnitMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update Measurement Unit</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Measurement Unit</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.GeneralMeasurementUnitMasterId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MeasurementUnitDisplayName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.MeasurementUnitDisplayName, new { @class = "form-control"})
+                                        @Html.ValidationMessageFor(x => x.MeasurementUnitDisplayName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MeasurementUnitShortCode, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.MeasurementUnitShortCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.MeasurementUnitShortCode)
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

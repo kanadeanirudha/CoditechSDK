@@ -1,0 +1,43 @@
+﻿@model OrganisationCentrewiseDepartmentListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    ModelPopUpViewModel addFollowUpModel = new ModelPopUpViewModel() { ModelPopUpId = "AssociateUnAssociateOrganisationCentrewiseDepartmentModelPopupId", ModalContentId = "AssociateUnAssociateOrganisationCentrewiseDepartmentModelPopupContentId" };
+}
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            <tbody>
+                @if (Model?.OrganisationCentrewiseDepartmentList?.Count > 0)
+                {
+                    foreach (var item in Model?.OrganisationCentrewiseDepartmentList)
+                    {
+                        <tr>
+                            <td>@item.DepartmentName</td>
+                            <td>@item.DepartmentShortCode</td>
+                            <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsAssociated)</td>
+                            <td class="text-center">
+                                @if (item.IsAssociated)
+                                {
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="OrganisationCentrewiseDepartment.GetAssociateUnAssociateCentrewiseDepartment('@addFollowUpModel.ModalContentId','@item.OrganisationCentrewiseDepartmentId','@item.GeneralDepartmentMasterId','@item.DepartmentName')" title="UnAssociate Centre From Department" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
+                                }
+                                else
+                                {
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="OrganisationCentrewiseDepartment.GetAssociateUnAssociateCentrewiseDepartment('@addFollowUpModel.ModalContentId','@item.OrganisationCentrewiseDepartmentId','@item.GeneralDepartmentMasterId','@item.DepartmentName')" title="Associate Centre To Department" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", addFollowUpModel)

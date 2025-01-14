@@ -1,0 +1,87 @@
+﻿@model PaymentGatewayDetailsViewModel
+@{
+    ViewBag.Title = Model.PaymentGatewayDetailId > 0 ? "Update Payment Gateway Details" : "Add Payment Gateway Details";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.PaymentGatewayDetailId >= 0 };
+    DropdownViewModel paymentGatewayDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.PaymentGateway.ToString(), DropdownName = "PaymentGatewayId", DropdownSelectedValue = Model.PaymentGatewayId.ToString(), IsDisabled = Model.PaymentGatewayDetailId >= 0 };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.PaymentGatewayDetailId > 0)
+                                {
+                                    <h4 class="card-title">
+                                        Update Payment Gateway Details : @(Model.IsLiveMode ? "Live Mode" : "Test Mode")
+                                    </h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">
+                                        Create Payment Gateway Details : @(Model.IsLiveMode ? "Live Mode" : "Test Mode")
+                                    </h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.PaymentGatewayId)
+                            @Html.HiddenFor(m => m.PaymentGatewayDetailId)
+                            @Html.HiddenFor(m => m.CentreCode)
+                            @Html.HiddenFor(m => m.IsLiveMode)
+                            @Html.HiddenFor(m => m.PaymentCode)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PaymentGatewayId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", paymentGatewayDropdown)
+                                        @Html.ValidationMessageFor(x => x.PaymentGatewayId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        <label class="form-label required" for="GatewayUsername">Key Id</label>
+                                        @Html.TextBoxFor(x => x.GatewayUsername, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.GatewayUsername)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        <label class="form-label required" for="TransactionKey">Secret Key</label>
+                                        @Html.TextBoxFor(x => x.TransactionKey, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.TransactionKey)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsAutoCaptured, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsAutoCaptured, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode&SelectedParameter1=@Model.PaymentGatewayId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

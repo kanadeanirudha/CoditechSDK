@@ -1,0 +1,33 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@model UserModel
+@{
+    Layout = null;
+    string controllerName = Convert.ToString(ViewContext.RouteData.Values["controller"]).ToLower();
+    string actionName = Convert.ToString(ViewContext.RouteData.Values["action"]).ToLower();
+    UserMainMenuModel userMenuModel = Model?.MenuList?.FirstOrDefault(x => x.ControllerName == controllerName);
+    List<UserMainMenuModel> menuList = userMenuModel != null ? Model?.MenuList?.Where(x => x.ModuleCode == userMenuModel.ModuleCode)?.ToList() : null;
+    UserModuleModel userModuleModel = userMenuModel != null ? Model?.ModuleList?.FirstOrDefault(x => x.ModuleCode == userMenuModel.ModuleCode) : new UserModuleModel();
+}
+
+<li class="has-submenu">
+    <a href="#">
+        <span>
+            <i class="@userModuleModel.ModuleIconName"></i>
+            @userModuleModel.ModuleName
+        </span>
+    </a>
+    <ul class="submenu">
+        @foreach (UserModuleModel item in Model?.ModuleList?.OrderBy(x => x.ModuleSeqNumber))
+        {
+            <li>
+                <a href="/@item.DefaultMenuLink">
+                    <i class="@item.ModuleIconName"></i>@item.ModuleName
+                </a>
+            </li>
+        }
+    </ul><!--end submenu-->
+</li><!--end has-submenu-->
+<!-- BEGIN: Main Menu-->
+@Html.Partial("~/Views/Shared/_MenuList.cshtml", menuList)
+<!-- END: Main Menu-->

@@ -1,0 +1,235 @@
+﻿@model MediaManagerFolderListViewModel
+@{
+    ViewBag.Title = "Media Manager Upload";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    UserModel userInfo = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+    AdminRoleMediaFolderActionModel adminRoleMediaFolderActionModel = new AdminRoleMediaFolderActionModel();
+    if (!userInfo.IsAdminUser)
+    {
+        if (userInfo?.AdminRoleMediaFolderActionList?.Count > 0)
+        {
+            adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.Where(x => x.AdminRoleMasterId == userInfo.SelectedAdminRoleMasterId).FirstOrDefault();
+        }
+    }
+    else
+    {
+        adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.FirstOrDefault();
+    }
+}
+@Html.Hidden("ActiveFolderId", Model.ActiveFolderId)
+<div class="page-content mt-5" onload="CoditechCommon.LoadListByCentreCode('@controllerName', '@actionName')">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Folder Structure Block -->
+            <div class="col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        @if (adminRoleMediaFolderActionModel != null && adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.ViewFolder.ToString())))
+                        {
+                            <div class="files-nav">
+                                <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
+                                    @Html.Partial("~/Views/MediaManager/MediaManagerDetails/_FolderStructure.cshtml", Model.MediaRootFolder)
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <h6 class="mt-0 mb-0">No Folder Access</h6>
+                        }
+                    </div><!--end card-body-->
+                </div><!--end card-->
+
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="mt-0 mb-0">Storage Used : @Model.TotalFileSize MB</h6>
+                    </div><!--end card-body-->
+                </div><!--end card-->
+            </div>
+
+            <!-- Main Content Block -->
+            <div class="col-lg-9">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title">Media Manager Upload</span>
+                        <div class="d-flex align-items-center">
+                            <!-- Toggle Switch -->
+                            <div class="form-check form-switch me-3">
+                                <input class="form-check-input" type="checkbox" id="viewToggle" />
+                            </div>
+
+                            <!-- Upload File Button -->
+                            @if (adminRoleMediaFolderActionModel != null && adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.UploadFile.ToString())))
+                            {
+                                <form asp-action="UploadFile" asp-controller="MediaManager" enctype="multipart/form-data" method="post" style="display:inline;">
+                                    <label class="btn btn-sm btn-soft-primary" for="imageUpload">
+                                        <i class="fas fa-upload me-2"></i>Upload File
+                                    </label>
+                                    <input type="file" id="imageUpload" name="imageFile" style="display: none;" onchange="this.form.submit()" />
+                                    <input type="hidden" name="folderId" value="@Model.ActiveFolderId" />
+                                </form>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/MediaManager/MediaManagerDetails/_MediaFileList.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createFolderModalLabel">Create Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CreateFolder" asp-controller="MediaManager" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="folderName" class="form-label">Folder Name</label>
+                        <input type="hidden" name="rootFolderId" value="" />
+                        <input type="text" class="form-control" id="folderName" name="FolderName" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-soft-primary me-2">Create Folder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="renameFolderModal" tabindex="-1" aria-labelledby="renameFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameFolderModalLabel">Rename Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="RenameFolder" asp-controller="MediaManager" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="oldFolderName" class="form-label">Folder Name</label>
+                        <input type="hidden" id="renameFolderId" name="folderId" />
+                        <input type="text" class="form-control" id="oldFolderName" name="FolderName" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-soft-primary me-2">Rename Folder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="moveFolderModal" tabindex="-1" aria-labelledby="moveFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="moveFolderModalLabel">Move Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="MoveFolder" asp-controller="MediaManager" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="moveFolderDropdown" class="form-label">Select Destination Folder</label>
+                        <input type="hidden" id="moveFolderId" name="folderId" />
+                        <select class="form-select" id="moveFolderDropdown" name="destinationFolderId" required>
+                            <!-- This will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-soft-primary me-2">Move Folder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-labelledby="deleteFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteFolderModalLabel">Delete Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="DeleteFolder" asp-controller="MediaManager" method="post">
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this folder?</p>
+                    <input type="hidden" id="deleteFolderId" name="folderId" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-soft-primary me-2">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteFileModal" tabindex="-1" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteFileModalLabel">Delete File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="DeleteFile" asp-controller="MediaManager" method="post">
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this file?</p>
+                    <input type="hidden" id="activeFolderId" name="activeFolderId" />
+                    <input type="hidden" id="mediaId" name="mediaId" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-soft-primary me-2">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hide the labels by default */
+    .toggle-label {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* Grid label is initially visible */
+    #gridLabel {
+        left: 10px;
+        opacity: 1;
+    }
+
+    /* List label is hidden initially */
+    #listLabel {
+        right: 10px;
+        opacity: 0;
+    }
+
+    /* When the toggle is checked, switch labels */
+    #viewToggle:checked + .form-check-label #gridLabel {
+        opacity: 0;
+    }
+
+    #viewToggle:checked + .form-check-label #listLabel {
+        opacity: 1;
+    }
+
+</style>
+

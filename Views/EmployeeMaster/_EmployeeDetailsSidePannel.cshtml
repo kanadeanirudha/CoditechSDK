@@ -1,0 +1,28 @@
+﻿@using Coditech.Admin.Utilities;
+@model Dictionary<string, string>
+@{
+    Layout = null;
+    long employeeId = Convert.ToInt64(Model?.FirstOrDefault(x => x.Key == "EmployeeId").Value);
+    long personId = Convert.ToInt64(Model?.FirstOrDefault(x => x.Key == "PersonId").Value);
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="card sidebar-card">
+    <div class="card-body">
+        <div class="files-nav">
+            <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
+                <a class="nav-link" href="/EmployeeMaster/UpdateEmployeePersonalDetails?employeeId=@employeeId&personId=@personId" aria-selected="true">
+                    <i class="ti-menu"></i><h5 class="m-0 ps-2">Personal Details</h5>
+                </a>
+                <a class="nav-link" href="/EmployeeMaster/GetEmployeeOtherDetail?employeeId=@employeeId&personId=@personId" aria-selected="true">
+                    <i class="fas fa-address-card"></i><h5 class="m-0 ps-2">Other Details</h5>
+                </a>
+                <a class="nav-link" href="/EmployeeMaster/EmployeeServiceList?employeeId=@employeeId&personId=@personId" aria-selected="true">
+                    <i class="fas fa-user-cog"></i><h5 class="m-0 ps-2">Service Details</h5>
+                </a>
+                <a class="nav-link" href="/EmployeeMaster/CreateEditEmployeeAddress?employeeId=@employeeId&personId=@personId" aria-selected="true">
+                    <i class="fas fa-map-marker-alt"></i><h5 class="m-0 ps-2">Address</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
