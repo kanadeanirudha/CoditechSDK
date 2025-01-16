@@ -3,7 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.Engine.Admin", "Coditech.Engine.Admin\Coditech.Engine.Admin.csproj", "{AF0E468E-20C5-418A-BE19-6D3A7FCD20B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coditech.Engine.Admin", "Coditech.Engine.Admin\Coditech.Engine.Admin.csproj", "{AF0E468E-20C5-418A-BE19-6D3A7FCD20B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.Admin.Custom", "Coditech.Admin.Custom\Coditech.Admin.Custom.csproj", "{CFC7D8B4-0184-49D8-BEC9-34C039574CC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.API.Client.Custom", "Coditech.API.Client.Custom\Coditech.API.Client.Custom.csproj", "{B7010355-AC0E-4C03-8E7F-A8819B3EE38E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.API.Model.Custom", "Coditech.API.Model.Custom\Coditech.API.Model.Custom.csproj", "{841856D1-AD39-40A2-950C-A2228E9420F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.Resources.Custom", "Coditech.Resources.Custom\Coditech.Resources.Custom.csproj", "{810F6011-F556-4213-8037-F906A7F221C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.Engine.Organisation", "Coditech.Engine.Organisation\Coditech.Engine.Organisation.csproj", "{440CE641-B91F-4B6C-B657-2FF205FA7205}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.API.Data.Custom", "Coditech.API.Data.Custom\Coditech.API.Data.Custom.csproj", "{8B8F62C5-62AD-44CA-BCAD-6A2E80529F97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.Common.API.Custom", "Coditech.Common.API.Custom\Coditech.Common.API.Custom.csproj", "{63D93FCE-217B-44A9-A659-06E593C13051}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coditech.Engine.MediaManager", "Coditech.Engine.MediaManager\Coditech.Engine.MediaManager.csproj", "{C992BDF7-A781-49F0-8D1F-428CB7BE7572}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +31,38 @@ Global
 		{AF0E468E-20C5-418A-BE19-6D3A7FCD20B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF0E468E-20C5-418A-BE19-6D3A7FCD20B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF0E468E-20C5-418A-BE19-6D3A7FCD20B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFC7D8B4-0184-49D8-BEC9-34C039574CC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFC7D8B4-0184-49D8-BEC9-34C039574CC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFC7D8B4-0184-49D8-BEC9-34C039574CC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFC7D8B4-0184-49D8-BEC9-34C039574CC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7010355-AC0E-4C03-8E7F-A8819B3EE38E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7010355-AC0E-4C03-8E7F-A8819B3EE38E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7010355-AC0E-4C03-8E7F-A8819B3EE38E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7010355-AC0E-4C03-8E7F-A8819B3EE38E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841856D1-AD39-40A2-950C-A2228E9420F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841856D1-AD39-40A2-950C-A2228E9420F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841856D1-AD39-40A2-950C-A2228E9420F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841856D1-AD39-40A2-950C-A2228E9420F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{810F6011-F556-4213-8037-F906A7F221C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{810F6011-F556-4213-8037-F906A7F221C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{810F6011-F556-4213-8037-F906A7F221C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{810F6011-F556-4213-8037-F906A7F221C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{440CE641-B91F-4B6C-B657-2FF205FA7205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{440CE641-B91F-4B6C-B657-2FF205FA7205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{440CE641-B91F-4B6C-B657-2FF205FA7205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{440CE641-B91F-4B6C-B657-2FF205FA7205}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B8F62C5-62AD-44CA-BCAD-6A2E80529F97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B8F62C5-62AD-44CA-BCAD-6A2E80529F97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B8F62C5-62AD-44CA-BCAD-6A2E80529F97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B8F62C5-62AD-44CA-BCAD-6A2E80529F97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63D93FCE-217B-44A9-A659-06E593C13051}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63D93FCE-217B-44A9-A659-06E593C13051}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63D93FCE-217B-44A9-A659-06E593C13051}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63D93FCE-217B-44A9-A659-06E593C13051}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C992BDF7-A781-49F0-8D1F-428CB7BE7572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C992BDF7-A781-49F0-8D1F-428CB7BE7572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C992BDF7-A781-49F0-8D1F-428CB7BE7572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C992BDF7-A781-49F0-8D1F-428CB7BE7572}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
