@@ -8,32 +8,35 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Coditech.Admin.Core">
-      <HintPath>SharedLibraries\Coditech.Admin.Core.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.Admin.Core.dll</HintPath>
     </Reference>
     <Reference Include="Coditech.Admin.Utilities">
-      <HintPath>SharedLibraries\Coditech.Admin.Utilities.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.Admin.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Coditech.API.Client">
+      <HintPath>..\SharedLibraries\Coditech.API.Client.dll</HintPath>
     </Reference>
     <Reference Include="Coditech.API.Data">
-      <HintPath>SharedLibraries\Coditech.API.Data.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.API.Data.dll</HintPath>
     </Reference>
     <Reference Include="Coditech.Common.API.Model">
-      <HintPath>SharedLibraries\Coditech.Common.API.Model.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.Common.API.Model.dll</HintPath>
     </Reference>
     <Reference Include="Coditech.Common.Helper">
-      <HintPath>SharedLibraries\Coditech.Common.Helper.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.Common.Helper.dll</HintPath>
     </Reference>
     <Reference Include="Coditech.Common.Logger">
-      <HintPath>SharedLibraries\Coditech.Common.Logger.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.Common.Logger.dll</HintPath>
     </Reference>
     <Reference Include="Coditech.Resources">
-      <HintPath>SharedLibraries\Coditech.Resources.dll</HintPath>
+      <HintPath>..\SharedLibraries\Coditech.Resources.dll</HintPath>
     </Reference>
   </ItemGroup>
 

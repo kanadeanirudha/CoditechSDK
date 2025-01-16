@@ -2,6 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/bin/Debug/net8.0
-/obj
 /.vs
+/Coditech.Project/.vs
+/Coditech.Project/Coditech.Engine.Admin/bin
+/Coditech.Project/Coditech.Engine.Admin/obj

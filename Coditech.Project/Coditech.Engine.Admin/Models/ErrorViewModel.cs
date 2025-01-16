@@ -1,4 +1,4 @@
-namespace CoditechSDK.Models
+namespace Coditech.Engine.Admin.Models
 {
     public class ErrorViewModel
     {
