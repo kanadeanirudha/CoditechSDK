@@ -1,9 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+	<ItemGroup>
+		<Content Include="data\**" CopyToPublishDirectory="PreserveNewest" />
+		<Content Update="appsettings.Development.json">
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="Magick.NET.Core" Version="14.4.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Coditech.API.Data">
+			<HintPath>..\SharedLibraries\Coditech.API.Data.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.API">
+			<HintPath>..\SharedLibraries\Coditech.Common.API.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.Helper">
+			<HintPath>..\SharedLibraries\Coditech.Common.Helper.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.Logger">
+			<HintPath>..\SharedLibraries\Coditech.Common.Logger.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.Service">
+			<HintPath>..\SharedLibraries\Coditech.Common.Service.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.MediaManager.Service">
+			<HintPath>..\SharedLibraries\Coditech.MediaManager.Service.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>
