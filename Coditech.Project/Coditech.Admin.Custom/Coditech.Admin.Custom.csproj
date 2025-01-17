@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Coditech.API.Client.Custom\Coditech.API.Client.Custom.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Coditech.Admin.Core">
+      <HintPath>..\SharedLibraries\Coditech.Admin.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
