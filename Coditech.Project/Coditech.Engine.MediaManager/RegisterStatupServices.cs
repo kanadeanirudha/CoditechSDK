@@ -1,13 +1,11 @@
 ﻿using Coditech.API.Data;
-using Coditech.API.Service;
+using Coditech.API.Service.DependencyRegistration;
 using Coditech.Common.API;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
-using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-
 namespace Coditech.API.Common
 {
     /// <summary>
@@ -44,6 +42,7 @@ namespace Coditech.API.Common
 
             //RegisterDI
             builder.RegisterDI();
+            builder.RegisterCustomDI();
 
             // Configured conventional route settings.
             builder.ConfigureRouteSettings();
@@ -239,11 +238,8 @@ namespace Coditech.API.Common
         }
         #endregion
 
-        public static void RegisterDI(this WebApplicationBuilder builder)
+        public static void RegisterCustomDI(this WebApplicationBuilder builder)
         {
-            builder.Services.AddScoped<ICoditechLogging, CoditechLogging>();
-            builder.Services.AddScoped<IMediaManagerService, MediaManagerService>();
-            builder.Services.AddScoped<IMediaSettingMasterService, MediaSettingMasterService>();
         }
     }
 }
