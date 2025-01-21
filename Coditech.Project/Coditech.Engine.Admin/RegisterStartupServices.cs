@@ -1,7 +1,7 @@
 ﻿using Coditech.Admin.Helpers;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
-
+using Coditech.Admin.Custom;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -25,6 +25,7 @@ namespace Coditech.Admin
 
             //Register Dependecncy.
             builder.RegisterDI();
+            builder.RegisterCustomDI();
 
             // Adds a default implementation for the Microsoft.AspNetCore.Http.IHttpContextAccessor
             // service. 

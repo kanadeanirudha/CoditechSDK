@@ -1,19 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Coditech.API.Client.Custom\Coditech.API.Client.Custom.csproj" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Coditech.Admin.Core">
-      <HintPath>..\SharedLibraries\Coditech.Admin.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="Coditech.Admin.Core">
+			<HintPath>..\SharedLibraries\Coditech.Admin.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Admin.Utilities">
+			<HintPath>..\SharedLibraries\Coditech.Admin.Utilities.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.API.Client">
+			<HintPath>..\SharedLibraries\Coditech.API.Client.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.API.Model">
+			<HintPath>..\SharedLibraries\Coditech.Common.API.Model.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.Helper">
+			<HintPath>..\SharedLibraries\Coditech.Common.Helper.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.Logger">
+			<HintPath>..\SharedLibraries\Coditech.Common.Logger.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Resources">
+			<HintPath>..\SharedLibraries\Coditech.Resources.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+	</ItemGroup>
 
 </Project>
