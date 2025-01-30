@@ -47,12 +47,16 @@
                         </a>
                     }
                 </div>
-                <a href="../MediaManager/GetMediaDetails?mediaId=@media.MediaId">
+                <a href="../BioradMedisyMediaManager/GetMediaDetails?mediaId=@media.MediaId">
                     <div class="d-flex align-items-center justify-content-center flex-column">
                         <div class="card-image-info">
                             <img src="@media.Path" alt="@media.FileName" class="img-thumbnail">
                         </div>
                         <h6 class="text-truncate" title="@media.FileName">@media.FileName</h6>
+                        @if (!string.IsNullOrEmpty(media.Custom2))
+                        {
+                            <h6 style="text-align:center" title="@media.Custom2">@Html.Partial("~/Views/Shared/Datatable/_DatatableStatusData.cshtml", new DataTableStatusViewModel() { Key = media.Custom1, Value = media.Custom2 })</h6>
+                        }
                     </div>
                 </a>
             </div>
@@ -70,9 +74,15 @@
                             <td style="text-align: center; width: 0px">
                                 <img src="@media.Path" class="thumb-xs">
                             </td>
-                            <td><a href="../MediaManager/GetMediaDetails?mediaId=@media.MediaId">@media.FileName</a></td>
+                            <td><a href="../BioradMedisyMediaManager/GetMediaDetails?mediaId=@media.MediaId">@media.FileName</a></td>
                             <td>@media.FolderName</td>
                             <td>@media.Size KB</td>
+                            <td style="text-align:center">
+                                @if (!string.IsNullOrEmpty(media.Custom2))
+                                {
+                                    @Html.Partial("~/Views/Shared/Datatable/_DatatableStatusData.cshtml", new DataTableStatusViewModel() { Key = media.Custom1, Value = media.Custom2 })
+                                }
+                            </td>
                             <td class="text-center">
                                 @if (isDownloadAllowed)
                                 {
@@ -95,7 +105,7 @@
                                 {
                                     <span class="m-2">|</span>
                                 }
-                                <a href="../MediaManager/GetMediaDetails?mediaId=@media.MediaId" title="View" class="btn btn-sm btn-soft-warning btn-circle me-2"> <i class="fas fa-eye" style="color: orange;"></i></a>
+                                <a href="../BioradMedisyMediaManager/GetMediaDetails?mediaId=@media.MediaId" title="Update" class="btn btn-sm btn-soft-warning btn-circle me-2"><i class="fas fa-eye"></i></a>
                             </td>
                         </tr>
                     }

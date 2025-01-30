@@ -6,4 +6,27 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Coditech.API.Model.Custom\Coditech.API.Model.Custom.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Coditech.Admin.Utilities">
+      <HintPath>..\SharedLibraries\Coditech.Admin.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Coditech.API.Client">
+      <HintPath>..\SharedLibraries\Coditech.API.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Coditech.Common.API.Model">
+      <HintPath>..\SharedLibraries\Coditech.Common.API.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Coditech.Common.Logger">
+      <HintPath>..\SharedLibraries\Coditech.Common.Logger.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

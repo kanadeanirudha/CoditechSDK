@@ -22,6 +22,9 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Coditech.API.Model.Custom\Coditech.API.Model.Custom.csproj" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="Coditech.API.Data">
@@ -29,6 +32,9 @@
 		</Reference>
 		<Reference Include="Coditech.Common.API">
 			<HintPath>..\SharedLibraries\Coditech.Common.API.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Common.API.Model">
+		  <HintPath>..\SharedLibraries\Coditech.Common.API.Model.dll</HintPath>
 		</Reference>
 		<Reference Include="Coditech.Common.Helper">
 			<HintPath>..\SharedLibraries\Coditech.Common.Helper.dll</HintPath>
@@ -41,6 +47,9 @@
 		</Reference>
 		<Reference Include="Coditech.MediaManager.Service">
 			<HintPath>..\SharedLibraries\Coditech.MediaManager.Service.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Resources">
+		  <HintPath>..\SharedLibraries\Coditech.Resources.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
