@@ -5,6 +5,7 @@
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+
 	<ItemGroup>
 		<Content Include="data\**" CopyToPublishDirectory="PreserveNewest" />
 		<Content Update="appsettings.Development.json">
@@ -14,14 +15,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Data\ApplicationImages\" />
-		<Folder Include="Data\Media\ApplicationIcon\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Dapper" Version="2.1.35" />
-		<PackageReference Include="Magick.NET.Core" Version="14.4.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
@@ -45,8 +40,8 @@
 		<Reference Include="Coditech.Common.Service">
 			<HintPath>..\SharedLibraries\Coditech.Common.Service.dll</HintPath>
 		</Reference>
-		<Reference Include="Coditech.MediaManager.Service">
-			<HintPath>..\SharedLibraries\Coditech.MediaManager.Service.dll</HintPath>
+		<Reference Include="Coditech.Payment.Service">
+			<HintPath>..\SharedLibraries\Coditech.Payment.Service.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
