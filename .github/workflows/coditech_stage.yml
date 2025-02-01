@@ -127,7 +127,7 @@ jobs:
            # Stop the IIS site
            Stop-WebSite -Name "dbtm-stage-api-organisation" 
            # Stop the associated app pool
-           Stop-WebAppPool -Name "dbtm-stage-organisation"
+           Stop-WebAppPool -Name "dbtm-stage-api-organisation"
 
            # Wait for a few seconds (optional, if needed)
            Start-Sleep -Seconds 5
