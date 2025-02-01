@@ -17,7 +17,11 @@
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
 	</ItemGroup>
-
+	<ItemGroup>
+		<Folder Include="wwwroot\assets\images\jstree\" />
+		<Folder Include="wwwroot\css\login\" />
+		<Folder Include="wwwroot\js\login\" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Dapper" Version="2.1.35" />
