@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.API.Service;
 using Coditech.API.Service.DependencyRegistration;
 using Coditech.Common.API;
 using Coditech.Common.Helper;
@@ -240,6 +241,8 @@ namespace Coditech.API.Common
 
         public static void RegisterCustomDI(this WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<IBioradMedisyMediaManagerService, BioradMedisyMediaManagerService>();
+            builder.Services.AddScoped<IMediaManagerService, BioradMedisyMediaManagerService>();
         }
     }
 }
