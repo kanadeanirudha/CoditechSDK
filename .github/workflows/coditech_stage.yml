@@ -73,13 +73,13 @@ jobs:
           Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\Admin\Coditech.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMStage\Admin\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMStage\Admin\ -Recurse -Force
       - name: Copy Build webroot
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\Admin\Coditech.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
       - name: Copy Build views
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\Admin\Coditech.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
       - name: Copy Build report folder
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\Admin\Coditech.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
 
       - name: Start ADMIN IIS Site and App Pool
         run: |
@@ -107,7 +107,7 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\API\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\MediaManager\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\MediaManager\ -Recurse -Force 
 
       - name: Start MediaManager IIS Site and App Pool
         run: |
@@ -133,7 +133,7 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\API\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\Organisation\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\Organisation\ -Recurse -Force 
 
       - name: Start Organisation IIS Site and App Pool
         run: |
@@ -159,7 +159,7 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\API\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\DBTM\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\DBTM\ -Recurse -Force 
 
       - name: Start dbtm IIS Site and App Pool
         run: |
@@ -185,7 +185,7 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech\Coditech.Project\API\Coditech.Engine.Payment\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\payment\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.Payment\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\payment\ -Recurse -Force 
 
       - name: Start payment IIS Site and App Pool
         run: |
