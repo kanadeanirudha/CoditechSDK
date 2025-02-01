@@ -78,8 +78,8 @@ jobs:
         run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
       - name: Copy Build views
         run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
-      - name: Copy Build report folder
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
+      #- name: Copy Build report folder
+      # run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
 
       - name: Start ADMIN IIS Site and App Pool
         run: |
