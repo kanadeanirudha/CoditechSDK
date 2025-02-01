@@ -38,7 +38,7 @@ on:
 
 jobs:
   coditech_build:
-    runs-on: [self-hosted, Windows, x64, coditech_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_Stage]
     if: github.event.inputs.coditech_build == 'true'
 
     steps:
@@ -56,7 +56,7 @@ jobs:
            & "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\msbuild.exe"  './Coditech.Project/Coditech.Project.sln' /p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True /p:publishUrl="./publish/Release" /p:Configuration=Release /p:TransformConfigFiles=false
 
   admin_deploy:
-    runs-on: [self-hosted, Windows, x64, coditech_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
     needs: coditech_build
     if: github.event.inputs.admin_deploy == 'true'
     
@@ -90,7 +90,7 @@ jobs:
           Start-WebAppPool -Name "dbtm-stage-admin"
 
   mediamanager_api_deploy:
-    runs-on: [self-hosted, Windows, x64, coditech_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
     needs: coditech_build
     if: github.event.inputs.mediamanager_api_deploy == 'true'
 
@@ -117,7 +117,7 @@ jobs:
            Start-WebAppPool -Name "dbtm-stage-api-mediamanager"
 
   organisation_api_deploy:
-    runs-on: [self-hosted, Windows, x64, coditech_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
     needs: coditech_build
     if: github.event.inputs.organisation_api_deploy == 'true'
 
@@ -143,7 +143,7 @@ jobs:
            Start-WebAppPool -Name "dbtm-stage-api-organisation"
            
   dbtm_api_deploy:
-    runs-on: [self-hosted, Windows, x64, coditech_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
     needs: coditech_build
     if: github.event.inputs.dbtm_api_deploy == 'true'
 
@@ -169,7 +169,7 @@ jobs:
            Start-WebAppPool -Name "dbtm-stage-api-dbtm"
 
   payment_api_deploy:
-    runs-on: [self-hosted, Windows, x64, coditech_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
     needs: coditech_build
     if: github.event.inputs.payment_api_deploy == 'true'
 
