@@ -1,7 +1,14 @@
 ﻿@using Coditech.Admin.Helpers
 @model DropdownViewModel
 @{
-    CoditechDropdownHelper.GeneralDropdownList(Model);
+    if (Model.IsCustomDropdown)
+    {
+        CoditechCustomDropdownHelper.GeneralDropdownList(Model);
+    }
+    else
+    {
+        CoditechDropdownHelper.GeneralDropdownList(Model);
+    }
 }
 @if (Model.IsDisabled)
 {

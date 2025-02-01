@@ -1,0 +1,131 @@
+﻿@model AccSetupGLBankViewModel
+@{
+    ViewBag.Title = Model.AccSetupGLBankId > 0 ? "Update AccSetupGLBank" : "Add AccSetupGLBank";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel accSetupBalanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupBalanceSheet.ToString(), DropdownName = "AccSetupBalanceSheetId", DropdownSelectedValue = Model.AccSetupBalanceSheetId.ToString()};
+    DropdownViewModel accSetupGLDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupGLDropdown.ToString(), DropdownName = "AccSetupGLId", DropdownSelectedValue = Model.AccSetupGLId.ToString() };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.AccSetupGLBankId > 0)
+                                {
+                                    <h4 class="card-title">
+                                        Update Bank Account Details
+                                    </h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">
+                                        Create Bank Account Details
+                                    </h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.AccSetupGLBankId)
+                            @Html.HiddenFor(m => m.AccSetupBalanceSheetId)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AccSetupBalanceSheetId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupBalanceSheetDropdown)
+                                        @Html.ValidationMessageFor(x => x.AccSetupBalanceSheetId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AccSetupGLId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupGLDropdown)
+                                        @Html.ValidationMessageFor(x => x.AccSetupGLId)
+                                    </div>
+                                </div>>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankAccountName, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.BankAccountName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BankAccountName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankAccountNumber, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.BankAccountNumber, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BankAccountNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankBranchName, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.BankBranchName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BankBranchName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BankLimitAmount, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.BankLimitAmount, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BankLimitAmount)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.RateOfInterest, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.RateOfInterest, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.RateOfInterest)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.InterestMode, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.InterestMode, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.InterestMode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.InterestTypeEnumId, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.InterestTypeEnumId, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.InterestTypeEnumId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IFSCCode, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.IFSCCode, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.IFSCCode)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

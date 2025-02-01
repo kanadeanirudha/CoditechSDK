@@ -1,0 +1,33 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMSubscriptionPlanActivityListViewModel
+@{
+    ViewBag.Title = " Subscription Plan Activity List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMSubscriptionPlanId", Model.DBTMSubscriptionPlanId.ToString());
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/DBTM/DBTMSubscriptionPlan/_DBTMSubscriptionPlanSidePannel.cshtml", keyValuePairs)
+            </div>
+            <div class="col-10">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Subscription Plan Activity List: @Model.PlanName </span>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/DBTM/DBTMSubscriptionPlan/_PlanActivityList.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->
+<script src="~/js/coditech/DBTM/DBTMSubscriptionPlanActivity.js"></script>

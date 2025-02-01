@@ -1,0 +1,286 @@
+﻿@using Coditech.Admin.ViewModel
+@model DBTMNewRegistrationViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+    ViewBag.Title = "New Registration";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel countryDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Country.ToString(), DropdownName = "GeneralCountryMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetRegionListByCountryId()" };
+    DropdownViewModel regionDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Region.ToString(), DropdownName = "GeneralRegionMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralRegionMasterId), Parameter = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetCityListByRegionId()" };
+    DropdownViewModel cityDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.City.ToString(), DropdownName = "GeneralCityMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCityMasterId), Parameter = Convert.ToString(Model.GeneralRegionMasterId) };
+    ModelPopUpViewModel termsAndConditionsModel = new ModelPopUpViewModel() { ModelPopUpId = "AddTermsAndConditionsModelPopupId", ModalContentId = "AddTermsAndConditionsContentId" };
+    string centreActive = Model.IsCentreRegistration ? "active" : "";
+    string individualActive = !Model.IsCentreRegistration ? "active" : "";
+}
+<div class="card-body p-0 auth-content" style="max-height: 550px; overflow-y: auto;">
+    <ul class="nav-border nav nav-pills" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link @centreActive fw-semibold" href="/dbtmnewregistration/centreregistration" role="tab">Centre Registration</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @individualActive fw-semibold" href="/dbtmnewregistration/individualRegistration" role="tab">Individual Registration</a>
+        </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active p-3" id="LogIn_Tab" role="tabpanel">
+            @using (Html.BeginForm("CentreIndividualRegistration", controllerName, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.IsCentreRegistration)
+                <div class="row">
+                    @if (Model.IsCentreRegistration)
+                    {
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.CentreName, new { @class = "form-label required" })
+                                @Html.TextBoxFor(x => x.CentreName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.CentreName)
+                            </div>
+                        </div>
+                    }
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.PersonTitle, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                   {
+                       DropdownSelectedValue = Model.PersonTitle ?? string.Empty,
+                       DropdownName = "PersonTitle",
+                       GroupCode = DropdownTypeEnum.Title.ToString(),
+                       IsTextValueSame = true,
+                       IsRequired = true,
+                       IsStringProperty = true
+                   })
+                            @Html.ValidationMessageFor(x => x.PersonTitle)
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.FirstName, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowOnlyAlphabetWithouSpacing()" })
+                            @Html.ValidationMessageFor(x => x.FirstName)
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.LastName, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.LastName, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowOnlyAlphabetWithouSpacing()" })
+                            @Html.ValidationMessageFor(x => x.LastName)
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                   {
+                       DropdownSelectedValue = Model.GenderEnumId.ToString(),
+                       DropdownName = "GenderEnumId",
+                       GroupCode = DropdownTypeEnum.Gender.ToString()
+                   })   @Html.ValidationMessageFor(x => x.GenderEnumId)
+                        </div>
+                    </div>
+                    <!-- Email ID -->
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.EmailId, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.EmailId)
+                        </div>
+                    </div> 
+                    <div class="col-lg-6" id="EmailIdSendOTPDivId">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="form-check" style="padding-left:0px !important; display:block !important">
+                                <button type="button" class="btn btn-warning" onclick="CoditechCommon.SendOTP('email')">Send OTP</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" id="EmailIdTokenDivId" style="display:none">
+                        <div class="mb-3">
+                            <label class="form-label">Verify OTP</label>
+                            @Html.TextBoxFor(x => x.EmailIdToken, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()", @style = "width:40%" })
+                            <button type="button" class="btn btn-warning" onclick="CoditechCommon.VerifySendOTP('email')">Verify OTP</button>
+                            <button type="button" class="btn btn-warning" onclick="CoditechCommon.SendOTP('email')">Send OTP Again</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" id="EmailIdVerifiedOTPDivId" style="display:none">
+                        <div class="mb-3">
+                            <label class="form-label">Verification Status</label>
+                            <div class="form-check">
+                                @Html.CheckBoxFor(x => x.IsEmailIdVerifed, new { @class = "form-check-input", @disabled = "disabled" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.CallingCode, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                   {
+                       DropdownType = DropdownTypeEnum.CallingCode.ToString(),
+                       DropdownName = "CallingCode",
+                       DropdownSelectedValue = Model.CallingCode,
+                       IsRequired = true
+                   })
+                            @Html.ValidationMessageFor(x => x.CallingCode)
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.MobileNumber, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.MobileNumber, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()" })
+                            @Html.ValidationMessageFor(x => x.MobileNumber)
+                        </div>
+                    </div>
+                    <div class="col-lg-6" id="MobileNumberSendOTPDivId">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="form-check" style="padding-left:0px !important; display:block !important">
+                                <button type="button" class="btn btn-warning" onclick="CoditechCommon.SendOTP('mobile')">Send OTP</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" id="MobileNumberTokenDivId" style="display:none">
+                        <div class="mb-3">
+                            <label class="form-label">Verify OTP</label>
+                            @Html.TextBoxFor(x => x.MobileNumberToken, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()", @style = "width:40%" })
+                            <button type="button" class="btn btn-warning" onclick="CoditechCommon.VerifySendOTP('mobile')">Verify OTP</button>
+                            <button type="button" class="btn btn-warning" onclick="CoditechCommon.SendOTP('mobile')">Send OTP Again</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" id="MobileNumberVerifiedOTPDivId" style="display:none">
+                        <div class="mb-3">
+                            <label class="form-label">Verification Status</label>
+                            <div class="form-check">
+                                @Html.CheckBoxFor(x => x.IsMobileNumberVerifed, new { @class = "form-check-input", @disabled = "disabled" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.AddressLine1, new { @class = "form-label required" })
+                            @Html.TextAreaFor(x => x.AddressLine1, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.AddressLine1)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.AddressLine2, new { @class = "form-label" })
+                            @Html.TextAreaFor(x => x.AddressLine2, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.AddressLine2)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.GeneralCountryMasterId, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", countryDropdown)
+                            @Html.ValidationMessageFor(x => x.GeneralCountryMasterId, null, new { id = $"errorGeneralCountryMasterId" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.GeneralRegionMasterId, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", regionDropdown)
+                            @Html.ValidationMessageFor(x => x.GeneralRegionMasterId, null, new { id = $"errorGeneralRegionMasterId" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.GeneralCityMasterId, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", cityDropdown)
+                            @Html.ValidationMessageFor(x => x.GeneralCityMasterId, null, new { id = $"errorGeneralCityMasterId" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.Pincode, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.Pincode, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.Pincode)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(x => x.Password, new { @class = "form-label" })
+                            <div class="input-group password-input-wraper">
+                                @Html.TextBoxFor(x => x.Password, new { @class = "form-control password-input", type = "password", placeholder = "Password here..." })
+                                <i class="fas fa-eye view-password"></i>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Password, null)
+                            @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(x => x.ConfirmPassword, new { @class = "form-label" })
+                            <div class="input-group password-input-wraper">
+                                @Html.TextBoxFor(x => x.ConfirmPassword, new { @class = "form-control password-input", type = "password", placeholder = "Password here..." })
+                                <i class="fas fa-eye view-password"></i>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, null)
+                            @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(x => x.DeviceSerialCode, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.DeviceSerialCode, new { @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                            @Html.ValidationMessageFor(x => x.DeviceSerialCode)
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                          @*   <div class="form-check" style="padding-left:0px !important;">
+                                <button type="button" class="btn btn-primary w-70 waves-effect waves-light">Add More Device<i class="fas fa-sign-in-alt ms-1"></i></button>
+                            </div> *@
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <a data-bs-toggle="modal" data-bs-target="#@termsAndConditionsModel.ModelPopUpId" href="void javascritp(0)" onclick="CoditechCommon.GetTermsAndCondition('@termsAndConditionsModel.ModalContentId')">
+                                    @Html.CheckBoxFor(x => x.IsTermsAndCondition, new { @class = "form-check-input" })
+                                </a>
+                                <label class="form-check-label text-muted" for="termsCheckbox">
+                                    I agree to the terms and conditions
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row my-3">
+                    <div class="col-sm-6">
+                        <div class="custom-control custom-switch switch-success">
+                            <div class="col-sm-6 text-end">
+                                <button class="btn btn-primary w-100 waves-effect waves-light">Register<i class="fas fa-sign-in-alt ms-1"></i></button>
+                            </div>
+                            @*  <input type="checkbox" class="custom-control-input" id="customSwitchSuccess">
+                        <label class="form-label text-muted" for="customSwitchSuccess">Remember me</label> *@
+                        </div>
+                    </div>
+                    <div class="col-sm-6 text-end">
+                        <a href="/user/login" class="text-muted font-13"><i class="dripicons-lock"></i>Log in</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", termsAndConditionsModel)
+<script src="~/js/coditech/Common/CoditechCommon.js"></script>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".view-password").click(function () {
+                $(this).toggleClass("fa fa-eye-slash");
+                var inputAttribute = $('.password-input');
+                if (inputAttribute.attr("type") == "password") {
+                    inputAttribute.attr("type", "text");
+                } else {
+                    inputAttribute.attr("type", "password");
+                }
+            });
+        });
+    </script>
+}
