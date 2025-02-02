@@ -1,0 +1,133 @@
+name: Deploy-Stage-DBTM
+
+on: 
+
+  workflow_dispatch:
+
+     inputs:
+       coditech_build:
+         description: 'Build Coditech'
+         required: true
+         default: true
+         type: boolean
+       admin_deploy:
+         description: 'Deploy Admin'
+         required: true
+         default: true
+         type: boolean
+       mediamanager_api_deploy:
+         description: 'Deploy MediaManager API'
+         required: true
+         default: true
+         type: boolean
+       organisation_api_deploy:
+         description: 'Deploy Organisation API'
+         required: true
+         default: true
+         type: boolean
+
+jobs:
+  coditech_build:
+    runs-on: [self-hosted, Windows, x64, dbtm_Stage]
+    if: github.event.inputs.coditech_build == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: DBTMStage
+
+      - name: Restore Packages
+        run: | 
+           & "C:\\GitAction\\nugettools\\nuget.exe" restore './Coditech.Project/Coditech.Project.sln' -DirectDownload -MSBuildPath "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\"
+
+      - name: Build
+        run: | 
+           & "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\msbuild.exe"  './Coditech.Project/Coditech.Project.sln' /p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True /p:publishUrl="./publish/Release" /p:Configuration=Release /p:TransformConfigFiles=false
+
+  admin_deploy:
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    needs: coditech_build
+    if: github.event.inputs.admin_deploy == 'true'
+    
+    steps:
+      - name: Stop ADMIN IIS Site and App Pool
+        run: |
+          # Stop the IIS site
+          Stop-WebSite -Name "dbtm-stage-admin" 
+
+          # Stop the associated app pool
+          Stop-WebAppPool -Name "dbtm-stage-admin"
+
+          # Wait for a few seconds (optional, if needed)
+          Start-Sleep -Seconds 5
+
+      - name: Copy Build file
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMStage\Admin\ -Recurse -Force
+      - name: Copy Build webroot
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
+      - name: Copy Build views
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
+      #- name: Copy Build report folder
+      # run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
+
+      - name: Start ADMIN IIS Site and App Pool
+        run: |
+          # Start the IIS site
+          Start-WebSite -Name "dbtm-stage-admin"
+
+          # Start the associated app pool
+          Start-WebAppPool -Name "dbtm-stage-admin"
+
+  mediamanager_api_deploy:
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    needs: coditech_build
+    if: github.event.inputs.mediamanager_api_deploy == 'true'
+
+    steps:
+
+      - name: Stop MediaManager IIS Site and App Pool
+        run: |
+           # Stop the IIS site
+           Stop-WebSite -Name "dbtm-stage-api-mediamanager" 
+           # Stop the associated app pool
+           Stop-WebAppPool -Name "dbtm-stage-api-mediamanager"
+
+           # Wait for a few seconds (optional, if needed)
+           Start-Sleep -Seconds 5
+
+      - name: Copy Build file
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\MediaManager\ -Recurse -Force 
+
+      - name: Start MediaManager IIS Site and App Pool
+        run: |
+           # Start the IIS site
+           Start-WebSite -Name "dbtm-stage-api-mediamanager"
+           # Start the associated app pool
+           Start-WebAppPool -Name "dbtm-stage-api-mediamanager"
+
+  organisation_api_deploy:
+    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    needs: coditech_build
+    if: github.event.inputs.organisation_api_deploy == 'true'
+
+    steps:
+      - name: Stop Organisation IIS Site and App Pool
+        run: |
+           # Stop the IIS site
+           Stop-WebSite -Name "dbtm-stage-api-organisation" 
+           # Stop the associated app pool
+           Stop-WebAppPool -Name "dbtm-stage-api-organisation"
+
+           # Wait for a few seconds (optional, if needed)
+           Start-Sleep -Seconds 5
+
+      - name: Copy Build file
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\Organisation\ -Recurse -Force 
+
+      - name: Start Organisation IIS Site and App Pool
+        run: |
+           # Start the IIS site
+           Start-WebSite -Name "dbtm-stage-api-organisation"
+           # Start the associated app pool
+           Start-WebAppPool -Name "dbtm-stage-api-organisation"
