@@ -1,0 +1,224 @@
+﻿@model TaskApprovalSettingViewModel
+@{
+    ViewBag.Title = Model.TaskMasterId > 0 ? "Update Task Approval Setting" : "Add Task Approval Setting";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("TaskApprovalSettingId", Model.TaskMasterId.ToString());
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+
+                                <h4 class="card-title">Update Task Approval Setting</h4>
+
+
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = "frmTaskApprovalSetting" }))
+                        {
+                            @Html.HiddenFor(m => m.TaskApprovalSettingId)
+                            @Html.HiddenFor(m => m.TaskMasterId)
+                            @Html.HiddenFor(m => m.CentreCode)
+                            @Html.HiddenFor(m => m.EmployeeIds, new { id = "EmployeeIds" })
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TaskCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.TaskCode, new { @class = "form-control", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(x => x.TaskCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TaskDescription, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.TaskDescription, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.CentreName, new { @class = "form-control", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
+
+                                @* <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsFinalApproval, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsFinalApproval, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div> *@
+
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        <a class="btn btn-sm btn-soft-primary" onclick="TaskApprovalSetting.AddApprover()" role="button"><i class="fas fa-plus me-2"></i>Add Approver</a>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row" id="EmployeeListId">
+                               @*  <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ApprovalSequenceNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ApprovalSequenceNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()", @maxlength = "50" })
+                                        @Html.ValidationMessageFor(x => x.ApprovalSequenceNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsFinalApproval, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsFinalApproval, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div> *@
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-12">
+                                    <button type="submit" class="btn btn-success" id="saveDropdownValues" onclick="TaskApprovalSetting.SaveData()">@AdminResources.LabelSave</button>
+                                    <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    <table class="table table-bordered table-sm" id="makeEditable">
+                                        <thead>
+                                            <tr>
+                                                <th>Employee Name</th>
+                                                <th>Is Final Approval</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model?.EmployeeList?.Count > 0)
+                                            {
+                                                foreach (var item in Model?.EmployeeList)
+                                                {
+                                                    <tr>
+                                                        <td>@item.FirstName @item.LastName</td>
+                                                        <td> @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", @item.IsFinalApproval)</td>
+                                                        <td class="text-center">
+                                                            <a href="../@controllerName/Delete" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/General/TaskApprovalSetting.js"></script>
+
+
+
+
+
+
+
+
+
+@* @model TaskApprovalSettingViewModel
+@{
+    ViewBag.Title = Model.TaskMasterId > 0 ? "Update Task Approval Setting" : "Add Task Approval Setting";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("TaskApprovalSettingId", Model.TaskMasterId.ToString());
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.TaskMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update Task Approval Setting</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Task Approval Setting</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm("AddUpdateTaskApprovalSetting", controllerName, FormMethod.Post, new { id = "frmTaskApprovalSetting" }))
+                        {
+                            @Html.HiddenFor(m => m.TaskMasterId)
+                            @Html.HiddenFor(m => m.CentreCode)
+                            @Html.HiddenFor(m => m.EmployeeIds, new { id = "EmployeeIds" })
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TaskCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.TaskCode, new { @class = "form-control", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(x => x.TaskCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TaskDescription, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.TaskDescription, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.CentreName, new { @class = "form-control", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CountNumber, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.CountNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()", @maxlength = "3" })
+                                        @Html.ValidationMessageFor(x => x.CountNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        <a class=" btn btn-sm btn-soft-primary" onclick="TaskApprovalSetting.GetEmployeeListByCentreCode('@Model.CentreCode','@Model.CountNumber')" role="button"><i class="fas fa-plus me-2"></i>Add Approver</a>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row" id="EmployeeListId">
+
+                            </div>
+                            <button type="submit" class="btn btn-success" id="saveDropdownValues" onclick="TaskApprovalSetting.SaveData()">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/General/TaskApprovalSetting.js"></script> *@

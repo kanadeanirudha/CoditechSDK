@@ -5,6 +5,7 @@
     Layout = null;
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    bool isUpdate = Model.TaskApprovalSettingId > 0;
 }
 
 <!-- Page Content -->
@@ -14,6 +15,10 @@
             <tr>
                 <th>Employee List</th>
                 <th>Priority</th>
+
+                <th>Is Final Approval</th>
+
+
             </tr>
         </thead>
         <tbody>
@@ -24,9 +29,26 @@
                         @Html.DropDownList("EmployeeId_" + i, ViewData["EmployeeList"] as List<SelectListItem>, new { @class = "form-select employee-dropdown", data_index = i })
                         @Html.ValidationMessageFor(x => x.EmployeeIds)
                     </td>
+
                     <td>
-                        @i
+                        <div class="mb-3">
+                            @Html.TextBoxFor(x => x.ApprovalSequenceNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()", @maxlength = "50" })
+                            @Html.ValidationMessageFor(x => x.ApprovalSequenceNumber)
+                        </div>
                     </td>
+
+                    @* <td>
+                            @i
+                        </td> *@
+
+                    <td>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(x => x.IsFinalApproval, new { @class = "form-check-input" })
+                            </div>
+                        </div>
+                    </td>
+
                 </tr>
             }
         </tbody>
@@ -34,3 +56,49 @@
 </div>
 <script src="~/js/coditech/General/TaskApprovalSetting.js"></script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @if (Model.TaskApprovalSettingId > 0)
+            {
+                @foreach (var i in Enumerable.Range(1, Model.CountNumber))
+                {
+                    <tr>
+                        <td>
+                            @Html.DropDownList("EmployeeId_" + i, ViewData["EmployeeList"] as List<SelectListItem>, new { @class = "form-select employee-dropdown", data_index = i })
+                            @Html.ValidationMessageFor(x => x.EmployeeIds)
+                        </td>
+                        <td>
+                            @i
+                        </td>
+                    </tr>
+                }
+            } *@

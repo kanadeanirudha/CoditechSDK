@@ -3,6 +3,8 @@
     ViewBag.Title = Model.GeneralFinancialYearId > 0 ? "Update FinancialYear" : "Add FinancialYear";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode };
+
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -29,6 +31,13 @@
                         {
                             @Html.HiddenFor(m => m.GeneralFinancialYearId)
                             <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.FromDate, new { @class = "form-label required" })

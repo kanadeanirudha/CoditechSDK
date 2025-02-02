@@ -1,9 +1,9 @@
 ﻿@model AccGLSetupNarrationViewModel
 @{
-    ViewBag.Title = Model.AccGLSetupNarrationId > 0 ? "Update Account Narration" : "Add Account Narration";
+    ViewBag.Title = Model.AccGLSetupNarrationId > 0 ? "Update Narration" : "Add Narration";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode,};
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.AccGLSetupNarrationId >= 0 };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -17,13 +17,13 @@
                                 @if (Model.AccGLSetupNarrationId > 0)
                                 {
                                     <h4 class="card-title">
-                                        Update Narration Details : @(Model.IsSystemGenerated ? "Live Mode" : "Test Mode")
+                                            Update Narration Details
                                     </h4>
                                 }
                                 else
                                 {
                                     <h4 class="card-title">
-                                        Create Narration Details : @(Model.IsSystemGenerated ? "Live Mode" : "Test Mode")
+                                        Create Narration Details 
                                     </h4>
                                 }
                             </div><!--end col-->
@@ -33,50 +33,41 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.AccGLSetupNarrationId)
-                            @* @Html.HiddenFor(m => m.PaymentGatewayDetailId) *@
-                            @* @Html.HiddenFor(m => m.CentreCode) *@
-                            @* @Html.HiddenFor(m => m.IsLiveMode) *@
+                            @Html.HiddenFor(m => m.NarrationType)
+                            @Html.HiddenFor(m => m.CentreCode)
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required"  })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                                         @Html.ValidationMessageFor(x => x.CentreCode)
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.NarrationType, new { @class = "form-label " })
-                                        @Html.TextBoxFor(x => x.NarrationType, new { @class = "form-control" })
+                                        @Html.LabelFor(x => x.NarrationType, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.NarrationType, new { @class = "form-control", @readonly = "readonly" })
                                         @Html.ValidationMessageFor(x => x.NarrationType)
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.NarrationDescription, new { @class = "form-label " })
-                                        @Html.TextBoxFor(x => x.NarrationDescription, new { @class = "form-control" })
+                                        @Html.TextAreaFor(x => x.NarrationDescription, new { @class = "form-control" })
                                         @Html.ValidationMessageFor(x => x.NarrationDescription)
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label " })
-                                        @Html.TextBoxFor(x => x.IsActive, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.IsActive)
-                                    </div>
-                                </div>
-
                                 <div class="col-lg-6">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsSystemGenerated, new { @class = "form-label" })
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
                                         <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsSystemGenerated, new { @class = "form-check-input" })
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode=@Model.AccGLSetupNarrationId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode&SelectedParameter1=@Model.AccGLSetupNarrationId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.API.Service;
 using Coditech.API.Service.DependencyRegistration;
 using Coditech.Common.API;
 using Coditech.Common.Helper;
@@ -41,6 +42,7 @@ namespace Coditech.API.Common
 
             //RegisterDI
             builder.RegisterDI();
+            builder.RegisterCustomDI();
 
             // Configured conventional route settings.
             builder.ConfigureRouteSettings();
@@ -210,5 +212,10 @@ namespace Coditech.API.Common
             TranslatorExtension.TranslatorInstance = CoditechDependencyResolver._staticServiceProvider?.GetService<CoditechTranslator>();
         }
         #endregion
+
+        public static void RegisterCustomDI(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUserService, DBTMUserService>();
+        }
     }
 }

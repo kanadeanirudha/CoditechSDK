@@ -322,4 +322,13 @@
             return false;
         }
     },
+    LoadListByBalanceSheet: function (controllerName, methodName) {
+        $('#DataTables_SearchById').val("")
+        if ($("#SelectedParameter1").val() == "") {
+            CoditechNotification.DisplayNotificationMessage("Please select centre.", "error");
+        }
+        else {
+            CoditechDataTable.LoadList(controllerName, methodName);
+        }
+    },
 }

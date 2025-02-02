@@ -1,0 +1,38 @@
+﻿@model DBTMMySubscriptionPlanListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string css = "";
+}
+
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="action-set table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            <tbody>
+                @if (Model?.DBTMMySubscriptionPlanList?.Count > 0)
+                {
+                    foreach (var item in Model?.DBTMMySubscriptionPlanList)
+                    {
+                        <tr>
+                            <td>@item.PlanName</td>
+                            <td>@item.DeviceSerialCode</td>
+                            <td>@item.DurationInDays</td>
+                            <td>@AdminGeneralHelper.FormatPriceWithCurrency(@item.PlanCost)</td>
+                            <td>@AdminGeneralHelper.FormatPriceWithCurrency(@item.PlanDiscount)</td>
+                            <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsExpired)</td>
+                            <td>@item.PlanDurationExpirationDate.ToCoditechDateFormat()</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)

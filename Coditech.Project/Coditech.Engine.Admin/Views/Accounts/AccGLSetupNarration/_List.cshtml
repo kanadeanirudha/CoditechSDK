@@ -1,43 +1,48 @@
 ﻿@model AccGLSetupNarrationListViewModel
 @{
-    Layout = null;
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
+	Layout = null;
+	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+	string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 @* <div class="row"> *@
 @*     @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage) *@
 @*     @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy) *@
 @* </div> *@
 <div class="row">
-    <div class="col-sm-12 table-responsive">
-        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
-            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
-            <tbody>
-                @if (Model?.AccGLSetupNarrationList?.Count > 0)
-                {
-                    foreach (var item in Model?.AccGLSetupNarrationList)
-                    {
-                        <tr>
-                            <td>@item.NarrationType</td>
-                            <td class="text-center data-action">
-                                @if (item.AccGLSetupNarrationId > 0)
-                                {
-                                    <a href="../@controllerName/Edit?accGLSetupNarrationId=@item.AccGLSetupNarrationId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a href="../@controllerName/Create?centreCode=@Model.SelectedCentreCode" title="Create" class="btn btn-sm btn-soft-success btn-circle me-2">
-                                        <i class="fas fa-plus"></i>
-                                    </a>
-                                }
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
+	<div class="col-sm-12 table-responsive">
+		<table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+			@Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+			<tbody>
+				@if (Model?.AccGLSetupNarrationList?.Count > 0)
+				{
+					foreach (var item in Model?.AccGLSetupNarrationList)
+					{
+						<tr>
+							<td>@item.NarrationType</td>
+							<td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+							    @item.NarrationDescription
+							</td>
+
+							<td> @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)</td>
+							<td class="text-center data-action">
+								@if (item.AccGLSetupNarrationId > 0)
+								{
+									<a href="../@controllerName/Edit?accGLSetupNarrationId=@item.AccGLSetupNarrationId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+										<i class="fas fa-edit"></i>
+									</a>
+								}
+								else
+								{
+									<a href="../@controllerName/Create?centreCode=@Model.SelectedCentreCode&narrationType=@item.NarrationType" title="Create" class="btn btn-sm btn-soft-success btn-circle me-2">
+										<i class="fas fa-plus"></i>
+									</a>
+								}
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
 </div>
 

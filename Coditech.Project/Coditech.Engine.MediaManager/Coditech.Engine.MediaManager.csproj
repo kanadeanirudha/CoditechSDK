@@ -12,6 +12,12 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Data\ApplicationImages\" />
+		<Folder Include="Data\Media\ApplicationIcon\" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Dapper" Version="2.1.35" />

@@ -66,7 +66,7 @@
                                     <label class="btn btn-sm btn-soft-primary" for="imageUpload">
                                         <i class="fas fa-upload me-2"></i>Upload File
                                     </label>
-                                    <input type="file" id="imageUpload" name="imageFile" style="display: none;" onchange="this.form.submit()" />
+                                    <input type="file" id="imageUpload" name="imageFile" style="display: none;" onchange="this.form.submit(); CoditechCommon.ShowLodder();" />
                                     <input type="hidden" name="folderId" value="@Model.ActiveFolderId" />
                                 </form>
                             }

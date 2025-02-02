@@ -1,0 +1,48 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMSubscriptionPlanActivityListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    ModelPopUpViewModel addFollowUpModel = new ModelPopUpViewModel() { ModelPopUpId = "AssociateUnAssociateDBTMSubscriptionPlanActivityModelPopupId", ModalContentId = "AssociateUnAssociateDBTMSubscriptionPlanActivityModelPopupContentId" };
+}
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            @Html.HiddenFor(x => x.SelectedParameter1)
+            <tbody>
+                @if (Model?.DBTMSubscriptionPlanActivityList?.Count > 0)
+                {
+                    foreach (var item in Model?.DBTMSubscriptionPlanActivityList)
+                    {
+                        <tr>
+                            <td>@item.TestName</td>
+                            <td>@item.TestCode</td>
+                            <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsAssociated)</td>
+                            <td class="text-center">
+                                @if (item.IsAssociated)
+                                {
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMSubscriptionPlanActivity.GetAssociateUnAssociatePlanActivity('@addFollowUpModel.ModalContentId','@item.DBTMSubscriptionPlanActivityId','@Model.DBTMSubscriptionPlanId','@Model.PlanName','@item.TestName','@item.DBTMTestMasterId')" title="UnAssociate Plan Activity From Test" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
+                                }
+                                else
+                                {
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMSubscriptionPlanActivity.GetAssociateUnAssociatePlanActivity('@addFollowUpModel.ModalContentId','@item.DBTMSubscriptionPlanActivityId','@Model.DBTMSubscriptionPlanId','@Model.PlanName','@item.TestName','@item.DBTMTestMasterId')" title="Associate Plan Activity From Test" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", addFollowUpModel)
+@section scripts {
+    <script src="~/js/coditech/DBTM/DBTMSubscriptionPlanActivity.js"></script>
+}
