@@ -155,7 +155,7 @@ namespace Coditech.API.Service
             long? dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode)?.Select(y => y.DBTMTraineeDetailId)?.FirstOrDefault();
             if (dBTMTraineeDetailId > 0)
             {
-                GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
+                GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
                 if (IsNotNull(generalPersonModel))
                 {
                     listModel.FirstName = generalPersonModel.FirstName;
@@ -167,6 +167,27 @@ namespace Coditech.API.Service
             return listModel;
         }
 
+        private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
+        {
+            long personId = 0;
+            string centreCode = string.Empty;
+            string personCode = string.Empty;
+            short generalDepartmentMasterId = 0;
+            if (entityType == UserTypeEnum.Trainee.ToString())
+            {
+                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
+                if (IsNotNull(dbtmTraineeDetails))
+                {
+                    personId = dbtmTraineeDetails.PersonId;
+                    centreCode = dbtmTraineeDetails.CentreCode;
+                }
+                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId);
+            }
+            else
+            {
+                return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
+            }
+        }
         public virtual DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
@@ -189,14 +210,14 @@ namespace Coditech.API.Service
 
             if (dBTMTraineeDetailId > 0)
             {
-                GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
+                GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
                 if (IsNotNull(generalPersonModel))
                 {
                     listModel.FirstName = generalPersonModel.FirstName;
                     listModel.LastName = generalPersonModel.LastName;
                 }
                 DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
-                
+
                 if (dBTMTestMaster != null)
                 {
                     listModel.Columns = (from a in _dBTMParametersAssociatedToTestRepository.Table

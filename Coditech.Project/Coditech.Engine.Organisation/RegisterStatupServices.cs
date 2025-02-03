@@ -155,6 +155,7 @@ namespace Coditech.API.Common
             string connectionString = builder.Configuration.GetConnectionString("CoditechDatabase");
             // Coditech entity registration
             builder.Services.AddDbContext<Coditech_Entities>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
+            builder.Services.AddDbContext<CoditechCustom_Entities>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
 
             // Repository classes registration
             builder.Services.AddTransient(typeof(ICoditechRepository<>), typeof(CoditechRepository<>));

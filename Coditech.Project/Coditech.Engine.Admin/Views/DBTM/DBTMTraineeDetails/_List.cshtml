@@ -41,10 +41,9 @@
                             <td>@item.LastName</td>
                             <td>@item.MobileNumber</td>
                             <td>@item.EmailId</td>
-                            <td>
-                                <a href="../@controllerName/TraineeActivitiesList?SelectedParameter1=@item.PersonCode">@item.NumberOfActivityPerformed</a>
+                            <td style="text-align: center;">
+                                <a href="../@controllerName/TraineeActivitiesList?SelectedParameter1=@item.PersonCode"><span class="badge badge-soft-info">@item.NumberOfActivityPerformed</span></a>
                             </td>
-
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
