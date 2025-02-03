@@ -24,7 +24,7 @@ namespace Coditech.API.Service
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
-            _organisationCentreMasterRepository = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _organisationCentreMasterRepository = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dbtmDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
@@ -120,8 +120,8 @@ namespace Coditech.API.Service
         protected List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
         {
             List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
-            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
-            List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
+            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
+            List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
             return generalRunningNumbersList;
         }
 
@@ -143,7 +143,7 @@ namespace Coditech.API.Service
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
             };
-            new CoditechRepository<GeneralPersonAddress>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(generalPersonAddress);
+            new CoditechRepository<GeneralPersonAddress>(_serviceProvider.GetService<Coditech_Entities>()).Insert(generalPersonAddress);
         }
 
         protected virtual void InsertDBTMDeviceRegistration(DBTMNewRegistrationModel dBTMNewRegistrationModel, DateTime currentDate, long employeeId, long dBTMDeviceMasterId)
@@ -191,7 +191,7 @@ namespace Coditech.API.Service
                 generalPersonModel.SelectedCentreCode = organisationCentreMaster.CentreCode;
                 generalPersonModel.SelectedDepartmentId = generalDepartmentMasterList.FirstOrDefault().ToString();
                 generalPersonModel.EmployeeDesignationMasterId = 1;
-                employeeId = InsertEmployee(generalPersonModel, settingMasterList, true);
+                employeeId = base.InsertEmployee(generalPersonModel, settingMasterList, true);
             }
             return employeeId;
         }
@@ -206,14 +206,14 @@ namespace Coditech.API.Service
                 item.CreatedDate = currentDate;
                 item.ModifiedDate = currentDate;
             }
-            new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(generalRunningNumbersList);
+            new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Insert(generalRunningNumbersList);
         }
 
         protected virtual List<short> InsertOrganisationCentrewiseDepartment(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster)
         {
             List<string> departmentList = new List<string>();
             departmentList = ("DBTMCentreDirector,DBTMManager,DBTMTrainer").Split(",").ToList();
-            List<short> generalDepartmentMasterList = new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => departmentList.Contains(x.DepartmentShortCode))?.Select(x => x.GeneralDepartmentMasterId).ToList();
+            List<short> generalDepartmentMasterList = new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => departmentList.Contains(x.DepartmentShortCode))?.Select(x => x.GeneralDepartmentMasterId).ToList();
             if (generalDepartmentMasterList?.Count == 0)
             {
                 List<GeneralDepartmentMaster> departmentMasterList = new List<GeneralDepartmentMaster>();
@@ -234,9 +234,9 @@ namespace Coditech.API.Service
                     generalDepartmentMaster.ModifiedDate = currentDate;
                     departmentMasterList.Add(generalDepartmentMaster);
                 }
-                new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(departmentMasterList);
+                new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<Coditech_Entities>()).Insert(departmentMasterList);
 
-                generalDepartmentMasterList = new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => departmentList.Contains(x.DepartmentShortCode))?.Select(x => x.GeneralDepartmentMasterId).ToList();
+                generalDepartmentMasterList = new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => departmentList.Contains(x.DepartmentShortCode))?.Select(x => x.GeneralDepartmentMasterId).ToList();
             }
 
             List<OrganisationCentrewiseDepartment> organizationDeptList = new List<OrganisationCentrewiseDepartment>();
@@ -250,7 +250,7 @@ namespace Coditech.API.Service
                 organisationCentrewiseDepartment.ModifiedDate = currentDate;
                 organizationDeptList.Add(organisationCentrewiseDepartment);
             }
-            new CoditechRepository<OrganisationCentrewiseDepartment>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(organizationDeptList);
+            new CoditechRepository<OrganisationCentrewiseDepartment>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organizationDeptList);
 
             return generalDepartmentMasterList;
         }
@@ -259,7 +259,7 @@ namespace Coditech.API.Service
         {
             List<string> userTypeList = new List<string>();
             userTypeList = ("Employee,DBTMTrainee").Split(",").ToList();
-            List<OrganisationCentrewiseUserNameRegistration> organisationCentrewiseUserNameRegistrationList = new CoditechRepository<OrganisationCentrewiseUserNameRegistration>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => x.CentreCode == centreCode && userTypeList.Contains(x.UserType))?.ToList();
+            List<OrganisationCentrewiseUserNameRegistration> organisationCentrewiseUserNameRegistrationList = new CoditechRepository<OrganisationCentrewiseUserNameRegistration>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && userTypeList.Contains(x.UserType))?.ToList();
             if (IsNotNull(organisationCentrewiseUserNameRegistrationList))
             {
                 foreach (var item in organisationCentrewiseUserNameRegistrationList)
@@ -269,7 +269,7 @@ namespace Coditech.API.Service
                     item.CreatedDate = currentDate;
                     item.ModifiedDate = currentDate;
                 }
-                new CoditechRepository<OrganisationCentrewiseUserNameRegistration>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(organisationCentrewiseUserNameRegistrationList);
+                new CoditechRepository<OrganisationCentrewiseUserNameRegistration>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseUserNameRegistrationList);
             }
         }
 
@@ -277,7 +277,7 @@ namespace Coditech.API.Service
         {
             List<string> emailTemplateList = new List<string>();
             emailTemplateList = ("EmployeeRegistration,MobileResetPasswordLink,ResetPasswordLink").Split(",").ToList();
-            List<OrganisationCentrewiseEmailTemplate> organisationCentrewiseEmailTemplateList = new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => x.CentreCode == centreCode && emailTemplateList.Contains(x.EmailTemplateCode) && x.IsActive)?.ToList();
+            List<OrganisationCentrewiseEmailTemplate> organisationCentrewiseEmailTemplateList = new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && emailTemplateList.Contains(x.EmailTemplateCode) && x.IsActive)?.ToList();
             if (IsNotNull(organisationCentrewiseEmailTemplateList))
             {
                 foreach (var item in organisationCentrewiseEmailTemplateList)
@@ -287,39 +287,39 @@ namespace Coditech.API.Service
                     item.CreatedDate = currentDate;
                     item.ModifiedDate = currentDate;
                 }
-                new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(organisationCentrewiseEmailTemplateList);
+                new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseEmailTemplateList);
             }
         }
 
         protected virtual void InsertOrganisationCentrewiseWhatsAppSetting(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string centreCode)
         {
-            OrganisationCentrewiseWhatsAppSetting organisationCentrewiseWhatsAppSetting = new CoditechRepository<OrganisationCentrewiseWhatsAppSetting>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.FirstOrDefault();
+            OrganisationCentrewiseWhatsAppSetting organisationCentrewiseWhatsAppSetting = new CoditechRepository<OrganisationCentrewiseWhatsAppSetting>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.FirstOrDefault();
             if (IsNotNull(organisationCentrewiseWhatsAppSetting))
             {
                 organisationCentrewiseWhatsAppSetting.OrganisationCentrewiseWhatsAppSettingId = 0;
                 organisationCentrewiseWhatsAppSetting.CentreCode = organisationCentreMaster.CentreCode;
                 organisationCentrewiseWhatsAppSetting.CreatedDate = currentDate;
                 organisationCentrewiseWhatsAppSetting.ModifiedDate = currentDate;
-                new CoditechRepository<OrganisationCentrewiseWhatsAppSetting>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(organisationCentrewiseWhatsAppSetting);
+                new CoditechRepository<OrganisationCentrewiseWhatsAppSetting>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseWhatsAppSetting);
             }
         }
 
         protected virtual void InsertOrganisationCentrewiseSmsSetting(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string centreCode)
         {
-            OrganisationCentrewiseSmsSetting organisationCentrewiseSms = new CoditechRepository<OrganisationCentrewiseSmsSetting>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.FirstOrDefault();
+            OrganisationCentrewiseSmsSetting organisationCentrewiseSms = new CoditechRepository<OrganisationCentrewiseSmsSetting>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.FirstOrDefault();
             if (IsNotNull(organisationCentrewiseSms))
             {
                 organisationCentrewiseSms.OrganisationCentrewiseSmsSettingId = 0;
                 organisationCentrewiseSms.CentreCode = organisationCentreMaster.CentreCode;
                 organisationCentrewiseSms.CreatedDate = currentDate;
                 organisationCentrewiseSms.ModifiedDate = currentDate;
-                new CoditechRepository<OrganisationCentrewiseSmsSetting>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(organisationCentrewiseSms);
+                new CoditechRepository<OrganisationCentrewiseSmsSetting>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseSms);
             }
         }
 
         protected virtual void InsertOrganisationCentrewiseSmtpSetting(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string centreCode)
         {
-            OrganisationCentrewiseSmtpSetting organisationCentrewiseSmtp = new CoditechRepository<OrganisationCentrewiseSmtpSetting>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.FirstOrDefault();
+            OrganisationCentrewiseSmtpSetting organisationCentrewiseSmtp = new CoditechRepository<OrganisationCentrewiseSmtpSetting>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.FirstOrDefault();
             if (IsNotNull(organisationCentrewiseSmtp))
             {
                 organisationCentrewiseSmtp.OrganisationCentrewiseSmtpSettingId = 0;
@@ -327,7 +327,7 @@ namespace Coditech.API.Service
                 organisationCentrewiseSmtp.FromDisplayName = organisationCentreMaster.CentreName;
                 organisationCentrewiseSmtp.CreatedDate = currentDate;
                 organisationCentrewiseSmtp.ModifiedDate = currentDate;
-                new CoditechRepository<OrganisationCentrewiseSmtpSetting>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(organisationCentrewiseSmtp);
+                new CoditechRepository<OrganisationCentrewiseSmtpSetting>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseSmtp);
             }
         }
 
@@ -402,7 +402,7 @@ namespace Coditech.API.Service
             AdminSanctionPost adminSanctionPostEntity = adminSanctionPostModel.FromModelToEntity<AdminSanctionPost>();
 
             //Create new adminSanctionPost and return it.
-            AdminSanctionPost adminSanctionPostData = new CoditechRepository<AdminSanctionPost>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(adminSanctionPostEntity);
+            AdminSanctionPost adminSanctionPostData = new CoditechRepository<AdminSanctionPost>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminSanctionPostEntity);
             if (adminSanctionPostData?.AdminSanctionPostId > 0)
             {
                 adminSanctionPostModel.AdminSanctionPostId = adminSanctionPostData.AdminSanctionPostId;
@@ -420,7 +420,7 @@ namespace Coditech.API.Service
                     ModifiedDate = currentDate
                 };
                 //Create new adminRoleMaster
-                adminRoleMaster = new CoditechRepository<AdminRoleMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(adminRoleMaster);
+                adminRoleMaster = new CoditechRepository<AdminRoleMaster>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMaster);
                 AdminRoleCentreRights adminRoleCentreRight = new AdminRoleCentreRights()
                 {
                     AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
@@ -431,7 +431,7 @@ namespace Coditech.API.Service
                 };
 
                 //Create new adminRoleCentreRight
-                adminRoleCentreRight = new CoditechRepository<AdminRoleCentreRights>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(adminRoleCentreRight);
+                adminRoleCentreRight = new CoditechRepository<AdminRoleCentreRights>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleCentreRight);
                 AdminRoleApplicableDetails adminRoleApplicableDetails = new AdminRoleApplicableDetails()
                 {
                     AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
@@ -441,11 +441,11 @@ namespace Coditech.API.Service
                     CreatedDate = currentDate,
                     ModifiedDate = currentDate
                 };
-                new CoditechRepository<AdminRoleApplicableDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(adminRoleApplicableDetails);
+                new CoditechRepository<AdminRoleApplicableDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleApplicableDetails);
 
                 //insert admin Role Menu Detail
                 List<string> associateMenus = ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList();
-                List<UserMainMenuMaster> menuList = new CoditechRepository<UserMainMenuMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Where(x => associateMenus.Contains(x.MenuCode)).ToList();
+                List<UserMainMenuMaster> menuList = new CoditechRepository<UserMainMenuMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => associateMenus.Contains(x.MenuCode)).ToList();
                 List<AdminRoleMenuDetails> adminRoleMenuDetailList = new List<AdminRoleMenuDetails>();
                 foreach (var menu in menuList)
                 {
@@ -461,7 +461,7 @@ namespace Coditech.API.Service
                         ModifiedDate = currentDate
                     });
                 }
-                new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Insert(adminRoleMenuDetailList);
+                new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMenuDetailList);
             }
         }
     }
