@@ -30,7 +30,7 @@ namespace Coditech.API.Service
             short generalDepartmentMasterId = 0;
             if (entityType == UserTypeEnum.Trainee.ToString())
             {
-                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<Coditech_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
+                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
                 if (IsNotNull(dbtmTraineeDetails))
                 {
                     personId = dbtmTraineeDetails.PersonId;

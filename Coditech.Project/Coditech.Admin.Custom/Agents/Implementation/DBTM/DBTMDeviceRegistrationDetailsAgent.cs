@@ -50,7 +50,7 @@ namespace Coditech.Admin.Agents
                 DBTMDeviceRegistrationDetailsListViewModel listViewModel = new DBTMDeviceRegistrationDetailsListViewModel();
                 listViewModel.RegistrationDetailsList = dBTMDeviceRegistrationDetailsList?.RegistrationDetailsList?.ToViewModel<DBTMDeviceRegistrationDetailsViewModel>().ToList();
 
-                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.RegistrationDetailsList.Count, BindColumns());
+                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.RegistrationDetailsList.Count, BindColumns(), false);
                 return listViewModel;
             }
             return new DBTMDeviceRegistrationDetailsListViewModel();
@@ -67,9 +67,9 @@ namespace Coditech.Admin.Agents
                     dBTMDeviceRegistrationDetailsViewModel.EntityId = entityId;
 
                     DBTMDeviceRegistrationDetailsResponse response = _dBTMDeviceRegistrationDetailsClient.CreateRegistrationDetails(dBTMDeviceRegistrationDetailsViewModel.ToModel<DBTMDeviceRegistrationDetailsModel>());
-                DBTMDeviceRegistrationDetailsModel dBTMDeviceRegistrationDetailsModel = response?.DBTMDeviceRegistrationDetailsModel;
-                return IsNotNull(dBTMDeviceRegistrationDetailsModel) ? dBTMDeviceRegistrationDetailsModel.ToViewModel<DBTMDeviceRegistrationDetailsViewModel>() : new DBTMDeviceRegistrationDetailsViewModel();
-            }
+                    DBTMDeviceRegistrationDetailsModel dBTMDeviceRegistrationDetailsModel = response?.DBTMDeviceRegistrationDetailsModel;
+                    return IsNotNull(dBTMDeviceRegistrationDetailsModel) ? dBTMDeviceRegistrationDetailsModel.ToViewModel<DBTMDeviceRegistrationDetailsViewModel>() : new DBTMDeviceRegistrationDetailsViewModel();
+                }
                 else
                 {
                     return (DBTMDeviceRegistrationDetailsViewModel)GetViewModelWithErrorMessage(dBTMDeviceRegistrationDetailsViewModel, GeneralResources.ErrorFailedToCreate);
@@ -167,13 +167,13 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Device Serial Code",
                 ColumnCode = "DeviceSerialCode",
                 IsSortable = true,
-            });           
+            });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Purchase Date",
                 ColumnCode = "PurchaseDate",
                 IsSortable = true,
-            }); 
+            });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Warranty Expiration Date",
