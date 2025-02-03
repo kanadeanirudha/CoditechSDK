@@ -13,7 +13,7 @@ namespace Coditech.Admin.ViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string SelectedParameter1 { get; set; }
-        public string CentreCode { get; set; }
+        public string SelectedCentreCode { get; set; }
 
     }
 }

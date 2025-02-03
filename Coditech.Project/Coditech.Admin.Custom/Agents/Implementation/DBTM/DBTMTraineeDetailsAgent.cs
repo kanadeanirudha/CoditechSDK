@@ -354,6 +354,8 @@ namespace Coditech.Admin.Agents
             listViewModel.PersonCode = personCode;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
+            listViewModel.SelectedCentreCode = response.SelectedCentreCode;
+
             return listViewModel;
         }
 

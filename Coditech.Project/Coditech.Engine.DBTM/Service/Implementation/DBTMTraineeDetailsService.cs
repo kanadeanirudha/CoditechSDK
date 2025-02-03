@@ -160,6 +160,7 @@ namespace Coditech.API.Service
                 {
                     listModel.FirstName = generalPersonModel.FirstName;
                     listModel.LastName = generalPersonModel.LastName;
+                    listModel.SelectedCentreCode = generalPersonModel.SelectedCentreCode;
                 }
             }
 
