@@ -25,6 +25,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Coditech.API.Data.Custom\Coditech.API.Data.Custom.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Reference Include="Coditech.API.Data">
 			<HintPath>..\SharedLibraries\Coditech.API.Data.dll</HintPath>
 		</Reference>
