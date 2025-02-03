@@ -258,7 +258,7 @@ namespace Coditech.API.Service
         protected virtual void InsertOrganisationCentrewiseUserNameRegistration(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string centreCode)
         {
             List<string> userTypeList = new List<string>();
-            userTypeList = ("Employee,DBTMTrainee").Split(",").ToList();
+            userTypeList = ($"{UserTypeEnum.Employee.ToString()},{UserTypeEnum.Trainee.ToString()}").Split(",").ToList();
             List<OrganisationCentrewiseUserNameRegistration> organisationCentrewiseUserNameRegistrationList = new CoditechRepository<OrganisationCentrewiseUserNameRegistration>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && userTypeList.Contains(x.UserType))?.ToList();
             if (IsNotNull(organisationCentrewiseUserNameRegistrationList))
             {
