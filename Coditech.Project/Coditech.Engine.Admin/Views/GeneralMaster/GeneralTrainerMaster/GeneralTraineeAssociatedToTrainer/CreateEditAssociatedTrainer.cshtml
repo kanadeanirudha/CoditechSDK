@@ -61,13 +61,12 @@
                                         @Html.LabelFor(x => x.GeneralTrainerMasterId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
                                {
-                                   DropdownType = DropdownCustomTypeEnum.UnAssociatedTrainerList.ToString(),
+                                   DropdownType = DropdownTypeEnum.UnAssociatedTrainerList.ToString(),
                                    DropdownName = "GeneralTrainerMasterId",
                                    DropdownSelectedValue = Model.GeneralTrainerMasterId.ToString(),
                                    Parameter = Model.GeneralTraineeAssociatedToTrainerId == 0
                                     ? $"{Model.SelectedCentreCode}~{0}~{Model.EntityId}~{Model.UserType}~false"
                                     : $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}~{Model.EntityId}~{Model.UserType}~true",
-                                   IsCustomDropdown = true,
                                    IsDisabled = Model.GeneralTraineeAssociatedToTrainerId > 0
                                })
                                         @Html.ValidationMessageFor(x => x.GeneralTrainerMasterId)
