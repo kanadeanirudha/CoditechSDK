@@ -163,10 +163,10 @@ namespace Coditech.API.Service
         }
 
 
-        public virtual DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId, int pagingStart, int pagingLength)
+        public virtual DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
         {
             //Bind the Filter, sorts & Paging details.
-            PageListModel pageListModel = new PageListModel(null, null, pagingStart, pagingLength);
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerId, ParameterDirection.Input, DbType.Int64);
