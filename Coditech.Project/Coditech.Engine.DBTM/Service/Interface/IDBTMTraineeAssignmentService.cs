@@ -13,7 +13,7 @@ namespace Coditech.API.Service
         bool UpdateDBTMTraineeAssignment(DBTMTraineeAssignmentModel model);
         bool DeleteDBTMTraineeAssignment(ParameterModel parameterModel);
         GeneralTrainerListModel GetTrainerByCentreCode(string centreCode);
-        DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId);
+        DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId,int pagingStart, int pagingLength);
         bool SendAssignmentReminder(string dBTMTraineeAssignmentId);
     }
 }

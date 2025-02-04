@@ -162,11 +162,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeAssignment/GetTraineeDetailByCentreCodeAndgeneralTrainerId")]
         [Produces(typeof(DBTMTraineeDetailsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
+        public virtual IActionResult GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId,int pagingStart, int pagingLength)
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMTraineeAssignmentService.GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode,generalTrainerId);
+                DBTMTraineeDetailsListModel list = _dBTMTraineeAssignmentService.GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode,generalTrainerId,pagingStart, pagingLength);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
             }
