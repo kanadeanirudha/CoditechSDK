@@ -10,7 +10,8 @@
         DBTMBatchActivity,
         DBTMSubscriptionPlanType,
         DBTMTestStatus,
-        DBTMDeviceStatus
+        DBTMDeviceStatus,
+        UnAssociatedTrainerList
     }
     public enum DashboardFormCustomEnum
     {

@@ -232,7 +232,7 @@ namespace Coditech.Admin.Controllers
         {
             DropdownViewModel departmentDropdown = new DropdownViewModel()
             {
-                DropdownType = DropdownTypeEnum.UnAssociatedTrainerList.ToString(),
+                DropdownType = DropdownCustomTypeEnum.UnAssociatedTrainerList.ToString(),
                 DropdownName = "GeneralTrainerMasterId",
                 Parameter = $"{selectedCentreCode}~{selectedDepartmentId}~{entityId}~{UserTypeEnum.Trainee.ToString()}~false",
             };
