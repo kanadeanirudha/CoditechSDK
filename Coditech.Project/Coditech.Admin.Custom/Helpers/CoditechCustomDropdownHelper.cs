@@ -126,7 +126,7 @@ namespace Coditech.Admin.Helpers
             {
                 string centreCode = dropdownViewModel.Parameter.Split("~")[0];
                 long generalTrainerId = Convert.ToInt16(dropdownViewModel.Parameter.Split("~")[1]);
-                DBTMTraineeDetailsListResponse response = new DBTMTraineeAssignmentClient().GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId, 1, int.MaxValue);
+                DBTMTraineeDetailsListResponse response = new DBTMTraineeAssignmentClient().GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId);
                 list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             }
             dropdownList.Add(new SelectListItem() { Text = "-------Select Trainee Details-------", Value = "" });

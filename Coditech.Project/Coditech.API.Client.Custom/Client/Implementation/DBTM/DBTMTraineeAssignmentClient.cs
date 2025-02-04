@@ -310,14 +310,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTraineeDetailsListResponse GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId, int? pageIndex, int? pageSize)
+        public virtual DBTMTraineeDetailsListResponse GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
         {
-            return Task.Run(async () => await GetTraineeDetailsByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetTraineeDetailsByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeDetailsListResponse> GetTraineeDetailsByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeDetailsListResponse> GetTraineeDetailsByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTraineeAssignmentEndpoint.GetTraineeDetailsByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId, pageIndex, pageSize);
+            string endpoint = dBTMTraineeAssignmentEndpoint.GetTraineeDetailsByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
 

@@ -46,7 +46,7 @@ namespace Coditech.API.Client
         /// </summary>
         /// <returns>DBTMTraineeAssignmentListResponse</returns>
         GeneralTrainerListResponse GetTrainerByCentreCode(string centreCode);
-        DBTMTraineeDetailsListResponse GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId, int? pageIndex, int? pageSize);
+        DBTMTraineeDetailsListResponse GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId);
         TrueFalseResponse SendAssignmentReminder(string dBTMTraineeAssignmentId);
     }
 }
