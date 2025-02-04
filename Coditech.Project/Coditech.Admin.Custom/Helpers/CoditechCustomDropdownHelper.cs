@@ -41,6 +41,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMTestList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.UnAssociatedTrainerList.ToString()))
+            {
+                GetUnAssociatedTrainerList(dropdownViewModel, dropdownList);
+            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMBatchActivity.ToString()))
             {
                 GetDBTMBatchActivityList(dropdownViewModel, dropdownList);
@@ -72,6 +76,31 @@ namespace Coditech.Admin.Helpers
                     Value = Convert.ToString(item.DBTMActivityCategoryId),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMActivityCategoryId)
                 });
+            }
+        }
+
+        private static void GetUnAssociatedTrainerList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------" });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                string selectedCentreCode = dropdownViewModel.Parameter.Split("~")[0];
+                short selectedDepartmentId = Convert.ToInt16(dropdownViewModel.Parameter.Split("~")[1]);
+                long entityId = Convert.ToInt64(dropdownViewModel.Parameter.Split("~")[2]);
+                string userType = Convert.ToString(dropdownViewModel.Parameter.Split("~")[3]);
+                bool isAssociated = Convert.ToBoolean(dropdownViewModel.Parameter.Split("~")[4]);
+                GeneralTraineeAssociatedToTrainerListResponse response = new GeneralTrainerClient().GetAssociatedTrainerList(selectedCentreCode, selectedDepartmentId, isAssociated, entityId, userType, 0, null, null, null, 1, int.MaxValue);
+                GeneralTraineeAssociatedToTrainerListModel list = new GeneralTraineeAssociatedToTrainerListModel() { AssociatedTrainerList = response.AssociatedTrainerList };
+                foreach (var item in list?.AssociatedTrainerList)
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.FirstName} {item.LastName}",
+                        Value = item.GeneralTrainerMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                    });
+                }
             }
         }
 
