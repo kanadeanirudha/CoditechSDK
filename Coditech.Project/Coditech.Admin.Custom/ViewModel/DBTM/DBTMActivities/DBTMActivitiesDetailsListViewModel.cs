@@ -14,7 +14,6 @@ namespace Coditech.Admin.ViewModel
         public long DBTMDeviceDataId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string PersonCode { get; set; }
         public string SelectedParameter1 { get; set; }
     }
 }
