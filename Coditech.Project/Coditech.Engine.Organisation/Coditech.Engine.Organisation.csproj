@@ -44,6 +44,9 @@
 		<Reference Include="Coditech.Organisation.Service">
 			<HintPath>..\SharedLibraries\Coditech.Organisation.Service.dll</HintPath>
 		</Reference>
+		<Reference Include="Coditech.Resources">
+		  <HintPath>..\SharedLibraries\Coditech.Resources.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
