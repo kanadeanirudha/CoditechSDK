@@ -30,16 +30,20 @@
                                     </div>
                                 }
                             </td>
-                            <td>@item.PersonCode</td>
+                            <td>
+                                <a href="../EmployeeMaster/UpdateEmployeePersonalDetails?employeeId=@item.EmployeeId&personId=@item.PersonId">@item.PersonCode</a>
+                            </td>
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
                             <td>@item.MobileNumber</td>
-                            <td>@item.EmailId</td>
+                            <td>
+                                <a href="../EmployeeMaster/UpdateEmployeePersonalDetails?employeeId=@item.EmployeeId&personId=@item.PersonId">@item.EmailId</a>
+                            </td>
                             <td>@item.TrainerSpecialization</td>
                             <td>@item.NumberOfTraineeAssociated</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?generalTrainerId=@item.GeneralTrainerMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>@* <span class="m-2">|</span> *@
-                            @*     <a href="../@controllerName/Delete?generalTrainerIds=@item.GeneralTrainerMasterId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
+                                <a href="../@controllerName/Edit?generalTrainerId=@item.GeneralTrainerMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="../EmployeeMaster/UpdateEmployeePersonalDetails?employeeId=@item.EmployeeId&personId=@item.PersonId" title="View" class="btn btn-sm btn-soft-warning btn-circle me-2"> <i class="fas fa-eye" style="color: orange;"></i></a>
                             </td>
                         </tr>
                     }

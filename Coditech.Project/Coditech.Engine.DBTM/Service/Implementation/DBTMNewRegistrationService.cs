@@ -179,6 +179,7 @@ namespace Coditech.API.Service
                 UserType = UserTypeEnum.Employee.ToString(),
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
+                IsPasswordChange = true,
             };
             GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);
             long employeeId = 0;
