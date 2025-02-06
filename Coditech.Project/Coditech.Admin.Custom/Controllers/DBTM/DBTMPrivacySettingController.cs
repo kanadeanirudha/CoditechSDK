@@ -19,6 +19,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult List(DataTableViewModel dataTableModel)
         {
             DBTMPrivacySettingListViewModel list = new DBTMPrivacySettingListViewModel();
+            GetListOnlyIfSingleCentre(dataTableModel);
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
                 list = _dBTMPrivacySettingAgent.GetDBTMPrivacySettingList(dataTableModel);

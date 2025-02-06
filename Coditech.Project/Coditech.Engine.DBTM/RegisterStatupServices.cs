@@ -250,7 +250,7 @@ namespace Coditech.API.Common
         public static void RegisterDI(this WebApplicationBuilder builder)
         {
             // Add Dependency 
-            builder.Services.AddScoped<ICoditechLogging, CoditechLogging>();
+            builder.Services.AddSingleton<ICoditechLogging, CoditechLogging>();
             builder.Services.AddScoped<IDBTMDeviceMasterService, DBTMDeviceMasterService>();
             builder.Services.AddScoped<IDBTMTraineeDetailsService, DBTMTraineeDetailsService>();
             builder.Services.AddScoped<IDBTMActivityCategoryService, DBTMActivityCategoryService>();
