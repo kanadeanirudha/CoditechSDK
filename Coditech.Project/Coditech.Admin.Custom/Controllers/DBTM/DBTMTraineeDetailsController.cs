@@ -1,6 +1,7 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
@@ -23,6 +24,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult List(DataTableViewModel dataTableViewModel)
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
+            GetListOnlyIfSingleCentre(dataTableViewModel);
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
                 list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
@@ -39,6 +41,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult ActiveMemberList(DataTableViewModel dataTableViewModel)
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
+            GetListOnlyIfSingleCentre(dataTableViewModel);
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
                 list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
@@ -55,6 +58,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult InActiveMemberList(DataTableViewModel dataTableViewModel)
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
+            GetListOnlyIfSingleCentre(dataTableViewModel);
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
                 list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
