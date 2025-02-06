@@ -206,7 +206,7 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTraineeDetailsAgent.UpdateAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("UpdateAssociatedTrainer", new { generalTraineeAssociatedToTrainerId = generalTraineeAssociatedToTrainerViewModel.GeneralTraineeAssociatedToTrainerId });
+                return RedirectToAction("GetAssociatedTrainerList", new { SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId, SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId });
             }
             return View(createEditAssociatedTrainer, generalTraineeAssociatedToTrainerViewModel);
         }
@@ -255,7 +255,7 @@ namespace Coditech.Admin.Controllers
         #region Trainee Activities List
         public virtual ActionResult TraineeActivitiesList(DataTableViewModel dataTableModel)
         {
-            DBTMActivitiesListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesList(Convert.ToString(dataTableModel.SelectedParameter1),7,dataTableModel);
+            DBTMActivitiesListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesList(Convert.ToString(dataTableModel.SelectedParameter1), 7, dataTableModel);
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMActivities/_List.cshtml", list);
@@ -268,14 +268,14 @@ namespace Coditech.Admin.Controllers
         //Trainee Activities Details List
         public virtual ActionResult TraineeActivitiesDetailsList(DataTableViewModel dataTableModel)
         {
-            DBTMActivitiesDetailsListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesDetailsList(Convert.ToInt64(dataTableModel.SelectedParameter1),dataTableModel);
+            DBTMActivitiesDetailsListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesDetailsList(Convert.ToInt64(dataTableModel.SelectedParameter1), dataTableModel);
             if (AjaxHelper.IsAjaxRequest)
             {
-                return PartialView("~/Views/DBTM/DBTMActivities/DBTMActivitiesDetails_List.cshtml",list);
+                return PartialView("~/Views/DBTM/DBTMActivities/DBTMActivitiesDetails_List.cshtml", list);
             }
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
 
-            return View($"~/Views/DBTM/DBTMActivities/DBTMActivitiesDetailsList.cshtml",list);
+            return View($"~/Views/DBTM/DBTMActivities/DBTMActivitiesDetailsList.cshtml", list);
         }
         #endregion
     }
