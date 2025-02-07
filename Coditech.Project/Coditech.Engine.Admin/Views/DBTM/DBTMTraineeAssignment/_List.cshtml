@@ -21,7 +21,9 @@
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
                             <td>@item.TestName</td> 
-                            <td>@item.TestStatus</td>
+                            <td class="text-center">
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableStatusData.cshtml", new DataTableStatusViewModel() { Key = item.TestStatus, Value = item.TestStatus })
+                            </td>
                             <td class="text-center">
                                 <a href="../@controllerName/Edit?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
                                 <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="SetReminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
