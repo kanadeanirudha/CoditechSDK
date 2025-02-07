@@ -26,8 +26,8 @@
                             </td>
                             <td class="text-center">
                                 <a href="../@controllerName/Edit?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
-                                <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="SetReminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
-                               @*  <a href="../@controllerName/Delete?dBTMTraineeAssignmentIds=@item.DBTMTraineeAssignmentId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
+                                <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a><span class="m-2">|</span>
+                                <a href="../@controllerName/ViewAssignmentResult?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="View Assignment Result" class="btn btn-sm btn-soft-warning btn-circle"><i class="fas fa-eye"></i></a>
                             </td>
                         </tr>
                     }
