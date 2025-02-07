@@ -11,5 +11,6 @@ namespace Coditech.Admin.ViewModel
         }
         public string SelectedCentreCode { get; set; } = string.Empty;
         public string ListType { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
     }
 }

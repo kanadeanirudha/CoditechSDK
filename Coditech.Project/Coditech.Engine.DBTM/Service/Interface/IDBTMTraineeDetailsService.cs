@@ -7,7 +7,7 @@ namespace Coditech.API.Service
 {
     public interface IDBTMTraineeDetailsService
     {
-        DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string selectedCentreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
+        DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string selectedCentreCode,long generalTrainerMasterId,FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId);
         bool UpdateDBTMTraineeOtherDetails(DBTMTraineeDetailsModel model);
         bool DeleteDBTMTraineeDetails(ParameterModel parameterModel);
