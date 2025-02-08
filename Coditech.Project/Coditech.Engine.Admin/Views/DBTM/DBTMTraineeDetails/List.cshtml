@@ -4,7 +4,17 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByCentreCode()" };
-    DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true };
+    DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "SelectedParameter1",
+                Parameter = Model.SelectedCentreCode,
+                DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId),
+                ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')",
+                IsCustomDropdown = true,
+                SelectedText = "All",
+                SelectedValue = "0"
+            };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
