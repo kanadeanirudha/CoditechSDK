@@ -59,7 +59,7 @@ namespace Coditech.Admin.Agents
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
-            DBTMTraineeDetailsListResponse response = _dBTMTraineeDetailsClient.List(dataTableModel.SelectedCentreCode, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            DBTMTraineeDetailsListResponse response = _dBTMTraineeDetailsClient.List(dataTableModel.SelectedCentreCode, Convert.ToInt64(string.IsNullOrEmpty(dataTableModel.SelectedParameter1) ? "0" : dataTableModel.SelectedParameter1), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMTraineeDetailsListModel dBTMTraineeDetailsList = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             DBTMTraineeDetailsListViewModel listViewModel = new DBTMTraineeDetailsListViewModel();
             listViewModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.DBTMTraineeDetailsList?.ToViewModel<DBTMTraineeDetailsViewModel>().ToList();
@@ -235,7 +235,7 @@ namespace Coditech.Admin.Agents
                 LastName = response.GeneralPersonModel.LastName,
                 EntityId = dBTMTraineeDetailId,
                 PersonId = personId,
-                UserType= UserTypeEnum.Trainee.ToString()
+                UserType = UserTypeEnum.Trainee.ToString()
             };
             return generalTraineeAssociatedToTrainerViewModel;
         }
@@ -333,7 +333,7 @@ namespace Coditech.Admin.Agents
 
         #region DBTMTraineeActivities
 
-        public virtual DBTMActivitiesListViewModel GetTraineeActivitiesList(string personCode,int numberOfDaysRecord,DataTableViewModel dataTableModel)
+        public virtual DBTMActivitiesListViewModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, DataTableViewModel dataTableModel)
         {
             FilterCollection filters = new FilterCollection();
             dataTableModel = dataTableModel ?? new DataTableViewModel();
@@ -344,8 +344,8 @@ namespace Coditech.Admin.Agents
             }
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
-            
-            DBTMActivitiesListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesList(personCode, numberOfDaysRecord, null,filters, sortlist, dataTableModel.PageIndex,dataTableModel.PageSize);
+
+            DBTMActivitiesListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesList(personCode, numberOfDaysRecord, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMActivitiesListModel dBTMActivitiesList = new DBTMActivitiesListModel { ActivitiesList = response?.ActivitiesList };
             DBTMActivitiesListViewModel listViewModel = new DBTMActivitiesListViewModel();
             listViewModel.ActivitiesList = dBTMActivitiesList?.ActivitiesList?.ToViewModel<DBTMActivitiesViewModel>().ToList();
@@ -379,12 +379,12 @@ namespace Coditech.Admin.Agents
             DBTMActivitiesDetailsListModel activitiesDetailsListModel = new DBTMActivitiesDetailsListModel
             {
                 ActivitiesDetailsList = response?.ActivitiesDetailsList,
-                Columns = response?.Columns 
+                Columns = response?.Columns
             };
             DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
             {
                 ActivitiesDetailsList = activitiesDetailsListModel?.ActivitiesDetailsList?.ToViewModel<DBTMActivitiesDetailsViewModel>().ToList(),
-                Columns = activitiesDetailsListModel?.Columns?.ToList() 
+                Columns = activitiesDetailsListModel?.Columns?.ToList()
             };
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.ActivitiesDetailsList.Count, BindTraineeActivitiesDetailsColumns(listViewModel.Columns), false);
 
@@ -493,7 +493,7 @@ namespace Coditech.Admin.Agents
         protected virtual List<DatatableColumns> BindTraineeActivitiesColumns()
         {
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
-           
+
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Test Name",
@@ -514,7 +514,7 @@ namespace Coditech.Admin.Agents
             });
             return datatableColumnList;
         }
-     
+
         protected virtual List<DatatableColumns> BindTraineeActivitiesDetailsColumns(List<string> columns)
         {
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
@@ -525,9 +525,9 @@ namespace Coditech.Admin.Agents
                 {
                     datatableColumnList.Add(new DatatableColumns()
                     {
-                        ColumnName = item,  
-                        ColumnCode = item,  
-                        IsSortable = true   
+                        ColumnName = item,
+                        ColumnCode = item,
+                        IsSortable = true
                     });
                 }
             }

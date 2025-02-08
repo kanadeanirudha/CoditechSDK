@@ -1,6 +1,7 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
@@ -38,7 +39,13 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult Create()
         {
-            return View(createEdit, new DBTMTraineeAssignmentViewModel());
+            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel();
+            List<UserAccessibleCentreModel> list = SessionHelper.GetDataFromSession<UserModel>("UserData")?.AccessibleCentreList;
+            if (list != null && list.Count == 1)
+            {
+                dBTMTraineeAssignmentViewModel.SelectedCentreCode = list[0].CentreCode;
+            }
+            return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
         [HttpPost]

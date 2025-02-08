@@ -11,7 +11,7 @@ namespace Coditech.API.Client
         /// Get list of DBTMTraineeDetails.
         /// </summary>
         /// <returns>DBTMTraineeDetailsListResponse</returns>
-        DBTMTraineeDetailsListResponse List(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMTraineeDetailsListResponse List(string selectedCentreCode,long generalTrainerMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
 
         /// <summary>
         /// Get DBTM Trainee Other Details by dBTMTraineeDetailId.

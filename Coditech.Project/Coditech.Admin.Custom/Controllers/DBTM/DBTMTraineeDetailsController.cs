@@ -30,7 +30,6 @@ namespace Coditech.Admin.Controllers
                 list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
-
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeDetails/_List.cshtml", list);
@@ -280,6 +279,18 @@ namespace Coditech.Admin.Controllers
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
 
             return View($"~/Views/DBTM/DBTMActivities/DBTMActivitiesDetailsList.cshtml", list);
+        }
+
+        public ActionResult GetTrainerByCentreCode(string centreCode)
+        {
+            DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "GeneralTrainerMasterId",
+                Parameter = centreCode,
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
         #endregion
     }

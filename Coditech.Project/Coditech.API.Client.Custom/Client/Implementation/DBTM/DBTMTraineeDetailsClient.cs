@@ -17,14 +17,14 @@ namespace Coditech.API.Client
         {
             dBTMTraineeDetailsEndpoint = new DBTMTraineeDetailsEndpoint();
         }
-        public virtual DBTMTraineeDetailsListResponse List(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public virtual DBTMTraineeDetailsListResponse List(string selectedCentreCode, long generalTrainerMasterId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await ListAsync(selectedCentreCode, expand, filter, sort, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await ListAsync(selectedCentreCode, generalTrainerMasterId,expand, filter, sort, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeDetailsListResponse> ListAsync(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeDetailsListResponse> ListAsync(string selectedCentreCode, long generalTrainerMasterId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTraineeDetailsEndpoint.ListAsync(selectedCentreCode, expand, filter, sort, pageIndex, pageSize);
+            string endpoint = dBTMTraineeDetailsEndpoint.ListAsync(selectedCentreCode, generalTrainerMasterId,expand, filter, sort, pageIndex, pageSize);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
