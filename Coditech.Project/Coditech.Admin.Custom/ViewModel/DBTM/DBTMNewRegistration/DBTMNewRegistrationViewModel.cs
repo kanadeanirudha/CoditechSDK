@@ -8,6 +8,10 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Centre Name")]
         public string CentreName { get; set; }
 
+        [MaxLength(30)]
+        [Display(Name = "Centre Code")]
+        public string CentreCode { get; set; }
+
         [MaxLength(50)]
         [MinLength(1)]
         [Required]
@@ -86,7 +90,6 @@ namespace Coditech.Admin.ViewModel
         public string ConfirmPassword { get; set; }
         [Display(Name = "Terms And Condition")]
         public bool IsTermsAndCondition { get; set; }
-        public bool IsCentreRegistration { get; set; }
         [Display(Name = "Calling Code")]
         public string CallingCode { get; set; }
     }

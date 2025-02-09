@@ -30,4 +30,9 @@
     {
         DBTMTraineeRegistration,
     }
+
+    public enum LogComponentCustomEnum
+    {
+        DBTMCentreRegistration,
+    }
 }

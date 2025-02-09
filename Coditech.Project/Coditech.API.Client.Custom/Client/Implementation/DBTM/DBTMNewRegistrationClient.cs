@@ -17,14 +17,14 @@ namespace Coditech.API.Client
             dBTMNewRegistrationEndpoint = new DBTMNewRegistrationEndpoint();
         }
         
-        public virtual DBTMNewRegistrationResponse DBTMNewRegistration(DBTMNewRegistrationModel body)
+        public virtual DBTMNewRegistrationResponse DBTMCentreRegistration(DBTMNewRegistrationModel body)
         {
             return Task.Run(async () => await NewRegistrationAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
         public virtual async Task<DBTMNewRegistrationResponse> NewRegistrationAsync(DBTMNewRegistrationModel body, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMNewRegistrationEndpoint.NewRegistrationAsync();
+            string endpoint = dBTMNewRegistrationEndpoint.DBTMCentreRegistrationAsync();
             HttpResponseMessage response = null;
             bool disposeResponse = true;
             try

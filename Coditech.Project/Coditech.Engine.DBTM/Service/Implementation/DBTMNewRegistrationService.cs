@@ -28,31 +28,30 @@ namespace Coditech.API.Service
             _dbtmDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        //Create DBTMDevice.
-        public virtual DBTMNewRegistrationModel DBTMNewRegistration(DBTMNewRegistrationModel dBTMNewRegistrationModel)
+        #region Public
+        //Create DBTM Centre Registration.
+        public virtual DBTMNewRegistrationModel DBTMCentreRegistration(DBTMNewRegistrationModel dBTMNewRegistrationModel)
         {
             if (IsNull(dBTMNewRegistrationModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            if (IsCentreNameAlreadyExist(dBTMNewRegistrationModel.CentreName))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Centre Name"));
+                if (IsCentreNameAlreadyExist(dBTMNewRegistrationModel.CentreName))
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Centre Name"));
 
-            DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMasterService(_coditechLogging, _serviceProvider).GetDBTMDeviceMasterDetailsByCode(dBTMNewRegistrationModel.DeviceSerialCode);
+                DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMasterService(_coditechLogging, _serviceProvider).GetDBTMDeviceMasterDetailsByCode(dBTMNewRegistrationModel.DeviceSerialCode);
 
-            if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Device Serial Code."));
+                if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Device Serial Code."));
 
-            if (new DBTMDeviceRegistrationDetailsService(_coditechLogging, _serviceProvider).IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
+                if (new DBTMDeviceRegistrationDetailsService(_coditechLogging, _serviceProvider).IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
 
-            string centreCode = "HO";
-            List<GeneralRunningNumbers> generalRunningNumbersList = GetGeneralRunningNumbersList(centreCode);
+                string centreCode = "HO";
+                List<GeneralRunningNumbers> generalRunningNumbersList = GetGeneralRunningNumbersList(centreCode);
 
-            if (IsNull(generalRunningNumbersList) || generalRunningNumbersList.Count == 0)
-                throw new CoditechException(ErrorCodes.InvalidData, string.Format("EmployeeRegistration and DBTMTraineeRegistration not set for HO."));
+                if (IsNull(generalRunningNumbersList) || generalRunningNumbersList.Count == 0)
+                    throw new CoditechException(ErrorCodes.InvalidData, string.Format("EmployeeRegistration and DBTMTraineeRegistration not set for HO."));
 
-            if (dBTMNewRegistrationModel.IsCentreRegistration)
-            {
                 OrganisationCentreMaster organisationCentreMaster = null;
                 long personId = 0;
                 long employeeId = 0;
@@ -86,13 +85,13 @@ namespace Coditech.API.Service
                     InsertGeneralRunningNumbers(generalRunningNumbersList, currentDate, organisationCentreMaster, centreCode);
 
                     //Insert General Person and registor employee
-                    employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, generalDepartmentMasterList, out personId);
+                    employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.DirectorDepartmentId.ToString(), ApiCustomSettings.DirectorDesignationId, out personId);
 
                     //Insert Employee Address
                     InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
 
                     //Insert Admin Role
-                    InsertAdminRole(currentDate, generalDepartmentMasterList.FirstOrDefault(), organisationCentreMaster.CentreCode, employeeId, out sanctionPostCode);
+                    InsertAdminRole(currentDate, ApiCustomSettings.DirectorDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.DirectorDesignationId, DashboardFormCustomEnum.DBTMCentreDashboard.ToString(), ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList(), out sanctionPostCode);
 
                     //DBTM Device Registration Details
                     InsertDBTMDeviceRegistration(dBTMNewRegistrationModel, currentDate, employeeId, dBTMDeviceMaster.DBTMDeviceMasterId);
@@ -101,22 +100,23 @@ namespace Coditech.API.Service
                 {
                     dBTMNewRegistrationModel.HasError = true;
                     dBTMNewRegistrationModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
-                    _coditechLogging.LogMessage(ex, "DBTMNewRegistration", TraceLevel.Error);
+                    _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Error);
                     //Call Delete data method
                     CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
-                    objStoredProc.SetParameter("NewCentreCode", organisationCentreMaster.CentreCode, ParameterDirection.Input, DbType.String);
-                    objStoredProc.SetParameter("EntityId", employeeId, ParameterDirection.Input, DbType.String);
-                    objStoredProc.SetParameter("UserType", userType, ParameterDirection.Input, DbType.String);
-                    objStoredProc.SetParameter("SanctionPostCode", sanctionPostCode, ParameterDirection.Input, DbType.String);
-                    objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
-                    objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
-                    int status = 0;
-                    objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMNewRegistration @NewCentreCode,@EntityId,@UserType,@SanctionPostCode,@PersonId,@Status OUT", 5, out status);
+                        objStoredProc.SetParameter("NewCentreCode", organisationCentreMaster.CentreCode, ParameterDirection.Input, DbType.String);
+                        objStoredProc.SetParameter("EntityId", employeeId, ParameterDirection.Input, DbType.String);
+                        objStoredProc.SetParameter("UserType", userType, ParameterDirection.Input, DbType.String);
+                        objStoredProc.SetParameter("SanctionPostCode", sanctionPostCode, ParameterDirection.Input, DbType.String);
+                        objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
+                        objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+                        int status = 0;
+                        objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMNewRegistration @NewCentreCode,@EntityId,@UserType,@SanctionPostCode,@PersonId,@Status OUT", 5, out status);
                 }
-            }
             return dBTMNewRegistrationModel;
         }
+        #endregion
 
+        #region Protected
         protected List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
         {
             List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
@@ -162,7 +162,7 @@ namespace Coditech.API.Service
             new DBTMDeviceRegistrationDetailsService(_coditechLogging, _serviceProvider).CreateRegistrationDetails(dBTMDeviceRegistrationDetailsModel);
         }
 
-        protected virtual long InsertEmployee(DBTMNewRegistrationModel dBTMNewRegistrationModel, DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, List<short> generalDepartmentMasterList, out long personId)
+        protected virtual long InsertEmployee(DBTMNewRegistrationModel dBTMNewRegistrationModel, DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string selectedDepartmentId, short employeeDesignationMasterId, out long personId)
         {
             personId = 0;
             GeneralPersonModel generalPersonModel = new GeneralPersonModel()
@@ -190,8 +190,8 @@ namespace Coditech.API.Service
                 List<GeneralSystemGlobleSettingModel> settingMasterList = GetSystemGlobleSettingList();
                 generalPersonModel.PersonId = personData.PersonId;
                 generalPersonModel.SelectedCentreCode = organisationCentreMaster.CentreCode;
-                generalPersonModel.SelectedDepartmentId = generalDepartmentMasterList.FirstOrDefault().ToString();
-                generalPersonModel.EmployeeDesignationMasterId = 1;
+                generalPersonModel.SelectedDepartmentId = selectedDepartmentId;
+                generalPersonModel.EmployeeDesignationMasterId = employeeDesignationMasterId;
                 employeeId = base.InsertEmployee(generalPersonModel, settingMasterList, true);
             }
             return employeeId;
@@ -380,12 +380,12 @@ namespace Coditech.API.Service
         }
 
         //Create adminSanctionPost.
-        protected virtual void InsertAdminRole(DateTime currentDate, short departmentId, string centreCode, long employeeId, out string sanctionPostCode)
+        protected virtual void InsertAdminRole(DateTime currentDate, short departmentId, string centreCode, long employeeId, short designationId, string dashboardFormCustomEnum, List<string> associateMenus, out string sanctionPostCode)
         {
             sanctionPostCode = string.Empty;
             AdminSanctionPostModel adminSanctionPostModel = new AdminSanctionPostModel()
             {
-                DesignationId = 1,
+                DesignationId = designationId,
                 DepartmentId = departmentId,
                 NoOfPost = 1,
                 IsActive = true,
@@ -416,7 +416,7 @@ namespace Coditech.API.Service
                     AdminRoleCode = adminSanctionPostModel.SanctionPostCode,
                     OthCentreLevel = string.Empty,
                     IsActive = true,
-                    DashboardFormEnumId = GetEnumIdByEnumCode(DashboardFormEnum.DBTMCentreDashboard.ToString(), GeneralEnumaratorGroupCodeEnum.DashboardForm.ToString()),
+                    DashboardFormEnumId = GetEnumIdByEnumCode(dashboardFormCustomEnum, GeneralEnumaratorGroupCodeEnum.DashboardForm.ToString()),
                     CreatedDate = currentDate,
                     ModifiedDate = currentDate
                 };
@@ -445,7 +445,6 @@ namespace Coditech.API.Service
                 new CoditechRepository<AdminRoleApplicableDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleApplicableDetails);
 
                 //insert admin Role Menu Detail
-                List<string> associateMenus = ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList();
                 List<UserMainMenuMaster> menuList = new CoditechRepository<UserMainMenuMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => associateMenus.Contains(x.MenuCode)).ToList();
                 List<AdminRoleMenuDetails> adminRoleMenuDetailList = new List<AdminRoleMenuDetails>();
                 foreach (var menu in menuList)
@@ -465,5 +464,6 @@ namespace Coditech.API.Service
                 new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMenuDetailList);
             }
         }
+        #endregion
     }
 }
