@@ -6,10 +6,10 @@ namespace Coditech.API.Client
     public interface IDBTMNewRegistrationClient : IBaseClient
     {
         /// <summary>
-        /// Add DBTMNewRegistration.
+        /// Add DBTMCentreRegistration.
         /// </summary>
         /// <param name="DBTMNewRegistrationModel">DBTMNewRegistrationModel.</param>
         /// <returns>Returns DBTMDeviceResponse.</returns>
-        DBTMNewRegistrationResponse DBTMNewRegistration(DBTMNewRegistrationModel body);
+        DBTMNewRegistrationResponse DBTMCentreRegistration(DBTMNewRegistrationModel body);
     }
 }

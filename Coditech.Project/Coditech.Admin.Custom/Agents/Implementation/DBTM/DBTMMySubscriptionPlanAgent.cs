@@ -37,15 +37,19 @@ namespace Coditech.Admin.Agents
                 {
                     filters.Add("PlanName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                     filters.Add("DurationInDays", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                    filters.Add("DeviceSerialCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                    filters.Add("PlanCost", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                    filters.Add("PlanDiscount", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                    filters.Add("PlanDurationExpirationDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 }
                 SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
-                DBTMMySubscriptionPlanListResponse response = _dBTMMySubscriptionPlanClient.List(entityId,null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+                DBTMMySubscriptionPlanListResponse response = _dBTMMySubscriptionPlanClient.List(entityId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
                 DBTMMySubscriptionPlanListModel mySubscriptionPlanList = new DBTMMySubscriptionPlanListModel { DBTMMySubscriptionPlanList = response?.DBTMMySubscriptionPlanList };
                 DBTMMySubscriptionPlanListViewModel listViewModel = new DBTMMySubscriptionPlanListViewModel();
                 listViewModel.DBTMMySubscriptionPlanList = mySubscriptionPlanList?.DBTMMySubscriptionPlanList?.ToViewModel<DBTMSubscriptionPlanViewModel>().ToList();
 
-                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMMySubscriptionPlanList.Count, BindColumns(),false);
+                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMMySubscriptionPlanList.Count, BindColumns(), false);
                 return listViewModel;
             }
             return new DBTMMySubscriptionPlanListViewModel();

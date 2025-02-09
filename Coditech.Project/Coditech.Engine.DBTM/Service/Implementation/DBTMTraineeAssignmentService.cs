@@ -162,23 +162,20 @@ namespace Coditech.API.Service
             return list;
         }
 
+
         public virtual DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
         {
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGetTraineeDetailListByCentreCodeAndgeneralTrainerId @CentreCode,@GeneralTrainerMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
 
-            listModel.DBTMTraineeDetailsList = (from a in _dBTMTraineeDetailsRepository.Table
-                                                join b in _generalPersonRepository.Table on a.PersonId equals b.PersonId
-                                                join c in _generalTraineeAssociatedToTrainerRepository.Table on a.DBTMTraineeDetailId equals c.EntityId
-                                                join d in _generalTrainerRepository.Table on c.GeneralTrainerMasterId equals d.GeneralTrainerMasterId
-                                                where (a.CentreCode == centreCode || centreCode == null)
-                                                && (c.GeneralTrainerMasterId == generalTrainerId) && a.IsActive
-                                                select new DBTMTraineeDetailsModel
-                                                {
-                                                    DBTMTraineeDetailId = a.DBTMTraineeDetailId,
-                                                    FirstName = b.FirstName,
-                                                    LastName = b.LastName,
-                                                }).ToList();
-
+            listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
+            listModel.BindPageListModel(pageListModel);
             return listModel;
         }
         #region Protected Method

@@ -20,7 +20,7 @@ namespace Coditech.Admin.Helpers
         public static DropdownViewModel GeneralDropdownList(DropdownViewModel dropdownViewModel)
         {
             List<SelectListItem> dropdownList = new List<SelectListItem>();
-          
+
             if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMActivityCategory.ToString()))
             {
                 GetDBTMActivityCategoryList(dropdownViewModel, dropdownList);
@@ -106,7 +106,10 @@ namespace Coditech.Admin.Helpers
                 GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
             }
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
+            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText))
+                dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
+            else
+                dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
             foreach (var item in list?.GeneralTrainerList)
             {
                 dropdownList.Add(new SelectListItem()

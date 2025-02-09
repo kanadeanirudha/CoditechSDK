@@ -29,17 +29,17 @@ namespace Coditech.Admin.Agents
         #region Public Methods
 
         //Add NewRegistration.
-        public virtual DBTMNewRegistrationViewModel DBTMNewRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
+        public virtual DBTMNewRegistrationViewModel DBTMCentreRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             try
             {
-                DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.DBTMNewRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
+                DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.DBTMCentreRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
                 DBTMNewRegistrationModel dBTMNewRegistrationModel = response?.DBTMNewRegistrationModel;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMNewRegistration", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Warning);
                 switch (ex.ErrorCode)
                 {
                     case ErrorCodes.AlreadyExist:
@@ -52,7 +52,7 @@ namespace Coditech.Admin.Agents
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMNewRegistration", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Error);
                 return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, GeneralResources.UpdateErrorMessage);
             }
         }

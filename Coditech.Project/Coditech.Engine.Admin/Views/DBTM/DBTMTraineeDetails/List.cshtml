@@ -3,7 +3,18 @@
     ViewBag.Title = "All Trainee Details List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByCentreCode()" };
+    DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "SelectedParameter1",
+                Parameter = Model.SelectedCentreCode,
+                DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId),
+                ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')",
+                IsCustomDropdown = true,
+                SelectedText = "All",
+                SelectedValue = "0"
+            };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -35,7 +46,14 @@
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                             </div>
                             <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
+                                <label>Trainer</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
+                            </div>
+                            <div class="col-md-1">
+                               @*  <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" /> *@
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('@controllerName','@actionName')" />
                             </div>
                         </div>
                     </div>
@@ -49,3 +67,4 @@
         </div>
     </div>
 </div>
+<script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
