@@ -4,6 +4,6 @@ namespace Coditech.API.Service
 {
     public interface IDBTMNewRegistrationService
     {
-        DBTMNewRegistrationModel DBTMNewRegistration(DBTMNewRegistrationModel model);
+        DBTMNewRegistrationModel DBTMCentreRegistration(DBTMNewRegistrationModel model);
     }
 }

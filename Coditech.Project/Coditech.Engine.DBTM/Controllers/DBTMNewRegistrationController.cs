@@ -3,6 +3,7 @@ using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,25 +24,25 @@ namespace Coditech.Engine.DBTM.Controllers
             _coditechLogging = coditechLogging;
         }
 
-        [Route("/DBTMCentreRegistration/CentreRegistration")]
+        [Route("/DBTMCentreRegistration/DBTMCentreRegistration")]
         [HttpPost, ValidateModel]
         [Produces(typeof(DBTMNewRegistrationResponse))]
         [AllowAnonymous]
-        public virtual IActionResult CentreRegistration([FromBody] DBTMNewRegistrationModel model)
+        public virtual IActionResult DBTMCentreRegistration([FromBody] DBTMNewRegistrationModel model)
         {
             try
             {
-                DBTMNewRegistrationModel newRegistration = _dBTMNewRegistrationService.DBTMNewRegistration(model);
+                DBTMNewRegistrationModel newRegistration = _dBTMNewRegistrationService.DBTMCentreRegistration(model);
                 return IsNotNull(newRegistration) ? CreateCreatedResponse(new DBTMNewRegistrationResponse { DBTMNewRegistrationModel = newRegistration }) : CreateInternalServerErrorResponse();
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMNewRegistration", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMNewRegistration", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
