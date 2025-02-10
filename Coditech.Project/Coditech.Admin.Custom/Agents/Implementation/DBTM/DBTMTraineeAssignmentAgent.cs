@@ -181,12 +181,6 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Status",
-                ColumnCode = "DBTMTestStatusEnumId",
-                IsSortable = true,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
                 ColumnName = "Date",
                 ColumnCode = "AssignmentDate",
                 IsSortable = true,
@@ -195,6 +189,12 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Time",
                 ColumnCode = "AssignmentTime",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Test Status",
+                ColumnCode = "DBTMTestStatusEnumId",
                 IsSortable = true,
             });
             return datatableColumnList;
