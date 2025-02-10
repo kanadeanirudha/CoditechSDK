@@ -21,6 +21,9 @@
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
                             <td>@item.TestName</td> 
+                            <td>@item.TestStatus</td>
+                            <td>@item.AssignmentDate.ToCoditechDateFormat()</td>
+                            <td>@item.AssignmentTime</td>
                             <td class="text-center">
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableStatusData.cshtml", new DataTableStatusViewModel() { Key = item.TestStatus, Value = item.TestStatus })
                             </td>

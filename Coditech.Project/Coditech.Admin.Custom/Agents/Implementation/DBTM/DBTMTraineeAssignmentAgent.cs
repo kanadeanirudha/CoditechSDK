@@ -38,6 +38,8 @@ namespace Coditech.Admin.Agents
                 filters.Add("FirstName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("LastName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("TestName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("AssignmentDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("AssignmentTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
             
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
@@ -181,6 +183,18 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Test Status",
                 ColumnCode = "DBTMTestStatusEnumId",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Date",
+                ColumnCode = "AssignmentDate",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Time",
+                ColumnCode = "AssignmentTime",
                 IsSortable = true,
             });
             return datatableColumnList;
