@@ -8,9 +8,7 @@ namespace Coditech.Common.API.Model
         [MaxLength(30)]
         [Display(Name = "Centre Code")]
         public string CentreCode { get; set; }
-
         [MaxLength(100)]
-        [Required]
         [Display(Name = "Centre Name")]
         public string CentreName { get; set; }
         [Required]
@@ -55,15 +53,18 @@ namespace Coditech.Common.API.Model
         [Required]
         [Display(Name = "Mobile Number")]
         public string MobileNumber { get; set; }
-        [Required]
         public string DeviceSerialCode { get; set; }
+        [Required]
         public string Password { get; set; }
+        [Required]
+        public string ConfirmPassword { get; set; }
         public bool TermsAndCondition { get; set; }
         [Required]
         public string PersonTitle { get; set; }
+        [Required]
         public int GenderEnumId { get; set; }
         [Required]
         public string CallingCode { get; set; }
-
+        public int TrainerSpecializationEnumId { get; set; }
     }
 }

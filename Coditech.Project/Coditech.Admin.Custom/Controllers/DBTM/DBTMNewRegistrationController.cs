@@ -28,11 +28,14 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult CentreRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition) {
+            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
+            {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
             }
             else
             {
+                ModelState.Remove("CentreCode");
+                ModelState.Remove("TrainerSpecializationEnumId");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.DBTMCentreRegistration(dBTMNewRegistrationViewModel);
@@ -61,17 +64,18 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-           
-                dBTMNewRegistrationViewModel.CentreName = "DBTMCentre";
+
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
             }
             else
             {
+                ModelState.Remove("DeviceSerialCode");
+                ModelState.Remove("CentreName");
                 if (ModelState.IsValid)
                 {
-                    dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();// _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
+                    dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         TempData["FormSizeClass"] = "col-lg-4";
@@ -98,7 +102,6 @@ namespace Coditech.Admin.Controllers
         {
             TempData["FormSizeClass"] = "col-lg-8";
 
-            dBTMNewRegistrationViewModel.CentreName = "DBTMCentre";
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
@@ -107,7 +110,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();// _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
+                    dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         TempData["FormSizeClass"] = "col-lg-4";

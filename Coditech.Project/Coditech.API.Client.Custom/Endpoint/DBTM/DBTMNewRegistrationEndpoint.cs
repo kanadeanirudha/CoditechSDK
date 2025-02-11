@@ -7,5 +7,11 @@ namespace Coditech.API.Endpoint
     {
         public string DBTMCentreRegistrationAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreRegistration/DBTMCentreRegistration";
+
+        public string TrainerRegistrationAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/TrainerRegistration/TrainerRegistration";
+
+        public string IndividualRegistrationAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/IndividualRegistration/IndividualRegistration";
     }
 }

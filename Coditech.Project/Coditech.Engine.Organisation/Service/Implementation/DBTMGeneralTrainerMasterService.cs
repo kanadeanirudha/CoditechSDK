@@ -1,6 +1,5 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
-using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 

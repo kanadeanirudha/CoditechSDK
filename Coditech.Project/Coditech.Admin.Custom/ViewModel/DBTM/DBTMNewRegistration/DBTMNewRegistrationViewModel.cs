@@ -7,24 +7,23 @@ namespace Coditech.Admin.ViewModel
         [MaxLength(100)]
         [Display(Name = "Centre Name")]
         public string CentreName { get; set; }
-
         [MaxLength(30)]
         [Display(Name = "Centre Code")]
         public string CentreCode { get; set; }
 
+        [Required]
         [MaxLength(50)]
         [MinLength(1)]
-        [Required]
         [Display(Name = "Title")]
         public string PersonTitle { get; set; }
 
-        [MaxLength(50)]
         [Required]
+        [MaxLength(50)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [MaxLength(50)]
         [Required]
+        [MaxLength(50)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
@@ -49,8 +48,8 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Region")]
         public short GeneralRegionMasterId { get; set; }
 
-        [MaxLength(200)]
         [Required]
+        [MaxLength(200)]
         [Display(Name = "Address1")]
         public string AddressLine1 { get; set; }
 
@@ -58,8 +57,8 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Address2")]
         public string AddressLine2 { get; set; }
 
-        [MaxLength(50)]
         [Required]
+        [MaxLength(50)]
         [Display(Name = "Pin code")]
         public string Pincode { get; set; }
         [Required]
@@ -69,7 +68,6 @@ namespace Coditech.Admin.ViewModel
         public string MobileNumber { get; set; }
         public string MobileNumberToken { get; set; }
         public bool IsMobileNumberVerifed { get; set; }
-        [Required]
         [MaxLength(100)]
         [Display(Name = "Device Serial Code")]
         public string DeviceSerialCode { get; set; }
@@ -90,7 +88,11 @@ namespace Coditech.Admin.ViewModel
         public string ConfirmPassword { get; set; }
         [Display(Name = "Terms And Condition")]
         public bool IsTermsAndCondition { get; set; }
+        [Required]
         [Display(Name = "Calling Code")]
         public string CallingCode { get; set; }
+        [Display(Name = "Specialization")]
+        public string TrainerSpecialization { get; set; }
+        public int TrainerSpecializationEnumId { get; set; }
     }
 }
