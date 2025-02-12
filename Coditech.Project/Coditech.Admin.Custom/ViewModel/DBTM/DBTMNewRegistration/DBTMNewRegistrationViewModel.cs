@@ -4,9 +4,11 @@ namespace Coditech.Admin.ViewModel
 {
     public class DBTMNewRegistrationViewModel : BaseViewModel
     {
+        [Required]
         [MaxLength(100)]
         [Display(Name = "Centre Name")]
         public string CentreName { get; set; }
+        [Required]
         [MaxLength(30)]
         [Display(Name = "Centre Code")]
         public string CentreCode { get; set; }
@@ -68,6 +70,7 @@ namespace Coditech.Admin.ViewModel
         public string MobileNumber { get; set; }
         public string MobileNumberToken { get; set; }
         public bool IsMobileNumberVerifed { get; set; }
+        [Required]
         [MaxLength(100)]
         [Display(Name = "Device Serial Code")]
         public string DeviceSerialCode { get; set; }
@@ -93,6 +96,7 @@ namespace Coditech.Admin.ViewModel
         public string CallingCode { get; set; }
         [Display(Name = "Specialization")]
         public string TrainerSpecialization { get; set; }
+        [Required]
         public int TrainerSpecializationEnumId { get; set; }
     }
 }

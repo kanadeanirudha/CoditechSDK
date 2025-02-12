@@ -5,9 +5,11 @@ namespace Coditech.Common.API.Model
     public class DBTMNewRegistrationModel : BaseModel
     {
         public long DBTMNewRegistrationId { get; set; }
+        [Required]
         [MaxLength(30)]
         [Display(Name = "Centre Code")]
         public string CentreCode { get; set; }
+        [Required]
         [MaxLength(100)]
         [Display(Name = "Centre Name")]
         public string CentreName { get; set; }
@@ -53,6 +55,7 @@ namespace Coditech.Common.API.Model
         [Required]
         [Display(Name = "Mobile Number")]
         public string MobileNumber { get; set; }
+        [Required]
         public string DeviceSerialCode { get; set; }
         [Required]
         public string Password { get; set; }
@@ -65,6 +68,7 @@ namespace Coditech.Common.API.Model
         public int GenderEnumId { get; set; }
         [Required]
         public string CallingCode { get; set; }
+        [Required]
         public int TrainerSpecializationEnumId { get; set; }
     }
 }

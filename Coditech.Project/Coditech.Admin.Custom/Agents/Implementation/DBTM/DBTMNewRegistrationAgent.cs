@@ -33,7 +33,7 @@ namespace Coditech.Admin.Agents
         {
             try
             {
-                dBTMNewRegistrationViewModel.CentreCode = string.Empty;
+                dBTMNewRegistrationViewModel.CentreCode = "DBTMCentre";
                 dBTMNewRegistrationViewModel.TrainerSpecializationEnumId =0;
                 DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.DBTMCentreRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
                 DBTMNewRegistrationModel dBTMNewRegistrationModel = response?.DBTMNewRegistrationModel;
@@ -62,8 +62,8 @@ namespace Coditech.Admin.Agents
         //Add TrainerRegistration.
         public virtual DBTMNewRegistrationViewModel TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
-            dBTMNewRegistrationViewModel.DeviceSerialCode = string.Empty;
-            dBTMNewRegistrationViewModel.CentreName = string.Empty;
+            dBTMNewRegistrationViewModel.DeviceSerialCode ="TDD001";
+            dBTMNewRegistrationViewModel.CentreName = "DBTMCentre";
             try
             { 
                 DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.TrainerRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
