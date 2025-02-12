@@ -1,0 +1,374 @@
+﻿@model Coditech.Admin.ViewModel.CalendarViewModel
+@{
+    Layout = null;
+}
+<div id="calendar" style="min-height:600px;"></div>
+
+<!-- Load required libraries in proper order -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js"></script>
+
+<script>
+     $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        buttonText: {
+            today: 'today',
+            month: 'month',
+            week: 'week',
+            day: 'day'
+        },
+            events: function (start, end, timezone, callback) {
+            $.ajax({
+                url: '/DBTMDashboard/GetCalendarData',
+                type: 'GET',
+                dataType: "JSON",
+                success: function (data) {
+                    var events = [];
+                    $.each(data, function (index, item) {
+                        events.push({
+                            id: item.CalenderId,
+                            title: item.Title,
+                            start: moment(item.Start_Date).format('YYYY-MM-DD'),
+                            end: moment(item.End_Date).format('YYYY-MM-DD'),
+                            backgroundColor: item.BackgroundColor,
+                            description: item.Desc
+                        });
+                    });
+                    callback(events);
+                }
+            });
+        },
+        eventRender: function (event, element) {
+            element.attr('title', event.description);
+        }
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* chalu script
+<script>
+
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            buttonText: {
+                today: 'today',
+                month: 'month',
+                week: 'week',
+                day: 'day'
+            },
+
+            events: [
+                {
+                    title: 'Meeting with Team',
+                    description: 'Discuss project progress',
+                    start: '2025-02-06T10:00:00',
+                    end: '2025-02-06T11:00:00',
+                    backgroundColor: "#9501fc",
+                    borderColor: "#fc0101"
+                },
+                {
+                    title: 'Lunch Break',
+                    description: 'Take a break for lunch',
+                    start: '2025-02-07T12:00:00',
+                    end: '2025-02-07T13:00:00',
+                    backgroundColor: "#9501fc",
+                    borderColor: "#fc0101"
+                },
+                {
+                    title: 'Conference Call',
+                    description: 'Call with overseas clients',
+                    start: '2025-02-08T15:00:00',
+                    end: '2025-02-08T16:00:00',
+                    backgroundColor: "#9501fc",
+                    borderColor: "#fc0101"
+                }
+            ],
+            eventRender: function (event, element) {
+                element.qtip({
+                    content: event.description
+                });
+            },
+            editable: false
+        });
+
+</script> *@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @model Coditech.Admin.ViewModel.CalenderViewModel
+@{
+    Layout = null;
+}
+<div id="calendar"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js"></script>
+
+<script>
+
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            buttonText: {
+                today: 'today',
+                month: 'month',
+                week: 'week',
+                day: 'day'
+            },
+            events: function (start, end, timezone, callback) {
+                $.ajax({
+                    url: '/Home/GetCalendarData',
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (result) {
+                        var events = [];
+                        $.each(result, function (i, data) {
+                            events.push({
+                                title: data.Title,
+                                description: data.Desc,
+                                start: moment(data.Start_Date).format('YYYY-MM-DD'),
+                                end: moment(data.End_Date).format('YYYY-MM-DD'),
+                                backgroundColor: "#9501fc",
+                                borderColor: "#fc0101"
+                            });
+                        });
+                        callback(events);
+                    }
+                });
+            },
+            eventRender: function (event, element) {
+                element.qtip({
+                    content: event.description
+                });
+            },
+            editable: false
+        });
+
+</script> *@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @model CalenderViewModel
+@{
+    Layout = null;
+}
+<div id="calendar"></div>
+<canvas id="@Model.CalenderId"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.9.1/fullcalendar.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" />
+<script>
+        $(document).ready(function ()
+    {
+        $('#calendar').fullCalendar({
+            header:
+            {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            buttonText: {
+                today: 'today',
+                month: 'month',
+                week: 'week',
+                day: 'day'
+            },
+
+            events: function (start, end, timezone, callback)
+            {
+                $.ajax({
+                    url: '/Home/GetCalendarData',
+                    type: "GET",
+                    dataType: "JSON",
+
+                    success: function (result)
+                    {
+                        var events = [];
+
+                        $.each(result, function (i, data)
+                        {
+                            events.push(
+                           {
+                               title: data.Title,
+                               description: data.Desc,
+                               start: moment(data.Start_Date).format('YYYY-MM-DD'),
+                               end: moment(data.End_Date).format('YYYY-MM-DD'),
+                               backgroundColor: "#9501fc",
+                               borderColor: "#fc0101"
+                           });
+                        });
+
+                        callback(events);
+                    }
+                });
+            },
+
+            eventRender: function (event, element)
+            {
+                element.qtip(
+                {
+                    content: event.description
+                });
+            },
+
+            editable: false,
+               events: function (start, end, timezone, callback)
+    {
+        $.ajax({
+            url: '/Home/GetCalendarData',
+            type: "GET",
+            dataType: "JSON",
+
+            success: function (result)
+            {
+                var events = [];
+
+                $.each(result, function (i, data)
+                {
+                    events.push(
+                   {
+                       title: data.Title,
+                       description: data.Desc,
+                       start: moment(data.Start_Date).format('YYYY-MM-DD'),
+                       end: moment(data.End_Date).format('YYYY-MM-DD'),
+                       backgroundColor: "#9501fc",
+                       borderColor: "#fc0101"
+                   });
+                });
+
+                callback(events);
+            }
+        });
+    },
+           });
+    });
+        });
+</script> *@

@@ -37,5 +37,17 @@ namespace Coditech.API.Service
                 return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
             }
         }
+
+        public override GeneralTrainerModel CreateTrainer(GeneralTrainerModel generalTrainerModel)
+        {
+            generalTrainerModel = base.CreateTrainer(generalTrainerModel);
+            if (!generalTrainerModel.HasError)
+            {
+
+                return generalTrainerModel;
+            }
+            return generalTrainerModel;
+        }
+
     }
 }
