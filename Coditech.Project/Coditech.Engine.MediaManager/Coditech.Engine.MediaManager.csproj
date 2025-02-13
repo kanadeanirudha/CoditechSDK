@@ -12,6 +12,12 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Data\ApplicationImages\" />
+		<Folder Include="Data\Media\ApplicationIcon\" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Dapper" Version="2.1.35" />
@@ -21,6 +27,10 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Coditech.API.Data.Custom\Coditech.API.Data.Custom.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

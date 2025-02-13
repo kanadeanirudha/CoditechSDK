@@ -3,6 +3,21 @@
     ViewBag.Title = "View File Details";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    UserModel userInfo = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+    AdminRoleMediaFolderActionModel adminRoleMediaFolderActionModel = new AdminRoleMediaFolderActionModel();
+    if (!userInfo.IsAdminUser)
+    {
+        if (userInfo?.AdminRoleMediaFolderActionList?.Count > 0)
+        {
+            adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.Where(x => x.AdminRoleMasterId == userInfo.SelectedAdminRoleMasterId).FirstOrDefault();
+        }
+    }
+    else
+    {
+        adminRoleMediaFolderActionModel = userInfo?.AdminRoleMediaFolderActionList.FirstOrDefault();
+    }
+    bool isDownloadAllowed = userInfo.IsAdminUser ? true : false;
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -23,7 +38,27 @@
                                     @if (Model.Type.StartsWith("image"))
                                     {
                                         <img class="card-img-top img-fluid bg-light-alt" src="@Model.Path" style="height:350px; width:100%">
+                                        @if (isDownloadAllowed)
+                                        {
+                                            <div class="d-flex align-items-center" style="position: relative; margin-top: 10px;">
+                                                <!-- Download Icon -->
+                                                <a href="@Model.Path" download title="Download Image" class="download-icon-link me-3" style="text-decoration: none;">
+                                                    <i class="dripicons-download" style="font-size: 24px; color: aqua;"></i>
+                                                </a>
+
+                                                <!-- Replace File Button -->
+                                                <form asp-action="ReplaceFile" asp-controller="MediaManager" enctype="multipart/form-data" method="post" style="display:inline;">
+                                                    <label class="btn btn-sm btn-soft-warning" for="imageUpload" style="margin-bottom: 0;">
+                                                        <i class="fas fa-upload me-2"></i>Replace File
+                                                    </label>
+                                                    <input type="file" id="imageUpload" name="imageFile" style="display: none;" onchange="this.form.submit()" />
+                                                    <input type="hidden" name="MediaId" value="@Model.MediaId" />
+                                                    <input type="hidden" name="folderId" value="@Model.MediaFolderMasterId" />
+                                                </form>
+                                            </div>
+                                        }
                                     }
+
                                     else if (Model.Type.StartsWith("video"))
                                     {
                                         <video controls style="width:100%">

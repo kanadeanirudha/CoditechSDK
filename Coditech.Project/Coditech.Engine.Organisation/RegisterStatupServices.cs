@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.API.Service;
 using Coditech.API.Service.DependencyRegistration;
 using Coditech.Common.API;
 using Coditech.Common.Helper;
@@ -41,6 +42,7 @@ namespace Coditech.API.Common
 
             //RegisterDI
             builder.RegisterDI();
+            builder.RegisterCustomDI();
 
             // Configured conventional route settings.
             builder.ConfigureRouteSettings();
@@ -153,6 +155,7 @@ namespace Coditech.API.Common
             string connectionString = builder.Configuration.GetConnectionString("CoditechDatabase");
             // Coditech entity registration
             builder.Services.AddDbContext<Coditech_Entities>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
+            builder.Services.AddDbContext<CoditechCustom_Entities>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
 
             // Repository classes registration
             builder.Services.AddTransient(typeof(ICoditechRepository<>), typeof(CoditechRepository<>));
@@ -210,5 +213,11 @@ namespace Coditech.API.Common
             TranslatorExtension.TranslatorInstance = CoditechDependencyResolver._staticServiceProvider?.GetService<CoditechTranslator>();
         }
         #endregion
+
+        public static void RegisterCustomDI(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUserService, DBTMUserService>();
+            builder.Services.AddScoped<IGeneralTrainerMasterService, DBTMGeneralTrainerMasterService>();
+        }
     }
 }

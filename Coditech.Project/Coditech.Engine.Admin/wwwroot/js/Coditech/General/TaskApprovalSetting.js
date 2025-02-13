@@ -13,6 +13,7 @@
     GetEmployeeListByCentreCode: function (centreCode, countNumber) {
         CoditechCommon.ShowLodder();
         countNumber = $("#CountNumber").val();
+
         $.ajax({
             cache: false,
             type: "GET",
@@ -35,6 +36,39 @@
                 }
             }
         });
+    },
+
+    AddApprover: function () {
+        const isUpdate = $("#frmTaskApprovalSetting input[name='TaskApprovalSettingId']").val() > 0;
+        let countNumber = isUpdate ? 1 : $("#CountNumber").val(); 
+
+        CoditechCommon.ShowLodder();
+
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: `/TaskApprovalSetting/GetEmployeeListByCentreCode?centreCode=${$('#CentreCode').val()}&countNumber=${countNumber}`,
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+              
+                if (isUpdate) {
+                    $("#EmployeeListId").html("");
+                }
+
+                $("#EmployeeListId").append(result);
+                TaskApprovalSetting.BindDropdownEvents();
+                CoditechCommon.HideLodder();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401 || xhr.status === 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load employee list.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+       
     },
 
      ValidateDropdownValues: function () {
