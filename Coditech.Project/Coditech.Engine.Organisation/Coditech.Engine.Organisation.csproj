@@ -50,12 +50,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Service\Implementation\" />
+		<ProjectReference Include="..\Coditech.API.Data.Custom\Coditech.API.Data.Custom.csproj" />
+		<ProjectReference Include="..\Coditech.Common.Utilities.Custom\Coditech.Common.Utilities.Custom.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Coditech.API.Data.Custom\Coditech.API.Data.Custom.csproj" />
-		<ProjectReference Include="..\Coditech.Common.Utilities.Custom\Coditech.Common.Utilities.Custom.csproj" />
+	  <Folder Include="Service\" />
+	  <Folder Include="Service\Implementation\" />
 	</ItemGroup>
 
 </Project>

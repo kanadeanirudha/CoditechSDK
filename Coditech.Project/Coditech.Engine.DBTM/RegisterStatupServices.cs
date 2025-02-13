@@ -251,19 +251,7 @@ namespace Coditech.API.Common
         {
             // Add Dependency 
             builder.Services.AddSingleton<ICoditechLogging, CoditechLogging>();
-            builder.Services.AddScoped<IDBTMDeviceMasterService, DBTMDeviceMasterService>();
-            builder.Services.AddScoped<IDBTMTraineeDetailsService, DBTMTraineeDetailsService>();
-            builder.Services.AddScoped<IDBTMActivityCategoryService, DBTMActivityCategoryService>();
-            builder.Services.AddScoped<IDBTMTestMasterService, DBTMTestMasterService>();
-            builder.Services.AddScoped<IDBTMDeviceRegistrationDetailsService, DBTMDeviceRegistrationDetailsService>();
-            builder.Services.AddScoped<IDBTMTraineeAssignmentService, DBTMTraineeAssignmentService>();
-            builder.Services.AddScoped<IDBTMNewRegistrationService, DBTMNewRegistrationService>();
-            builder.Services.AddScoped<IDBTMBatchActivityService, DBTMBatchActivityService>();
-            builder.Services.AddScoped<IDBTMSubscriptionPlanService, DBTMSubscriptionPlanService>();
-            builder.Services.AddScoped<IDBTMPrivacySettingService, DBTMPrivacySettingService>();
-            builder.Services.AddScoped<IDBTMDashboardService, DBTMDashboardService>();
-            builder.Services.AddScoped<IDBTMMySubscriptionPlanService, DBTMMySubscriptionPlanService>();
-            builder.Services.AddScoped<IDBTMDeviceDataService, DBTMDeviceDataService>();
+            builder.Services.AddScoped<ICustomDashboardService, CustomDashboardService>();
         }
         #endregion
     }

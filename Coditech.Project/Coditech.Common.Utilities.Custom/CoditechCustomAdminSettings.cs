@@ -13,12 +13,12 @@ namespace Coditech.Admin.Utilities
         private static IConfigurationSection settings = CoditechDependencyResolver.GetService<IConfiguration>().GetSection("appsettings");
 
         
-        public static string CoditechDBTMApiRootUri
+        public static string CoditechCustomApiRootUri
         {
             get
             {
 #if DEBUG
-                return Convert.ToString(settings["CoditechDBTMApiRootUri"]);
+                return Convert.ToString(settings["CoditechCustomApiRootUri"]);
 #else
    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-dbtm.{settings["ApiDomainName"]}");
 #endif

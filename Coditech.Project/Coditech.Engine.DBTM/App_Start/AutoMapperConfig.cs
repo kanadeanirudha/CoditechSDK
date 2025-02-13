@@ -10,24 +10,9 @@ namespace Coditech.API.Mapper
         public AutoMapperConfig()
         {
             CreateMap<FilterTuple, FilterDataTuple>().ReverseMap();
-            CreateMap<DBTMDeviceMaster, DBTMDeviceModel>().ReverseMap();
-            CreateMap<DBTMTraineeDetails, DBTMTraineeDetailsModel>().ReverseMap();
             CreateMap<GeneralPerson, GeneralPersonModel>().ReverseMap();
             CreateMap<UserMaster, GeneralPersonModel>().ReverseMap();
-            CreateMap<DBTMActivityCategory, DBTMActivityCategoryModel>().ReverseMap();
-            CreateMap<DBTMTestMaster, DBTMTestModel>().ReverseMap();
-            CreateMap<DBTMDeviceRegistrationDetails, DBTMDeviceRegistrationDetailsModel>().ReverseMap();
-            CreateMap<DBTMTraineeAssignment, DBTMTraineeAssignmentModel>().ReverseMap();
-            CreateMap<DBTMBatchActivity, DBTMBatchActivityModel>().ReverseMap();
             CreateMap<AdminSanctionPostModel, AdminSanctionPost>().ReverseMap();
-            CreateMap<DBTMSubscriptionPlan, DBTMSubscriptionPlanModel>().ReverseMap();
-            CreateMap<DBTMSubscriptionPlanAssociatedToUser, DBTMSubscriptionPlanModel>().ReverseMap();
-            CreateMap<DBTMSubscriptionPlanActivity, DBTMSubscriptionPlanActivityModel>().ReverseMap();
-            CreateMap<DBTMPrivacySetting, DBTMPrivacySettingModel>().ReverseMap();
-            CreateMap<DBTMDeviceData, DBTMDeviceDataModel>().ReverseMap();
-            CreateMap<DBTMDeviceDataDetails, DBTMDeviceDataModel>().ReverseMap();
-            CreateMap<DBTMDeviceData, DBTMActivitiesModel>().ReverseMap();
-            CreateMap<DBTMTraineeDetails, DBTMActivitiesDetailsModel>().ReverseMap();
         }
     }
 }

@@ -45,5 +45,9 @@
 	  <ProjectReference Include="..\Coditech.API.Client.Custom\Coditech.API.Client.Custom.csproj" />
 	  <ProjectReference Include="..\Coditech.API.Model.Custom\Coditech.API.Model.Custom.csproj" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="App_Start\" />
+	</ItemGroup>
 
 </Project>
