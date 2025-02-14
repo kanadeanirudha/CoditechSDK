@@ -112,27 +112,23 @@ namespace Coditech.Admin.Helpers
                 {
                     list.GeneralTrainerList = list.GeneralTrainerList?.Where(x =>
                         string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
-                        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
                 }
             }
-            dropdownList.Add(new SelectListItem()
-            {
-                Text = string.IsNullOrEmpty(dropdownViewModel.SelectedText) ? "-------Select Trainer-------" : dropdownViewModel.SelectedText,
-                Value = string.IsNullOrEmpty(dropdownViewModel.SelectedValue) ? "" : dropdownViewModel.SelectedValue
-            });
 
-            // If the user is not a trainer,add all trainers to the dropdown
-            if (list?.GeneralTrainerList?.Any() == true)
+            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != "Trainer")
+                dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
+            else
+                dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
+
+            foreach (var item in list?.GeneralTrainerList)
             {
-                foreach (var item in list.GeneralTrainerList)
+                dropdownList.Add(new SelectListItem()
                 {
-                    dropdownList.Add(new SelectListItem()
-                    {
-                        Text = $"{item.FirstName} {item.LastName}",
-                        Value = item.GeneralTrainerMasterId.ToString(),
-                        Selected = dropdownViewModel.DropdownSelectedValue == item.GeneralTrainerMasterId.ToString()
-                    });
-                }
+                    Text = $"{item.FirstName} {item.LastName}",
+                    Value = item.GeneralTrainerMasterId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                });
             }
         }
 
