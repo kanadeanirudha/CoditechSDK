@@ -117,7 +117,7 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
                 objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
                 int status = 0;
-                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMNewRegistration @NewCentreCode,@EntityId,@UserType,@SanctionPostCode,@PersonId,@Status OUT", 5, out status);
+                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMCentreRegistration @NewCentreCode,@EntityId,@UserType,@SanctionPostCode,@PersonId,@Status OUT", 5, out status);
             }
             return dBTMNewRegistrationModel;
         }

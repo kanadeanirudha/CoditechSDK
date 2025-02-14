@@ -1,7 +1,6 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
-using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
@@ -288,7 +287,9 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
                 DropdownName = "GeneralTrainerMasterId",
                 Parameter = centreCode,
-                IsCustomDropdown = true
+                IsCustomDropdown = true,
+                SelectedText = "All",
+                SelectedValue = "0"
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
