@@ -273,7 +273,7 @@ namespace Coditech.Admin.Controllers
             DBTMActivitiesDetailsListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesDetailsList(Convert.ToInt64(dataTableModel.SelectedParameter1), dataTableModel);
             if (AjaxHelper.IsAjaxRequest)
             {
-                return PartialView("~/Views/DBTM/DBTMActivities/DBTMActivitiesDetails_List.cshtml", list);
+                return PartialView("~/Views/DBTM/DBTMActivities/_DBTMActivitiesDetailsList.cshtml", list);
             }
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
 

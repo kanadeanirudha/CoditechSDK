@@ -11,6 +11,7 @@ namespace Coditech.Admin.ViewModel
             ActivitiesDetailsList = new List<DBTMActivitiesDetailsViewModel>();
             Columns = new List<string>();
         }
+        public string PersonCode { get; set; }
         public long DBTMDeviceDataId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

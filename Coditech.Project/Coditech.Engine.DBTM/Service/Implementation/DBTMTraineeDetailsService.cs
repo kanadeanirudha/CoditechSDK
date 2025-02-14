@@ -147,7 +147,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMActivitiesModel> dBTMActivitiesList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeActivitiesList @PersonCode,@NumberOfDaysRecord,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMActivitiesModel> dBTMActivitiesList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeActivitiesList @PersonCode,@NumberOfDaysRecord,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             DBTMActivitiesListModel listModel = new DBTMActivitiesListModel();
 
             listModel.ActivitiesList = dBTMActivitiesList?.Count > 0 ? dBTMActivitiesList : new List<DBTMActivitiesModel>();
@@ -217,6 +217,7 @@ namespace Coditech.API.Service
                 {
                     listModel.FirstName = generalPersonModel.FirstName;
                     listModel.LastName = generalPersonModel.LastName;
+                    listModel.PersonCode = dBTMDeviceData.PersonCode;
                 }
                 DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
 
