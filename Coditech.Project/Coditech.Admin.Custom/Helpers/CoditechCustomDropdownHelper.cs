@@ -98,26 +98,41 @@ namespace Coditech.Admin.Helpers
 
         private static void GetCentrewiseDBTMTrainerList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             GeneralTrainerListModel list = new GeneralTrainerListModel();
+
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
                 GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
-            }
-            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText))
-                dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
-            else
-                dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
-            foreach (var item in list?.GeneralTrainerList)
-            {
-                dropdownList.Add(new SelectListItem()
+
+                // Filter the list if the user is a trainer
+                if (userModel?.Custom1 == "Trainer")
                 {
-                    Text = $"{item.FirstName} {item.LastName}",
-                    Value = item.GeneralTrainerMasterId.ToString(),
-                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
-                });
+                    list.GeneralTrainerList = list.GeneralTrainerList?.Where(x =>
+                        string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
+                        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                }
+            }
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = string.IsNullOrEmpty(dropdownViewModel.SelectedText) ? "-------Select Trainer-------" : dropdownViewModel.SelectedText,
+                Value = string.IsNullOrEmpty(dropdownViewModel.SelectedValue) ? "" : dropdownViewModel.SelectedValue
+            });
+
+            // If the user is not a trainer,add all trainers to the dropdown
+            if (list?.GeneralTrainerList?.Any() == true)
+            {
+                foreach (var item in list.GeneralTrainerList)
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.FirstName} {item.LastName}",
+                        Value = item.GeneralTrainerMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == item.GeneralTrainerMasterId.ToString()
+                    });
+                }
             }
         }
 

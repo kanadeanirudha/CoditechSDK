@@ -14,12 +14,37 @@ namespace Coditech.API.Service
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+        }
+
+        public override UserModel Login(UserLoginModel userLoginModel)
+        {
+            UserModel model = base.Login(userLoginModel);
+
+            if (!model.HasError)
+            {
+                var result = (from a in _userMasterRepository.Table
+                              join b in _generalTrainerMasterRepository.Table
+                              on a.EntityId equals b.EmployeeId
+                              where a.UserMasterId == 3 && a.UserType == "Employee"
+                              select new { a, b }).FirstOrDefault();
+
+                if (result != null)
+                {
+                    model.Custom1 = "Trainer";
+                }
+            }
+            return model;
         }
 
         protected override GeneralPersonModel GetGeneralPersonDetailsByEntityType(long entityId, string entityType)
