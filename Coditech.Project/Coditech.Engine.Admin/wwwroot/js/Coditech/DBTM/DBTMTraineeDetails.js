@@ -43,7 +43,7 @@
         }
     },
 
-    GetDBTMTrainerListByCentreCode: function () {
+    GetDBTMTrainerListByCentreCode: function (listType) {
         var selectedItem = $("#SelectedCentreCode").val();
         if (selectedItem != "") {
             CoditechCommon.ShowLodder();
@@ -57,6 +57,7 @@
                 success: function (data) {
                     $("#SelectedParameter1").html("").html(data);
                     $("#GeneralTrainerMasterId").html("").html(data);
+                    DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId(listType);
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -73,13 +74,19 @@
         }
     },
 
-    GetDBTMTrainerListByGeneralTrainerMasterId: function () {
+    GetDBTMTrainerListByGeneralTrainerMasterId: function (listType) {
         $('#DataTables_SearchById').val("")
         if ($("#SelectedCentreCode").val() == "") {
             CoditechNotification.DisplayNotificationMessage("Please select centre.", "error");
         }
         else if ($("#SelectedParameter1").val() == "") {
             CoditechNotification.DisplayNotificationMessage("Please select trainer.", "error");
+        }
+        else if (listType == "Active") {
+            CoditechDataTable.LoadList("DBTMTraineeDetails", "ActiveMemberList");
+        }
+        else if (listType == "InActive") {
+            CoditechDataTable.LoadList("DBTMTraineeDetails", "InActiveMemberList");
         }
         else {
             CoditechDataTable.LoadList("DBTMTraineeDetails", "List");

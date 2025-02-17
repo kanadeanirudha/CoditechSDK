@@ -3,14 +3,14 @@
     ViewBag.Title = "All Trainee Details List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByCentreCode()" };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByCentreCode('"+Model.ListType+"')" };
     DropdownViewModel trainerDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
                 DropdownName = "SelectedParameter1",
                 Parameter = Model.SelectedCentreCode,
                 DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId),
-                ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')",
+                ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + Model.ListType + "')",
                 IsCustomDropdown = true,
                 SelectedText = "All",
                 SelectedValue = "0"
@@ -53,7 +53,7 @@
                             </div>
                             <div class="col-md-1">
                                @*  <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" /> *@
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('@controllerName','@actionName')" />
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('@Model.ListType')" />
                             </div>
                         </div>
                     </div>
