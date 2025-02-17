@@ -5,6 +5,7 @@
         public List<DBTMActivitiesDetailsModel> ActivitiesDetailsList { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string PersonCode { get; set; }
         public List<string> Columns { get; set; }
     }
 }

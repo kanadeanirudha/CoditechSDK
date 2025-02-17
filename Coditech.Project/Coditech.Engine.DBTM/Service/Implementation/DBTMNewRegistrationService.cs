@@ -180,14 +180,13 @@ namespace Coditech.API.Service
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Error);
                 //Call Delete data method
                 CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
-                //objStoredProc.SetParameter("NewCentreCode", organisationCentreMaster.CentreCode, ParameterDirection.Input, DbType.String);
-                //objStoredProc.SetParameter("EntityId", employeeId, ParameterDirection.Input, DbType.String);
-                //objStoredProc.SetParameter("UserType", userType, ParameterDirection.Input, DbType.String);
-                //objStoredProc.SetParameter("SanctionPostCode", sanctionPostCode, ParameterDirection.Input, DbType.String);
-                //objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
-                //objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+                objStoredProc.SetParameter("NewCentreCode", organisationCentreMaster.CentreCode, ParameterDirection.Input, DbType.String);
+                objStoredProc.SetParameter("EntityId", employeeId, ParameterDirection.Input, DbType.String);
+                objStoredProc.SetParameter("UserType", userType, ParameterDirection.Input, DbType.String);
+                objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
+                objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
                 int status = 0;
-               // objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMNewRegistration @NewCentreCode,@EntityId,@UserType,@SanctionPostCode,@PersonId,@Status OUT", 5, out status);
+                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTrainerNewRegistration @NewCentreCode,@EntityId,@UserType,@PersonId,@Status OUT",4, out status);
             }
             return dBTMNewRegistrationModel;
         }

@@ -351,11 +351,9 @@ namespace Coditech.Admin.Agents
             listViewModel.ActivitiesList = dBTMActivitiesList?.ActivitiesList?.ToViewModel<DBTMActivitiesViewModel>().ToList();
 
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.ActivitiesList.Count, BindTraineeActivitiesColumns());
-            listViewModel.PersonCode = personCode;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
             listViewModel.SelectedCentreCode = response.SelectedCentreCode;
-
             return listViewModel;
         }
 
@@ -391,7 +389,7 @@ namespace Coditech.Admin.Agents
             listViewModel.DBTMDeviceDataId = dBTMDeviceDataId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
-
+            listViewModel.PersonCode = response.PersonCode;
             return listViewModel;
         }
         #endregion

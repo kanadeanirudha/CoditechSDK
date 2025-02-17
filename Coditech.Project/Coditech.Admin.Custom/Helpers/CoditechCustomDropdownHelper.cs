@@ -98,18 +98,29 @@ namespace Coditech.Admin.Helpers
 
         private static void GetCentrewiseDBTMTrainerList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             GeneralTrainerListModel list = new GeneralTrainerListModel();
+
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
                 GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
+
+                // Filter the list if the user is a trainer
+                if (userModel?.Custom1 == "Trainer")
+                {
+                    list.GeneralTrainerList = list.GeneralTrainerList?.Where(x =>
+                        string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
+                        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
+                }
             }
-            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText))
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != "Trainer")
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
             else
                 dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
+
             foreach (var item in list?.GeneralTrainerList)
             {
                 dropdownList.Add(new SelectListItem()
