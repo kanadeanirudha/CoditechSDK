@@ -6,7 +6,7 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 <div class="row">
-  @*   @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @*   @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
     @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy) *@
 </div>
 <div class="row">
@@ -33,7 +33,7 @@
                     @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.DefaultFlag)
                     </td> *@
                             <td class="text-center">
-                                @if (item.IsCurrentPosition)
+                                @if (item.IsCurrentPosition || item.CurrentEmployeeServiceId == item.EmployeeServiceId)
                                 {
                                     <a href="../@controllerName/GetEmployeeService?employeeId=@item.EmployeeId&personId=@Model.PersonId&employeeServiceId=@item.EmployeeServiceId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a>
                                     @*   <span class="m-2">|</span>
