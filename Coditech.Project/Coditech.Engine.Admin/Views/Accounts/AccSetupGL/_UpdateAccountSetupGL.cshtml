@@ -1,0 +1,18 @@
+﻿@model AccSetupGLModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+
+<!-- Page Content-->
+@Html.Partial("~/Views/Accounts/AccSetupGL/_AccSetupGLTree.cshtml", Model)
+
+@using (Html.BeginForm("UpdateAccountSetupGL", controllerName, FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.SelectedCentreCode)
+    @Html.HiddenFor(m => m.AccSetupBalanceSheetTypeId)
+    @Html.HiddenFor(m => m.AccSetupBalancesheetId)
+    @Html.HiddenFor(m => m.AccSetupChartOfAccountTemplateId)
+}
+

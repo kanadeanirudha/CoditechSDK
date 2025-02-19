@@ -1,6 +1,5 @@
 ﻿@using Coditech.Admin.Utilities;
 @using Coditech.Common.API.Model;
-@using Newtonsoft.Json
 @{
     ViewBag.Title = "Dashboard";
     UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
@@ -48,8 +47,6 @@
                     </a>
                 </div> <!--end col-->
             }
-         
-        </div><!-- container -->
-    </div>
+        </div><!--end row-->
+    </div><!-- container -->
 </div>
-
