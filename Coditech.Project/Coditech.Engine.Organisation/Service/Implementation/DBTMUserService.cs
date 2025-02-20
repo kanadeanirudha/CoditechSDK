@@ -36,7 +36,7 @@ namespace Coditech.API.Service
                 var result = (from a in _userMasterRepository.Table
                               join b in _generalTrainerMasterRepository.Table
                               on a.EntityId equals b.EmployeeId
-                              where a.UserMasterId == 3 && a.UserType == "Employee"
+                              where a.UserMasterId == model.UserMasterId && a.UserType == "Employee"
                               select new { a, b }).FirstOrDefault();
 
                 if (result != null)

@@ -40,6 +40,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
             GetListOnlyIfSingleCentre(dataTableViewModel);
+            dataTableViewModel.SelectedParameter2 = "Active";
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
                 list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
@@ -57,6 +58,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
             GetListOnlyIfSingleCentre(dataTableViewModel);
+            dataTableViewModel.SelectedParameter2 = "InActive";
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
                 list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");

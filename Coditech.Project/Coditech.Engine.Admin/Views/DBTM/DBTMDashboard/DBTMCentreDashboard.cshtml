@@ -4,6 +4,7 @@
 @model DBTMDashboardViewModel
 @{
     ViewBag.Title = "Dashboard";
+    CalendarViewModel calendarViewModel = new CalendarViewModel();
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -87,6 +88,13 @@
                     </div><!--end card-->
                 </a>
             </div>
+            <div id="calendar" class="row mb-3">
+                <div class="col-lg-9">
+                    <div class="text-center" style="position: relative; padding-top:0px !important">
+                        @Html.Partial("~/Views/Shared/Calendar/_Calendar.cshtml", calendarViewModel)
+                    </div><!--end card-body-->
+                </div>
+            </div><!--end row-->
         </div>
     </div><!-- container -->
 </div>
