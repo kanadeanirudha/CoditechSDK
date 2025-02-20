@@ -1,0 +1,86 @@
+﻿@model AccSetupGLModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+
+@if (Model?.AccSetupGLList?.Count > 0)
+{
+    @foreach (var account in Model.AccSetupGLList)
+    {
+        @Html.Raw(RenderTree(account))
+    }
+}
+else
+{
+    <div class="col-sm-12 col-md-5">
+        <strong class="text-danger">No Result Found</strong>
+    </div>
+}
+
+@functions {
+    string RenderTree(AccSetupGLModel account)
+    {
+        bool hasChildren = account.SubAccounts != null && account.SubAccounts.Any();
+        string folderIcon = hasChildren ? "📂" : "📄";
+        string chevron = hasChildren ? $"<span id='chevron-{account.AccSetupGLId}' class='chevron-icon'>▶</span>" : "";
+
+        string html = $@"
+        <div class='pl-3'>
+            <div class='justify-content-between align-items-center p-2 rounded border bg-white shadow-sm' onclick='toggleSubAccounts({account.AccSetupGLId})'>
+                <div class='align-items-center'>
+                    <span class='me-2'>{folderIcon}</span>
+                    <span>{account.GLName} <span class='text-muted small ms-2'>({account.CategoryCode})</span>
+                        <div style='float: right;'>
+                                <span>0.00</span>
+                        </div>
+                     </span>
+                </div>
+    {chevron}
+            </div>";
+
+        if (hasChildren)
+        {
+            html += $"<div class='ps-4 border-start mt-2 d-none' id='subaccounts-{account.AccSetupGLId}'>";
+            foreach (var sub in account.SubAccounts)
+            {
+                html += RenderTree(sub);
+            }
+            html += "</div>";
+        }
+
+        html += "</div>";
+        return html;
+    }
+}
+<!-- JavaScript for Expand/Collapse -->
+<script>
+    function toggleSubAccounts(accountId) {
+        const subAccountElement = document.getElementById(`subaccounts-${accountId}`);
+        const chevronIcon = document.getElementById(`chevron-${accountId}`);
+
+        if (subAccountElement) {
+            subAccountElement.classList.toggle('d-none');  // Show/Hide child elements
+        }
+
+        if (chevronIcon) {
+            chevronIcon.classList.toggle('rotate-90');  // Rotate chevron on click
+        }
+    }
+</script>
+
+<style>
+    .chevron-icon {
+        transition: transform 0.3s ease-in-out;
+        display: inline-block;
+    }
+
+    .rotate-90 {
+        transform: rotate(90deg);
+    }
+
+    .chevron-icon {
+        display: none !important;
+    }
+</style>

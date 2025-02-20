@@ -3,6 +3,7 @@
     ViewBag.Title = Model.GeneralRunningNumberId > 0 ? "Update Running Numbers" : "Add Running Numbers";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    Model.DisplayFormat = Model.GeneralRunningNumberId > 0 ? Model.DisplayFormat : "<centrecode><separator><prefix><separator><currentsequence>";
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "", IsDisabled = Model.GeneralRunningNumberId > 0 };
 }
 <!-- Page Content-->
@@ -54,13 +55,9 @@
                                         @Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.Description, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.Description)
-                                    </div>
-                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-lg-2">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.KeyFieldEnumId, new { @class = "form-label required" })
@@ -84,11 +81,10 @@
                                 <div class="col-lg-8">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.DisplayFormat, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.DisplayFormat, new { @class = "form-control" })
+                                        @Html.TextBoxFor(x => x.DisplayFormat, new { @class = "form-control", @title = "Create running number using <centrecode>,<prefix>,<yyyy>,<yy>,<mm>,<dd>,<hh>,<min>,<sec>,<currentsequence> micros" })
                                         @Html.ValidationMessageFor(x => x.DisplayFormat)
                                     </div>
                                 </div>
-                               
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.Separator, new { @class = "form-label required" })
@@ -110,6 +106,17 @@
                                         @Html.ValidationMessageFor(x => x.CurrentSequnce)
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Description, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.Description)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.IsSequenceReset, new { @class = "form-label required" })

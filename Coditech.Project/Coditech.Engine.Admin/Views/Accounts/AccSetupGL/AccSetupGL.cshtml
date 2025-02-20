@@ -1,0 +1,59 @@
+﻿@model AccSetupGLModel
+@{
+    ViewBag.Title = "Balance Sheet List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "AccSetupGL.GetAccSetupBalanceSheetByCentreCodeAndTypeId()" };
+    DropdownViewModel accSetupBalanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupBalanceSheetType.ToString(), DropdownName = "AccSetupBalanceSheetTypeId", DropdownSelectedValue = Model.AccSetupBalanceSheetTypeId.ToString(), ChangeEvent = "AccSetupGL.GetAccSetupBalanceSheetByCentreCodeAndTypeId()" };
+    DropdownViewModel accSetupGLBalanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupBalanceSheet.ToString(), DropdownName = "AccSetupBalanceSheetId", DropdownSelectedValue = Model.AccSetupBalancesheetId.ToString(), Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}~{Model.AccSetupBalanceSheetTypeId}" : "", ChangeEvent = "AccSetupGL.GetAccSetupGLTree()" };
+}
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Chart Of Accounts</span>
+                    </div>
+                    <!--  DropDownSelector -->
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>Balance Sheet Type</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupBalanceSheetDropdown)
+                            </div>
+
+                            <div class="col-md-1">
+                                <label>Balance Sheet</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupGLBalanceSheetDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="AccSetupGL.GetAccSetupGLTree()" />
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="AccSetupGLTreeDivId">
+                                @if (Model.AccSetupBalancesheetId > 0)
+                                {
+                                    @Html.Partial("~/Views/Accounts/AccSetupGL/_UpdateAccountSetupGL.cshtml", Model);
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->
+<script src="~/js/coditech/Accounts/AccSetupGL.js"></script>
