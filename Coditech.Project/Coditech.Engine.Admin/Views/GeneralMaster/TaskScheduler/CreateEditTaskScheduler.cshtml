@@ -5,9 +5,11 @@
     string actionName = Model.TaskSchedulerMasterId > 0 ? "UpdateBatchTaskSchedulerDetails" : "CreateBatchTaskScheduler";
     string css = Model.TaskSchedulerMasterId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("TaskSchedulerMasterId", Model.TaskSchedulerMasterId.ToString());
+    keyValuePairs.Add("GeneralBatchMasterId", Model.ConfiguratorId.ToString());
+    string selectedCentreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.SelectedCentreCode;
 
-    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency};
+    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency };
+    DropdownViewModel deviceSerialCodeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMDeviceSerialCodeByCentreCode.ToString(), DropdownName = "Custom1", DropdownSelectedValue = Model.Custom1, IsCustomDropdown = true };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -63,7 +65,7 @@
                                         @Html.TextBoxFor(x => x.ExpireDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
                                         @Html.ValidationMessageFor(x => x.ExpireDate)
                                     </div>
-                                </div>                               
+                                </div>
                                 <div class="col-lg-6" id="weeklyScheduleDiv">
                                     <div class="mb-3 multiselect-dropdown">
                                         @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
@@ -71,7 +73,14 @@
                                         @Html.ValidationMessageFor(x => x.SelectedWeekDays)
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        <label class="form-label required" for="Custom1">Device Serial Code</label>
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", deviceSerialCodeDropdown)
+                                        @Html.ValidationMessageFor(x => x.Custom1)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.IsEnabled, new { @class = "form-label" })
                                         <div class="form-check">
@@ -147,194 +156,3 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@* 15feb
-             $(function () {
-            function updateExpiryDate() {
-                var selectedFrequency = $("#SchedulerFrequency").val();
-                var startDate = $("#StartDate").datepicker("getDate");
-
-                if (selectedFrequency === "OneTime" && startDate) {
-                    $("#ExpireDate").datepicker("setDate", startDate);
-                    $("#ExpireDate").prop("readonly", true);
-                } else {
-                    $("#ExpireDate").prop("readonly", false);
-                }
-            }
-
-            // Start Date Datepicker
-            $("#StartDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                yearRange: "2022:2035",
-                minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31),
-                onSelect: function () {
-                    updateExpiryDate();
-                }
-            });
-
-            // Expiry Date Datepicker
-            $("#ExpireDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                yearRange: "2022:2035",
-                minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31)
-            });
-
-            // Scheduler Frequency Change Event
-            $("#SchedulerFrequency").change(function () {
-                updateExpiryDate();
-            });
-
-            function loadWeeklySchedulerPartial() {
-            var selectedFrequency = $("#SchedulerFrequency").val();
-            if (selectedFrequency === "Weekly") {
-                $.ajax({
-                    url: '/GeneralBatchMaster/LoadWeeklySchedulerPartial',
-                    type: 'GET',
-                    success: function (response) {
-                        $("#weeklyScheduleDiv").html(response);
-                    },
-                    error: function () {
-                        alert("Error loading weekly scheduler.");
-                    }
-                });
-            } else {
-                $("#weeklyScheduleDiv").html("");
-            }
-        }
-
-        $("#SchedulerFrequency").change(function () {
-            updateExpiryDate();
-            loadWeeklySchedulerPartial();
-        });
-
-
-        loadWeeklySchedulerPartial();
-        }); *@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@* @section scripts {
-    <script type="text/javascript">
-                        $(function () {
-            function updateExpiryDate() {
-                var selectedFrequency = $("#SchedulerFrequency").val();
-                var startDate = $("#StartDate").datepicker("getDate");
-
-                if (selectedFrequency === "OneTime" && startDate) {
-                    $("#ExpireDate").datepicker("setDate", startDate);
-                    $("#ExpireDate").prop("readonly", true);
-                } else {
-                    $("#ExpireDate").prop("readonly", false);
-                }
-            }
-
-            // Start Date Datepicker
-            $("#StartDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                yearRange: "2022:2035",
-                minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31),
-                onSelect: function () {
-                    updateExpiryDate();
-                }
-            });
-
-            // Expiry Date Datepicker
-            $("#ExpireDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                yearRange: "2022:2035",
-                minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31)
-            });
-
-            // Scheduler Frequency Change Event
-            $("#SchedulerFrequency").change(function () {
-                updateExpiryDate();
-            });
-        });
-    </script>
-} *@

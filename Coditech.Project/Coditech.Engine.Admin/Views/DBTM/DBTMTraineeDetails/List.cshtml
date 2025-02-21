@@ -3,6 +3,8 @@
     ViewBag.Title = "All Trainee Details List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByCentreCode('"+Model.ListType+"')" };
     DropdownViewModel trainerDropdown = new DropdownViewModel()
             {
@@ -35,7 +37,10 @@
                         {
                             <span class="card-title">All Trainee Details List</span>
                         }
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateDBTMTrainee" role="button"><i class="fas fa-plus me-2"></i>Add Trainee</a>
+                        @if (userModel?.Custom1 != "DBTMTrainer")
+                        {
+                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateDBTMTrainee" role="button"><i class="fas fa-plus me-2"></i>Add Trainee</a>
+                        }
                     </div>
                     <div class="card-header">
                         <div class="row">

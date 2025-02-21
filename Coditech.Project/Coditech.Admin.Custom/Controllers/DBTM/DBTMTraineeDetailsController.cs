@@ -60,7 +60,7 @@ namespace Coditech.Admin.Controllers
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
                 }
                 else
-                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             list.ListType = "Active";
@@ -86,7 +86,7 @@ namespace Coditech.Admin.Controllers
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
                 }
                 else
-                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             list.ListType = "InActive";

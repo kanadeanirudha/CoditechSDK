@@ -45,6 +45,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMBatchActivityList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMDeviceSerialCodeByCentreCode.ToString()))
+            {
+                GetCentrewiseDeviceSerialCodeList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -202,6 +206,33 @@ namespace Coditech.Admin.Helpers
         {
             centreCode = !string.IsNullOrEmpty(centreCode) && centreCode.Contains(":") ? centreCode.Split(':')[0] : centreCode;
             return centreCode;
+        }
+
+        private static void GetCentrewiseDeviceSerialCodeList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (string.IsNullOrEmpty(dropdownViewModel.Parameter) && AccessibleCentreList()?.Count == 1)
+            {
+                dropdownViewModel.Parameter = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).SelectedCentreCode;
+            }
+            DBTMDeviceRegistrationDetailsListModel list = new DBTMDeviceRegistrationDetailsListModel();
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
+                DBTMDeviceRegistrationDetailsListResponse response = new DBTMDeviceRegistrationDetailsClient().GetDeviceSerialCodeByCentreCode(centreCode);
+                list = new DBTMDeviceRegistrationDetailsListModel { RegistrationDetailsList = response?.RegistrationDetailsList };
+            }
+            dropdownList.Add(new SelectListItem() { Text = "-------Select Device Serial Code-------", Value = "" });
+            foreach (var item in list?.RegistrationDetailsList)
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = item.DeviceSerialCode,
+                    // Value = item.Custom1.ToString(),
+                    Value = Convert.ToString(item.Custom1),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.Custom1)
+                   
+                });
+            }
         }
     }
 }

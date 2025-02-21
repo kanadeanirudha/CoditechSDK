@@ -67,6 +67,7 @@ namespace Coditech.API.Service
                             {
                                 AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
                                 EmployeeId = generalTrainerModel.EmployeeId,
+                                RoleType = "Regular",
                                 IsActive = true,
                                 CreatedDate = currentDate,
                                 ModifiedDate = currentDate,
