@@ -22,5 +22,11 @@ namespace Coditech.API.Endpoint
 
         public string DeleteRegistrationDetailsAsync() =>
                   $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMDeviceRegistrationDetails/DeleteRegistrationDetails";
+
+        public string GetDeviceSerialCodeByCentreCode(string centreCode)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMDeviceRegistrationDetails/GetDeviceSerialCodeByCentreCode?centreCode={centreCode}";
+            return endpoint;
+        }
     }
 }

@@ -10,7 +10,9 @@
         DBTMBatchActivity,
         DBTMSubscriptionPlanType,
         DBTMTestStatus,
-        DBTMDeviceStatus
+        DBTMDeviceStatus,
+        DBTMDeviceSerialCodeByCentreCode,
+        
     }
     public enum DashboardFormCustomEnum
     {

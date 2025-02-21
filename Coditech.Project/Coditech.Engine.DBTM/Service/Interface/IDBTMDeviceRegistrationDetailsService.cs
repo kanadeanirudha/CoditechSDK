@@ -12,5 +12,6 @@ namespace Coditech.API.Service
         DBTMDeviceRegistrationDetailsModel GetRegistrationDetails(long dBTMDeviceRegistrationDetailId);
         bool UpdateRegistrationDetails(DBTMDeviceRegistrationDetailsModel model);
         bool DeleteRegistrationDetails(ParameterModel parameterModel);
+        DBTMDeviceRegistrationDetailsListModel GetDeviceSerialCodeByCentreCode(string centreCode);
     }
 }

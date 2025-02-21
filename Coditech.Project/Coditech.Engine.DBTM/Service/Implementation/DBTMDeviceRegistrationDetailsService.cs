@@ -21,6 +21,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMDeviceMaster> _dBTMDeviceMasterRepository;
         private readonly ICoditechRepository<DBTMSubscriptionPlan> _dBTMSubscriptionPlanRepository;
         private readonly ICoditechRepository<DBTMSubscriptionPlanAssociatedToUser> _dBTMSubscriptionPlanAssociatedToUserRepository;
+        private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
 
 
         public DBTMDeviceRegistrationDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -31,6 +32,7 @@ namespace Coditech.API.Service
             _dBTMDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMSubscriptionPlanRepository = new CoditechRepository<DBTMSubscriptionPlan>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMSubscriptionPlanAssociatedToUserRepository = new CoditechRepository<DBTMSubscriptionPlanAssociatedToUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public virtual DBTMDeviceRegistrationDetailsListModel GetDBTMDeviceRegistrationDetailsList(long userMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -163,6 +165,21 @@ namespace Coditech.API.Service
             return status == 1 ? true : false;
         }
 
+        //Get device serial code list.
+        public virtual DBTMDeviceRegistrationDetailsListModel GetDeviceSerialCodeByCentreCode(string centreCode)
+        {
+          
+            List<DBTMDeviceRegistrationDetailsModel> accSetupGLRecords = new List<DBTMDeviceRegistrationDetailsModel>();
+            CoditechViewRepository<DBTMDeviceRegistrationDetailsModel> objStoredProc = new CoditechViewRepository<DBTMDeviceRegistrationDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>() );
+
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+
+            accSetupGLRecords = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDeviceSerialCodeByCentreCode @CentreCode")?.ToList();
+            DBTMDeviceRegistrationDetailsListModel list = new DBTMDeviceRegistrationDetailsListModel();
+            list.RegistrationDetailsList = accSetupGLRecords;
+            return list;
+        }
+       
         #region Protected Method
         //Check if DeviceSerialCode is already present or not.
         public virtual bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
