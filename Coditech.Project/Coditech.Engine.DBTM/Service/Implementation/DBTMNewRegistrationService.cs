@@ -2,6 +2,7 @@
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
@@ -91,6 +92,7 @@ namespace Coditech.API.Service
                 //Centre UserName Registration
                 InsertGeneralRunningNumbers(generalRunningNumbersList, currentDate, organisationCentreMaster, centreCode);
 
+                dBTMNewRegistrationModel.Custom1="DBTMCentreOwner";
                 //Insert General Person and registor employee
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.DirectorDepartmentId.ToString(), ApiCustomSettings.DirectorDesignationId, out personId);
 
@@ -128,6 +130,12 @@ namespace Coditech.API.Service
             if (IsNull(dBTMNewRegistrationModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            if (IsEmailIdAlreadyExist(dBTMNewRegistrationModel.EmailId))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Email Id"));
+
+            if(!_organisationCentreMasterRepository.Table.Any(x=>x.CentreCode == dBTMNewRegistrationModel.CentreCode))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Centre Code."));
+
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster() { CentreCode = dBTMNewRegistrationModel.CentreCode };
             long personId = 0;
             long employeeId = 0;
@@ -137,6 +145,7 @@ namespace Coditech.API.Service
             {
                 DateTime currentDate = DateTime.Now;
 
+                dBTMNewRegistrationModel.Custom1 = "DBTMTrainer";
                 //Insert General Person and registor employee
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.TrainerDepartmentId.ToString(), ApiCustomSettings.TrainerDesignationId, out personId);
                 if (employeeId > 0)
@@ -252,6 +261,7 @@ namespace Coditech.API.Service
             {
                 EmployeeId = employeeId,
                 TrainerSpecializationEnumId = dBTMNewRegistrationModel.TrainerSpecializationEnumId,
+                UniqueCode = GenerateNumericCode(),
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
             };
@@ -276,6 +286,7 @@ namespace Coditech.API.Service
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
                 IsPasswordChange = true,
+                Custom1 = dBTMNewRegistrationModel.Custom1
             };
             GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);
             long employeeId = 0;

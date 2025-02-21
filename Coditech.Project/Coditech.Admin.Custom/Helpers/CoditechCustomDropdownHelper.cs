@@ -112,7 +112,7 @@ namespace Coditech.Admin.Helpers
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
 
                 // Filter the list if the user is a trainer
-                if (userModel?.Custom1 == "Trainer")
+                if (userModel?.Custom1 == "DBTMTrainer")
                 {
                     list.GeneralTrainerList = list.GeneralTrainerList?.Where(x =>
                         string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
@@ -120,7 +120,7 @@ namespace Coditech.Admin.Helpers
                 }
             }
 
-            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != "Trainer")
+            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != "DBTMTrainer")
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
             else
                 dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
