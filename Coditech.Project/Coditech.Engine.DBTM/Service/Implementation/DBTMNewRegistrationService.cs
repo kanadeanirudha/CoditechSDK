@@ -91,6 +91,7 @@ namespace Coditech.API.Service
                 //Centre UserName Registration
                 InsertGeneralRunningNumbers(generalRunningNumbersList, currentDate, organisationCentreMaster, centreCode);
 
+                dBTMNewRegistrationModel.Custom1="DBTMCentreOwner";
                 //Insert General Person and registor employee
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.DirectorDepartmentId.ToString(), ApiCustomSettings.DirectorDesignationId, out personId);
 
@@ -137,6 +138,7 @@ namespace Coditech.API.Service
             {
                 DateTime currentDate = DateTime.Now;
 
+                dBTMNewRegistrationModel.Custom1 = "DBTMTrainer";
                 //Insert General Person and registor employee
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.TrainerDepartmentId.ToString(), ApiCustomSettings.TrainerDesignationId, out personId);
                 if (employeeId > 0)
@@ -276,6 +278,7 @@ namespace Coditech.API.Service
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
                 IsPasswordChange = true,
+                Custom1 = dBTMNewRegistrationModel.Custom1
             };
             GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);
             long employeeId = 0;

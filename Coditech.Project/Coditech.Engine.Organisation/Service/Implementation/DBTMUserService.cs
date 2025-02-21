@@ -33,15 +33,10 @@ namespace Coditech.API.Service
 
             if (!model.HasError)
             {
-                var result = (from a in _userMasterRepository.Table
-                              join b in _generalTrainerMasterRepository.Table
-                              on a.EntityId equals b.EmployeeId
-                              where a.UserMasterId == model.UserMasterId && a.UserType == "Employee"
-                              select new { a, b }).FirstOrDefault();
-
-                if (result != null)
+                GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(model.EntityId, model.UserType);
+                if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
                 {
-                    model.Custom1 = "Trainer";
+                    model.Custom1 = generalPersonModel.Custom1;
                 }
             }
             return model;
@@ -75,7 +70,7 @@ namespace Coditech.API.Service
             {
                 InsertDBTMTraineeDetails(generalPersonModel, settingMasterList);
             }
-            else 
+            else
             {
                 base.InsertPersonDetails(generalPersonModel, settingMasterList);
             }
@@ -127,7 +122,7 @@ namespace Coditech.API.Service
                         string messageText = ReplaceDBTMTraineeEmailTemplate(generalPersonModel, emailTemplateModel.EmailTemplate);
                         _coditechEmail.SendEmail(generalPersonModel.SelectedCentreCode, generalPersonModel.EmailId, "", subject, messageText, true);
                     }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       }
+                }
                 catch (Exception ex)
                 {
                     _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.TraineeDetails.ToString(), TraceLevel.Error);
@@ -135,7 +130,7 @@ namespace Coditech.API.Service
             }
         }
 
-        private  string ReplaceDBTMTraineeEmailTemplate(GeneralPersonModel generalPersonModel, string emailTemplate)
+        private string ReplaceDBTMTraineeEmailTemplate(GeneralPersonModel generalPersonModel, string emailTemplate)
         {
             string messageText = emailTemplate;
             messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, generalPersonModel.FirstName, messageText);
