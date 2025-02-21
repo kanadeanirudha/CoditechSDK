@@ -31,7 +31,7 @@ namespace Coditech.API.Service
         {
             UserModel model = base.Login(userLoginModel);
 
-            if (!model.HasError)
+            if (!model.HasError && model.UserType != UserTypeEnum.Admin.ToString())
             {
                 GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(model.EntityId, model.UserType);
                 if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
