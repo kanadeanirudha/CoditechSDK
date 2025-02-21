@@ -2,6 +2,7 @@
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
@@ -260,6 +261,7 @@ namespace Coditech.API.Service
             {
                 EmployeeId = employeeId,
                 TrainerSpecializationEnumId = dBTMNewRegistrationModel.TrainerSpecializationEnumId,
+                UniqueCode = GenerateNumericCode(),
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
             };
