@@ -129,6 +129,12 @@ namespace Coditech.API.Service
             if (IsNull(dBTMNewRegistrationModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            if (IsEmailIdAlreadyExist(dBTMNewRegistrationModel.EmailId))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Email Id"));
+
+            if(!_organisationCentreMasterRepository.Table.Any(x=>x.CentreCode == dBTMNewRegistrationModel.CentreCode))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Centre Code."));
+
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster() { CentreCode = dBTMNewRegistrationModel.CentreCode };
             long personId = 0;
             long employeeId = 0;
