@@ -40,5 +40,11 @@ namespace Coditech.API.Client
         /// <param name="ParameterModel">ParameterModel.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteRegistrationDetails(ParameterModel body);
+
+        /// <summary>
+        /// Get list of device serial code.
+        /// </summary>
+        /// <returns>DBTMDeviceRegistrationDetailsListResponse</returns>
+        DBTMDeviceRegistrationDetailsListResponse GetDeviceSerialCodeByCentreCode(string centreCode);
     }
 }

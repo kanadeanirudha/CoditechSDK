@@ -1,6 +1,7 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
@@ -24,9 +25,17 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
             GetListOnlyIfSingleCentre(dataTableViewModel);
-            if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
+           if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
-                list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+                if (userModel?.Custom1 == "DBTMTrainer")
+                {
+                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
+                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
+                }
+                else
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             if (AjaxHelper.IsAjaxRequest)
@@ -43,7 +52,15 @@ namespace Coditech.Admin.Controllers
             dataTableViewModel.SelectedParameter2 = "Active";
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
-                list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+                if (userModel?.Custom1 == "DBTMTrainer")
+                {
+                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
+                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
+                }
+                else
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             list.ListType = "Active";
@@ -61,7 +78,15 @@ namespace Coditech.Admin.Controllers
             dataTableViewModel.SelectedParameter2 = "InActive";
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
             {
-                list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+                if (userModel?.Custom1 == "DBTMTrainer")
+                {
+                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
+                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
+                }
+                else
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             list.ListType = "InActive";

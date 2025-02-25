@@ -125,7 +125,7 @@ namespace Coditech.API.Service
 
         public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)
        => _dBTMDeviceMasterRepository.Table.Where(x => x.DeviceSerialCode == deviceSerialCode && x.IsActive).FirstOrDefault();
-
+        
         #region Protected Method
 
         #endregion

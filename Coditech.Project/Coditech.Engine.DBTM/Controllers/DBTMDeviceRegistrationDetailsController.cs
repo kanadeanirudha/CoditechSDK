@@ -135,5 +135,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMDeviceRegistrationDetails/GetDeviceSerialCodeByCentreCode")]
+        [HttpGet]
+        [Produces(typeof(DBTMDeviceRegistrationDetailsListResponse))]
+        public virtual IActionResult GetDeviceSerialCodeByCentreCode(string centreCode)
+        {
+            try
+            {
+                DBTMDeviceRegistrationDetailsListModel list = _dBTMDeviceRegistrationDetailsService.GetDeviceSerialCodeByCentreCode(centreCode);
+                return IsNotNull(list) ? CreateOKResponse(new DBTMDeviceRegistrationDetailsListResponse { RegistrationDetailsList = list.RegistrationDetailsList }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMDeviceRegistrationDetails", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMDeviceRegistrationDetailsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMDeviceRegistrationDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMDeviceRegistrationDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

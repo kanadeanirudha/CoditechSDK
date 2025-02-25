@@ -7,5 +7,6 @@
         {
             RegistrationDetailsList = new List<DBTMDeviceRegistrationDetailsModel>();
         }
+        public string DeviceSerialCode { get; set; }
     }
 }
