@@ -36,6 +36,7 @@ namespace Coditech.Admin.Agents
                 DBTMDashboardResponse response = _dashboardClient.GetDBTMDashboardDetails(selectedAdminRoleMasterId, userMasterId);
                 dashboardViewModel = response?.DBTMDashboardModel?.ToViewModel<DBTMDashboardViewModel>();
             }
+            dashboardViewModel.NumberOfDaysRecord = 30;
             return dashboardViewModel;
         }
 
