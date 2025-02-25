@@ -21,6 +21,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechRepository<DBTMDeviceMaster> _dbtmDeviceMasterRepository;
         private readonly ICoditechRepository<AdminSanctionPost> _adminSanctionPostRepository;
         private readonly ICoditechRepository<AdminRoleMaster> _adminRoleMasterRepository;
+        protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
 
         //protected virtual readonly ICoditech _dBTMDeviceMasterRepository;
         public DBTMNewRegistrationService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -31,6 +32,7 @@ namespace Coditech.API.Service
             _dbtmDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _adminSanctionPostRepository = new CoditechRepository<AdminSanctionPost>(_serviceProvider.GetService<Coditech_Entities>());
             _adminRoleMasterRepository = new CoditechRepository<AdminRoleMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Public
@@ -92,7 +94,7 @@ namespace Coditech.API.Service
                 //Centre UserName Registration
                 InsertGeneralRunningNumbers(generalRunningNumbersList, currentDate, organisationCentreMaster, centreCode);
 
-                dBTMNewRegistrationModel.Custom1="DBTMCentreOwner";
+                dBTMNewRegistrationModel.Custom1 = "DBTMCentreOwner";
                 //Insert General Person and registor employee
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.DirectorDepartmentId.ToString(), ApiCustomSettings.DirectorDesignationId, out personId);
 
@@ -133,10 +135,18 @@ namespace Coditech.API.Service
             if (IsEmailIdAlreadyExist(dBTMNewRegistrationModel.EmailId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Email Id"));
 
-            if(!_organisationCentreMasterRepository.Table.Any(x=>x.CentreCode == dBTMNewRegistrationModel.CentreCode))
+            if (!_organisationCentreMasterRepository.Table.Any(x => x.CentreCode == dBTMNewRegistrationModel.CentreCode))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Centre Code."));
 
-            OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster() { CentreCode = dBTMNewRegistrationModel.CentreCode };
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMNewRegistrationModel.CentreCode)?.FirstOrDefault();
+
+            if (IsNull(joiningCodeDetails))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
+
+            if (joiningCodeDetails.IsExpired)
+                throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+
+            OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster() { CentreCode = joiningCodeDetails.CentreCode };
             long personId = 0;
             long employeeId = 0;
             string userType = UserTypeEnum.Employee.ToString();
@@ -153,8 +163,8 @@ namespace Coditech.API.Service
                     //Insert Employee Address
                     InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
 
-                    
-                    int adminSanctionPostId = _adminSanctionPostRepository.Table.Where(x => x.CentreCode == dBTMNewRegistrationModel.CentreCode && x.DepartmentId == ApiCustomSettings.TrainerDepartmentId && x.DesignationId== ApiCustomSettings.TrainerDesignationId).Select(y => y.AdminSanctionPostId).FirstOrDefault();
+
+                    int adminSanctionPostId = _adminSanctionPostRepository.Table.Where(x => x.CentreCode == dBTMNewRegistrationModel.CentreCode && x.DepartmentId == ApiCustomSettings.TrainerDepartmentId && x.DesignationId == ApiCustomSettings.TrainerDesignationId).Select(y => y.AdminSanctionPostId).FirstOrDefault();
                     if (adminSanctionPostId > 0)
                     {
                         var adminRoleMaster = _adminRoleMasterRepository.Table.Where(x => x.AdminSanctionPostId == adminSanctionPostId).FirstOrDefault();
@@ -180,6 +190,9 @@ namespace Coditech.API.Service
                         InsertAdminRole(currentDate, ApiCustomSettings.TrainerDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.TrainerDesignationId, DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), ApiCustomSettings.DBTMTrainerMenuCode.Split(",").ToList(), out sanctionPostCode);
                     }
                     InsertDBTMTrainerRegistration(dBTMNewRegistrationModel, currentDate, employeeId);
+
+                    joiningCodeDetails.IsExpired = true;
+                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                 }
             }
             catch (Exception ex)
@@ -195,7 +208,7 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
                 objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
                 int status = 0;
-                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTrainerNewRegistration @NewCentreCode,@EntityId,@UserType,@PersonId,@Status OUT",4, out status);
+                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTrainerNewRegistration @NewCentreCode,@EntityId,@UserType,@PersonId,@Status OUT", 4, out status);
             }
             return dBTMNewRegistrationModel;
         }
