@@ -8,6 +8,6 @@ namespace Coditech.Admin.Agents
         /// Get GetDBTMDashboardDetails.
         /// </summary>
         /// <returns>Returns DBTMDashboardViewModel.</returns>
-        DBTMDashboardViewModel GetDBTMDashboardDetails();
+        DBTMDashboardViewModel GetDBTMDashboardDetails(short numberOfDaysRecord);
     }
 }
