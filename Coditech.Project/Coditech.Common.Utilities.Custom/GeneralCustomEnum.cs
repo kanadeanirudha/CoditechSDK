@@ -37,6 +37,11 @@
     {
         DBTMCentreRegistration,
         TrainerRegistration,
-        IndividualRegistration
+        IndividualRegistration,
+        DBTMRegisterTrainee
+    }
+    public enum UserTypeCustomEnum
+    {
+        DBTMIndividualRegister
     }
 }
