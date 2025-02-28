@@ -147,13 +147,13 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Serial Code",
+                ColumnName = "Device Serial Code",
                 ColumnCode = "DeviceSerialCode",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = " DBTM Device Status",
+                ColumnName = "Device Status",
                 ColumnCode = "StatusEnumId",
                 IsSortable = true,
             }); datatableColumnList.Add(new DatatableColumns()
@@ -169,7 +169,7 @@ namespace Coditech.Admin.Agents
                 IsSortable = true,
             }); datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "IsActive",
+                ColumnName = "Is Active",
                 ColumnCode = "IsActive",
                 IsSortable = true,
             });

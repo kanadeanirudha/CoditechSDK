@@ -47,7 +47,7 @@ namespace Coditech.API.Service
                 }
                 else if (dashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    DataSet dataset = GetDBTMCenterOwenerDashboardDetailsByUserId(userMasterId);
+                    DataSet dataset = GetDBTMTrainerDashboardDetailsByUserId(userMasterId);
                     dataset.Tables[0].TableName = "TraineeDetails";
                     ConvertDataTableToList dataTable = new ConvertDataTableToList();
                     dBTMDashboardModel = dataTable.ConvertDataTable<DBTMDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
@@ -61,6 +61,14 @@ namespace Coditech.API.Service
             objStoredProc.GetParameter("@UserId", userId, ParameterDirection.Input, SqlDbType.BigInt);
             objStoredProc.GetParameter("@NumberOfDaysRecord", 30, ParameterDirection.Input, SqlDbType.SmallInt);
             return objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMCenterOwenerDashboard");
+        }
+
+        protected virtual DataSet GetDBTMTrainerDashboardDetailsByUserId(long userId)
+        {
+            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.GetParameter("@UserId", userId, ParameterDirection.Input, SqlDbType.BigInt);
+            objStoredProc.GetParameter("@NumberOfDaysRecord", 30, ParameterDirection.Input, SqlDbType.SmallInt);
+            return objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMTrainerDashboard");
         }
     }
 }
