@@ -88,15 +88,22 @@
                             <table class="table mb-0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="border-top-0">Activity Name</th>
+                                        <th class="border-top-0">Test Name</th>
+                                        <th class="border-top-0">Top Activity</th>
+                                        <th class="border-top-0">Test Code</th>
                                     </tr><!--end tr-->
                                 </thead>
                                 <tbody>
-                                    @*  @foreach (var item in Model?.DBTMTrainerDashboardModel?.TopActivityPerformed) *@
-                                    <tr>
-                                        <td><a href="/dbtmtestmaster/Edit?dBTMTestMasterId=DBTMTestMasterId" class="text-primary">Gajju P</a></td>
-                                    </tr>
-                                </tbody>
+                                <tbody>
+                                        @foreach (var item in Model?.TopActivityPerformed)
+                                        {
+                                        <tr>
+                                            <td>@item.TestName</td>
+                                            <td>@item.TopActivityCount</td>
+                                            <td>@item.TestCode</td>                                         
+                                        </tr>
+                                        }
+                                </tbody>                               
                             </table> <!--end table-->
                         </div><!--end /div-->
                     </div><!--end card-body-->

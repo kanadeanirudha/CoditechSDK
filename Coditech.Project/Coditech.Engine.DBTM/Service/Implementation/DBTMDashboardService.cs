@@ -51,6 +51,10 @@ namespace Coditech.API.Service
                     dataset.Tables[0].TableName = "TraineeDetails";
                     ConvertDataTableToList dataTable = new ConvertDataTableToList();
                     dBTMDashboardModel = dataTable.ConvertDataTable<DBTMDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+                   
+                    dataset.Tables[1].TableName = "TopActivityPerformed";
+                    dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
+                    dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
                 }
             }
             return dBTMDashboardModel;

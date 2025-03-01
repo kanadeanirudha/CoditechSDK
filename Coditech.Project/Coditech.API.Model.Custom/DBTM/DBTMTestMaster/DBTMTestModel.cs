@@ -18,5 +18,6 @@ namespace Coditech.Common.API.Model
         [Required]
         public List<string> DBTMSelectedTestParameter { get; set; }
        public string DBTMTestParameterId { get; set; }
+        public int TopActivityCount { get; set; }
     }
 }
