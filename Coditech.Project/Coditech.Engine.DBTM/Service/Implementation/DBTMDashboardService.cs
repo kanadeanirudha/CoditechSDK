@@ -24,7 +24,7 @@ namespace Coditech.API.Service
         }
 
         //Get Dashboard Details by selected Admin Role Master id.
-        public virtual DBTMDashboardModel GetDBTMDashboardDetails(int selectedAdminRoleMasterId, long userMasterId)
+        public virtual DBTMDashboardModel GetDBTMDashboardDetails(short numberOfDaysRecord, int selectedAdminRoleMasterId, long userMasterId)
         {
             if (selectedAdminRoleMasterId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "SelectedAdminRoleMasterId"));
@@ -40,14 +40,14 @@ namespace Coditech.API.Service
                 dBTMDashboardModel.DBTMDashboardFormEnumCode = dashboardFormEnumCode;
                 if (dashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMCentreDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    DataSet dataset = GetDBTMCenterOwenerDashboardDetailsByUserId(userMasterId);
+                    DataSet dataset = GetDBTMCenterOwenerDashboardDetailsByUserId(numberOfDaysRecord,userMasterId);
                     dataset.Tables[0].TableName = "NumberOfTrainersDetails";
                     ConvertDataTableToList dataTable = new ConvertDataTableToList();
                     dBTMDashboardModel = dataTable.ConvertDataTable<DBTMDashboardModel>(dataset.Tables["NumberOfTrainersDetails"])?.FirstOrDefault();
                 }
                 else if (dashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    DataSet dataset = GetDBTMTrainerDashboardDetailsByUserId(userMasterId);
+                    DataSet dataset = GetDBTMTrainerDashboardDetailsByUserId(numberOfDaysRecord, userMasterId);
                     dataset.Tables[0].TableName = "TraineeDetails";
                     ConvertDataTableToList dataTable = new ConvertDataTableToList();
                     dBTMDashboardModel = dataTable.ConvertDataTable<DBTMDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
@@ -55,19 +55,19 @@ namespace Coditech.API.Service
             }
             return dBTMDashboardModel;
         }
-        protected virtual DataSet GetDBTMCenterOwenerDashboardDetailsByUserId(long userId)
+        protected virtual DataSet GetDBTMCenterOwenerDashboardDetailsByUserId(short numberOfDaysRecord, long userId)
         {
             ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.GetParameter("@UserId", userId, ParameterDirection.Input, SqlDbType.BigInt);
-            objStoredProc.GetParameter("@NumberOfDaysRecord", 30, ParameterDirection.Input, SqlDbType.SmallInt);
+            objStoredProc.GetParameter("@NumberOfDaysRecord", numberOfDaysRecord, ParameterDirection.Input, SqlDbType.SmallInt);
             return objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMCenterOwenerDashboard");
         }
 
-        protected virtual DataSet GetDBTMTrainerDashboardDetailsByUserId(long userId)
+        protected virtual DataSet GetDBTMTrainerDashboardDetailsByUserId(short numberOfDaysRecord,long userId)
         {
             ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.GetParameter("@UserId", userId, ParameterDirection.Input, SqlDbType.BigInt);
-            objStoredProc.GetParameter("@NumberOfDaysRecord", 30, ParameterDirection.Input, SqlDbType.SmallInt);
+            objStoredProc.GetParameter("@NumberOfDaysRecord", numberOfDaysRecord, ParameterDirection.Input, SqlDbType.SmallInt);
             return objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMTrainerDashboard");
         }
     }
