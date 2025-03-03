@@ -1,86 +1,117 @@
 ﻿@model AccSetupGLModel
+
 @{
     Layout = null;
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 
-@if (Model?.AccSetupGLList?.Count > 0)
-{
-    @foreach (var account in Model.AccSetupGLList)
+<!-- Category Container -->
+<div style="margin:5px;">
+    @if (Model?.AccSetupCategoryList?.Any() == true)
     {
-        @Html.Raw(RenderTree(account))
+        foreach (var cat in Model.AccSetupCategoryList)
+        {
+            @Html.Raw(RenderAccSetupCategoryTree(cat))
+            <!-- Wrap all GL items for a category in a container -->
+            <div id="cat-gl-@cat.AccSetupCategoryId" style="display:none;">
+                @foreach (var gl in Model?.AccSetupGLList?.Where(x => x.CategoryCode == cat.CategoryCode))
+                {
+                    @Html.Raw(RenderAccSetupGLTree(gl))
+                }
+            </div>
+        }
     }
-}
-else
-{
-    <div class="col-sm-12 col-md-5">
-        <strong class="text-danger">No Result Found</strong>
-    </div>
-}
+    else
+    {
+        <div class="col-sm-12 col-md-5">
+            <strong class="text-danger">No Result Found</strong>
+        </div>
+    }
+</div>
 
 @functions {
-    string RenderTree(AccSetupGLModel account)
+    // Render a Category row (e.g., "Assets", "Liabilities")
+    string RenderAccSetupCategoryTree(AccSetupCategoryModel cat)
     {
-        bool hasChildren = account.SubAccounts != null && account.SubAccounts.Any();
-        string folderIcon = hasChildren ? "📂" : "📄";
-        string chevron = hasChildren ? $"<span id='chevron-{account.AccSetupGLId}' class='chevron-icon'>▶</span>" : "";
+        string folderIcon = "📂";
+        string amount = "<span>0.00</span>";
+        // Use distinct IDs for category toggle
+        string chevron = $"<span id='cat-chevron-{cat.AccSetupCategoryId}' style='transition: transform 0.3s; display:inline-block; cursor:pointer;'>▶</span>";
 
         string html = $@"
-        <div class='pl-3'>
-            <div class='justify-content-between align-items-center p-2 rounded border bg-white shadow-sm' onclick='toggleSubAccounts({account.AccSetupGLId})'>
-                <div class='align-items-center'>
-                    <span class='me-2'>{folderIcon}</span>
-                    <span>{account.GLName} <span class='text-muted small ms-2'>({account.CategoryCode})</span>
-                        <div style='float: right;'>
-                                <span>0.00</span>
-                        </div>
-                     </span>
+        <div style='padding-left:10px; margin-bottom:10px;'>
+            <div style='display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid #dee2e6; border-radius:4px; background-color:#fff; box-shadow:0 0.125rem 0.25rem rgba(0,0,0,0.075); cursor:pointer;'
+                 onclick='toggleSubAccounts(""cat"", {cat.AccSetupCategoryId})'>
+                <!-- LEFT SECTION -->
+                <div style='display:flex; align-items:center;'>
+                    <span style='margin-right:8px;'>{folderIcon}</span>
+                    <span>
+                    {cat.CategoryName}
+                        <span style='color:#6c757d; font-size:80%; margin-left:8px;'>({cat.CategoryName})</span>
+                    </span>
+                    <span style='margin-left:8px;'>{chevron}</span>
                 </div>
-    {chevron}
-            </div>";
+                <!-- RIGHT SECTION -->
+                <div>{amount}</div>
+            </div>
+        </div>";
+        return html;
+    }
 
+    // Render a GL item (e.g., "Current Assets", "Bank Accounts")
+    string RenderAccSetupGLTree(AccSetupGLModel gl)
+    {
+        bool hasChildren = gl.SubAccounts != null && gl.SubAccounts.Any();
+        string folderIcon = hasChildren ? "📂" : "📄";
+        string amount = "<span>0.00</span>";
+        string chevron = hasChildren ? $"<span id='gl-chevron-{gl.AccSetupGLId}' style='transition: transform 0.3s; display:inline-block; cursor:pointer;'>▶</span>" : "";
+
+        string html = $@"
+        <div style='padding-left:20px; margin-bottom:8px;'>
+            <div style='display:flex; justify-content:space-between; align-items:center; padding:8px; border:1px solid #dee2e6; border-radius:4px; background-color:#fff; box-shadow:0 0.125rem 0.25rem rgba(0,0,0,0.075); cursor:pointer;'
+                 onclick='toggleSubAccounts(""gl"", {gl.AccSetupGLId})'>
+                <!-- LEFT SECTION -->
+                <div style='display:flex; align-items:center;'>
+                    <span style='margin-right:8px;'>{folderIcon}</span>
+                    <span>
+                    {gl.GLName}
+                        <span style='color:#6c757d; font-size:80%; margin-left:8px;'>({gl.GLCode})</span>
+                    </span>
+                    <span style='margin-left:8px;'>{chevron}</span>
+                </div>
+                <!-- RIGHT SECTION -->
+                <div>{amount}</div>
+            </div>";
         if (hasChildren)
         {
-            html += $"<div class='ps-4 border-start mt-2 d-none' id='subaccounts-{account.AccSetupGLId}'>";
-            foreach (var sub in account.SubAccounts)
+            html += $@"
+            <div id='gl-subaccounts-{gl.AccSetupGLId}' style='padding-left:30px; border-left:1px solid #dee2e6; margin-top:8px; display:none;'>";
+            foreach (var sub in gl.SubAccounts)
             {
-                html += RenderTree(sub);
+                html += RenderAccSetupGLTree(sub);
             }
             html += "</div>";
         }
-
         html += "</div>";
         return html;
     }
 }
-<!-- JavaScript for Expand/Collapse -->
+
 <script>
-    function toggleSubAccounts(accountId) {
-        const subAccountElement = document.getElementById(`subaccounts-${accountId}`);
-        const chevronIcon = document.getElementById(`chevron-${accountId}`);
-
-        if (subAccountElement) {
-            subAccountElement.classList.toggle('d-none');  // Show/Hide child elements
+    // Toggle function with type: "cat" for categories and "gl" for GL items.
+    function toggleSubAccounts(type, id) {
+        var sub, chev;
+        if (type === "cat") {
+            sub = document.getElementById('cat-gl-' + id);
+            chev = document.getElementById('cat-chevron-' + id);
+        } else if (type === "gl") {
+            sub = document.getElementById('gl-subaccounts-' + id);
+            chev = document.getElementById('gl-chevron-' + id);
         }
-
-        if (chevronIcon) {
-            chevronIcon.classList.toggle('rotate-90');  // Rotate chevron on click
+        if (sub) {
+            sub.style.display = (sub.style.display === "none" || sub.style.display === "") ? "block" : "none";
+        }
+        if (chev) {
+            chev.style.transform = (chev.style.transform === "rotate(90deg)") ? "" : "rotate(90deg)";
         }
     }
 </script>
-
-<style>
-    .chevron-icon {
-        transition: transform 0.3s ease-in-out;
-        display: inline-block;
-    }
-
-    .rotate-90 {
-        transform: rotate(90deg);
-    }
-
-    .chevron-icon {
-        display: none !important;
-    }
-</style>

@@ -12,7 +12,7 @@
             </label>
             <div class="search-field position-relative">
                 <input id="DataTables_SearchById" type="text" onkeyup="CoditechCommon.SearchDatatableData()" class="form-control form-control-sm" value="@Model">
-                <a id="DataTables_SearchButton" onclick="CoditechDataTable.LoadList('@controllerName','@actionName')" class="position-absolute search-icon"><i class="fas fa-search" title="Search"></i></a>
+                <a id="DataTables_SearchButton" onclick="CoditechDataTable.LoadListFirst('@controllerName','@actionName')" class="position-absolute search-icon"><i class="fas fa-search" title="Search"></i></a>
             </div>
             @if (!string.IsNullOrEmpty(@Model))
             {

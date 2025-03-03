@@ -29,11 +29,11 @@ namespace Coditech.API.Controllers
         [Route("/DBTMDashboardController/GetDBTMDashboardDetails")]
         [HttpGet]
         [Produces(typeof(DBTMDashboardResponse))]
-        public virtual IActionResult GetDBTMDashboardDetails(int selectedAdminRoleMasterId,long userMasterId)
+        public virtual IActionResult GetDBTMDashboardDetails(short numberOfDaysRecord, int selectedAdminRoleMasterId,long userMasterId)
         {
             try
             {
-                DBTMDashboardModel dashboardModel = _dashboardService.GetDBTMDashboardDetails(selectedAdminRoleMasterId, userMasterId);
+                DBTMDashboardModel dashboardModel = _dashboardService.GetDBTMDashboardDetails(numberOfDaysRecord,selectedAdminRoleMasterId, userMasterId);
                 return IsNotNull(dashboardModel) ? CreateOKResponse(new DBTMDashboardResponse { DBTMDashboardModel = dashboardModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)

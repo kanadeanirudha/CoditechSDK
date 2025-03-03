@@ -34,7 +34,7 @@ namespace Coditech.Admin.Agents
             numberOfDaysRecord = numberOfDaysRecord == 0 ? CoditechAdminSettings.DefaultDashboardDataDays : numberOfDaysRecord;
             if (selectedAdminRoleMasterId > 0 && userMasterId > 0)
             {
-                DBTMDashboardResponse response = _dashboardClient.GetDBTMDashboardDetails(selectedAdminRoleMasterId, userMasterId);
+                DBTMDashboardResponse response = _dashboardClient.GetDBTMDashboardDetails(numberOfDaysRecord,selectedAdminRoleMasterId, userMasterId);
                 dashboardViewModel = response?.DBTMDashboardModel?.ToViewModel<DBTMDashboardViewModel>();
             }
             dashboardViewModel.NumberOfDaysRecord = numberOfDaysRecord;
