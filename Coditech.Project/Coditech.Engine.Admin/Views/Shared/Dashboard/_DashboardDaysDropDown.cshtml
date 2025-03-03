@@ -1,0 +1,23 @@
+﻿@model short
+
+<div class="col-sm-7">
+    <div class="page-title-box">
+        <div class="row">
+            <div class="col" class="col text-end">
+                <div class="col-auto align-self-center">
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                       {
+                           DropdownType = DropdownTypeEnum.DashboardDaysDropDown.ToString(),
+                           DropdownName = "DashboardDaysDropDown",
+                           DropdownSelectedValue = Model.ToString(),
+                           ChangeEvent = "CoditechCommon.DashboardDays()"
+                       })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!--end page-title-box-->
+</div>

@@ -331,4 +331,11 @@
             CoditechDataTable.LoadList(controllerName, methodName);
         }
     },
+    DashboardDays: function () {
+        CoditechCommon.ShowLodder();
+        var numberOfDaysRecord = $("#DashboardDaysDropDown option:selected").val();
+        let url = window.location.origin + window.location.pathname + '?numberOfDaysRecord=' + numberOfDaysRecord;
+        window.location.href = url;
+        CoditechCommon.HideLodder();
+    },
 }
