@@ -500,7 +500,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Date",
+                ColumnName = "CreatedDate",
                 ColumnCode = "Date",
                 IsSortable = true,
             });
