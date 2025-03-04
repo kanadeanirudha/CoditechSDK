@@ -50,97 +50,47 @@ namespace Coditech.API.Service
         }
 
         //Create DBTMTest.
-        //public virtual DBTMTestModel CreateDBTMTest(DBTMTestModel dBTMTestModel)
-        //{
-        //    if (IsNull(dBTMTestModel))
-        //        throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
-        //    if (IsDBTMTestNameAlreadyExist(dBTMTestModel.TestCode, dBTMTestModel.DBTMTestMasterId))
-        //        throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Test Code"));
-
-
-        //    DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
-
-        //    //Create new DBTMTest and return it.
-        //    DBTMTestMaster dBTMTestData = _dBTMTestMasterRepository.Insert(dBTMTestMaster);
-        //    if (dBTMTestData?.DBTMTestMasterId > 0)
-        //    {
-        //        dBTMTestModel.DBTMTestMasterId = dBTMTestData.DBTMTestMasterId;
-        //        List<DBTMParametersAssociatedToTest> parametersAssociatedToTestlist = new List<DBTMParametersAssociatedToTest>();
-        //        foreach (string item in dBTMTestModel.DBTMSelectedTestParameter)
-        //        {
-        //            parametersAssociatedToTestlist.Add(new DBTMParametersAssociatedToTest()
-        //            {
-        //                DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-        //                DBTMTestParameterId = Convert.ToByte(item)
-        //            });
-        //        }
-
-        //        _dBTMParametersAssociatedToTestRepository.InsertAsync(parametersAssociatedToTestlist);
-
-        //        List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestlist = new List<DBTMCalculationAssociatedToTest>();
-        //        foreach (string item in dBTMTestModel.DBTMSelectedTestCalculation)
-        //        {
-        //            calculationAssociatedToTestlist.Add(new DBTMCalculationAssociatedToTest()
-        //            {
-        //                DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-        //                DBTMTestCalculationId = Convert.ToByte(item)
-        //            });
-        //        }
-
-        //        _dBTMCalculationAssociatedToTestRepository.InsertAsync(calculationAssociatedToTestlist);
-        //    }
-
-        //    else
-        //    {
-        //        dBTMTestModel.HasError = true;
-        //        dBTMTestModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
-        //    }
-        //    return dBTMTestModel;
-        //}
-
-        //Create DBTMTest.
         public virtual DBTMTestModel CreateDBTMTest(DBTMTestModel dBTMTestModel)
         {
-            if (dBTMTestModel == null)
+            if (IsNull(dBTMTestModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
             if (IsDBTMTestNameAlreadyExist(dBTMTestModel.TestCode, dBTMTestModel.DBTMTestMasterId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Test Code"));
 
+
             DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
 
             //Create new DBTMTest and return it.
             DBTMTestMaster dBTMTestData = _dBTMTestMasterRepository.Insert(dBTMTestMaster);
-
             if (dBTMTestData?.DBTMTestMasterId > 0)
             {
                 dBTMTestModel.DBTMTestMasterId = dBTMTestData.DBTMTestMasterId;
-
-                if (dBTMTestModel.DBTMSelectedTestParameter?.Count > 0)
+                List<DBTMParametersAssociatedToTest> parametersAssociatedToTestlist = new List<DBTMParametersAssociatedToTest>();
+                foreach (string item in dBTMTestModel.DBTMSelectedTestParameter)
                 {
-                    var parametersList = dBTMTestModel.DBTMSelectedTestParameter
-                        .Select(item => new DBTMParametersAssociatedToTest
-                        {
-                            DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                            DBTMTestParameterId = Convert.ToByte(item)
-                        }).ToList();
-
-                    _dBTMParametersAssociatedToTestRepository.Insert(parametersList);
+                    parametersAssociatedToTestlist.Add(new DBTMParametersAssociatedToTest()
+                    {
+                        DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
+                        DBTMTestParameterId = Convert.ToByte(item)
+                    });
                 }
 
-                if (dBTMTestModel.DBTMSelectedTestCalculation?.Count > 0)
-                {
-                    var calculationsList = dBTMTestModel.DBTMSelectedTestCalculation
-                        .Select(item => new DBTMCalculationAssociatedToTest
-                        {
-                            DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                            DBTMTestCalculationId = Convert.ToByte(item)
-                        }).ToList();
+                _dBTMParametersAssociatedToTestRepository.Insert(parametersAssociatedToTestlist);
 
-                    _dBTMCalculationAssociatedToTestRepository.Insert(calculationsList);
+                List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestlist = new List<DBTMCalculationAssociatedToTest>();
+                foreach (string item in dBTMTestModel.DBTMSelectedTestCalculation)
+                {
+                    calculationAssociatedToTestlist.Add(new DBTMCalculationAssociatedToTest()
+                    {
+                        DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
+                        DBTMTestCalculationId = Convert.ToByte(item)
+                    });
                 }
+
+                _dBTMCalculationAssociatedToTestRepository.Insert(calculationAssociatedToTestlist);
             }
+
             else
             {
                 dBTMTestModel.HasError = true;
@@ -148,7 +98,6 @@ namespace Coditech.API.Service
             }
             return dBTMTestModel;
         }
-
 
         //Get DBTMTest by dBTMTestMasterId.
         public virtual DBTMTestModel GetDBTMTest(int dBTMTestMasterId)
@@ -168,118 +117,6 @@ namespace Coditech.API.Service
         }
 
         //Update DBTMTest.
-        //public virtual bool UpdateDBTMTest(DBTMTestModel dBTMTestModel)
-        //{
-        //    if (IsNull(dBTMTestModel))
-        //        throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
-
-        //    if (dBTMTestModel.DBTMTestMasterId < 1)
-        //        throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestMasterID"));
-
-        //    DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
-
-        //    //Update DBTMTest
-        //    bool isdBTMTestUpdated = _dBTMTestMasterRepository.Update(dBTMTestMaster);
-        //    if (isdBTMTestUpdated)
-        //    {
-        //        List<DBTMParametersAssociatedToTest> deleteDBTMParametersAssociatedToTest = null;
-        //        List<DBTMParametersAssociatedToTest> insertDBTMParametersAssociatedToTest = null;
-        //        List<DBTMParametersAssociatedToTest> parametersAssociatedToTestList = _dBTMParametersAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();
-
-        //        foreach (string item in dBTMTestModel.DBTMSelectedTestParameter)
-        //        {
-        //            if (!parametersAssociatedToTestList.Any(x => x.DBTMTestParameterId.ToString() == item))
-        //            {
-        //                if (IsNull(insertDBTMParametersAssociatedToTest))
-        //                {
-        //                    insertDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
-        //                }
-        //                insertDBTMParametersAssociatedToTest.Add(new DBTMParametersAssociatedToTest()
-        //                {
-        //                    DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-        //                    DBTMTestParameterId = Convert.ToByte(item)
-        //                });
-        //            }
-        //        }
-
-        //        foreach (DBTMParametersAssociatedToTest item in parametersAssociatedToTestList)
-        //        {
-        //            if (!dBTMTestModel.DBTMSelectedTestParameter.Any(x => x == item.DBTMTestParameterId.ToString()))
-        //            {
-        //                if (IsNull(deleteDBTMParametersAssociatedToTest))
-        //                {
-        //                    deleteDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
-        //                }
-        //                deleteDBTMParametersAssociatedToTest.Add(item);
-        //            }
-        //        }
-
-        //        if (insertDBTMParametersAssociatedToTest?.Count > 0)
-        //        {
-        //            _dBTMParametersAssociatedToTestRepository.Insert(insertDBTMParametersAssociatedToTest);
-        //        }
-
-        //        if (deleteDBTMParametersAssociatedToTest?.Count > 0)
-        //        {
-        //            _dBTMParametersAssociatedToTestRepository.Delete(deleteDBTMParametersAssociatedToTest);
-        //        }
-        //    }
-
-
-        //    List<DBTMCalculationAssociatedToTest> deleteDBTMCalculationAssociatedToTest = null;
-        //    List<DBTMCalculationAssociatedToTest> insertDBTMCalculationAssociatedToTest = null;
-        //    List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestList = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();
-
-        //    foreach (string item in dBTMTestModel.DBTMSelectedTestCalculation)
-        //    {
-        //        if (!calculationAssociatedToTestList.Any(x => x.DBTMTestCalculationId.ToString() == item))
-        //        {
-        //            if (IsNull(insertDBTMCalculationAssociatedToTest))
-        //            {
-        //                insertDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
-        //            }
-        //            insertDBTMCalculationAssociatedToTest.Add(new DBTMCalculationAssociatedToTest()
-        //            {
-        //                DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-        //                DBTMTestCalculationId = Convert.ToByte(item)
-        //            });
-        //        }
-        //    }
-
-        //    foreach (DBTMCalculationAssociatedToTest item in calculationAssociatedToTestList)
-        //    {
-        //        if (!dBTMTestModel.DBTMSelectedTestParameter.Any(x => x == item.DBTMTestCalculationId.ToString()))
-        //        {
-        //            if (IsNull(deleteDBTMCalculationAssociatedToTest))
-        //            {
-        //                deleteDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
-        //            }
-        //            deleteDBTMCalculationAssociatedToTest.Add(item);
-        //        }
-        //    }
-
-        //    if (insertDBTMCalculationAssociatedToTest?.Count > 0)
-        //    {
-        //        _dBTMParametersAssociatedToTestRepository.Insert(insertDBTMCalculationAssociatedToTest);
-        //    }
-
-        //    if (deleteDBTMCalculationAssociatedToTest?.Count > 0)
-        //    {
-        //        _dBTMParametersAssociatedToTestRepository.Delete(deleteDBTMCalculationAssociatedToTest);
-        //    }
-        //}
-
-
-
-        //  else
-        //    {
-        //        dBTMTestModel.HasError = true;
-        //        dBTMTestModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
-        //    }
-        //    return isdBTMTestUpdated;
-        //}
-
-        //Update DBTMTest.
         public virtual bool UpdateDBTMTest(DBTMTestModel dBTMTestModel)
         {
             if (IsNull(dBTMTestModel))
@@ -290,18 +127,22 @@ namespace Coditech.API.Service
 
             DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
 
-            // Update DBTMTest
+            //Update DBTMTest
             bool isdBTMTestUpdated = _dBTMTestMasterRepository.Update(dBTMTestMaster);
             if (isdBTMTestUpdated)
             {
+                List<DBTMParametersAssociatedToTest> deleteDBTMParametersAssociatedToTest = null;
+                List<DBTMParametersAssociatedToTest> insertDBTMParametersAssociatedToTest = null;
                 List<DBTMParametersAssociatedToTest> parametersAssociatedToTestList = _dBTMParametersAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();
-                List<DBTMParametersAssociatedToTest> insertDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
-                List<DBTMParametersAssociatedToTest> deleteDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
 
                 foreach (string item in dBTMTestModel.DBTMSelectedTestParameter)
                 {
                     if (!parametersAssociatedToTestList.Any(x => x.DBTMTestParameterId.ToString() == item))
                     {
+                        if (IsNull(insertDBTMParametersAssociatedToTest))
+                        {
+                            insertDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
+                        }
                         insertDBTMParametersAssociatedToTest.Add(new DBTMParametersAssociatedToTest()
                         {
                             DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
@@ -313,29 +154,34 @@ namespace Coditech.API.Service
                 {
                     if (!dBTMTestModel.DBTMSelectedTestParameter.Any(x => x == item.DBTMTestParameterId.ToString()))
                     {
+                        if (IsNull(deleteDBTMParametersAssociatedToTest))
+                        {
+                            deleteDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
+                        }
                         deleteDBTMParametersAssociatedToTest.Add(item);
                     }
                 }
-
-                // Insert new parameters
-                if (insertDBTMParametersAssociatedToTest.Count > 0)
+                if (insertDBTMParametersAssociatedToTest?.Count > 0)
                 {
                     _dBTMParametersAssociatedToTestRepository.Insert(insertDBTMParametersAssociatedToTest);
                 }
-
-                if (deleteDBTMParametersAssociatedToTest.Count > 0)
+                if (deleteDBTMParametersAssociatedToTest?.Count > 0)
                 {
                     _dBTMParametersAssociatedToTestRepository.Delete(deleteDBTMParametersAssociatedToTest);
                 }
-
+                
+                List<DBTMCalculationAssociatedToTest> deleteDBTMCalculationAssociatedToTest = null;
+                List<DBTMCalculationAssociatedToTest> insertDBTMCalculationAssociatedToTest = null;
                 List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestList = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();
-                List<DBTMCalculationAssociatedToTest> insertDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
-                List<DBTMCalculationAssociatedToTest> deleteDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
 
                 foreach (string item in dBTMTestModel.DBTMSelectedTestCalculation)
                 {
                     if (!calculationAssociatedToTestList.Any(x => x.DBTMTestCalculationId.ToString() == item))
                     {
+                        if (IsNull(insertDBTMCalculationAssociatedToTest))
+                        {
+                            insertDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
+                        }
                         insertDBTMCalculationAssociatedToTest.Add(new DBTMCalculationAssociatedToTest()
                         {
                             DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
@@ -343,23 +189,22 @@ namespace Coditech.API.Service
                         });
                     }
                 }
-
                 foreach (DBTMCalculationAssociatedToTest item in calculationAssociatedToTestList)
                 {
                     if (!dBTMTestModel.DBTMSelectedTestCalculation.Any(x => x == item.DBTMTestCalculationId.ToString()))
                     {
+                        if (IsNull(deleteDBTMCalculationAssociatedToTest))
+                        {
+                            deleteDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
+                        }
                         deleteDBTMCalculationAssociatedToTest.Add(item);
                     }
                 }
-
-                // Insert new calculations
-                if (insertDBTMCalculationAssociatedToTest.Count > 0)
+                if (insertDBTMCalculationAssociatedToTest?.Count > 0)
                 {
                     _dBTMCalculationAssociatedToTestRepository.Insert(insertDBTMCalculationAssociatedToTest);
                 }
-
-                // Delete old calculations
-                if (deleteDBTMCalculationAssociatedToTest.Count > 0)
+                if (deleteDBTMCalculationAssociatedToTest?.Count > 0)
                 {
                     _dBTMCalculationAssociatedToTestRepository.Delete(deleteDBTMCalculationAssociatedToTest);
                 }
@@ -369,7 +214,6 @@ namespace Coditech.API.Service
                 dBTMTestModel.HasError = true;
                 dBTMTestModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
             }
-
             return isdBTMTestUpdated;
         }
 
