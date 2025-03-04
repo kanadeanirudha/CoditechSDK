@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
@@ -169,7 +170,6 @@ namespace Coditech.API.Service
             }
             else if (generalPersonModel.UserType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-
                 DBTMDeviceMaster dBTMDeviceMaster = GetDBTMDeviceMasterDetailsByCode(generalPersonModel.Custom2);
 
                 if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
@@ -178,8 +178,9 @@ namespace Coditech.API.Service
                 if (IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
                     throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
 
-                generalPersonModel.SelectedCentreCode = "IndividualCentre"; // application Json;
+                generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
+
             generalPersonModel = base.InsertPersonInformation(generalPersonModel);
 
             if (!generalPersonModel.HasError)
@@ -191,7 +192,7 @@ namespace Coditech.API.Service
                 }
                 else if (generalPersonModel.UserType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                   DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMaster();
+                    DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMaster();
                     int subscriptionPlanTypeEnumId = GetEnumIdByEnumCode("DBTMDeviceRegistrationPlan", DropdownCustomTypeEnum.DBTMSubscriptionPlanType.ToString());
 
                     DBTMSubscriptionPlan dBTMSubscriptionPlan = _dBTMSubscriptionPlanRepository.Table.Where(x => x.SubscriptionPlanTypeEnumId == subscriptionPlanTypeEnumId && x.IsActive)?.FirstOrDefault();
