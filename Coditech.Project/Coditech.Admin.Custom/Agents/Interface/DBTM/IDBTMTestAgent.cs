@@ -39,5 +39,6 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteDBTMTest(string dBTMTestMasterIds, out string errorMessage);
         DBTMTestParameterListViewModel DBTMTestParameter();
+        DBTMTestCalculationListViewModel DBTMTestCalculation();
     }
 }

@@ -160,5 +160,28 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetDBTMTestCalculation")]
+        [Produces(typeof(DBTMTestCalculationListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetDBTMTestCalculation()
+        {
+            try
+            {
+                DBTMTestCalculationListModel list = _dBTMTestMasterService.GetDBTMTestCalculation();
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestCalculationListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestCalculation", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestCalculationListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestCalculation", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestCalculationListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

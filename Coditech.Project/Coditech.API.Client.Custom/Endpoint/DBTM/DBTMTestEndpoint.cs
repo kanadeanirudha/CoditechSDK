@@ -25,5 +25,8 @@ namespace Coditech.API.Endpoint
 
         public string GetDBTMTestParameterAsync() =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestParameter";
+
+        public string GetDBTMTestCalculationAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestCalculation";
     }
 }

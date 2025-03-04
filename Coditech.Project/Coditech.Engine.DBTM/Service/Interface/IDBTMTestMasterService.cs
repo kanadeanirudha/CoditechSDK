@@ -13,5 +13,6 @@ namespace Coditech.API.Service
         bool UpdateDBTMTest(DBTMTestModel model);
         bool DeleteDBTMTest(ParameterModel parameterModel);
         DBTMTestParameterListModel GetDBTMTestParameter();
+        DBTMTestCalculationListModel GetDBTMTestCalculation();
     }
 }

@@ -143,6 +143,16 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
+        public virtual DBTMTestCalculationListViewModel DBTMTestCalculation()
+        {
+
+            DBTMTestCalculationListResponse response = _dBTMTestClient.GetDBTMTestCalculation();
+            DBTMTestCalculationListModel dBTMTestCalculationList = new DBTMTestCalculationListModel { DBTMTestCalculationList = response?.DBTMTestCalculationList };
+            DBTMTestCalculationListViewModel listViewModel = new DBTMTestCalculationListViewModel();
+            listViewModel.DBTMTestCalculationList = dBTMTestCalculationList?.DBTMTestCalculationList?.ToViewModel<DBTMTestCalculationViewModel>().ToList();
+            return listViewModel;
+        }
+
         #endregion
 
         #region protected
