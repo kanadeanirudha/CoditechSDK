@@ -11,7 +11,5 @@ namespace Coditech.API.Endpoint
         public string TrainerRegistrationAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/TrainerRegistration/TrainerRegistration";
 
-        public string IndividualRegistrationAsync() =>
-            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/IndividualRegistration/IndividualRegistration";
     }
 }

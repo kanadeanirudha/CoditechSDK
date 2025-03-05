@@ -16,18 +16,20 @@ namespace Coditech.Admin.Agents
         #region Private Variable
         protected readonly ICoditechLogging _coditechLogging;
         private readonly IDBTMNewRegistrationClient _dBTMNewRegistrationClient;
+        private readonly IDBTMUserClient _userClient;
+
         #endregion
 
         #region Public Constructor
-        public DBTMNewRegistrationAgent(ICoditechLogging coditechLogging, IDBTMNewRegistrationClient dBTMNewRegistrationClient)
+        public DBTMNewRegistrationAgent(ICoditechLogging coditechLogging, IDBTMNewRegistrationClient dBTMNewRegistrationClient, IDBTMUserClient userClient)
         {
             _coditechLogging = coditechLogging;
             _dBTMNewRegistrationClient = GetClient<IDBTMNewRegistrationClient>(dBTMNewRegistrationClient);
+            _userClient = GetClient<IDBTMUserClient>(userClient);
         }
         #endregion
 
         #region Public Methods
-
         //Add NewRegistration.
         public virtual DBTMNewRegistrationViewModel DBTMCentreRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
@@ -95,8 +97,9 @@ namespace Coditech.Admin.Agents
         {
             try
             {
-                DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.IndividualRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
-                DBTMNewRegistrationModel dBTMNewRegistrationModel = response?.DBTMNewRegistrationModel;
+                dBTMNewRegistrationViewModel.UserType = UserTypeCustomEnum.DBTMIndividualRegister.ToString();
+                GeneralPersonResponse response = _userClient.IndividualRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
+                GeneralPersonModel dBTMNewRegistrationModel = response?.GeneralPersonModel;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
             }
             catch (CoditechException ex)

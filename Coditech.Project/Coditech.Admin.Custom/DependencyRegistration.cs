@@ -41,6 +41,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMMySubscriptionPlanClient, DBTMMySubscriptionPlanClient>();
             builder.Services.AddScoped<IDBTMPrivacySettingClient, DBTMPrivacySettingClient>();
             builder.Services.AddScoped<IDBTMDashboardClient, DBTMDashboardClient>();
+            builder.Services.AddScoped<IDBTMUserClient, DBTMUserClient>();
             #endregion 
             #endregion Client
         }

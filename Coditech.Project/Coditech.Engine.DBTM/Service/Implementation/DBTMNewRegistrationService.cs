@@ -211,13 +211,6 @@ namespace Coditech.API.Service
             }
             return dBTMNewRegistrationModel;
         }
-
-        //Create Individual Registration.
-        public virtual DBTMNewRegistrationModel IndividualRegistration(DBTMNewRegistrationModel dBTMNewRegistrationModel)
-        {
-            return dBTMNewRegistrationModel;
-        }
-
         #endregion
 
         #region Protected

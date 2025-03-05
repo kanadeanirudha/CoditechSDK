@@ -156,7 +156,8 @@ namespace Coditech.API.Service
         public virtual GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel)
         {
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
-            if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            string userType = generalPersonModel.UserType;
+            if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == generalPersonModel.Custom1)?.FirstOrDefault();
 
@@ -168,7 +169,7 @@ namespace Coditech.API.Service
 
                 generalPersonModel.SelectedCentreCode = joiningCodeDetails.CentreCode;
             }
-            else if (generalPersonModel.UserType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 DBTMDeviceMaster dBTMDeviceMaster = GetDBTMDeviceMasterDetailsByCode(generalPersonModel.Custom2);
 
@@ -180,17 +181,17 @@ namespace Coditech.API.Service
 
                 generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
-
+            generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
             generalPersonModel = base.InsertPersonInformation(generalPersonModel);
 
             if (!generalPersonModel.HasError)
             {
-                if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     joiningCodeDetails.IsExpired = true;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                 }
-                else if (generalPersonModel.UserType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMaster();
                     int subscriptionPlanTypeEnumId = GetEnumIdByEnumCode("DBTMDeviceRegistrationPlan", DropdownCustomTypeEnum.DBTMSubscriptionPlanType.ToString());
@@ -204,7 +205,7 @@ namespace Coditech.API.Service
                     {
                         DBTMDeviceMasterId = dBTMDeviceMaster.DBTMDeviceMasterId,
                         EntityId = generalPersonModel.EntityId,
-                        UserType = UserTypeEnum.Trainee.ToString(),
+                        UserType = generalPersonModel.UserType,
                         PurchaseDate = DateTime.Now,
                         WarrantyExpirationDate = DateTime.Now.AddMonths(dBTMDeviceMaster.WarrantyExpirationPeriodInMonth),
                     };

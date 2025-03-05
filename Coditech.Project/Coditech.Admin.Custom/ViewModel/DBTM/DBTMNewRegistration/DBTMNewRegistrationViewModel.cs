@@ -98,5 +98,6 @@ namespace Coditech.Admin.ViewModel
         public string TrainerSpecialization { get; set; }
         [Required]
         public int TrainerSpecializationEnumId { get; set; }
+        public string UserType { get; set; }
     }
 }

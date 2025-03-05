@@ -18,12 +18,6 @@ namespace Coditech.API.Client
         /// <param name="DBTMNewRegistrationModel">DBTMNewRegistrationModel.</param>
         /// <returns>Returns DBTMDeviceResponse.</returns>
         DBTMNewRegistrationResponse TrainerRegistration(DBTMNewRegistrationModel body);
-
-        /// <summary>
-        /// Add IndividualRegistration.
-        /// </summary>
-        /// <param name="DBTMNewRegistrationModel">DBTMNewRegistrationModel.</param>
-        /// <returns>Returns DBTMDeviceResponse.</returns>
-        DBTMNewRegistrationResponse IndividualRegistration(DBTMNewRegistrationModel body);
+       
     }
 }
