@@ -11,5 +11,6 @@ namespace Coditech.API.Client
         /// <param name="GeneralPersonModel">GeneralPersonModelModel.</param>
         /// <returns>Returns GeneralPersonResponse.</returns>
         GeneralPersonResponse IndividualRegistration(GeneralPersonModel body);
+        GeneralPersonResponse TraineeRegistration(GeneralPersonModel body);
     }
 }

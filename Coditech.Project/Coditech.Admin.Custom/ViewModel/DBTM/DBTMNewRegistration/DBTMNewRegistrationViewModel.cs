@@ -8,7 +8,8 @@ namespace Coditech.Admin.ViewModel
         [MaxLength(100)]
         [Display(Name = "Centre Name")]
         public string CentreName { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Joining Code Is Required")]
         [MaxLength(30)]
         [Display(Name = "Centre Code")]
         public string CentreCode { get; set; }

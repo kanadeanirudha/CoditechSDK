@@ -7,6 +7,8 @@ namespace Coditech.API.Endpoint
     {
         public string IndividualRegistrationAsync() =>
             $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/DBTMRegisterTrainee";
+        public string TraineeRegistrationAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/DBTMRegisterTrainee";
     }
 }
        
