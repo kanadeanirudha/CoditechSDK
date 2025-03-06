@@ -6,9 +6,10 @@ namespace Coditech.API.Client
         /// <summary>
         /// Get DBTM Dashboard by selectedAdminRoleMasterId.
         /// </summary>
+        /// <param name="numberOfDaysRecord">selectedAdminRoleMasterId</param>
         /// <param name="selectedAdminRoleMasterId">selectedAdminRoleMasterId</param>
         /// <param name="userMasterId">userMasterId</param>
         /// <returns>Returns DBTMDashboardResponse.</returns>
-        DBTMDashboardResponse GetDBTMDashboardDetails(int selectedAdminRoleMasterId, long userMasterId);
+        DBTMDashboardResponse GetDBTMDashboardDetails(short numberOfDaysRecord,int selectedAdminRoleMasterId, long userMasterId);
     }
 }

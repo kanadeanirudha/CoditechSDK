@@ -26,16 +26,18 @@ namespace Coditech.Admin.Agents
         #region Public Methods
 
         //Get DBTM Dashboard by general selected Admin Role Master id.
-        public virtual DBTMDashboardViewModel GetDBTMDashboardDetails()
+        public virtual DBTMDashboardViewModel GetDBTMDashboardDetails(short numberOfDaysRecord)
         {
             int selectedAdminRoleMasterId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.SelectedAdminRoleMasterId ?? 0;
             long userMasterId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.UserMasterId ?? 0;
             DBTMDashboardViewModel dashboardViewModel = new DBTMDashboardViewModel();
+            numberOfDaysRecord = numberOfDaysRecord == 0 ? CoditechAdminSettings.DefaultDashboardDataDays : numberOfDaysRecord;
             if (selectedAdminRoleMasterId > 0 && userMasterId > 0)
             {
-                DBTMDashboardResponse response = _dashboardClient.GetDBTMDashboardDetails(selectedAdminRoleMasterId, userMasterId);
+                DBTMDashboardResponse response = _dashboardClient.GetDBTMDashboardDetails(numberOfDaysRecord,selectedAdminRoleMasterId, userMasterId);
                 dashboardViewModel = response?.DBTMDashboardModel?.ToViewModel<DBTMDashboardViewModel>();
             }
+            dashboardViewModel.NumberOfDaysRecord = numberOfDaysRecord;
             return dashboardViewModel;
         }
 

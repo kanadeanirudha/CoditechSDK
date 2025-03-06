@@ -79,7 +79,7 @@
             }
             @if (adminRoleMediaFolderActionModel.SelectedMediaActions.Any(x => x.Equals(MediaFolderActionEnum.MoveFolder.ToString())))
             {
-                <a class="dropdown-item" id="moveFolder" onclick="openMoveFolderModal('@Model.RootFolderId')">Move</a>
+                <a class="dropdown-item" id="moveFolder" onclick="openMoveFolderModal('@Model.RootFolderId','@Model.RootFolderName')">Move</a>
             }
             else
             {

@@ -36,8 +36,6 @@ var InventoryStorageDimensionGroup = {
 
         // Set the JSON data to a form field
         $("#StorageDimensionGroupMapperData").val(jsonData);
-        console.log('JSON data:', jsonData);
-        debugger;
         // Submit the form
         $("#frmInventoryStorageDimensionGroup").submit();
     }

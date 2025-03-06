@@ -14,17 +14,17 @@ namespace Coditech.API.Client
             dashboardEndpoint = new DBTMDashboardEndpoint();
         }
 
-        public virtual DBTMDashboardResponse GetDBTMDashboardDetails(int selectedAdminRoleMasterId, long userMasterId)
+        public virtual DBTMDashboardResponse GetDBTMDashboardDetails(short numberOfDaysRecord, int selectedAdminRoleMasterId, long userMasterId)
         {
-            return Task.Run(async () => await GetDBTMDashboardDetailsAsync(selectedAdminRoleMasterId, userMasterId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetDBTMDashboardDetailsAsync(numberOfDaysRecord, selectedAdminRoleMasterId, userMasterId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMDashboardResponse> GetDBTMDashboardDetailsAsync(int selectedAdminRoleMasterId, long userMasterId, System.Threading.CancellationToken cancellationToken)
+        public virtual async Task<DBTMDashboardResponse> GetDBTMDashboardDetailsAsync(short numberOfDaysRecord, int selectedAdminRoleMasterId, long userMasterId, System.Threading.CancellationToken cancellationToken)
         {
             if (selectedAdminRoleMasterId <= 0)
                 throw new System.ArgumentNullException("selectedAdminRoleMasterId");
 
-            string endpoint = dashboardEndpoint.GetDBTMDashboardDetailsAsync(selectedAdminRoleMasterId, userMasterId);
+            string endpoint = dashboardEndpoint.GetDBTMDashboardDetailsAsync(numberOfDaysRecord, selectedAdminRoleMasterId, userMasterId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
