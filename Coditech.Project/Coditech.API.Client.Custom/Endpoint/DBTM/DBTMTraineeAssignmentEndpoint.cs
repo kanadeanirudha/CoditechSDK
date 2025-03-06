@@ -30,7 +30,7 @@ namespace Coditech.API.Endpoint
         public string GetTraineeDetailsByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId) =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetTraineeDetailByCentreCodeAndgeneralTrainerId?centreCode={centreCode}&generalTrainerId={generalTrainerId}";
 
-        public string SendAssignmentReminderAsync(string dBTMTraineeAssignmentId) =>
-            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/SendAssignmentReminder?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}";
+        public string SendAssignmentReminderAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/SendAssignmentReminder";
     }
 }

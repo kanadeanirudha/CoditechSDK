@@ -356,44 +356,51 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual TrueFalseResponse SendAssignmentReminder(string dBTMTraineeAssignmentId)
+        public virtual DBTMTraineeAssignmentResponse SendAssignmentReminder(DBTMTraineeAssignmentModel model)
         {
-            return Task.Run(async () => await SendAssignmentReminderAsync(dBTMTraineeAssignmentId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await SendAssignmentReminderAsync(model, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<TrueFalseResponse> SendAssignmentReminderAsync(string dBTMTraineeAssignmentId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeAssignmentResponse> SendAssignmentReminderAsync(DBTMTraineeAssignmentModel model, CancellationToken cancellationToken)
         {
 
-            string endpoint = dBTMTraineeAssignmentEndpoint.SendAssignmentReminderAsync(dBTMTraineeAssignmentId);
+            string endpoint = dBTMTraineeAssignmentEndpoint.SendAssignmentReminderAsync();
             HttpResponseMessage response = null;
-            var disposeResponse = true;
+            bool disposeResponse = true;
             try
             {
                 ApiStatus status = new ApiStatus();
+                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(model), status, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                Dictionary<string, IEnumerable<string>> dictionary = BindHeaders(response);
 
-                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
-                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
-                var status_ = (int)response.StatusCode;
-                if (status_ == 200)
+                switch (response.StatusCode)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<TrueFalseResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
-                    if (objectResponse.Object == null)
-                    {
-                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
-                    }
-                    return objectResponse.Object;
-                }
-                else
-                if (status_ == 204)
-                {
-                    return new TrueFalseResponse();
-                }
-                else
-                {
-                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    TrueFalseResponse typedBody = JsonConvert.DeserializeObject<TrueFalseResponse>(responseData);
-                    UpdateApiStatus(typedBody, status, response);
-                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                    case HttpStatusCode.OK:
+                        {
+                            ObjectResponseResult<DBTMTraineeAssignmentResponse> objectResponseResult2 = await ReadObjectResponseAsync<DBTMTraineeAssignmentResponse>(response, BindHeaders(response), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                            if (objectResponseResult2.Object == null)
+                            {
+                                throw new CoditechException(objectResponseResult2.Object.ErrorCode, objectResponseResult2.Object.ErrorMessage);
+                            }
+                            return objectResponseResult2.Object;
+                        }
+                    case HttpStatusCode.Created:
+                        {
+                            ObjectResponseResult<DBTMTraineeAssignmentResponse> objectResponseResult = await ReadObjectResponseAsync<DBTMTraineeAssignmentResponse>(response, dictionary, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                            if (objectResponseResult.Object == null)
+                            {
+                                throw new CoditechException(objectResponseResult.Object.ErrorCode, objectResponseResult.Object.ErrorMessage);
+                            }
+
+                            return objectResponseResult.Object;
+                        }
+                    default:
+                        {
+                            string value = ((response.Content != null) ? (await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)) : null);
+                            ResetPasswordResponse result = JsonConvert.DeserializeObject<ResetPasswordResponse>(value);
+                            UpdateApiStatus(result, status, response);
+                            throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                        }
                 }
             }
             finally

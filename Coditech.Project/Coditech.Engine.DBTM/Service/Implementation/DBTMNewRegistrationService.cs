@@ -389,7 +389,7 @@ namespace Coditech.API.Service
         protected virtual void InsertOrganisationCentrewiseEmailTemplate(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string centreCode)
         {
             List<string> emailTemplateList = new List<string>();
-            emailTemplateList = ("EmployeeRegistration,MobileResetPasswordLink,ResetPasswordLink").Split(",").ToList();
+            emailTemplateList = ("EmployeeRegistration,MobileResetPasswordLink,ResetPasswordLink,AssignmentReminder").Split(",").ToList();
             List<OrganisationCentrewiseEmailTemplate> organisationCentrewiseEmailTemplateList = new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && emailTemplateList.Contains(x.EmailTemplateCode) && x.IsActive)?.ToList();
             if (IsNotNull(organisationCentrewiseEmailTemplateList))
             {
@@ -401,6 +401,15 @@ namespace Coditech.API.Service
                     item.ModifiedDate = currentDate;
                 }
                 new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseEmailTemplateList);
+                if (organisationCentrewiseEmailTemplateList.Any(x => x.EmailTemplateCode == "AssignmentReminder"))
+                {
+                    List<DBTMTraineeAssignmentModel> traineeAssignments = GetTraineesForCentre(centreCode);
+
+                    foreach (var trainee in traineeAssignments)
+                    {
+                        SendReminderEmail(trainee);
+                    }
+                }
             }
         }
 
@@ -584,6 +593,32 @@ namespace Coditech.API.Service
                 }
                 new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMenuDetailList);
             }
+        }
+
+        protected virtual bool SendReminderEmail(DBTMTraineeAssignmentModel reminderModel)
+        {
+            GeneralEmailTemplateModel emailTemplateModel = GetEmailTemplateByCode(reminderModel.SelectedCentreCode, EmailTemplateCodeCustomEnum.SendAssignmentReminder.ToString());
+
+            if (emailTemplateModel != null && !string.IsNullOrEmpty(emailTemplateModel.EmailTemplate))
+            {
+
+                string subject = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, reminderModel.SelectedCentreCode, emailTemplateModel.Subject);
+                string messageText = emailTemplateModel.EmailTemplate;
+                messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, reminderModel.FirstName, messageText);
+                messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, reminderModel.LastName, messageText);
+                messageText = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TestName, reminderModel.TestName, messageText);
+                messageText = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.AssignmentDate, reminderModel.AssignmentDate.ToString("dd MMM yyyy"), messageText);
+
+                // Send the email
+                _coditechEmail.SendEmail(reminderModel.SelectedCentreCode, reminderModel.EmailId, "", emailTemplateModel.Subject, messageText, true);
+                return true;
+            }
+            return false;
+        }
+
+        protected virtual List<DBTMTraineeAssignmentModel> GetTraineesForCentre(string centreCode)
+        {
+            return new CoditechRepository<DBTMTraineeAssignmentModel>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.SelectedCentreCode == centreCode ).ToList();
         }
         #endregion
     }

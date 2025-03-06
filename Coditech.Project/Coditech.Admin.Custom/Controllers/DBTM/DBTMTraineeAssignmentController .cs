@@ -101,25 +101,33 @@ namespace Coditech.Admin.Controllers
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
-        }
+        }       
 
-        [HttpPut]
-        public virtual ActionResult SendAssignmentReminder(string dBTMTraineeAssignmentId, string selectedCentreCode)
+        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId )
         {
             string message = string.Empty;
             bool status = false;
 
-            if (!string.IsNullOrEmpty(dBTMTraineeAssignmentId))
-            {
-                status = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId, out message);
+            DBTMTraineeAssignmentViewModel model = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
 
-                SetNotificationMessage(GetSuccessNotificationMessage("Send Reminder Assignment Successfully."));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
+            if (model != null)
+            {
+                model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(model, out message);
+                status = (model != null);  
             }
 
-            SetNotificationMessage(GetErrorNotificationMessage("ErrorFailedToSendReminder"));
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
+            if (status)
+            {
+                SetNotificationMessage(GetSuccessNotificationMessage("Send Reminder Assignment Successfully."));
+            }
+            else
+            {
+                SetNotificationMessage(GetErrorNotificationMessage("Error Failed To Send Reminder"));
+            }
+
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId) });
         }
+
 
         public ActionResult GetTrainerByCentreCode(string centreCode)
         {
@@ -152,3 +160,5 @@ namespace Coditech.Admin.Controllers
         }
     }
 }
+
+
