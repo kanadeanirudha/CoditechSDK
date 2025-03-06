@@ -24,5 +24,6 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMNewRegistrationViewModel">DBTM New Registration View Model.</param>
         /// <returns>Returns created model.</returns>
         DBTMNewRegistrationViewModel IndividualRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel);
+        DBTMNewRegistrationViewModel TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel);
     }
 }

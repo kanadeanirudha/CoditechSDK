@@ -66,9 +66,16 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3 multiselect-dropdown">
-                                        @Html.LabelFor(x => x.DBTMSelectedTestParameter, new { @class = "form-label required" })
+                                        @Html.LabelFor(x => x.DBTMSelectedTestParameter, new { @class = "form-label required"})
                                         @Html.ListBoxFor(x => x.DBTMSelectedTestParameter, new SelectList(Model.DBTMTestParameterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
                                         @Html.ValidationMessageFor(x => x.DBTMSelectedTestParameter)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3 multiselect-dropdown">
+                                        @Html.LabelFor(x => x.DBTMSelectedTestCalculation, new { @class = "form-label required" })
+                                        @Html.ListBoxFor(x => x.DBTMSelectedTestCalculation, new SelectList(Model.DBTMTestCalculationList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
+                                        @Html.ValidationMessageFor(x => x.DBTMSelectedTestCalculation)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

@@ -24,5 +24,15 @@ namespace Coditech.Admin.Utilities
 #endif
             }
         }
+        public static string CoditechOrganisationApiRootUri
+        {
+            get
+            {
+                    return Convert.ToString(settings["CoditechOrganisationApiRootUri"]);
+
+                //return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-organisation.{settings["ApiDomainName"]}");
+
+            }
+        }
     }
 }

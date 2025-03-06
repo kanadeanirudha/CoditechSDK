@@ -33,6 +33,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTestViewModel dBTMTestViewModel = new DBTMTestViewModel();
             BindDBTMTestParameter(dBTMTestViewModel);
+            BindDBTMTestCalculation(dBTMTestViewModel);
             return View(createEdit, dBTMTestViewModel);
         }
 
@@ -49,6 +50,7 @@ namespace Coditech.Admin.Controllers
                 }
             }
             BindDBTMTestParameter(dBTMTestViewModel);
+            BindDBTMTestCalculation(dBTMTestViewModel);
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTestViewModel.ErrorMessage));
             return View(createEdit, dBTMTestViewModel);
         }
@@ -58,6 +60,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTestViewModel dBTMTestViewModel = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId);
             BindDBTMTestParameter(dBTMTestViewModel);
+            BindDBTMTestCalculation(dBTMTestViewModel);
             return ActionView(createEdit, dBTMTestViewModel);
         }
 
@@ -72,6 +75,7 @@ namespace Coditech.Admin.Controllers
                 return RedirectToAction("Edit", new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
             }
             BindDBTMTestParameter(dBTMTestViewModel);
+            BindDBTMTestCalculation(dBTMTestViewModel);
             return View(createEdit, dBTMTestViewModel);
         }
 
@@ -106,6 +110,24 @@ namespace Coditech.Admin.Controllers
                     {
                         Text = item.ParameterName,
                         Value = item.DBTMTestParameterId.ToString()
+                    });
+                }
+            }
+        }
+
+        protected virtual void BindDBTMTestCalculation(DBTMTestViewModel dBTMTestViewModel)
+        {
+            dBTMTestViewModel.DBTMTestCalculationList = dBTMTestViewModel.DBTMTestCalculationList ?? new List<SelectListItem>();
+            DBTMTestCalculationListViewModel parameterList = _dBTMTestAgent.DBTMTestCalculation();
+
+            if (parameterList?.DBTMTestCalculationList != null)
+            {
+                foreach (var item in parameterList.DBTMTestCalculationList)
+                {
+                    dBTMTestViewModel.DBTMTestCalculationList.Add(new SelectListItem
+                    {
+                        Text = item.CalculationName,
+                        Value = item.DBTMTestCalculationId.ToString()
                     });
                 }
             }

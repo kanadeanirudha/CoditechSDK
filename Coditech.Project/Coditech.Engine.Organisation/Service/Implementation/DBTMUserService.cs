@@ -1,21 +1,29 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
+using Coditech.Resources;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.API.Service
 {
-    public class DBTMUserService : UserService
+    public class DBTMUserService : UserService, IDBTMUserService
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
+        protected readonly ICoditechRepository<DBTMDeviceMaster> _dBTMDeviceMasterRepository;
+        protected readonly ICoditechRepository<DBTMDeviceRegistrationDetails> _dBTMDeviceRegistrationDetailsRepository;
+        protected readonly ICoditechRepository<DBTMSubscriptionPlan> _dBTMSubscriptionPlanRepository;
+        protected readonly ICoditechRepository<DBTMSubscriptionPlanAssociatedToUser> _dBTMSubscriptionPlanAssociatedToUserRepository;
 
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
@@ -25,6 +33,11 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMDeviceRegistrationDetailsRepository = new CoditechRepository<DBTMDeviceRegistrationDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMSubscriptionPlanRepository = new CoditechRepository<DBTMSubscriptionPlan>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMSubscriptionPlanAssociatedToUserRepository = new CoditechRepository<DBTMSubscriptionPlanAssociatedToUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public override UserModel Login(UserLoginModel userLoginModel)
@@ -137,5 +150,98 @@ namespace Coditech.API.Service
             messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, generalPersonModel.LastName, messageText);
             return ReplaceEmailTemplateFooter(generalPersonModel.SelectedCentreCode, messageText);
         }
+
+        #region DBTMRegisterTrainee
+
+        public virtual GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel)
+        {
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
+            string userType = generalPersonModel.UserType;
+            if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == generalPersonModel.Custom1)?.FirstOrDefault();
+
+                if (IsNull(joiningCodeDetails))
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
+
+                if (joiningCodeDetails.IsExpired)
+                    throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+
+                generalPersonModel.SelectedCentreCode = joiningCodeDetails.CentreCode;
+            }
+            else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                DBTMDeviceMaster dBTMDeviceMaster = GetDBTMDeviceMasterDetailsByCode(generalPersonModel.Custom2);
+
+                if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
+                    throw new CoditechException(ErrorCodes.InvalidData, string.Format("Invalid Device Serial Code."));
+
+                if (IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
+
+                generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
+            }
+            generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
+            generalPersonModel = base.InsertPersonInformation(generalPersonModel);
+
+            if (!generalPersonModel.HasError)
+            {
+                if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    joiningCodeDetails.IsExpired = true;
+                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
+                }
+                else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMaster();
+                    int subscriptionPlanTypeEnumId = GetEnumIdByEnumCode("DBTMDeviceRegistrationPlan", DropdownCustomTypeEnum.DBTMSubscriptionPlanType.ToString());
+
+                    DBTMSubscriptionPlan dBTMSubscriptionPlan = _dBTMSubscriptionPlanRepository.Table.Where(x => x.SubscriptionPlanTypeEnumId == subscriptionPlanTypeEnumId && x.IsActive)?.FirstOrDefault();
+
+                    if (IsNull(dBTMSubscriptionPlan))
+                        throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
+
+                    DBTMDeviceRegistrationDetails dBTMDeviceRegistrationDetails = new DBTMDeviceRegistrationDetails()
+                    {
+                        DBTMDeviceMasterId = dBTMDeviceMaster.DBTMDeviceMasterId,
+                        EntityId = generalPersonModel.EntityId,
+                        UserType = generalPersonModel.UserType,
+                        PurchaseDate = DateTime.Now,
+                        WarrantyExpirationDate = DateTime.Now.AddMonths(dBTMDeviceMaster.WarrantyExpirationPeriodInMonth),
+                    };
+
+                    //Create new DBTMDeviceRegistrationDetails and return it.
+                    DBTMDeviceRegistrationDetails dBTMDeviceRegistrationDetailsData = _dBTMDeviceRegistrationDetailsRepository.Insert(dBTMDeviceRegistrationDetails);
+                    if (dBTMDeviceRegistrationDetailsData?.DBTMDeviceRegistrationDetailId > 0)
+                    {
+                        DBTMSubscriptionPlanAssociatedToUser dBTMSubscriptionPlanAssociatedToUser = new DBTMSubscriptionPlanAssociatedToUser()
+                        {
+                            DBTMSubscriptionPlanId = dBTMSubscriptionPlan.DBTMSubscriptionPlanId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                            EntityId = generalPersonModel.EntityId,
+                            DBTMDeviceMasterId = dBTMDeviceRegistrationDetails.DBTMDeviceMasterId,
+                            DurationInDays = dBTMSubscriptionPlan.DurationInDays,
+                            PlanCost = dBTMSubscriptionPlan.PlanCost,
+                            PlanDiscount = dBTMSubscriptionPlan.PlanDiscount,
+                            IsExpired = false,
+                            PlanDurationExpirationDate = DateTime.Now.AddMonths(dBTMDeviceMaster.WarrantyExpirationPeriodInMonth),
+                            SalesInvoiceMasterId = 0,
+                        };
+
+                        dBTMSubscriptionPlanAssociatedToUser = _dBTMSubscriptionPlanAssociatedToUserRepository.Insert(dBTMSubscriptionPlanAssociatedToUser);
+                    }
+                }
+            }
+            return generalPersonModel;
+        }
+
+        public virtual DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)
+      => _dBTMDeviceMasterRepository.Table.Where(x => x.DeviceSerialCode == deviceSerialCode && x.IsActive).FirstOrDefault();
+
+        public virtual bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
+        {
+            return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
+        }
+        #endregion
     }
 }

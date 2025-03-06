@@ -108,6 +108,9 @@ namespace Coditech.Admin.Controllers
             }
             else
             {
+                ModelState.Remove("DeviceSerialCode");
+                ModelState.Remove("CentreName");
+                ModelState.Remove("CentreCode");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
@@ -121,6 +124,44 @@ namespace Coditech.Admin.Controllers
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMIndividualRegistration.cshtml", dBTMNewRegistrationViewModel);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public virtual ActionResult TraineeRegistration()
+        {
+            TempData["FormSizeClass"] = "col-lg-8";
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", new DBTMNewRegistrationViewModel());
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
+        {
+            TempData["FormSizeClass"] = "col-lg-8";
+
+            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
+            {
+                dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
+            }
+            else
+            {
+                ModelState.Remove("CentreName");
+                ModelState.Remove("CentreCode");
+                 ModelState.Remove("DeviceSerialCode");
+                if (ModelState.IsValid)
+                {
+                    dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
+                    if (!dBTMNewRegistrationViewModel.HasError)
+                    {
+                        TempData["FormSizeClass"] = "col-lg-4";
+                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        return RedirectToAction("Login", "user");
+                    }
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }
 }

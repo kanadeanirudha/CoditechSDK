@@ -56,5 +56,12 @@ namespace Coditech.Common.API
                 return Convert.ToInt16(settings["TrainerDesignationId"]);
             }
         }
+        public static string DBTMIndividualCentre
+        {
+            get
+            {
+                return Convert.ToString(settings["DBTMIndividualCentre"]);
+            }
+        }
     }
 }

@@ -27,7 +27,8 @@ namespace Coditech.API.Data
         public DbSet<DBTMPrivacySetting> DBTMPrivacySetting { get; set; }
         public DbSet<DBTMDeviceData> DBTMDeviceData { get; set; }
         public DbSet<DBTMDeviceDataDetails> DBTMDeviceDataDetails { get; set; }
+        public DbSet<DBTMTestCalculation> DBTMTestCalculation { get; set; }
+        public DbSet<DBTMCalculationAssociatedToTest> DBTMCalculationAssociatedToTest { get; set; }
         #endregion
-
     }
 }

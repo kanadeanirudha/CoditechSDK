@@ -41,5 +41,6 @@ namespace Coditech.API.Client
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteDBTMTest(ParameterModel body);
         DBTMTestParameterListResponse GetDBTMTestParameter();
+        DBTMTestCalculationListResponse GetDBTMTestCalculation();
     }
 }

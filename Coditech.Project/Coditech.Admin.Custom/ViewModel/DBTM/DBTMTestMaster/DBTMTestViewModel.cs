@@ -27,6 +27,10 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Parameter")]
         public List<string> DBTMSelectedTestParameter { get; set; }
+        [Required]
+        [Display(Name = "Calculation")]
+        public List<string> DBTMSelectedTestCalculation { get; set; }
         public List<SelectListItem> DBTMTestParameterList { get; set; }
+        public List<SelectListItem> DBTMTestCalculationList { get; set; }
     }
 }

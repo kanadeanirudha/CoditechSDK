@@ -6,6 +6,5 @@ namespace Coditech.API.Service
     {
         DBTMNewRegistrationModel DBTMCentreRegistration(DBTMNewRegistrationModel model);
         DBTMNewRegistrationModel TrainerRegistration(DBTMNewRegistrationModel model);
-        DBTMNewRegistrationModel IndividualRegistration(DBTMNewRegistrationModel model);
     }
 }

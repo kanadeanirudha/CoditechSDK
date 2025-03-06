@@ -17,7 +17,11 @@ namespace Coditech.Common.API.Model
         public bool IsActive { get; set; }
         [Required]
         public List<string> DBTMSelectedTestParameter { get; set; }
-       public string DBTMTestParameterId { get; set; }
         public int TopActivityCount { get; set; }
+        public byte DBTMTestParameterId { get; set; }
+        [Required]
+        public List<string> DBTMSelectedTestCalculation { get; set; }
+        public byte DBTMTestCalculationId { get; set; }
+
     }
 }

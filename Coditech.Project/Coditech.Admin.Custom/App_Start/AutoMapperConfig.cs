@@ -39,6 +39,9 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMActivitiesListModel, DBTMActivitiesListViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesDetailsModel, DBTMActivitiesDetailsViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesDetailsListModel, DBTMActivitiesDetailsListViewModel>().ReverseMap();
+            CreateMap<DBTMTestCalculationModel, DBTMTestCalculationViewModel>().ReverseMap();
+            CreateMap<DBTMTestCalculationListModel, DBTMTestCalculationListViewModel>().ReverseMap();
+            CreateMap<DBTMNewRegistrationViewModel, GeneralPersonModel>().ReverseMap();
             #endregion
         }
     }
