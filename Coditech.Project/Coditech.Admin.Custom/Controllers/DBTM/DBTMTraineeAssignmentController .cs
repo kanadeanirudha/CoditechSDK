@@ -101,33 +101,25 @@ namespace Coditech.Admin.Controllers
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
-        }       
+        }
 
-        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId )
+        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId)
         {
-            string message = string.Empty;
-            bool status = false;
+     
+            DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel();
 
-            DBTMTraineeAssignmentViewModel model = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
+            model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId);
 
-            if (model != null)
-            {
-                model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(model, out message);
-                status = (model != null);  
-            }
-
-            if (status)
+            if (!model.HasError)
             {
                 SetNotificationMessage(GetSuccessNotificationMessage("Send Reminder Assignment Successfully."));
             }
             else
             {
-                SetNotificationMessage(GetErrorNotificationMessage("Error Failed To Send Reminder"));
+                SetNotificationMessage(GetErrorNotificationMessage(model.ErrorMessage));
             }
-
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId) });
         }
-
 
         public ActionResult GetTrainerByCentreCode(string centreCode)
         {

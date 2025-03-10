@@ -9,7 +9,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Diagnostics;
-using System.Reflection;
 using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.Admin.Agents
@@ -139,21 +138,19 @@ namespace Coditech.Admin.Agents
         }
 
         //Send Reminder Assignment.
-        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(DBTMTraineeAssignmentViewModel model, out string errorMessage)
+        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId)
         {          
-            errorMessage = string.Empty;
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
 
-                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(model.ToModel<DBTMTraineeAssignmentModel>());
+                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId);
 
                 return response?.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Warning);
-                errorMessage = ex.ErrorMessage;
                 switch (ex.ErrorCode)
                 {
                     case ErrorCodes.AlreadyExist:
@@ -165,7 +162,6 @@ namespace Coditech.Admin.Agents
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
-                errorMessage = "ErrorFailedToSendReminder";
                 return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }

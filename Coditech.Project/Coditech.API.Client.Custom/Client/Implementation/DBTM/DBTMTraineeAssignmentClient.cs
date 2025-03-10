@@ -356,21 +356,21 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTraineeAssignmentResponse SendAssignmentReminder(DBTMTraineeAssignmentModel model)
+        public virtual DBTMTraineeAssignmentResponse SendAssignmentReminder(long dBTMTraineeAssignmentId)
         {
-            return Task.Run(async () => await SendAssignmentReminderAsync(model, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await SendAssignmentReminderAsync(dBTMTraineeAssignmentId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeAssignmentResponse> SendAssignmentReminderAsync(DBTMTraineeAssignmentModel model, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeAssignmentResponse> SendAssignmentReminderAsync(long dBTMTraineeAssignmentId, CancellationToken cancellationToken)
         {
 
-            string endpoint = dBTMTraineeAssignmentEndpoint.SendAssignmentReminderAsync();
+            string endpoint = dBTMTraineeAssignmentEndpoint.SendAssignmentReminderAsync(dBTMTraineeAssignmentId);
             HttpResponseMessage response = null;
             bool disposeResponse = true;
             try
             {
                 ApiStatus status = new ApiStatus();
-                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(model), status, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(dBTMTraineeAssignmentId), status, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
                 Dictionary<string, IEnumerable<string>> dictionary = BindHeaders(response);
 
                 switch (response.StatusCode)

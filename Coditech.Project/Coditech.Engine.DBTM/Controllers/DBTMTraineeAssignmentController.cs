@@ -186,12 +186,12 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeAssignment/SendAssignmentReminder")]
         [HttpPost, ValidateModel]
         [Produces(typeof(DBTMTraineeAssignmentResponse))]
-        public virtual IActionResult SendAssignmentReminder([FromBody] DBTMTraineeAssignmentModel model)
+        public virtual IActionResult SendAssignmentReminder([FromBody] long dBTMTraineeAssignmentId)
         {
             try
             {
-                DBTMTraineeAssignmentModel isUpdated = _dBTMTraineeAssignmentService.SendAssignmentReminder(model);
-                return IsNotNull(isUpdated) ? CreateOKResponse(new DBTMTraineeAssignmentResponse { DBTMTraineeAssignmentModel = model }) : CreateInternalServerErrorResponse();
+                DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = _dBTMTraineeAssignmentService.SendAssignmentReminder(dBTMTraineeAssignmentId);
+                return IsNotNull(dBTMTraineeAssignmentModel) ? CreateOKResponse(new DBTMTraineeAssignmentResponse { DBTMTraineeAssignmentModel = dBTMTraineeAssignmentModel }) : CreateInternalServerErrorResponse();
 
             }
             catch (CoditechException ex)

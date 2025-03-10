@@ -8,7 +8,6 @@ using Coditech.Common.Service;
 using Coditech.Resources;
 using System.Collections.Specialized;
 using System.Data;
-using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -138,46 +137,81 @@ namespace Coditech.API.Service
             return status == 1 ? true : false;
         }
 
-        public virtual DBTMTraineeAssignmentModel SendAssignmentReminder(DBTMTraineeAssignmentModel reminderModel)
+        public virtual DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId)
         {
-            try
-            {
-                DBTMTraineeAssignment traineeAssignment = _dBTMTraineeAssignmentRepository.Table.FirstOrDefault(x => x.DBTMTraineeAssignmentId == reminderModel.DBTMTraineeAssignmentId);
+                if (dBTMTraineeAssignmentId <= 0)
+                    throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentId"));
 
-                if (traineeAssignment == null)
+                var traineeAssignmentData = _dBTMTraineeAssignmentRepository.Table
+                    .Where(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId)
+                    .Select(x => new
+                    {
+                        x.DBTMTraineeAssignmentId,
+                        x.GeneralTrainerMasterId,
+                        x.DBTMTraineeDetailId,
+                        x.DBTMTestMasterId,
+                        x.AssignmentDate
+                    })
+                    .FirstOrDefault();
+
+                if (IsNull(traineeAssignmentData))
                     throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+                var trainee = _dBTMTraineeDetailsRepository.Table
+                    .Where(x => x.DBTMTraineeDetailId == traineeAssignmentData.DBTMTraineeDetailId)
+                    .Select(x => new
+                    {
+                        x.PersonId,
+                        x.CentreCode
+                    })
+                    .FirstOrDefault();
 
-                DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == traineeAssignment.DBTMTraineeDetailId);
-
-                if (trainee == null)
+                if (IsNull(trainee))
                     throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-                GeneralPerson person = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == trainee.PersonId);
+                var person = _generalPersonRepository.Table
+                    .Where(x => x.PersonId == trainee.PersonId)
+                    .Select(x => new
+                    {
+                        x.FirstName,
+                        x.LastName,
+                        x.EmailId
+                    })
+                    .FirstOrDefault();
 
-                if (person == null || string.IsNullOrEmpty(person.EmailId))
+                if (string.IsNullOrEmpty(person.EmailId))
                     throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-                DBTMTestMaster test = _dBTMTestRepository.Table.FirstOrDefault(x => x.DBTMTestMasterId == traineeAssignment.DBTMTestMasterId);
+                var test = _dBTMTestRepository.Table
+                    .Where(x => x.DBTMTestMasterId == traineeAssignmentData.DBTMTestMasterId)
+                    .Select(x => new
+                    {
+                        x.TestName
+                    })
+                    .FirstOrDefault();
 
-                if (test == null)
+                if (IsNull(test))
                     throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-                reminderModel.FirstName = person.FirstName;
-                reminderModel.LastName = person.LastName;
-                reminderModel.EmailId = person.EmailId;
-                reminderModel.TestName = test.TestName;
-                reminderModel.AssignmentDate = traineeAssignment.AssignmentDate;
-                reminderModel.SelectedCentreCode = trainee.CentreCode;
+                DBTMTraineeAssignmentModel reminderModel = new DBTMTraineeAssignmentModel
+                {
+                    DBTMTraineeAssignmentId = traineeAssignmentData.DBTMTraineeAssignmentId,
+                    GeneralTrainerMasterId = traineeAssignmentData.GeneralTrainerMasterId,
+                    AssignmentDate = traineeAssignmentData.AssignmentDate,
+                    FirstName = person.FirstName,
+                    LastName = person.LastName,
+                    EmailId = person.EmailId,
+                    TestName = test.TestName,
+                    SelectedCentreCode = trainee.CentreCode
+                };
 
                 GeneralEmailTemplateModel emailTemplateModel = GetEmailTemplateByCode(reminderModel.SelectedCentreCode, EmailTemplateCodeCustomEnum.SendAssignmentReminder.ToString());
 
                 if (emailTemplateModel != null && !string.IsNullOrEmpty(emailTemplateModel.EmailTemplate))
                 {
-                    string subject = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName,reminderModel.SelectedCentreCode,emailTemplateModel.Subject);
+                    string subject = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, reminderModel.SelectedCentreCode, emailTemplateModel.Subject);
 
                     string messageText = emailTemplateModel.EmailTemplate;
-
                     messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, reminderModel.FirstName, messageText);
                     messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, reminderModel.LastName, messageText);
                     messageText = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TestName, reminderModel.TestName, messageText);
@@ -186,13 +220,7 @@ namespace Coditech.API.Service
                     // Send the email
                     _coditechEmail.SendEmail(reminderModel.SelectedCentreCode, reminderModel.EmailId, "", subject, messageText, true);
                 }
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.GeneralMessages.ToString(), TraceLevel.Error);
-            }
-
-            return reminderModel;
+                return reminderModel;
         }
 
         public virtual GeneralTrainerListModel GetTrainerByCentreCode(string centreCode)
@@ -216,7 +244,6 @@ namespace Coditech.API.Service
 
             return list;
         }
-
 
         public virtual DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
         {

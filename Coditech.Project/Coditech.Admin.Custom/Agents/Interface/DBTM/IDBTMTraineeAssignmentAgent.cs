@@ -39,6 +39,6 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentIds, out string errorMessage);
 
-        DBTMTraineeAssignmentViewModel SendAssignmentReminder(DBTMTraineeAssignmentViewModel model,out string errorMessage);
+        DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId);
     }
 }

@@ -48,6 +48,6 @@ namespace Coditech.API.Client
         GeneralTrainerListResponse GetTrainerByCentreCode(string centreCode);
         DBTMTraineeDetailsListResponse GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId);
 
-        DBTMTraineeAssignmentResponse SendAssignmentReminder(DBTMTraineeAssignmentModel model);
+        DBTMTraineeAssignmentResponse SendAssignmentReminder(long dBTMTraineeAssignmentId);
     }
 }
