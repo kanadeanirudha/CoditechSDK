@@ -138,23 +138,34 @@ namespace Coditech.Admin.Agents
         }
 
         //Send Reminder Assignment.
-        public virtual bool SendAssignmentReminder(string dBTMTraineeAssignmentId, out string errorMessage)
-        {
-            errorMessage = "ErrorFailedToSendReminder";
-
+        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId)
+        {          
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
-                TrueFalseResponse trueFalseResponse = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId);
-                return trueFalseResponse.IsSuccess;
+
+                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId);
+
+                return response?.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), ex.ErrorMessage);
+                    default:
+                        return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.UpdateErrorMessage);
+                }
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
-                errorMessage = "ErrorFailedToSendReminder";
-                return false;
+                return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
+        
         #endregion
 
         #region protected

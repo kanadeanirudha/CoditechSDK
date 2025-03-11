@@ -389,7 +389,7 @@ namespace Coditech.API.Service
         protected virtual void InsertOrganisationCentrewiseEmailTemplate(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster, string centreCode)
         {
             List<string> emailTemplateList = new List<string>();
-            emailTemplateList = ("EmployeeRegistration,MobileResetPasswordLink,ResetPasswordLink").Split(",").ToList();
+            emailTemplateList = ("EmployeeRegistration,MobileResetPasswordLink,ResetPasswordLink,DBTMSendPendingAssignmentReminder").Split(",").ToList();
             List<OrganisationCentrewiseEmailTemplate> organisationCentrewiseEmailTemplateList = new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && emailTemplateList.Contains(x.EmailTemplateCode) && x.IsActive)?.ToList();
             if (IsNotNull(organisationCentrewiseEmailTemplateList))
             {
@@ -400,7 +400,7 @@ namespace Coditech.API.Service
                     item.CreatedDate = currentDate;
                     item.ModifiedDate = currentDate;
                 }
-                new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseEmailTemplateList);
+                new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseEmailTemplateList);              
             }
         }
 
@@ -584,6 +584,10 @@ namespace Coditech.API.Service
                 }
                 new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMenuDetailList);
             }
+        }
+        protected virtual List<DBTMTraineeAssignmentModel> GetTraineesForCentre(string centreCode)
+        {
+            return new CoditechRepository<DBTMTraineeAssignmentModel>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.SelectedCentreCode == centreCode ).ToList();
         }
         #endregion
     }

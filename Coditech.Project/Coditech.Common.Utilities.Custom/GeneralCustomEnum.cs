@@ -31,6 +31,7 @@
     public enum EmailTemplateCodeCustomEnum
     {
         DBTMTraineeRegistration,
+        SendAssignmentReminder,
     }
 
     public enum LogComponentCustomEnum
@@ -44,5 +45,5 @@
     public enum UserTypeCustomEnum
     {
         DBTMIndividualRegister
-    }
+    }   
 }

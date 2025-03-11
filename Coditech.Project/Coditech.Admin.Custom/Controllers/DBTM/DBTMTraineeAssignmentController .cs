@@ -103,22 +103,22 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
         }
 
-        [HttpPut]
-        public virtual ActionResult SendAssignmentReminder(string dBTMTraineeAssignmentId, string selectedCentreCode)
+        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId)
         {
-            string message = string.Empty;
-            bool status = false;
+     
+            DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel();
 
-            if (!string.IsNullOrEmpty(dBTMTraineeAssignmentId))
+            model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId);
+
+            if (!model.HasError)
             {
-                status = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId, out message);
-
                 SetNotificationMessage(GetSuccessNotificationMessage("Send Reminder Assignment Successfully."));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
             }
-
-            SetNotificationMessage(GetErrorNotificationMessage("ErrorFailedToSendReminder"));
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
+            else
+            {
+                SetNotificationMessage(GetErrorNotificationMessage(model.ErrorMessage));
+            }
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId) });
         }
 
         public ActionResult GetTrainerByCentreCode(string centreCode)
@@ -152,3 +152,5 @@ namespace Coditech.Admin.Controllers
         }
     }
 }
+
+
