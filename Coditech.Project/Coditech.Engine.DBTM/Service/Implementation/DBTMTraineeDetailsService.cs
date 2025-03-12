@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
@@ -21,6 +22,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
         private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
+        private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
+        private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
 
         public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -31,9 +34,11 @@ namespace Coditech.API.Service
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public virtual DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode,long generalTrainerMasterId,FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public virtual DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             string listType = "";
             string isActive = filters?.Find(x => string.Equals(x.FilterName, FilterKeys.IsActive, StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
@@ -206,33 +211,74 @@ namespace Coditech.API.Service
 
             listModel.ActivitiesDetailsList = dBTMActivitiesDetailsList?.Count > 0 ? dBTMActivitiesDetailsList : new List<DBTMActivitiesDetailsModel>();
             listModel.BindPageListModel(pageListModel);
-
-            DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
-            long? dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode)?.Select(y => y.DBTMTraineeDetailId)?.FirstOrDefault();
-
-            if (dBTMTraineeDetailId > 0)
+            if (listModel.ActivitiesDetailsList.Count > 0)
             {
-                GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
-                if (IsNotNull(generalPersonModel))
-                {
-                    listModel.FirstName = generalPersonModel.FirstName;
-                    listModel.LastName = generalPersonModel.LastName;
-                    listModel.PersonCode = dBTMDeviceData.PersonCode;
-                }
-                DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
+                DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();
+                long? dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode)?.Select(y => y.DBTMTraineeDetailId)?.FirstOrDefault();
 
-                if (dBTMTestMaster != null)
+                if (dBTMTraineeDetailId > 0)
                 {
-                    listModel.Columns = (from a in _dBTMParametersAssociatedToTestRepository.Table
-                                         join b in _dBTMTestParameterRepository.Table
-                                         on a.DBTMTestParameterId equals b.DBTMTestParameterId
-                                         where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
-                                         select b.ParameterName)
-                                         .Distinct()
-                                         .ToList();
+                    GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
+                    if (IsNotNull(generalPersonModel))
+                    {
+                        listModel.FirstName = generalPersonModel.FirstName;
+                        listModel.LastName = generalPersonModel.LastName;
+                        listModel.PersonCode = dBTMDeviceData.PersonCode;
+                    }
+                    DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
+
+                    if (dBTMTestMaster != null)
+                    {
+                        listModel.TestName = dBTMTestMaster.TestName;
+                        listModel.TestColumns = (from a in _dBTMParametersAssociatedToTestRepository.Table
+                                                 join b in _dBTMTestParameterRepository.Table
+                                                 on a.DBTMTestParameterId equals b.DBTMTestParameterId
+                                                 where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
+                                                 select b.ParameterName)?.Distinct()?.ToList();
+
+                        listModel.CalculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
+                                                        join b in _dBTMTestCalculationRepository.Table
+                                                        on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
+                                                        where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
+                                                        orderby b.OrderBy ascending
+                                                        select b.CalculationName)?.Distinct()?.ToList();
+                        if (listModel?.CalculationColumns?.Count > 0)
+                        {
+                            Calculation(listModel.CalculationColumns, listModel.ActivitiesDetailsList);
+                        }
+                    }
                 }
             }
             return listModel;
+        }
+
+        public void Calculation(List<string> CalculationColumns, List<DBTMActivitiesDetailsModel> ActivitiesDetailsList)
+        {
+            if (CalculationColumns.Any(x => x == "CompletionTime"))
+            {
+                long completionTime = ActivitiesDetailsList.Sum(x => x.Time);
+                ActivitiesDetailsList.ForEach(x =>
+                {
+                    x.CompletionTime = completionTime;
+                });
+            }
+            if (CalculationColumns.Any(x => x == "Speed"))
+            {
+                ActivitiesDetailsList.ForEach(x =>
+                {
+                    x.Speed = x.Distance / x.Time;
+                });
+            }
+            if (CalculationColumns.Any(x => x == "AverageSpeed"))
+            {
+                decimal totalTime = ActivitiesDetailsList.Sum(x => x.Time);
+                decimal totalDistance = ActivitiesDetailsList.Sum(x => x.Distance);
+                decimal averageSpeed = totalDistance / totalTime;
+                ActivitiesDetailsList.ForEach(x =>
+                {
+                    x.AverageSpeed = averageSpeed;
+                });
+            }
         }
     }
 }

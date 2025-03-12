@@ -377,19 +377,22 @@ namespace Coditech.Admin.Agents
             DBTMActivitiesDetailsListModel activitiesDetailsListModel = new DBTMActivitiesDetailsListModel
             {
                 ActivitiesDetailsList = response?.ActivitiesDetailsList,
-                Columns = response?.Columns
+                TestColumns = response?.TestColumns,
+                CalculationColumns = response?.CalculationColumns,
             };
             DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
             {
                 ActivitiesDetailsList = activitiesDetailsListModel?.ActivitiesDetailsList?.ToViewModel<DBTMActivitiesDetailsViewModel>().ToList(),
-                Columns = activitiesDetailsListModel?.Columns?.ToList()
+                TestColumns = activitiesDetailsListModel?.TestColumns?.ToList(),
+                CalculationColumns = activitiesDetailsListModel?.CalculationColumns?.ToList()
             };
-            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.ActivitiesDetailsList.Count, BindTraineeActivitiesDetailsColumns(listViewModel.Columns), false);
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.ActivitiesDetailsList.Count, BindTraineeActivitiesDetailsColumns(listViewModel.TestColumns, listViewModel.CalculationColumns), false);
 
             listViewModel.DBTMDeviceDataId = dBTMDeviceDataId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
             listViewModel.PersonCode = response.PersonCode;
+            listViewModel.TestName = response.TestName;
             return listViewModel;
         }
         #endregion
@@ -513,19 +516,31 @@ namespace Coditech.Admin.Agents
             return datatableColumnList;
         }
 
-        protected virtual List<DatatableColumns> BindTraineeActivitiesDetailsColumns(List<string> columns)
+        protected virtual List<DatatableColumns> BindTraineeActivitiesDetailsColumns(List<string> testColumns, List<string> calculationColumns)
         {
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
 
-            if (columns != null && columns.Any())
+            if (testColumns != null && testColumns.Any())
             {
-                foreach (var item in columns)
+                foreach (var item in testColumns)
                 {
                     datatableColumnList.Add(new DatatableColumns()
                     {
                         ColumnName = item,
                         ColumnCode = item,
                         IsSortable = true
+                    });
+                }
+            }
+
+            if (calculationColumns != null && calculationColumns.Any())
+            {
+                foreach (var item in calculationColumns)
+                {
+                    datatableColumnList.Add(new DatatableColumns()
+                    {
+                        ColumnName = item,
+                        ColumnCode = item,
                     });
                 }
             }

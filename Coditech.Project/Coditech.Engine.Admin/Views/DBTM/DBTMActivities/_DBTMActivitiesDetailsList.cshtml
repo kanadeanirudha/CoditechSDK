@@ -22,15 +22,15 @@
                     foreach (var item in Model?.ActivitiesDetailsList)
                     {
                         <tr>
-                            @foreach (var item1 in Model.Columns)
+                            @foreach (var item1 in Model.TestColumns)
                             {
                                 if (item1 == "Time")
                                 {
-                                    <td>@item.Time</td>
+                                    <td>@item.Time sec</td>
                                 }
                                 else if (item1 == "Distance")
                                 {
-                                    <td>@item.Distance</td>
+                                    <td>@Math.Round(item.Distance, 2) m</td>
                                 }
                                 else if (item1 == "Force")
                                 {
@@ -43,6 +43,21 @@
                                 else if (item1 == "Angle")
                                 {
                                     <td>@item.Angle</td>
+                                }
+                            }
+                            @foreach (var item1 in Model.CalculationColumns)
+                            {
+                                if (item1 == "CompletionTime")
+                                {
+                                    <td>@item.CompletionTime Sec</td>
+                                }
+                                else if (item1 == "Speed")
+                                {
+                                    <td>@Math.Round(item.Speed, 2) m/s</td>
+                                }
+                                else if (item1 == "AverageSpeed")
+                                {
+                                    <td>@Math.Round(item.AverageSpeed, 2) m/s</td>
                                 }
                             }
                         </tr>
