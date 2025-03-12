@@ -13,6 +13,8 @@
         public decimal Force { get; set; }
         public decimal Acceleration { get; set; }
         public decimal Angle { get; set; }
-        public List<string> Columns { get; set; }
+        public long CompletionTime { get; set; }
+        public decimal Speed { get; set; }
+        public decimal AverageSpeed { get; set; }
     }
 }

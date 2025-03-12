@@ -8,6 +8,7 @@ namespace Coditech.API.Data
         public byte DBTMTestCalculationId { get; set; }
         public string CalculationName { get; set; }
         public string CalculationFormula { get; set; }
+        public short OrderBy { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
