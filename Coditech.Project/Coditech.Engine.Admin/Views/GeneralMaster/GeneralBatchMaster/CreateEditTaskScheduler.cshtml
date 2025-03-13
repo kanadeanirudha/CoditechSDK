@@ -1,0 +1,154 @@
+﻿@model TaskSchedulerViewModel
+@{
+    ViewBag.Title = Model.TaskSchedulerMasterId > 0 ? "Update Batch Scheduler Details" : "Add Batch Scheduler";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = Model.TaskSchedulerMasterId > 0 ? "UpdateBatchTaskSchedulerDetails" : "CreateBatchTaskScheduler";
+    string css = Model.TaskSchedulerMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("GeneralBatchMasterId", Model.ConfiguratorId.ToString());
+
+    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency};
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            @*  <div class="col-lg-12"> *@
+            @if (Model.TaskSchedulerMasterId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
+                </div>
+            }
+            <div class="@css">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.TaskSchedulerMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update Scheduler Details: @Model.SchedulerName</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Scheduler</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.TaskSchedulerMasterId)
+                            @Html.HiddenFor(m => m.ConfiguratorId)
+                            @Html.HiddenFor(x => x.WeekDays)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SchedulerFrequency, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", frequencyDropdown)
+                                        @Html.ValidationMessageFor(x => x.SchedulerFrequency)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.StartDate, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.StartDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.StartDate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ExpireDate, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ExpireDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ExpireDate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ExpireTime, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ExpireTime, new { @class = "form-control", type = "time" })
+                                        @Html.ValidationMessageFor(x => x.ExpireTime)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6" id="weeklyScheduleDiv">
+                                    <div class="mb-3 multiselect-dropdown">
+                                        @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
+                                        @Html.ListBoxFor(x => x.SelectedWeekDays, new SelectList(Model.SchedulerWeekDaysList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
+                                        @Html.ValidationMessageFor(x => x.SelectedWeekDays)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsEnabled, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsEnabled, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.ConfiguratorId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script type="text/javascript">
+        function updateExpiryDate() {
+            var selectedFrequency = $("#SchedulerFrequency").val();
+            var startDate = $("#StartDate").datepicker("getDate");
+
+            if (selectedFrequency === "Weekly") {
+                $("#weeklyScheduleDiv").show();
+            } else {
+                $("#weeklyScheduleDiv").hide();
+            }
+
+            if (selectedFrequency === "OneTime" && startDate) {
+                $("#ExpireDate").datepicker("setDate", startDate);
+                $("#ExpireDate").prop("readonly", true);
+            } else {
+                $("#ExpireDate").prop("readonly", false);
+            }
+        }
+
+        $(document).ready(function () {
+            updateExpiryDate(); // Ensure correct state on page load
+
+            $("#SchedulerFrequency").change(function () {
+                updateExpiryDate();
+            });
+
+            // Start Date Datepicker
+            $("#StartDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                language: "en",
+                autoSize: true,
+                yearRange: "2022:2035",
+                minDate: new Date(2022, 0, 1),
+                maxDate: new Date(2035, 11, 31),
+                onSelect: function () {
+                    updateExpiryDate();
+                }
+            });
+
+            // Expiry Date Datepicker
+            $("#ExpireDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                language: "en",
+                autoSize: true,
+                yearRange: "2022:2035",
+                minDate: new Date(2022, 0, 1),
+                maxDate: new Date(2035, 11, 31)
+            });
+        });
+    </script>
+}
