@@ -1,0 +1,42 @@
+﻿@model CoditechApplicationSettingViewModel
+@{
+    ViewBag.Title = "Application Version Details";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+}
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Application Version Details</h4>
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                        <a class="btn btn-sm btn-soft-secondary float-end" href="..@dashboardUrl" role="button">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <p class="font-14 text-muted ms-3">
+                                    @Model.ApplicationValue1
+                                </p>
+                                <p class="font-14 text-muted ms-3">
+                                    @Model.ApplicationValue2
+                                </p>
+                                <p class="font-14 text-muted ms-3">
+                                    @Model.ApplicationValue3
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

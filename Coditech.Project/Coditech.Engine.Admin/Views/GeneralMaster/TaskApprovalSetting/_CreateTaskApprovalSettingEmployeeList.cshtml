@@ -1,0 +1,34 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@model TaskApprovalSettingViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content -->
+<div class="table-responsive">
+    <table class="table table-bordered table-sm" id="makeEditable">
+        <thead>
+            <tr>
+                <th>Employee List</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 1; i <= Model.CountNumber; i++)
+            {
+                <tr>
+                    <td>
+                        @Html.DropDownList("EmployeeId_" + i, ViewData["EmployeeList"] as List<SelectListItem>, new { @class = "form-select employee-dropdown", data_index = i })
+                        @Html.ValidationMessageFor(x => x.EmployeeIds)
+                    </td>
+                    <td>
+                        @i
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script src="~/js/coditech/General/TaskApprovalSetting.js"></script>

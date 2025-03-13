@@ -70,7 +70,6 @@
                 "plugins": ["checkbox"]
             });
             $('#jstree').on("changed.jstree", function (e, data) {
-                debugger;
                 if (data.selected != "" && data.selected != null) {
                     $("#SaveAdminRoleMediaFolderId").removeAttr('disabled');
                 }

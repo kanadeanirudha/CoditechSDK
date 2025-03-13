@@ -322,4 +322,21 @@
             return false;
         }
     },
+    LoadListByBalanceSheet: function (controllerName, methodName) {
+        $('#DataTables_SearchById').val("")
+        if ($("#SelectedParameter1").val() == "") {
+            CoditechNotification.DisplayNotificationMessage("Please select centre.", "error");
+        }
+        else {
+            CoditechDataTable.LoadList(controllerName, methodName);
+        }
+    },
+
+    DashboardDays: function () {
+        CoditechCommon.ShowLodder();
+        var numberOfDaysRecord = $("#DashboardDaysDropDown option:selected").val();
+        let url = window.location.origin + window.location.pathname.replace("index", "GetDashboard") + '?numberOfDaysRecord=' + numberOfDaysRecord;
+        window.location.href = url;
+        CoditechCommon.HideLodder();
+    },
 }

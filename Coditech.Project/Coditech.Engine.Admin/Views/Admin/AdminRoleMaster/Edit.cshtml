@@ -80,7 +80,21 @@
                                    DropdownSelectedValue = Model.DashboardFormEnumId.ToString(),
                                    DropdownName = "DashboardFormEnumId",
                                    GroupCode = DropdownTypeEnum.DashboardForm.ToString(),
-                                   IsRequired=false
+                                   IsRequired = false
+                               })
+                                        @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.LimitedDataAccessEnumId, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.LimitedDataAccessEnumId.ToString(),
+                                   DropdownName = "LimitedDataAccessEnumId",
+                                   GroupCode = DropdownTypeEnum.LimitedDataAccess.ToString(),
+                                   IsRequired = true,
+                                   AddSelectItem = false
                                })
                                         @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
                                     </div>
@@ -121,5 +135,5 @@
 </div>
 
 @section scripts {
-<script src="~/js/coditech/admin/adminrolemaster.js"></script>
+    <script src="~/js/coditech/admin/adminrolemaster.js"></script>
 }

@@ -127,7 +127,7 @@
             };
 
             document.getElementById('moveFolder').onclick = function () {
-                openMoveFolderModal(folderId);
+                openMoveFolderModal(folderId, folderName);
                 menu.style.display = 'none';
             };
 
@@ -155,19 +155,21 @@
             $('#mediaId').val(mediaId);
         }
 
-        function openMoveFolderModal(folderId) {
+        function openMoveFolderModal(folderId, RootFolderName) {
             $('#moveFolderModal').modal('show');
             $('#moveFolderId').val(folderId);
+            $('#moveFolderRootFolderNameId').html("").html(RootFolderName);
 
             CoditechCommon.ShowLodder();
             // Fetch folder structure for the dropdown, excluding the current folder
             $.ajax({
-                url: '@Url.Action("GetFolderDropdown", "MediaManager")',
+                url: '@Url.Action("GetMoveFolderDropdown", "MediaManager")',
                 type: 'GET',
-                data: { excludeFolderId: folderId },
+                data: { moveFolderId: folderId },
                 success: function (data) {
                     var dropdown = $('#moveFolderDropdown');
                     dropdown.empty();
+                    dropdown.append($('<option></option>').attr('value', '').text("Select Destination Folder"));
                     data.forEach(function (folder) {
                         dropdown.append($('<option></option>').attr('value', folder.FolderId).text(folder.FolderName));
                     });

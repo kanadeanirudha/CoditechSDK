@@ -13,7 +13,7 @@
     <!-- Tab panes -->
     <div class="tab-content">
         <div class="tab-pane active p-3" id="LogIn_Tab" role="tabpanel">
-            @using (Html.BeginForm("Login", "User", "DBTMNewRegistration", FormMethod.Post))
+            @using (Html.BeginForm("Login", "User", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 <div class="form-group mb-2">
@@ -49,12 +49,6 @@
                     </div>
                 </div>
                 @Html.HiddenFor(x => x.ReturnUrl)
-            }
-            @if (CoditechAdminSettings.ApplicationCode == "DBTM")
-            {
-                <div class="m-3 text-center text-muted">
-                    <p class="mb-0">Don't have an account ?  <a href="/dbtmnewregistration/centreregistration" class="text-primary ms-2">Free Resister</a></p>
-                </div>
             }
         </div>
     </div>
