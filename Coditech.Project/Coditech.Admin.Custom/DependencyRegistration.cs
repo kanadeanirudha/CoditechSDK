@@ -11,6 +11,7 @@ namespace Coditech.Admin.Custom
             #region Agent
             #region BioradMedisy
             builder.Services.AddScoped<IBioradMedisyMediaManagerAgent, BioradMedisyMediaManagerAgent>();
+            builder.Services.AddScoped<IMediaManagerFolderAgent, BioradMedisyMediaManagerAgent>();
             #endregion BioradMedisy
             #endregion Agent
 
