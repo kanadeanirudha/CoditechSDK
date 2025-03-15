@@ -3,6 +3,7 @@
     ViewBag.Title = "Application Version Details";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
 }
 <div class="page-content mt-5">
     <div class="container-fluid">
@@ -15,7 +16,7 @@
                                 <h4 class="card-title">Application Version Details</h4>
                             </div><!--end col-->
                         </div>  <!--end row-->
-                        <a class=" btn btn-sm btn-soft-secondary float-end" href="/dashboard/index" role="button">
+                        <a class="btn btn-sm btn-soft-secondary float-end" href="..@dashboardUrl" role="button">
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>

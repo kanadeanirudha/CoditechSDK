@@ -3,6 +3,7 @@
     ViewBag.Title = "Ticket List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -12,22 +13,25 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Raised Ticket List</span>
-                        @if (!Model.IsTicketReplied)
-                        {
-                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Raise Ticket</a>
-                            <a class=" btn btn-sm btn-soft-secondary float-end" href="/dashboard/index" role="button">
-                                <i class="fas fa-arrow-left me-2"></i>Back
-                            </a>
-                        }
-                    </div>
-                    <div class="card-body">
-                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                            @Html.Partial("~/Views/GeneralMaster/TicketMaster/_List.cshtml", Model)
+                        <div>
+                            @if (!Model.IsTicketReplied)
+                            {
+                                <a class=" btn btn-sm btn-soft-secondary" href="..@dashboardUrl" role="button">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </a>
+                                <a class=" btn btn-sm btn-soft-primary " href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Raise Ticket</a>
+                            }
                         </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                        @Html.Partial("~/Views/GeneralMaster/TicketMaster/_List.cshtml", Model)
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 <!-- end page content -->

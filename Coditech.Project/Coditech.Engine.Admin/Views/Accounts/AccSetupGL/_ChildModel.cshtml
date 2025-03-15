@@ -1,0 +1,75 @@
+﻿@model AccSetupGLModel
+@{
+    DropdownViewModel accSetupGLTypeDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.AccSetupGLType.ToString(),
+                DropdownName = "AccSetupGLTypeId",
+                DropdownSelectedValue = Convert.ToString(Model.AccSetupGLTypeId)
+            };
+}
+<!-- Add Child Modal -->
+<div class="modal fade" id="addChildModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow-lg rounded-3">
+            <form id="addChildForm" onsubmit="AccSetupGL.AddChild(); return false;">
+                <div class="modal-header text-white" style="background-color: #0c213a !important;">
+                    <h5 class="modal-title fw-bold">New Account</h5>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="addChildErrorMessage"
+                         class="alert alert-danger d-none text-center p-2 rounded shadow-sm fade show"
+                         role="alert"
+                         style="max-width: 350px; margin: 0 auto; font-size: 0.9rem;">
+
+                        <i class="bi bi-exclamation-triangle-fill d-block mb-1" style="font-size: 1rem;"></i>
+                        <span id="addChildErrorText"></span> <!-- This will hold the actual error message -->
+
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-1"
+                                aria-label="Close"
+                                onclick="$('#addChildErrorMessage').addClass('d-none');">
+                        </button>
+                    </div>
+                    <div class="row g-6">
+                        <input type="hidden" name="ParentAccSetupGLId" value="" />
+                        <input type="hidden" name="AccSetupCategoryId" value="" />
+                        <input type="hidden" name="AccSetupBalancesheetId" value="" />
+                        <input type="hidden" name="AccSetupBalanceSheetTypeId" value="" />
+                        <input type="hidden" name="SelectedCentreCode" value="" />
+
+                        <div class="flex flex-col space-y-2">
+                            @Html.LabelFor(x => x.AccSetupGLTypeId, new { @class = "form-label required" })
+                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupGLTypeDropdown)
+                            @Html.ValidationMessageFor(x => x.AccSetupGLTypeId, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="flex flex-col space-y-2">
+                            @Html.LabelFor(x => x.GLName, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.GLName, new { @class = "form-control" })
+                            <span class="text-danger" data-valmsg-for="GLName"></span>
+                        </div>
+
+                        <div class="flex flex-col space-y-2">
+                            @Html.LabelFor(x => x.GLCode, new { @class = "form-label required" })
+                            @Html.TextBoxFor(x => x.GLCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                            <span class="text-danger" data-valmsg-for="GLCode"></span>
+                        </div>
+
+                        <div class="flex flex-col space-y-2">
+                            @Html.LabelFor(x => x.IsGroup, new { @class = "form-label" })
+                            <div class="form-check">
+                                @Html.CheckBoxFor(x => x.IsGroup, new { @class = "form-check-input" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn btn-secondary " data-bs-dismiss="modal">Cancel</button>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+</div>
