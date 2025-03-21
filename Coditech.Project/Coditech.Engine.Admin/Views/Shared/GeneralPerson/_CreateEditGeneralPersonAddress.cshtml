@@ -5,7 +5,7 @@
     DropdownViewModel regionDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Region.ToString(), DropdownName = "GeneralRegionMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralRegionMasterId), Parameter = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"User.GetCityListByRegionId('{Model.AddressTypeEnum}')", ClassName = $"GeneralRegionMasterId_{Model.AddressTypeEnum}" };
     DropdownViewModel cityDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.City.ToString(), DropdownName = "GeneralCityMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCityMasterId), Parameter = Convert.ToString(Model.GeneralRegionMasterId), ClassName = $"GeneralCityMasterId_{Model.AddressTypeEnum}" };
 }
-@using (Html.BeginForm("CreateEditGeneralPersonalAddress", "User", FormMethod.Post, new { id = $"frmGeneralPersonalAddress_{Model.AddressTypeEnum}" }))
+@using (Html.BeginForm("CreateEditGeneralPersonalAddress", Model.ControllerName, FormMethod.Post, new { id = $"frmGeneralPersonalAddress_{Model.AddressTypeEnum}" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.GeneralPersonAddressId)

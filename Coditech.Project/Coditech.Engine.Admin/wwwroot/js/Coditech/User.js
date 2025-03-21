@@ -64,7 +64,7 @@
         }
     },
 
-    GetGeneralPersonAddressess: function (personId, entityId, entityType) {
+    GetGeneralPersonAddressess: function (personId, entityId, entityType, controllerName) {
         CoditechCommon.ShowLodder();
         $.ajax(
             {
@@ -72,7 +72,7 @@
                 type: "GET",
                 dataType: "html",
                 url: "/User/GetGeneralPersonAddressess",
-                data: { "personId": personId, "entityId": entityId, "entityType": entityType },
+                data: { "personId": personId, "entityId": entityId, "entityType": entityType, "controllerName": controllerName },
                 contentType: "application/json; charset=utf-8",
                 success: function (result) {
                     $('#generalPersonAddressDivId').html("").html(result);

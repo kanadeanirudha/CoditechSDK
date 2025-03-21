@@ -1,12 +1,12 @@
 ﻿@model GeneralPersonAddressListViewModel
 @{
     Layout = null;
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
 }
 @foreach (GeneralPersonAddressViewModel item in Model?.GeneralPersonAddressList)
 {
     item.EntityId = Model.EntityId;
     item.EntityType = Model.EntityType;
+    item.ControllerName = Model.ControllerName;
     <div class="row">
         <div class="col-12">
             <div class="card">
