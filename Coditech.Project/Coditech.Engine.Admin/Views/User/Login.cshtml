@@ -35,13 +35,13 @@
                 <div class="form-group row my-3">
                     <div class="col-sm-6">
                         <div class="custom-control custom-switch switch-success">
-                            <input type="checkbox" class="custom-control-input" id="customSwitchSuccess">
-                            <label class="form-label text-muted" for="customSwitchSuccess">Remember me</label>
+                            @Html.CheckBoxFor(x => x.RememberMe, new { @class = "custom-control-input"})
+                             <label class="form-label text-muted" for="customSwitchSuccess">Remember me</label> 
                         </div>
                     </div>
                     <div class="col-sm-6 text-end">
                         <a href="/user/resetpassword" class="text-muted font-13 forgot-password"><i class="dripicons-lock"></i>Forgot password?</a>
-                    </div>
+                    </div> 
                 </div>
                 <div class="form-group mb-0 row">
                     <div class="col-12">

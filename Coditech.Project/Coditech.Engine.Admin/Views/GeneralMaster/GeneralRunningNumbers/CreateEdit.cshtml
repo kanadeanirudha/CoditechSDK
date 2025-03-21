@@ -4,7 +4,7 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     Model.DisplayFormat = Model.GeneralRunningNumberId > 0 ? Model.DisplayFormat : "<centrecode><separator><prefix><separator><currentsequence>";
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "", IsDisabled = Model.GeneralRunningNumberId > 0 };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "GeneralRunningNumbers.GetFinancialYearListByCentreCode()", IsDisabled = Model.GeneralRunningNumberId > 0 };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -50,7 +50,8 @@
                                {
                                    DropdownType = DropdownTypeEnum.FinancialYear.ToString(),
                                    DropdownName = "GeneralFinancialYearId",
-                                   DropdownSelectedValue = Model.GeneralFinancialYearId.ToString()
+                                   DropdownSelectedValue = Model.GeneralFinancialYearId.ToString(),
+                                   Parameter = !string.IsNullOrEmpty(Model.CentreCode) ? $"{Model.CentreCode}" : ""
                                })
                                         @Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
                                     </div>
@@ -166,3 +167,4 @@
         </div>
     </div>
 </div>
+<script src="~/js/coditech/general/generalRunningNumbers.js"></script>

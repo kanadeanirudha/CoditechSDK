@@ -40,6 +40,7 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.TaskSchedulerMasterId)
+                            @Html.HiddenFor(m => m.SchedulerCallFor)
                             @Html.HiddenFor(m => m.ConfiguratorId)
                             @Html.HiddenFor(x => x.WeekDays)
                             <div class="row">

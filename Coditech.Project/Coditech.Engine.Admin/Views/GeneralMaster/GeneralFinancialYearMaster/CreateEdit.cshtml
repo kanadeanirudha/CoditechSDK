@@ -52,20 +52,20 @@
                                         @Html.ValidationMessageFor(x => x.ToDate)
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row-lg-grow-1">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.IsCurrentFinancialYear, new { @class = "form-label" })
-                                    <div class="form-check">
-                                        @Html.CheckBoxFor(x => x.IsCurrentFinancialYear, new { @class = "form-check-input" })
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsYearEnd, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsYearEnd, new { @class = "form-check-input" })
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row-lg-6">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.IsYearEnd, new { @class = "form-label" })
-                                    <div class="form-check">
-                                        @Html.CheckBoxFor(x => x.IsYearEnd, new { @class = "form-check-input" })
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsCurrentFinancialYear, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsCurrentFinancialYear, new { @class = "form-check-input" })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -86,119 +86,53 @@
                 datepicker.datepicker("option", "maxDate", maxDate);
             }
 
-            function updateConstraintsFromFromDate() {
+                    function updateConstraintsFromFromDate() {
                 const fromDate = $("#FromDate").datepicker("getDate");
                 if (fromDate) {
-                    const minToDate = fromDate; // ToDate starts from FromDate
-                    const maxToDate = new Date(fromDate.getFullYear() + 2, 11, 31); // Up to 2 years after
+                    const minToDate = new Date(fromDate.getFullYear(), 0, 1);
+                    const maxToDate = new Date(fromDate.getFullYear() + 4, 11, 31);
                     restrictDateRange($("#ToDate"), minToDate, maxToDate);
-                } else {
-                    resetDatepickers();
                 }
             }
 
             function updateConstraintsFromToDate() {
                 const toDate = $("#ToDate").datepicker("getDate");
                 if (toDate) {
-                    const minFromDate = new Date(toDate.getFullYear() - 2, 0, 1); // Up to 2 years before
-                    const maxFromDate = toDate; // FromDate ends at ToDate
+                    const minFromDate = new Date(toDate.getFullYear() - 4, 0, 1);
+                    const maxFromDate = toDate;
                     restrictDateRange($("#FromDate"), minFromDate, maxFromDate);
-                } else {
-                    resetDatepickers();
                 }
             }
 
             // Initialize FromDate datepicker
             $("#FromDate").datepicker({
-                changeMonth: true, // Enable month dropdown
-                changeYear: true,  // Enable year dropdown
-                showMonthAfterYear: false, // Default layout
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()", // Use actual date format
+                changeMonth: true,
+                changeYear: true,
+                showMonthAfterYear: false,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 autoSize: true,
                 showButtonPanel: true,
                 closeText: "Clear",
-                yearRange: "-2:+2", // 2 years before and after today
+                yearRange: "2024:2027",
                 onSelect: function () {
                     updateConstraintsFromFromDate();
-                },
-                beforeShow: function (input, instance) {
-                    const toDate = $("#ToDate").datepicker("getDate");
-                    if (toDate) {
-                        const minFromDate = new Date(toDate.getFullYear() - 2, 0, 1); // Up to 2 years before ToDate
-                        instance.settings.minDate = minFromDate;
-                        instance.settings.maxDate = toDate; // End at ToDate
-                    } else {
-                        const today = new Date();
-                        instance.settings.minDate = new Date(today.getFullYear() - 2, 0, 1);
-                        instance.settings.maxDate = new Date(today.getFullYear() + 2, 11, 31);
-                    }
-                },
-                onClose: function () {
-                    if ($(window.event.srcElement).hasClass("ui-datepicker-close")) {
-                        $(this).val("");
-                        resetDatepickers();
-                    }
                 }
             });
 
             // Initialize ToDate datepicker
             $("#ToDate").datepicker({
-                changeMonth: true, // Enable month dropdown
-                changeYear: true,  // Enable year dropdown
-                showMonthAfterYear: false, // Default layout
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()", // Use actual date format
+                changeMonth: true,
+                changeYear: true,
+                showMonthAfterYear: false,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 autoSize: true,
                 showButtonPanel: true,
                 closeText: "Clear",
-                yearRange: "-2:+2", // 2 years before and after today
+                yearRange: "2025:2027",
                 onSelect: function () {
                     updateConstraintsFromToDate();
-                },
-                beforeShow: function (input, instance) {
-                    const fromDate = $("#FromDate").datepicker("getDate");
-                    if (fromDate) {
-                        const maxToDate = new Date(fromDate.getFullYear() + 2, 11, 31); // Up to 2 years after FromDate
-                        instance.settings.minDate = fromDate; // Start from FromDate
-                        instance.settings.maxDate = maxToDate;
-                    } else {
-                        const today = new Date();
-                        instance.settings.minDate = new Date(today.getFullYear() - 2, 0, 1);
-                        instance.settings.maxDate = new Date(today.getFullYear() + 2, 11, 31);
-                    }
-                },
-                onClose: function () {
-                    if ($(window.event.srcElement).hasClass("ui-datepicker-close")) {
-                        $(this).val("");
-                        resetDatepickers();
-                    }
                 }
             });
-
-            // Function to reset constraints on both datepickers
-            function resetDatepickers() {
-                const today = new Date();
-                const minDateFrom = new Date(today.getFullYear() - 2, 0, 1); // 2 years before today
-                const maxDateTo = new Date(today.getFullYear() + 2, 11, 31); // 2 years after today
-
-                $("#FromDate").datepicker("option", "minDate", minDateFrom);
-                $("#FromDate").datepicker("option", "maxDate", maxDateTo);
-                $("#ToDate").datepicker("option", "minDate", minDateFrom);
-                $("#ToDate").datepicker("option", "maxDate", maxDateTo);
-
-                // Reset year range relative to today
-                $("#FromDate").datepicker("option", "yearRange", "-2:+2");
-                $("#ToDate").datepicker("option", "yearRange", "-2:+2");
-            }
-
-            // Reset constraints when both fields are cleared
-            $("#FromDate, #ToDate").on("change", function () {
-                if (!$("#FromDate").val() && !$("#ToDate").val()) {
-                    resetDatepickers();
-                }
-            });
-
-            // Set initial constraints relative to today's date
-            resetDatepickers();
         });
     </script>
 }
