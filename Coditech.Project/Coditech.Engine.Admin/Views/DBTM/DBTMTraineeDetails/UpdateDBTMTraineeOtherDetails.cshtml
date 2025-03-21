@@ -38,7 +38,7 @@
                                {
                                    DropdownSelectedValue = Model.GroupEnumId.ToString(),
                                    DropdownName = "GroupEnumId",
-                                   GroupCode = DropdownTypeEnum.GymGroup.ToString(),
+                                   GroupCode = "GymGroup",
                                    IsRequired = true
                                })
                                         @Html.ValidationMessageFor(x => x.GroupEnumId)
@@ -52,7 +52,7 @@
                                {
                                    DropdownSelectedValue = Model.SourceEnumId.ToString(),
                                    DropdownName = "SourceEnumId",
-                                   GroupCode = DropdownTypeEnum.GymSource.ToString(),
+                                   GroupCode = DropdownTypeEnum.LeadSource.ToString(),
                                    IsRequired = true
                                })
                                         @Html.ValidationMessageFor(x => x.SourceEnumId)
