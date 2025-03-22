@@ -125,6 +125,7 @@ namespace Coditech.API.Service
             //Check Is DBTM Trainee need to Login
             if (dBTMTraineeDetails?.DBTMTraineeDetailId > 0 && settingMasterList?.FirstOrDefault(x => x.FeatureName.Equals(GeneralSystemGlobleSettingCustomEnum.IsDBTMTraineeLogin.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue == "1")
             {
+                generalPersonModel.EntityId = dBTMTraineeDetails.DBTMTraineeDetailId;
                 InsertUserMasterDetails(generalPersonModel, dBTMTraineeDetails.DBTMTraineeDetailId, false);
                 try
                 {
@@ -157,6 +158,7 @@ namespace Coditech.API.Service
         {
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             string userType = generalPersonModel.UserType;
+            DBTMDeviceMaster dBTMDeviceMaster = null;
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == generalPersonModel.Custom1)?.FirstOrDefault();
@@ -171,7 +173,7 @@ namespace Coditech.API.Service
             }
             else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                DBTMDeviceMaster dBTMDeviceMaster = GetDBTMDeviceMasterDetailsByCode(generalPersonModel.Custom2);
+                dBTMDeviceMaster = GetDBTMDeviceMasterDetailsByCode(generalPersonModel.Custom2);
 
                 if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
                     throw new CoditechException(ErrorCodes.InvalidData, string.Format("Invalid Device Serial Code."));
@@ -193,7 +195,6 @@ namespace Coditech.API.Service
                 }
                 else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMaster();
                     int subscriptionPlanTypeEnumId = GetEnumIdByEnumCode("DBTMDeviceRegistrationPlan", DropdownCustomTypeEnum.DBTMSubscriptionPlanType.ToString());
 
                     DBTMSubscriptionPlan dBTMSubscriptionPlan = _dBTMSubscriptionPlanRepository.Table.Where(x => x.SubscriptionPlanTypeEnumId == subscriptionPlanTypeEnumId && x.IsActive)?.FirstOrDefault();
