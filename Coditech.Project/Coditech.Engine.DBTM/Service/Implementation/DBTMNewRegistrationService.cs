@@ -59,7 +59,7 @@ namespace Coditech.API.Service
             List<GeneralRunningNumbers> generalRunningNumbersList = GetGeneralRunningNumbersList(centreCode);
 
             if (IsNull(generalRunningNumbersList) || generalRunningNumbersList.Count == 0)
-                throw new CoditechException(ErrorCodes.InvalidData, string.Format("EmployeeRegistration and DBTMTraineeRegistration not set for HO."));
+                throw new CoditechException(ErrorCodes.InvalidData, string.Format("EmployeeRegistration Or DBTMTraineeRegistration running number not set for HO."));
 
             OrganisationCentreMaster organisationCentreMaster = null;
             long personId = 0;
@@ -134,9 +134,6 @@ namespace Coditech.API.Service
             if (IsEmailIdAlreadyExist(dBTMNewRegistrationModel.EmailId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Email Id"));
 
-            if (!_organisationCentreMasterRepository.Table.Any(x => x.CentreCode == dBTMNewRegistrationModel.CentreCode))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Centre Code."));
-
             OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMNewRegistrationModel.CentreCode)?.FirstOrDefault();
 
             if (IsNull(joiningCodeDetails))
@@ -144,6 +141,9 @@ namespace Coditech.API.Service
 
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+
+            if (!_organisationCentreMasterRepository.Table.Any(x => x.CentreCode == joiningCodeDetails.CentreCode))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Centre Code."));
 
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster() { CentreCode = joiningCodeDetails.CentreCode };
             long personId = 0;
