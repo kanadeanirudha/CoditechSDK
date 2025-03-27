@@ -3,7 +3,8 @@
     ViewBag.Title = Model.InventoryCategoryId > 0 ? "Update Inventory Category" : "Add Inventory Category";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel parentInventoryCategorys = new DropdownViewModel() { DropdownType = DropdownTypeEnum.InventoryCategory.ToString(), DropdownName = "ParentInventoryCategoryId", DropdownSelectedValue = Model.ParentInventoryCategoryId.ToString(), ChangeEvent = "", Parameter = Model.InventoryCategoryId.ToString() };
+    DropdownViewModel parentInventoryCategorys = new DropdownViewModel() { DropdownType = DropdownTypeEnum.InventoryCategory.ToString(), DropdownName = "ParentInventoryCategoryId", DropdownSelectedValue = Model.ParentInventoryCategoryId.ToString(), ChangeEvent = "", Parameter = Model.InventoryCategoryId.ToString(), IsRequired = false };
+    DropdownViewModel inventoryCategoryType = new DropdownViewModel() { DropdownType = DropdownTypeEnum.InventoryCategoryType.ToString(), DropdownName = "InventoryCategoryTypeMasterId", DropdownSelectedValue = Model.InventoryCategoryTypeMasterId.ToString() };
 
 }
 <!-- Page Content-->
@@ -50,6 +51,13 @@
                                         @Html.LabelFor(x => x.ItemPrefix, new { @class = "form-label" })
                                         @Html.TextBoxFor(x => x.ItemPrefix, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
                                         @Html.ValidationMessageFor(x => x.ItemPrefix)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.InventoryCategoryTypeMasterId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryCategoryType)
+                                        @Html.ValidationMessageFor(x => x.InventoryCategoryTypeMasterId)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

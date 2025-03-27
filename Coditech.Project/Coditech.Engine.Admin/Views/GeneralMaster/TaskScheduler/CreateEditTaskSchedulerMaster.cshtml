@@ -4,7 +4,7 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = Model.TaskSchedulerMasterId > 0 ? "UpdateTaskSchedulerDetails" : "CreateTaskScheduler";
 
-    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency };
+    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency, ExcludedValues = new string[] { "Daily", "Weekly" } };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -32,7 +32,7 @@
                         @Html.HiddenFor(m => m.SchedulerCallFor)
                         @Html.HiddenFor(x => x.WeekDays)
                         <div class="row">
-                            <div class="col-lg-3">
+                            <div class="col-lg-4">
                                 <div class="mb-3">
                                     @Html.LabelFor(x => x.SchedulerCallFor, new { @class = "form-label required" })
                                     @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
@@ -47,29 +47,47 @@
                                     @Html.ValidationMessageFor(x => x.SchedulerCallFor)
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-4">
                                 <div class="mb-3">
                                     @Html.LabelFor(x => x.SchedulerName, new { @class = "form-label required" })
                                     @Html.TextBoxFor(x => x.SchedulerName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.SchedulerName)
+                                    <span class="error-message text-danger" style="display: none;"></span>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-4">
                                 <div class="mb-3">
                                     @Html.LabelFor(x => x.SchedulerFrequency, new { @class = "form-label required" })
                                     @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", frequencyDropdown)
                                     @Html.ValidationMessageFor(x => x.SchedulerFrequency)
                                 </div>
                             </div>
-                            <div class="col-lg-3" id="weeklyScheduleDiv">
-                                <div class="mb-3 multiselect-dropdown">
-                                    @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
-                                    @Html.ListBoxFor(x => x.SelectedWeekDays, new SelectList(Model.SchedulerWeekDaysList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
-                                    @Html.ValidationMessageFor(x => x.SelectedWeekDays)
+                            <div class="col-lg-12 mt-2" id="cronInfoDiv" style="display:none;">
+                                <div class="cron-info p-3 bg-light rounded">
+                                    <h5>What is a Cron Expression?</h5>
+                                    <p>
+                                        A cron expression is a definition of the schedule onto which the recurring jobs will be executed. It’s a combination of a string that has 5 fields, separated by white space, that represents a schedule. It consists of the following format,
+                                        &lt;minutes&gt; &lt;hours&gt; &lt;days of month&gt; &lt;months&gt; &lt;days of week&gt;, use the specified format to enter the cron expression for scheduling a recurring Job.
+                                    </p>
+                                    <strong>Commonly Used Cron Expressions</strong>
+                                    <pre class="p-2 ">
+                                Every minute                                             * * * *             Every 5th minute                         */5 * * * *
+                                Every 15th minute                                        */15 * * * *        Every hour, on the hour                  0 * * * *
+                                Every 8 hours                                            0 */8 * * *         Every day at 1:00 AM                     0 1 * * *
+                                Every 15 minutes between 1:00 AM and 3:00 AM every day   */15 1-3 * * *      Every Saturday at 2:30 AM                3 0 2 * * 6
+                                Every month on the 1st at 12:15 AM                       15 0 1 * *          Every year on January 1st at 12:15 AM    15 0 1 1 *
+
+                                                            </pre>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CronExpression, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.CronExpression, new { @class = "form-control" })
+                                        <span class="error-message text-danger" style="display: none;"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" id="startDateTimeDiv">
                             <div class="col-lg-3">
                                 <div class="mb-3">
                                     @Html.LabelFor(x => x.StartDate, new { @class = "form-label required" })
@@ -82,20 +100,6 @@
                                     @Html.LabelFor(x => x.StartTime, new { @class = "form-label required" })
                                     @Html.TextBoxFor(x => x.StartTime, new { @class = "form-control", type = "time" })
                                     @Html.ValidationMessageFor(x => x.StartTime)
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ExpireDate, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.ExpireDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.ExpireDate)
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ExpireTime, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.ExpireTime, new { @class = "form-control", type = "time" })
-                                    @Html.ValidationMessageFor(x => x.ExpireTime)
                                 </div>
                             </div>
                         </div>
@@ -119,29 +123,31 @@
 </div>
 @section scripts {
     <script type="text/javascript">
-        function updateExpiryDate() {
+                function updateStartDateTimeVisibility() {
             var selectedFrequency = $("#SchedulerFrequency").val();
-            var startDate = $("#StartDate").datepicker("getDate");
 
-            if (selectedFrequency === "Weekly") {
-                $("#weeklyScheduleDiv").show();
+            if (selectedFrequency === "OneTime") {
+                $("#startDateTimeDiv").show();
+                $("#StartDate").prop("required", true);
+                $("#StartTime").prop("required", true);
             } else {
-                $("#weeklyScheduleDiv").hide();
+                $("#startDateTimeDiv").hide();
+                $("#StartDate").prop("required", false);
+                $("#StartTime").prop("required", false);
             }
 
-            if (selectedFrequency === "OneTime" && startDate) {
-                $("#ExpireDate").datepicker("setDate", startDate);
-                $("#ExpireDate").prop("readonly", true);
+            if (selectedFrequency === "Recurring") {
+                $("#cronInfoDiv").show();
             } else {
-                $("#ExpireDate").prop("readonly", false);
+                $("#cronInfoDiv").hide();
             }
         }
 
-        $(document).ready(function () {
-            updateExpiryDate(); // Ensure correct state on page load
+                $(document).ready(function () {
+            updateStartDateTimeVisibility(); // Set initial visibility
 
             $("#SchedulerFrequency").change(function () {
-                updateExpiryDate();
+                updateStartDateTimeVisibility();
             });
 
             // Start Date Datepicker
@@ -153,22 +159,33 @@
                 autoSize: true,
                 yearRange: "2022:2035",
                 minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31),
-                onSelect: function () {
-                    updateExpiryDate();
-                }
+                maxDate: new Date(2035, 11, 31)
             });
 
-            // Expiry Date Datepicker
-            $("#ExpireDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                yearRange: "2022:2035",
-                minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31)
+            $("form").submit(function (event) {
+                var isValid = true;
+
+                // Validate Scheduler Name
+                var schedulerName = $("#SchedulerName").val().trim();
+                if (schedulerName === "") {
+                    $("#SchedulerName").siblings(".error-message").text("The Scheduler Name field is required.").show();
+                    isValid = false;
+                } else {
+                    $("#SchedulerName").siblings(".error-message").hide();
+                }
+
+                var selectedFrequency = $("#SchedulerFrequency").val();
+                var cronExpression = $("#CronExpression").val().trim();
+                if (selectedFrequency === "Recurring" && cronExpression === "") {
+                    $("#CronExpression").siblings(".error-message").text("The Cron Expression field is required.").show();
+                    isValid = false;
+                } else {
+                    $("#CronExpression").siblings(".error-message").hide();
+                }
+
+                if (!isValid) {
+                    event.preventDefault(); 
+                }
             });
         });
     </script>

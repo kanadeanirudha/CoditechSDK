@@ -5,7 +5,7 @@
 
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId.ToString());
+    keyValuePairs.Add("DBTMTraineeDetailId", Model.EntityId.ToString());
     keyValuePairs.Add("PersonId", Model.PersonId.ToString());
 
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()", IsDisabled = Model.GeneralTraineeAssociatedToTrainerId > 0 };

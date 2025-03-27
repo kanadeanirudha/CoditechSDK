@@ -47,6 +47,7 @@
                                     @if (Model.OrganisationCentrewiseUserNameRegistrationId > 0)
                                     {
                                         @Html.DropDownList("UserType", ViewData["UserType"] as List<SelectListItem>, new { @class = "form-select", @disabled = "disabled" })
+
                                     }
                                     else
                                     {
