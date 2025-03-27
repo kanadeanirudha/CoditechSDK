@@ -7,7 +7,7 @@
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.ConfiguratorId.ToString());
 
-    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency};
+    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency, ExcludedValues = new string[] { "Recurring"} };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
