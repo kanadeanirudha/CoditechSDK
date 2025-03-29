@@ -43,9 +43,13 @@
                                 {
                                     <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="GeneralBatchMaster.GetAssociateUnAssociateBatchwiseUser('@addFollowUpModel.ModalContentId','@item.GeneralBatchUserId','@Model.GeneralBatchMasterId','@item.BatchName','@item.FirstName','@item.LastName','@item.EntityId')" title="UnAssociate Batch From User" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
                                 }
-                                else
+                                else if (item.IsBatchActive)
                                 {
                                     <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="GeneralBatchMaster.GetAssociateUnAssociateBatchwiseUser('@addFollowUpModel.ModalContentId','@item.GeneralBatchUserId','@Model.GeneralBatchMasterId','@item.BatchName','@item.FirstName','@item.LastName','@item.EntityId')" title="Associate Batch To User" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-soft-info">Batch Is Not Active</span>
                                 }
                             </td>
                         </tr>
