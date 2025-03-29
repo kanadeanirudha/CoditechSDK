@@ -1,6 +1,6 @@
-﻿@model UserTypeListViewModel
+﻿@model UserModuleListViewModel
 @{
-    ViewBag.Title = "User Type List";
+    ViewBag.Title = "User Module List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
@@ -11,13 +11,13 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">User Type List</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add User Type</a>
+                        <span class="card-title">User Module List</span>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add User Module</a>
                         
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                            @Html.Partial("~/Views/GeneralMaster/UserType/_List.cshtml", Model)
+                            @Html.Partial("~/Views/GeneralMaster/GeneralUserModule/_List.cshtml", Model)
                         </div>
                     </div>
                 </div>

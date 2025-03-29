@@ -3,7 +3,7 @@ using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
-
+using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -37,7 +37,7 @@ namespace Coditech.API.Service
                     personId = dbtmTraineeDetails.PersonId;
                     centreCode = dbtmTraineeDetails.CentreCode;
                 }
-                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId);
+                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
             }
             else
             {

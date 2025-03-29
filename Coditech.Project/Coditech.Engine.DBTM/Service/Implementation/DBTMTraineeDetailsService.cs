@@ -188,7 +188,7 @@ namespace Coditech.API.Service
                     personId = dbtmTraineeDetails.PersonId;
                     centreCode = dbtmTraineeDetails.CentreCode;
                 }
-                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId);
+                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
             }
             else
             {

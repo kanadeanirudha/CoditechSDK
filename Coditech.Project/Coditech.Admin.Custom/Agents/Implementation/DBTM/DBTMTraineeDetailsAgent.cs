@@ -222,6 +222,7 @@ namespace Coditech.Admin.Agents
             listViewModel.PersonId = personId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
+            listViewModel.IsEntityActive = response.IsEntityActive;
             return listViewModel;
         }
 
