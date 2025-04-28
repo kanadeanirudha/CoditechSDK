@@ -32,5 +32,13 @@ namespace Coditech.Admin.ViewModel
         public List<string> DBTMSelectedTestCalculation { get; set; }
         public List<SelectListItem> DBTMTestParameterList { get; set; }
         public List<SelectListItem> DBTMTestCalculationList { get; set; }
+        [Display(Name = "Minimun Paired Device")]
+        public short MinimunPairedDevice { get; set; }
+        [Display(Name = "Lap Distance")]
+        public short LapDistance { get; set; }
+        [Display(Name = "Is Lap Distance Change")]
+        public bool IsLapDistanceChange { get; set; }
+        [Display(Name = "Is Multi Test")]
+        public bool IsMultiTest { get; set; }
     }
 }
