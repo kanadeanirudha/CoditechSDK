@@ -43,6 +43,9 @@
 		<Reference Include="Coditech.Common.Service">
 			<HintPath>..\SharedLibraries\Coditech.Common.Service.dll</HintPath>
 		</Reference>
+		<Reference Include="Coditech.Hangfire">
+		  <HintPath>..\SharedLibraries\Coditech.Hangfire.dll</HintPath>
+		</Reference>
 		<Reference Include="Coditech.Organisation.Service">
 			<HintPath>..\SharedLibraries\Coditech.Organisation.Service.dll</HintPath>
 		</Reference>

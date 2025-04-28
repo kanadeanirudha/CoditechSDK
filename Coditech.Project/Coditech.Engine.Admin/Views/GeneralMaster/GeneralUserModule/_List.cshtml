@@ -20,12 +20,9 @@
                         <tr>
                             <td>@item.ModuleName</td>
                             <td>@item.ModuleCode</td>
-                            <td>@item.ModuleRelatedWith</td>
                             <td>@item.ModuleSeqNumber</td>
                             <td>@item.ModuleTooltip</td>
                             <td style="text-align:center"><i class="@item.ModuleIconName"></i></td>
-                            <td>@item.ModuleColorClass</td>
-                            <td>@item.ModuleIconPath</td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.ModuleActiveFlag)
                             </td>

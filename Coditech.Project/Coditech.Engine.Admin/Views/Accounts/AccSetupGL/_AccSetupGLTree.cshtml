@@ -67,42 +67,62 @@
         string amount = "<span>$0.00</span>";
         string chevron = isFolder ? $"<span id='gl-chevron-{gl.AccSetupGLId}' style='cursor:pointer; margin-right:5px;'>▶</span>" : "";
 
+        // Edit button for folders
+        string editButton = !gl.IsSystemGenerated ? $@"
+    <button type='button' class='btn btn-sm btn-soft-success btn-circle me-2 edit-btn'
+            data-glid='{gl.AccSetupGLId}'data-categoryid='{categoryId}'>
+        <i class='fas fa-edit'></i>
+    </button>" : "";
+
+        // Edit button for non-folders
+        string editBtn = (!isFolder && !gl.IsSystemGenerated) ? $@"
+    <button type='button' class='btn btn-sm btn-soft-success btn-circle me-2 edit-btn'
+            data-glid='{gl.AccSetupGLId}'data-categoryid='{categoryId}'>
+        <i class='fas fa-edit'></i>
+    </button>" : "";
+
+        // Delete button for folders
         string deleteButton = !gl.IsSystemGenerated ? $@"
-        <button type='button' class='btn btn-sm btn-soft-danger btn-circle del-child-btn'
-                data-glid='{gl.AccSetupGLId}' data-systemgenerated='false'>
-            <i class='fas fa-trash-alt'></i>
-        </button>
-        " : "";
+    <button type='button' class='btn btn-sm btn-soft-danger btn-circle me-2 del-child-btn'
+            data-glid='{gl.AccSetupGLId}'>
+        <i class='fas fa-trash-alt'></i>
+    </button>" : "";
+
+        // Delete button for non-folders
         string deleteBtn = (!isFolder && !gl.IsSystemGenerated) ? $@"
-        <button type='button' class='btn btn-sm btn-soft-danger btn-circle del-child-btn'
-                data-glid='{gl.AccSetupGLId}'>
-            <i class='fas fa-trash-alt'></i>
-        </button>" : "";
+    <button type='button' class='btn btn-sm btn-soft-danger btn-circle me-2 del-child-btn'
+            data-glid='{gl.AccSetupGLId}'>
+        <i class='fas fa-trash-alt'></i>
+    </button>" : "";
 
+        // Inline actions for folder
         string inlineActions = isFolder ? $@"
-        <span id='gl-buttons-{gl.AccSetupGLId}' style='margin-left:5px;display:none;'>
-            <button type='button' class='btn btn-sm btn-soft-success btn-circle add-child-btn'
-                    data-parentid='{gl.AccSetupGLId}' data-categoryid='{categoryId}'>
-                <i class='fas ti-plus'></i>
-            </button>
-        {deleteButton}
-        </span>" : "";
+    <span id='gl-buttons-{gl.AccSetupGLId}' style='margin-left:5px;display:none;'>
+        <button type='button' class='btn btn-sm btn-soft-success btn-circle me-2 add-child-btn'
+                data-parentid='{gl.AccSetupGLId}' data-categoryid='{categoryId}'>
+            <i class='fas ti-plus'></i>
+        </button>
+    {deleteButton}
+    {editButton}
+    </span>" : "";
 
+        // Final HTML
         string html = $@"
-        <div id='gl-{gl.AccSetupGLId}' style='padding-left:20px; margin-bottom:8px;'>
-          <div style='display:flex; justify-content:space-between; align-items:center; padding:8px;
-                      border:1px solid #dee2e6; border-radius:4px; background-color:#fff;'
-               onclick='toggleSubAccounts(""gl"", {gl.AccSetupGLId})'>
+    <div id='gl-{gl.AccSetupGLId}' style='padding-left:20px; margin-bottom:8px;'>
+        <div style='display:flex; justify-content:space-between; align-items:center; padding:8px;
+                    border:1px solid #dee2e6; border-radius:4px; background-color:#fff;'
+             onclick='toggleSubAccounts(""gl"", {gl.AccSetupGLId})'>
             <div style='display:flex; align-items:center;'>
-              <span>{icon}</span>
-              <span>{gl.GLName} ({gl.GLCode})</span>
-              <span>{chevron} {inlineActions}</span>
-          {deleteBtn}
+                <span>{icon}</span>
+                <span>{gl.GLName} ({gl.GLCode})</span>
+                <span>{chevron} {inlineActions}</span>
+            {deleteBtn}{editBtn}
             </div>
             <div>{amount}</div>
         </div>
         <div id='gl-subaccounts-{gl.AccSetupGLId}' style='padding-left:30px; border-left:1px solid #dee2e6; margin-top:8px; display:none;'>";
 
+        // Render sub-accounts
         if (isFolder)
         {
             foreach (var sub in gl.SubAccounts)
@@ -111,23 +131,12 @@
             }
         }
         html += "</div></div>";
+
         return html;
     }
 }
-
 <!-- Set global variables if needed -->
 <script>
     var actionMode = '@Model.ActionMode';
 </script>
-
-<!-- External JS files -->
 <script src="~/js/coditech/Accounts/AccSetupGL.js"></script>
-
-<!-- Optional: Call JS functions explicitly after the DOM is loaded -->
-<script>
-    $(document).ready(function () {
-        if (typeof AccSetupGL !== "undefined" && typeof AccSetupGL.Initialize === "function") {
-            AccSetupGL.Initialize();
-        }
-    });
-</script>

@@ -12,14 +12,21 @@
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-lg-3 col-md-4 mb-3">
                 @Html.Partial("~/Views/EmployeeMaster/_EmployeeDetailsSidePannel.cshtml", keyValuePairs)
             </div>
-            <div class="col-10">
+
+            <div class="col-lg-9 col-md-8">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                         <span class="card-title">Employee Service List : @Model.FirstName @Model.LastName</span>
-                        @* <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/GetEmployeeService?employeeId=@Model.EmployeeId&personId=@Model.PersonId" role="button"><i class="fas fa-plus me-2"></i>Add Employee Service</a> *@
+                        @*
+                        <a class="btn btn-sm btn-soft-primary"
+                        href="/@controllerName/GetEmployeeService?employeeId=@Model.EmployeeId&personId=@Model.PersonId"
+                        role="button">
+                        <i class="fas fa-plus me-2"></i>Add Employee Service
+                        </a>*@
+
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">

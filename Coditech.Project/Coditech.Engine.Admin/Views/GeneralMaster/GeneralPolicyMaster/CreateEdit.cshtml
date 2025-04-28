@@ -1,0 +1,112 @@
+﻿@model GeneralPolicyViewModel
+@{
+    ViewBag.Title = Model.GeneralPolicyMasterId > 0 ? "Update General Policy" : "Add General Policy";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string css = Model.GeneralPolicyMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    DropdownViewModel moduleDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.ModuleList.ToString(), DropdownName = "PolicyRelatedToModuleCode", DropdownSelectedValue = Model.PolicyRelatedToModuleCode, IsDisabled = Model.GeneralPolicyMasterId > 0 };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            @if (Model.GeneralPolicyMasterId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/GeneralMaster/GeneralPolicyMaster/_GeneralPolicySidePannel.cshtml", Model.PolicyCode)
+                </div>
+            }
+            <div class="@css">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.GeneralPolicyMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update General Policy</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create General Policy</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.GeneralPolicyMasterId)
+                            @if (Model.GeneralPolicyMasterId > 0)
+                            {
+                                @Html.HiddenFor(m => m.PolicyApplicableStatus)
+                                @Html.HiddenFor(m => m.PolicyRelatedToModuleCode)
+                            }
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PolicyCode, new { @class = "form-label required" })
+                                        @if (Model.GeneralPolicyMasterId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.PolicyCode, new { @class = "form-control", @readonly = "readonly" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.PolicyCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.PolicyCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PolicyName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.PolicyName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.PolicyName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PolicyRelatedToModuleCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
+                                        @Html.ValidationMessageFor(x => x.PolicyRelatedToModuleCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PolicyApplicableStatus, new { @class = "form-label required" })
+                                        @if (Model.GeneralPolicyMasterId > 0)
+                                        {
+                                            @Html.HiddenFor(x => x.PolicyApplicableStatus)
+                                            @Html.DropDownListFor(x => x.PolicyApplicableStatus, ViewData["PolicyApplicableStatus"] as List<SelectListItem>, new { @class = "form-select", disabled = "disabled" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor( x => x.PolicyApplicableStatus, ViewData["PolicyApplicableStatus"] as List<SelectListItem>, new { @class = "form-select" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.PolicyApplicableStatus)
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PolicyDescription, new { @class = "form-label required" })
+                                        @Html.TextAreaFor(x => x.PolicyDescription, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.PolicyDescription)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsPolicyActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsPolicyActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
