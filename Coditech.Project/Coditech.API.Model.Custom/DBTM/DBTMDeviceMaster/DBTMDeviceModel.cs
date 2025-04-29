@@ -5,6 +5,7 @@ namespace Coditech.Common.API.Model
     public class DBTMDeviceModel : BaseModel
     {
         public long DBTMDeviceMasterId { get; set; }
+        public long DBTMParentDeviceMasterId { get; set; }
         [MaxLength(200)]
         [Required]
         public string DeviceName { get; set; }

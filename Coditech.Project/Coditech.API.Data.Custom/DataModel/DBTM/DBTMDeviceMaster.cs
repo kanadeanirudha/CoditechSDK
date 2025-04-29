@@ -6,6 +6,7 @@ namespace Coditech.API.Data
     {
         [Key]
         public long DBTMDeviceMasterId { get; set; }
+        public long DBTMParentDeviceMasterId { get; set; }
         public string DeviceName { get; set; }
         public string DeviceSerialCode { get; set; }
         public string Description { get; set; }
