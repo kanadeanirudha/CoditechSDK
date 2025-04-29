@@ -1,0 +1,34 @@
+﻿@model UserModel
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle waves-effect waves-light nav-user"
+       href="#" id="balanceSheetDropdown"
+       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-list-ul" data-fa-transform="grow-12" style="color: pink;"></i>
+    </a>
+
+    <ul class="dropdown-menu" aria-labelledby="balanceSheetDropdown">
+        @if (Model?.BalanceSheetList?.Count > 0)
+        {
+            @foreach (var item in Model.BalanceSheetList)
+            {
+                <li>
+                    <a class="dropdown-item" href="/User/ChangeAccountBalanceSheet?selectedBalanceId=@item.AccSetupBalanceSheetId">
+                        @item.AccBalancesheetHeadDesc
+                    </a>
+                </li>
+            }
+        }
+    </ul>
+</li>
+
+
+
+
+
+
+
+
+
+
+

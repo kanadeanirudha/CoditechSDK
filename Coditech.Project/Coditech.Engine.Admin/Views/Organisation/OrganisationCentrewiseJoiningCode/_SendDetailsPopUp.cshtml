@@ -26,8 +26,13 @@
                     @Html.ValidationMessageFor(x => x.EmailId)
                 </div>
             </div>
-            <div class="col-lg-3 d-flex align-items-end" id="EmailIdSendOTPDivId">
-                <button type="button" class="btn btn-success w-100" onclick="OrganisationCentrewiseJoiningCode.SendJoiningCode('email')">Send</button>
+            <div class="col-lg-3" id="EmailIdSendOTPDivId">
+                <div class="mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="form-check" style="padding-left:0px !important; display:block !important">
+                        <button type="button" class="btn btn-success" onclick="OrganisationCentrewiseJoiningCode.SendJoiningCode('email')">Send</button>
+                    </div>
+                </div>
             </div>
             <!-- OR Separator -->
             <div class="col-12 d-flex justify-content-center">
@@ -55,10 +60,14 @@
                     @Html.ValidationMessageFor(x => x.MobileNumber)
                 </div>
             </div>
-            <div class="col-lg-3 d-flex align-items-end" id="MobileNumberSendOTPDivId">
-                <button type="button" class="btn btn-success w-100" onclick="OrganisationCentrewiseJoiningCode.SendJoiningCode('mobile')">Send</button>
+            <div class="col-lg-3" id="MobileNumberSendOTPDivId">
+                <div class="mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="form-check" style="padding-left:0px !important; display:block !important">
+                        <button type="button" class="btn btn-success" onclick="OrganisationCentrewiseJoiningCode.SendJoiningCode('mobile')">Send</button>
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
 

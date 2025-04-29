@@ -1,0 +1,62 @@
+﻿@model ACCGLOpeningBalanceViewModel
+@{
+    ViewBag.Title = "Update Control Head Type List";
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel accSetupCategoryDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.AccSetupCategory.ToString(),
+                DropdownName = "AccSetupCategoryId",
+                DropdownSelectedValue = Model.AccSetupCategoryId.ToString(),
+                ChangeEvent = "AccGLOpeningBalance.GetAccSetUpCategoryList()"
+            };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Update Control Head Type List</span>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>Account Category</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupCategoryDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="AccGLOpeningBalance.GetAccSetUpCategoryList()" />
+                            </div>
+                            <div class="col-md-1">
+                                <label>Financial Year :</label>
+                            </div>
+                            <div class="col-md-4">
+                                @if (Model.GeneralFinancialYearModel!= null)
+                                {
+                                    <label>
+                                        @Model.GeneralFinancialYearModel.ToDate.ToCoditechDateFormat()
+                                        To
+                                        @Model.GeneralFinancialYearModel.FromDate.ToCoditechDateFormat()
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="AccGLOpeningBalanceControlHeadDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @if (Model.AccGLOpeningBalanceId > 0)
+                            {
+                                @Html.Partial("~/Views/Accounts/AccGLOpeningBalance/_ControlHeadTypeList.cshtml", Model)
+                           }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page content -->
+<script src="~/js/coditech/Accounts/ACCGLOpeningBalance.js"></script>

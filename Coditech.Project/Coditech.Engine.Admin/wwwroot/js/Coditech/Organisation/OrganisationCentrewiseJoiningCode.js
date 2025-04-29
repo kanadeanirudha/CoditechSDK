@@ -64,14 +64,9 @@
                             $("#EmailIdSendOTPDivId").hide();
                             $("#EmailIdTokenDivId").show();
                         }
-                        CoditechNotification.DisplayNotificationMessage(result.message, "success");
                         let url = window.location.origin + window.location.pathname + '?selectedCentrecode=' + result.centreCode;
                         window.location.href = url;
-                    }
-                    else {
-                        CoditechNotification.DisplayNotificationMessage(result.message, "error");
-                    }
-                    CoditechCommon.HideLodder();
+                    }                  
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     if (xhr.status === 401 || xhr.status === 403) {

@@ -222,6 +222,7 @@ namespace Coditech.Admin.Agents
             listViewModel.PersonId = personId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
+            listViewModel.IsEntityActive = response.IsEntityActive;
             return listViewModel;
         }
 
@@ -539,13 +540,26 @@ namespace Coditech.Admin.Agents
                 {
                     datatableColumnList.Add(new DatatableColumns()
                     {
-                        ColumnName = item,
+                        ColumnName = FormatColumnName(item),
                         ColumnCode = item,
                     });
                 }
             }
             return datatableColumnList;
         }
+        #endregion
+        #region
+        // it will return DBTMActivitiesDetailsList ColumnName     
+        public string FormatColumnName(string columnName)
+        {
+            if (columnName == "AverageSpeed")
+                return "Average Speed";
+            else if (columnName == "CompletionTime")
+                return "Completion Time";
+            else
+                return columnName; 
+        }
+
         #endregion
     }
 }

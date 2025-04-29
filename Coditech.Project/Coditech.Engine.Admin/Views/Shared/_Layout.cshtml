@@ -4,6 +4,7 @@
     string messageData = Convert.ToString(TempData["Notifications"]);
     UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
     string applicationLogoPath = CoditechAdminSettings.ApplicationLogoPath;
+    string applicationLogoSmallPath = CoditechAdminSettings.ApplicationLogoSmallPath;
     string applicationLogoBackground = CoditechAdminSettings.ApplicationLogoBackground;
     string applicationLayoutBackground = CoditechAdminSettings.ApplicationLayoutBackground;
     string applicationTitle = CoditechAdminSettings.ApplicationTitle;
@@ -52,10 +53,25 @@
             <div class="brand" style="background-color:@applicationLogoBackground !important">
                 <a href="..@dashboardUrl" class="logo">
                     <span>
-                        <img src="@applicationLogoPath" alt="logo-small" class="logo-sm">
+                        @if (!string.IsNullOrEmpty(userData?.LogoSmallMediaPath))
+                        {
+                            <img src="@userData.LogoSmallMediaPath" alt="logo-small" class="logo-sm">
+                        }
+                        else
+                        {
+                            <img src="@applicationLogoSmallPath" alt="logo-small" class="logo-sm">
+                        }
+
                     </span>
                     <span>
-                        <img src="@applicationLogoPath" alt="logo-large" class="logo-lg logo-dark">
+                        @if (!string.IsNullOrEmpty(userData?.LogoMediaPath))
+                        {
+                            <img src="@userData?.LogoMediaPath" alt="logo-large" class="logo-lg logo-dark">
+                        }
+                        else
+                        {
+                            <img src="@applicationLogoPath" alt="logo-large" class="logo-lg logo-dark">
+                        }
                     </span>
                 </a>
             </div>
@@ -78,6 +94,11 @@
                 </div>
                 </div>
                 </li> *@
+                    @if (userData?.BalanceSheetList?.Count > 0)
+                    {
+                        @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData)
+                        ;
+                    }
                     @* @Html.Partial("~/Views/Shared/_NotificationCount.cshtml", userData.UserMasterId) *@
                     @Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
                     <li class="menu-item">

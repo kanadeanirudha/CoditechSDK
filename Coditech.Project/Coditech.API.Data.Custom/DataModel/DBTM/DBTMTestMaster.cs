@@ -9,6 +9,10 @@ namespace Coditech.API.Data
         public short DBTMActivityCategoryId { get; set; }
         public string TestName { get; set; }
         public string TestCode { get; set; }
+        public short? MinimunPairedDevice { get; set; }
+        public short? LapDistance { get; set; }
+        public bool? IsLapDistanceChange { get; set; }
+        public bool? IsMultiTest { get; set; }
         public bool IsActive { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }

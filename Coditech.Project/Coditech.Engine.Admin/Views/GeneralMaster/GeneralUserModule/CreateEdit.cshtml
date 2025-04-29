@@ -1,0 +1,120 @@
+﻿@model UserModuleViewModel
+@{
+    ViewBag.Title = Model.UserModuleMasterId > 0 ? "Update User Module" : "Add User Module";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                @if (Model.UserModuleMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update User Module</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create User Module</h4>
+                                }
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.UserModuleMasterId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ModuleName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ModuleCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.ModuleCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleRelatedWith, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleRelatedWith, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleRelatedWith)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleSeqNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleSeqNumber, new { @class = "form-control", type = "number", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.ModuleSeqNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleTooltip, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleTooltip, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleTooltip)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleIconName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleIconName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleIconName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleColorClass, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleColorClass, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleColorClass)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleFormName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleFormName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleFormName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleIconPath, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ModuleIconPath, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ModuleIconPath)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleInstalledFlag, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.ModuleInstalledFlag, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleActiveFlag, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.ModuleActiveFlag, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
