@@ -10,7 +10,6 @@ namespace Coditech.API.Data
         public int DBTMTestMasterId { get; set; }
         public DateTime AssignmentDate { get; set; }
         public TimeSpan? AssignmentTime { get; set; }
-        public int DBTMTestStatusEnumId { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
