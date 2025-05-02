@@ -15,7 +15,7 @@ namespace Coditech.Common.API.Model
         [MaxLength(50)]
         public string TestCode { get; set; }
         public short MinimunPairedDevice { get; set; }
-        public short LapDistance { get; set; }
+        public string LapDistance { get; set; }
         public bool IsLapDistanceChange { get; set; }
         public bool IsMultiTest { get; set; }
         public bool IsActive { get; set; }

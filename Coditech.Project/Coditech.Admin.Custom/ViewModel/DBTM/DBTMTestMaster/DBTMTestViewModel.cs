@@ -35,12 +35,12 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Minimun Paired Device")]
         public short MinimunPairedDevice { get; set; }
         [Display(Name = "Lap Distance")]
-        public short LapDistance { get; set; }
+        [Required]
+        public string LapDistance { get; set; }
         [Display(Name = "Is Lap Distance Change")]
         public bool IsLapDistanceChange { get; set; }
         [Display(Name = "Is Multi Test")]
         public bool IsMultiTest { get; set; }
-        [Required]
         [Display(Name = "Test Instructions")]
         public string TestInstructions { get; set; }
         [Required]

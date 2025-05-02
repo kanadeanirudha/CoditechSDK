@@ -14,7 +14,7 @@
         public decimal Acceleration { get; set; }
         public decimal Angle { get; set; }
         public long CompletionTime { get; set; }
-        public decimal Speed { get; set; }
-        public decimal AverageSpeed { get; set; }
+        public decimal Velocity { get; set; }
+        public decimal AverageVelocity { get; set; }
     }
 }

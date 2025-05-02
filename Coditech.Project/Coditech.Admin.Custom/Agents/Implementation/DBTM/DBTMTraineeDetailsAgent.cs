@@ -552,8 +552,8 @@ namespace Coditech.Admin.Agents
         // it will return DBTMActivitiesDetailsList ColumnName     
         public string FormatColumnName(string columnName)
         {
-            if (columnName == "AverageSpeed")
-                return "Average Speed";
+            if (columnName == "AverageVelocity")
+                return "Average Velocity";
             else if (columnName == "CompletionTime")
                 return "Completion Time";
             else
