@@ -13,6 +13,8 @@ namespace Coditech.API.Data
         public short? LapDistance { get; set; }
         public bool? IsLapDistanceChange { get; set; }
         public bool? IsMultiTest { get; set; }
+        public string TestInstructions { get; set; }
+        public long TestMediaId { get; set; }
         public bool IsActive { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }

@@ -26,6 +26,9 @@ namespace Coditech.Common.API.Model
         [Required]
         public List<string> DBTMSelectedTestCalculation { get; set; }
         public byte DBTMTestCalculationId { get; set; }
-
+        public string TestInstructions { get; set; }
+        public long TestMediaId { get; set; }
+        public string TestMediaPath { get; set; }
+        public string TestMediaFileName { get; set; }
     }
 }

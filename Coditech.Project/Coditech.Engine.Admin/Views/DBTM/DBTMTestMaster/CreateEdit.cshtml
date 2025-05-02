@@ -28,6 +28,8 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.DBTMTestMasterId)
+                            @Html.HiddenFor(m => m.TestMediaId)
+                            @Html.HiddenFor(m => m.TestMediaPath)
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
@@ -45,14 +47,14 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.TestName, new { @class = "form-label required"})
+                                        @Html.LabelFor(x => x.TestName, new { @class = "form-label required" })
                                         @Html.TextBoxFor(x => x.TestName, new { @class = "form-control" })
                                         @Html.ValidationMessageFor(x => x.TestName)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.TestCode, new { @class = "form-label required"})
+                                        @Html.LabelFor(x => x.TestCode, new { @class = "form-label required" })
                                         @if (Model.DBTMTestMasterId > 0)
                                         {
                                             @Html.TextBoxFor(x => x.TestCode, new { @class = "form-control", @readonly = "readonly" })
@@ -66,7 +68,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3 multiselect-dropdown">
-                                        @Html.LabelFor(x => x.DBTMSelectedTestParameter, new { @class = "form-label required"})
+                                        @Html.LabelFor(x => x.DBTMSelectedTestParameter, new { @class = "form-label required" })
                                         @Html.ListBoxFor(x => x.DBTMSelectedTestParameter, new SelectList(Model.DBTMTestParameterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
                                         @Html.ValidationMessageFor(x => x.DBTMSelectedTestParameter)
                                     </div>
@@ -110,13 +112,35 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label"})
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
                                         <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input"})
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TestInstructions, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_HTMLEditor.cshtml", new HTMLEditorViewModel()
+                               {
+                                   EditorName = "TestInstructions",
+                                   EditorValue = Model.TestInstructions
+                               })
+                                        @Html.ValidationMessageFor(x => x.TestInstructions)
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="mb-6">
+                                        @Html.LabelFor(x => x.TestMediaId, new { @class = "form-label required" })
+                                        <input type="file" id="testUpload" class="form-control" />
+                                        <img id="testPreview" src="#" alt="Uploaded Test" style="display:none;width:100px;height:100px;margin-top:10px;" />
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
@@ -126,6 +150,46 @@
         </div>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+@section scripts {
+    <script type="text/javascript">
+        var testMediaPath = $('#TestMediaPath').val();
+        if (!(testMediaPath === '' || testMediaPath === null)) {
+            $('#testPreview').attr('src', $('#TestMediaPath').val()).show();
+        }
+
+        $('#testUpload').change(function () {
+            var formData = new FormData();
+            var fileInput = $('#testUpload')[0];
+            $("#notificationDivId").hide();
+            if (fileInput.files.length > 0) {
+                CoditechCommon.ShowLodder();
+                formData.append('files', fileInput.files[0]);
+                $.ajax({
+                    url: '/GeneralCommon/UploadMedia',  // Ensure this matches the route
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == true || response.status == "true") {
+                            $('#testPreview').attr('src', response.imageUrl).show();
+                            $('input[name="TestMediaId"]').val(response.photoMediaId);
+                        }
+                        else {
+                            CoditechNotification.DisplayNotificationMessage(response.message, "error")
+                        }
+                        CoditechCommon.HideLodder();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('Error uploading file:', textStatus, errorThrown);
+                        CoditechCommon.HideLodder();
+                    }
+                });
+            }
+        });
+    </script>
+}
 
 
 

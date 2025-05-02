@@ -4,6 +4,7 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Common.Service;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Specialized;
@@ -11,7 +12,7 @@ using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
-    public class DBTMTestMasterService : IDBTMTestMasterService
+    public class DBTMTestMasterService : BaseService, IDBTMTestMasterService
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
@@ -20,7 +21,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
-        public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider)
+        private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
+        public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
@@ -29,6 +31,7 @@ namespace Coditech.API.Service
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -112,6 +115,15 @@ namespace Coditech.API.Service
             {
                 dBTMTestModel.DBTMSelectedTestParameter = _dBTMParametersAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMTestParameterId.ToString())?.ToList();
                 dBTMTestModel.DBTMSelectedTestCalculation = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMTestCalculationId.ToString())?.ToList();
+            }
+            if (dBTMTestModel.TestMediaId > 0)
+            {
+                var mediaDetail = _mediaDetailRepository.Table.Where(x => x.MediaId == dBTMTestModel.TestMediaId).FirstOrDefault();
+                if (mediaDetail != null)
+                {
+                    dBTMTestModel.TestMediaPath = $"{GetMediaUrl()}{mediaDetail.Path}";
+                    dBTMTestModel.TestMediaFileName = mediaDetail.FileName;
+                }
             }
             return dBTMTestModel;
         }
