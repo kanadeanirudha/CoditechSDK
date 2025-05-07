@@ -9,5 +9,8 @@ namespace Coditech.Admin.ViewModel
         {
             DBTMTraineeAssignmentToUserList = new List<DBTMTraineeAssignmentToUserViewModel>();
         }
+        public long DBTMTraineeAssignmentId { get; set; }
+        public string TestName { get; set; }
+        public string SelectedParameter1 { get; set; }
     }
 }

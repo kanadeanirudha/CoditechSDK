@@ -1,0 +1,65 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMTraineeAssignmentToUserListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    ModelPopUpViewModel addFollowUpModel = new ModelPopUpViewModel() { ModelPopUpId = "AssociateUnAssociateDBTMTraineeAssignmentToUserModelPopupId", ModalContentId = "AssociateUnAssociateDBTMTraineeAssignmentToModelPopupContentId" };
+}
+<div class="row">
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+</div>
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
+            @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
+            @Html.HiddenFor(x => x.SelectedParameter1)
+            <tbody>
+                @if (Model?.DBTMTraineeAssignmentToUserList?.Count > 0)
+                {
+                    foreach (var item in Model?.DBTMTraineeAssignmentToUserList)
+                    {
+                        <tr>
+                            <td style="text-align: center; width: 0px">
+                                @if (!string.IsNullOrEmpty(item.ImagePath))
+                                {
+                                    <img src="@item.ImagePath" class="rounded-circle thumb-xs me-1" />
+                                }
+                                else
+                                {
+                                    <div class="avatar-box thumb-md align-self-center">
+                                        <span class="avatar-title bg-soft-pink rounded-circle">@item.FirstName.Substring(0, 1)@item.LastName.Substring(0, 1)</span>
+                                    </div>
+                                }
+                            </td>
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+                            <td>@item.MobileNumber</td>
+                            <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsAssociated)</td>
+                            <td class="text-center">
+                                @if (item.IsAssociated)
+                                {
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMTraineeAssignment.GetAssociateUnAssociateAssignmentwiseUser('@addFollowUpModel.ModalContentId','@item.DBTMTraineeAssignmentUserId','@Model.DBTMTraineeAssignmentId','@item.TestName','@item.FirstName','@item.LastName','@item.DBTMTraineeDetailId')" title="UnAssociate Assignment From User" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
+                                }
+                                else if (item.IsAssignmentActive)
+                                {
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMTraineeAssignment.GetAssociateUnAssociateAssignmentwiseUser('@addFollowUpModel.ModalContentId','@item.DBTMTraineeAssignmentUserId','@Model.DBTMTraineeAssignmentId','@item.TestName','@item.FirstName','@item.LastName','@item.DBTMTraineeDetailId')" title="Associate Assignment To User" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-soft-info">Assignment Is Not Active</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", addFollowUpModel)
+@section scripts {
+    <script src="~/js/coditech/DBTM/DBTMAssignmentUser.js"></script>
+}

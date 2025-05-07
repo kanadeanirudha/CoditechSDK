@@ -47,7 +47,19 @@ namespace Coditech.API.Client
         /// <returns>DBTMTraineeAssignmentListResponse</returns>
         GeneralTrainerListResponse GetTrainerByCentreCode(string centreCode);
         DBTMTraineeDetailsListResponse GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId);
-
         DBTMTraineeAssignmentResponse SendAssignmentReminder(long dBTMTraineeAssignmentId);
+
+        /// <summary>
+        /// Get list of DBTMTraineeAssignmentToUser.
+        /// </summary>
+        /// <returns>DBTMTraineeAssignmentToUserListResponse</returns>
+        DBTMTraineeAssignmentToUserListResponse GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+
+        /// <summary>
+        /// Update Associate UnAssociate Assignmentwise User.
+        /// </summary>
+        /// <param name="DBTMTraineeAssignmentToUserModel">DBTMTraineeAssignmentToUserModel.</param>
+        /// <returns>Returns updated DBTMTraineeAssignmentToUserResponse</returns>
+        DBTMTraineeAssignmentToUserResponse AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel body);
     }
 }

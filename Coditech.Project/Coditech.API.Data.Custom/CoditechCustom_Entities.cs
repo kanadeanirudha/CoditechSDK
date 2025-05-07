@@ -29,6 +29,7 @@ namespace Coditech.API.Data
         public DbSet<DBTMDeviceDataDetails> DBTMDeviceDataDetails { get; set; }
         public DbSet<DBTMTestCalculation> DBTMTestCalculation { get; set; }
         public DbSet<DBTMCalculationAssociatedToTest> DBTMCalculationAssociatedToTest { get; set; }
+        public DbSet<DBTMTraineeAssignmentToUser> DBTMTraineeAssignmentToUser { get; set; }
         #endregion
     }
 }
