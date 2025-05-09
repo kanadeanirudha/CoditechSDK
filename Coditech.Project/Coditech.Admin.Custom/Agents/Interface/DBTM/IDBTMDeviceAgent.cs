@@ -38,5 +38,6 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMDeviceIds">dBTMDeviceIds.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteDBTMDevice(string dBTMDeviceIds, out string errorMessage);
+        DBTMDeviceListViewModel GetSlaveList(long dBTMParentDeviceMasterId, DataTableViewModel dataTableModel);
     }
 }

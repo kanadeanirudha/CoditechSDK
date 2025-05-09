@@ -81,7 +81,7 @@ namespace Coditech.Admin.Helpers
 
         private static void GetDBTMDeviceRegistrationDetailsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            DBTMDeviceListResponse response = new DBTMDeviceClient().List(null, null, null, 1, int.MaxValue);
+            DBTMDeviceListResponse response = new DBTMDeviceClient().List(0,null, null, null, 1, int.MaxValue);
             dropdownList.Add(new SelectListItem() { Text = "-------Select Registration Details-------" });
 
             DBTMDeviceListModel list = new DBTMDeviceListModel { DBTMDeviceList = response.DBTMDeviceList };

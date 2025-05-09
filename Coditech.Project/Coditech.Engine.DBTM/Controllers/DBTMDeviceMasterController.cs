@@ -28,11 +28,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMDeviceMaster/GetDBTMDeviceList")]
         [Produces(typeof(DBTMDeviceListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMDeviceList(FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMDeviceList(long dBTMParentDeviceMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
-                DBTMDeviceListModel list = _dBTMDeviceMasterService.GetDBTMDeviceList(filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                DBTMDeviceListModel list = _dBTMDeviceMasterService.GetDBTMDeviceList(dBTMParentDeviceMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMDeviceListResponse>(data) : CreateNoContentResponse();
             }

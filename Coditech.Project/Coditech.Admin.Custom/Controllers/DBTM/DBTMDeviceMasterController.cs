@@ -30,7 +30,7 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult Create()
         {
-            return View(createEdit, new DBTMDeviceViewModel());
+            return View(createEdit, new DBTMDeviceViewModel() { IsMasterDevice = true });
         }
 
         [HttpPost]
@@ -86,10 +86,36 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction<DBTMDeviceMasterController>(x => x.List(null));
         }
 
+        #region DBTM Slave Device
+        public virtual ActionResult GetSlaveList(DataTableViewModel dataTableViewModel)
+        {
+            DBTMDeviceListViewModel list = _dBTMDeviceAgent.GetSlaveList(Convert.ToInt64(dataTableViewModel.SelectedParameter1), dataTableViewModel);
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMDeviceMaster/_List.cshtml", list);
+            }
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+
+            return View($"~/Views/DBTM/DBTMDeviceMaster/List.cshtml", list);
+        }
+
+        [HttpGet]
+        public virtual ActionResult CreateSlave(long dBTMDeviceId)
+        {
+
+            return View(createEdit, new DBTMDeviceViewModel() { IsMasterDevice = false, DBTMParentDeviceMasterId = dBTMDeviceId });
+        }
+        #endregion
+
         public virtual ActionResult Cancel()
         {
             DataTableViewModel dataTableViewModel = new DataTableViewModel();
             return RedirectToAction("List", dataTableViewModel);
+        }
+        public virtual ActionResult CancelSlave(long dBTMDeviceId)
+        {
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedParameter1 = dBTMDeviceId.ToString()};
+            return RedirectToAction("GetSlaveList", dataTableViewModel);
         }
         #region Protected
 

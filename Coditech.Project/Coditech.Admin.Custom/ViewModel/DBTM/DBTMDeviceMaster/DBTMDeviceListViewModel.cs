@@ -9,5 +9,8 @@ namespace Coditech.Admin.ViewModel
         {
             DBTMDeviceList = new List<DBTMDeviceViewModel>();
         }
+        public long DBTMDeviceMasterId { get; set; }
+        public long DBTMParentDeviceMasterId { get; set; }
+        public string SelectedParameter1 { get; set; }
     }
 }
