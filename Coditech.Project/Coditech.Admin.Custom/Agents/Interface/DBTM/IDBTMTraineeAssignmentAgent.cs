@@ -38,7 +38,20 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMTraineeAssignmentIds">dBTMTraineeAssignmentIds.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentIds, out string errorMessage);
-
         DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId);
+
+        /// <summary>
+        /// Get list of Associated Assignment.
+        /// </summary>
+        /// <param name="dataTableModel">DataTable ViewModel.</param>
+        /// <returns>DBTMTraineeAssignmentToUserListViewModel</returns>
+        DBTMTraineeAssignmentToUserListViewModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, DataTableViewModel dataTableModel);
+
+        /// <summary>
+        /// Update Associate UnAssociate Assignmentwise User.
+        /// </summary>
+        /// <param name="DBTMTraineeAssignmentToUserViewModel">DBTMTraineeAssignmentToUserViewModel.</param>
+        /// <returns>Returns updated DBTMTraineeAssignmentToUserViewModel</returns>
+        DBTMTraineeAssignmentToUserViewModel AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel);
     }
 }

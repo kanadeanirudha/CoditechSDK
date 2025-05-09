@@ -409,5 +409,102 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+
+        public virtual DBTMTraineeAssignmentToUserListResponse GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        {
+            return Task.Run(async () => await DBTMTraineeAssignmentToUserListAsync(dBTMTraineeAssignmentId, expand, filter, sort, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMTraineeAssignmentToUserListResponse> DBTMTraineeAssignmentToUserListAsync(long dBTMTraineeAssignmentId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTraineeAssignmentEndpoint.DBTMTraineeAssignmentToUserListAsync(dBTMTraineeAssignmentId, expand, filter, sort, pageIndex, pageSize);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeAssignmentToUserListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTraineeAssignmentToUserListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTraineeAssignmentToUserListResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeAssignmentToUserListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+
+        public virtual DBTMTraineeAssignmentToUserResponse AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel body)
+        {
+            return Task.Run(async () => await AssociateUnAssociateAssignmentwiseUserAsync(body, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMTraineeAssignmentToUserResponse> AssociateUnAssociateAssignmentwiseUserAsync(DBTMTraineeAssignmentToUserModel body, System.Threading.CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTraineeAssignmentEndpoint.AssociateUnAssociateAssignmentwiseUserAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeAssignmentToUserResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                if (status_ == 201)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeAssignmentToUserResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTraineeAssignmentToUserResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeAssignmentToUserResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

@@ -205,5 +205,51 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMTraineeAssignment/GetDBTMTraineeAssignmentToUserList")]
+        [Produces(typeof(DBTMTraineeAssignmentToUserListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        {
+            try
+            {
+                DBTMTraineeAssignmentToUserListModel list = _dBTMTraineeAssignmentService.GetDBTMTraineeAssignmentToUserList(dBTMTraineeAssignmentId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeAssignmentToUserListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentToUserListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentToUserListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTraineeAssignment/AssociateUnAssociateBatchwiseUser")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMTraineeAssignmentToUserResponse))]
+        public virtual IActionResult AssociateUnAssociateAssignmentwiseUser([FromBody] DBTMTraineeAssignmentToUserModel model)
+        {
+            try
+            {
+                bool isUpdated = _dBTMTraineeAssignmentService.AssociateUnAssociateAssignmentwiseUser(model);
+                return isUpdated ? CreateOKResponse(new DBTMTraineeAssignmentToUserResponse { DBTMTraineeAssignmentToUserModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentToUserResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentToUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

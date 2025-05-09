@@ -7,5 +7,7 @@
         {
             DBTMTraineeAssignmentToUserList = new List<DBTMTraineeAssignmentToUserModel>();
         }
+        public string TestName { get; set; }
+        public long DBTMTraineeAssignmentId { get; set; }
     }
 }
