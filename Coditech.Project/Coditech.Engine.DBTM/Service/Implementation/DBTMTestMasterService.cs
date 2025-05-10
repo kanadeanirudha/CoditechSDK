@@ -6,7 +6,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
@@ -128,7 +127,8 @@ namespace Coditech.API.Service
             return dBTMTestModel;
         }
 
-        //Update DBTMTest.
+        //Update DBTM Test 
+
         public virtual bool UpdateDBTMTest(DBTMTestModel dBTMTestModel)
         {
             if (IsNull(dBTMTestModel))
@@ -158,7 +158,8 @@ namespace Coditech.API.Service
                         insertDBTMParametersAssociatedToTest.Add(new DBTMParametersAssociatedToTest()
                         {
                             DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                            DBTMTestParameterId = Convert.ToByte(item)
+                            DBTMTestParameterId = Convert.ToByte(item),
+                            IsActive = true
                         });
                     }
                 }
@@ -170,6 +171,7 @@ namespace Coditech.API.Service
                         {
                             deleteDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
                         }
+                        item.IsActive = false;
                         deleteDBTMParametersAssociatedToTest.Add(item);
                     }
                 }
@@ -179,9 +181,9 @@ namespace Coditech.API.Service
                 }
                 if (deleteDBTMParametersAssociatedToTest?.Count > 0)
                 {
-                    _dBTMParametersAssociatedToTestRepository.Delete(deleteDBTMParametersAssociatedToTest);
+                    _dBTMParametersAssociatedToTestRepository.BatchUpdate(deleteDBTMParametersAssociatedToTest);
                 }
-                
+
                 List<DBTMCalculationAssociatedToTest> deleteDBTMCalculationAssociatedToTest = null;
                 List<DBTMCalculationAssociatedToTest> insertDBTMCalculationAssociatedToTest = null;
                 List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestList = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();

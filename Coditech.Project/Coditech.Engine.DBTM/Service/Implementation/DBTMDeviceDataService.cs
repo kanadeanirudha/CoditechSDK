@@ -55,11 +55,11 @@ namespace Coditech.API.Service
                     DBTMDeviceDataDetails dBTMDeviceDataDetails = new DBTMDeviceDataDetails()
                     {
                         DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
-                        Time = item.Time,
-                        Distance = item.Distance,
-                        Force = item.Force,
-                        Acceleration = item.Acceleration,
-                        Angle = item.Angle
+                        //Time = item.Time,
+                        //Distance = item.Distance,
+                        //Force = item.Force,
+                        //Acceleration = item.Acceleration,
+                        //Angle = item.Angle
                     };
                     dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
                 }
