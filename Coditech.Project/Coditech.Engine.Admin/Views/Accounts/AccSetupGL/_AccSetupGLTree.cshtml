@@ -34,7 +34,7 @@
     string RenderAccSetupCategoryTree(AccSetupCategoryModel cat)
     {
         string folderIcon = "📂";
-        string amount = "<span>$0.00</span>";
+        string amount = $"<span>{Model.ClosingBalance}</span>" ;
         string chevron = $"<span id='cat-chevron-{cat.AccSetupCategoryId}' style='cursor:pointer; margin-right:5px;'>▶</span>";
         string inlineActions = $@"
         <span id='cat-buttons-{cat.AccSetupCategoryId}' style='margin-left:5px; display:none;'>
@@ -55,7 +55,7 @@
               <span>{cat.CategoryName} ({cat.CategoryCode})</span>
               <span>{chevron} {inlineActions}</span>
             </div>
-            <div>{amount}</div>
+            <div>{Model.CurrencySymbol}{amount}</div>
           </div>
         </div>";
     }
@@ -64,7 +64,7 @@
     {
         bool isFolder = gl.IsGroup || (gl.SubAccounts?.Any() == true);
         string icon = isFolder ? "📂" : "📄";
-        string amount = "<span>$0.00</span>";
+        // string amount = $"<span>{Model.ClosingBalance}</span";
         string chevron = isFolder ? $"<span id='gl-chevron-{gl.AccSetupGLId}' style='cursor:pointer; margin-right:5px;'>▶</span>" : "";
 
         // Edit button for folders
@@ -118,7 +118,7 @@
                 <span>{chevron} {inlineActions}</span>
             {deleteBtn}{editBtn}
             </div>
-            <div>{amount}</div>
+            <div>{Model.CurrencySymbol}{gl.ClosingBalance}</div>
         </div>
         <div id='gl-subaccounts-{gl.AccSetupGLId}' style='padding-left:30px; border-left:1px solid #dee2e6; margin-top:8px; display:none;'>";
 

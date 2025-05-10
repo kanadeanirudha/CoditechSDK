@@ -8,7 +8,6 @@
 
     Initialize: function () {
         this.BindEvents();
-
     },
 
     GetFinancialYearListByCentreCode: function () {
@@ -113,66 +112,122 @@
             `
             <tr id="row${newRowCount}">
     <!-- Account Name -->
-    <td>
-        <input id="AccGlName${newRowCount}" class="form-control input-sm typeahead" placeholder="Search Account*" type="text" maxlength="200" />
-        <div class="cheque-fields" style="display: none; margin-top: 5px;">
-            <input class="form-control input-sm" type="text" id="AccBranchName${newRowCount}" placeholder="Branch Name" />
-        </div>
-    </td>
+        <td>
+            <input id="AccGlName${newRowCount}" class="form-control input-sm typeahead" placeholder="Search Account*" type="text" maxlength="200" />
+            <div class="cheque-fields" style="display: none; margin-top: 5px;">
+                <input class="form-control input-sm" type="text" id="AccBranchName${newRowCount}" placeholder="Branch Name" />
+            </div>
+            <div class="Person-field" style="display: none; margin-top: 5px;">
+                <input class="form-control input-sm" type="text" id="PersonId${newRowCount}" placeholder="Person Name" />
+            </div>
+        </td>
 
-    <!-- Narration -->
-    <td>
-        <input class="form-control input-sm" type="text" maxlength="500" placeholder="Narration" />
-        <div class="cheque-fields" style="display: none; margin-top: 5px;">
-            <input class="form-control input-sm" type="text" id="AccChequeNumber${newRowCount}" placeholder="Cheque Number" />
-            <input class="form-control input-sm" type="date" id="AccChequeDate${newRowCount}" />
-        </div>
-    </td>
+        <!-- Narration -->
+        <td>
+            <input class="form-control input-sm" type="text" maxlength="500" placeholder="Narration" />
+            <div class="cheque-fields" style="display: none; margin-top: 5px;">
+                <input class="form-control input-sm" type="text" id="AccChequeNumber${newRowCount}" placeholder="Cheque Number" />
+                <input class="form-control input-sm" type="date" id="AccChequeDate${newRowCount}" />
+            </div>
+        </td>
 
-    <!-- Debit & Credit Fields -->
-    <td><input class="form-control input-sm debit-field validate-number" type="text" id="debitBal${newRowCount}" maxlength="15" value="0" /></td>
-    <td><input class="form-control input-sm credit-field validate-number" type="text" id="creditBal${newRowCount}" maxlength="15" value="0" /></td>
+        <!-- Debit & Credit Fields -->
+        <td><input class="form-control input-sm debit-field validate-number" type="text" id="debitBal${newRowCount}" maxlength="15" value="0" /></td>
+        <td><input class="form-control input-sm credit-field validate-number" type="text" id="creditBal${newRowCount}" maxlength="15" value="0" /></td>
 
-    <!-- Actions -->
-    <td>
-        <a href="#" class="btn btn-sm btn-soft-success edit-row" title="Edit"><i class="fas fa-edit"></i></a>
-        <a href="#" class="btn btn-sm btn-soft-danger remove-row" title="Delete"><i class="fas fa-trash-alt"></i></a>
-    </td>
-</tr>`
+        <!-- Actions -->
+        <td>
+            <a href="#" class="btn btn-sm btn-soft-success edit-row" title="Edit"><i class="fas fa-edit"></i></a>
+            <a href="#" class="btn btn-sm btn-soft-danger remove-row" title="Delete"><i class="fas fa-trash-alt"></i></a>
+        </td>
+    </tr>`
         );
 
         AccGLTransaction.valuTransactionType = valuTransactionType;
         AccGLTransaction.InitializeAutocomplete("#AccGlName" + newRowCount, valuTransactionType);
         AccGLTransaction.calculateTotals();
     },
+
+
     SaveData: function () {
         var data = [];
-
-        $('#example tbody tr').each(function () { // Loop through each row
+        $('#example tbody tr').each(function () {
             var row = $(this);
-            var rowId = row.attr('id').replace("row", ""); // Extract row number dynamically
+            var rowId = row.attr('id').replace("row", "");
 
-            var debitAmount = parseFloat(row.find(`#debitBal${rowId}`).val()) || 0; // Get debit amount
-            var creditAmount = parseFloat(row.find(`#creditBal${rowId}`).val()) || 0; // Get credit amount
+            // Get debit and credit values
+            var debitAmount = parseFloat(row.find(`#debitBal${rowId}`).val()) || 0;
+            var creditAmount = parseFloat(row.find(`#creditBal${rowId}`).val()) || 0;
 
+            // Determine flag and amount
+            var debitCreditEnum = debitAmount > 0 ? 0 : 1;  // 0 for debit, 1 for credit
+            var transactionAmount = debitAmount > 0 ? debitAmount : creditAmount;
+
+            // Get selected account info
+            var selectedAccount = row.find(`#AccGlName${rowId}`).data("selected-account");
+
+            // Get UserTypeId from selected account's userTypeId
+            var userTypeId = selectedAccount ? selectedAccount.userTypeId : "";  // Assign default value if not selected
+
+            // Get PersonId from the person autocomplete (stored after person selection)
+            var personId = row.find(`#PersonId${rowId}`).data("person-id") || ""; // Use `data` to retrieve the selected PersonId
+
+            // Build row data object
             var rowData = {
-                AccGlName: row.find(`#AccGlName${rowId}`).val() || "", // Correct input selector
-                Narration: row.find("td:eq(1) input").val() || "", // Get narration field
-                DebitAmount: debitAmount,
-                CreditAmount: creditAmount,
-                TransactionAmount: debitAmount + creditAmount // Corrected calculation
+                TransactionSubId: "",
+                AccSetupGLId: selectedAccount?.id || 0,
+                DebitCreditEnum: debitCreditEnum,
+                TransactionAmount: transactionAmount,
+                ChequeNo: row.find(`#AccChequeNumber${rowId}`).val() || "",
+                ChequeDatetime: row.find(`#AccChequeDate${rowId}`).val() || "",
+                NarrationDescription: row.find("td:eq(1) input").val() || "",
+                AccGLName: row.find(`#AccGlName${rowId}`).val() || "",
+                BranchName: row.find(`#AccBranchName${rowId}`).val() || "",
+                PersonId: personId,  // Use selected PersonId from person autocomplete
+                UserType: userTypeId || "",  // Store userTypeId from the selected account
+                IsActive: 1
             };
 
+            // Push the row data into the data array
             data.push(rowData);
         });
 
-        var jsonData = JSON.stringify(data);
+        // Build XML with enum-based DebitCreditEnum
+        const safe = val => (val != null ? val : "");
 
-        $("#TransactionDetailsData").val(jsonData);
-        console.log('🚀 JSON Data:', jsonData);
+        // Initialize XML structure
+        xmlData = "<rows>";
+        data.forEach(item => {
+            xmlData += `
+    <row>
+        <TransactionSubId>${safe(item.TransactionSubId)}</TransactionSubId>
+        <AccSetupGLId>${safe(item.AccSetupGLId)}</AccSetupGLId>
+        <DebitCreditEnum>${safe(item.DebitCreditEnum)}</DebitCreditEnum>
+        <TransactionAmount>${safe(item.TransactionAmount)}</TransactionAmount>
+        <ChequeNo>${safe(item.ChequeNo)}</ChequeNo>
+        <ChequeDatetime>${safe(item.ChequeDatetime)}</ChequeDatetime>
+        <NarrationDescription>${safe(item.NarrationDescription)}</NarrationDescription>
+        <AccGLName>${safe(item.AccGLName)}</AccGLName>
+        <BranchName>${safe(item.BranchName)}</BranchName>
+        <PersonId>${safe(item.PersonId)}</PersonId>  <!-- Store PersonId -->
+        <UserTypeId>${safe(item.UserType)}</UserTypeId>  <!-- Store UserTypeId -->
+        <IsActive>${safe(item.IsActive)}</IsActive>
+    </row>`;
+        });
+        xmlData += "</rows>";
 
+        // Set hidden field and global var with XML data
+        AccGLTransaction.SelectedXmlData = xmlData;
+        $("#TransactionDetailsData").val(xmlData);
+
+        // Log final XML Data for debugging
+        console.log("✅ Final XML Data:\n", xmlData);
+
+        // Submit the form
         $("#frmWorkoutPlanDetails").submit();
+        console.log("✅ Final XML Data submitted:\n", xmlData);
     },
+
 
     editRow: function (row) {
         row.find("input").prop("disabled", false);
@@ -205,34 +260,20 @@
         }
     },
 
-    //calculateTotals: function () {
-    //    var totalDebit = 0, totalCredit = 0;
 
-    //    $(".debit-field").each(function () {
-    //        totalDebit += parseFloat($(this).val()) || 0;
-    //    });
-
-    //    $(".credit-field").each(function () {
-    //        totalCredit += parseFloat($(this).val()) || 0;
-    //    });
-
-    //    $("#debitBal").val(totalDebit.toFixed(2));
-    //    $("#creditBal").val(totalCredit.toFixed(2));
-    //},
 
     InitializeAutocomplete: function (selector, transactionTypeCode) {
         transactionTypeCode = transactionTypeCode || AccGLTransaction.valuTransactionType;
-        console.log("✅ Using Stored TransactionTypeCode:", transactionTypeCode);
 
         $(selector).autocomplete({
+            minLength: 1,
+            delay: 0,
             source: function (request, response) {
-                console.log("🔍 Sending AJAX Request with TransactionType:", transactionTypeCode);
-
                 $.ajax({
                     url: "/AccGLTransaction/GetAccounts",
                     type: "POST",
                     data: {
-                        term: request.term,
+                        term: request.term, // Server will filter based on this
                         maxResults: 10,
                         accountId: 0,
                         personType: "",
@@ -240,66 +281,129 @@
                     },
                     dataType: "json",
                     success: function (data) {
-                        console.log("✅ Received Data:", data);
-
                         let actualData = [];
+
                         if (Array.isArray(data.Value)) {
                             actualData = data.Value;
                         } else if (data.Value && Array.isArray(data.Value.data)) {
                             actualData = data.Value.data;
-                        } else {
-                            console.error("❌ Invalid Data Format:", data);
-                            response([]);
-                            return;
                         }
 
-                        var suggestions = $.map(actualData, function (item) {
-                            console.log("🟢 Adding Suggestion:", item.GLName);
+                        const term = request.term.toLowerCase();
+                        const filtered = actualData.filter(item =>
+                            item.GLName.toLowerCase().includes(term)
+                        );
+
+                        const suggestions = $.map(filtered, function (item) {
                             return {
                                 label: item.GLName,
                                 value: item.GLName,
-                                id: item.AccSetupGLId, // If you need the ID
+                                id: item.AccSetupGLId,
                                 typeId: item.AccSetupGLTypeId,
-                                parentId: item.ParentAccSetupGLId
+                                parentId: item.ParentAccSetupGLId,
+                                userTypeId: item.UserTypeId
                             };
                         });
 
-                        console.log("✅ Final Suggestions:", suggestions);
-
-                        if (suggestions.length > 0) {
-                            console.log("🔽 Setting Autocomplete Source:", suggestions);
-                        } else {
-                            console.warn("⚠️ No suggestions found.");
-                        }
-
+                        console.log(suggestions);
                         response(suggestions);
-                        $(selector).autocomplete("option", "source", suggestions);
+                    },
+                    error: function () {
+                        response([]);
                     }
                 });
             },
             select: function (event, ui) {
-                console.log("✅ Selected Account:", ui.item);
-
-                // Store selected account data
                 $(selector).data("selected-account", ui.item);
 
-                // Find the closest row to apply the logic correctly
                 var row = $(selector).closest("tr");
 
-                // Check if typeId is 5
+                // Show/hide cheque fields based on account typeId
                 if (ui.item.typeId === 5) {
-                    console.log("🔄 Showing extra fields for typeId 5");
-
-                    // Show cheque-related fields
                     row.find(".cheque-fields").show();
+                    row.find(".Person-field").hide();
                 } else {
-                    console.log("🔄 Hiding extra fields for other types");
-
-                    // Hide cheque-related fields
                     row.find(".cheque-fields").hide();
+                    row.find(".Person-field").hide();
+                }
+
+                // Show person field if userTypeId > 0
+                if (ui.item.userTypeId > 0) {
+                    console.log("Triggering person fetch...");
+
+                    row.find(".Person-field").show();  // Display Person field
+                    var $personInput = row.find(".Person-field input");
+                    $personInput.val("");  // Clear previous value
+
+                    // Trigger person autocomplete based on selected account's userTypeId
+                    $personInput.autocomplete({
+                        minLength: 1,
+                        delay: 0,
+                        source: function (request, response) {
+                            $.ajax({
+                                url: "/AccGLTransaction/GetPersonsByUserType",
+                                type: "POST",
+                                data: {
+                                    term: request.term,
+                                    userTypeId: ui.item.userTypeId // Use the selected account's userTypeId
+                                },
+                                dataType: "json",
+                                success: function (data) {
+                                    let actualData = [];
+                                    console.log(data);
+
+                                    if (Array.isArray(data.Value)) {
+                                        actualData = data.Value;
+                                    } else if (data.Value && Array.isArray(data.Value.data)) {
+                                        actualData = data.Value.data;
+                                    }
+
+                                    const term = request.term.toLowerCase();
+                                    const filtered = actualData.filter(item =>
+                                        item.PersonName.toLowerCase().includes(term)
+                                    );
+
+                                    const suggestions = $.map(filtered, function (item) {
+                                        return {
+                                            label: item.PersonName,
+                                            value: item.PersonName,
+                                            PersonId: item.PersonId, // Store PersonId
+                                            userTypeId: item.UserTypeId // Store UserTypeId
+                                        };
+                                    });
+
+                                    console.log(suggestions);
+                                    response(suggestions);
+                                },
+                                error: function () {
+                                    response([]);
+                                }
+                            });
+                        },
+                        select: function (event, person) {
+                            var selectedPerson = person.item;
+
+                            // Save selected PersonId and UserTypeId on the input field
+                            $personInput.data("person-id", selectedPerson.PersonId); // Store PersonId
+                            $personInput.data("user-type-id", selectedPerson.userTypeId); // Store UserTypeId
+
+                            console.log("Selected PersonId:", selectedPerson.PersonId);
+                            console.log("Selected UserTypeId:", selectedPerson.userTypeId);
+
+                            // You can now access the stored PersonId and UserTypeId like this:
+                            var personId = $personInput.data("person-id");
+                            var userTypeId = $personInput.data("user-type-id");
+
+                            console.log("Stored PersonId from input field:", personId);
+                            console.log("Stored UserTypeId from input field:", userTypeId);
+                        }
+                    });
+                } else {
+                    row.find(".Person-field").hide();
                 }
             }
         });
+
     },
 
     BindEvents: function () {
@@ -356,10 +460,10 @@
         });
 
         $(document).on("click", ".remove-row", function () {
-            var rowId = $(this).data("rowid");
-            $("#" + rowId).remove();
+            $(this).closest("tr").remove();
             AccGLTransaction.calculateTotals();
         });
+
 
         $('#btnAdd').on('click', function () {
             $('#ResetAccountTransactionMasterRecord').show();

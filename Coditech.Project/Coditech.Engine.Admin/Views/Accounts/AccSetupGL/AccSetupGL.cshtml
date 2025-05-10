@@ -13,21 +13,40 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">Chart Of Accounts</span>
+                        <span class="card-title col-md-9">Chart Of Accounts</span>
+                        <div class="col-md-1">
+                            <span >
+                                <label>Financial Year :</label>
+                            </span>
+
+                        </div>
+                        <span class="col-md-2">
+                            @if (Model.GeneralFinancialYearModel != null)
+                            {
+                                <label>
+                                    @Model.GeneralFinancialYearModel.FromDate.ToCoditechDateFormat()
+                                    To
+                                    @Model.GeneralFinancialYearModel.ToDate.ToCoditechDateFormat()
+                                </label>
+                            }
+                        </span>
+
                     </div>
                     <!--  DropDownSelector -->
                     <div class="card-header">
                         <div class="row">
+                        </div>
+                        <div class="row">
                             <div class="col-md-1">
                                 <label>@AdminResources.LabelCentre</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                             </div>
                             <div class="col-md-1">
                                 <label>Balance Sheet Type</label>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupBalanceSheetDropdown)
                             </div>
 
@@ -41,6 +60,7 @@
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="AccSetupGL.GetAccSetupGLTree()" />
                             </div>
                         </div>
+
                         <div class="card-body">
                             <div id="AccSetupGLTreeDivId">
                                 @if (Model.AccSetupBalancesheetId > 0)
