@@ -19,14 +19,14 @@ namespace Coditech.API.Client
             dBTMDeviceEndpoint = new DBTMDeviceEndpoint();
         }
 
-        public virtual DBTMDeviceListResponse List(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public virtual DBTMDeviceListResponse List(long dBTMParentDeviceMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await ListAsync(expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await ListAsync(dBTMParentDeviceMasterId, expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMDeviceListResponse> ListAsync(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMDeviceListResponse> ListAsync(long dBTMParentDeviceMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMDeviceEndpoint.ListAsync(expand, filter, sort, pageIndex, pageSize);
+            string endpoint = dBTMDeviceEndpoint.ListAsync(dBTMParentDeviceMasterId, expand, filter, sort, pageIndex, pageSize);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

@@ -14,6 +14,8 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+		<PackageReference Include="MailKit" Version="4.0.0" />
+		<PackageReference Include="Twilio" Version="7.9.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="data\**" CopyToPublishDirectory="PreserveNewest" />
@@ -40,6 +42,9 @@
 		</Reference>
 		<Reference Include="Coditech.Common.Service">
 			<HintPath>..\SharedLibraries\Coditech.Common.Service.dll</HintPath>
+		</Reference>
+		<Reference Include="Coditech.Hangfire">
+		  <HintPath>..\SharedLibraries\Coditech.Hangfire.dll</HintPath>
 		</Reference>
 		<Reference Include="Coditech.Organisation.Service">
 			<HintPath>..\SharedLibraries\Coditech.Organisation.Service.dll</HintPath>

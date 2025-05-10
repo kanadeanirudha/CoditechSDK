@@ -6,9 +6,9 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMDeviceEndpoint : BaseEndpoint
     {
-        public string ListAsync(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public string ListAsync(long dBTMParentDeviceMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMDeviceMaster/GetDBTMDeviceList{BuildEndpointQueryString(expand, filter, sort, pageIndex, pageSize)}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMDeviceMaster/GetDBTMDeviceList?dBTMParentDeviceMasterId={dBTMParentDeviceMasterId}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
         public string CreateDBTMDeviceAsync() =>

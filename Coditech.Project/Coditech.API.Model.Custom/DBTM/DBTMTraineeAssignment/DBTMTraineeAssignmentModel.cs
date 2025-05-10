@@ -8,8 +8,6 @@ namespace Coditech.Common.API.Model
         [Required]
         public long GeneralTrainerMasterId { get; set; }
         [Required]
-        public long DBTMTraineeDetailId { get; set; }
-        [Required]
         public int DBTMTestMasterId { get; set; }
         [Required]
         public DateTime AssignmentDate { get; set; }

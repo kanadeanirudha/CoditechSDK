@@ -19,7 +19,14 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Associate Trainer List : @Model.FirstName @Model.LastName</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/InsertAssociatedTrainer?dBTMTraineeDetailId=@Model.DBTMTraineeDetailId&personId=@Model.PersonId" role="button"><i class="fas fa-plus me-2"></i>Associate Trainer</a>
+                        @if (Model.IsEntityActive)
+                        {
+                            <a class="btn btn-sm btn-soft-primary float-end"
+                               href="/@controllerName/InsertAssociatedTrainer?dBTMTraineeDetailId=@Model.DBTMTraineeDetailId&personId=@Model.PersonId"
+                               role="button">
+                                <i class="fas fa-plus me-2"></i>Associate Trainer
+                            </a>
+                        }
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">

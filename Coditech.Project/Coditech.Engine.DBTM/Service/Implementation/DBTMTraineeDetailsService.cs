@@ -188,7 +188,7 @@ namespace Coditech.API.Service
                     personId = dbtmTraineeDetails.PersonId;
                     centreCode = dbtmTraineeDetails.CentreCode;
                 }
-                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId);
+                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
             }
             else
             {
@@ -262,21 +262,21 @@ namespace Coditech.API.Service
                     x.CompletionTime = completionTime;
                 });
             }
-            if (CalculationColumns.Any(x => x == "Speed"))
+            if (CalculationColumns.Any(x => x == "Velocity"))
             {
                 ActivitiesDetailsList.ForEach(x =>
                 {
-                    x.Speed = x.Distance / x.Time;
+                    x.Velocity = x.Distance / x.Time;
                 });
             }
-            if (CalculationColumns.Any(x => x == "AverageSpeed"))
+            if (CalculationColumns.Any(x => x == "AverageVelocity"))
             {
                 decimal totalTime = ActivitiesDetailsList.Sum(x => x.Time);
                 decimal totalDistance = ActivitiesDetailsList.Sum(x => x.Distance);
-                decimal averageSpeed = totalDistance / totalTime;
+                decimal AverageVelocity = totalDistance / totalTime;
                 ActivitiesDetailsList.ForEach(x =>
                 {
-                    x.AverageSpeed = averageSpeed;
+                    x.AverageVelocity = AverageVelocity;
                 });
             }
         }

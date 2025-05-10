@@ -7,7 +7,7 @@ namespace Coditech.API.Service
 {
     public interface IDBTMDeviceMasterService
     {
-        DBTMDeviceListModel GetDBTMDeviceList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
+        DBTMDeviceListModel GetDBTMDeviceList(long dBTMParentDeviceMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMDeviceModel CreateDBTMDevice(DBTMDeviceModel model);
         DBTMDeviceModel GetDBTMDevice(long dBTMDeviceId);
         bool UpdateDBTMDevice(DBTMDeviceModel model);

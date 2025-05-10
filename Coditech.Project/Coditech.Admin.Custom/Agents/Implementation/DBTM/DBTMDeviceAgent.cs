@@ -41,7 +41,7 @@ namespace Coditech.Admin.Agents
             }
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "DeviceName" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
-            DBTMDeviceListResponse response = _dBTMDeviceClient.List(null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            DBTMDeviceListResponse response = _dBTMDeviceClient.List(0, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMDeviceListModel deviceList = new DBTMDeviceListModel { DBTMDeviceList = response?.DBTMDeviceList };
             DBTMDeviceListViewModel listViewModel = new DBTMDeviceListViewModel();
             listViewModel.DBTMDeviceList = deviceList?.DBTMDeviceList?.ToViewModel<DBTMDeviceViewModel>().ToList();
@@ -133,6 +133,30 @@ namespace Coditech.Admin.Agents
                 return false;
             }
         }
+
+        public virtual DBTMDeviceListViewModel GetSlaveList(long dBTMParentDeviceMasterId, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
+            {
+                filters.Add("FirstName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("LastName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("EmailId", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("MobileNumber", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+            }
+
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+
+            DBTMDeviceListResponse response = _dBTMDeviceClient.List(dBTMParentDeviceMasterId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            DBTMDeviceListModel dBTMDeviceList = new DBTMDeviceListModel { DBTMDeviceList = response?.DBTMDeviceList };
+            DBTMDeviceListViewModel listViewModel = new DBTMDeviceListViewModel();
+            listViewModel.DBTMDeviceList = dBTMDeviceList?.DBTMDeviceList?.ToViewModel<DBTMDeviceViewModel>().ToList();
+
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMDeviceList.Count, BindColumns());
+            listViewModel.DBTMDeviceMasterId = dBTMParentDeviceMasterId;
+            return listViewModel;
+        }
         #endregion
 
         #region protected
@@ -168,6 +192,41 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "IsMasterDevice",
                 IsSortable = true,
             }); datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Active",
+                ColumnCode = "IsActive",
+                IsSortable = true,
+            });
+            return datatableColumnList;
+        }
+
+        protected virtual List<DatatableColumns> BindDBTMSlaveColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Device Name",
+                ColumnCode = "DeviceName",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Device Serial Code",
+                ColumnCode = "DeviceSerialCode",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Device Status",
+                ColumnCode = "StatusEnumId",
+                IsSortable = true,
+            }); datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Registration Date",
+                ColumnCode = "RegistrationDate",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Is Active",
                 ColumnCode = "IsActive",

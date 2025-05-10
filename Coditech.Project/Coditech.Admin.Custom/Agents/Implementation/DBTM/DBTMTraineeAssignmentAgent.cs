@@ -165,7 +165,70 @@ namespace Coditech.Admin.Agents
                 return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
-        
+
+        #region DBTMAssignmentUser
+        public virtual DBTMTraineeAssignmentToUserListViewModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
+            {
+                filters.Add("FirstName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("LastName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("EmailId", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("MobileNumber", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+            }
+
+
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+
+            DBTMTraineeAssignmentToUserListResponse response = _dBTMTraineeAssignmentClient.GetDBTMTraineeAssignmentToUserList(dBTMTraineeAssignmentId, null, filters, sortlist, dataTableModel.PageIndex, int.MaxValue);
+            DBTMTraineeAssignmentToUserListModel DBTMTraineeAssignmentToUserList = new DBTMTraineeAssignmentToUserListModel { DBTMTraineeAssignmentToUserList = response?.DBTMTraineeAssignmentToUserList };
+            DBTMTraineeAssignmentToUserListViewModel listViewModel = new DBTMTraineeAssignmentToUserListViewModel();
+            listViewModel.DBTMTraineeAssignmentToUserList = DBTMTraineeAssignmentToUserList?.DBTMTraineeAssignmentToUserList?.ToViewModel<DBTMTraineeAssignmentToUserViewModel>().ToList();
+
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentToUserList.Count, BindAssociatedAssignmentColumns());
+
+            listViewModel.DBTMTraineeAssignmentId = dBTMTraineeAssignmentId;
+            listViewModel.TestName = response.TestName;
+            return listViewModel;
+        }
+
+        //Update Associate UnAssociate Assignmentwise User.
+        public virtual DBTMTraineeAssignmentToUserViewModel AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel dBTMTraineeAssignmentToUserViewModel)
+        {
+            try
+            {
+                long dBTMTraineeAssignmentId = dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentId;
+                long dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentUserId;
+              //  DBTMTraineeAssignmentToUserViewModel.UserType = UserTypeEnum.Trainee.ToString();
+                DBTMTraineeAssignmentToUserResponse response = _dBTMTraineeAssignmentClient.AssociateUnAssociateAssignmentwiseUser(dBTMTraineeAssignmentToUserViewModel.ToModel<DBTMTraineeAssignmentToUserModel>());
+                DBTMTraineeAssignmentToUserModel dBTMTraineeAssignmentToUserModel = response?.DBTMTraineeAssignmentToUserModel;
+                dBTMTraineeAssignmentToUserViewModel = IsNotNull(dBTMTraineeAssignmentToUserModel) ? dBTMTraineeAssignmentToUserModel.ToViewModel<DBTMTraineeAssignmentToUserViewModel>() : new DBTMTraineeAssignmentToUserViewModel();
+                dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentId = dBTMTraineeAssignmentId;
+                dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentUserId = dBTMTraineeAssignmentUserId;
+                return dBTMTraineeAssignmentToUserViewModel;
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMTraineeAssignmentToUserViewModel)GetViewModelWithErrorMessage(dBTMTraineeAssignmentToUserViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMTraineeAssignmentToUserViewModel)GetViewModelWithErrorMessage(dBTMTraineeAssignmentToUserViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
+                return (DBTMTraineeAssignmentToUserViewModel)GetViewModelWithErrorMessage(dBTMTraineeAssignmentToUserViewModel, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region protected
@@ -192,13 +255,13 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Date",
+                ColumnName = "Assignment Date",
                 ColumnCode = "AssignmentDate",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Time",
+                ColumnName = "Assignment Time",
                 ColumnCode = "AssignmentTime",
                 IsSortable = true,
             });
@@ -206,6 +269,41 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Test Status",
                 ColumnCode = "DBTMTestStatusEnumId",
+                IsSortable = true,
+            });
+            return datatableColumnList;
+        }
+
+        protected virtual List<DatatableColumns> BindAssociatedAssignmentColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Image",
+                ColumnCode = "Image",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "First Name",
+                ColumnCode = "FirstName",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Last Name",
+                ColumnCode = "LastName",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Contact",
+                ColumnCode = "MobileNumber",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Associated",
+                ColumnCode = "DBTMTraineeAssignmentId",
                 IsSortable = true,
             });
             return datatableColumnList;

@@ -14,6 +14,10 @@ namespace Coditech.Common.API.Model
         [Required]
         [MaxLength(50)]
         public string TestCode { get; set; }
+        public short MinimunPairedDevice { get; set; }
+        public string LapDistance { get; set; }
+        public bool IsLapDistanceChange { get; set; }
+        public bool IsMultiTest { get; set; }
         public bool IsActive { get; set; }
         [Required]
         public List<string> DBTMSelectedTestParameter { get; set; }
@@ -22,6 +26,9 @@ namespace Coditech.Common.API.Model
         [Required]
         public List<string> DBTMSelectedTestCalculation { get; set; }
         public byte DBTMTestCalculationId { get; set; }
-
+        public string TestInstructions { get; set; }
+        public long TestMediaId { get; set; }
+        public string TestMediaPath { get; set; }
+        public string TestMediaFileName { get; set; }
     }
 }

@@ -39,12 +39,10 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult Create()
         {
-            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel();
-            List<UserAccessibleCentreModel> list = SessionHelper.GetDataFromSession<UserModel>("UserData")?.AccessibleCentreList;
-            if (list != null && list.Count == 1)
+            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel()
             {
-                dBTMTraineeAssignmentViewModel.SelectedCentreCode = list[0].CentreCode;
-            }
+                SelectedCentreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.SelectedCentreCode
+            };
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
@@ -105,7 +103,7 @@ namespace Coditech.Admin.Controllers
 
         public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId)
         {
-     
+
             DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel();
 
             model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId);
@@ -150,6 +148,37 @@ namespace Coditech.Admin.Controllers
             DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId };
             return RedirectToAction("List", dataTableViewModel);
         }
+
+        #region Assignmnet User
+        public virtual ActionResult GetDBTMTraineeAssignmentToUserList(DataTableViewModel dataTableViewModel)
+        {
+            DBTMTraineeAssignmentToUserListViewModel list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentToUserList(Convert.ToInt64(dataTableViewModel.SelectedParameter1), dataTableViewModel);
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/_AssociatedAssignmentList.cshtml", list);
+            }
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+
+            return View($"~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/AssociatedAssignmentList.cshtml", list);
+        }
+
+        [HttpGet]
+        public virtual ActionResult GetAssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel)
+        {
+            return PartialView("~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/_AssociateUnAssociateAssignmentwiseUser.cshtml", DBTMTraineeAssignmentToUserViewModel);
+        }
+
+        [HttpPost]
+        public virtual ActionResult AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel)
+        {
+            SetNotificationMessage(_dBTMTraineeAssignmentAgent.AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel).HasError
+                ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+            return RedirectToAction("GetDBTMTraineeAssignmentToUserList", new DataTableViewModel { SelectedParameter1 = DBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentId.ToString() });
+        }
+        #endregion
+        #region Protected
+        #endregion
     }
 }
 

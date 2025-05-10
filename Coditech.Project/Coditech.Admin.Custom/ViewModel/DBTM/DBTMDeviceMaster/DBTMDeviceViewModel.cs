@@ -6,7 +6,7 @@ namespace Coditech.Admin.ViewModel
     public class DBTMDeviceViewModel : BaseViewModel
     {
         public long DBTMDeviceMasterId { get; set; }
-
+        public long DBTMParentDeviceMasterId { get; set; }
         [MaxLength(200)]
         [Required]
         [Display(Name = "Device Name")]

@@ -23,17 +23,18 @@ namespace Coditech.API.Service
             _dBTMDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public virtual DBTMDeviceListModel GetDBTMDeviceList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public virtual DBTMDeviceListModel GetDBTMDeviceList(long dBTMParentDeviceMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<DBTMDeviceModel> objStoredProc = new CoditechViewRepository<DBTMDeviceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMParentDeviceMasterId", dBTMParentDeviceMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMDeviceModel> dBTMDeviceList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceList @WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMDeviceModel> dBTMDeviceList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceList @DBTMParentDeviceMasterId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             DBTMDeviceListModel listModel = new DBTMDeviceListModel();
 
             listModel.DBTMDeviceList = dBTMDeviceList?.Count > 0 ? dBTMDeviceList : new List<DBTMDeviceModel>();
@@ -44,9 +45,11 @@ namespace Coditech.API.Service
         //Create DBTMDevice.
         public virtual DBTMDeviceModel CreateDBTMDevice(DBTMDeviceModel dBTMDeviceModel)
         {
+           
+
             if (IsNull(dBTMDeviceModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
+            dBTMDeviceModel.DBTMParentDeviceMasterId = dBTMDeviceModel.IsMasterDevice ? 0 : dBTMDeviceModel.DBTMParentDeviceMasterId;
             DBTMDeviceMaster dBTMDeviceMaster = dBTMDeviceModel.FromModelToEntity<DBTMDeviceMaster>();
 
             //Create new DBTMDevice and return it.
@@ -84,6 +87,7 @@ namespace Coditech.API.Service
             if (dBTMDeviceModel.DBTMDeviceMasterId < 1)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceMasterID"));
 
+            dBTMDeviceModel.DBTMParentDeviceMasterId = dBTMDeviceModel.IsMasterDevice ? 0 : dBTMDeviceModel.DBTMParentDeviceMasterId;
             DBTMDeviceMaster dBTMDeviceMaster = dBTMDeviceModel.FromModelToEntity<DBTMDeviceMaster>();
 
             //Update DBTMDevice

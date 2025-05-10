@@ -3,8 +3,8 @@
     ViewBag.Title = "Balance Sheet List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()" };
-    DropdownViewModel accSetupBalanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupBalanceSheetType.ToString(), DropdownName = "SelectedParameter1", DropdownSelectedValue = Model.SelectedParameter1.ToString(), Parameter = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByBalanceSheet('" + @controllerName + "','" + @actionName + "')" };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent ="AccSetupBalanceSheet.GetBalanceSheetTypeByBalanceSheetTypeId()" };
+    DropdownViewModel accSetupBalanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupBalanceSheetType.ToString(), DropdownName = "SelectedParameter1", DropdownSelectedValue = Model.SelectedParameter1.ToString(), Parameter = Model.SelectedCentreCode, ChangeEvent = "AccSetupBalanceSheet.GetBalanceSheetTypeByBalanceSheetTypeId('" + @controllerName + "','" + @actionName + "')" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -25,13 +25,13 @@
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                             </div>
                             <div class="col-md-1">
-                                <label>@AdminResources.LabelAccSetupBalanceSheet</label>
+                                <label>Balance Sheet Type</label>
                             </div>
                             <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupBalanceSheetDropdown)
                             </div>
                             <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCodeAndDepartmentId('@controllerName','@actionName')" />
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="AccSetupBalanceSheet.GetBalanceSheetTypeByBalanceSheetTypeId('@controllerName','@actionName')" />
                             </div>
                         </div>
                     </div>
@@ -45,5 +45,5 @@
         </div>
     </div>
 </div>
-
 <!-- end page content -->
+<script src="~/js/coditech/Accounts/AccSetupBalanceSheet.js"></script>

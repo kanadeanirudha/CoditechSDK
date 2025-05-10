@@ -11,7 +11,7 @@ namespace Coditech.API.Client
         /// Get list of DBTMDevice.
         /// </summary>
         /// <returns>DBTMDeviceListResponse</returns>
-        DBTMDeviceListResponse List(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMDeviceListResponse List(long dBTMParentDeviceMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
 
         /// <summary>
         /// Create DBTMDevice.

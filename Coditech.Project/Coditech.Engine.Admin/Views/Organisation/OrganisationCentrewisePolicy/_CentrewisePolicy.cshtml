@@ -1,0 +1,83 @@
+﻿@using Coditech.Admin.Utilities;
+@model GeneralPolicyDetailsViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<!-- Page Content-->
+<div class="modal-header">
+    <h6 class="modal-title m-0" id="exampleModalDefaultLabel">Policy Code: @Model.PolicyCode </h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div><!--end modal-header-->
+@using (Html.BeginForm("CentrewisePolicyDetails", controllerName, FormMethod.Post, new { id = "frmCentrewisePolicy" }))
+{
+    @Html.HiddenFor(m => m.PolicyCode)
+    @Html.HiddenFor(x => x.GeneralPolicyDetailId)
+    @Html.HiddenFor(x => x.GeneralPolicyRulesId)
+    @Html.HiddenFor(x => x.CentreCode)
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    @Html.LabelFor(x => x.PolicyAnswered, new { @class = "form-label required" })
+                    @Html.TextAreaFor(x => x.PolicyAnswered, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.PolicyAnswered)
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    @Html.LabelFor(x => x.ApplicableFromDate, new { @class = "form-label" })
+                    @Html.TextBoxFor(x => x.ApplicableFromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @id = "ApplicableFromDate" })
+                    @Html.ValidationMessageFor(x => x.ApplicableFromDate)
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    @Html.LabelFor(x => x.ApplicableUptoDate, new { @class = "form-label" })
+                    @Html.TextBoxFor(x => x.ApplicableUptoDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @id = "ApplicableUptoDate" })
+                    @Html.ValidationMessageFor(x => x.ApplicableUptoDate)
+                </div>
+            </div>
+        </div><!--end row-->
+    </div>
+    <!--end modal-body-->
+    <div class="modal-footer">
+        <button type="submit" id="saveDraft" class="btn btn-success" data-test-selector="linkSave" onclick="OrganisationCentrewisePolicy.CentrewisePolicy(); return false;">@AdminResources.LabelSave</button>
+        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+    </div>
+}
+<!-- end page content -->
+<script src="~/js/coditech/Organisation/OrganisationCentrewisePolicy.js"></script>
+@Html.Partial("_ValidationScriptsPartial")
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#ApplicableFromDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showMonthAfterYear: false,
+            dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+            language: "en",
+            autoSize: true,
+            showButtonPanel: true,
+            yearRange: "2024:2027",
+            closeText: "Clear",
+            minDate: new Date(2022, 0, 1),
+            maxDate: new Date(2035, 11, 31),
+            onSelect: function (selectedDate) {
+                var fromDate = $(this).datepicker("getDate");
+                $("#ApplicableUptoDate").datepicker("option", "minDate", fromDate);
+            }
+        });
+        $("#ApplicableUptoDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+            language: "en",
+            autoSize: true,
+            yearRange: "2025:2027",
+            minDate: new Date(2022, 0, 1),
+            maxDate: new Date(2035, 11, 31)
+        });
+    });
+</script>

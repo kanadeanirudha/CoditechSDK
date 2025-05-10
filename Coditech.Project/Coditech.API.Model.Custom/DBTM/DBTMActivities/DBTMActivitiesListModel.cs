@@ -12,5 +12,6 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string SelectedCentreCode { get; set; }
+        public bool IsEntityActive { get; set; }
     }
 }

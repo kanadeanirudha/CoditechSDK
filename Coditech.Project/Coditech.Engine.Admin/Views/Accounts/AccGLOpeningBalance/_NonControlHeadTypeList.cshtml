@@ -1,0 +1,69 @@
+﻿ @model ACCGLOpeningBalanceListViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string css = "";
+}
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        @using (Html.BeginForm("UpdateNonControlHeadType", controllerName, FormMethod.Post, new { id = "frmAccGLOpeningBalanceDetails" }))
+        {
+            @Html.HiddenFor(m => m.AccGLOpeningBalanceId)
+            @Html.HiddenFor(m => m.AccGLOpeningBalanceData)
+            @Html.HiddenFor(m => m.AccSetupGLId)
+            @Html.HiddenFor(m => m.GeneralFinancialYearModel)
+            @Html.HiddenFor(m => m.AccSetupCategoryId)
+            <table class="table table-bordered table-sm" id="makeEditable">
+                <thead>
+                    <tr>
+                        <th>GL Name</th>
+                        <th class="text-center">Opening Balance</th>
+                        <th class="text-center">Debit / Credit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.ACCGLOpeningBalanceList?.Count > 0)
+                    {
+                        foreach (var item in Model.ACCGLOpeningBalanceList)
+                        {
+                            <tr id="row_@item.AccSetupGLId">
+                                <input type="hidden" id="AccSetupGLId_@item.AccSetupGLId" value="@item.AccSetupGLId" />
+                                <td>@item.GLName</td>
+                                <td class="col-auto">
+                                    <div>
+                                        <input class="form-control form-control-sm text-center opening-balance"
+                                               id="OpeningBalance_@item.AccSetupGLId"
+                                               name="ACCGLBalanceList[@item.AccSetupGLId].OpeningBalance"
+                                               type="text"
+                                               value="@item.OpeningBalance"
+                                        @(item.OpeningBalance > 0 ? "readonly" : "") />
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    @if (item.DebitCreditEnum == 0)
+                                    {
+                                        <span style="color: red; font-weight: bold;">Dr</span>
+                                    }
+                                    else if (item.DebitCreditEnum == 1)
+                                    {
+                                        <span style="color: blue; font-weight: bold;">Cr</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success" onclick="AccGLOpeningBalance.SaveDataDeatils()">@AdminResources.LabelSave</button>
+        }
+    </div>
+</div>
+<script src="/js/coditech/Accounts/ACCGLOpeningBalance.js"></script>
+
+
+
+
+
+
+

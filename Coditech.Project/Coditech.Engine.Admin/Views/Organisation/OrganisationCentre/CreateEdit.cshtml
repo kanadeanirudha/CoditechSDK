@@ -38,6 +38,10 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.OrganisationCentreMasterId)
+                            @Html.HiddenFor(m => m.LogoMediaId)
+                            @Html.HiddenFor(m => m.LogoSmallMediaId)
+                            @Html.HiddenFor(m => m.LogoMediaPath)
+                            @Html.HiddenFor(m => m.LogoSmallMediaPath)
                             <div class="col-lg-4">
                                 <div class="mb-3">
                                     @Html.LabelFor(x => x.OrganisationId, new { @class = "form-label required"})
@@ -254,6 +258,23 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-6">
+                                        @Html.LabelFor(x => x.LogoMediaId, new { @class = "form-label" })
+                                        <input type="file" id="logoUpload" class="form-control" />
+                                        <img id="logoPreview" src="#" alt="Uploaded Logo" style="display:none;width:100px;height:100px;margin-top:10px;" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-6">
+                                        @Html.LabelFor(x => x.LogoSmallMediaId, new { @class = "form-label" })
+                                        <input type="file" id="logoSmallUpload" class="form-control" />
+                                        <img id="logoSmallPreview" src="#" alt="Uploaded Logo Small" style="display:none;width:100px;height:100px;margin-top:10px;" />
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
@@ -263,6 +284,7 @@
         </div>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 @section scripts {
     <script type="text/javascript">
         $(function () {
@@ -283,6 +305,78 @@
                 },
                 maxDate: new Date(),
             });
+        });
+
+        var logoMediaPath = $('#LogoMediaPath').val();
+        if (!(logoMediaPath === '' || logoMediaPath === null)) {
+            $('#logoPreview').attr('src', $('#LogoMediaPath').val()).show();
+        }
+
+        $('#logoUpload').change(function () {
+            var formData = new FormData();
+            var fileInput = $('#logoUpload')[0];
+            $("#notificationDivId").hide();
+            if (fileInput.files.length > 0) {
+                CoditechCommon.ShowLodder();
+                formData.append('files', fileInput.files[0]);
+                $.ajax({
+                    url: '/GeneralCommon/UploadMedia',  // Ensure this matches the route
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == true || response.status == "true") {
+                            $('#logoPreview').attr('src', response.imageUrl).show();
+                            $('input[name="LogoMediaId"]').val(response.photoMediaId);
+                        }
+                        else {
+                            CoditechNotification.DisplayNotificationMessage(response.message, "error")
+                        }
+                        CoditechCommon.HideLodder();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('Error uploading file:', textStatus, errorThrown);
+                        CoditechCommon.HideLodder();
+                    }
+                });
+            }
+        });
+
+        var signatureMediaPath = $('#LogoSmallMediaPath').val();
+        if (!(signatureMediaPath === '' || signatureMediaPath === null)) {
+            $('#logoSmallPreview').attr('src', $('#LogoSmallMediaPath').val()).show();
+        }
+
+        $('#logoSmallUpload').change(function () {
+            var formData = new FormData();
+            var fileInput = $('#logoSmallUpload')[0];
+            $("#notificationDivId").hide();
+            if (fileInput.files.length > 0) {
+                CoditechCommon.ShowLodder();
+                formData.append('files', fileInput.files[0]);
+                $.ajax({
+                    url: '/GeneralCommon/UploadMedia',  // Ensure this matches the route
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == true || response.status == "true") {
+                            $('#logoSmallPreview').attr('src', response.imageUrl).show();
+                            $('input[name="LogoSmallMediaId"]').val(response.photoMediaId);
+                        }
+                        else {
+                            CoditechNotification.DisplayNotificationMessage(response.message, "error")
+                        }
+                        CoditechCommon.HideLodder();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('Error uploading file:', textStatus, errorThrown);
+                        CoditechCommon.HideLodder();
+                    }
+                });
+            }
         });
     </script>
 }

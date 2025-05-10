@@ -2,18 +2,35 @@
 @{
     ViewBag.Title = "DBTM Device List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string actionName = Model.DBTMDeviceMasterId > 0 ? "Edit" : "Create";
+    string css = Model.DBTMDeviceMasterId > 0 || Model.DBTMParentDeviceMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMDeviceMasterId", Model.DBTMDeviceMasterId.ToString());
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
+            @if (Model.DBTMDeviceMasterId > 0 || Model.DBTMParentDeviceMasterId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/DBTM/DBTMDeviceMaster/_DBTMDeviceMasterSidePannel.cshtml", keyValuePairs)
+                </div>
+            }
+            <div class="@css">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">DBTM Device List</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Device</a>
-                        
+
+                        @if (Model.DBTMDeviceMasterId == 0 && Model.DBTMParentDeviceMasterId == 0)
+                        {
+                            <span class="card-title">DBTM Device Master List</span>
+                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Master Device</a>
+                        }
+                        else if (Model.DBTMDeviceMasterId > 0 && Model.DBTMParentDeviceMasterId==0)
+                        {
+                            <span class="card-title">DBTM Device Slave List</span>
+                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateSlave?dBTMDeviceId=@Model.DBTMDeviceMasterId" role="button"><i class="fas fa-plus me-2"></i>Add Slave Device </a>
+                        }
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
