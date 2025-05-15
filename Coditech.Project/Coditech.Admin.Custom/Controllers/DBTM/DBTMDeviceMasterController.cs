@@ -42,7 +42,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMDeviceViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", CreateActionDataTable());
+                    if (dBTMDeviceViewModel.IsMasterDevice)
+                    {
+                        return RedirectToAction("List", CreateActionDataTable());
+                    }
+                    else
+                    {
+                        return RedirectToAction("Edit", new { dBTMDeviceId = dBTMDeviceViewModel.DBTMDeviceMasterId });
+                    }
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMDeviceViewModel.ErrorMessage));
@@ -114,7 +121,7 @@ namespace Coditech.Admin.Controllers
         }
         public virtual ActionResult CancelSlave(long dBTMDeviceId)
         {
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedParameter1 = dBTMDeviceId.ToString()};
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedParameter1 = dBTMDeviceId.ToString() };
             return RedirectToAction("GetSlaveList", dataTableViewModel);
         }
         #region Protected

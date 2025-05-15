@@ -5,7 +5,7 @@
     string actionName = Model.DBTMDeviceMasterId > 0 ? "Edit" : "Create";
     string css = Model.DBTMDeviceMasterId > 0 || Model.DBTMParentDeviceMasterId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("DBTMDeviceMasterId", Model.DBTMDeviceMasterId.ToString());
+    keyValuePairs.Add("DBTMDeviceMasterId", Model.DBTMParentDeviceMasterId > 0 ? Model.DBTMParentDeviceMasterId.ToString() : Model.DBTMDeviceMasterId.ToString());
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
