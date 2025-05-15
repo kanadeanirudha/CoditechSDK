@@ -28,15 +28,22 @@
                         {
                             <tr>
                                 <td class="text-center">@item.GLName</td>
-                                <td class="text-center">@item.OpeningBalance</td>
+                                <td class="col-auto">
+                                    <div>
+                                        <input class="form-control form-control-sm text-center opening-balance"
+                                               type="text"
+                                               value="@item.ClosingBalance"
+                                        @(item.ClosingBalance > 0 ? "readonly" : "") />
+                                    </div>
+                                </td>
                                 <td class="text-center">
                                     @if (item.DebitCreditEnum == 0)
                                     {
-                                        <span style="color: red; font-weight: bold;">Dr</span>
+                                        <span style="color: red; font-weight: bold;">Debit</span>
                                     }
                                     else if (item.DebitCreditEnum == 1)
                                     {
-                                        <span style="color: blue; font-weight: bold;">Cr</span>
+                                        <span style="color: green; font-weight: bold;">Credit</span>
                                     }
                                 </td>
                                 <td class="text-center">

@@ -3,6 +3,7 @@
     ViewBag.Title = Model.OrganisationCentrewiseAccountSetupId > 0 ? "Update Organisation Centrewise Account Setup" : "Add Organisation Centrewise Account Setup";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+
     DropdownViewModel centreDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
@@ -10,6 +11,8 @@
                 DropdownSelectedValue = Model.CentreCode,
                 ChangeEvent = "OrganisationCentrewiseAccountSetup.GetOrganisationCentrewiseAccountSetup('" + Model.OrganisationCentrewiseAccountSetupId + "')"
             };
+
+    DropdownViewModel currencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Currency.ToString(), DropdownName = "GeneralCurrencyMasterId", DropdownSelectedValue = Model.GeneralCurrencyMasterId.ToString() };
 }
 <div class="page-content mt-5">
     <div class="container-fluid">
@@ -41,7 +44,17 @@
                                         @Html.ValidationMessageFor(x => x.CentreCode)
                                     </div>
                                 </div>
-                                <div id="OrganisationCentrewiseAccountSetupDivId"> 
+                                <div id="OrganisationCentrewiseAccountSetupDivId">
+                                    @if (!string.IsNullOrWhiteSpace(Model.CentreCode))
+                                    {
+                                        <div class="col-lg-6">
+                                            <div class="mb-3">
+                                                @Html.LabelFor(x => x.GeneralCurrencyMasterId, new { @class = "form-label required" })
+                                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", currencyDropdown)
+                                                @Html.ValidationMessageFor(x => x.GeneralCurrencyMasterId)
+                                            </div>
+                                        </div>
+                                    }
 
                                 </div>
                             </div>

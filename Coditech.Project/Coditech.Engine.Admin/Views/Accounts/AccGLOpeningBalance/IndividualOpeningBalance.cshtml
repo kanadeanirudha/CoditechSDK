@@ -1,161 +1,96 @@
 ﻿ @model AccGLIndividualOpeningBalanceViewModel
 @{
-	ViewBag.Title = "Individual Opening Balance";
-	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-	string actionName = ViewContext.RouteData.Values["action"].ToString();
+    ViewBag.Title = "Individual Opening Balance";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 <!-- Page Content -->
 <div class="page-content mt-5">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="card">
-					<div class="card-header">
-						<h4 class="card-title">
-							Individual Opening Balance
-						</h4> 
-					</div>
-					<div class="card-body">
-						@using (Html.BeginForm("IndividualOpeningBalance", controllerName, FormMethod.Post, new { id = "frmIndividualOpeningBalanceDetails" }))
-						{
-							@Html.HiddenFor(x => x.AccGLIndividualOpeningBalanceId)
-							@Html.HiddenFor(x => x.IndividualOpeningBalanceData)
-							@Html.HiddenFor(x => x.GeneralFinancialYearId)
-							@Html.HiddenFor(m => m.AccSetupGLId)
-							@Html.HiddenFor(m => m.UserTypeId)
-							@Html.HiddenFor(m => m.PersonId)
-							<table class="table table-bordered table-sm" id="makeEditable">
-								<thead>
-									<tr>
-										<th>Person Name</th>
-										<th class="text-center">Opening Balance</th>
-										<th class="text-center">Debit / Credit</th>
-									</tr>
-								</thead>
-								<tbody>
-									@if (Model?.AccGLIndividualOpeningBalanceList?.Count > 0)
-									{
-										foreach (var item in Model.AccGLIndividualOpeningBalanceList)
-										{
-											<tr id="row_@item.AccSetupGLId">
-												<input type="hidden" id="AccSetupGLId_@item.AccSetupGLId" value="@item.AccSetupGLId" />
-												<input type="hidden" id="PersonId_@item.PersonId" value="@item.PersonId">
-												<td>@item.PersonName</td>
-												<td class="col-auto">
-													<div>
-														<input class="form-control form-control-sm text-center opening-balance"
-															   id="OpeningBalance_@item.AccSetupGLId"
-															   name="ACCGLBalanceList[@item.AccSetupGLId].OpeningBalance"
-															   type="text"
-															   value="@item.OpeningBalance"
-														@(item.OpeningBalance > 0 ? "readonly" : "") />
-													</div>
-												</td>
-												<td class="text-center">
-													@if (item.DebitCreditEnum == 0)
-													{
-														<span style="color: red; font-weight: bold;">Dr</span>
-													}
-													else if (item.DebitCreditEnum == 1)
-													{
-														<span style="color: blue; font-weight: bold;">Cr</span>
-													}
-												</td>
-											</tr>
-										}
-									}
-								</tbody>
-							</table>
-							<button type="submit" class="btn btn-success" onclick="AccGLOpeningBalance.SaveIndividualOpeningBalanceData()">@AdminResources.LabelSave</button>
-						}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            Individual Opening Balance
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm("IndividualOpeningBalance", controllerName, FormMethod.Post, new { id = "frmIndividualOpeningBalanceDetails" }))
+                        {
+                            @Html.HiddenFor(x => x.AccGLIndividualOpeningBalanceId)
+                            @Html.HiddenFor(x => x.IndividualOpeningBalanceData)
+                            @Html.HiddenFor(x => x.GeneralFinancialYearId)
+                            @Html.HiddenFor(m => m.AccSetupGLId)
+                            @Html.HiddenFor(m => m.UserTypeId)
+                            @Html.HiddenFor(m => m.PersonId)
+                            <table class="table table-bordered table-sm" id="makeEditable">
+                                <thead>
+                                    <tr>
+                                        <th>Person Name</th>
+                                        <th class="text-center">Opening Balance</th>
+                                        <th class="text-center">Debit / Credit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.AccGLIndividualOpeningBalanceList?.Count > 0)
+                                    {
+                                        foreach (var item in Model.AccGLIndividualOpeningBalanceList)
+                                        {
+                                            <tr id="row_@item.AccSetupGLId">
+                                                <input type="hidden" id="AccSetupGLId_@item.AccSetupGLId" value="@item.AccSetupGLId" />
+                                                <input type="hidden" id="PersonId_@item.PersonId" value="@item.PersonId">
+                                                <td>@item.PersonName</td>
+                                                <td class="col-auto">
+                                                    <div>
+                                                        <input class="form-control form-control-sm text-center opening-balance"
+                                                               id="OpeningBalance_@item.AccSetupGLId"
+                                                               name="ACCGLBalanceList[@item.AccSetupGLId].OpeningBalance"
+                                                               type="text"
+                                                               value="@item.ClosingBalance"
+                                                        @(item.ClosingBalance > 0 ? "readonly" : "") />
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (item.DebitCreditEnum == 0)
+                                                    {
+                                                        <span style="color: red; font-weight: bold;">Debit</span>
+                                                    }
+                                                    else if (item.DebitCreditEnum == 1)
+                                                    {
+                                                        <span style="color: green; font-weight: bold;">Credit</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            <button type="submit" class="btn btn-success" onclick="AccGLOpeningBalance.SaveIndividualOpeningBalanceData()">@AdminResources.LabelSave</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="/js/coditech/Accounts/ACCGLOpeningBalance.js"></script>
 
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-@*  @model AccGLIndividualOpeningBalanceViewModel
-@{
-    Layout = null;
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string css = "";
-}
-<div class="row">
-    <div class="col-sm-12 table-responsive">
-        @using (Html.BeginForm("IndividualOpeningBalance", controllerName, FormMethod.Post, new { id = "frmIndividualOpeningBalanceDetails" }))
-        {@* 
-            @Html.HiddenFor(m => m.AccGLOpeningBalanceId)
-            @Html.HiddenFor(m => m.AccGLOpeningBalanceData)
-            @Html.HiddenFor(m => m.AccSetupGLId)
-            @Html.HiddenFor(m => m.GeneralFinancialYearModel)
-            @Html.HiddenFor(m => m.AccSetupCategoryId) 
-            <table class="table table-bordered table-sm" id="makeEditable">
-                <thead>
-                    <tr>
-                        <th>Person Name</th>
-                        <th>User Type</th>
-                        <th class="text-center">Opening Balance</th>
-                        <th class="text-center">Debit / Credit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model?.AccGLIndividualOpeningBalanceList?.Count > 0)
-                    {
-                        foreach (var item in Model.AccGLIndividualOpeningBalanceList)
-                        {
-                            <tr id="row_@item.AccSetupGLId">
-                                <input type="hidden" id="AccSetupGLId_@item.AccSetupGLId" value="@item.AccSetupGLId" />
-                                <td>@item.PersonName</td>
-                                <td>@item.UserType</td>
-                                <td class="col-auto">
-                                    <div>
-                                        <input class="form-control form-control-sm text-center opening-balance"
-                                               id="OpeningBalance_@item.AccSetupGLId"
-                                               name="ACCGLBalanceList[@item.AccSetupGLId].OpeningBalance"
-                                               type="text"
-                                               value="@item.OpeningBalance"
-                                        @(item.OpeningBalance > 0 ? "readonly" : "") />
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    @if (item.DebitCreditEnum == 0)
-                                    {
-                                        <span style="color: red; font-weight: bold;">Dr</span>
-                                    }
-                                    else if (item.DebitCreditEnum == 1)
-                                    {
-                                        <span style="color: blue; font-weight: bold;">Cr</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-           <button type="submit" class="btn btn-success" onclick="AccGLOpeningBalance.SaveDataDeatils()">@AdminResources.LabelSave</button> 
-        }
-    </div>
-</div>
-<script src="/js/coditech/Accounts/ACCGLOpeningBalance.js"></script> *@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

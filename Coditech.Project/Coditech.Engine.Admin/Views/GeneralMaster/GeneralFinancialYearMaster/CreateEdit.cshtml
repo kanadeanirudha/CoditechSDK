@@ -3,7 +3,7 @@
     ViewBag.Title = Model.GeneralFinancialYearId > 0 ? "Update FinancialYear" : "Add FinancialYear";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.GeneralFinancialYearId > 0 };
 
 }
 <!-- Page Content-->
@@ -30,6 +30,7 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.GeneralFinancialYearId)
+                            @Html.HiddenFor(m => m.CentreCode)
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
