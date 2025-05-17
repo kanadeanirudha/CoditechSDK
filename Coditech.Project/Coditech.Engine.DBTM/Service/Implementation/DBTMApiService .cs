@@ -75,10 +75,17 @@ namespace Coditech.API.Service
                                                                         {
                                                                             FirstName = b.FirstName,
                                                                             LastName = b.LastName,
-                                                                            DBTMActivityStatus = GetEnumDisplayTextByEnumId(a.ActivityStatusEnumId),
+                                                                            ActivityStatusEnumId = a.ActivityStatusEnumId
                                                                         }
-                                                                   )?.ToList();
-                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList;
+                                                   )?.ToList();
+                if (generalBatchUserList?.Count > 0)
+                {
+                    foreach (var user in generalBatchUserList)
+                    {
+                        user.DBTMActivityStatus = GetEnumDisplayTextByEnumId(user.ActivityStatusEnumId);
+                    }
+                }
+                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList?? new List<DBTMGeneralBatchUserModel>();
             }
             return dBTMBatchModel;
         }
