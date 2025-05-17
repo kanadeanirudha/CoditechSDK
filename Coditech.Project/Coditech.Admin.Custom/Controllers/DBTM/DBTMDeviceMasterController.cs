@@ -48,7 +48,7 @@ namespace Coditech.Admin.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("Edit", new { dBTMDeviceId = dBTMDeviceViewModel.DBTMDeviceMasterId });
+                        return RedirectToAction("GetSlaveList", new { SelectedParameter1 = dBTMDeviceViewModel.DBTMParentDeviceMasterId });
                     }
                 }
             }
