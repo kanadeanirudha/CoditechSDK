@@ -251,6 +251,7 @@ namespace Coditech.API.Common
         {
             // Add Dependency 
             builder.Services.AddSingleton<ICoditechLogging, CoditechLogging>();
+            builder.Services.AddScoped<IDBTMUserService, DBTMUserService>();
             builder.Services.AddScoped<IDBTMDeviceMasterService, DBTMDeviceMasterService>();
             builder.Services.AddScoped<IDBTMTraineeDetailsService, DBTMTraineeDetailsService>();
             builder.Services.AddScoped<IDBTMActivityCategoryService, DBTMActivityCategoryService>();
