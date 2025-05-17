@@ -16,6 +16,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dbtmTraineeDetailsRepository;
+        private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
         private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -24,6 +25,7 @@ namespace Coditech.API.Service
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dbtmTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
+            _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public virtual DBTMUserModel Login(UserLoginModel userLoginModel)
@@ -32,14 +34,18 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
             userLoginModel.Password = MD5Hash(userLoginModel.Password);
-            UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x => x.UserName == userLoginModel.UserName && x.Password == userLoginModel.Password && x.UserType == UserTypeEnum.Trainee.ToString());
+            UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x => x.UserName == userLoginModel.UserName && x.Password == userLoginModel.Password && (x.UserType == UserTypeEnum.Trainee.ToString() || x.UserType == UserTypeEnum.Employee.ToString()));
 
             if (IsNull(userMasterData))
                 throw new CoditechException(ErrorCodes.NotFound, null);
             else if (!userMasterData.IsActive)
                 throw new CoditechException(ErrorCodes.ContactAdministrator, null);
 
-            long personId = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).FirstOrDefault().PersonId;
+            long personId = 0;
+            if (userMasterData.UserType == UserTypeEnum.Trainee.ToString())
+                personId = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).FirstOrDefault().PersonId;
+            else if (userMasterData.UserType == UserTypeEnum.Employee.ToString())
+                personId = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).FirstOrDefault().PersonId;
 
             GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(personId);
             if (IsNull(generalPersonModel))
@@ -54,7 +60,8 @@ namespace Coditech.API.Service
                 PersonTitle = generalPersonModel.PersonTitle,
                 FirstName = generalPersonModel.FirstName,
                 MiddleName = generalPersonModel.MiddleName,
-                LastName = generalPersonModel.LastName
+                LastName = generalPersonModel.LastName,
+                Custom1 = generalPersonModel.Custom1,
             };
             return userModel;
         }
