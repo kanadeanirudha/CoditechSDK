@@ -21,7 +21,7 @@ namespace Coditech.Engine.DBTM.Controllers
             _coditechLogging = coditechLogging;
         }
 
-        [Route("/DBTMApi/GetBatchList")]
+        [Route("/dbtmapi/getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
         public virtual IActionResult GetBatchList(long entityId, string userType)

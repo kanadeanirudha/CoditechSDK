@@ -1,14 +1,12 @@
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
-using Coditech.Common.API.Model.Responses;
+using Coditech.Common.API.Model.Response;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Diagnostics;
-
-using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.Engine.DBTM.Controllers
 {
@@ -24,23 +22,23 @@ namespace Coditech.Engine.DBTM.Controllers
 
         [Route("/DBTMDeviceData/InsertDeviceData")]
         [HttpPost, ValidateModel]
-        [Produces(typeof(DBTMDeviceDataResponse))]
-        public virtual IActionResult InsertDeviceData([FromBody] DBTMDeviceDataModel model)
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
         {
             try
             {
-                DBTMDeviceDataModel dBTMDeviceData = _dBTMDeviceDataService.InsertDeviceData(model);
-                return IsNotNull(dBTMDeviceData) ? CreateCreatedResponse(new DBTMDeviceDataResponse { DBTMDeviceDataModel = dBTMDeviceData }) : CreateInternalServerErrorResponse();
+                bool deleted = _dBTMDeviceDataService.InsertDeviceData(model);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new DBTMDeviceDataResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMDeviceDataResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

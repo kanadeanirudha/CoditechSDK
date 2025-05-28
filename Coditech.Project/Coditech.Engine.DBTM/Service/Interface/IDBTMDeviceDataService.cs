@@ -4,6 +4,6 @@ namespace Coditech.API.Service
 {
     public interface IDBTMDeviceDataService
     {
-        DBTMDeviceDataModel InsertDeviceData(DBTMDeviceDataModel model);
+        bool InsertDeviceData(List<DBTMDeviceDataModel> model);
     }
 }

@@ -48,7 +48,10 @@ namespace Coditech.API.Service
         public DBTMBatchModel GetBatchDetails(int generalBatchMasterId)
         {
             int dbtmTestMasterId = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId).FirstOrDefault();
-            DBTMBatchModel dBTMBatchModel = new DBTMBatchModel();
+            DBTMBatchModel dBTMBatchModel = new DBTMBatchModel()
+            {
+                GeneralBatchMasterId = generalBatchMasterId,
+            };
 
             if (dbtmTestMasterId > 0)
             {
@@ -85,7 +88,7 @@ namespace Coditech.API.Service
                         user.DBTMActivityStatus = GetEnumDisplayTextByEnumId(user.ActivityStatusEnumId);
                     }
                 }
-                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList?? new List<DBTMGeneralBatchUserModel>();
+                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
             }
             return dBTMBatchModel;
         }
@@ -125,16 +128,16 @@ namespace Coditech.API.Service
                 dBTMTestApiModel.IsLapDistanceChange = testDetails.IsLapDistanceChange;
                 dBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
                 dBTMTestApiModel.IsActive = testDetails.IsActive;
-                
+
                 List<DBTMTraineeAssignmentToUserApiModel> generalTraineeAssignmentToUserList = (from a in _dBTMTraineeAssignmentToUserRepository.Table
-                                                                       
-                                                                         where a.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId
-                                                                         select new DBTMTraineeAssignmentToUserApiModel
-                                                                         {
-                                                                             DBTMTraineeDetailId = a.DBTMTraineeDetailId
-                                                                         }
+
+                                                                                                where a.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId
+                                                                                                select new DBTMTraineeAssignmentToUserApiModel
+                                                                                                {
+                                                                                                    DBTMTraineeDetailId = a.DBTMTraineeDetailId
+                                                                                                }
                                                                    )?.ToList();
-                dBTMTestApiModel.DBTMTraineeAssignmentToUserApiModel = generalTraineeAssignmentToUserList;
+                dBTMTestApiModel.DBTMTraineeAssignmentToUserApiModel = generalTraineeAssignmentToUserList ?? new List<DBTMTraineeAssignmentToUserApiModel>();
             }
             return dBTMTestApiModel;
         }
