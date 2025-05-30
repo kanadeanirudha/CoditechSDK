@@ -21,6 +21,27 @@ namespace Coditech.Engine.DBTM.Controllers
             _coditechLogging = coditechLogging;
         }
 
+        [Route("/DBTMDeviceData/InsertDeviceData")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
+        {
+            try
+            {
+                bool deleted = _dBTMApiService.InsertDeviceData(model);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
         [Route("/dbtmapi/getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]

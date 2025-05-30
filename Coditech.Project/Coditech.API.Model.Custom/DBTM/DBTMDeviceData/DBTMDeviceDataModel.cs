@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 namespace Coditech.Common.API.Model
@@ -8,6 +9,7 @@ namespace Coditech.Common.API.Model
         public long DBTMDeviceDataId { get; set; }
         [MaxLength(100)]
         [Required]
+        [JsonPropertyName("DSC")]
         public string DeviceSerialCode { get; set; }
         [MaxLength(200)]
         [Required]
@@ -25,7 +27,9 @@ namespace Coditech.Common.API.Model
 
     public class DBTMDeviceDataDetailModel
     {
+        [JsonPropertyName("PC")]
         public string ParameterCode { get; set; }
+        [JsonPropertyName("PV")]
         public decimal ParameterValue { get; set; }
         public string FromTo { get; set; }
         public short Row { get; set; }
