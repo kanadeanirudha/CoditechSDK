@@ -306,7 +306,7 @@ namespace Coditech.API.Service
                     data = "sec";
                     break;
                 case "Distance":
-                    data = "sec";
+                    data = "m";
                     break;
                 case "AverageVelocity":
                     data = "m/s";
