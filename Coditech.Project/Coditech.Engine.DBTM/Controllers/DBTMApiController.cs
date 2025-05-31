@@ -21,7 +21,7 @@ namespace Coditech.Engine.DBTM.Controllers
             _coditechLogging = coditechLogging;
         }
 
-        [Route("/DBTMDeviceData/InsertDeviceData")]
+        [Route("/DBTMApi/InsertDeviceData")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
         public virtual IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
