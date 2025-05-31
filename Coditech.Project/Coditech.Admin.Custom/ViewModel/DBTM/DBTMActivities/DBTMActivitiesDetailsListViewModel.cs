@@ -1,17 +1,13 @@
 ﻿using Coditech.Common.Helper;
+using System.Data;
 
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMActivitiesDetailsListViewModel : BaseViewModel
     {
-        public List<DBTMActivitiesDetailsViewModel> ActivitiesDetailsList { get; set; }
-        public List<string> TestColumns { get; set; }
-        public List<string> CalculationColumns { get; set; }
+        public DataTable DataTable { get; set; }
         public DBTMActivitiesDetailsListViewModel()
         {
-            ActivitiesDetailsList = new List<DBTMActivitiesDetailsViewModel>();
-            TestColumns = new List<string>();
-            CalculationColumns = new List<string>();
         }
         public string PersonCode { get; set; }
         public long DBTMDeviceDataId { get; set; }

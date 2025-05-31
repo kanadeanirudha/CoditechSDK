@@ -28,8 +28,8 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                bool deleted = _dBTMApiService.InsertDeviceData(model);
-                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
+                bool status = _dBTMApiService.InsertDeviceData(model);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = status });
             }
             catch (CoditechException ex)
             {

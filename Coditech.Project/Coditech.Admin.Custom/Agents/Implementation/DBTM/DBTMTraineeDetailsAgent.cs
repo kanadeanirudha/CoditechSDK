@@ -375,19 +375,11 @@ namespace Coditech.Admin.Agents
             SortCollection sortList = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
             DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, null, filters, sortList, dataTableModel.PageIndex, int.MaxValue);
-            DBTMActivitiesDetailsListModel activitiesDetailsListModel = new DBTMActivitiesDetailsListModel
-            {
-                ActivitiesDetailsList = response?.ActivitiesDetailsList,
-                TestColumns = response?.TestColumns,
-                CalculationColumns = response?.CalculationColumns,
-            };
+           
             DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
             {
-                ActivitiesDetailsList = activitiesDetailsListModel?.ActivitiesDetailsList?.ToViewModel<DBTMActivitiesDetailsViewModel>().ToList(),
-                TestColumns = activitiesDetailsListModel?.TestColumns?.ToList(),
-                CalculationColumns = activitiesDetailsListModel?.CalculationColumns?.ToList()
+                DataTable = response.DataTable
             };
-            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.ActivitiesDetailsList.Count, BindTraineeActivitiesDetailsColumns(listViewModel.TestColumns, listViewModel.CalculationColumns), false);
 
             listViewModel.DBTMDeviceDataId = dBTMDeviceDataId;
             listViewModel.FirstName = response.FirstName;
@@ -516,50 +508,6 @@ namespace Coditech.Admin.Agents
             });
             return datatableColumnList;
         }
-
-        protected virtual List<DatatableColumns> BindTraineeActivitiesDetailsColumns(List<string> testColumns, List<string> calculationColumns)
-        {
-            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
-
-            if (testColumns != null && testColumns.Any())
-            {
-                foreach (var item in testColumns)
-                {
-                    datatableColumnList.Add(new DatatableColumns()
-                    {
-                        ColumnName = item,
-                        ColumnCode = item,
-                        IsSortable = true
-                    });
-                }
-            }
-
-            if (calculationColumns != null && calculationColumns.Any())
-            {
-                foreach (var item in calculationColumns)
-                {
-                    datatableColumnList.Add(new DatatableColumns()
-                    {
-                        ColumnName = FormatColumnName(item),
-                        ColumnCode = item,
-                    });
-                }
-            }
-            return datatableColumnList;
-        }
-        #endregion
-        #region
-        // it will return DBTMActivitiesDetailsList ColumnName     
-        public string FormatColumnName(string columnName)
-        {
-            if (columnName == "AverageVelocity")
-                return "Average Velocity";
-            else if (columnName == "CompletionTime")
-                return "Completion Time";
-            else
-                return columnName; 
-        }
-
         #endregion
     }
 }

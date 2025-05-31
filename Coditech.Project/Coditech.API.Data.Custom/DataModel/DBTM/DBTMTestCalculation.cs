@@ -6,6 +6,7 @@ namespace Coditech.API.Data
     {
         [Key]
         public byte DBTMTestCalculationId { get; set; }
+        public string CalculationCode { get; set; }
         public string CalculationName { get; set; }
         public string CalculationFormula { get; set; }
         public short OrderBy { get; set; }
