@@ -7,6 +7,7 @@ namespace Coditech.API.Data
         [Key]
         public byte DBTMTestParameterId { get; set; }
         public string ParameterName { get; set; }
+        public string ParameterCode { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

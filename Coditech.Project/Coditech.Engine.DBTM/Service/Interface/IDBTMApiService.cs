@@ -4,6 +4,7 @@ namespace Coditech.API.Service
 {
     public interface IDBTMApiService
     {
+        bool InsertDeviceData(List<DBTMDeviceDataModel> model);
         List<DBTMBatchModel> GetBatchList(long entityId, string userType);
         DBTMBatchModel GetBatchDetails(int generalBatchMasterId);
         List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType);

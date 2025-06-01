@@ -1,15 +1,13 @@
-﻿namespace Coditech.Common.API.Model
+﻿using System.Data;
+
+namespace Coditech.Common.API.Model
 {
     public class DBTMActivitiesDetailsListModel : BaseListModel
     {
-        public List<DBTMActivitiesDetailsModel> ActivitiesDetailsList { get; set; }
-        public List<string> TestColumns { get; set; }
-        public List<string> CalculationColumns { get; set; }
+        public DataTable DataTable { get; set; }
         public DBTMActivitiesDetailsListModel()
         {
-            ActivitiesDetailsList = new List<DBTMActivitiesDetailsModel>();
-            TestColumns = new List<string>();
-            CalculationColumns = new List<string>();
+            DataTable = new DataTable();
         }
         public string PersonCode { get; set; }
         public long PersonId { get; set; }
