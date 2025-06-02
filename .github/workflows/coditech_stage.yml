@@ -1,4 +1,4 @@
-name: Deploy-Stage-DBTM
+name: Deploy-Production-DBTM
 
 on: 
 
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: DBTMStage
+          ref: DBTMProduction
 
       - name: Restore Packages
         run: | 
@@ -56,7 +56,7 @@ jobs:
            & "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\msbuild.exe"  './Coditech.Project/Coditech.Project.sln' /p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True /p:publishUrl="./publish/Release" /p:Configuration=Release /p:TransformConfigFiles=false
 
   admin_deploy:
-    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.admin_deploy == 'true'
     
@@ -64,30 +64,30 @@ jobs:
       - name: Stop ADMIN IIS Site and App Pool
         run: |
           # Stop the IIS site
-          Stop-WebSite -Name "dbtm-stage-admin" 
+          Stop-WebSite -Name "dbtm-admin" 
 
           # Stop the associated app pool
-          Stop-WebAppPool -Name "dbtm-stage-admin"
+          Stop-WebAppPool -Name "dbtm-admin"
 
           # Wait for a few seconds (optional, if needed)
           Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMStage\Admin\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMProduction\Admin\ -Recurse -Force
       - name: Copy Build webroot
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMProduction\Admin\wwwroot\ -Recurse -Force
       - name: Copy Build views
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Views\*  -Destination C:\HostingSites\DBTMProduction\Admin\Views\ -Recurse -Force
       #- name: Copy Build report folder
-      # run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
+      # run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Reports\*  -Destination C:\HostingSites\DBTMProduction\Admin\Reports\ -Recurse -Force
 
       - name: Start ADMIN IIS Site and App Pool
         run: |
           # Start the IIS site
-          Start-WebSite -Name "dbtm-stage-admin"
+          Start-WebSite -Name "dbtm-admin"
 
           # Start the associated app pool
-          Start-WebAppPool -Name "dbtm-stage-admin"
+          Start-WebAppPool -Name "dbtm-admin"
 
   mediamanager_api_deploy:
     runs-on: [self-hosted, Windows, x64, dbtm_stage]
@@ -99,22 +99,22 @@ jobs:
       - name: Stop MediaManager IIS Site and App Pool
         run: |
            # Stop the IIS site
-           Stop-WebSite -Name "dbtm-stage-api-mediamanager" 
+           Stop-WebSite -Name "dbtm-api-mediamanager" 
            # Stop the associated app pool
-           Stop-WebAppPool -Name "dbtm-stage-api-mediamanager"
+           Stop-WebAppPool -Name "dbtm-api-mediamanager"
 
            # Wait for a few seconds (optional, if needed)
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\MediaManager\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMProduction\MediaManager\ -Recurse -Force 
 
       - name: Start MediaManager IIS Site and App Pool
         run: |
            # Start the IIS site
-           Start-WebSite -Name "dbtm-stage-api-mediamanager"
+           Start-WebSite -Name "dbtm-api-mediamanager"
            # Start the associated app pool
-           Start-WebAppPool -Name "dbtm-stage-api-mediamanager"
+           Start-WebAppPool -Name "dbtm-api-mediamanager"
 
   organisation_api_deploy:
     runs-on: [self-hosted, Windows, x64, dbtm_stage]
@@ -125,22 +125,22 @@ jobs:
       - name: Stop Organisation IIS Site and App Pool
         run: |
            # Stop the IIS site
-           Stop-WebSite -Name "dbtm-stage-api-organisation" 
+           Stop-WebSite -Name "dbtm-api-organisation" 
            # Stop the associated app pool
-           Stop-WebAppPool -Name "dbtm-stage-api-organisation"
+           Stop-WebAppPool -Name "dbtm-api-organisation"
 
            # Wait for a few seconds (optional, if needed)
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\Organisation\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMProduction\Organisation\ -Recurse -Force 
 
       - name: Start Organisation IIS Site and App Pool
         run: |
            # Start the IIS site
-           Start-WebSite -Name "dbtm-stage-api-organisation"
+           Start-WebSite -Name "dbtm-api-organisation"
            # Start the associated app pool
-           Start-WebAppPool -Name "dbtm-stage-api-organisation"
+           Start-WebAppPool -Name "dbtm-api-organisation"
            
   dbtm_api_deploy:
     runs-on: [self-hosted, Windows, x64, dbtm_stage]
@@ -151,22 +151,22 @@ jobs:
       - name: Stop dbtm IIS Site and App Pool
         run: |
            # Stop the IIS site
-           Stop-WebSite -Name "dbtm-stage-api-dbtm" 
+           Stop-WebSite -Name "dbtm-api-dbtm" 
            # Stop the associated app pool
-           Stop-WebAppPool -Name "dbtm-stage-api-dbtm"
+           Stop-WebAppPool -Name "dbtm-api-dbtm"
 
            # Wait for a few seconds (optional, if needed)
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\DBTM\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMProduction\DBTM\ -Recurse -Force 
 
       - name: Start dbtm IIS Site and App Pool
         run: |
            # Start the IIS site
-           Start-WebSite -Name "dbtm-stage-api-dbtm"
+           Start-WebSite -Name "dbtm-api-dbtm"
            # Start the associated app pool
-           Start-WebAppPool -Name "dbtm-stage-api-dbtm"
+           Start-WebAppPool -Name "dbtm-api-dbtm"
 
   payment_api_deploy:
     runs-on: [self-hosted, Windows, x64, dbtm_stage]
@@ -177,19 +177,19 @@ jobs:
       - name: Stop payment IIS Site and App Pool
         run: |
            # Stop the IIS site
-           Stop-WebSite -Name "dbtm-stage-api-payment" 
+           Stop-WebSite -Name "dbtm-api-payment" 
            # Stop the associated app pool
-           Stop-WebAppPool -Name "dbtm-stage-api-payment"
+           Stop-WebAppPool -Name "dbtm-api-payment"
 
            # Wait for a few seconds (optional, if needed)
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Payment\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\payment\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Payment\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMProduction\payment\ -Recurse -Force 
 
       - name: Start payment IIS Site and App Pool
         run: |
            # Start the IIS site
-           Start-WebSite -Name "dbtm-stage-api-payment"
+           Start-WebSite -Name "dbtm-api-payment"
            # Start the associated app pool
-           Start-WebAppPool -Name "dbtm-stage-api-payment"
+           Start-WebAppPool -Name "dbtm-api-payment"
