@@ -38,7 +38,7 @@ on:
 
 jobs:
   coditech_build:
-    runs-on: [self-hosted, Windows, x64, dbtm_Stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_production]
     if: github.event.inputs.coditech_build == 'true'
 
     steps:
@@ -117,7 +117,7 @@ jobs:
            Start-WebAppPool -Name "dbtm-api-mediamanager"
 
   organisation_api_deploy:
-    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.organisation_api_deploy == 'true'
 
@@ -143,7 +143,7 @@ jobs:
            Start-WebAppPool -Name "dbtm-api-organisation"
            
   dbtm_api_deploy:
-    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.dbtm_api_deploy == 'true'
 
@@ -169,7 +169,7 @@ jobs:
            Start-WebAppPool -Name "dbtm-api-dbtm"
 
   payment_api_deploy:
-    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.payment_api_deploy == 'true'
 
