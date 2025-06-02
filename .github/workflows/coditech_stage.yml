@@ -90,7 +90,7 @@ jobs:
           Start-WebAppPool -Name "dbtm-admin"
 
   mediamanager_api_deploy:
-    runs-on: [self-hosted, Windows, x64, dbtm_stage]
+    runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.mediamanager_api_deploy == 'true'
 
