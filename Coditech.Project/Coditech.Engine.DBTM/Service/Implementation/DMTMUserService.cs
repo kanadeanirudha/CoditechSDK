@@ -79,6 +79,8 @@ namespace Coditech.API.Service
                 userModel.PastInjuries = dbtmTraineeDetails.PastInjuries;
                 userModel.MedicalHistory = dbtmTraineeDetails.MedicalHistory;
                 userModel.OtherInformation = dbtmTraineeDetails.OtherInformation;
+                userModel.Height = dbtmTraineeDetails.Height;
+                userModel.Weight = dbtmTraineeDetails.Weight;
             }
 
             GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(dbtmTraineeDetails.PersonId);
@@ -125,6 +127,8 @@ namespace Coditech.API.Service
                 dbtmTraineeDetails.MedicalHistory = dbtmUserModel.MedicalHistory;
                 dbtmTraineeDetails.PastInjuries = dbtmUserModel.PastInjuries;
                 dbtmTraineeDetails.OtherInformation = dbtmUserModel.OtherInformation;
+                dbtmTraineeDetails.Height = dbtmUserModel.Height;
+                dbtmTraineeDetails.Weight = dbtmUserModel.Weight;
                 dbtmTraineeDetails.ModifiedBy = dbtmUserModel.ModifiedBy;
                 bool status = _dbtmTraineeDetailsRepository.Update(dbtmTraineeDetails);
                 if (status)
