@@ -24,5 +24,7 @@
         public string OtherInformation { get; set; }
         public string PhotoMediaPath { get; set; }
         public bool IsAcceptedTermsAndConditions { get; set; }
+        public decimal Height { get; set; }
+        public decimal Weight { get; set; }
     }
 }
