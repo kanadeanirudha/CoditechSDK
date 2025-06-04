@@ -59,6 +59,8 @@ namespace Coditech.API.Service
 
                     DBTMDeviceData dBTMDeviceData = new DBTMDeviceData()
                     {
+                        TypeOfRecord = dBTMDeviceDataModel.TypeOfRecord,
+                        TablePrimaryColumnId = dBTMDeviceDataModel.TablePrimaryColumnId,
                         DeviceSerialCode = dBTMDeviceDataModel.DeviceSerialCode,
                         PersonCode = dBTMDeviceDataModel.PersonCode,
                         TestCode = dBTMDeviceDataModel.TestCode,

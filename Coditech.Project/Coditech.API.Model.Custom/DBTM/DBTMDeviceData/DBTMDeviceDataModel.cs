@@ -7,6 +7,10 @@ namespace Coditech.Common.API.Model
     public class DBTMDeviceDataModel
     {
         public long DBTMDeviceDataId { get; set; }
+        [JsonPropertyName("TOR")]
+        public string TypeOfRecord { get; set; }
+        [JsonPropertyName("TPCId")]
+        public long TablePrimaryColumnId { get; set; }
         [MaxLength(100)]
         [Required]
         [JsonPropertyName("DSC")]

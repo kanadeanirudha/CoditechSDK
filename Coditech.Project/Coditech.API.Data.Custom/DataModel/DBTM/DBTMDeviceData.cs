@@ -6,6 +6,8 @@ namespace Coditech.API.Data
     {
         [Key]
         public long DBTMDeviceDataId { get; set; }
+        public string TypeOfRecord { get; set; }
+        public long TablePrimaryColumnId { get; set; }
         public string DeviceSerialCode { get; set; }
         public string PersonCode { get; set; }
         public string TestCode { get; set; }
