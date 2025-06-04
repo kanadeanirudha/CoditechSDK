@@ -1,0 +1,42 @@
+﻿@model DBTMBatchWiseReportsListViewModel
+@{
+    ViewBag.Title = "Batch Reports";
+    DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMBatchWiseReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Batch Reports</h4>
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <label>Batch List</label>
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
+                                </div>
+                                <div class="col-md-1">
+                                    <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMBatchWiseReports()" />
+                                </div>
+                                <div id="DBTMBatchWiseReportsDivId">
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+<script src="~/js/layout/jquery.min.js"></script>
+
+

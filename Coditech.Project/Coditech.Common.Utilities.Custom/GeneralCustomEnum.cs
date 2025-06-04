@@ -12,7 +12,7 @@
         DBTMTestStatus,
         DBTMDeviceStatus,
         DBTMDeviceSerialCodeByCentreCode,
-        
+        BatchWiseReports
     }
     public enum DashboardFormCustomEnum
     {

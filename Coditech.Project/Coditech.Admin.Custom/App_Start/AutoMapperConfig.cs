@@ -44,6 +44,7 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMNewRegistrationViewModel, GeneralPersonModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentToUserListModel, DBTMTraineeAssignmentToUserListViewModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentToUserModel, DBTMTraineeAssignmentToUserViewModel>().ReverseMap();
+            CreateMap<DBTMBatchWiseReportsListModel, DBTMBatchWiseReportsListViewModel>().ReverseMap();
             #endregion
         }
     }
