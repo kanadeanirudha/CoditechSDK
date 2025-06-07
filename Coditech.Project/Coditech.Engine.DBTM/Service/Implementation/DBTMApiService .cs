@@ -67,6 +67,7 @@ namespace Coditech.API.Service
                         Comments = dBTMDeviceDataModel.Comments,
                         Height = dBTMTraineeDetails.Height,
                         Weight = dBTMTraineeDetails.Weight,
+                        TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
                         CreatedBy = dBTMDeviceDataModel.CreatedBy,
                         CreatedDate = createdDate
                     };
@@ -137,6 +138,7 @@ namespace Coditech.API.Service
                     dBTMBatchModel.DBTMTestApiModel.LapDistance = testDetails.LapDistance;
                     dBTMBatchModel.DBTMTestApiModel.IsLapDistanceChange = testDetails.IsLapDistanceChange;
                     dBTMBatchModel.DBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
+                    dBTMBatchModel.DBTMTestApiModel.TestInstructions = testDetails.TestInstructions;
                 }
                 List<DBTMGeneralBatchUserModel> generalBatchUserList = (from a in _generalBatchUserRepository.Table
                                                                         join b in _userMasterRepository.Table on a.EntityId equals b.EntityId

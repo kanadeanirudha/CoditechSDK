@@ -11,5 +11,6 @@
         public string TestName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public DateTime? TestPerformedTime { get; set; }
     }
 }

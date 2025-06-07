@@ -54,6 +54,7 @@ namespace Coditech.API.Service
                 listModel.DataTable.Columns.Add("Date", typeof(String));
                 listModel.DataTable.Columns.Add("Weight", typeof(String));
                 listModel.DataTable.Columns.Add("Height", typeof(String));
+                listModel.DataTable.Columns.Add("Test Performed Time", typeof(String));
                 var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                                       join b in _dBTMTestParameterRepository.Table
                                       on a.DBTMTestParameterId equals b.DBTMTestParameterId
@@ -63,20 +64,39 @@ namespace Coditech.API.Service
                                           b.ParameterName,
                                           b.ParameterCode
                                       })?.Distinct()?.ToList();
+                var calculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
+                                          join b in _dBTMTestCalculationRepository.Table
+                                          on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
+                                          where a.DBTMTestMasterId == dBTMTestMasterId
+                                          orderby b.OrderBy ascending
+                                          select new { b.CalculationName, b.CalculationCode })?.Distinct()?.ToList();
 
-                DataRow newRow = listModel.DataTable.NewRow();
-                DateTime dateTime = DateTime.Now;
+                DataRow newRow = null;
+                DateTime? dateTime = null;
                 foreach (var item in dBTMBatchWiseReportsList)
                 {
                     if (dateTime != item.CreatedDate)
                     {
+                        newRow = listModel.DataTable.NewRow();
                         newRow["Test Name"] = item.TestName;
                         newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
                         newRow["Date"] = item.CreatedDate;
                         newRow["Weight"] = item.Weight;
                         newRow["Height"] = item.Height;
+                        newRow["Test Performed Time"] = item.TestPerformedTime;
                     }
-                    dateTime = item.CreatedDate;
+
+                    if (dateTime != item.CreatedDate)
+                    {
+                        foreach (var item1 in calculationColumns)
+                        {
+                            if (!listModel.DataTable.Columns.Contains(item1.CalculationName))
+                            {
+                                listModel.DataTable.Columns.Add(item1.CalculationName, typeof(String));
+                            }
+                            Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMBatchWiseReportsList, item.CreatedDate);
+                        }
+                    }
                     string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
                     if (!string.IsNullOrEmpty(parameterName))
                     {
@@ -88,40 +108,33 @@ namespace Coditech.API.Service
 
                         newRow[columnName] = $"{item.ParameterValue} {Unit(item.ParameterCode)}";
                     }
+                    if (dateTime != item.CreatedDate)
+                    {
+                        listModel.DataTable.Rows.Add(newRow);
+                    }
+                    dateTime = item.CreatedDate;
                 }
-                var calculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
-                                          join b in _dBTMTestCalculationRepository.Table
-                                          on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
-                                          where a.DBTMTestMasterId == dBTMTestMasterId
-                                          orderby b.OrderBy ascending
-                                          select new { b.CalculationName, b.CalculationCode })?.Distinct()?.ToList();
-                foreach (var item in calculationColumns)
-                {
-                    listModel.DataTable.Columns.Add(item.CalculationName, typeof(String));
-                    Calculation(item.CalculationCode, item.CalculationName, newRow, dBTMBatchWiseReportsList);
-                }
-                listModel.DataTable.Rows.Add(newRow);
             }
             return listModel;
         }
-        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMBatchWiseReportsModel> dBTMBatchWiseReportsList)
+        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMBatchWiseReportsModel> dBTMBatchWiseReportsList, DateTime createdDate)
         {
             switch (calculationCode)
             {
                 case "CompletionTime":
-                    decimal completionTime = dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
+                    decimal completionTime = dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
                     newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
                     break;
                 case "AverageVelocity":
-                    decimal totalDistance = dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
-                    decimal totalTime = dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
+                    decimal totalDistance = dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Distance" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
+                    decimal totalTime = dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
                     newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
                     break;
                 case "MaxLap":
-                    newRow[calculationName] = $"{dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time").Max(x => x.ParameterValue)} {Unit(calculationCode)}";
+                    newRow[calculationName] = $"{dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
                 case "MinLap":
-                    newRow[calculationName] = $"{dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
+                    newRow[calculationName] = $"{dBTMBatchWiseReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Min(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
                 case "Power":
                     newRow[calculationName] = $"{dBTMBatchWiseReportsList.FirstOrDefault(x => x.ParameterCode == "Power").ParameterValue} {Unit(calculationCode)}";
