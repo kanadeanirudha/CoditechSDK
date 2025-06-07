@@ -26,6 +26,8 @@ namespace Coditech.Common.API.Model
 
         [XmlIgnore]
         public long CreatedBy { get; set; }
+        [JsonPropertyName("TFT")]
+        public DateTime TestPerformedTime { get; set; }
         public List<DBTMDeviceDataDetailModel> DataList { get; set; }
     }
 

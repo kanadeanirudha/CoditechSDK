@@ -14,6 +14,7 @@ namespace Coditech.API.Data
         public string Comments { get; set; }
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
+        public DateTime TestPerformedTime { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
