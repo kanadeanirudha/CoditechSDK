@@ -142,11 +142,13 @@ namespace Coditech.API.Service
                 }
                 List<DBTMGeneralBatchUserModel> generalBatchUserList = (from a in _generalBatchUserRepository.Table
                                                                         join b in _userMasterRepository.Table on a.EntityId equals b.EntityId
+                                                                        join c in _dBTMTraineeDetailsRepository.Table on a.EntityId equals  c.DBTMTraineeDetailId
                                                                         where a.GeneralBatchMasterId == generalBatchMasterId && b.UserType == UserTypeEnum.Trainee.ToString()
                                                                         select new DBTMGeneralBatchUserModel
                                                                         {
                                                                             FirstName = b.FirstName,
                                                                             LastName = b.LastName,
+                                                                            PersonCode = c.PersonCode,
                                                                             ActivityStatusEnumId = a.ActivityStatusEnumId
                                                                         }
                                                    )?.ToList();
