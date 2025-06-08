@@ -46,7 +46,6 @@ namespace Coditech.API.Service
             List<DBTMBatchWiseReportsModel> dBTMBatchWiseReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
             DBTMBatchWiseReportsListModel listModel = new DBTMBatchWiseReportsListModel();
 
-            listModel.BindPageListModel(pageListModel);
             if (dBTMBatchWiseReportsList?.Count > 0)
             {
                 listModel.DataTable.Columns.Add("Test Name", typeof(String));
