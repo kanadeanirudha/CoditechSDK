@@ -2,10 +2,10 @@
 
 namespace Coditech.Common.API.Model
 {
-    public class DBTMBatchWiseReportsListModel : BaseListModel
+    public class DBTMReportsListModel : BaseListModel
     {
         public DataTable DataTable { get; set; }
-        public DBTMBatchWiseReportsListModel()
+        public DBTMReportsListModel()
         {
             DataTable = new DataTable();
         }

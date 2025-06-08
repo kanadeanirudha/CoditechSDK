@@ -4,6 +4,7 @@ namespace Coditech.API.Service
 {
     public interface IDBTMReportsService
     {
-        DBTMBatchWiseReportsListModel BatchWiseReports(int generalBatchMasterId);
+        DBTMReportsListModel BatchWiseReports(int generalBatchMasterId);
+        DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long entityId);
     }
 }

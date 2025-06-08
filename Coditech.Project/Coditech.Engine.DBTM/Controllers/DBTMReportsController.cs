@@ -28,7 +28,7 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMBatchWiseReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId);
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
@@ -41,6 +41,30 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMBatchWiseReports", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMBatchWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMReports/TestWiseReports")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long entityId)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate,entityId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

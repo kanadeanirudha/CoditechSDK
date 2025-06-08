@@ -1,0 +1,111 @@
+﻿@model DBTMTestWiseReportsListViewModel
+@{
+    ViewBag.Title = "Test Reports";
+    DropdownViewModel testDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMTestWiseReports()", IsCustomDropdown = true };
+    DropdownViewModel studentsDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(),
+                DropdownName = "DBTMTraineeDetailId",
+                DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(),
+                SelectedText = "All",
+                SelectedValue = "0", 
+                //ChangeEvent = "DBTMReports.GetDBTMTestWiseReports()" ,
+                IsCustomDropdown = true
+            };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Test Reports</h4>
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>Test List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>Students List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", studentsDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseReports()" />
+                            </div>
+                            <div id="DBTMTestWiseReportsDivId">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+@section scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#FromDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                maxDate: new Date(),
+            });
+        });
+        $(function () {
+            $("#ToDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                maxDate: new Date(),
+            });
+        });
+    </script>
+}
+
+

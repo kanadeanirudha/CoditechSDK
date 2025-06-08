@@ -53,6 +53,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetBatchWiseReportsList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeList.ToString()))
+            {
+                GetTraineeDetailsList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -85,7 +89,7 @@ namespace Coditech.Admin.Helpers
 
         private static void GetDBTMDeviceRegistrationDetailsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            DBTMDeviceListResponse response = new DBTMDeviceClient().List(0,null, null, null, 1, int.MaxValue);
+            DBTMDeviceListResponse response = new DBTMDeviceClient().List(0, null, null, null, 1, int.MaxValue);
             dropdownList.Add(new SelectListItem() { Text = "-------Select Registration Details-------" });
 
             DBTMDeviceListModel list = new DBTMDeviceListModel { DBTMDeviceList = response.DBTMDeviceList };
@@ -147,7 +151,7 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string centreCode = dropdownViewModel.Parameter.Split("~")[0];
-                long generalTrainerId = Convert.ToInt16(dropdownViewModel.Parameter.Split("~")[1]);
+                long generalTrainerId = Convert.ToInt64(dropdownViewModel.Parameter.Split("~")[1]);
                 DBTMTraineeDetailsListResponse response = new DBTMTraineeAssignmentClient().GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId);
                 list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             }
@@ -253,6 +257,26 @@ namespace Coditech.Admin.Helpers
                     Text = $"{item.BatchName}",
                     Value = item.GeneralBatchMasterId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralBatchMasterId)
+                });
+            }
+        }
+
+        private static void GetTraineeDetailsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-------Select Students-------", Value = " "});
+
+            string centreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).SelectedCentreCode;
+            long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
+            DBTMTraineeDetailsListResponse response = new DBTMTraineeAssignmentClient().GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode, entityId); 
+            DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
+
+            foreach (var item in list?.DBTMTraineeDetailsList)
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = $"{item.FirstName} {item.LastName}",
+                    Value = item.DBTMTraineeDetailId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTraineeDetailId)
                 });
             }
         }

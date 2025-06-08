@@ -266,6 +266,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<IDBTMMySubscriptionPlanService, DBTMMySubscriptionPlanService>();
             builder.Services.AddScoped<IDBTMApiService, DBTMApiService>();
             builder.Services.AddScoped<IDBTMReportsService, DBTMReportsService>();
+            builder.Services.AddScoped<ILiveTestResultDashboardService, LiveTestResultDashboardService>();
         }
         #endregion
     }
