@@ -36,7 +36,7 @@
     },
 
     GetDBTMTestWiseReports: function () {
-        var dBTMTestMasterId = $("#dBTMTestMasterId").val();
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();

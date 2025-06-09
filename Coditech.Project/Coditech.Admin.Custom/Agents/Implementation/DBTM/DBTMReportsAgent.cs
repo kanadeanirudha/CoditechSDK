@@ -38,8 +38,14 @@ namespace Coditech.Admin.Agents
         //Test Wise Reports 
         public virtual DBTMTestWiseReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
-            long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
-            DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate,entityId);
+            long entityId = 0;
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            if (userModel?.Custom1 == "DBTMTrainer")
+            {
+                entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
+            }
+
+            DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, entityId);
 
             DBTMTestWiseReportsListViewModel listViewModel = new DBTMTestWiseReportsListViewModel
             {

@@ -263,12 +263,22 @@ namespace Coditech.Admin.Helpers
 
         private static void GetTraineeDetailsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Students-------", Value = " "});
-
-            string centreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).SelectedCentreCode;
-            long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
-            DBTMTraineeDetailsListResponse response = new DBTMTraineeAssignmentClient().GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode, entityId); 
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            string centreCode = userModel.SelectedCentreCode;
+            long entityId = 0;
+            if (userModel?.Custom1 == "DBTMTrainer")
+            {
+                entityId = userModel.EntityId;
+            }
+            DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, entityId, null, null, null, 1, int.MaxValue);
             DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
+            dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
+            if (userModel?.Custom1 == "DBTMTrainer")
+            {
+                list.DBTMTraineeDetailsList = list.DBTMTraineeDetailsList?.Where(x =>
+                    string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
+            }
 
             foreach (var item in list?.DBTMTraineeDetailsList)
             {
@@ -282,9 +292,3 @@ namespace Coditech.Admin.Helpers
         }
     }
 }
-
-
-
-
-
-

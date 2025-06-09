@@ -1,15 +1,13 @@
 ﻿@model DBTMTestWiseReportsListViewModel
 @{
     ViewBag.Title = "Test Reports";
-    DropdownViewModel testDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMTestWiseReports()", IsCustomDropdown = true };
+    DropdownViewModel testDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), IsCustomDropdown = true };
     DropdownViewModel studentsDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(),
                 DropdownName = "DBTMTraineeDetailId",
                 DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(),
-                SelectedText = "All",
-                SelectedValue = "0", 
-                //ChangeEvent = "DBTMReports.GetDBTMTestWiseReports()" ,
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseReports()",
                 IsCustomDropdown = true
             };
 }
