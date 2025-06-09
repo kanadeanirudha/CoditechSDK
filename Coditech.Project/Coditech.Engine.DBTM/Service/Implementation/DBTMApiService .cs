@@ -1,10 +1,12 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -140,16 +142,12 @@ namespace Coditech.API.Service
                     dBTMBatchModel.DBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
                     dBTMBatchModel.DBTMTestApiModel.TestInstructions = testDetails.TestInstructions;
                 }
-                List<DBTMGeneralBatchUserModel> generalBatchUserList = (from a in _generalBatchUserRepository.Table
-                                                                        join b in _userMasterRepository.Table on a.EntityId equals b.EntityId
-                                                                        where a.GeneralBatchMasterId == generalBatchMasterId && b.UserType == UserTypeEnum.Trainee.ToString()
-                                                                        select new DBTMGeneralBatchUserModel
-                                                                        {
-                                                                            FirstName = b.FirstName,
-                                                                            LastName = b.LastName,
-                                                                            ActivityStatusEnumId = a.ActivityStatusEnumId
-                                                                        }
-                                                   )?.ToList();
+                PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+                CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+                objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
+                objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+                List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralBatchUserList @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+
                 if (generalBatchUserList?.Count > 0)
                 {
                     foreach (var user in generalBatchUserList)
