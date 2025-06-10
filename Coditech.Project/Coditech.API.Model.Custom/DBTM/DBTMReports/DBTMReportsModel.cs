@@ -1,6 +1,6 @@
 ﻿namespace Coditech.Common.API.Model
 {
-    public class DBTMBatchWiseReportsModel : BaseModel
+    public class DBTMReportsModel : BaseModel
     {
         public string ParameterCode { get; set; }
         public decimal ParameterValue { get; set; }

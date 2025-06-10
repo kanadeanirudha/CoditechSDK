@@ -25,6 +25,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMPrivacySettingAgent, DBTMPrivacySettingAgent>();
             builder.Services.AddScoped<IDBTMDashboardAgent, DBTMDashboardAgent>();
             builder.Services.AddScoped<IDBTMReportsAgent, DBTMReportsAgent>();
+            builder.Services.AddScoped<ILiveTestResultDashboardAgent, LiveTestResultDashboardAgent>();
             #endregion
             #endregion Agent
 
@@ -44,6 +45,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMDashboardClient, DBTMDashboardClient>();
             builder.Services.AddScoped<IDBTMUserClient, DBTMUserClient>();
             builder.Services.AddScoped<IDBTMReportsClient, DBTMReportsClient>();
+            builder.Services.AddScoped<ILiveTestResultDashboardClient, LiveTestResultDashboardClient>();
             #endregion 
             #endregion Client
         }

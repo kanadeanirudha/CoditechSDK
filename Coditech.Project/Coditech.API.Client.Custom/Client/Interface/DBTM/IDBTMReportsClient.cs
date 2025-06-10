@@ -5,5 +5,6 @@ namespace Coditech.API.Client
     public interface IDBTMReportsClient : IBaseClient
     {
         DBTMBatchWiseReportsListResponse BatchWiseReports(int generalBatchMasterId);
+        DBTMTestWiseReportsListResponse TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate,long entityId);
     }
 }

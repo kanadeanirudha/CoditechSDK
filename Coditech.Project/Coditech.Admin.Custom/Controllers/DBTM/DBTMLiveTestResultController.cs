@@ -1,14 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Coditech.Admin.Agents;
+using Coditech.Admin.ViewModel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Coditech.Admin.Controllers
 {
-    public class DBTMLiveTestResultController : BaseController
+    public class LiveTestResultDashboardController : BaseController
     {
+        private readonly ILiveTestResultDashboardAgent _liveTestResultDashboardAgent;
         private const string create = "~/Views/DBTM/DBTMLiveTestResult/LiveTestResult.cshtml";
 
-        [HttpGet]
-        public virtual ActionResult LiveTestResult()
+        public LiveTestResultDashboardController(ILiveTestResultDashboardAgent liveTestResultDashboardAgent)
         {
+            _liveTestResultDashboardAgent = liveTestResultDashboardAgent;
+        }
+        
+
+        [HttpGet]
+        public virtual ActionResult LiveTestResultDashboard()
+        {
+            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard();
             return View(create);
         }
     }
