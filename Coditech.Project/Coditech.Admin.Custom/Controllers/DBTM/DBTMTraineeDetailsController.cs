@@ -29,7 +29,7 @@ namespace Coditech.Admin.Controllers
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
@@ -54,7 +54,7 @@ namespace Coditech.Admin.Controllers
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
@@ -80,7 +80,7 @@ namespace Coditech.Admin.Controllers
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");

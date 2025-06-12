@@ -1,4 +1,5 @@
-﻿using Coditech.Admin.ViewModel;
+﻿using Coditech.Admin.Utilities;
+using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
@@ -43,8 +44,12 @@ namespace Coditech.Admin.Agents
             }
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            long userId = 0;
+            if (userModel.Custom1 == CustomConstants.DBTMTrainer)
+                userId = userModel.UserMasterId;
 
-            GeneralBatchListResponse response = _generalBatchClient.List(dataTableModel.SelectedCentreCode, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            GeneralBatchListResponse response = _generalBatchClient.List(dataTableModel.SelectedCentreCode, userId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             GeneralBatchListModel generalBatchList = new GeneralBatchListModel { GeneralBatchList = response?.GeneralBatchList };
             GeneralBatchListViewModel listViewModel = new GeneralBatchListViewModel();
             listViewModel.GeneralBatchList = generalBatchList?.GeneralBatchList?.ToViewModel<GeneralBatchViewModel>().ToList();
@@ -125,7 +130,7 @@ namespace Coditech.Admin.Agents
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMBatchActivity", TraceLevel.Info);
-                TrueFalseResponse trueFalseResponse = _dBTMBatchActivityClient.DeleteDBTMBatchActivity(new ParameterModel { Ids = dBTMBatchActivityId});
+                TrueFalseResponse trueFalseResponse = _dBTMBatchActivityClient.DeleteDBTMBatchActivity(new ParameterModel { Ids = dBTMBatchActivityId });
                 return trueFalseResponse.IsSuccess;
             }
             catch (CoditechException ex)

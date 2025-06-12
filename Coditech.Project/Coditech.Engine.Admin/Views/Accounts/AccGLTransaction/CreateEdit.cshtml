@@ -1,162 +1,193 @@
 ﻿@model AccGLTransactionViewModel
 @{
-	ViewBag.Title = Model.AccGLTransactionId > 0 ? "Update Transaction" : "Add Transaction";
-	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-	string actionName = ViewContext.RouteData.Values["action"].ToString();
-	if (string.IsNullOrEmpty(Model.SelectedCentreCode))
-	{
-		List<UserAccessibleCentreModel> accessibleCentreList = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.AccessibleCentreList;
-		if (accessibleCentreList != null && accessibleCentreList.Count == 1)
-		{
-			Model.SelectedCentreCode = accessibleCentreList[0].CentreCode;
-		}
-	}
-	DropdownViewModel accSetupTransactionTypeDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupTransactionType.ToString(), DropdownName = "AccSetupTransactionTypeId", DropdownSelectedValue = Model.AccSetupTransactionTypeId.ToString() };
-	DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "AccGLTransaction.GetFinancialYearListByCentreCode()" };
-	DropdownViewModel balanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseAccountBalanceSheet.ToString(), DropdownName = "AccSetupBalanceSheetId", DropdownSelectedValue = Model.AccSetupBalanceSheetId.ToString() };
-	DropdownViewModel financialYearDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.FinancialYear.ToString(), DropdownName = "GeneralFinancialYearId", DropdownSelectedValue = Model.GeneralFinancialYearId.ToString(), Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}" : "" };
+    ViewBag.Title = Model.AccGLTransactionId > 0 ? "Update Transaction" : "Add Transaction";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    if (string.IsNullOrEmpty(Model.SelectedCentreCode))
+    {
+        List<UserAccessibleCentreModel> accessibleCentreList = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.AccessibleCentreList;
+        if (accessibleCentreList != null && accessibleCentreList.Count == 1)
+        {
+            Model.SelectedCentreCode = accessibleCentreList[0].CentreCode;
+        }
+    }
+    DropdownViewModel accSetupTransactionTypeDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccSetupTransactionType.ToString(), DropdownName = "AccSetupTransactionTypeId", DropdownSelectedValue = Model.AccSetupTransactionTypeId.ToString() };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "AccGLTransaction.GetFinancialYearListByCentreCode()" };
+    DropdownViewModel financialYearDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.FinancialYear.ToString(), DropdownName = "GeneralFinancialYearId", DropdownSelectedValue = Model.GeneralFinancialYearId.ToString(), Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}" : "" };
 }
 
 <!-- Page Content -->
 <div class="page-content mt-5">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="card">
-					<div class="card-header">
-						<h4 class="card-title">
-							@(Model.AccGLTransactionId > 0 ? "Update Transaction" : "Create Transaction")
-						</h4>
-					</div>
-					<div class="card-body">
-						@using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = "frmWorkoutPlanDetails" }))
-						{
-							@Html.AntiForgeryToken()
-							@Html.HiddenFor(x => x.AccSetupBalanceSheetId)
-							@Html.HiddenFor(x => x.TransactionDetailsData)
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            @(Model.AccGLTransactionId > 0 ? "Update Transaction" : "Create Transaction")
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = "transactionDetails" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(x => x.AccSetupBalanceSheetId)
+                            @Html.HiddenFor(x => x.TransactionDetailsData)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SelectedCentreCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                        @Html.ValidationMessageFor(x => x.SelectedCentreCode)
+                                    </div>
+                                </div>
 
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="mb-3">
-										@Html.LabelFor(x => x.SelectedCentreCode, new { @class = "form-label required" })
-										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-										@Html.ValidationMessageFor(x => x.SelectedCentreCode)
-									</div>
-								</div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.GeneralFinancialYearId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", financialYearDropdown)
+                                        @Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AccSetupTransactionTypeId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupTransactionTypeDropdown)
+                                        @Html.ValidationMessageFor(x => x.AccSetupTransactionTypeId)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2">
+                                        <span class="mb-1">
+                                            <label class="form-label required">Transaction Date</label>
+                                            <span class="form-control-plaintext">
+                                                @Model.TransactionDate.ToCoditechDateFormat()
+                                            </span>
+                                        </span>
+                                    </div>
 
-								<div class="col-lg-3">
-									<div class="mb-3">
-										@Html.LabelFor(x => x.GeneralFinancialYearId, new { @class = "form-label required" })
-										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", financialYearDropdown)
-										@Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
-									</div>
-								</div>
+                                    <div class="col-lg-2">
+                                        <div class="mb-3">
+                                            @Html.LabelFor(x => x.NarrationDescription, new { @class = "form-label required " })
+                                            @Html.TextAreaFor(x => x.NarrationDescription, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.NarrationDescription)
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="mb-3">
+                                            @Html.LabelFor(x => x.TransactionRefId, new { @class = "form-label required" })
+                                            @Html.TextBoxFor(x => x.TransactionRefId, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
+                                            @Html.ValidationMessageFor(x => x.TransactionRefId)
+                                        </div>
+                                    </div>
+                                </div>
 
-								<div class="col-lg-2">
-									<div class="mb-3">
-										@Html.LabelFor(x => x.AccSetupTransactionTypeId, new { @class = "form-label required" })
-										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", accSetupTransactionTypeDropdown)
-										@Html.ValidationMessageFor(x => x.AccSetupTransactionTypeId)
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-lg-2">
-										<span class="mb-1">
-											<label class="form-label required">Transaction Date</label>
-											<span class="form-control-plaintext">
-												@Model.TransactionDate.ToCoditechDateFormat()
-											</span>
-										</span>
-									</div>
+                                <div class="mb-3">
+                                    <button type="button" id="addRowButton" class="btn btn-success">
+                                        <i class="fas fa-plus me-1"></i> Add Transaction Row
+                                    </button>
+                                </div>
+                                <!-- Transaction Details Table -->
+                                <div id="accGLTransactionDetailsId">
+                                    <table id="example" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Account</th>
+                                                <th>Narration</th>
+                                                <th>Debit</th>
+                                                <th>Credit</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody> </tbody>
+                                        <tfoot id="tableDebitCredit" style="display: none">
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                                <th>
+                                                    <input type="text" id="debitBal" class="form-control" value="0" style="text-align: right;" disabled />
+                                                </th>
+                                                <th>
+                                                    <input type="text" id="creditBal" class="form-control" value="0" style="text-align: right;" disabled />
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success" onclick="AccGLTransaction.SaveData()">@AdminResources.LabelSave</button>
 
-									<div class="col-lg-2">
-										<div class="mb-3">
-											@Html.LabelFor(x => x.NarrationDescription, new { @class = "form-label required " })
-											@Html.TextAreaFor(x => x.NarrationDescription, new { @class = "form-control" })
-											@Html.ValidationMessageFor(x => x.NarrationDescription)
-										</div>
-									</div>
-									<div class="col-lg-2">
-										<div class="mb-3">
-											@Html.LabelFor(x => x.TransactionRefId, new { @class = "form-label required" })
-											@Html.TextBoxFor(x => x.TransactionRefId, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
-											@Html.ValidationMessageFor(x => x.TransactionRefId)
-										</div>
-									</div>
-								</div>
-							
-								<div class="mb-3">
-									<button type="button" id="addRowButton" class="btn btn-sm btn-soft-success btn-circle ">
-										<i class='fas ti-plus'></i>
-									</button>
-								</div>
-
-								<!-- Transaction Details Table -->
-								<div id="accGLTransactionDetailsId">
-									<table id="example" class="table table-striped">
-										<thead>
-											<tr>
-												<th>Account</th>
-												<th>Narration</th>
-												<th>Debit</th>
-												<th>Credit</th>
-												<th>Actions</th>
-											</tr>
-										</thead>
-										<tbody> </tbody>
-										<tfoot id="tableDebitCredit" style="display: none">
-											<tr>
-												<th></th>
-												<th></th>
-												<th>
-													<input type="text" id="debitBal" class="form-control" value="0" style="text-align: right;" disabled />
-												</th>
-												<th>
-													<input type="text" id="creditBal" class="form-control" value="0" style="text-align: right;" disabled />
-												</th>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-							</div>
-
-							//<button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-							<button type="submit" class="btn btn-success" onclick="AccGLTransaction.SaveData()">@AdminResources.LabelSave</button>
-
-							<a href="../@controllerName/Cancel?SelectedParameter1=@Model.AccSetupBalanceSheetId" class="btn btn-secondary">
-								<i class="ft-x"></i>@AdminResources.LabelCancel
-							</a>
-						}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                            <a href="../@controllerName/Cancel?SelectedParameter1=@Model.AccSetupBalanceSheetId" class="btn btn-secondary">
+                                <i class="ft-x"></i>@AdminResources.LabelCancel
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
 <script src="~/js/coditech/Accounts/AccGLTransaction.js"></script>
 <script>
-	document.addEventListener("DOMContentLoaded", function () {
-		console.log("jQuery loaded:", typeof jQuery);
-		console.log("Typeahead loaded:", typeof $.fn.typeahead);
-	});
-	$(document).ready(function () {
-		if (typeof AccGLTransaction !== "undefined" && AccGLTransaction !== null) {
-			// Attach event to Add Row button
-			$("#addRowButton").click(function () {
-				AccGLTransaction.AddRow();
-			});
-			// Update totals when debit/credit fields change
-			$(document).on("input", ".debit-field, .credit-field", function () {
-				AccGLTransaction.calculateTotals();
-			});
-			// Uncomment this if you want to pre-load transaction details
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM fully loaded");
+
+        const addRowButton = document.getElementById("addRowButton");
+
+        if (typeof AccGLTransaction !== "undefined" && AccGLTransaction !== null) {
+            addRowButton.addEventListener("click", function () {
+                let isValid = true;
+                let messages = [];
+
+                // Utility to validate field and show error
+                function validateField(fieldId, message) {
+                    const field = document.getElementById(fieldId);
+                    const value = field?.value?.trim();
+                    const validationSpan = field?.closest(".mb-3")?.querySelector(".field-validation-error");
+                    if (!value) {
+                        isValid = false;
+                        messages.push(message);
+                        if (validationSpan) validationSpan.textContent = message;
+                    } else {
+                        if (validationSpan) validationSpan.textContent = "";
+                    }
+                }
+
+                // Run validations
+                validateField("SelectedCentreCode", "Centre is required.");
+                validateField("GeneralFinancialYearId", "Financial Year is required.");
+                validateField("AccSetupTransactionTypeId", "Transaction Type is required.");
+                validateField("NarrationDescription", "Narration Description is required.");
+                validateField("TransactionRefId", "Transaction Ref is required.");
+
+                if (!isValid) {
+                    console.log("Validation failed:", messages);
+                    CoditechNotification.DisplayNotificationMessage("Please select the required fields", "error");
+                    setTimeout(function () {
+                        if ($("#notificationDivId").is(":visible")) {
+                            $("#notificationDivId").fadeOut(1000);
+                        }
+                    }, 2500);
+                    return false;
+                }
+                // All good, add row
+                AccGLTransaction.AddRow();
+            });
+
+            // Handle debit/credit input changes
+            document.addEventListener("input", function (event) {
+                if (event.target.classList.contains("debit-field") || event.target.classList.contains("credit-field")) {
+                    AccGLTransaction.calculateTotals();
+                }
+            });
+
+            // Load initial rows if needed
 			AccGLTransaction.GetTransactionDetailsByType(@Model.AccSetupBalanceSheetTypeId);
 
-		} else {
-			console.error("⚠️ AccGLTransaction is not loaded. Check script path or JS errors.");
-		}
-	});
+        } else {
+            console.error("⚠️ AccGLTransaction is not loaded. Check script path or JS errors.");
+        }
+    });
 </script>
-

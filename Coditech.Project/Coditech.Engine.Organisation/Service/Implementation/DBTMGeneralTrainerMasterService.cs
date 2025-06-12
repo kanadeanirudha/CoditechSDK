@@ -81,7 +81,7 @@ namespace Coditech.API.Service
                         //Insert Admin Role
                         InsertAdminRole(currentDate, ApiCustomSettings.TrainerDepartmentId, employeeMaster.CentreCode, generalTrainerModel.EmployeeId, ApiCustomSettings.TrainerDesignationId, DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), ApiCustomSettings.DBTMTrainerMenuCode.Split(",").ToList(), out sanctionPostCode);
                     }
-                    generalPerson.Custom1 = "DBTMTrainer";
+                    generalPerson.Custom1 = CustomConstants.DBTMTrainer;
                     _generalPersonRepository.Update(generalPerson);
                 }
                 return generalTrainerModel;

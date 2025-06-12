@@ -120,7 +120,7 @@ namespace Coditech.Admin.Helpers
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
 
                 // Filter the list if the user is a trainer
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     list.GeneralTrainerList = list.GeneralTrainerList?.Where(x =>
                         string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
@@ -128,7 +128,7 @@ namespace Coditech.Admin.Helpers
                 }
             }
 
-            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != "DBTMTrainer")
+            if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != CustomConstants.DBTMTrainer)
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
             else
                 dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
@@ -266,14 +266,14 @@ namespace Coditech.Admin.Helpers
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             string centreCode = userModel.SelectedCentreCode;
             long entityId = 0;
-            if (userModel?.Custom1 == "DBTMTrainer")
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
                 entityId = userModel.EntityId;
             }
             DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, entityId, null, null, null, 1, int.MaxValue);
             DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
-            if (userModel?.Custom1 == "DBTMTrainer")
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
                 list.DBTMTraineeDetailsList = list.DBTMTraineeDetailsList?.Where(x =>
                     string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&

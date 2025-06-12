@@ -24,10 +24,11 @@
         $("#notificationMessageId").html("").html(message);
         $("#notificationDivId").addClass(notificationStyle);
         $("#notificationDivId").show();
+        $("#notificationDivId").fadeOut(10000); // fades slowly
     },
 }
 
 $("#notificationCloseId").click(function () {
-    $("#notificationDivId").fadeOut(1000);
+    $("#notificationDivId").stop(true, true).fadeOut(1000);
 });
 $("#notificationDivId").fadeOut(10000);

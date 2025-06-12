@@ -37,7 +37,7 @@
                         {
                             <span class="card-title">All Trainee Details List</span>
                         }
-                        @if (userModel?.Custom1 != "DBTMTrainer")
+                        @if (userModel?.Custom1 != CustomConstants.DBTMTrainer)
                         {
                             <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateDBTMTrainee" role="button"><i class="fas fa-plus me-2"></i>Add Trainee</a>
                         }

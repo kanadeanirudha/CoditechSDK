@@ -1,34 +1,33 @@
 ﻿@model UserModel
-
+@{
+	UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+}
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle waves-effect waves-light nav-user"
-       href="#" id="balanceSheetDropdown"
-       role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fas fa-list-ul" data-fa-transform="grow-12" style="color: pink;"></i>
-    </a>
-
-    <ul class="dropdown-menu" aria-labelledby="balanceSheetDropdown">
-        @if (Model?.BalanceSheetList?.Count > 0)
-        {
-            @foreach (var item in Model.BalanceSheetList)
-            {
-                <li>
-                    <a class="dropdown-item" href="/User/ChangeAccountBalanceSheet?selectedBalanceId=@item.AccSetupBalanceSheetId">
-                        @item.AccBalancesheetHeadDesc
-                    </a>
-                </li>
-            }
-        }
-    </ul>
-</li>
-
-
-
-
-
-
-
-
-
-
-
+	<a class="nav-link dropdown-toggle waves-effect waves-light nav-user"
+	   href="#" id="balanceSheetDropdown"
+	   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+		<i class="fas fa-list-ul" data-fa-transform="grow-12" style="color: pink;"></i>
+	</a>
+	<ul class="dropdown-menu" aria-labelledby="balanceSheetDropdown">
+		@if (Model?.BalanceSheetList?.Count > 0)
+		{
+			@foreach (var item in Model.BalanceSheetList)
+			{
+					<li>
+					<a class="dropdown-item d-flex align-items-center"
+                       style="width: 250px; white-space: normal;" href="/User/ChangeAccountBalanceSheet?selectedBalanceId=@item.AccSetupBalanceSheetId">
+							@if (userData.SelectedBalanceSheetId == item.AccSetupBalanceSheetId)
+							{
+							<i class="fas fa-check-circle btn-soft-success me-2" style="pointer-events:none;"></i>
+							}
+							else
+							{
+							<i class="fas fa-times-circle btn-soft-danger me-2" style="pointer-events:none;"></i>
+							}
+							@item.AccBalancesheetHeadDesc
+						</a>
+					</li>
+			}
+		}
+	</ul>
+</li

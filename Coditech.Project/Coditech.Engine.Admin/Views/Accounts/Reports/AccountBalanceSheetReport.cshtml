@@ -1,0 +1,103 @@
+﻿@model AccountBalanceSheetReportViewModel
+@{
+	ViewBag.Title = "Account BalanceSheet Report";
+	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+	string actionName = ViewContext.RouteData.Values["action"].ToString();
+	DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "AccountBalanceSheetReport.GetFinancialYearListByCentreCode()" };
+	DropdownViewModel balanceSheetDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseAccountBalanceSheet.ToString(), DropdownName = "AccSetupBalanceSheetId", DropdownSelectedValue = Model.AccSetupBalanceSheetId.ToString() };
+	DropdownViewModel financialYearDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.FinancialYear.ToString(), DropdownName = "GeneralFinancialYearId", DropdownSelectedValue = Model.GeneralFinancialYearId.ToString(), Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}" : "" };
+
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<span class="card-title">Account BalanceSheet Reports</span>
+					</div>
+					<div class="card-header">
+						@using (Html.BeginForm("AccountBalanceSheetReport", controllerName, FormMethod.Post))
+						{
+							<div class="row">
+								<div class="col-md-1">
+									<label class="form-label">@AdminResources.LabelCentre</label>
+								</div>
+								<div class="col-md-4">
+									@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+									@Html.ValidationMessageFor(x => x.SelectedCentreCode)
+								</div>
+								<div class="col-lg-3">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.GeneralFinancialYearId, new { @class = "form-label required" })
+										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", financialYearDropdown)
+										@Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.AccSetupBalanceSheetId, new { @class = "form-label required" })
+										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", balanceSheetDropdown)
+										@Html.ValidationMessageFor(x => x.AccSetupBalanceSheetId)
+									</div>
+								</div>
+								<div class="col-md-1">
+									<button type="submit" class="btn btn-success">Download</button>
+								</div>
+								<div class="col-md-1">
+									<!-- New preview button -->
+									<button type="button" id="previewReport" class="btn btn-primary">Preview</button>
+								</div>
+							</div>
+							<div class="row mt-4">
+								<div class="col-12">
+									<iframe id="reportFrame" width="100%" height="800px" frameborder="0"></iframe>
+								</div>
+							</div>
+						}
+
+						@if (!Model.IsRecordFound)
+						{
+							<div class="row">
+								<div class="col-sm-12 col-md-5">
+									<span>No Result Found</span>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end page content -->
+<script src="~/js/coditech/Accounts/Reports/AccountBalanceSheetReport.js"></script>
+@section scripts {
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#previewReport').on('click', function () {
+				var centreCode = $('#SelectedCentreCode').val();
+				var fromDate = $('#FromDate').val();
+				var toDate = $('#ToDate').val();
+				var reportType = $('#ReportType').val();
+
+				if (!centreCode || !fromDate || !toDate) {
+					alert("Please fill all required fields.");
+					return;
+				}
+
+				var form = $('#pdfPostForm');
+
+				form.find('input[name="SelectedCentreCode"]').val(centreCode);
+				form.find('input[name="FromDate"]').val(fromDate);
+				form.find('input[name="ToDate"]').val(toDate);
+				form.find('input[name="ReportType"]').val(reportType);
+
+				$('#reportFrame').show(); // show the iframe
+				form.submit();
+			});
+		});
+	</script>
+}
+

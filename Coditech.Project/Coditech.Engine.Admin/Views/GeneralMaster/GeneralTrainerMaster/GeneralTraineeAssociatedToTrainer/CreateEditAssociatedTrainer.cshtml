@@ -5,8 +5,9 @@
 
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("DBTMTraineeDetailId", Model.EntityId > 0 ? Model.EntityId.ToString() : Model.DBTMTraineeDetailId.ToString());
+    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId.ToString());
     keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()", IsDisabled = Model.GeneralTraineeAssociatedToTrainerId > 0 };
     DropdownViewModel departmentDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(), DropdownName = "SelectedDepartmentId", DropdownSelectedValue = Convert.ToString(Model.SelectedDepartmentId), Parameter = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetTrainerListByCentreCodeAndDepartmentId()", IsDisabled = Model.GeneralTraineeAssociatedToTrainerId > 0 };
 }
@@ -14,9 +15,9 @@
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-2">
+                <div class="col-lg-2">
                 @Html.Partial("~/Views/DBTM/DBTMTraineeDetails/_DBTMTraineeDetailsSidePannel.cshtml", keyValuePairs)
-            </div>
+                </div>
 
             <div class="col-lg-10">
                 <div class="card">
@@ -43,14 +44,14 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.SelectedCentreCode, new { @class = "form-label required" })
+                                        @Html.LabelFor(x => x.SelectedCentreCode, new { @class = "form-label required"})
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                                         @Html.ValidationMessageFor(x => x.SelectedCentreCode)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.SelectedDepartmentId, new { @class = "form-label required" })
+                                        @Html.LabelFor(x => x.SelectedDepartmentId, new { @class = "form-label required"})
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", departmentDropdown)
                                         @Html.ValidationMessageFor(x => x.SelectedDepartmentId)
                                     </div>
@@ -77,7 +78,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsCurrentTrainer, new { @class = "form-check-label" })
+                                        @Html.LabelFor(x => x.IsCurrentTrainer, new { @class = "form-check-label"})
                                         <div class="form-check">
                                             @Html.CheckBoxFor(x => x.IsCurrentTrainer, new { @class = "form-check-input" })
                                         </div>

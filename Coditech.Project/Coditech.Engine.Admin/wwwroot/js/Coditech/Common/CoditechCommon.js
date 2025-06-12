@@ -10,6 +10,9 @@
     },
 
     HideLodder: function () {
+        $(function () {
+            initializeSelect2Dropdowns();
+        });
         $('.spinner').css('display', 'none');
     },
 
@@ -339,4 +342,18 @@
         window.location.href = url;
         CoditechCommon.HideLodder();
     },
+
+    AvoidSpacingAndSpecialCharacters: function () {
+        const charCode = event.which || event.keyCode;
+        if (
+            (charCode >= 48 && charCode <= 57) ||
+            (charCode >= 65 && charCode <= 90) ||
+            (charCode >= 97 && charCode <= 122)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+
 }
