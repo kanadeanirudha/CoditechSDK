@@ -42,7 +42,7 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
-        [Route("/dbtmapi/getbatchlist")]
+        [Route("/DBTMApi/Getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
         public virtual IActionResult GetBatchList(long entityId, string userType)

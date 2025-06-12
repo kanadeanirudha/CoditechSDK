@@ -5,7 +5,7 @@
     
 }
 @Html.HiddenFor(m => m.OrganisationCentrewiseAccountSetupId)
-<div class="col-lg-6">
+<div class="col-lg-4">
     <div class="mb-3">
         @Html.LabelFor(x => x.GeneralCurrencyMasterId, new { @class = "form-label required" })
         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", currencyDropdown)

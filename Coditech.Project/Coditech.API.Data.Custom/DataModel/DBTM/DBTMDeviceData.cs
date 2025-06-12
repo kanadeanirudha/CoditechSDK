@@ -6,12 +6,15 @@ namespace Coditech.API.Data
     {
         [Key]
         public long DBTMDeviceDataId { get; set; }
+        public string TypeOfRecord { get; set; }
+        public long TablePrimaryColumnId { get; set; }
         public string DeviceSerialCode { get; set; }
         public string PersonCode { get; set; }
         public string TestCode { get; set; }
         public string Comments { get; set; }
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
+        public DateTime TestPerformedTime { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

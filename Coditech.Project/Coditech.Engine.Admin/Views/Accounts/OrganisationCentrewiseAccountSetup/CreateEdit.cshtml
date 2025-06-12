@@ -37,7 +37,7 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
@@ -47,7 +47,7 @@
                                 <div id="OrganisationCentrewiseAccountSetupDivId">
                                     @if (!string.IsNullOrWhiteSpace(Model.CentreCode))
                                     {
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <div class="mb-3">
                                                 @Html.LabelFor(x => x.GeneralCurrencyMasterId, new { @class = "form-label required" })
                                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", currencyDropdown)
@@ -55,7 +55,6 @@
                                             </div>
                                         </div>
                                     }
-
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>

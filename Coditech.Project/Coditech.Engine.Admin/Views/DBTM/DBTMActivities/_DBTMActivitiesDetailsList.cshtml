@@ -2,8 +2,6 @@
 @model DBTMActivitiesDetailsListViewModel
 @{
     Layout = null;
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 
 <div class="row">
@@ -30,16 +28,6 @@
                             }
                         </tr>
                     }
-                    @*  @foreach (var datatableColumn in Model?.DataTable.Columns)
-                {
-                @foreach (var item in Model?.DataTable.Rows)
-                {
-                <tr>
-                <td>@item.</td>
-                </tr>
-                }
-                }
-                *@
                 </tbody>
             }
         </table>

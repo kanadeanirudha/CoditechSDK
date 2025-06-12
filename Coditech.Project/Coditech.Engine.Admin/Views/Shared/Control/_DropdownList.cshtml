@@ -1,5 +1,4 @@
-﻿@using Coditech.Admin.Helpers
-@model DropdownViewModel
+﻿@model DropdownViewModel
 @{
     if (Model.IsCustomDropdown)
     {
@@ -9,12 +8,16 @@
     {
         CoditechDropdownHelper.GeneralDropdownList(Model);
     }
+    var htmlAttributes = new Dictionary<string, object>
+    {
+        { "class", "form-select select2-dropdown " + Model.ClassName },
+        { "onchange", Model.ChangeEvent },
+        { "id", Model.DropdownName }
+    };
+    if (Model.IsDisabled)
+    {
+        htmlAttributes["disabled"] = "disabled";
+    }
 }
-@if (Model.IsDisabled)
-{
-    @Html.DropDownList(Model.DropdownName, Model.DropdownList, new { @class = "form-select " + Model.ClassName, @onchange = Model.ChangeEvent, @disabled = "disabled" })
-}
-else
-{
-    @Html.DropDownList(Model.DropdownName, Model.DropdownList, new { @class = "form-select " + Model.ClassName, @onchange = Model.ChangeEvent })
-}
+
+@Html.DropDownList(Model.DropdownName, Model.DropdownList, htmlAttributes)

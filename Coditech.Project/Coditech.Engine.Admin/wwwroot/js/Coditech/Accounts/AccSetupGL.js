@@ -14,6 +14,29 @@ var AccSetupGL = {
                 Initialize();
             } else {
             }
+            $(document).ready(function () {
+                // Live validation + auto-uppercase
+                $(document).on('input', '#IFSCCode', function () {
+                    const regex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+                    const $input = $(this);
+                    const $error = $("[data-valmsg-for='IFSCCode']");
+
+                    // Convert to uppercase
+                    $input.val($input.val().toUpperCase());
+
+                    const ifscCode = $input.val();
+
+                    // Validation messages
+                    if (!ifscCode) {
+                        $error.text("IFSC code is required.");
+                    } else if (!regex.test(ifscCode)) {
+                        $error.text("Invalid IFSC code format.");
+                    } else {
+                        $error.text(""); // Valid
+                    }
+                });
+            });
+
 
             $('#addChildForm').on('submit', function (e) {
                 e.preventDefault();
@@ -97,7 +120,7 @@ var AccSetupGL = {
                 $(".text-danger").text("");
                 console.log("🧹 3Modal fully reset on close");
                 let url = window.location.origin + window.location.pathname +
-                    '?selectedCentreCode=' + ( $("#SelectedCentreCode").val() || '') +
+                    '?selectedCentreCode=' + ($("#SelectedCentreCode").val() || '') +
                     '&accSetupBalanceSheetTypeId=' + ($("#AccSetupBalanceSheetTypeId").val() || '') +
                     '&accSetupBalancesheetId=' + ($("#AccSetupBalancesheetId").val() || '');
 
@@ -319,21 +342,27 @@ var AccSetupGL = {
         if (accSetupGLTypeId === "5") {
             let bankAccountName = $('#BankAccountName').val().trim();
             let bankBranchName = $('#BankBranchName').val().trim();
-            let ifscCode = $('#IFSCCode').val().trim();
+            let ifscCode = $('#IFSCCode').val().trim().toUpperCase();  // Force uppercase here
             let bankAccountNumber = $('#BankAccountNumber').val().trim();
-            let regex = /^[A-Z]{4}0[A-Z0-9]{6}$/i; // ✅ IFSC Code Validation (Case-insensitive)
+
+            let regex = /^[A-Z]{4}0[A-Z0-9]{6}$/;  // IFSC regex (case-sensitive, so input forced uppercase)
+
+            let isValid = true;  // You should initialize isValid if not already
+
             if (!bankAccountName) {
                 $("[data-valmsg-for='BankAccountName']").text("Bank account name is required.");
                 isValid = false;
             } else {
                 $("[data-valmsg-for='BankAccountName']").text("");
             }
+
             if (!bankBranchName) {
                 $("[data-valmsg-for='BankBranchName']").text("Bank branch name is required.");
                 isValid = false;
             } else {
                 $("[data-valmsg-for='BankBranchName']").text("");
             }
+
             if (!ifscCode) {
                 $("[data-valmsg-for='IFSCCode']").text("IFSC code is required.");
                 isValid = false;
@@ -343,22 +372,27 @@ var AccSetupGL = {
             } else {
                 $("[data-valmsg-for='IFSCCode']").text("");
             }
+
             if (!bankAccountNumber) {
                 $("[data-valmsg-for='BankAccountNumber']").text("Bank account number is required.");
                 isValid = false;
             } else {
                 $("[data-valmsg-for='BankAccountNumber']").text("");
             }
-            // ✅ Store bank details if valid
-            bankModel = {
-                AccSetupBalanceSheetId: $('#AccSetupBalanceSheetId').val(),
-                AccSetupGLId: $('#AccSetupGLId').val(),
-                BankAccountName: bankAccountName,
-                BankBranchName: bankBranchName,
-                IFSCCode: ifscCode,
-                BankAccountNumber: bankAccountNumber
-            };
+
+            if (isValid) {
+                // Store bank details if valid
+                bankModel = {
+                    AccSetupBalanceSheetId: $('#AccSetupBalanceSheetId').val(),
+                    AccSetupGLId: $('#AccSetupGLId').val(),
+                    BankAccountName: bankAccountName,
+                    BankBranchName: bankBranchName,
+                    IFSCCode: ifscCode,
+                    BankAccountNumber: bankAccountNumber
+                };
+            }
         }
+
         // ✅ Store JSON Data in Hidden Field Only If AccSetupGLTypeId is 5
         if (bankModel) {
             let jsonData = JSON.stringify(bankModel);
@@ -448,7 +482,7 @@ var AccSetupGL = {
                     setTimeout(() => {
                         $('input[name="BankAccountName"]').val(response.data['bankAccountName'] || '');
                         $('input[name="BankAccountNumber"]').val(response.data['bankAccountNumber'] || '')
-                            .attr('disabled', 'disabled'); 
+                            .attr('disabled', 'disabled');
                         $('input[name="BankBranchName"]').val(response.data['bankBranchName'] || '');
                         $('input[name="IFSCCode"]').val(response.data['iFSCCode'] || '').attr('disabled', 'disabled');
                     }, 100);
@@ -576,12 +610,13 @@ var AccSetupGL = {
             CoditechNotification.DisplayNotificationMessage("Please select Centre and Balance Sheet Type.", "error");
         }
     },
-
     GetAccSetupGLTree: function () {
         var selectedCentreCode = $("#SelectedCentreCode").val();
         var accSetupBalanceSheetTypeId = $("#AccSetupBalanceSheetTypeId").val();
         var accSetupBalanceSheetId = $("#AccSetupBalanceSheetId").val();
+
         $("#AccSetupGLTreeDivId").html("");
+
         if (selectedCentreCode != "" && accSetupBalanceSheetTypeId != "" && accSetupBalanceSheetId != "") {
             CoditechCommon.ShowLodder();
             $.ajax({
@@ -603,12 +638,24 @@ var AccSetupGL = {
                     if (xhr.status == "401" || xhr.status == "403") {
                         location.reload();
                     }
+
                     CoditechNotification.DisplayNotificationMessage("Failed to retrieve BalanceSheet.", "error");
+
+                    // Automatically fade out the error message after 10 seconds
+                    setTimeout(function () {
+                        $("#notificationDivId").fadeOut(1000);
+                    }, 1000);
+
                     CoditechCommon.HideLodder();
                 }
             });
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select Centre and Balance Sheet Type and BalanceSheet.", "error");
+
+            // Automatically fade out the error message after 10 seconds
+            setTimeout(function () {
+                $("#notificationDivId").fadeOut(1000);
+            }, 1000);
         }
     }
 };
@@ -682,8 +729,14 @@ $(document).ready(function () {
             $("#bankContainer").html("");
         }
     });
+
     // Initialize AccSetupGL when the document is ready
     if (typeof AccSetupGL !== "undefined" && typeof AccSetupGL.Initialize === "function") {
         AccSetupGL.Initialize();
     }
+
+    // Use delegated event for dynamic IFSCCode input
+    $(document).on('input', '#IFSCCode', function () {
+        this.value = this.value.toUpperCase();
+    });
 });
