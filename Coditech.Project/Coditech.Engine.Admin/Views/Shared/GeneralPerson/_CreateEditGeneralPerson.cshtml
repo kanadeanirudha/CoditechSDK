@@ -215,14 +215,16 @@
             @Html.ValidationMessageFor(x => x.GeneralOccupationMasterId)
         </div>
     </div>
-    <div class="col-lg-3">
-        <div class="mb-3">
-            @Html.LabelFor(x => x.PhotoMediaId, new { @class = "form-label" })
-            <input type="file" id="imageUpload" class="form-control" />
-            <img id="imagePreview" src="#" alt="Uploaded Image" style="display:none;width:100px;height:100px;margin-top:10px;" />
+    @if (Model.PersonId != 0)
+    {
+        <div class="col-lg-3">
+            <div class="mb-3">
+                @Html.LabelFor(x => x.PhotoMediaId, new { @class = "form-label" })
+                <input type="file" id="imageUpload" class="form-control" />
+                <img id="imagePreview" src="#" alt="Uploaded Image" style="display:none;width:100px;height:100px;margin-top:10px;" />
+            </div>
         </div>
-    </div>
-
+    }
 </div>
 <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
 
@@ -249,7 +251,7 @@
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        if(response.status == true||response.status == "true"){
+                        if (response.status == true || response.status == "true") {
                             $('#imagePreview').attr('src', response.imageUrl).show();
                             $('input[name="PhotoMediaId"]').val(response.photoMediaId);
                         }

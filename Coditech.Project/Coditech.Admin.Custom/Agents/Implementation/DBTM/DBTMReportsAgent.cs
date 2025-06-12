@@ -3,6 +3,7 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 
 namespace Coditech.Admin.Agents
@@ -40,7 +41,7 @@ namespace Coditech.Admin.Agents
         {
             long entityId = 0;
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-            if (userModel?.Custom1 == "DBTMTrainer")
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
                 entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
             }

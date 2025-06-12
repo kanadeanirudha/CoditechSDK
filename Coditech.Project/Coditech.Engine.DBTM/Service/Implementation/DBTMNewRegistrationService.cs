@@ -154,7 +154,7 @@ namespace Coditech.API.Service
             {
                 DateTime currentDate = DateTime.Now;
 
-                dBTMNewRegistrationModel.Custom1 = "DBTMTrainer";
+                dBTMNewRegistrationModel.Custom1 = CustomConstants.DBTMTrainer;
                 //Insert General Person and registor employee
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.TrainerDepartmentId.ToString(), ApiCustomSettings.TrainerDesignationId, out personId);
                 if (employeeId > 0)

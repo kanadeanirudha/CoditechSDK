@@ -48,7 +48,8 @@
                                                                name="ACCGLBalanceList[@item.AccSetupGLId].OpeningBalance"
                                                                type="text"
                                                                value="@item.ClosingBalance"
-                                                        @(item.ClosingBalance > 0 ? "readonly" : "") />
+                                                        @(item.ClosingBalance > 0 ? "readonly" : "")
+                                                               onkeypress="return CoditechCommon.ValidNumeric()" />
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
@@ -66,7 +67,11 @@
                                     }
                                 </tbody>
                             </table>
-                            <button type="submit" class="btn btn-success" onclick="AccGLOpeningBalance.SaveIndividualOpeningBalanceData()">@AdminResources.LabelSave</button>
+
+                            @if (Model?.AccGLIndividualOpeningBalanceList?.Count > 0)
+                            {
+                                <button type="button" class="btn btn-success" onclick="AccGLOpeningBalance.SaveIndividualOpeningBalanceData()">@AdminResources.LabelSave</button>
+                            }
                         }
                     </div>
                 </div>
