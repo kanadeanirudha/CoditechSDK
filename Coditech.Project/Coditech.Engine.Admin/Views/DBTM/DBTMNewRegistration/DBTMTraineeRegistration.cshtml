@@ -69,14 +69,14 @@
                             @Html.ValidationMessageFor(x => x.LastName)
                         </div>
                     </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-3">
                             <div class="mb-3">
                                 <label class="form-label" for="Custom2">Display Name</label>
-                                @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowOnlyAlphabetWithouSpacing()" })
+                                @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control"})
                                 @Html.ValidationMessageFor(x => x.Custom2)
                             </div>
                         </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-3">
                         <div class="mb-3">
                             @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()

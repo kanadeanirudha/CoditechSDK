@@ -51,6 +51,16 @@
             @Html.ValidationMessageFor(x => x.LastName)
         </div>
     </div>
+    @if (Model.UserType == UserTypeEnum.Trainee.ToString())
+    {
+        <div class="col-lg-3">
+            <div class="mb-3">
+                <label class="form-label" for="Custom2">Display Name</label>
+                @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.Custom2)
+            </div>
+        </div>
+    }
     <div class="col-lg-3">
         <div class="mb-3">
             @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
@@ -92,7 +102,7 @@
     </div>
     <div class="col-lg-3">
         <div class="mb-3">
-            @Html.LabelFor(x => x.EmailId, new { @class = "form-label"})
+            @Html.LabelFor(x => x.EmailId, new { @class = "form-label" })
             @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
             @Html.ValidationMessageFor(x => x.EmailId)
         </div>

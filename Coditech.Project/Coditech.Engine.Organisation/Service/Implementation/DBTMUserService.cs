@@ -7,7 +7,6 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
 using System.Diagnostics;
-
 using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.API.Service
@@ -184,6 +183,10 @@ namespace Coditech.API.Service
                 generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
+            if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))
+            {
+                generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
+            }
             generalPersonModel = base.InsertPersonInformation(generalPersonModel);
 
             if (!generalPersonModel.HasError)
@@ -243,6 +246,7 @@ namespace Coditech.API.Service
         {
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
         }
+
         #endregion
     }
 }
