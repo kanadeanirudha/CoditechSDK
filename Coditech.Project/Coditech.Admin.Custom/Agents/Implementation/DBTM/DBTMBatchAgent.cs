@@ -33,8 +33,11 @@ namespace Coditech.Admin.Agents
                 filters.Add("BatchName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("BatchTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-            long userId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserMasterId;
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "BatchName " : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            long userId = 0;
+            if (userModel.Custom1 == CustomConstants.DBTMTrainer)
+                userId = userModel.UserMasterId;
 
             GeneralBatchListResponse response = _generalBatchClient.List(dataTableModel.SelectedCentreCode, userId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             GeneralBatchListModel generalBatchList = new GeneralBatchListModel { GeneralBatchList = response?.GeneralBatchList };
