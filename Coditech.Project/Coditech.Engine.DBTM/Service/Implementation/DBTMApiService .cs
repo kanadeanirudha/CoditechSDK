@@ -196,14 +196,12 @@ namespace Coditech.API.Service
                 dBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
                 dBTMTestApiModel.IsActive = testDetails.IsActive;
 
-                List<DBTMTraineeAssignmentToUserApiModel> generalTraineeAssignmentToUserList = (from a in _dBTMTraineeAssignmentToUserRepository.Table
+                PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+                CoditechViewRepository<DBTMTraineeAssignmentToUserApiModel> objStoredProc = new CoditechViewRepository<DBTMTraineeAssignmentToUserApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+                objStoredProc.SetParameter("@DBTMTraineeAssignmentId", dBTMTraineeAssignmentId, ParameterDirection.Input, DbType.Int64);
+                objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+                List<DBTMTraineeAssignmentToUserApiModel> generalTraineeAssignmentToUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralAssignmentToUserList @DBTMTraineeAssignmentId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
 
-                                                                                                where a.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId
-                                                                                                select new DBTMTraineeAssignmentToUserApiModel
-                                                                                                {
-                                                                                                    DBTMTraineeDetailId = a.DBTMTraineeDetailId
-                                                                                                }
-                                                                   )?.ToList();
                 dBTMTestApiModel.DBTMTraineeAssignmentToUserApiModel = generalTraineeAssignmentToUserList ?? new List<DBTMTraineeAssignmentToUserApiModel>();
             }
             return dBTMTestApiModel;
