@@ -101,6 +101,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult CreateDBTMTrainee()
         {
             DBTMTraineeDetailsCreateEditViewModel viewModel = new DBTMTraineeDetailsCreateEditViewModel();
+            viewModel.UserType = UserTypeEnum.Trainee.ToString();
             return View(createEditTraineeDetails, viewModel);
         }
 
