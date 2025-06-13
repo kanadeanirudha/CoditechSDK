@@ -101,6 +101,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult CreateDBTMTrainee()
         {
             DBTMTraineeDetailsCreateEditViewModel viewModel = new DBTMTraineeDetailsCreateEditViewModel();
+            viewModel.UserType = UserTypeEnum.Trainee.ToString();
             return View(createEditTraineeDetails, viewModel);
         }
 
@@ -125,6 +126,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult UpdateDBTMTraineePersonalDetails(long dBTMTraineeDetailId, long personId)
         {
             DBTMTraineeDetailsCreateEditViewModel dBTMTraineeDetailsCreateEditViewModel = _dBTMTraineeDetailsAgent.GetDBTMTraineePersonalDetails(dBTMTraineeDetailId, personId);
+            dBTMTraineeDetailsCreateEditViewModel.UserType = UserTypeEnum.Trainee.ToString();
             return ActionView(createEditTraineeDetails, dBTMTraineeDetailsCreateEditViewModel);
         }
 
