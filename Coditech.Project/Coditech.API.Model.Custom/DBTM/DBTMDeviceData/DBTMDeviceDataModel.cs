@@ -24,7 +24,6 @@ namespace Coditech.Common.API.Model
         [MaxLength(200)]
         public string Comments { get; set; }
 
-        [XmlIgnore]
         public long CreatedBy { get; set; }
         [JsonPropertyName("TFT")]
         public DateTime TestPerformedTime { get; set; }
