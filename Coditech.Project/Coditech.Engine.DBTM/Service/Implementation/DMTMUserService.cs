@@ -54,6 +54,7 @@ namespace Coditech.API.Service
             DBTMUserModel userModel = new DBTMUserModel()
             {
                 EntityId = userMasterData.EntityId,
+                EmailId = userMasterData.EmailId,
                 IsPasswordChange = userMasterData.IsPasswordChange,
                 IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions,
                 PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId),
