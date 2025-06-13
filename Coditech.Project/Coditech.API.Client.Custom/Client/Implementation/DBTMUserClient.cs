@@ -4,8 +4,6 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Newtonsoft.Json;
 using System.Net;
-using Coditech.Common.Logger;
-using System.Diagnostics;
 
 namespace Coditech.API.Client
 {
@@ -85,11 +83,9 @@ namespace Coditech.API.Client
             bool disposeResponse = true;
             try
             {
-                new CoditechLogging().LogMessage("TraineeRegistrationAsync 1:"+ endpoint, "TraineeRegistration", TraceLevel.Error);
                 ApiStatus status = new ApiStatus();
                 response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
                 Dictionary<string, IEnumerable<string>> dictionary = BindHeaders(response);
-                new CoditechLogging().LogMessage("TraineeRegistrationAsync 2:" + JsonConvert.SerializeObject(response), "TraineeRegistration", TraceLevel.Error);
 
                 switch (response.StatusCode)
                 {
@@ -117,17 +113,10 @@ namespace Coditech.API.Client
                         {
                             string value = ((response.Content != null) ? (await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)) : null);
                             GeneralPersonResponse result = JsonConvert.DeserializeObject<GeneralPersonResponse>(value);
-                            new CoditechLogging().LogMessage("TraineeRegistrationAsync 3:" + JsonConvert.SerializeObject(result), "TraineeRegistration", TraceLevel.Error);
-
                             UpdateApiStatus(result, status, response);
                             throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                         }
                 }
-            }
-            catch (Exception ex)
-            {
-                new CoditechLogging().LogMessage(ex, "TraineeRegistration", TraceLevel.Error);
-                throw new CoditechException(null, null, null);
             }
             finally
             {
