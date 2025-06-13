@@ -149,13 +149,6 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
                 List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralBatchUserList @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
 
-                if (generalBatchUserList?.Count > 0)
-                {
-                    foreach (var user in generalBatchUserList)
-                    {
-                        user.DBTMActivityStatus = GetEnumDisplayTextByEnumId(user.ActivityStatusEnumId);
-                    }
-                }
                 dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
             }
             return dBTMBatchModel;
