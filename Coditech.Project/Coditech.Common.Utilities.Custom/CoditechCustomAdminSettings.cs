@@ -12,7 +12,7 @@ namespace Coditech.Admin.Utilities
         /// <returns>The appsettings configuration section.</returns>
         private static IConfigurationSection settings = CoditechDependencyResolver.GetService<IConfiguration>().GetSection("appsettings");
 
-        
+
         public static string CoditechDBTMApiRootUri
         {
             get
@@ -20,7 +20,7 @@ namespace Coditech.Admin.Utilities
 #if DEBUG
                 return Convert.ToString(settings["CoditechDBTMApiRootUri"]);
 #else
-   return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-dbtm.{settings["ApiDomainName"]}");
+                return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-dbtm.{settings["ApiDomainName"]}");
 #endif
             }
         }
@@ -28,10 +28,11 @@ namespace Coditech.Admin.Utilities
         {
             get
             {
-                    return Convert.ToString(settings["CoditechOrganisationApiRootUri"]);
-
-                //return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-organisation.{settings["ApiDomainName"]}");
-
+#if DEBUG
+                return Convert.ToString(settings["CoditechOrganisationApiRootUri"]);
+#else
+                return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-organisation.{settings["ApiDomainName"]}");
+#endif
             }
         }
     }
