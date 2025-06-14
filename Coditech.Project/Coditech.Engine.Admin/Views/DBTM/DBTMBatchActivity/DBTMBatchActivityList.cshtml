@@ -11,10 +11,23 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">DBTM Batch Activity List : @Model.BatchName </span>
-                       
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateDBTMBatchActivity?generalBatchMasterId=@Model.SelectedParameter1" role="button"><i class="fas fa-plus me-2"></i>Add Batch Activity</a>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title">DBTM Batch Activity List : @Model.BatchName</span>
+                        <div class="d-flex">
+                            @if (Model?.DBTMBatchActivityList == null || Model.DBTMBatchActivityList.Count == 0)
+                            {
+                                <a class="btn btn-sm btn-soft-primary"
+                                   href="/@controllerName/CreateDBTMBatchActivity?generalBatchMasterId=@Model.SelectedParameter1"
+                                   role="button">
+                                    <i class="fas fa-plus me-2"></i>Add Batch Activity
+                                </a>
+                            }
+                            <a class="btn btn-sm btn-soft-secondary ms-2"
+                               href="/@controllerName/List?SelectedParameter1=@Model.SelectedCentreCode"
+                               role="button">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
