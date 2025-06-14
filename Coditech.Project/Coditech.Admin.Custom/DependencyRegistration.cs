@@ -26,6 +26,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMDashboardAgent, DBTMDashboardAgent>();
             builder.Services.AddScoped<IDBTMReportsAgent, DBTMReportsAgent>();
             builder.Services.AddScoped<ILiveTestResultDashboardAgent, LiveTestResultDashboardAgent>();
+            builder.Services.AddScoped<IGeneralBatchAgent, DBTMBatchAgent>();
             #endregion
             #endregion Agent
 
