@@ -3,18 +3,18 @@
     ViewBag.Title = Model.GeneralPolicyRulesId > 0 ? "Update General Policy Rule" : "Add General Policy Rule";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string css = Model.GeneralPolicyRulesId > 0 ? "col-lg-10" : "col-lg-12";
+    string css = Model.GeneralPolicyRulesId > 0 || !string.IsNullOrWhiteSpace(Model.PolicyCode) ? "col-lg-10" : "col-lg-12";
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            @if (Model.GeneralPolicyRulesId > 0)
-            {
+            @if (!string.IsNullOrWhiteSpace(Model.PolicyCode))
+            { 
                 <div class="col-lg-2">
                     @Html.Partial("~/Views/GeneralMaster/GeneralPolicyMaster/_GeneralPolicySidePannel.cshtml", Model.PolicyCode)
                 </div>
-            }
+             } 
             <div class="@css">
                 <div class="card">
                     <div class="card-header">

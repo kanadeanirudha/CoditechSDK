@@ -1,85 +1,86 @@
 ﻿@using Coditech.Admin.Utilities;
 @using Coditech.Common.API.Model;
 @{
-    string messageData = Convert.ToString(TempData["Notifications"]);
-    UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-    string applicationLogoPath = CoditechAdminSettings.ApplicationLogoPath;
-    string applicationLogoSmallPath = CoditechAdminSettings.ApplicationLogoSmallPath;
-    string applicationLogoBackground = CoditechAdminSettings.ApplicationLogoBackground;
-    string applicationLayoutBackground = CoditechAdminSettings.ApplicationLayoutBackground;
-    string applicationTitle = CoditechAdminSettings.ApplicationTitle;
-    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
-    TempData.Remove("Notifications");
+	string messageData = Convert.ToString(TempData["Notifications"]);
+	UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+	string applicationLogoPath = CoditechAdminSettings.ApplicationLogoPath;
+	string applicationLogoSmallPath = CoditechAdminSettings.ApplicationLogoSmallPath;
+	string applicationLogoBackground = CoditechAdminSettings.ApplicationLogoBackground;
+	string applicationLayoutBackground = CoditechAdminSettings.ApplicationLayoutBackground;
+	string applicationTitle = CoditechAdminSettings.ApplicationTitle;
+	string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+	TempData.Remove("Notifications");
 }
 <!DOCTYPE html>
 <!-- saved from url=(0081)# -->
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>@ViewData["Title"] | @applicationTitle</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta content="" name="description">
-    <meta content="" name="author">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>@ViewData["Title"] | @applicationTitle</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta content="" name="description">
+	<meta content="" name="author">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="~/favicon.ico">
+	<!-- App favicon -->
+	<link rel="shortcut icon" href="~/favicon.ico">
 
-    <!-- App css -->
-    <link href="~/css/layout/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/css/layout/icons.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/css/layout/metisMenu.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/css/layout/daterangepicker.css" rel="stylesheet" type="text/css" />
-    <link href="~/css/layout/app.min.css" rel="stylesheet" type="text/css">
-    <link href="~/css/layout/datatables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/css/layout/buttons.bootstrap5.min.css" rel="stylesheet" />
-    <link href="~/css/layout/bootstrap-select.min.css" rel="stylesheet" />
-    <link href="~/css/layout/site.css" rel="stylesheet" />
-    <link href="~/css/layout/jstree.css" rel="stylesheet" />
-    @if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
-    {
-        <link href="~/css/layout/@CoditechAdminSettings.ThemeColor-theme.css" rel="stylesheet" />
-    }
+	<!-- App css -->
+	<link href="~/css/layout/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="~/css/layout/icons.min.css" rel="stylesheet" type="text/css" />
+	<link href="~/css/layout/metisMenu.min.css" rel="stylesheet" type="text/css" />
+	<link href="~/css/layout/daterangepicker.css" rel="stylesheet" type="text/css" />
+	<link href="~/css/layout/app.min.css" rel="stylesheet" type="text/css">
+	<link href="~/css/layout/datatables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+	<link href="~/css/layout/buttons.bootstrap5.min.css" rel="stylesheet" />
+	<link href="~/css/layout/bootstrap-select.min.css" rel="stylesheet" />
+	<link href="~/css/layout/site.css" rel="stylesheet" />
+	<link href="~/css/layout/jstree.css" rel="stylesheet" />
+	<link href="~/css/layout/select2.min.css" rel="stylesheet" />
+	@if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
+	{
+		<link href="~/css/layout/@CoditechAdminSettings.ThemeColor-theme.css" rel="stylesheet" />
+	}
 </head>
 
 <body data-layout="horizontal" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
-    @Html.Partial("~/Views/Shared/_Loader.cshtml")
+	@Html.Partial("~/Views/Shared/_Loader.cshtml")
 
-    @if (userData != null)
-    {
-        <!-- Top Bar Start -->
-        <div class="topbar">
-            <!-- LOGO -->
-            <div class="brand" style="background-color:@applicationLogoBackground !important">
-                <a href="..@dashboardUrl" class="logo">
-                    <span>
-                        @if (!string.IsNullOrEmpty(userData?.LogoSmallMediaPath))
-                        {
-                            <img src="@userData.LogoSmallMediaPath" alt="logo-small" class="logo-sm">
-                        }
-                        else
-                        {
-                            <img src="@applicationLogoSmallPath" alt="logo-small" class="logo-sm">
-                        }
+	@if (userData != null)
+	{
+		<!-- Top Bar Start -->
+		<div class="topbar">
+			<!-- LOGO -->
+			<div class="brand" style="background-color:@applicationLogoBackground !important">
+				<a href="..@dashboardUrl" class="logo">
+					<span>
+						@if (!string.IsNullOrEmpty(userData?.LogoSmallMediaPath))
+						{
+							<img src="@userData.LogoSmallMediaPath" alt="logo-small" class="logo-sm">
+						}
+						else
+						{
+							<img src="@applicationLogoSmallPath" alt="logo-small" class="logo-sm">
+						}
 
-                    </span>
-                    <span>
-                        @if (!string.IsNullOrEmpty(userData?.LogoMediaPath))
-                        {
-                            <img src="@userData?.LogoMediaPath" alt="logo-large" class="logo-lg logo-dark">
-                        }
-                        else
-                        {
-                            <img src="@applicationLogoPath" alt="logo-large" class="logo-lg logo-dark">
-                        }
-                    </span>
-                </a>
-            </div>
-            <!--end logo-->
-            <!-- Navbar -->
-            <nav class="navbar-custom">
-                <ul class="list-unstyled topbar-nav float-end mb-0">
-                    @*  <li class="dropdown hide-phone">
+					</span>
+					<span>
+						@if (!string.IsNullOrEmpty(userData?.LogoMediaPath))
+						{
+							<img src="@userData?.LogoMediaPath" alt="logo-large" class="logo-lg logo-dark">
+						}
+						else
+						{
+							<img src="@applicationLogoPath" alt="logo-large" class="logo-lg logo-dark">
+						}
+					</span>
+				</a>
+			</div>
+			<!--end logo-->
+			<!-- Navbar -->
+			<nav class="navbar-custom">
+				<ul class="list-unstyled topbar-nav float-end mb-0">
+					@*  <li class="dropdown hide-phone">
                 <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-bs-toggle="dropdown" role="button" aria-haspopup="false" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search topbar-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </a>
@@ -94,86 +95,104 @@
                 </div>
                 </div>
                 </li> *@
-                    @if (userData?.BalanceSheetList?.Count > 0)
-                    {
-                        @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData)
-                        ;
-                    }
-                    @* @Html.Partial("~/Views/Shared/_NotificationCount.cshtml", userData.UserMasterId) *@
-                    @Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
-                    <li class="menu-item">
-                        <!-- Mobile menu toggle-->
-                        <a class="navbar-toggle nav-link" id="mobileToggle">
-                            <div class="lines">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </a><!-- End mobile menu toggle-->
-                    </li> <!--end menu item-->
-                </ul><!--end topbar-nav-->
+					@if (userData?.BalanceSheetList?.Count > 0)
+					{
+						@Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData)
+						;
+					}
+					@* @Html.Partial("~/Views/Shared/_NotificationCount.cshtml", userData.UserMasterId) *@
+					@Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
+					<li class="menu-item">
+						<!-- Mobile menu toggle-->
+						<a class="navbar-toggle nav-link" id="mobileToggle">
+							<div class="lines">
+								<span></span>
+								<span></span>
+								<span></span>
+							</div>
+						</a><!-- End mobile menu toggle-->
+					</li> <!--end menu item-->
+				</ul><!--end topbar-nav-->
 
-                <div class="navbar-custom-menu">
-                    <div id="navigation">
-                        <!-- Navigation Menu-->
-                        <ul class="navigation-menu">
-                            @Html.Partial("~/Views/Shared/_ModuleList.cshtml", userData)
+				<div class="navbar-custom-menu">
+					<div id="navigation">
+						<!-- Navigation Menu-->
+						<ul class="navigation-menu">
+							@Html.Partial("~/Views/Shared/_ModuleList.cshtml", userData)
 
-                            <!-- END: Main Menu-->
-                        </ul><!-- End navigation menu -->
-                    </div> <!-- end navigation -->
-                </div>
-                <!-- Navbar -->
-            </nav>
-            <!-- end navbar-->
-        </div>
-        <!-- Top Bar End -->
-        <div class="page-wrapper">
-            @Html.Partial("~/Views/Shared/_NotificationMessage.cshtml", @messageData)
-            <!-- Page Content-->
-            @RenderBody()
-            <!-- end page content -->
-        </div>
-    }
-    <!-- end page-wrapper -->
-    <footer class="footer text-center text-sm-start">
-        <div class="boxed-footer">
-            Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
-            @*<span class="text-muted d-none d-sm-inline-block float-end">Crafted with <i class="mdi mdi-heart text-danger"></i> by Mannatthemes</span>*@
-        </div>
-    </footer>
-    <!-- jQuery  -->
-    <script src="~/js/layout/jquery.min.js"></script>
-    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="~/js/layout/bootstrap.bundle.min.js"></script>
-    <script src="~/js/layout/metismenu.min.js"></script>
-    <script src="~/js/layout/waves.js"></script>
-    <script src="~/js/layout/feather.min.js"></script>
-    <script src="~/js/layout/simplebar.min.js"></script>
-    <script src="~/js/layout/moment.js"></script>
-    <script src="~/js/layout/daterangepicker.js"></script>
-    <script src="~/js/layout/app.js"></script>
-    <script src="~/js/layout/bootstrap-select.min.js"></script>
-    <!-- coditech script-->
-    <script src="~/js/coditech/common/coditechcommon.js"></script>
-    <script src="~/js/coditech/common/coditechdatatable.js"></script>
-    <script src="~/js/coditech/common/coditechnotification.js"></script>
-    <script src="~/js/coditech/user.js"></script>
+							<!-- END: Main Menu-->
+						</ul><!-- End navigation menu -->
+					</div> <!-- end navigation -->
+				</div>
+				<!-- Navbar -->
+			</nav>
+			<!-- end navbar-->
+		</div>
+		<!-- Top Bar End -->
+		<div class="page-wrapper">
+			@Html.Partial("~/Views/Shared/_NotificationMessage.cshtml", @messageData)
+			<!-- Page Content-->
+			@RenderBody()
+			<!-- end page content -->
+		</div>
+	}
+	<!-- end page-wrapper -->
+	<footer class="footer text-center text-sm-start">
+		<div class="boxed-footer">
+			Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
+			@*<span class="text-muted d-none d-sm-inline-block float-end">Crafted with <i class="mdi mdi-heart text-danger"></i> by Mannatthemes</span>*@
+		</div>
+	</footer>
+	<!-- jQuery  -->
+	<script src="~/js/layout/jquery.min.js"></script>
+	<script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+	<script src="~/js/layout/bootstrap.bundle.min.js"></script>
+	<script src="~/js/layout/metismenu.min.js"></script>
+	<script src="~/js/layout/waves.js"></script>
+	<script src="~/js/layout/feather.min.js"></script>
+	<script src="~/js/layout/simplebar.min.js"></script>
+	<script src="~/js/layout/moment.js"></script>
+	<script src="~/js/layout/daterangepicker.js"></script>
+	<script src="~/js/layout/app.js"></script>
+	<script src="~/js/layout/bootstrap-select.min.js"></script>
+	<script src="~/js/layout/select2.min.js"></script>
+	<!-- coditech script-->
+	<script src="~/js/coditech/common/coditechcommon.js"></script>
+	<script src="~/js/coditech/common/coditechdatatable.js"></script>
+	<script src="~/js/coditech/common/coditechnotification.js"></script>
+	<script src="~/js/coditech/user.js"></script>
 </body>
 @await RenderSectionAsync("Scripts", required: false)
 </html>
 <script>
-    if (performance.navigation.type == 2) {
-        location.reload();
-    }
+	if (performance.navigation.type == 2) {
+		location.reload();
+	}
 
-    window.onbeforeunload = function () {
-        var inputs = document.getElementsByTagName("button");
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].type == "button" || inputs[i].type == "submit") {
-                inputs[i].disabled = true;
-            }
-        }
-    };
+	window.onbeforeunload = function () {
+		var inputs = document.getElementsByTagName("button");
+		for (var i = 0; i < inputs.length; i++) {
+			if (inputs[i].type == "button" || inputs[i].type == "submit") {
+				inputs[i].disabled = true;
+			}
+		}
+	};
+
+	 window.initializeSelect2Dropdowns = function () {
+		$('.select2-dropdown').each(function () {
+			if ($(this).hasClass('select2-hidden-accessible')) {
+				$(this).select2('destroy');
+			}
+
+			$(this).select2({
+				placeholder: "-------- Select --------",
+				allowClear: true,
+				width: '100%'
+			});
+		});
+	};
+	$(document).ready(function () {
+		initializeSelect2Dropdowns();
+	});
 </script>

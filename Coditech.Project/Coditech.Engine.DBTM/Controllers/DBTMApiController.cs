@@ -21,7 +21,28 @@ namespace Coditech.Engine.DBTM.Controllers
             _coditechLogging = coditechLogging;
         }
 
-        [Route("/DBTMApi/GetBatchList")]
+        [Route("/DBTMApi/InsertDeviceData")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
+        {
+            try
+            {
+                bool status = _dBTMApiService.InsertDeviceData(model);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = status });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [Route("/DBTMApi/Getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
         public virtual IActionResult GetBatchList(long entityId, string userType)

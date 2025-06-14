@@ -30,7 +30,10 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.GeneralFinancialYearId)
-                            @Html.HiddenFor(m => m.CentreCode)
+                            if (Model.GeneralFinancialYearId > 0)
+                            {
+                                @Html.HiddenFor(m => m.CentreCode)
+                            }
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
@@ -81,13 +84,13 @@
 </div>
 @section scripts {
     <script type="text/javascript">
-                $(function () {
+        $(function () {
             function restrictDateRange(datepicker, minDate, maxDate) {
                 datepicker.datepicker("option", "minDate", minDate);
                 datepicker.datepicker("option", "maxDate", maxDate);
             }
 
-                    function updateConstraintsFromFromDate() {
+            function updateConstraintsFromFromDate() {
                 const fromDate = $("#FromDate").datepicker("getDate");
                 if (fromDate) {
                     const minToDate = new Date(fromDate.getFullYear(), 0, 1);

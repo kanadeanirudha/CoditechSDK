@@ -29,7 +29,7 @@ namespace Coditech.Admin.Controllers
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
@@ -54,7 +54,7 @@ namespace Coditech.Admin.Controllers
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
@@ -80,7 +80,7 @@ namespace Coditech.Admin.Controllers
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
-                if (userModel?.Custom1 == "DBTMTrainer")
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
@@ -101,6 +101,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult CreateDBTMTrainee()
         {
             DBTMTraineeDetailsCreateEditViewModel viewModel = new DBTMTraineeDetailsCreateEditViewModel();
+            viewModel.UserType = UserTypeEnum.Trainee.ToString();
             return View(createEditTraineeDetails, viewModel);
         }
 
@@ -125,6 +126,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult UpdateDBTMTraineePersonalDetails(long dBTMTraineeDetailId, long personId)
         {
             DBTMTraineeDetailsCreateEditViewModel dBTMTraineeDetailsCreateEditViewModel = _dBTMTraineeDetailsAgent.GetDBTMTraineePersonalDetails(dBTMTraineeDetailId, personId);
+            dBTMTraineeDetailsCreateEditViewModel.UserType = UserTypeEnum.Trainee.ToString();
             return ActionView(createEditTraineeDetails, dBTMTraineeDetailsCreateEditViewModel);
         }
 

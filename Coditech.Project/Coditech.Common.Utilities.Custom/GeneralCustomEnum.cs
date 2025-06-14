@@ -12,7 +12,8 @@
         DBTMTestStatus,
         DBTMDeviceStatus,
         DBTMDeviceSerialCodeByCentreCode,
-        
+        BatchWiseReports,
+        DBTMTraineeList
     }
     public enum DashboardFormCustomEnum
     {
@@ -40,7 +41,8 @@
         TrainerRegistration,
         IndividualRegistration,
         DBTMRegisterTrainee,
-        TraineeRegistration
+        TraineeRegistration,
+        LiveTestResultDashboard
     }
     public enum UserTypeCustomEnum
     {

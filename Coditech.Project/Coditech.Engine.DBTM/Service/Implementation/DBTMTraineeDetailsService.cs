@@ -6,7 +6,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
@@ -209,9 +208,8 @@ namespace Coditech.API.Service
             List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceDataDetailsList @DBTMDeviceDataId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             DBTMActivitiesDetailsListModel listModel = new DBTMActivitiesDetailsListModel();
 
-            listModel.ActivitiesDetailsList = dBTMActivitiesDetailsList?.Count > 0 ? dBTMActivitiesDetailsList : new List<DBTMActivitiesDetailsModel>();
             listModel.BindPageListModel(pageListModel);
-            if (listModel.ActivitiesDetailsList.Count > 0)
+            if (dBTMActivitiesDetailsList?.Count > 0)
             {
                 DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();
                 long? dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode)?.Select(y => y.DBTMTraineeDetailId)?.FirstOrDefault();
@@ -230,55 +228,97 @@ namespace Coditech.API.Service
                     if (dBTMTestMaster != null)
                     {
                         listModel.TestName = dBTMTestMaster.TestName;
-                        listModel.TestColumns = (from a in _dBTMParametersAssociatedToTestRepository.Table
-                                                 join b in _dBTMTestParameterRepository.Table
-                                                 on a.DBTMTestParameterId equals b.DBTMTestParameterId
-                                                 where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
-                                                 select b.ParameterName)?.Distinct()?.ToList();
+                        var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
+                                              join b in _dBTMTestParameterRepository.Table
+                                              on a.DBTMTestParameterId equals b.DBTMTestParameterId
+                                              where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId && a.IsActive
+                                              select new
+                                              {
+                                                  b.ParameterName,
+                                                  b.ParameterCode
+                                              })?.Distinct()?.ToList();
 
-                        listModel.CalculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
-                                                        join b in _dBTMTestCalculationRepository.Table
-                                                        on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
-                                                        where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
-                                                        orderby b.OrderBy ascending
-                                                        select b.CalculationName)?.Distinct()?.ToList();
-                        if (listModel?.CalculationColumns?.Count > 0)
+                        DataRow newRow = listModel.DataTable.NewRow();
+                        foreach (var item in dBTMActivitiesDetailsList)
                         {
-                            Calculation(listModel.CalculationColumns, listModel.ActivitiesDetailsList);
+                            string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
+                            if (!string.IsNullOrEmpty(parameterName))
+                            {
+                                string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
+                                listModel.DataTable.Columns.Add(columnName, typeof(String));
+                                newRow[columnName] = $"{ item.ParameterValue} {Unit(item.ParameterCode)}";
+                            }
                         }
+
+                        var calculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
+                                                  join b in _dBTMTestCalculationRepository.Table
+                                                  on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
+                                                  where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
+                                                  orderby b.OrderBy ascending
+                                                  select new { b.CalculationName, b.CalculationCode })?.Distinct()?.ToList();
+                        foreach (var item in calculationColumns)
+                        {
+                            listModel.DataTable.Columns.Add(item.CalculationName, typeof(String));
+                            Calculation(item.CalculationCode, item.CalculationName, newRow, dBTMActivitiesDetailsList);
+                        }
+                        listModel.DataTable.Rows.Add(newRow);
                     }
                 }
             }
             return listModel;
         }
 
-        public void Calculation(List<string> CalculationColumns, List<DBTMActivitiesDetailsModel> ActivitiesDetailsList)
+        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList)
         {
-            if (CalculationColumns.Any(x => x == "CompletionTime"))
+            switch (calculationCode)
             {
-                long completionTime = ActivitiesDetailsList.Sum(x => x.Time);
-                ActivitiesDetailsList.ForEach(x =>
-                {
-                    x.CompletionTime = completionTime;
-                });
+                case "CompletionTime":
+                    decimal completionTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
+                    newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
+                    break;
+                case "AverageVelocity":
+                    decimal totalDistance = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
+                    decimal totalTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
+                    newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
+                    break;
+                case "MaxLap":
+                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Max(x => x.ParameterValue)} {Unit(calculationCode)}";
+                    break;
+                case "MinLap":
+                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
+                    break;
+                case "Power":
+                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power").ParameterValue} {Unit(calculationCode)}";
+                    break;
+                default:
+                    newRow[calculationName] = "N/A";
+                    break;
             }
-            if (CalculationColumns.Any(x => x == "Velocity"))
+        }
+
+        private string Unit(string parameterCode)
+        {
+            string data = string.Empty;
+            switch (parameterCode)
             {
-                ActivitiesDetailsList.ForEach(x =>
-                {
-                    x.Velocity = x.Distance / x.Time;
-                });
+                case "CompletionTime":
+                case "Time":
+                    data = "sec";
+                    break;
+                case "Distance":
+                    data = "m";
+                    break;
+                case "AverageVelocity":
+                    data = "m/s";
+                    break;
+                case "Power":
+                    data = "watt"; 
+                    break;
+                default:
+                    data = "";
+                    break;
             }
-            if (CalculationColumns.Any(x => x == "AverageVelocity"))
-            {
-                decimal totalTime = ActivitiesDetailsList.Sum(x => x.Time);
-                decimal totalDistance = ActivitiesDetailsList.Sum(x => x.Distance);
-                decimal AverageVelocity = totalDistance / totalTime;
-                ActivitiesDetailsList.ForEach(x =>
-                {
-                    x.AverageVelocity = AverageVelocity;
-                });
-            }
+            return data;
         }
     }
 }
