@@ -219,6 +219,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<IUserService, DBTMUserService>();
             builder.Services.AddScoped<IDBTMUserService, DBTMUserService>();
             builder.Services.AddScoped<IGeneralTrainerMasterService, DBTMGeneralTrainerMasterService>();
+            builder.Services.AddScoped<IGeneralBatchMasterService, DBTMGeneralBatchMasterService>();
         }
     }
 }
