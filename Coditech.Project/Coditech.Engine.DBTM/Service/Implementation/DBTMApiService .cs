@@ -2,7 +2,6 @@
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
-using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
@@ -95,6 +94,20 @@ namespace Coditech.API.Service
                             dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
                         }
                         _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
+                    }
+                }
+
+                string typeOfRecord = dBTMDeviceDataModelList.FirstOrDefault().TypeOfRecord;
+                long tablePrimaryColumnId = dBTMDeviceDataModelList.FirstOrDefault().TablePrimaryColumnId;
+                if (typeOfRecord == "Batch")
+                {
+                    List<long> entityIds = dBTMDeviceDataModelList.Where(x => x.EntityId > 0).Select(x => x.EntityId).ToList();
+                    if (entityIds?.Count > 0)
+                    {
+                        List<GeneralBatchUser> generalBatchUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == tablePrimaryColumnId && entityIds.Contains(x.EntityId)).ToList();
+                        int activityStatusEnumId = GetEnumIdByEnumCode("Completed", "DBTMTestStatus");
+                        generalBatchUsers.ForEach(x => { x.ActivityStatusEnumId = activityStatusEnumId; });
+                        _generalBatchUserRepository.BatchUpdate(generalBatchUsers);
                     }
                 }
             }
