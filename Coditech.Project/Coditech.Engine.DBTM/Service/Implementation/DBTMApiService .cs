@@ -147,7 +147,7 @@ namespace Coditech.API.Service
                 else
                 {
                     dBTMBatchModel.DBTMTestApiModel = new DBTMTestApiModel();
-                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId.ToString();
+                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId;
                     dBTMBatchModel.DBTMTestApiModel.TestName = testDetails.TestName;
                     dBTMBatchModel.DBTMTestApiModel.TestCode = testDetails.TestCode;
                     dBTMBatchModel.DBTMTestApiModel.MinimunPairedDevice = testDetails.MinimunPairedDevice;
