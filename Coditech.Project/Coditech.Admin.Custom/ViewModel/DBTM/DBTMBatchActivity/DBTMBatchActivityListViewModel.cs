@@ -13,5 +13,6 @@ namespace Coditech.Admin.ViewModel
         public int GeneralBatchMasterId { get; set; }
         public string SelectedParameter1 { get; set; }
         public string SelectedParameter2 { get; set; }
+        public string SelectedCentreCode { get; set; }
     }
 }
