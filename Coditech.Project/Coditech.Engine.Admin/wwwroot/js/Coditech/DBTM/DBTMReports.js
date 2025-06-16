@@ -7,6 +7,8 @@
 
     GetDBTMBatchWiseReports: function () {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
         $("#DBTMBatchWiseReportsDivId").html("");
         if (generalBatchMasterId != "") {
             CoditechCommon.ShowLodder();
@@ -15,7 +17,11 @@
                 type: "GET",
                 dataType: "html",
                 url: "/DBTMReports/GetBatchWiseReports",
-                data: { "generalBatchMasterId": generalBatchMasterId },
+                data: {
+                    "generalBatchMasterId": generalBatchMasterId,
+                    "FromDate": fromdate,  
+                    "ToDate": todate    
+                },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     $("#DBTMBatchWiseReportsDivId").html(data);

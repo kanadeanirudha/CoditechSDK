@@ -30,7 +30,7 @@ namespace Coditech.API.Service
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId)
+        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId,DateTime FromDate,DateTime ToDate)
         {
             int dBTMTestMasterId = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).FirstOrDefault().DBTMTestMasterId;
             if (dBTMTestMasterId <= 0)
@@ -42,8 +42,10 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT",3, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 
             if (dBTMReportsList?.Count > 0)

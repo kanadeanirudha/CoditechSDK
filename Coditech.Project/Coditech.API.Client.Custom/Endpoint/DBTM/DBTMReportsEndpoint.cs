@@ -5,9 +5,9 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMReportsEndpoint : BaseEndpoint
     {
-        public string BatchWiseReportsAsync(int generalBatchMasterId)
+        public string BatchWiseReportsAsync(int generalBatchMasterId,DateTime FromDate,DateTime ToDate)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/BatchWiseReports?generalBatchMasterId={generalBatchMasterId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/BatchWiseReports?generalBatchMasterId={generalBatchMasterId}&FromDate={FromDate}&ToDate={ToDate}";
             return endpoint;
         }
 
