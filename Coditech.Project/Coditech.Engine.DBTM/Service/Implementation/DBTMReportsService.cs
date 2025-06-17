@@ -30,7 +30,7 @@ namespace Coditech.API.Service
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId,DateTime FromDate,DateTime ToDate)
+        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
             int dBTMTestMasterId = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).FirstOrDefault().DBTMTestMasterId;
             if (dBTMTestMasterId <= 0)
@@ -45,7 +45,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT",3, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 
             if (dBTMReportsList?.Count > 0)
@@ -221,7 +221,7 @@ namespace Coditech.API.Service
                 case "AverageVelocity":
                     decimal totalDistance = dBTMReportsList.Where(x => x.ParameterCode == "Distance" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
                     decimal totalTime = dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
+                    newRow[calculationName] = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}" : "Invalid Data";
                     break;
                 case "MaxLap":
                     newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
