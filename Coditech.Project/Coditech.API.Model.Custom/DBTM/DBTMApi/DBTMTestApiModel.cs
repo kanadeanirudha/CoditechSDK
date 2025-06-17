@@ -14,7 +14,7 @@
         public bool? IsMultiTest { get; set; }
         public bool IsActive { get; set; }
         public string TestInstructions { get; set; }
-        public string ActivityCode { get; set; }
+        public int ActivityCode { get; set; }
         public List<DBTMTraineeAssignmentToUserApiModel> DBTMTraineeAssignmentToUserApiModel { get; set; }
     }
 }

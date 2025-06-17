@@ -50,12 +50,13 @@ namespace Coditech.API.Service
 
             if (dBTMReportsList?.Count > 0)
             {
-                listModel.DataTable.Columns.Add("Test Name", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Name", typeof(String));
                 listModel.DataTable.Columns.Add("Person Name", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Status", typeof(String));
                 listModel.DataTable.Columns.Add("Date", typeof(String));
                 listModel.DataTable.Columns.Add("Weight", typeof(String));
                 listModel.DataTable.Columns.Add("Height", typeof(String));
-                listModel.DataTable.Columns.Add("Test Performed Time", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Performed Time", typeof(String));
                 var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                                       join b in _dBTMTestParameterRepository.Table
                                       on a.DBTMTestParameterId equals b.DBTMTestParameterId
@@ -79,15 +80,16 @@ namespace Coditech.API.Service
                     if (dateTime != item.CreatedDate)
                     {
                         newRow = listModel.DataTable.NewRow();
-                        newRow["Test Name"] = item.TestName;
+                        newRow["Activity Name"] = item.TestName;
                         newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
-                        newRow["Date"] = item.CreatedDate;
+                        newRow["Activity Status"] = item.ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
+                        newRow["Date"] = item.CreatedDate.Year < 2025 ? null : item.CreatedDate;
                         newRow["Weight"] = item.Weight;
                         newRow["Height"] = item.Height;
-                        newRow["Test Performed Time"] = item.TestPerformedTime;
+                        newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
-                    if (dateTime != item.CreatedDate)
+                    if (dateTime != item.CreatedDate && !string.IsNullOrEmpty(item.ParameterCode))
                     {
                         foreach (var item1 in calculationColumns)
                         {
@@ -144,7 +146,7 @@ namespace Coditech.API.Service
                 listModel.DataTable.Columns.Add("Date", typeof(String));
                 listModel.DataTable.Columns.Add("Weight", typeof(String));
                 listModel.DataTable.Columns.Add("Height", typeof(String));
-                listModel.DataTable.Columns.Add("Test Performed Time", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Performed Time", typeof(String));
                 var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                                       join b in _dBTMTestParameterRepository.Table
                                       on a.DBTMTestParameterId equals b.DBTMTestParameterId
@@ -172,7 +174,7 @@ namespace Coditech.API.Service
                         newRow["Date"] = item.CreatedDate;
                         newRow["Weight"] = item.Weight;
                         newRow["Height"] = item.Height;
-                        newRow["Test Performed Time"] = item.TestPerformedTime;
+                        newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
                     if (dateTime != item.CreatedDate)

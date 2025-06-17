@@ -1,6 +1,6 @@
 ﻿@model DBTMTestWiseReportsListViewModel
 @{
-    ViewBag.Title = "Test Reports";
+    ViewBag.Title = "Activity Reports";
     DropdownViewModel testDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), IsCustomDropdown = true };
     DropdownViewModel studentsDropdown = new DropdownViewModel()
             {
@@ -20,22 +20,22 @@
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h4 class="card-title">Test Reports</h4>
+                                <h4 class="card-title">Activity Reports</h4>
                             </div><!--end col-->
                         </div>  <!--end row-->
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-1">
-                                <label>Test List</label>
+                                <label>Activity List</label>
                             </div>
                             <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
                             </div>
                             <div class="col-md-1">
-                                <label>Students List</label>
+                                <label>Trainee List</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", studentsDropdown)
                             </div>
                             <div class="col-md-1">

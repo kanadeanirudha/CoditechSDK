@@ -96,6 +96,20 @@ namespace Coditech.API.Service
                         _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
                     }
                 }
+
+                string typeOfRecord = dBTMDeviceDataModelList.FirstOrDefault().TypeOfRecord;
+                long tablePrimaryColumnId = dBTMDeviceDataModelList.FirstOrDefault().TablePrimaryColumnId;
+                if (typeOfRecord == "Batch")
+                {
+                    List<long> entityIds = dBTMDeviceDataModelList.Where(x => x.EntityId > 0).Select(x => x.EntityId).ToList();
+                    if (entityIds?.Count > 0)
+                    {
+                        List<GeneralBatchUser> generalBatchUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == tablePrimaryColumnId && entityIds.Contains(x.EntityId)).ToList();
+                        int activityStatusEnumId = GetEnumIdByEnumCode("Completed", "DBTMTestStatus");
+                        generalBatchUsers.ForEach(x => { x.ActivityStatusEnumId = activityStatusEnumId; });
+                        _generalBatchUserRepository.BatchUpdate(generalBatchUsers);
+                    }
+                }
             }
             return true;
         }
@@ -133,7 +147,7 @@ namespace Coditech.API.Service
                 else
                 {
                     dBTMBatchModel.DBTMTestApiModel = new DBTMTestApiModel();
-                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId.ToString();
+                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId;
                     dBTMBatchModel.DBTMTestApiModel.TestName = testDetails.TestName;
                     dBTMBatchModel.DBTMTestApiModel.TestCode = testDetails.TestCode;
                     dBTMBatchModel.DBTMTestApiModel.MinimunPairedDevice = testDetails.MinimunPairedDevice;
