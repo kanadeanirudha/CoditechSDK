@@ -25,9 +25,9 @@ namespace Coditech.Admin.Agents
 
         #region Public Methods
         //Batch Wise Reports 
-        public virtual DBTMBatchWiseReportsListViewModel BatchWiseReports(int generalBatchMasterId)
+        public virtual DBTMBatchWiseReportsListViewModel BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId);
+            DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId,FromDate,ToDate);
 
             DBTMBatchWiseReportsListViewModel listViewModel = new DBTMBatchWiseReportsListViewModel
             {

@@ -24,11 +24,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/BatchWiseReports")]
         [Produces(typeof(DBTMBatchWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult BatchWiseReports(int generalBatchMasterId)
+        public virtual IActionResult BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId);
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId,FromDate,ToDate);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
