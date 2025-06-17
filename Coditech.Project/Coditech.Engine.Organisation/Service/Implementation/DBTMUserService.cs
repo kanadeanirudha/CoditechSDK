@@ -187,7 +187,18 @@ namespace Coditech.API.Service
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
             }
-            generalPersonModel = base.InsertPersonInformation(generalPersonModel);
+            string centreCode = "CMGMZNIJ";
+            DateTime currentDate = DateTime.Now;
+
+            List<GeneralRunningNumbers> generalRunningNumbersList = GetGeneralRunningNumbersList(centreCode);
+           
+            if (IsNull(generalRunningNumbersList) || generalRunningNumbersList.Count == 0)
+                throw new CoditechException(ErrorCodes.InvalidData, string.Format("EmployeeRegistration Or DBTMTraineeRegistration running number not set for HO."));
+            
+            string selectedcentreCode = joiningCodeDetails.CentreCode;
+            InsertGeneralRunningNumbers(generalRunningNumbersList, currentDate, selectedcentreCode);
+
+            generalPersonModel = InsertPersonInformation(generalPersonModel);
 
             if (!generalPersonModel.HasError)
             {
@@ -247,6 +258,26 @@ namespace Coditech.API.Service
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
         }
 
+        protected List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
+        {
+            List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
+            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
+            List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
+            return generalRunningNumbersList;
+        }
+
+        protected virtual void InsertGeneralRunningNumbers(List<GeneralRunningNumbers> generalRunningNumbersList, DateTime currentDate, string selectedcentreCode)
+        {
+            foreach (var item in generalRunningNumbersList)
+            {
+                item.GeneralRunningNumberId = 0;
+                item.CentreCode = selectedcentreCode;
+                item.CurrentSequnce = 0;
+                item.CreatedDate = currentDate;
+                item.ModifiedDate = currentDate;
+            }
+            new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Insert(generalRunningNumbersList);
+        }
         #endregion
     }
 }

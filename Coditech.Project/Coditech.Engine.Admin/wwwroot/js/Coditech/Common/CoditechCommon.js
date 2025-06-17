@@ -153,6 +153,29 @@
             $("#GeneralDistrictMasterId").html("");
         }
     },
+
+    InitializeLocationDropdowns: function () {
+        var selectedCountry = $("#GeneralCountryMasterId").val();
+        var selectedRegion = $("#GeneralRegionMasterId").val();
+
+        if (selectedCountry !== "") {
+            CoditechCommon.GetRegionListByCountryId(function () {
+                if (selectedRegion !== "") {
+                    CoditechCommon.GetCityListByRegionId();
+                }
+            });
+        }
+
+        // Bind change events
+        $("#GeneralCountryMasterId").on("change", function () {
+            CoditechCommon.GetRegionListByCountryId();
+        });
+
+        $("#GeneralRegionMasterId").on("change", function () {
+            CoditechCommon.GetCityListByRegionId();
+        });
+    },
+
     GetTermsAndCondition: function (modelPopContentId) {
         CoditechCommon.ShowLodder(); // Show the loader
         $.ajax({
