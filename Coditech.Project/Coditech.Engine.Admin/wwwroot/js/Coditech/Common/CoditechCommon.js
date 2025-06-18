@@ -68,7 +68,7 @@
         }
     },
 
-    GetRegionListByCountryId: function () {
+    GetRegionListByCountryId: function (callback) {
         var selectedItem = $("#GeneralCountryMasterId").val();
         if (selectedItem != "") {
             CoditechCommon.ShowLodder();
@@ -82,12 +82,13 @@
                 success: function (data) {
                     $("#GeneralRegionMasterId").html("").html(data);
                     CoditechCommon.HideLodder();
+                    if (typeof callback === "function") callback(); // <-- run callback
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     if (xhr.status == "401" || xhr.status == "403") {
                         location.reload();
                     }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Region.", "error")
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Region.", "error");
                     CoditechCommon.HideLodder();
                 }
             });
@@ -97,7 +98,7 @@
         }
     },
 
-    GetCityListByRegionId: function () {
+    GetCityListByRegionId: function (callback) {
         var selectedItem = $("#GeneralRegionMasterId").val();
         if (selectedItem != "") {
             CoditechCommon.ShowLodder();
@@ -111,20 +112,37 @@
                 success: function (data) {
                     $("#GeneralCityMasterId").html("").html(data);
                     CoditechCommon.HideLodder();
+                    if (typeof callback === "function") callback(); // <-- run callback
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     if (xhr.status == "401" || xhr.status == "403") {
                         location.reload();
                     }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve City.", "error")
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve City.", "error");
                     CoditechCommon.HideLodder();
                 }
             });
-        }
-        else {
-            $("#GeneralRegionMasterId").html("");
+        } else {
+            $("#GeneralCityMasterId").html("");
+
         }
     },
+
+    InitializeLocationDropdowns: function () {
+        // On country change
+        $("#GeneralCountryMasterId").on("change", function () {
+            CoditechCommon.GetRegionListByCountryId(function () {
+                $("#GeneralRegionMasterId").html("");
+            });
+        });
+
+        // On region change
+        $("#GeneralRegionMasterId").on("change", function () {
+            CoditechCommon.GetCityListByRegionId();
+            CoditechCommon.GetDistrictListByRegionId();
+        });
+    },
+
     GetDistrictListByRegionId: function () {
         var selectedItem = $("#GeneralRegionMasterId").val();
         if (selectedItem != "") {
@@ -154,27 +172,6 @@
         }
     },
 
-    InitializeLocationDropdowns: function () {
-        var selectedCountry = $("#GeneralCountryMasterId").val();
-        var selectedRegion = $("#GeneralRegionMasterId").val();
-
-        if (selectedCountry !== "") {
-            CoditechCommon.GetRegionListByCountryId(function () {
-                if (selectedRegion !== "") {
-                    CoditechCommon.GetCityListByRegionId();
-                }
-            });
-        }
-
-        // Bind change events
-        $("#GeneralCountryMasterId").on("change", function () {
-            CoditechCommon.GetRegionListByCountryId();
-        });
-
-        $("#GeneralRegionMasterId").on("change", function () {
-            CoditechCommon.GetCityListByRegionId();
-        });
-    },
 
     GetTermsAndCondition: function (modelPopContentId) {
         CoditechCommon.ShowLodder(); // Show the loader
