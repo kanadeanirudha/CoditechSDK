@@ -19,7 +19,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult LiveTestResultDashboard()
         {
             LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard();
-            return View(create);
+            return View(create, liveTestResultDashboardViewModel);
         }
     }
 }

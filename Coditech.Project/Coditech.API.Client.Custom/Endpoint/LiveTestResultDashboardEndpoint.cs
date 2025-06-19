@@ -6,6 +6,6 @@ namespace Coditech.API.Endpoint
     public class LiveTestResultDashboardEndpoint : BaseEndpoint
     {
         public string GetLiveTestResultDashboardAsync(string selectedCentreCode, long entityId) =>
-            $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/LiveTestResultDashboard/GetLiveTestResultDashboard?selectedCentreCode={selectedCentreCode}&entityId={entityId}";
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/LiveTestResultDashboard/GetLiveTestResultDashboard?selectedCentreCode={selectedCentreCode}&entityId={entityId}";
     }
 }
