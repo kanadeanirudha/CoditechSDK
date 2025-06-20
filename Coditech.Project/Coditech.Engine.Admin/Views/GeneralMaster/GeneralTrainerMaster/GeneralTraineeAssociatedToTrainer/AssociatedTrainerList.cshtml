@@ -5,8 +5,9 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId.ToString());
+    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId > 0 ? Model.DBTMTraineeDetailId.ToString() : Model.EntityId.ToString());
     keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -21,10 +22,11 @@
                         <span class="card-title">Associate Trainer List : @Model.FirstName @Model.LastName</span>
                         @if (Model.IsEntityActive)
                         {
-                            @if (Model.Custom1 != "DBTMCentreOwner")
+
+                            @if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
                             {
                                 <a class="btn btn-sm btn-soft-primary float-end"
-                                href="/@controllerName/InsertAssociatedTrainer?dBTMTraineeDetailId=@Model.DBTMTraineeDetailId&personId=@Model.PersonId"
+                                href="/@controllerName/InsertAssociatedTrainer?dBTMTraineeDetailId=@Model.EntityId&personId=@Model.PersonId"
                                 role="button">
                                     <i class="fas fa-plus me-2"></i>Associate Trainer
                                 </a>
