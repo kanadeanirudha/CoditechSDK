@@ -24,11 +24,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/BatchWiseReports")]
         [Produces(typeof(DBTMBatchWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult BatchWiseReports(int generalBatchMasterId)
+        public virtual IActionResult BatchWiseReports(int generalBatchMasterId, string FromDate, string ToDate)
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId);
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate));
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
@@ -48,11 +48,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/TestWiseReports")]
         [Produces(typeof(DBTMTestWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long entityId)
+        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, string FromDate, string ToDate, long entityId)
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate,entityId);
+                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), entityId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
             }

@@ -1,7 +1,5 @@
-﻿ @using Coditech.Admin.Utilities;
-@using Coditech.Common.API.Model;
-@using Newtonsoft.Json
-@model string;
+﻿@using System.Data
+@model LiveTestResultDashboardViewModel;
 @{
     ViewBag.Title = "Live Test Result Dashboard";
 }
@@ -33,147 +31,45 @@
 
             <!-- Row 1 -->
             <div class="row g-4 justify-content-center">
-                <!-- Test 1 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">300 Yard Test</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Start</th><th>Lap</th><th>Time</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>John Doe</td><td>10:00</td><td>2</td><td>00:01:15</td><td><span class="badge bg-success">Running</span></td></tr>
-                                    <tr><td>2</td><td>Jane Smith</td><td>10:05</td><td>3</td><td>00:02:00</td><td><span class="badge bg-secondary">Completed</span></td></tr>
-                                    <tr><td>3</td><td>Mark Taylor</td><td>10:10</td><td>1</td><td>00:00:45</td><td><span class="badge bg-success">Running</span></td></tr>
-                                </tbody>
-                            </table>
+                @if (Model?.DataTableList?.Count > 0)
+                {
+                    @foreach (DataTable dataTable in Model?.DataTableList)
+                    {
+                        <div class="col-md-6 col-lg-12">
+                            <div class="card shadow">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center card-title-black">
+                                        @{
+                                            string activityName = dataTable.AsEnumerable().Select(row => row.Field<string>("Activity Name")).Distinct().FirstOrDefault();
+                                        }
+                                        @activityName
+                                    </h5>
+                                    <table class="table table-bordered table-striped text-center">
+                                        <thead class="table-header-light">
+                                            <tr>
+                                                @foreach (DataColumn datatableColumn in dataTable.Columns)
+                                                {
+                                                    <th>@datatableColumn</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (DataRow row in dataTable.Rows)
+                                            {
+                                                <tr>
+                                                    @foreach (DataColumn col in dataTable.Columns)
+                                                    {
+                                                        <td>@row[col]</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Test 2 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">Running Speed Test</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Distance</th><th>Time</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Alice Green</td><td>100m</td><td>12.3</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>2</td><td>David Black</td><td>100m</td><td>11.8</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>3</td><td>Emily Stone</td><td>100m</td><td>--</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 2 -->
-            <div class="row g-4 justify-content-center">
-                <!-- Test 3 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">Margaria Kalamen Test</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Power</th><th>Time</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Michael Jordan</td><td>850W</td><td>1.20s</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>2</td><td>Serena Lee</td><td>720W</td><td>1.35s</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>3</td><td>Paul Young</td><td>--</td><td>--</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Test 4 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">Agility T Test</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Time</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Susan Clark</td><td>9.3</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>2</td><td>Kevin Brown</td><td>10.1</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>3</td><td>Angela Scott</td><td>--</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 3 -->
-            <div class="row g-4 justify-content-center">
-                <!-- Test 5 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">Vertical Jump Test</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Height</th><th>Attempts</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Tom Harris</td><td>50cm</td><td>2</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>2</td><td>Nina Rose</td><td>47cm</td><td>2</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>3</td><td>Ryan West</td><td>--</td><td>--</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Test 6 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">Five-Zero-Five Agility Test</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Time</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Emily Davis</td><td>2.87</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>2</td><td>Jake Wilson</td><td>3.01</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>3</td><td>Rachel Moore</td><td>--</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 4 -->
-            <div class="row g-4 justify-content-center">
-                <!-- Test 7 -->
-                <div class="col-md-6 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title text-center card-title-black">Broad Jump</h5>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead class="table-header-light">
-                                    <tr><th>#</th><th>Name</th><th>Distance</th><th>Attempts</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Laura Bennett</td><td>185cm</td><td>2</td><td><span class="badge bg-success">Completed</span></td></tr>
-                                    <tr><td>2</td><td>Chris Young</td><td>170cm</td><td>1</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                    <tr><td>3</td><td>Anna White</td><td>--</td><td>--</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                    }
+                }
             </div>
         </div>
     </div>

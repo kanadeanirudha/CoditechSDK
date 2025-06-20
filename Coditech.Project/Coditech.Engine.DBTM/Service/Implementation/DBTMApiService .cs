@@ -2,7 +2,6 @@
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
-using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
@@ -97,6 +96,20 @@ namespace Coditech.API.Service
                         _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
                     }
                 }
+
+                string typeOfRecord = dBTMDeviceDataModelList.FirstOrDefault().TypeOfRecord;
+                long tablePrimaryColumnId = dBTMDeviceDataModelList.FirstOrDefault().TablePrimaryColumnId;
+                if (typeOfRecord == "Batch")
+                {
+                    List<long> entityIds = dBTMDeviceDataModelList.Where(x => x.EntityId > 0).Select(x => x.EntityId).ToList();
+                    if (entityIds?.Count > 0)
+                    {
+                        List<GeneralBatchUser> generalBatchUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == tablePrimaryColumnId && entityIds.Contains(x.EntityId)).ToList();
+                        int activityStatusEnumId = GetEnumIdByEnumCode("Completed", "DBTMTestStatus");
+                        generalBatchUsers.ForEach(x => { x.ActivityStatusEnumId = activityStatusEnumId; });
+                        _generalBatchUserRepository.BatchUpdate(generalBatchUsers);
+                    }
+                }
             }
             return true;
         }
@@ -134,7 +147,7 @@ namespace Coditech.API.Service
                 else
                 {
                     dBTMBatchModel.DBTMTestApiModel = new DBTMTestApiModel();
-                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId.ToString();
+                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId;
                     dBTMBatchModel.DBTMTestApiModel.TestName = testDetails.TestName;
                     dBTMBatchModel.DBTMTestApiModel.TestCode = testDetails.TestCode;
                     dBTMBatchModel.DBTMTestApiModel.MinimunPairedDevice = testDetails.MinimunPairedDevice;
@@ -157,21 +170,15 @@ namespace Coditech.API.Service
         public List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType)
         {
             long entityIds = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
-
-            List<DBTMTestApiModel> assignmentList = (from a in _dBTMTestMasterRepository.Table
-                                                     join b in _dBTMTraineeAssignmentRepository.Table
-                                                         on a.DBTMTestMasterId equals b.DBTMTestMasterId
-                                                     where b.GeneralTrainerMasterId == entityId
-                                                           && b.AssignmentDate <= DateTime.Today
-                                                     select new DBTMTestApiModel
-                                                     {
-                                                         DBTMTraineeAssignmentId = b.DBTMTraineeAssignmentId,
-                                                         DBTMTestMasterId = a.DBTMTestMasterId,
-                                                         TestName = a.TestName,
-                                                         AssignmentDate = b.AssignmentDate,
-                                                         AssignmentTime = b.AssignmentTime,
-                                                     })?.ToList();
-            return assignmentList;
+            //GetGeneralAssignmentList
+            List<DBTMTestApiModel> assignmentList= new List<DBTMTestApiModel>();
+                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTestApiModel> objStoredProc = new CoditechViewRepository<DBTMTestApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@EntityId", entityIds, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTestApiModel> generalAssignmentList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralAssignmentList @EntityId,@UserType,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            return generalAssignmentList;
         }
 
         public DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId)

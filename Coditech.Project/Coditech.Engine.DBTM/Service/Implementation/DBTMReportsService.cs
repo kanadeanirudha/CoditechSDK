@@ -3,6 +3,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
+using Coditech.Engine.DBTM.Helpers;
 using System.Data;
 namespace Coditech.API.Service
 {
@@ -30,7 +31,7 @@ namespace Coditech.API.Service
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId)
+        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
             int dBTMTestMasterId = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).FirstOrDefault().DBTMTestMasterId;
             if (dBTMTestMasterId <= 0)
@@ -42,18 +43,21 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 
             if (dBTMReportsList?.Count > 0)
             {
-                listModel.DataTable.Columns.Add("Test Name", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Name", typeof(String));
                 listModel.DataTable.Columns.Add("Person Name", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Status", typeof(String));
                 listModel.DataTable.Columns.Add("Date", typeof(String));
                 listModel.DataTable.Columns.Add("Weight", typeof(String));
                 listModel.DataTable.Columns.Add("Height", typeof(String));
-                listModel.DataTable.Columns.Add("Test Performed Time", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Performed Time", typeof(String));
                 var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                                       join b in _dBTMTestParameterRepository.Table
                                       on a.DBTMTestParameterId equals b.DBTMTestParameterId
@@ -77,15 +81,16 @@ namespace Coditech.API.Service
                     if (dateTime != item.CreatedDate)
                     {
                         newRow = listModel.DataTable.NewRow();
-                        newRow["Test Name"] = item.TestName;
+                        newRow["Activity Name"] = item.TestName;
                         newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
-                        newRow["Date"] = item.CreatedDate;
+                        newRow["Activity Status"] = item.ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
+                        newRow["Date"] = item.CreatedDate.Year < 2025 ? null : item.CreatedDate;
                         newRow["Weight"] = item.Weight;
                         newRow["Height"] = item.Height;
-                        newRow["Test Performed Time"] = item.TestPerformedTime;
+                        newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
-                    if (dateTime != item.CreatedDate)
+                    if (dateTime != item.CreatedDate && !string.IsNullOrEmpty(item.ParameterCode))
                     {
                         foreach (var item1 in calculationColumns)
                         {
@@ -93,7 +98,7 @@ namespace Coditech.API.Service
                             {
                                 listModel.DataTable.Columns.Add(item1.CalculationName, typeof(String));
                             }
-                            Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
+                            DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
                         }
                     }
                     string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
@@ -105,7 +110,7 @@ namespace Coditech.API.Service
                             listModel.DataTable.Columns.Add(columnName, typeof(String));
                         }
 
-                        newRow[columnName] = $"{item.ParameterValue} {Unit(item.ParameterCode)}";
+                        newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
                     }
                     if (dateTime != item.CreatedDate)
                     {
@@ -142,7 +147,7 @@ namespace Coditech.API.Service
                 listModel.DataTable.Columns.Add("Date", typeof(String));
                 listModel.DataTable.Columns.Add("Weight", typeof(String));
                 listModel.DataTable.Columns.Add("Height", typeof(String));
-                listModel.DataTable.Columns.Add("Test Performed Time", typeof(String));
+                listModel.DataTable.Columns.Add("Activity Performed Time", typeof(String));
                 var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                                       join b in _dBTMTestParameterRepository.Table
                                       on a.DBTMTestParameterId equals b.DBTMTestParameterId
@@ -170,7 +175,7 @@ namespace Coditech.API.Service
                         newRow["Date"] = item.CreatedDate;
                         newRow["Weight"] = item.Weight;
                         newRow["Height"] = item.Height;
-                        newRow["Test Performed Time"] = item.TestPerformedTime;
+                        newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
                     if (dateTime != item.CreatedDate)
@@ -181,7 +186,7 @@ namespace Coditech.API.Service
                             {
                                 listModel.DataTable.Columns.Add(item1.CalculationName, typeof(String));
                             }
-                            Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
+                           DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
                         }
                     }
                     string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
@@ -193,7 +198,7 @@ namespace Coditech.API.Service
                             listModel.DataTable.Columns.Add(columnName, typeof(String));
                         }
 
-                        newRow[columnName] = $"{item.ParameterValue} {Unit(item.ParameterCode)}";
+                        newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
                     }
                     if (dateTime != item.CreatedDate)
                     {
@@ -203,60 +208,6 @@ namespace Coditech.API.Service
                 }
             }
             return listModel;
-        }
-
-
-        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMReportsModel> dBTMReportsList, DateTime createdDate)
-        {
-            switch (calculationCode)
-            {
-                case "CompletionTime":
-                    decimal completionTime = dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
-                    break;
-                case "AverageVelocity":
-                    decimal totalDistance = dBTMReportsList.Where(x => x.ParameterCode == "Distance" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    decimal totalTime = dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
-                    break;
-                case "MaxLap":
-                    newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case "MinLap":
-                    newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Min(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case "Power":
-                    newRow[calculationName] = $"{dBTMReportsList.FirstOrDefault(x => x.ParameterCode == "Power").ParameterValue} {Unit(calculationCode)}";
-                    break;
-                default:
-                    newRow[calculationName] = "N/A";
-                    break;
-            }
-        }
-
-        private string Unit(string parameterCode)
-        {
-            string data = string.Empty;
-            switch (parameterCode)
-            {
-                case "CompletionTime":
-                case "Time":
-                    data = "sec";
-                    break;
-                case "Distance":
-                    data = "m";
-                    break;
-                case "AverageVelocity":
-                    data = "m/s";
-                    break;
-                case "Power":
-                    data = "watt";
-                    break;
-                default:
-                    data = "";
-                    break;
-            }
-            return data;
         }
     }
 }
