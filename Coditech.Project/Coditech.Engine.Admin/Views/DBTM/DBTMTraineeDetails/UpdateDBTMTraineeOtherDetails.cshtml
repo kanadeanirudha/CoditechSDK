@@ -4,7 +4,7 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId.ToString());
+    keyValuePairs.Add("DBTMTraineeDetailId", Model.DBTMTraineeDetailId > 0 ? Model.DBTMTraineeDetailId.ToString() : Model.EntityId.ToString());
     keyValuePairs.Add("PersonId", Model.PersonId.ToString());
 }
 <!-- Page Content-->

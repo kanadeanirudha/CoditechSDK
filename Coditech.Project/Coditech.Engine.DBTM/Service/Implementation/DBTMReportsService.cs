@@ -3,6 +3,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
+using Coditech.Engine.DBTM.Helpers;
 using System.Data;
 namespace Coditech.API.Service
 {
@@ -97,7 +98,7 @@ namespace Coditech.API.Service
                             {
                                 listModel.DataTable.Columns.Add(item1.CalculationName, typeof(String));
                             }
-                            Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
+                            DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
                         }
                     }
                     string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
@@ -109,7 +110,7 @@ namespace Coditech.API.Service
                             listModel.DataTable.Columns.Add(columnName, typeof(String));
                         }
 
-                        newRow[columnName] = $"{item.ParameterValue} {Unit(item.ParameterCode)}";
+                        newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
                     }
                     if (dateTime != item.CreatedDate)
                     {
@@ -185,7 +186,7 @@ namespace Coditech.API.Service
                             {
                                 listModel.DataTable.Columns.Add(item1.CalculationName, typeof(String));
                             }
-                            Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
+                           DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
                         }
                     }
                     string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
@@ -197,7 +198,7 @@ namespace Coditech.API.Service
                             listModel.DataTable.Columns.Add(columnName, typeof(String));
                         }
 
-                        newRow[columnName] = $"{item.ParameterValue} {Unit(item.ParameterCode)}";
+                        newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
                     }
                     if (dateTime != item.CreatedDate)
                     {
@@ -207,60 +208,6 @@ namespace Coditech.API.Service
                 }
             }
             return listModel;
-        }
-
-
-        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMReportsModel> dBTMReportsList, DateTime createdDate)
-        {
-            switch (calculationCode)
-            {
-                case "CompletionTime":
-                    decimal completionTime = dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
-                    break;
-                case "AverageVelocity":
-                    decimal totalDistance = dBTMReportsList.Where(x => x.ParameterCode == "Distance" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    decimal totalTime = dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}" : "Invalid Data";
-                    break;
-                case "MaxLap":
-                    newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case "MinLap":
-                    newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Min(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case "Power":
-                    newRow[calculationName] = $"{dBTMReportsList.FirstOrDefault(x => x.ParameterCode == "Power").ParameterValue} {Unit(calculationCode)}";
-                    break;
-                default:
-                    newRow[calculationName] = "N/A";
-                    break;
-            }
-        }
-
-        private string Unit(string parameterCode)
-        {
-            string data = string.Empty;
-            switch (parameterCode)
-            {
-                case "CompletionTime":
-                case "Time":
-                    data = "sec";
-                    break;
-                case "Distance":
-                    data = "m";
-                    break;
-                case "AverageVelocity":
-                    data = "m/s";
-                    break;
-                case "Power":
-                    data = "watt";
-                    break;
-                default:
-                    data = "";
-                    break;
-            }
-            return data;
         }
     }
 }
