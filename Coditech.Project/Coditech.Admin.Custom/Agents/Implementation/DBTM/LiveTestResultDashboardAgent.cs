@@ -45,7 +45,7 @@ namespace Coditech.Admin.Agents
                 switch (ex.ErrorCode)
                 {
                     case ErrorCodes.InvalidData:
-                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, liveTestResultDashboardViewModel.ErrorMessage);
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, ex.ErrorMessage);
                     case ErrorCodes.NotFound:
                         return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, AdminResources.ErrorMessage_ThisaccountdoesnotexistEnteravalidemailaddressorpassword);
                     case ErrorCodes.ContactAdministrator:
@@ -56,7 +56,7 @@ namespace Coditech.Admin.Agents
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "LiveTestResultDashboard", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex.Message, "LiveTestResultDashboard", TraceLevel.Error);
                 return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
