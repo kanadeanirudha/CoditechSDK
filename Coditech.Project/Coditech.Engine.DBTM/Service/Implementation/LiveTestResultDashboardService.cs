@@ -1,10 +1,13 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
+using Coditech.Resources;
 using System.Data;
+using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
     public class LiveTestResultDashboardService : BaseService, ILiveTestResultDashboardService
@@ -66,7 +69,7 @@ namespace Coditech.API.Service
 
                     DataRow newRow = null;
                     DateTime? dateTime = null;
-                    foreach (var item in dBTMReportsList.Where(x=> x.DBTMTestMasterId == dBTMTestMasterId))
+                    foreach (var item in dBTMReportsList.Where(x => x.DBTMTestMasterId == dBTMTestMasterId))
                     {
                         if (dateTime != item.CreatedDate)
                         {
@@ -110,6 +113,14 @@ namespace Coditech.API.Service
             return listModel;
         }
 
+        public virtual LiveTestResultLoginModel GetLiveTestResultLogin(LiveTestResultLoginModel liveTestResultLoginModel)
+        {
+            if (IsNull(liveTestResultLoginModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            liveTestResultLoginModel.Password = MD5Hash(liveTestResultLoginModel.Password);   
+            return liveTestResultLoginModel;
+        }
     }
 }
 

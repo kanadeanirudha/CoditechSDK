@@ -1,10 +1,13 @@
-﻿using Coditech.Admin.Utilities;
-using Coditech.Admin.ViewModel;
+﻿using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Resources;
+using System.Diagnostics;
+using static Coditech.Common.Helper.HelperUtility;
+
 
 namespace Coditech.Admin.Agents
 {
@@ -23,19 +26,22 @@ namespace Coditech.Admin.Agents
         #endregion
 
         #region Public Methods
-
-        //Get Dashboard by general selected Admin Role Master id.
-        public virtual LiveTestResultDashboardViewModel GetLiveTestResultDashboard()
+        //Get Live Test Result Dashboard
+        public virtual LiveTestResultLoginViewModel GetLiveTestResultDashboard(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
         {
-            string selectedCentreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).SelectedCentreCode;
-            long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.UserMasterId ?? 0;
-            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = new LiveTestResultDashboardViewModel();
-            if (!string.IsNullOrEmpty(selectedCentreCode) && entityId > 0)
+            try
             {
-                LiveTestResultDashboardResponse response = _liveTestResultDashboardClient.GetLiveTestResultDashboard(selectedCentreCode, entityId);
-                liveTestResultDashboardViewModel = response?.LiveTestResultDashboardModel?.ToViewModel<LiveTestResultDashboardViewModel>();
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
+                LiveTestResultLoginResponse response = _liveTestResultDashboardClient.GetLiveTestResultDashboard(liveTestResultLoginViewModel.ToModel<LiveTestResultLoginModel>());
+                LiveTestResultLoginModel liveTestResultLoginModel = response?.LiveTestResultLoginModel;
+                _coditechLogging.LogMessage("Agent method execution done.", "DBTMTraineeAssignment", TraceLevel.Info);
+                return IsNotNull(liveTestResultLoginModel) ? liveTestResultLoginModel.ToViewModel<LiveTestResultLoginViewModel>() : (LiveTestResultLoginViewModel)GetViewModelWithErrorMessage(new LiveTestResultLoginViewModel(), GeneralResources.UpdateErrorMessage);
             }
-            return liveTestResultDashboardViewModel;
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "LiveTestResultLogin", TraceLevel.Error);
+                return (LiveTestResultLoginViewModel)GetViewModelWithErrorMessage(liveTestResultLoginViewModel, GeneralResources.UpdateErrorMessage);
+            }
         }
         #endregion
     }
