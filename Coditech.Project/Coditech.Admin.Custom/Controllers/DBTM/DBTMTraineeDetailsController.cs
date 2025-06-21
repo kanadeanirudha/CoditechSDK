@@ -270,11 +270,6 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", departmentDropdown);
         }
 
-        public virtual ActionResult Cancel(string SelectedCentreCode, short selectedDepartmentId)
-        {
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedDepartmentId = selectedDepartmentId };
-            return RedirectToAction("GetAssociatedTrainerList", dataTableViewModel);
-        }
         #endregion TraineeAssociatedToTrainer
 
         public virtual ActionResult DBTMTraineeDetailsCancel(string SelectedCentreCode)

@@ -63,5 +63,13 @@ namespace Coditech.Common.API
                 return Convert.ToString(settings["DBTMIndividualCentre"]);
             }
         }
+
+        public static string RunningNumberList
+        {
+            get
+            {
+                return Convert.ToString(settings["RunningNumberList"]);
+            }
+        }
     }
 }
