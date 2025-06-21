@@ -2,6 +2,7 @@
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Responses;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
@@ -27,20 +28,36 @@ namespace Coditech.Admin.Agents
 
         #region Public Methods
         //Get Live Test Result Dashboard
-        public virtual LiveTestResultLoginViewModel GetLiveTestResultDashboard(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
+        public virtual LiveTestResultDashboardViewModel GetLiveTestResultDashboard(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
         {
+            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = new LiveTestResultDashboardViewModel();
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
-                LiveTestResultLoginResponse response = _liveTestResultDashboardClient.GetLiveTestResultDashboard(liveTestResultLoginViewModel.ToModel<LiveTestResultLoginModel>());
-                LiveTestResultLoginModel liveTestResultLoginModel = response?.LiveTestResultLoginModel;
+                LiveTestResultDashboardResponse response = _liveTestResultDashboardClient.GetLiveTestResultDashboard(liveTestResultLoginViewModel.ToModel<LiveTestResultLoginModel>());
+                LiveTestResultDashboardModel liveTestResultDashboardModel = response?.LiveTestResultDashboardModel;
                 _coditechLogging.LogMessage("Agent method execution done.", "DBTMTraineeAssignment", TraceLevel.Info);
-                return IsNotNull(liveTestResultLoginModel) ? liveTestResultLoginModel.ToViewModel<LiveTestResultLoginViewModel>() : (LiveTestResultLoginViewModel)GetViewModelWithErrorMessage(new LiveTestResultLoginViewModel(), GeneralResources.UpdateErrorMessage);
+                liveTestResultDashboardViewModel = IsNotNull(liveTestResultDashboardModel) ? liveTestResultDashboardModel.ToViewModel<LiveTestResultDashboardViewModel>() : (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(new LiveTestResultDashboardViewModel(), GeneralResources.UpdateErrorMessage);
+                return liveTestResultDashboardViewModel;
+            }
+            catch (CoditechException ex)
+            {
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.InvalidData:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, liveTestResultDashboardViewModel.ErrorMessage);
+                    case ErrorCodes.NotFound:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, AdminResources.ErrorMessage_ThisaccountdoesnotexistEnteravalidemailaddressorpassword);
+                    case ErrorCodes.ContactAdministrator:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
+                    default:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
+                }
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "LiveTestResultLogin", TraceLevel.Error);
-                return (LiveTestResultLoginViewModel)GetViewModelWithErrorMessage(liveTestResultLoginViewModel, GeneralResources.UpdateErrorMessage);
+                _coditechLogging.LogMessage(ex, "LiveTestResultDashboard", TraceLevel.Error);
+                return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
         #endregion

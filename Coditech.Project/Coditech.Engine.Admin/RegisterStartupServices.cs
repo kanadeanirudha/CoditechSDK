@@ -155,7 +155,7 @@ namespace Coditech.Admin
             {
                 routes.MapRoute(
                     name: "areaRoute",
-                    template: "{area:exists}/{controller}/{action}/{id?}");
+                    template: "{area:exists}/{controller}/{action?}/{id?}");
 
                 routes.MapRoute(
                     name: "default",

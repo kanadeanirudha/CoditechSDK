@@ -27,16 +27,16 @@ namespace Coditech.Admin.Controllers
         [AllowAnonymous]
         public ActionResult Index(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
         {
+            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = new LiveTestResultDashboardViewModel();
             if (ModelState.IsValid)
             {
-                liveTestResultLoginViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard(liveTestResultLoginViewModel);
-                if (!liveTestResultLoginViewModel.HasError)
+                liveTestResultDashboardViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard(liveTestResultLoginViewModel);
+                if (!liveTestResultDashboardViewModel.HasError)
                 {
-                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("Index");
+                    return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResult.cshtml", liveTestResultDashboardViewModel);
                 }
             }
-            SetNotificationMessage(GetErrorNotificationMessage(liveTestResultLoginViewModel.ErrorMessage));
+            SetNotificationMessage(GetErrorNotificationMessage(liveTestResultDashboardViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml", liveTestResultLoginViewModel);
         }
     }

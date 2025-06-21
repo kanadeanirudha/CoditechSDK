@@ -2,6 +2,7 @@
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
@@ -18,6 +19,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
         public LiveTestResultDashboardService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -26,19 +29,38 @@ namespace Coditech.API.Service
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         //Get Dashboard Details by selected Admin Role Master id.
-        public virtual LiveTestResultDashboardModel GetLiveTestResultDashboard(string selectedCentreCode, long entityId)
+        public virtual LiveTestResultDashboardModel GetLiveTestResultLogin(LiveTestResultLoginModel liveTestResultLoginModel)
         {
+            if (IsNull(liveTestResultLoginModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            if (!new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Any(x => x.DeviceSerialCode == liveTestResultLoginModel.DeviceSerialCode && x.IsActive && x.IsMasterDevice))
+                throw new CoditechException(ErrorCodes.InvalidData, "Invalide device serial code");
+
+            liveTestResultLoginModel.Password = MD5Hash(liveTestResultLoginModel.Password);
+            UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x => x.UserName == liveTestResultLoginModel.UserName && x.Password == liveTestResultLoginModel.Password
+                                                                                        && (x.UserType == UserTypeEnum.Employee.ToString()));
+            if (IsNull(userMasterData))
+                throw new CoditechException(ErrorCodes.NotFound, null);
+            else if (!userMasterData.IsActive)
+                throw new CoditechException(ErrorCodes.ContactAdministrator, null);
+
+            string selectedCentreCode = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).FirstOrDefault().CentreCode;
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", selectedCentreCode, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@FromDate", DateTime.Now.Date.AddDays(-10), ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@DeviceSerialCode", liveTestResultLoginModel.DeviceSerialCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@DBTMTestMasterId", liveTestResultLoginModel.DBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@FromDate", DateTime.Now.Date, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@ToDate", DateTime.Now.Date, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMLiveTestResult @CentreCode,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMLiveTestResult @CentreCode,@DeviceSerialCode,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             LiveTestResultDashboardModel listModel = new LiveTestResultDashboardModel();
 
             if (dBTMReportsList?.Count > 0)
@@ -111,15 +133,6 @@ namespace Coditech.API.Service
                 }
             }
             return listModel;
-        }
-
-        public virtual LiveTestResultLoginModel GetLiveTestResultLogin(LiveTestResultLoginModel liveTestResultLoginModel)
-        {
-            if (IsNull(liveTestResultLoginModel))
-                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
-            liveTestResultLoginModel.Password = MD5Hash(liveTestResultLoginModel.Password);   
-            return liveTestResultLoginModel;
         }
     }
 }

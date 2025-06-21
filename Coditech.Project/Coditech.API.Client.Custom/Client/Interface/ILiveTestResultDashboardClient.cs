@@ -4,6 +4,6 @@ namespace Coditech.API.Client
 {
     public interface ILiveTestResultDashboardClient : IBaseClient
     {
-        LiveTestResultLoginResponse GetLiveTestResultDashboard(LiveTestResultLoginModel body); 
+        LiveTestResultDashboardResponse GetLiveTestResultDashboard(LiveTestResultLoginModel body); 
     }
 }

@@ -8,6 +8,6 @@ namespace Coditech.Admin.Agents
         /// Get GetLiveTestResultDashboardDetails.
         /// </summary>
         /// <returns>Returns LiveTestResultLoginViewModel.</returns>
-        LiveTestResultLoginViewModel GetLiveTestResultDashboard(LiveTestResultLoginViewModel liveTestResultLoginViewModel);
+        LiveTestResultDashboardViewModel GetLiveTestResultDashboard(LiveTestResultLoginViewModel liveTestResultLoginViewModel);
     }
 }

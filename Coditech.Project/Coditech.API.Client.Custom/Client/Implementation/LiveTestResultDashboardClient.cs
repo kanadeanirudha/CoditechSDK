@@ -15,12 +15,12 @@ namespace Coditech.API.Client
             liveTestResultDashboardEndpoint = new LiveTestResultDashboardEndpoint();
         }
 
-        public virtual LiveTestResultLoginResponse GetLiveTestResultDashboard(LiveTestResultLoginModel body)
+        public virtual LiveTestResultDashboardResponse GetLiveTestResultDashboard(LiveTestResultLoginModel body)
         {
             return Task.Run(async () => await GetLiveTestResultDashboardAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<LiveTestResultLoginResponse> GetLiveTestResultDashboardAsync(LiveTestResultLoginModel body, CancellationToken cancellationToken)
+        public virtual async Task<LiveTestResultDashboardResponse> GetLiveTestResultDashboardAsync(LiveTestResultLoginModel body, CancellationToken cancellationToken)
         {
             string endpoint = liveTestResultDashboardEndpoint.GetLiveTestResultDashboardAsync();
             HttpResponseMessage response = null;
@@ -35,7 +35,7 @@ namespace Coditech.API.Client
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultLoginResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultDashboardResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
                         throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
@@ -45,7 +45,7 @@ namespace Coditech.API.Client
                 else
                 if (status_ == 201)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultLoginResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultDashboardResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
                         throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
@@ -55,7 +55,7 @@ namespace Coditech.API.Client
                 else
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    LiveTestResultLoginResponse typedBody = JsonConvert.DeserializeObject<LiveTestResultLoginResponse>(responseData);
+                    LiveTestResultDashboardResponse typedBody = JsonConvert.DeserializeObject<LiveTestResultDashboardResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }

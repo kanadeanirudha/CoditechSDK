@@ -1,10 +1,8 @@
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
-using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
-using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 
@@ -28,23 +26,23 @@ namespace Coditech.API.Controllers
 
         [Route("/LiveTestResultDashboard/GetLiveTestResultDashboard")]     
         [HttpPost, ValidateModel]
-        [Produces(typeof(LiveTestResultLoginResponse))]
+        [Produces(typeof(LiveTestResultDashboardResponse))]
         public virtual IActionResult GetLiveTestResultDashboard([FromBody] LiveTestResultLoginModel model)
         {
             try
             {
-                LiveTestResultLoginModel dashboardModel = _liveTestResultDashboardService.GetLiveTestResultLogin(model);
-                return IsNotNull(dashboardModel) ? CreateOKResponse(new LiveTestResultLoginResponse { LiveTestResultLoginModel = dashboardModel }) : CreateNoContentResponse();
+                LiveTestResultDashboardModel dashboardModel = _liveTestResultDashboardService.GetLiveTestResultLogin(model);
+                return IsNotNull(dashboardModel) ? CreateOKResponse(new LiveTestResultDashboardResponse { LiveTestResultDashboardModel = dashboardModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.LiveTestResultLogin.ToString(), TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new LiveTestResultLoginResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+                return CreateInternalServerErrorResponse(new LiveTestResultDashboardResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.LiveTestResultLogin.ToString(), TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new LiveTestResultLoginResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new LiveTestResultDashboardResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }
