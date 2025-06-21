@@ -1,0 +1,83 @@
+﻿@using Coditech.Admin.ViewModel
+@model LiveTestResultLoginViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+    ViewBag.Title = "LiveTestResultLogin";
+}
+<div class="card-body p-0 auth-content">
+    <ul class="nav-border nav nav-pills" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active fw-semibold" data-bs-toggle="tab" href="/liveTestResult/Index" role="tab">Live Result</a>
+        </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active p-3" id="LogIn_Tab" role="tabpanel">
+            @using (Html.BeginForm("Index", "LiveTestResult", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group mb-2">
+                    @Html.LabelFor(x => x.UserName, new { @class = "form-label" })
+                    <div class="input-group">
+                        @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", placeholder = "username..." })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.UserName, null)
+                </div>
+                <div class="form-group mb-2">
+                    @Html.LabelFor(x => x.Password, new { @class = "form-label" })
+                    <div class="input-group password-input-wraper">
+                        @Html.TextBoxFor(x => x.Password, new { @class = "form-control password-input", type = "password", placeholder = "Password here..." })
+                        <i class="fas fa-eye view-password"></i>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, null)
+                    @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                </div>
+                <div class="form-group mb-2">
+                    @Html.LabelFor(x => x.DeviceSerialCode, new { @class = "form-label" })
+                    <div class="input-group password-input-wraper">
+                        @Html.TextBoxFor(x => x.DeviceSerialCode, new { @class = "form-control password-input", type = "DeviceSerialCode", placeholder = "Device Code here..." })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DeviceSerialCode, null)
+                    @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                </div>
+                <div class="form-group mb-2">
+                    @Html.LabelFor(x => x.TestName, new { @class = "form-label" })
+                    <div class="input-group password-input-wraper">
+                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+               {
+                   DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(),
+                   DropdownName = "DBTMTestMasterId",
+                   DropdownSelectedValue = Model.DBTMTestMasterId
+                    .ToString(),
+                   IsCustomDropdown = true
+               })                     
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DBTMTestMasterId, null)
+                    @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                </div>
+                <div class="form-group row my-3">
+                </div>
+                <div class="form-group mb-0 row">
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100 waves-effect waves-light">Live Result<i class="fas fa-sign-in-alt ms-1"></i></button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".view-password").click(function () {
+                $(this).toggleClass("fa fa-eye-slash");
+                var inputAttribute = $('.password-input');
+                if (inputAttribute.attr("type") == "password") {
+                    inputAttribute.attr("type", "text");
+                } else {
+                    inputAttribute.attr("type", "password");
+                }
+            });
+        });
+    </script>
+}

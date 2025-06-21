@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Endpoint;
+using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 
@@ -14,26 +15,27 @@ namespace Coditech.API.Client
             liveTestResultDashboardEndpoint = new LiveTestResultDashboardEndpoint();
         }
 
-        public virtual LiveTestResultDashboardResponse GetLiveTestResultDashboard(string selectedCentreCode, long entityId)
+        public virtual LiveTestResultLoginResponse GetLiveTestResultDashboard(LiveTestResultLoginModel body)
         {
-            return Task.Run(async () => await GetLiveTestResultDashboardAsync(selectedCentreCode,entityId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetLiveTestResultDashboardAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<LiveTestResultDashboardResponse> GetLiveTestResultDashboardAsync(string selectedCentreCode, long entityId, System.Threading.CancellationToken cancellationToken)
+        public virtual async Task<LiveTestResultLoginResponse> GetLiveTestResultDashboardAsync(LiveTestResultLoginModel body, CancellationToken cancellationToken)
         {
-            string endpoint = liveTestResultDashboardEndpoint.GetLiveTestResultDashboardAsync( selectedCentreCode,entityId);
+            string endpoint = liveTestResultDashboardEndpoint.GetLiveTestResultDashboardAsync();
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
             {
                 ApiStatus status = new ApiStatus();
 
-                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
-                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultDashboardResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultLoginResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
                         throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
@@ -41,17 +43,23 @@ namespace Coditech.API.Client
                     return objectResponse.Object;
                 }
                 else
-                if (status_ == 204)
+                if (status_ == 201)
                 {
-                    return new LiveTestResultDashboardResponse();
+                    var objectResponse = await ReadObjectResponseAsync<LiveTestResultLoginResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
                 }
                 else
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    LiveTestResultDashboardResponse typedBody = JsonConvert.DeserializeObject<LiveTestResultDashboardResponse>(responseData);
+                    LiveTestResultLoginResponse typedBody = JsonConvert.DeserializeObject<LiveTestResultLoginResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
+
             }
             finally
             {

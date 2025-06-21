@@ -2,6 +2,7 @@
 using Coditech.Admin.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Coditech.Resources;
 
 namespace Coditech.Admin.Controllers
 {
@@ -14,20 +15,29 @@ namespace Coditech.Admin.Controllers
             _liveTestResultDashboardAgent = liveTestResultDashboardAgent;
         }
 
-
         [HttpGet]
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml");
+            LiveTestResultLoginViewModel liveTestResultLoginViewModel = new LiveTestResultLoginViewModel();
+            return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml", liveTestResultLoginViewModel);
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Index(string username,string password,string deviceCode, string testcode)
+        public ActionResult Index(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
         {
-            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard();
-            return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResult.cshtml", liveTestResultDashboardViewModel);
+            if (ModelState.IsValid)
+            {
+                liveTestResultLoginViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard(liveTestResultLoginViewModel);
+                if (!liveTestResultLoginViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                    return RedirectToAction("Index");
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(liveTestResultLoginViewModel.ErrorMessage));
+            return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml", liveTestResultLoginViewModel);
         }
     }
 }
