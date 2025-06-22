@@ -4,6 +4,6 @@ namespace Coditech.API.Service
 {
     public interface ILiveTestResultDashboardService
     {
-        LiveTestResultDashboardModel GetLiveTestResultDashboard(string selectedCentreCode, long entityId);
+        LiveTestResultDashboardModel GetLiveTestResultLogin(LiveTestResultLoginModel liveTestResultLoginModel);
     }
 }

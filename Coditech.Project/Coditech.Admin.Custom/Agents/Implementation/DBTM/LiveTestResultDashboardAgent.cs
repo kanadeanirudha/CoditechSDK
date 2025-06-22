@@ -1,10 +1,14 @@
-﻿using Coditech.Admin.Utilities;
-using Coditech.Admin.ViewModel;
+﻿using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Responses;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Resources;
+using System.Diagnostics;
+using static Coditech.Common.Helper.HelperUtility;
+
 
 namespace Coditech.Admin.Agents
 {
@@ -23,19 +27,38 @@ namespace Coditech.Admin.Agents
         #endregion
 
         #region Public Methods
-
-        //Get Dashboard by general selected Admin Role Master id.
-        public virtual LiveTestResultDashboardViewModel GetLiveTestResultDashboard()
+        //Get Live Test Result Dashboard
+        public virtual LiveTestResultDashboardViewModel GetLiveTestResultDashboard(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
         {
-            string selectedCentreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).SelectedCentreCode;
-            long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.UserMasterId ?? 0;
             LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = new LiveTestResultDashboardViewModel();
-            if (!string.IsNullOrEmpty(selectedCentreCode) && entityId > 0)
+            try
             {
-                LiveTestResultDashboardResponse response = _liveTestResultDashboardClient.GetLiveTestResultDashboard(selectedCentreCode, entityId);
-                liveTestResultDashboardViewModel = response?.LiveTestResultDashboardModel?.ToViewModel<LiveTestResultDashboardViewModel>();
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
+                LiveTestResultDashboardResponse response = _liveTestResultDashboardClient.GetLiveTestResultDashboard(liveTestResultLoginViewModel.ToModel<LiveTestResultLoginModel>());
+                LiveTestResultDashboardModel liveTestResultDashboardModel = response?.LiveTestResultDashboardModel;
+                _coditechLogging.LogMessage("Agent method execution done.", "DBTMTraineeAssignment", TraceLevel.Info);
+                liveTestResultDashboardViewModel = IsNotNull(liveTestResultDashboardModel) ? liveTestResultDashboardModel.ToViewModel<LiveTestResultDashboardViewModel>() : (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(new LiveTestResultDashboardViewModel(), GeneralResources.UpdateErrorMessage);
+                return liveTestResultDashboardViewModel;
             }
-            return liveTestResultDashboardViewModel;
+            catch (CoditechException ex)
+            {
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.InvalidData:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, ex.ErrorMessage);
+                    case ErrorCodes.NotFound:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, AdminResources.ErrorMessage_ThisaccountdoesnotexistEnteravalidemailaddressorpassword);
+                    case ErrorCodes.ContactAdministrator:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
+                    default:
+                        return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex.Message, "LiveTestResultDashboard", TraceLevel.Error);
+                return (LiveTestResultDashboardViewModel)GetViewModelWithErrorMessage(liveTestResultDashboardViewModel, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
+            }
         }
         #endregion
     }

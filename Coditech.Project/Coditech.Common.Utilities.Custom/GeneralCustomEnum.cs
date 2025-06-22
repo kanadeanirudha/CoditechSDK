@@ -42,7 +42,8 @@
         IndividualRegistration,
         DBTMRegisterTrainee,
         TraineeRegistration,
-        LiveTestResultDashboard
+        LiveTestResultDashboard,
+        LiveTestResultLogin
     }
     public enum UserTypeCustomEnum
     {
