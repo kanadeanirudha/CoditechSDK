@@ -41,6 +41,7 @@ namespace Coditech.Admin.ViewModel
         [RegularExpression(@"^\d{1,3}?$", ErrorMessage = "Height must be less than 999.")]
         [Display(Name = "Height(in)")]
         public decimal Height { get; set; }
+        public long EntityId { get; set; }
 
 
     }

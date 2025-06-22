@@ -170,21 +170,15 @@ namespace Coditech.API.Service
         public List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType)
         {
             long entityIds = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
-
-            List<DBTMTestApiModel> assignmentList = (from a in _dBTMTestMasterRepository.Table
-                                                     join b in _dBTMTraineeAssignmentRepository.Table
-                                                         on a.DBTMTestMasterId equals b.DBTMTestMasterId
-                                                     where b.GeneralTrainerMasterId == entityId
-                                                           && b.AssignmentDate <= DateTime.Today
-                                                     select new DBTMTestApiModel
-                                                     {
-                                                         DBTMTraineeAssignmentId = b.DBTMTraineeAssignmentId,
-                                                         DBTMTestMasterId = a.DBTMTestMasterId,
-                                                         TestName = a.TestName,
-                                                         AssignmentDate = b.AssignmentDate,
-                                                         AssignmentTime = b.AssignmentTime,
-                                                     })?.ToList();
-            return assignmentList;
+            //GetGeneralAssignmentList
+            List<DBTMTestApiModel> assignmentList= new List<DBTMTestApiModel>();
+                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTestApiModel> objStoredProc = new CoditechViewRepository<DBTMTestApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@EntityId", entityIds, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTestApiModel> generalAssignmentList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralAssignmentList @EntityId,@UserType,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            return generalAssignmentList;
         }
 
         public DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId)

@@ -58,9 +58,11 @@ namespace Coditech.API.Service
             string centreCode = "HO";
             List<GeneralRunningNumbers> generalRunningNumbersList = GetGeneralRunningNumbersList(centreCode);
 
-            if (IsNull(generalRunningNumbersList) || generalRunningNumbersList.Count == 0)
-                throw new CoditechException(ErrorCodes.InvalidData, string.Format("EmployeeRegistration Or DBTMTraineeRegistration running number not set for HO."));
-
+            if (IsNull(generalRunningNumbersList) || generalRunningNumbersList.Count == 0|| generalRunningNumbersList.Count != ApiCustomSettings.RunningNumberList?.Split(',')?.ToList()?.Count)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Running number not set for HO.");
+            }
+            
             OrganisationCentreMaster organisationCentreMaster = null;
             long personId = 0;
             long employeeId = 0;
@@ -207,17 +209,17 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("PersonId", personId, ParameterDirection.Input, DbType.String);
                 objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
                 int status = 0;
-                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTrainerNewRegistration @CentreCode,@EntityId,@UserType,@PersonId,@Status OUT",4, out status);
+                objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTrainerNewRegistration @CentreCode,@EntityId,@UserType,@PersonId,@Status OUT", 4, out status);
             }
             return dBTMNewRegistrationModel;
         }
         #endregion
 
-        #region Protected
+        #region Protected 
         protected List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
         {
-            List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
-            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
+            List<string> runningNumberList = ApiCustomSettings.RunningNumberList.Split(',').ToList();
+            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumberList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
             List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
             return generalRunningNumbersList;
         }
@@ -400,7 +402,7 @@ namespace Coditech.API.Service
                     item.CreatedDate = currentDate;
                     item.ModifiedDate = currentDate;
                 }
-                new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseEmailTemplateList);              
+                new CoditechRepository<OrganisationCentrewiseEmailTemplate>(_serviceProvider.GetService<Coditech_Entities>()).Insert(organisationCentrewiseEmailTemplateList);
             }
         }
 
@@ -587,7 +589,7 @@ namespace Coditech.API.Service
         }
         protected virtual List<DBTMTraineeAssignmentModel> GetTraineesForCentre(string centreCode)
         {
-            return new CoditechRepository<DBTMTraineeAssignmentModel>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.SelectedCentreCode == centreCode ).ToList();
+            return new CoditechRepository<DBTMTraineeAssignmentModel>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.SelectedCentreCode == centreCode).ToList();
         }
         #endregion
     }

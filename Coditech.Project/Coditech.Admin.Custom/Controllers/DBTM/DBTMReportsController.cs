@@ -18,13 +18,16 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult BatchWiseReports()
         {
-            return View(batchreports, new DBTMBatchWiseReportsListViewModel());
+            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsListViewModel =new DBTMBatchWiseReportsListViewModel();
+            dBTMBatchWiseReportsListViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
+            dBTMBatchWiseReportsListViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+            return View(batchreports, dBTMBatchWiseReportsListViewModel);
         }
 
         [HttpGet]
-        public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId)
+        public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId);
+            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,FromDate,ToDate);
             return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMBatchWiseReportsViewModel);
         }
 

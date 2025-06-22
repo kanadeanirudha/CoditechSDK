@@ -1,10 +1,8 @@
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
-using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
-using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 
@@ -26,24 +24,24 @@ namespace Coditech.API.Controllers
             _coditechLogging = coditechLogging;
         }
 
-        [Route("/LiveTestResultDashboard/GetLiveTestResultDashboard")]
-        [HttpGet]
+        [Route("/LiveTestResultDashboard/GetLiveTestResultDashboard")]     
+        [HttpPost, ValidateModel]
         [Produces(typeof(LiveTestResultDashboardResponse))]
-        public virtual IActionResult GetLiveTestResultDashboard(string selectedCentreCode, long entityId)
+        public virtual IActionResult GetLiveTestResultDashboard([FromBody] LiveTestResultLoginModel model)
         {
             try
             {
-                LiveTestResultDashboardModel dashboardModel = _liveTestResultDashboardService.GetLiveTestResultDashboard(selectedCentreCode, entityId);
+                LiveTestResultDashboardModel dashboardModel = _liveTestResultDashboardService.GetLiveTestResultLogin(model);
                 return IsNotNull(dashboardModel) ? CreateOKResponse(new LiveTestResultDashboardResponse { LiveTestResultDashboardModel = dashboardModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.LiveTestResultDashboard.ToString(), TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.LiveTestResultLogin.ToString(), TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new LiveTestResultDashboardResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.LiveTestResultDashboard.ToString(), TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.LiveTestResultLogin.ToString(), TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new LiveTestResultDashboardResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }

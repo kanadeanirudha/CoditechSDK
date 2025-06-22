@@ -219,6 +219,7 @@ namespace Coditech.Admin.Agents
 
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.AssociatedTrainerList.Count, BindAssociatedTraineeColumns());
             listViewModel.DBTMTraineeDetailId = dBTMTraineeDetailId;
+            listViewModel.EntityId = dBTMTraineeDetailId;
             listViewModel.PersonId = personId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;

@@ -187,7 +187,8 @@ namespace Coditech.API.Service
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
             }
-            generalPersonModel = base.InsertPersonInformation(generalPersonModel);
+            
+            generalPersonModel = InsertPersonInformation(generalPersonModel);
 
             if (!generalPersonModel.HasError)
             {
@@ -247,6 +248,13 @@ namespace Coditech.API.Service
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
         }
 
+        protected List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
+        {
+            List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
+            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
+            List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
+            return generalRunningNumbersList;
+        }
         #endregion
     }
 }

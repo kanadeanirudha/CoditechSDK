@@ -245,7 +245,7 @@ namespace Coditech.Admin.Helpers
 
         private static void GetBatchWiseReportsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Batch-------" });
+            dropdownList.Add(new SelectListItem() { Text = "-------Select Batch-------" , Value = "0" });
             long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
             string userType = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserType;
             DBTMBatchListResponse response = new DBTMBatchClient().GetBatchList(entityId, userType);

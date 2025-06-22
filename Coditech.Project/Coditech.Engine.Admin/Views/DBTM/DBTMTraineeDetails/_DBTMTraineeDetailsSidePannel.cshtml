@@ -2,7 +2,7 @@
 @model Dictionary<string, string>
 @{
     Layout = null;
-    long dBTMTraineeDetailId = Convert.ToInt32(Model?.FirstOrDefault(x => x.Key == "DBTMTraineeDetailId").Value);
+    long dBTMTraineeDetailId = Convert.ToInt64(Model?.FirstOrDefault(x => x.Key == "DBTMTraineeDetailId").Value);
     long personId = Convert.ToInt64(Model?.FirstOrDefault(x => x.Key == "PersonId").Value);
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
