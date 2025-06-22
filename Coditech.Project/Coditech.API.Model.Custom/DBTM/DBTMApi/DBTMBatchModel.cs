@@ -7,6 +7,7 @@
         public TimeSpan BatchTime { get; set; }
         public TimeSpan BatchStartTime { get; set; }
         public DBTMTestApiModel DBTMTestApiModel { get; set; }
+        public List<DBTMTestApiModel> DBTMBatchTestList { get; set; }
         public List<DBTMGeneralBatchUserModel> DBTMGeneralBatchUserModel { get; set; }
     }
 }
