@@ -11,6 +11,7 @@ namespace Coditech.Admin.ViewModel
         {
         }
         public int GeneralBatchMasterId { get; set; }
+        public int DBTMTestMasterId { get; set; }
         [Required]
         [Display(Name = "From Date")]
         public DateTime FromDate { get; set; }

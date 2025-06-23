@@ -31,9 +31,8 @@ namespace Coditech.API.Service
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            int dBTMTestMasterId = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).FirstOrDefault().DBTMTestMasterId;
             if (dBTMTestMasterId <= 0)
             {
                 return new DBTMReportsListModel();
