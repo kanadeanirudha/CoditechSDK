@@ -4,7 +4,7 @@ namespace Coditech.Admin.Agents
 {
     public interface IDBTMReportsAgent
     {
-        DBTMBatchWiseReportsListViewModel BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate);
+        DBTMBatchWiseReportsListViewModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate);
         DBTMTestWiseReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate);
     }
 }
