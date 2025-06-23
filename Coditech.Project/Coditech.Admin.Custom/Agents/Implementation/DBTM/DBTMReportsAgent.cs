@@ -5,6 +5,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Newtonsoft.Json;
 
 namespace Coditech.Admin.Agents
 {
@@ -27,7 +28,7 @@ namespace Coditech.Admin.Agents
         //Batch Wise Reports 
         public virtual DBTMBatchWiseReportsListViewModel BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId,FromDate,ToDate);
+            DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId, FromDate, ToDate);
 
             DBTMBatchWiseReportsListViewModel listViewModel = new DBTMBatchWiseReportsListViewModel
             {
@@ -39,14 +40,14 @@ namespace Coditech.Admin.Agents
         //Test Wise Reports 
         public virtual DBTMTestWiseReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
-            long entityId = 0;
+            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
-                entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
+                dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).Custom3);
             }
 
-            DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, entityId);
+            DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId));
 
             DBTMTestWiseReportsListViewModel listViewModel = new DBTMTestWiseReportsListViewModel
             {
