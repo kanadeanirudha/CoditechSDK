@@ -8,7 +8,7 @@ using Coditech.Common.Service;
 using Coditech.Resources;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-
+using Newtonsoft.Json;
 namespace Coditech.API.Service
 {
     public class DBTMUserService : UserService, IDBTMUserService
@@ -49,6 +49,12 @@ namespace Coditech.API.Service
                 if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
                 {
                     model.Custom1 = generalPersonModel.Custom1;
+                }
+                if (model.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
+                    dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y=>y.GeneralTrainerMasterId)?.FirstOrDefault();
+                    model.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
                 }
             }
             return model;
@@ -187,7 +193,7 @@ namespace Coditech.API.Service
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
             }
-            
+
             generalPersonModel = InsertPersonInformation(generalPersonModel);
 
             if (!generalPersonModel.HasError)

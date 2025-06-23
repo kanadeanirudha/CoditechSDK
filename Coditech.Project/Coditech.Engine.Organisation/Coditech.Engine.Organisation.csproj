@@ -62,6 +62,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Coditech.API.Data.Custom\Coditech.API.Data.Custom.csproj" />
+		<ProjectReference Include="..\Coditech.API.Model.Custom\Coditech.API.Model.Custom.csproj" />
 		<ProjectReference Include="..\Coditech.Common.Utilities.Custom\Coditech.Common.Utilities.Custom.csproj" />
 	</ItemGroup>
 
