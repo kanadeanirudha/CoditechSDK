@@ -7,6 +7,7 @@ namespace Coditech.API.Service
         bool InsertDeviceData(List<DBTMDeviceDataModel> model);
         List<DBTMBatchModel> GetBatchList(long entityId, string userType);
         DBTMBatchModel GetBatchDetails(int generalBatchMasterId);
+        DBTMBatchModel GetBatchDetailsV2(int generalBatchMasterId);
         List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType);
         DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId);
     }
