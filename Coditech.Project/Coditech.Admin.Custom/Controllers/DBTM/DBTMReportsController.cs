@@ -1,5 +1,6 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Coditech.Admin.Controllers
@@ -25,9 +26,9 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,FromDate,ToDate);
+            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate);
             return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMBatchWiseReportsViewModel);
         }
 
@@ -45,6 +46,19 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTestWiseReportsListViewModel dBTMTestWiseReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate);
             return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMTestWiseReportsViewModel);
+        }
+
+        public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
+        {
+            DropdownViewModel testDropdownn = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                Parameter = $"{generalBatchMasterId}~false", 
+                IsCustomDropdown = true
+            };
+
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn);
         }
     }
 }

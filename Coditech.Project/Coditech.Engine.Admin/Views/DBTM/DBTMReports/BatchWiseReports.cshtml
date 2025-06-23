@@ -1,7 +1,8 @@
 ﻿@model DBTMBatchWiseReportsListViewModel
 @{
     ViewBag.Title = "Batch Reports";
-    DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMBatchWiseReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true };
+    DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMTestListByGeneralBatchMasterId()", IsCustomDropdown = true };
+    DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.GeneralBatchMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMBatchWiseReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -21,9 +22,15 @@
                                 <div class="col-md-1">
                                     <label>Batch List</label>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
                                 </div>
+                            <div class="col-md-1">
+                                <label>Activity List</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn)
+                            </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
                             </div>
@@ -91,4 +98,3 @@
         });
     </script>
 }
-

@@ -7,6 +7,7 @@
 
     GetDBTMBatchWiseReports: function () {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         $("#DBTMBatchWiseReportsDivId").html("");
@@ -19,6 +20,7 @@
                 url: "/DBTMReports/GetBatchWiseReports",
                 data: {
                     "generalBatchMasterId": generalBatchMasterId,
+                    "dBTMTestMasterId": dBTMTestMasterId,
                     "FromDate": fromdate,  
                     "ToDate": todate    
                 },
@@ -38,6 +40,36 @@
         }
         else {
             $("#DBTMBatchWiseReportsDivId").html("");
+        }
+    },
+
+    GetDBTMTestListByGeneralBatchMasterId: function () {
+        var selectedItem = $("#GeneralBatchMasterId").val();
+
+        if (selectedItem != "") {
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetTestByGeneralBatchMasterId",
+                data: { generalBatchMasterId: selectedItem },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMTestMasterId").html(data); 
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            $("#DBTMTestMasterId").html(""); 
         }
     },
 

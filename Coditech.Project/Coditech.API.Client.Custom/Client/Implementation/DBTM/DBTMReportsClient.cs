@@ -14,14 +14,14 @@ namespace Coditech.API.Client
             dBTMReportsEndpoint = new DBTMReportsEndpoint();
         }
 
-        public virtual DBTMBatchWiseReportsListResponse BatchWiseReports(int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMBatchWiseReportsListResponse BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            return Task.Run(async () => await BatchWiseReportsAsync(generalBatchMasterId,FromDate,ToDate, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await BatchWiseReportsAsync(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMBatchWiseReportsListResponse> BatchWiseReportsAsync(int generalBatchMasterId, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
+        public virtual async Task<DBTMBatchWiseReportsListResponse> BatchWiseReportsAsync(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.BatchWiseReportsAsync(generalBatchMasterId, FromDate,ToDate);
+            string endpoint = dBTMReportsEndpoint.BatchWiseReportsAsync(generalBatchMasterId,dBTMTestMasterId, FromDate,ToDate);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
