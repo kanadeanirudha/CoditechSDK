@@ -2,6 +2,7 @@
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
@@ -155,6 +156,41 @@ namespace Coditech.API.Service
                     dBTMBatchModel.DBTMTestApiModel.IsLapDistanceChange = testDetails.IsLapDistanceChange;
                     dBTMBatchModel.DBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
                     dBTMBatchModel.DBTMTestApiModel.TestInstructions = testDetails.TestInstructions;
+                }
+                PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+                CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+                objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
+                objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+                List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralBatchUserList @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+
+                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
+            }
+            return dBTMBatchModel;
+        }
+
+        public DBTMBatchModel GetBatchDetailsV2(int generalBatchMasterId)
+        {
+            List<int> dbtmTestMasterIds = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId).ToList();
+            DBTMBatchModel dBTMBatchModel = new DBTMBatchModel()
+            {
+                GeneralBatchMasterId = generalBatchMasterId,
+            };
+
+            if (dbtmTestMasterIds?.Count > 0)
+            {
+                List<DBTMTestMaster> testDetailList = _dBTMTestMasterRepository.Table.Where(x => dbtmTestMasterIds.Contains(x.DBTMTestMasterId) && x.IsActive)?.ToList();
+
+                if (testDetailList?.Count == 0)
+                {
+                    throw new Exception("The test is not active or does not exist.");
+                }
+                else
+                {
+                    dBTMBatchModel.DBTMBatchTestList = new List<DBTMTestApiModel>();
+                    foreach (DBTMTestMaster item in testDetailList)
+                    {
+                        dBTMBatchModel.DBTMBatchTestList.Add(item.FromEntityToModel<DBTMTestApiModel>());
+                    }
                 }
                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
                 CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
