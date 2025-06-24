@@ -1,6 +1,7 @@
-﻿using Coditech.Common.Helper;
+﻿using System.ComponentModel.DataAnnotations;
+using Coditech.Common.API.Model;
+using Coditech.Common.Helper;
 using Coditech.Resources;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Coditech.Admin.ViewModel
@@ -10,7 +11,7 @@ namespace Coditech.Admin.ViewModel
         public long DBTMTraineeAssignmentId { get; set; }
 
         [Required]
-        [Display(Name = "Trainer")]
+        [Display(Name = "Trainee")]
         public long GeneralTrainerMasterId { get; set; }
 
         [Required]
@@ -35,12 +36,15 @@ namespace Coditech.Admin.ViewModel
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-       
+
         [Display(Name = "Test Name")]
         public string TestName { get; set; }
         public string MobileNumber { get; set; }
         public string ImagePath { get; set; }
         public bool IsAssociated { get; set; }
-       // public bool IsTestActive { get; set; }
+        public List<SelectListItem> AllTraineeList { get; set; }
+        [Display(Name = "Trainee")]
+        public List<string> SelectedTrainee { get; set; }
+        // public bool IsTestActive { get; set; }
     }
 }

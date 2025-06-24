@@ -1,4 +1,5 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Helpers;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
@@ -6,6 +7,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Coditech.Admin.Controllers
 {
@@ -37,14 +39,25 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult Create()
+        public ActionResult Create()
         {
-            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel()
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel
             {
-                SelectedCentreCode = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)?.SelectedCentreCode
+                SelectedCentreCode = userModel.SelectedCentreCode,
+                SelectedTrainee = new List<string>(),
+                GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0
             };
+
+            dBTMTraineeAssignmentViewModel.AllTraineeList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
+                Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
+            }).DropdownList;
+
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
+
 
         [HttpPost]
         public virtual ActionResult Create(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
