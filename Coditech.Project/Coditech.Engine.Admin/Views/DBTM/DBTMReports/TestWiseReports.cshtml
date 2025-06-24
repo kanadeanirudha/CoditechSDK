@@ -1,8 +1,15 @@
-﻿@model DBTMTestWiseReportsListViewModel
+﻿@model DBTMReportsListViewModel
 @{
     ViewBag.Title = "Activity Reports";
-    DropdownViewModel testDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), IsCustomDropdown = true };
-    DropdownViewModel studentsDropdown = new DropdownViewModel()
+    DropdownViewModel testDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
+                IsCustomDropdown = true,
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseReports()",
+            };
+    DropdownViewModel traineeDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(),
                 DropdownName = "DBTMTraineeDetailId",
@@ -36,7 +43,7 @@
                                 <label>Trainee List</label>
                             </div>
                             <div class="col-md-2">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", studentsDropdown)
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
