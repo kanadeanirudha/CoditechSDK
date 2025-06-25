@@ -1,6 +1,7 @@
-﻿using Coditech.Common.Helper;
+﻿using System.ComponentModel.DataAnnotations;
+using Coditech.Common.API.Model;
+using Coditech.Common.Helper;
 using Coditech.Resources;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Coditech.Admin.ViewModel
@@ -10,7 +11,6 @@ namespace Coditech.Admin.ViewModel
         public long DBTMTraineeAssignmentId { get; set; }
 
         [Required]
-        [Display(Name = "Trainer")]
         public long GeneralTrainerMasterId { get; set; }
 
         [Required]
@@ -19,7 +19,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Assignment Date")]
         public DateTime AssignmentDate { get; set; }
-
+        [Required]
         [Display(Name = "Assignment Time")]
         public TimeSpan? AssignmentTime { get; set; }
 
@@ -29,18 +29,20 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Test Status")]
         public string TestStatus { get; set; }
 
-        [Required]
-        [Display(Name = "LabelCentre", ResourceType = typeof(AdminResources))]
         public string SelectedCentreCode { get; set; }
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-       
+
         [Display(Name = "Test Name")]
+        [Required]
         public string TestName { get; set; }
         public string MobileNumber { get; set; }
         public string ImagePath { get; set; }
         public bool IsAssociated { get; set; }
-       // public bool IsTestActive { get; set; }
+        public List<SelectListItem> AllTraineeList { get; set; }
+        [Display(Name = "Trainee")]
+        [Required]
+        public List<string> SelectedTrainee { get; set; }
     }
 }

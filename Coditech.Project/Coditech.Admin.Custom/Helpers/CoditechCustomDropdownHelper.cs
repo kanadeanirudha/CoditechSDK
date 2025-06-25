@@ -7,6 +7,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace Coditech.Admin.Helpers
 {
@@ -169,9 +170,12 @@ namespace Coditech.Admin.Helpers
 
         private static void GetDBTMTestList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            DBTMTestListResponse response = new DBTMTestClient().List(null, null, null, 1, int.MaxValue);
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Test-------" });
 
+            DBTMTestListResponse response = new DBTMTestClient().List(null, null, null, 1, int.MaxValue);
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = "-------Select Acitity-------" });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = "-------Select Acitity -------" });
             DBTMTestListModel list = new DBTMTestListModel { DBTMTestList = response.DBTMTestList };
             foreach (var item in list.DBTMTestList)
             {
@@ -245,7 +249,7 @@ namespace Coditech.Admin.Helpers
 
         private static void GetBatchWiseReportsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Batch-------" , Value = "0" });
+            dropdownList.Add(new SelectListItem() { Text = "-------Select Batch-------", Value = "0" });
             long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
             string userType = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserType;
             DBTMBatchListResponse response = new DBTMBatchClient().GetBatchList(entityId, userType);
@@ -265,20 +269,20 @@ namespace Coditech.Admin.Helpers
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             string centreCode = userModel.SelectedCentreCode;
-            long entityId = 0;
+            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
             if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
-                entityId = userModel.EntityId;
+                dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).Custom3);
             }
-            DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, entityId, null, null, null, 1, int.MaxValue);
+            DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId), null, null, null, 1, int.MaxValue);
             DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
-            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
-            {
-                list.DBTMTraineeDetailsList = list.DBTMTraineeDetailsList?.Where(x =>
-                    string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
-                    string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
-            }
+            //if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+            //{
+            //    list.DBTMTraineeDetailsList = list.DBTMTraineeDetailsList?.Where(x =>
+            //        string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
+            //        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
+            //}
 
             foreach (var item in list?.DBTMTraineeDetailsList)
             {

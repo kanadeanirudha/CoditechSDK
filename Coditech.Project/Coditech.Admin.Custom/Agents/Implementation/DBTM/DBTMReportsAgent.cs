@@ -26,33 +26,32 @@ namespace Coditech.Admin.Agents
 
         #region Public Methods
         //Batch Wise Reports 
-        public virtual DBTMBatchWiseReportsListViewModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMReportsListViewModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
-
-            DBTMBatchWiseReportsListViewModel listViewModel = new DBTMBatchWiseReportsListViewModel
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (generalBatchMasterId > 0 && dBTMTestMasterId > 0)
             {
-                DataTable = response.DataTable
-            };
+                DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
+                listViewModel.DataTable = response.DataTable;
+            }
             return listViewModel;
         }
 
         //Test Wise Reports 
-        public virtual DBTMTestWiseReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
-            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (dBTMTestMasterId > 0)
             {
-                dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).Custom3);
+                DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).Custom3);
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId));
+                listViewModel.DataTable = response.DataTable;
             }
-
-            DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId));
-
-            DBTMTestWiseReportsListViewModel listViewModel = new DBTMTestWiseReportsListViewModel
-            {
-                DataTable = response.DataTable
-            };
             return listViewModel;
         }
         #endregion
