@@ -65,18 +65,23 @@ namespace Coditech.API.Service
             if (IsNull(dBTMTraineeAssignmentModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();          
+            DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
             //Create new DBTMTraineeAssignment and return it.
             DBTMTraineeAssignment dBTMTraineeAssignmentData = _dBTMTraineeAssignmentRepository.Insert(dBTMTraineeAssignment);
             if (dBTMTraineeAssignmentData?.DBTMTraineeAssignmentId > 0)
             {
-                dBTMTraineeAssignmentModel.DBTMTraineeAssignmentId = dBTMTraineeAssignmentData.DBTMTraineeAssignmentId;
-                DBTMTraineeAssignmentToUser dBTMTraineeAssignmentToUserData = new DBTMTraineeAssignmentToUser()
+                int dBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString());
+                foreach (var dBTMTraineeDetailId in dBTMTraineeAssignmentModel.SelectedTrainee)
                 {
-                    DBTMTraineeAssignmentId = dBTMTraineeAssignment.DBTMTraineeAssignmentId,
-                    DBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString())
-                };
-                dBTMTraineeAssignmentToUserData = _dBTMTraineeAssignmentToUserRepository.Insert(dBTMTraineeAssignmentToUserData);
+                    DBTMTraineeAssignmentToUser dBTMTraineeAssignmentToUserData = new DBTMTraineeAssignmentToUser
+                    {
+                        DBTMTraineeAssignmentId = dBTMTraineeAssignment.DBTMTraineeAssignmentId,
+                        DBTMTraineeDetailId = Convert.ToInt64(dBTMTraineeDetailId),
+                        DBTMTestStatusEnumId = dBTMTestStatusEnumId
+                    };
+                    _dBTMTraineeAssignmentToUserRepository.Insert(dBTMTraineeAssignmentToUserData);
+                }
+
             }
             else
             {

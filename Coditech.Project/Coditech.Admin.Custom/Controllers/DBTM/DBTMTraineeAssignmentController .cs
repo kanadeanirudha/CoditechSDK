@@ -53,7 +53,7 @@ namespace Coditech.Admin.Controllers
             {
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
-            }).DropdownList;
+            }).DropdownList?.Where(x=> x.Value != "")?.ToList();
 
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }

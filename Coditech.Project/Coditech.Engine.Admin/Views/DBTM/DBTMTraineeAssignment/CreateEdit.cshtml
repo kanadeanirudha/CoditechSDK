@@ -40,6 +40,7 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.DBTMTraineeAssignmentId)
+                            @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @if (Model.DBTMTraineeAssignmentId > 0)
                             {
                                 @Html.HiddenFor(x => x.SelectedCentreCode)
