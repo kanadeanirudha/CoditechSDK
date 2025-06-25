@@ -53,7 +53,7 @@ namespace Coditech.Admin.Controllers
             {
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
-            }).DropdownList?.Where(x=> x.Value != "")?.ToList();
+            }).DropdownList?.Where(x => x.Value != "")?.ToList();
 
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
@@ -71,6 +71,17 @@ namespace Coditech.Admin.Controllers
                     return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId) });
                 }
             }
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            dBTMTraineeAssignmentViewModel.SelectedCentreCode = userModel.SelectedCentreCode;
+            dBTMTraineeAssignmentViewModel.SelectedTrainee = new List<string>();
+            dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0;
+
+            dBTMTraineeAssignmentViewModel.AllTraineeList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
+                Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
+            }).DropdownList?.Where(x => x.Value != "")?.ToList();
+
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTraineeAssignmentViewModel.ErrorMessage));
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }

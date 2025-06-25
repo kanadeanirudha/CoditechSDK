@@ -170,9 +170,12 @@ namespace Coditech.Admin.Helpers
 
         private static void GetDBTMTestList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            DBTMTestListResponse response = new DBTMTestClient().List(null, null, null, 1, int.MaxValue);
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Test-------" });
 
+            DBTMTestListResponse response = new DBTMTestClient().List(null, null, null, 1, int.MaxValue);
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = "-------Select Acitity-------" });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = "-------Select Acitity -------" });
             DBTMTestListModel list = new DBTMTestListModel { DBTMTestList = response.DBTMTestList };
             foreach (var item in list.DBTMTestList)
             {

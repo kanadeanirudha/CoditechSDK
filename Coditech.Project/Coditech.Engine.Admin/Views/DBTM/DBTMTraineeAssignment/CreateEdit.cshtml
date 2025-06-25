@@ -1,12 +1,12 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
-    ViewBag.Title = Model.DBTMTraineeAssignmentId > 0 ? "Update DBTM Trainee Assignment" : "Add DBTM Trainee Assignment";
+    ViewBag.Title = Model.DBTMTraineeAssignmentId > 0 ? "Update Trainee Assignment" : "Add Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.DBTMTraineeAssignmentId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTraineeAssignmentId", Model.DBTMTraineeAssignmentId.ToString());
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()", IsDisabled = Model.DBTMTraineeAssignmentId > 0 };
+    // DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()", IsDisabled = Model.DBTMTraineeAssignmentId > 0 };
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "GeneralTrainerMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), Parameter = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTraineeListByCentreCodeAndTrainerMasterId()", IsDisabled = Model.DBTMTraineeAssignmentId > 0, IsCustomDropdown = true };
 }
 <!-- Page Content-->
@@ -27,11 +27,11 @@
                             <div class="col">
                                 @if (Model.DBTMTraineeAssignmentId > 0)
                                 {
-                                    <h4 class="card-title">Update DBTM Trainee Assignment </h4>
+                                    <h4 class="card-title">Update Trainee Assignment </h4>
                                 }
                                 else
                                 {
-                                    <h4 class="card-title">Add DBTM Trainee Assignment</h4>
+                                    <h4 class="card-title">Add Trainee Assignment</h4>
                                 }
                             </div><!--end col-->
                         </div> <!--end row-->
@@ -41,31 +41,17 @@
                         {
                             @Html.HiddenFor(m => m.DBTMTraineeAssignmentId)
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
-                            @if (Model.DBTMTraineeAssignmentId > 0)
-                            {
-                                @Html.HiddenFor(x => x.SelectedCentreCode)
-                            }
+                            @Html.HiddenFor(x => x.SelectedCentreCode)
                             <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.SelectedCentreCode, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                                        @Html.ValidationMessageFor(x => x.SelectedCentreCode)
-                                        @if (Model.DBTMTraineeAssignmentId > 0)
-                                        {
-                                            @Html.HiddenFor(x => x.SelectedCentreCode)
-                                        }
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3 multiselect-dropdown">
+                                <div class="col-lg-12">
+                                    <div class="mb-12 multiselect-dropdown">
                                         @Html.LabelFor(x => x.SelectedTrainee, new { @class = "form-label required" })
-                                        @Html.ListBoxFor(m => m.SelectedTrainee, new SelectList(Model.AllTraineeList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
+                                        @Html.ListBoxFor(m => m.SelectedTrainee, new SelectList(Model.AllTraineeList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" , data_live_search = "true" })
                                         @Html.ValidationMessageFor(x => x.SelectedTrainee)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="mb-3">
+                                    <div class="mb-4">
                                         @Html.LabelFor(x => x.TestName, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
                                         {
@@ -74,7 +60,7 @@
                                                                         DropdownSelectedValue = Model.DBTMTestMasterId
                                                                         .ToString(),
                                                                         IsDisabled = Model.DBTMTraineeAssignmentId > 0,
-                                                                        IsCustomDropdown = true
+                                                                        IsCustomDropdown = true,
                                                                         })
                                     @Html.ValidationMessageFor(x => x.DBTMTestMasterId)
                                 </div>

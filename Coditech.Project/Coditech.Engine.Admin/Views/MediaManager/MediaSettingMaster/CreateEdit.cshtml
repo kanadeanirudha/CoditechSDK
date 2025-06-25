@@ -40,7 +40,7 @@
                                 <div class="col-lg-4">
                                     <div class="mb-3 multiselect-dropdown">
                                         @Html.LabelFor(x => x.SelectedMediaTypeExtensionMasterIds, new { @class = "form-label required" })
-                                        @Html.ListBoxFor(x => x.SelectedMediaTypeExtensionMasterIds, new SelectList(Model.MediaTypeExtensionList, "MediaTypeExtensionMasterId", "ExtensionName"), new { @class = "selectpicker form-control", multiple = "multiple" })
+                                        @Html.ListBoxFor(x => x.SelectedMediaTypeExtensionMasterIds, new SelectList(Model.MediaTypeExtensionList, "MediaTypeExtensionMasterId", "ExtensionName"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
                                         @Html.ValidationMessageFor(x => x.SelectedMediaTypeExtensionMasterIds)
                                     </div>
                                 </div>
