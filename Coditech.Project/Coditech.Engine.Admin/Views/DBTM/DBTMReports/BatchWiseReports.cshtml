@@ -1,4 +1,4 @@
-﻿@model DBTMBatchWiseReportsListViewModel
+﻿@model DBTMReportsListViewModel
 @{
     ViewBag.Title = "Batch Reports";
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMTestListByGeneralBatchMasterId()", IsCustomDropdown = true };

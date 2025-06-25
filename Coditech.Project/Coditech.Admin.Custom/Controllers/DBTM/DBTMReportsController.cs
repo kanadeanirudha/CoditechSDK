@@ -19,33 +19,33 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult BatchWiseReports()
         {
-            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsListViewModel =new DBTMBatchWiseReportsListViewModel();
-            dBTMBatchWiseReportsListViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
-            dBTMBatchWiseReportsListViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-            return View(batchreports, dBTMBatchWiseReportsListViewModel);
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
+            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+            return View(batchreports, dBTMReportsViewModel);
         }
 
         [HttpGet]
         public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMBatchWiseReportsListViewModel dBTMBatchWiseReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate);
-            return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMBatchWiseReportsViewModel);
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
         }
 
         [HttpGet]
         public virtual ActionResult TestWiseReports()
         {
-            DBTMTestWiseReportsListViewModel dTMTestWiseReportsListViewModel = new DBTMTestWiseReportsListViewModel();
-            dTMTestWiseReportsListViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
-            dTMTestWiseReportsListViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-            return View(testreports, dTMTestWiseReportsListViewModel);
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
+            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+            return View(testreports, dBTMReportsViewModel);
         }
 
         [HttpGet]
         public virtual ActionResult GetTestWiseReports(int dBTMTestMasterId,long dBTMTraineeDetailId,DateTime FromDate,DateTime ToDate)
         {
-            DBTMTestWiseReportsListViewModel dBTMTestWiseReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate);
-            return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMTestWiseReportsViewModel);
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate);
+            return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
         }
 
         public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
@@ -54,7 +54,7 @@ namespace Coditech.Admin.Controllers
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
                 DropdownName = "DBTMTestMasterId",
-                Parameter = $"{generalBatchMasterId}~false", 
+                Parameter = $"{generalBatchMasterId}~true", 
                 IsCustomDropdown = true
             };
 

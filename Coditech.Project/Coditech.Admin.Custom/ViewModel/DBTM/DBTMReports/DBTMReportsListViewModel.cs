@@ -4,14 +4,15 @@ using System.Data;
 
 namespace Coditech.Admin.ViewModel
 {
-    public class DBTMTestWiseReportsListViewModel : BaseViewModel
+    public class DBTMReportsListViewModel : BaseViewModel
     {
         public DataTable DataTable { get; set; }
-        public DBTMTestWiseReportsListViewModel()
+        public DBTMReportsListViewModel()
         {
         }
-        public int DBTMTestMasterId { get; set; }
+        public int GeneralBatchMasterId { get; set; }
         public long DBTMTraineeDetailId { get; set; }
+        public int DBTMTestMasterId { get; set; }
         [Required]
         [Display(Name = "From Date")]
         public DateTime FromDate { get; set; }

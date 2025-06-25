@@ -59,14 +59,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTestWiseReportsListResponse TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long entityId)
+        public virtual DBTMTestWiseReportsListResponse TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long generalTrainerMasterId)
         {
-            return Task.Run(async () => await TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId,FromDate,ToDate, entityId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId,FromDate,ToDate, generalTrainerMasterId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long entityId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long generalTrainerMasterId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.TestWiseReportsAsync(dBTMTestMasterId,dBTMTraineeDetailId, FromDate,ToDate,entityId);
+            string endpoint = dBTMReportsEndpoint.TestWiseReportsAsync(dBTMTestMasterId,dBTMTraineeDetailId, FromDate,ToDate, generalTrainerMasterId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

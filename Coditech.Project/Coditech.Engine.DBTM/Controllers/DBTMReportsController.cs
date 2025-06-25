@@ -48,11 +48,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/TestWiseReports")]
         [Produces(typeof(DBTMTestWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, string FromDate, string ToDate, long entityId)
+        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, string FromDate, string ToDate, long generalTrainerMasterId)
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), entityId);
+                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), generalTrainerMasterId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
