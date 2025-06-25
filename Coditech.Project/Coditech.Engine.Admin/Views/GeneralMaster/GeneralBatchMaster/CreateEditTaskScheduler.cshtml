@@ -74,7 +74,7 @@
                                 <div class="col-lg-6" id="weeklyScheduleDiv">
                                     <div class="mb-3 multiselect-dropdown">
                                         @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
-                                        @Html.ListBoxFor(x => x.SelectedWeekDays, new SelectList(Model.SchedulerWeekDaysList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple" })
+                                        @Html.ListBoxFor(x => x.SelectedWeekDays, new SelectList(Model.SchedulerWeekDaysList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
                                         @Html.ValidationMessageFor(x => x.SelectedWeekDays)
                                     </div>
                                 </div>
