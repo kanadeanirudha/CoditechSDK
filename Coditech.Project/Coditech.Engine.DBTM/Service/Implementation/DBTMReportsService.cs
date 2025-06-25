@@ -121,7 +121,7 @@ namespace Coditech.API.Service
             return listModel;
         }
 
-        public virtual DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long entityId)
+        public virtual DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long generalTrainerMasterId)
         {
             if (dBTMTestMasterId <= 0)
             {
@@ -134,9 +134,9 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
-            objStoredProc.SetParameter("@EntityId", entityId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@EntityId,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 
             listModel.BindPageListModel(pageListModel);
