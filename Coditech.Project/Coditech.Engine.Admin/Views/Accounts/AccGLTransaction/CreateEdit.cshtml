@@ -182,9 +182,23 @@
                     AccGLTransaction.calculateTotals();
                 }
             });
+            document.addEventListener("keydown", function (event) {
+                if (event.altKey && event.key.toLowerCase() === "a") {
+                    event.preventDefault();
+                    AccGLTransaction.AddRow();
+                }
+            });
 
+    // Enable Edit button functionality using jQuery
+    $(document).on("click", ".edit-row", function (e) {
+        e.preventDefault();
+        const row = $(this).closest("tr");
+        if (typeof AccGLTransaction !== "undefined") {
+            AccGLTransaction.editRow(row);
+        }
+    });
             // Load initial rows if needed
-			AccGLTransaction.GetTransactionDetailsByType(@Model.AccSetupBalanceSheetTypeId);
+            @* AccGLTransaction.GetTransactionDetailsByType(@Model.AccSetupBalanceSheetTypeId); *@
 
         } else {
             console.error("⚠️ AccGLTransaction is not loaded. Check script path or JS errors.");

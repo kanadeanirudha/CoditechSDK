@@ -3,23 +3,22 @@
     ViewBag.Title = Model.TaskSchedulerMasterId > 0 ? "Update Batch Scheduler Details" : "Add Batch Scheduler";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = Model.TaskSchedulerMasterId > 0 ? "UpdateBatchTaskSchedulerDetails" : "CreateBatchTaskScheduler";
-    string css = Model.TaskSchedulerMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    string css = Model.TaskSchedulerMasterId > 0 || Model.ConfiguratorId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.ConfiguratorId.ToString());
 
-    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency, ExcludedValues = new string[] { "Recurring"} };
+    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency, ExcludedValues = new string[] { "Recurring" } };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            @*  <div class="col-lg-12"> *@
-            @if (Model.TaskSchedulerMasterId > 0)
+            @if (Model.TaskSchedulerMasterId > 0 || Model.ConfiguratorId > 0)
             {
                 <div class="col-lg-2">
                     @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
                 </div>
-            }
+             } 
             <div class="@css">
                 <div class="card">
                     <div class="card-header">
@@ -89,7 +88,7 @@
                                 </div> 
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.ConfiguratorId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>
                 </div>
