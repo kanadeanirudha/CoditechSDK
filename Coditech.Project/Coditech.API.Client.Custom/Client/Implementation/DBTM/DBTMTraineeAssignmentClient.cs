@@ -4,11 +4,8 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
-
 using Newtonsoft.Json;
-
 using System.Net;
-
 namespace Coditech.API.Client
 {
     public class DBTMTraineeAssignmentClient : BaseClient, IDBTMTraineeAssignmentClient
@@ -496,6 +493,55 @@ namespace Coditech.API.Client
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMTraineeAssignmentToUserResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeAssignmentToUserResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+
+        public virtual DBTMTraineeAssignmentResponse GetAssignmentResult(long dBTMTraineeAssignmentId)
+        {
+            return Task.Run(async () => await GetAssignmentResultAsync(dBTMTraineeAssignmentId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMTraineeAssignmentResponse> GetAssignmentResultAsync(long dBTMTraineeAssignmentId, CancellationToken cancellationToken)
+        {
+            if (dBTMTraineeAssignmentId <= 0)
+                throw new System.ArgumentNullException("dBTMTraineeAssignmentId");
+
+            string endpoint = dBTMTraineeAssignmentEndpoint.GetAssignmentResultAsync(dBTMTraineeAssignmentId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeAssignmentResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                if (status_ == 204)
+                {
+                    return new DBTMTraineeAssignmentResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTraineeAssignmentResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeAssignmentResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }

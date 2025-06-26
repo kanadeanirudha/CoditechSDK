@@ -251,5 +251,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentToUserResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMTraineeAssignment/GetAssignmentResult")]
+        [HttpGet]
+        [Produces(typeof(DBTMTraineeAssignmentResponse))]
+        public virtual IActionResult GetAssignmentResult(long dBTMTraineeAssignmentId)
+        {
+            try
+            {
+                DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = _dBTMTraineeAssignmentService.GetAssignmentResult(dBTMTraineeAssignmentId);
+                return IsNotNull(dBTMTraineeAssignmentModel) ? CreateOKResponse(new DBTMTraineeAssignmentResponse { DBTMTraineeAssignmentModel = dBTMTraineeAssignmentModel }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeAssignment", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeAssignmentResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

@@ -41,5 +41,8 @@ namespace Coditech.API.Endpoint
 
         public string AssociateUnAssociateAssignmentwiseUserAsync() =>
        $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/AssociateUnAssociateAssignmentwisewiseUser";
+
+        public string GetAssignmentResultAsync(long dBTMTraineeAssignmentId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetAssignmentResult?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}";
     }
 }

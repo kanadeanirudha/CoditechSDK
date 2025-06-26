@@ -1,0 +1,35 @@
+﻿@using System.Data
+@model DBTMTraineeAssignmentViewModel
+
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table class="table table-bordered">
+            @if (Model?.DataTable?.Rows?.Count > 0)
+            {
+                <thead>
+                    <tr>
+                        @foreach (DataColumn column in Model.DataTable.Columns)
+                        {
+                            <th>@column.ColumnName</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow row in Model.DataTable.Rows)
+                    {
+                        <tr>
+                            @foreach (DataColumn column in Model.DataTable.Columns)
+                            {
+                                <td>@row[column]</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            }
+            else
+            {
+                <tr><td colspan="100%">No records found.</td></tr>
+            }
+        </table>
+    </div>
+</div>

@@ -277,6 +277,20 @@ namespace Coditech.API.Service
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
+        public virtual DBTMTraineeAssignmentModel GetAssignmentResult(long dBTMTraineeAssignmentId)
+        {
+            if (dBTMTraineeAssignmentId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentId"));
+
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+
+            CoditechViewRepository<DBTMTraineeAssignmentModel> objStoredProc =new CoditechViewRepository<DBTMTraineeAssignmentModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTraineeAssignmentId", dBTMTraineeAssignmentId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = objStoredProc.ExecuteStoredProcedureList("Coditech_GetAssignmentResult @DBTMTraineeAssignmentId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.FirstOrDefault();
+
+            return dBTMTraineeAssignmentModel;
+        }
 
         #region DBTMTraineeAssignmentToUser
         public virtual DBTMTraineeAssignmentToUserListModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)

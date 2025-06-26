@@ -5,10 +5,8 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTraineeAssignmentController : BaseController
@@ -171,6 +169,13 @@ namespace Coditech.Admin.Controllers
         {
             DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId };
             return RedirectToAction("List", dataTableViewModel);
+        }
+
+        [HttpGet]
+        public virtual ActionResult GetAssignmentResult(long dBTMTraineeAssignmentId)
+        {
+            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetAssignmentResult(dBTMTraineeAssignmentId);
+            return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_AssignmentResult.cshtml", dBTMTraineeAssignmentViewModel);
         }
 
         #region Assignmnet User

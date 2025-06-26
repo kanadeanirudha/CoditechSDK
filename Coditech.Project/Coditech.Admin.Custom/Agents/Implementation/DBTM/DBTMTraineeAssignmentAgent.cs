@@ -165,6 +165,23 @@ namespace Coditech.Admin.Agents
                 return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
+        // Get GetAssignmentResult by dBTMTraineeAssignmentId
+        public virtual DBTMTraineeAssignmentViewModel GetAssignmentResult(long dBTMTraineeAssignmentId)
+        {
+            DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.GetAssignmentResult(dBTMTraineeAssignmentId);
+
+            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel();
+
+            if (response?.DBTMTraineeAssignmentModel != null)
+            {
+                dBTMTraineeAssignmentViewModel = response.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
+
+                dBTMTraineeAssignmentViewModel.DataTable = response.DBTMTraineeAssignmentModel.DataTable;
+            }
+
+            return dBTMTraineeAssignmentViewModel;
+        }
+
 
         #region DBTMAssignmentUser
         public virtual DBTMTraineeAssignmentToUserListViewModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, DataTableViewModel dataTableModel)
@@ -249,7 +266,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Name",
+                ColumnName = "Activity Name",
                 ColumnCode = "TestName",
                 IsSortable = true,
             });
@@ -267,7 +284,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Status",
+                ColumnName = "Activity Status",
                 ColumnCode = "DBTMTestStatusEnumId",
                 IsSortable = true,
             });
