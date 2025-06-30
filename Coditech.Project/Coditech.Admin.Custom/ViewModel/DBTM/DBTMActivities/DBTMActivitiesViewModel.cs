@@ -13,5 +13,6 @@ namespace Coditech.Admin.ViewModel
         [MaxLength(100)]
         [Required]
         public string DeviceSerialCode { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
     }
 }

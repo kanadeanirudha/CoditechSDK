@@ -24,7 +24,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public int DBTMTestStatusEnumId { get; set; }
 
-        [Display(Name = "Test Status")]
+        [Display(Name = "Activity Status")]
         public string TestStatus { get; set; }
 
         public string SelectedCentreCode { get; set; }
@@ -32,7 +32,7 @@ namespace Coditech.Admin.ViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        [Display(Name = "Test Name")]
+        [Display(Name = "Activity Name")]
         [Required]
         public string TestName { get; set; }
         public string MobileNumber { get; set; }

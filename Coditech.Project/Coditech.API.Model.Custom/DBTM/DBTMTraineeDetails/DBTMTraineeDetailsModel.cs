@@ -21,5 +21,6 @@
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
         public int NumberOfActivityPerformed { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
     }
 }
