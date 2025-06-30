@@ -188,12 +188,12 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult GetAssociatedTrainerList(DataTableViewModel dataTableViewModel)
         {
             GeneralTraineeAssociatedToTrainerListViewModel list = _dBTMTraineeDetailsAgent.GetAssociatedTrainerList(Convert.ToInt64(dataTableViewModel.SelectedParameter1), Convert.ToInt64(dataTableViewModel.SelectedParameter2), dataTableViewModel);
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableViewModel.SelectedParameter2;
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/_AssociatedTrainerList.cshtml", list);
             }
-            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
-            list.SelectedParameter2 = dataTableViewModel.SelectedParameter2;
 
             return View($"~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/AssociatedTrainerList.cshtml", list);
         }
