@@ -33,7 +33,6 @@ namespace Coditech.Admin.ViewModel
         public string LastName { get; set; }
 
         [Display(Name = "Activity Name")]
-        [Required]
         public string TestName { get; set; }
         public string MobileNumber { get; set; }
         public string ImagePath { get; set; }

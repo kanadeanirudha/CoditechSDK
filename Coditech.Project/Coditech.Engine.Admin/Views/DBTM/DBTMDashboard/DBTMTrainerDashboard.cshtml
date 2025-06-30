@@ -109,7 +109,7 @@
                     </div><!--end card-body-->
                 </div><!--end card-->
             </div>
-            @* <div class="col-md-6 col-lg-9">
+            <div class="col-md-6 col-lg-9">
                 <div class="card report-card">
                     <div class="card-header">
                         <div class="row align-items-center">
@@ -123,22 +123,29 @@
                             <table class="table mb-0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="border-top-0">Name</th>
-                                        <th class="border-top-0">Test Name</th>
+                                        <th class="border-top-0">Trainee</th>
+                                        <th class="border-top-0">Activity</th>
+                                        <th class="border-top-0">Assignment Date</th>
+                                        <th class="border-top-0">Assignment Time</th>
                                     </tr><!--end tr-->
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><a href="/DBTMTraineeAssignment/Edit?dBTMTraineeAssignmentId=DBTMTraineeAssignmentId" class="text-primary">Nikita G</a></td>
-                                        <td>TestName</td>
-                                    </tr>
+                                    @foreach (var item in Model?.DueTodayAssignments)
+                                    {
+                                        <tr>
+                                            <td>@item.FirstName @item.LastName</td>
+                                            <td>@item.TestName</td>
+                                            <td>@item.AssignmentDate.ToCoditechDateFormat()</td>
+                                            <td>@item.AssignmentTime</td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table> <!--end table-->
                         </div><!--end /div-->
                     </div><!--end card-body-->
                 </div><!--end card-->
-            </div> *@
-           @*  <div class="col-md-6 col-lg-9">
+            </div>
+            @*  <div class="col-md-6 col-lg-9">
                 <div class="card report-card">
                     <div class="card-header">
                         <div class="row align-items-center">

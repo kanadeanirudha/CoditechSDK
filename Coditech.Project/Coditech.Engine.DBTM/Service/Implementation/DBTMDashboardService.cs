@@ -56,7 +56,7 @@ namespace Coditech.API.Service
                     dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
                     dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
                    
-                    dataset.Tables[1].TableName = "DueTodayAssignments";
+                    dataset.Tables[2].TableName = "DueTodayAssignments";
                     dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
                     dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
                 }
