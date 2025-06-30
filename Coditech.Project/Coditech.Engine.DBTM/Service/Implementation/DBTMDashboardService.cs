@@ -55,6 +55,10 @@ namespace Coditech.API.Service
                     dataset.Tables[1].TableName = "TopActivityPerformed";
                     dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
                     dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
+                   
+                    dataset.Tables[1].TableName = "DueTodayAssignments";
+                    dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
+                    dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
                 }
             }
             return dBTMDashboardModel;
@@ -71,7 +75,6 @@ namespace Coditech.API.Service
         {
             ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.GetParameter("@UserId", userId, ParameterDirection.Input, SqlDbType.BigInt);
-            objStoredProc.GetParameter("@NumberOfDaysRecord", numberOfDaysRecord, ParameterDirection.Input, SqlDbType.SmallInt);
             return objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMTrainerDashboard");
         }
     }

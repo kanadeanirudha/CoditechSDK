@@ -10,5 +10,6 @@ namespace Coditech.API.Service
         DBTMBatchModel GetBatchDetailsV2(int generalBatchMasterId);
         List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType);
         DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId);
+        DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId);
     }
 }
