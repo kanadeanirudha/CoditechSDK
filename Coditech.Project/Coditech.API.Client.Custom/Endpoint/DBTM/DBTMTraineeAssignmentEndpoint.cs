@@ -30,8 +30,8 @@ namespace Coditech.API.Endpoint
         public string GetTraineeDetailsByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId) =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetTraineeDetailByCentreCodeAndgeneralTrainerId?centreCode={centreCode}&generalTrainerId={generalTrainerId}";
 
-        public string SendAssignmentReminderAsync(long dBTMTraineeAssignmentId) =>
-           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/SendAssignmentReminder?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}";
+        public string SendAssignmentReminderAsync(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/SendAssignmentReminder?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}&dBTMTraineeAssignmentUserId={dBTMTraineeAssignmentUserId}";
 
         public string DBTMTraineeAssignmentToUserListAsync(long dBTMTraineeAssignmentId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {

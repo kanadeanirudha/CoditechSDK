@@ -32,8 +32,7 @@ namespace Coditech.Admin.ViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        [Display(Name = "Activity Name")]
-        [Required]
+        [Display(Name = "Test Name")]
         public string TestName { get; set; }
         public string MobileNumber { get; set; }
         public string ImagePath { get; set; }
@@ -43,6 +42,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public List<string> SelectedTrainee { get; set; }
         public DataTable DataTable { get; set; }
+        public long DBTMTraineeAssignmentUserId { get; set; }
 
     }
 }

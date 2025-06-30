@@ -123,16 +123,16 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
         }
 
-        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId)
+        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
 
             DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel();
 
-            model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId);
+            model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId);
 
             if (!model.HasError)
             {
-                SetNotificationMessage(GetSuccessNotificationMessage("Send Reminder Assignment Successfully."));
+                SetNotificationMessage(GetSuccessNotificationMessage("Assignment reminder send successfully."));
             }
             else
             {
