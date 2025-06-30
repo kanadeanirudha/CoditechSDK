@@ -14,7 +14,7 @@ namespace Coditech.API.Service
         bool DeleteDBTMTraineeAssignment(ParameterModel parameterModel);
         GeneralTrainerListModel GetTrainerByCentreCode(string centreCode);
         DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId);
-        DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId);
+        DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId);
         DBTMTraineeAssignmentToUserListModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         bool AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel model);
         DBTMTraineeAssignmentModel GetAssignmentResult(long dBTMTraineeAssignmentId);

@@ -28,11 +28,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeAssignment/GetDBTMTraineeAssignmentList")]
         [Produces(typeof(DBTMTraineeAssignmentListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMTraineeAssignmentList(long generalTrainerMasterId,FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMTraineeAssignmentList(long generalTrainerMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
-                DBTMTraineeAssignmentListModel list = _dBTMTraineeAssignmentService.GetDBTMTraineeAssignmentList(generalTrainerMasterId,filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                DBTMTraineeAssignmentListModel list = _dBTMTraineeAssignmentService.GetDBTMTraineeAssignmentList(generalTrainerMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeAssignmentListResponse>(data) : CreateNoContentResponse();
             }
@@ -166,7 +166,7 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMTraineeAssignmentService.GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode,generalTrainerId);
+                DBTMTraineeDetailsListModel list = _dBTMTraineeAssignmentService.GetTraineeDetailByCentreCodeAndgeneralTrainerId(centreCode, generalTrainerId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
             }
@@ -186,11 +186,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeAssignment/SendAssignmentReminder")]
         [HttpPost, ValidateModel]
         [Produces(typeof(DBTMTraineeAssignmentResponse))]
-        public virtual IActionResult SendAssignmentReminder([FromBody] long dBTMTraineeAssignmentId)
+        public virtual IActionResult SendAssignmentReminder([FromBody] long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
             try
             {
-                DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = _dBTMTraineeAssignmentService.SendAssignmentReminder(dBTMTraineeAssignmentId);
+                DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = _dBTMTraineeAssignmentService.SendAssignmentReminder(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId);
                 return IsNotNull(dBTMTraineeAssignmentModel) ? CreateOKResponse(new DBTMTraineeAssignmentResponse { DBTMTraineeAssignmentModel = dBTMTraineeAssignmentModel }) : CreateInternalServerErrorResponse();
 
             }
