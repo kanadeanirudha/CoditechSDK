@@ -86,27 +86,6 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
-        [Route("/DBTMApi/GetBatchDetailsV2")]
-        [HttpGet]
-        [Produces(typeof(DBTMBatchResponse))]
-        public  IActionResult GetBatchDetailsV2(int generalBatchMasterId)
-        {
-            try
-            {
-                DBTMBatchModel model = _dBTMApiService.GetBatchDetailsV2(generalBatchMasterId);
-                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
         [Route("/DBTMApi/GetAssignmentList")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiListResponse))]
