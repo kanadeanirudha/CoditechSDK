@@ -150,7 +150,9 @@ namespace Coditech.API.Service
                     dBTMBatchModel.DBTMBatchTestList = new List<DBTMTestApiModel>();
                     foreach (DBTMTestMaster item in testDetailList)
                     {
-                        dBTMBatchModel.DBTMBatchTestList.Add(item.FromEntityToModel<DBTMTestApiModel>());
+                        DBTMTestApiModel dbtmTestApiModel= item.FromEntityToModel<DBTMTestApiModel>();\
+                        dbtmTestApiModel.ActivityCode = item.DBTMTestMasterId;
+                        dBTMBatchModel.DBTMBatchTestList.Add(dbtmTestApiModel);
                     }
                 }
                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
