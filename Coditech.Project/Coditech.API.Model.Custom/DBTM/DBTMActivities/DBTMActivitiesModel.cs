@@ -13,5 +13,6 @@ namespace Coditech.Common.API.Model
         public string DeviceSerialCode { get; set; }
         public string PersonCode { get; set; }
         public int NumberOfDaysRecord { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
     }
 }

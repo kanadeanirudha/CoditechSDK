@@ -12,9 +12,9 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Activities List : @Model.FirstName @Model.LastName</span>
-                        <a class=" btn btn-sm btn-soft-secondary float-end" href="/DBTMTraineeDetails/List?selectedCentreCode=@Model.SelectedCentreCode" role="button">
-                                <i class="fas fa-arrow-left me-2"></i>Back
-                            </a>
+                        <a class=" btn btn-sm btn-soft-secondary float-end" href="/DBTMTraineeDetails/List?selectedCentreCode=@Model.SelectedCentreCode&SelectedParameter1=@Model.GeneralTrainerMasterId" role="button" >
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">

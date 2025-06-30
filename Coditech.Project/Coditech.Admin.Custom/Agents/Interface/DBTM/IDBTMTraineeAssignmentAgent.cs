@@ -53,5 +53,12 @@ namespace Coditech.Admin.Agents
         /// <param name="DBTMTraineeAssignmentToUserViewModel">DBTMTraineeAssignmentToUserViewModel.</param>
         /// <returns>Returns updated DBTMTraineeAssignmentToUserViewModel</returns>
         DBTMTraineeAssignmentToUserViewModel AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel);
+
+        /// <summary>
+        /// Get GetAssignmentResult by dBTMTraineeAssignmentId.
+        /// </summary>
+        /// <param name="dBTMTraineeAssignmentId">dBTMTraineeAssignmentId</param>
+        /// <returns>Returns DBTMTraineeAssignmentViewModel.</returns>
+        DBTMTraineeAssignmentViewModel GetAssignmentResult(long dBTMTraineeAssignmentId);
     }
 }

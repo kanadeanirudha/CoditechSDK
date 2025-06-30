@@ -42,7 +42,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Height(in)")]
         public decimal Height { get; set; }
         public long EntityId { get; set; }
-
-
+        public long GeneralTrainerMasterId { get; set; }
     }
 }
