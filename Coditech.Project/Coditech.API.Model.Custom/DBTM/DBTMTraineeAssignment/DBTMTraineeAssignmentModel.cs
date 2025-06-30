@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace Coditech.Common.API.Model
 {
@@ -17,5 +18,7 @@ namespace Coditech.Common.API.Model
         public string SelectedCentreCode { get; set; }
         public string EmailId { get; set; }
         public List<string> SelectedTrainee { get; set; }
+        public DataTable DataTable { get; set; }
+
     }
 }

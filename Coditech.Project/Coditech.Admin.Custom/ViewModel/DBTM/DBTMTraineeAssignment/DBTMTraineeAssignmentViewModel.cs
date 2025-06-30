@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Coditech.Common.API.Model;
-using Coditech.Common.Helper;
-using Coditech.Resources;
+﻿using Coditech.Common.Helper;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using System.ComponentModel.DataAnnotations;
+using System.Data;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMTraineeAssignmentViewModel : BaseViewModel
@@ -44,5 +42,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Trainee")]
         [Required]
         public List<string> SelectedTrainee { get; set; }
+        public DataTable DataTable { get; set; }
+
     }
 }
