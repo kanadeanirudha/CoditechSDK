@@ -207,8 +207,8 @@ namespace Coditech.API.Service
         {
             long entityIds = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
             //GetGeneralAssignmentList
-            List<DBTMTestApiModel> assignmentList= new List<DBTMTestApiModel>();
-                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            List<DBTMTestApiModel> assignmentList = new List<DBTMTestApiModel>();
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMTestApiModel> objStoredProc = new CoditechViewRepository<DBTMTestApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@EntityId", entityIds, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
@@ -244,6 +244,27 @@ namespace Coditech.API.Service
             return dBTMTestApiModel;
         }
 
+        //Get Dashboard Details
+        public DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId)
+        {
+            if (userMasterId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "UserMasterId"));
+
+            DBTMMobileDashboardModel dBTMDashboardModel = new DBTMMobileDashboardModel();
+            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.GetParameter("@UserId", userMasterId, ParameterDirection.Input, SqlDbType.BigInt);
+            DataSet dataset = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMMobileTrainerDashboard");
+            
+            dataset.Tables[0].TableName = "TraineeDetails";
+            ConvertDataTableToList dataTable = new ConvertDataTableToList();
+            dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+
+            dataset.Tables[1].TableName = "TopActivityPerformed";
+            dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
+            dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
+
+            return dBTMDashboardModel;
+        }
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)
             => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
     }
