@@ -41,7 +41,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("AssignmentDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("AssignmentTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-            
+
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
             DBTMTraineeAssignmentListResponse response = _dBTMTraineeAssignmentClient.List(Convert.ToInt64(dataTableModel.SelectedParameter1), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
@@ -138,13 +138,13 @@ namespace Coditech.Admin.Agents
         }
 
         //Send Reminder Assignment.
-        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId)
-        {          
+        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
+        {
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
 
-                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId);
+                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId);
 
                 return response?.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
             }
@@ -218,7 +218,7 @@ namespace Coditech.Admin.Agents
             {
                 long dBTMTraineeAssignmentId = dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentId;
                 long dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentUserId;
-              //  DBTMTraineeAssignmentToUserViewModel.UserType = UserTypeEnum.Trainee.ToString();
+                //  DBTMTraineeAssignmentToUserViewModel.UserType = UserTypeEnum.Trainee.ToString();
                 DBTMTraineeAssignmentToUserResponse response = _dBTMTraineeAssignmentClient.AssociateUnAssociateAssignmentwiseUser(dBTMTraineeAssignmentToUserViewModel.ToModel<DBTMTraineeAssignmentToUserModel>());
                 DBTMTraineeAssignmentToUserModel dBTMTraineeAssignmentToUserModel = response?.DBTMTraineeAssignmentToUserModel;
                 dBTMTraineeAssignmentToUserViewModel = IsNotNull(dBTMTraineeAssignmentToUserModel) ? dBTMTraineeAssignmentToUserModel.ToViewModel<DBTMTraineeAssignmentToUserViewModel>() : new DBTMTraineeAssignmentToUserViewModel();

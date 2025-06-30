@@ -31,7 +31,7 @@
                             <td class="text-center">
                                 @if (string.Equals(item.TestStatus, "Pending"))
                                 {
-                                    <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
+                                    <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId&dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
                                 }
                                 else
                                 {

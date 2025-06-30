@@ -17,8 +17,10 @@ namespace Coditech.Common.API.Model
         public string TestStatus { get; set; }
         public string SelectedCentreCode { get; set; }
         public string EmailId { get; set; }
+        public string CentreName { get; set; }
         public List<string> SelectedTrainee { get; set; }
         public DataTable DataTable { get; set; }
+        public long DBTMTraineeAssignmentUserId { get; set; }
 
     }
 }
