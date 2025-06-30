@@ -127,6 +127,7 @@
                                         <th class="border-top-0">Activity</th>
                                         <th class="border-top-0">Assignment Date</th>
                                         <th class="border-top-0">Assignment Time</th>
+                                        <th class="border-top-0">Reminder</th>
                                     </tr><!--end tr-->
                                 </thead>
                                 <tbody>
@@ -137,6 +138,15 @@
                                             <td>@item.TestName</td>
                                             <td>@item.AssignmentDate.ToCoditechDateFormat()</td>
                                             <td>@item.AssignmentTime</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-soft-danger btn-circle send-reminder-btn"
+                                                        data-assignment-id="@item.DBTMTraineeAssignmentId"
+                                                        data-user-id="@item.DBTMTraineeAssignmentUserId"
+                                                        title="Send Reminder">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </button>
+
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -177,19 +187,7 @@
         </div>
     </div><!-- container -->
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@section scripts {
+    <!-- end page content -->
+    <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
+}

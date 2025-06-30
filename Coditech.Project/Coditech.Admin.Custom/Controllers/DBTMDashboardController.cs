@@ -11,11 +11,13 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IDashboardAgent _dashboardAgent;
         private readonly IDBTMDashboardAgent _dBTMDashboardAgent;
+        private readonly IDBTMTraineeAssignmentAgent _dBTMTraineeAssignmentAgent;
 
-        public DBTMDashboardController(IDashboardAgent dashboardAgent, IDBTMDashboardAgent dBTMDashboardAgent)
+        public DBTMDashboardController(IDashboardAgent dashboardAgent, IDBTMDashboardAgent dBTMDashboardAgent, IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent)
         {
             _dashboardAgent = dashboardAgent;
             _dBTMDashboardAgent = dBTMDashboardAgent;
+            _dBTMTraineeAssignmentAgent = dBTMTraineeAssignmentAgent;
         }
 
         [HttpGet]
@@ -125,5 +127,31 @@ namespace Coditech.Admin.Controllers
             // info.  
             return lst;
         }
+
+        #region Send Reminder
+        [HttpPost]
+        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
+        {
+
+            DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel() 
+            {
+                DBTMTraineeAssignmentId = dBTMTraineeAssignmentId,
+                DBTMTraineeAssignmentUserId = dBTMTraineeAssignmentUserId
+            };
+
+            model = _dBTMTraineeAssignmentAgent.SendAssignmentReminder(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId);
+
+            if (!model.HasError)
+            {
+                SetNotificationMessage(GetSuccessNotificationMessage("Assignment Reminder Send Successfully."));
+                return Json(new { success = true });
+            }
+            else
+            {
+                SetNotificationMessage(GetErrorNotificationMessage("Failed to Send Reminder."));
+                return Json(new { success = false});
+            }
+        }
+        #endregion
     }
 }
