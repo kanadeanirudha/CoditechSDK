@@ -11,7 +11,8 @@
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         $("#DBTMBatchWiseReportsDivId").html("");
-        if (generalBatchMasterId != "") {
+        if (generalBatchMasterId != "" && dBTMTestMasterId != "")
+        {
             CoditechCommon.ShowLodder();
             $.ajax({
                 cache: false,
@@ -38,8 +39,10 @@
                 }
             });
         }
-        else {
-            $("#DBTMBatchWiseReportsDivId").html("");
+        else
+        {
+            CoditechNotification.DisplayNotificationMessage("Please select batch and test.", "error");
+
         }
     },
 
@@ -106,7 +109,7 @@
             });
         }
         else {
-            $("#DBTMTestWiseReportsDivId").html("");
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     }
 };
