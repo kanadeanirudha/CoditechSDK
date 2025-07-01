@@ -43,5 +43,6 @@ namespace Coditech.Admin.ViewModel
         public decimal Height { get; set; }
         public long EntityId { get; set; }
         public long GeneralTrainerMasterId { get; set; }
+        public string SelectedParameter2 { get; set; }
     }
 }
