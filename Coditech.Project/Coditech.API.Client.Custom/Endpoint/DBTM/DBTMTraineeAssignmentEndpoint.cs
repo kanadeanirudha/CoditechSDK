@@ -38,11 +38,7 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetDBTMTraineeAssignmentToUserList?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
-
         public string AssociateUnAssociateAssignmentwiseUserAsync() =>
        $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/AssociateUnAssociateAssignmentwisewiseUser";
-
-        public string GetAssignmentResultAsync(long dBTMTraineeAssignmentId) =>
-           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetAssignmentResult?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}";
     }
 }

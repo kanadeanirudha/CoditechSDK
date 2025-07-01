@@ -59,6 +59,6 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dBTMTraineeAssignmentId">dBTMTraineeAssignmentId</param>
         /// <returns>Returns DBTMTraineeAssignmentViewModel.</returns>
-        DBTMTraineeAssignmentViewModel GetAssignmentResult(long dBTMTraineeAssignmentId);
+        DBTMActivitiesDetailsListViewModel GetAssignmentResult(long dBTMDeviceDataId, DataTableViewModel dataTableModel);
     }
 }

@@ -19,7 +19,7 @@ namespace Coditech.Admin.Controllers
             _dBTMTraineeAssignmentAgent = dBTMTraineeAssignmentAgent;
         }
 
-        public virtual ActionResult List(DataTableViewModel dataTableModel)
+        public ActionResult List(DataTableViewModel dataTableModel)
         {
             DBTMTraineeAssignmentListViewModel list = new DBTMTraineeAssignmentListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
@@ -27,12 +27,12 @@ namespace Coditech.Admin.Controllers
             {
                 list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
+            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+            list.SelectedParameter2 = dataTableModel.SelectedParameter1;
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", list);
             }
-            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
-
             return View($"~/Views/DBTM/DBTMTraineeAssignment/List.cshtml", list);
         }
 
@@ -58,7 +58,7 @@ namespace Coditech.Admin.Controllers
 
 
         [HttpPost]
-        public virtual ActionResult Create(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
+        public ActionResult Create(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -85,14 +85,14 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult Edit(long dBTMTraineeAssignmentId)
+        public ActionResult Edit(long dBTMTraineeAssignmentId)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
             return ActionView(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
         [HttpPost]
-        public virtual ActionResult Edit(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
+        public ActionResult Edit(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -104,7 +104,7 @@ namespace Coditech.Admin.Controllers
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
-        public virtual ActionResult Delete(string dBTMTraineeAssignmentIds, string selectedCentreCode)
+        public ActionResult Delete(string dBTMTraineeAssignmentIds, string selectedCentreCode)
         {
             string message = string.Empty;
             bool status = false;
@@ -123,7 +123,7 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
         }
 
-        public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
+        public ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
 
             DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel();
@@ -153,7 +153,7 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
 
-        public virtual ActionResult GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
+        public ActionResult GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
         {
             DropdownViewModel traineeDetailsDropdown = new DropdownViewModel()
             {
@@ -171,15 +171,22 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction("List", dataTableViewModel);
         }
 
-        [HttpGet]
-        public virtual ActionResult GetAssignmentResult(long dBTMTraineeAssignmentId)
+        public ActionResult GetAssignmentResult(DataTableViewModel dataTableModel)
         {
-            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetAssignmentResult(dBTMTraineeAssignmentId);
-            return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_AssignmentResult.cshtml", dBTMTraineeAssignmentViewModel);
+            DBTMActivitiesDetailsListViewModel list = _dBTMTraineeAssignmentAgent.GetAssignmentResult(Convert.ToInt64(dataTableModel.SelectedParameter1), dataTableModel);
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/_AssignmentResult.cshtml", list);
+            }
+            list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableModel.SelectedParameter2;
+            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+
+            return View($"~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/AssignmentResult.cshtml", list);
         }
 
         #region Assignmnet User
-        public virtual ActionResult GetDBTMTraineeAssignmentToUserList(DataTableViewModel dataTableViewModel)
+        public ActionResult GetDBTMTraineeAssignmentToUserList(DataTableViewModel dataTableViewModel)
         {
             DBTMTraineeAssignmentToUserListViewModel list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentToUserList(Convert.ToInt64(dataTableViewModel.SelectedParameter1), dataTableViewModel);
             if (AjaxHelper.IsAjaxRequest)
@@ -192,13 +199,13 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult GetAssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel)
+        public ActionResult GetAssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel)
         {
             return PartialView("~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/_AssociateUnAssociateAssignmentwiseUser.cshtml", DBTMTraineeAssignmentToUserViewModel);
         }
 
         [HttpPost]
-        public virtual ActionResult AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel)
+        public ActionResult AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel DBTMTraineeAssignmentToUserViewModel)
         {
             SetNotificationMessage(_dBTMTraineeAssignmentAgent.AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)

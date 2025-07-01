@@ -43,6 +43,7 @@ namespace Coditech.Admin.ViewModel
         public List<string> SelectedTrainee { get; set; }
         public DataTable DataTable { get; set; }
         public long DBTMTraineeAssignmentUserId { get; set; }
+        public long DBTMDeviceDataId { get; set; }
 
     }
 }
