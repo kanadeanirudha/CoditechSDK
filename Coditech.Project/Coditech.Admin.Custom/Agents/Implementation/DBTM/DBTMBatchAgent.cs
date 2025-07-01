@@ -30,8 +30,10 @@ namespace Coditech.Admin.Agents
             dataTableModel = dataTableModel ?? new DataTableViewModel();
             if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
             {
+                filters = new FilterCollection();
                 filters.Add("BatchName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("BatchTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("BatchStartTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "BatchName " : dataTableModel.SortByColumn, dataTableModel.SortBy);
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
