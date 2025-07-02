@@ -39,7 +39,7 @@ namespace Coditech.Admin.ViewModel
         public decimal Weight { get; set; }
         [Required]
         [RegularExpression(@"^\d{1,3}?$", ErrorMessage = "Height must be less than 999.")]
-        [Display(Name = "Height(in)")]
+        [Display(Name = "Height(cm)")]
         public decimal Height { get; set; }
         public long EntityId { get; set; }
         public long GeneralTrainerMasterId { get; set; }
