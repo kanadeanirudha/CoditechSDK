@@ -491,7 +491,7 @@ namespace Coditech.Admin.Agents
 
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Name",
+                ColumnName = "Activity Name",
                 ColumnCode = "TestName",
                 IsSortable = true,
             });

@@ -20,5 +20,6 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "To Date")]
         public DateTime ToDate { get; set; }
+        public bool IsRecordFound { get; set; } = true;
     }
 }
