@@ -173,9 +173,9 @@ namespace Coditech.Admin.Helpers
 
             DBTMTestListResponse response = new DBTMTestClient().List(null, null, null, 1, int.MaxValue);
             if (dropdownViewModel.IsRequired)
-                dropdownList.Add(new SelectListItem() { Value = "", Text = "-------Select Acitity-------" });
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
             else
-                dropdownList.Add(new SelectListItem() { Value = "0", Text = "-------Select Acitity -------" });
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
             DBTMTestListModel list = new DBTMTestListModel { DBTMTestList = response.DBTMTestList };
             foreach (var item in list.DBTMTestList)
             {
@@ -193,7 +193,10 @@ namespace Coditech.Admin.Helpers
         }
         private static void GetDBTMBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            dropdownList.Add(new SelectListItem() { Text = "-------Select Activity-------" });
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
 
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {

@@ -13,5 +13,6 @@ namespace Coditech.Admin.ViewModel
         public string ListType { get; set; }
         public long GeneralTrainerMasterId { get; set; }
         public string SelectedParameter1 { get; set; } 
+        public string SelectedParameter2 { get; set; } 
     }
 }

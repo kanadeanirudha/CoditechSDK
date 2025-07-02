@@ -32,13 +32,14 @@ namespace Coditech.Admin.Controllers
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
-                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
+                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
                 }
                 else
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
             }
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableViewModel.SelectedParameter1;
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeDetails/_List.cshtml", list);
@@ -124,10 +125,11 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult UpdateDBTMTraineePersonalDetails(long dBTMTraineeDetailId, long personId)
+        public virtual ActionResult UpdateDBTMTraineePersonalDetails(long dBTMTraineeDetailId, long personId, string SelectedParameter2)
         {
             DBTMTraineeDetailsCreateEditViewModel dBTMTraineeDetailsCreateEditViewModel = _dBTMTraineeDetailsAgent.GetDBTMTraineePersonalDetails(dBTMTraineeDetailId, personId);
             dBTMTraineeDetailsCreateEditViewModel.UserType = UserTypeEnum.Trainee.ToString();
+            dBTMTraineeDetailsCreateEditViewModel.SelectedParameter2 = SelectedParameter2;
             return ActionView(createEditTraineeDetails, dBTMTraineeDetailsCreateEditViewModel);
         }
 
@@ -287,7 +289,7 @@ namespace Coditech.Admin.Controllers
             {
                 return PartialView("~/Views/DBTM/DBTMActivities/_List.cshtml", list);
             }
-            list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableModel.SelectedParameter2;
 
             return View($"~/Views/DBTM/DBTMActivities/List.cshtml", list);
         }
@@ -301,6 +303,7 @@ namespace Coditech.Admin.Controllers
                 return PartialView("~/Views/DBTM/DBTMActivities/_DBTMActivitiesDetailsList.cshtml", list);
             }
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableModel.SelectedParameter2;
 
             return View($"~/Views/DBTM/DBTMActivities/DBTMActivitiesDetailsList.cshtml", list);
         }
@@ -328,6 +331,6 @@ namespace Coditech.Admin.Controllers
                 SelectedParameter1 = GeneralTrainerMasterId
             };
             return RedirectToAction("List", dataTableViewModel);
-        }        
+        }
     }
 }

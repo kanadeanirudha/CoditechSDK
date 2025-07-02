@@ -1,6 +1,6 @@
-﻿@model DBTMActivitiesListViewModel
+﻿@model DBTMActivitiesDetailsListViewModel
 @{
-    ViewBag.Title = "Activities List";
+    ViewBag.Title = "Activities Details List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
@@ -11,14 +11,14 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">Activities List : @Model.FirstName @Model.LastName</span>
-                        <a class=" btn btn-sm btn-soft-secondary float-end" href="/DBTMTraineeDetails/Cancel?selectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
+                        <span class="card-title">Activities Details List : @Model.FirstName @Model.LastName (@Model.TestName)</span>
+                        <a class=" btn btn-sm btn-soft-secondary float-end" href="/@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                            @Html.Partial("~/Views/DBTM/DBTMActivities/_List.cshtml", Model)
+                            @Html.Partial("~/Views/DBTM/DBTMTraineeAssignment/DBTMTraineeAssignmentUser/_AssignmentResult.cshtml", Model)
                         </div>
                     </div>
                 </div>

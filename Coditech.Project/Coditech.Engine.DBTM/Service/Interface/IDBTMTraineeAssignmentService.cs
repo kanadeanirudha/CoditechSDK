@@ -17,6 +17,5 @@ namespace Coditech.API.Service
         DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId);
         DBTMTraineeAssignmentToUserListModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         bool AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel model);
-        DBTMTraineeAssignmentModel GetAssignmentResult(long dBTMTraineeAssignmentId);
     }
 }

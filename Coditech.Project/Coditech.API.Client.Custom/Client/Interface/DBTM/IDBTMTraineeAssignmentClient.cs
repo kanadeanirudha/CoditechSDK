@@ -61,12 +61,5 @@ namespace Coditech.API.Client
         /// <param name="DBTMTraineeAssignmentToUserModel">DBTMTraineeAssignmentToUserModel.</param>
         /// <returns>Returns updated DBTMTraineeAssignmentToUserResponse</returns>
         DBTMTraineeAssignmentToUserResponse AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel body);
-
-        /// <summary>
-        /// Get ViewAssignmentResult by dBTMTraineeAssignmentId.
-        /// </summary>
-        /// <param name="dBTMTraineeAssignmentId">dBTMTraineeAssignmentId</param>
-        /// <returns>Returns DBTMTraineeAssignmentResponse.</returns>
-        DBTMTraineeAssignmentResponse GetAssignmentResult(long dBTMTraineeAssignmentId);
     }
 }

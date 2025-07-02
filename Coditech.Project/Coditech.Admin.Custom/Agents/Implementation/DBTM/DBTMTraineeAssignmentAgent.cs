@@ -10,7 +10,6 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.Admin.Agents
 {
     public class DBTMTraineeAssignmentAgent : BaseAgent, IDBTMTraineeAssignmentAgent
@@ -18,13 +17,15 @@ namespace Coditech.Admin.Agents
         #region Private Variable
         protected readonly ICoditechLogging _coditechLogging;
         private readonly IDBTMTraineeAssignmentClient _dBTMTraineeAssignmentClient;
+        private readonly IDBTMTraineeDetailsClient _dBTMTraineeDetailsClient;
         #endregion
 
         #region Public Constructor
-        public DBTMTraineeAssignmentAgent(ICoditechLogging coditechLogging, IDBTMTraineeAssignmentClient dBTMTraineeAssignmentClient)
+        public DBTMTraineeAssignmentAgent(ICoditechLogging coditechLogging, IDBTMTraineeAssignmentClient dBTMTraineeAssignmentClient, IDBTMTraineeDetailsClient dBTMTraineeDetailsClient)
         {
             _coditechLogging = coditechLogging;
             _dBTMTraineeAssignmentClient = GetClient<IDBTMTraineeAssignmentClient>(dBTMTraineeAssignmentClient);
+            _dBTMTraineeDetailsClient = GetClient<IDBTMTraineeDetailsClient>(dBTMTraineeDetailsClient);
         }
         #endregion
 
@@ -165,21 +166,21 @@ namespace Coditech.Admin.Agents
                 return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
-        // Get GetAssignmentResult by dBTMTraineeAssignmentId
-        public virtual DBTMTraineeAssignmentViewModel GetAssignmentResult(long dBTMTraineeAssignmentId)
+        public virtual DBTMActivitiesDetailsListViewModel GetAssignmentResult(long dBTMDeviceDataId, DataTableViewModel dataTableModel)
         {
-            DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.GetAssignmentResult(dBTMTraineeAssignmentId);
+            DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, null, null, null, dataTableModel.PageIndex, int.MaxValue);
 
-            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel();
-
-            if (response?.DBTMTraineeAssignmentModel != null)
+            DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
             {
-                dBTMTraineeAssignmentViewModel = response.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
+                DataTable = response.DataTable
+            };
 
-                dBTMTraineeAssignmentViewModel.DataTable = response.DBTMTraineeAssignmentModel.DataTable;
-            }
-
-            return dBTMTraineeAssignmentViewModel;
+            listViewModel.DBTMDeviceDataId = dBTMDeviceDataId;
+            listViewModel.FirstName = response.FirstName;
+            listViewModel.LastName = response.LastName;
+            listViewModel.PersonCode = response.PersonCode;
+            listViewModel.TestName = response.TestName;
+            return listViewModel;
         }
 
 
