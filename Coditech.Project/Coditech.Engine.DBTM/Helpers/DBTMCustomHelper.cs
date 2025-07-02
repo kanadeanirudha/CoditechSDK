@@ -18,6 +18,10 @@ namespace Coditech.Engine.DBTM.Helpers
                     decimal totalTime = dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
                     newRow[calculationName] = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}" : "Invalid Data";
                     break;
+                case "TotalDistanceCovered":
+                    decimal totalDistanceCovered = dBTMReportsList.Where(x => x.ParameterCode == "Distance" && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
+                    newRow[calculationName] = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)} {Unit(calculationCode)}" : "Invalid Data";
+                    break;
                 case "MaxLap":
                     newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == "Time" && x.CreatedDate == createdDate).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
@@ -40,16 +44,23 @@ namespace Coditech.Engine.DBTM.Helpers
             {
                 case "CompletionTime":
                 case "Time":
+                case "MaxLap":
+                case "MinLap":
                     data = "sec";
                     break;
+                case "TotalDistanceCovered":
                 case "Distance":
                     data = "m";
                     break;
                 case "AverageVelocity":
+                case "Velocity":
                     data = "m/s";
                     break;
                 case "Power":
                     data = "watt";
+                    break;
+                case "Weight":
+                    data = "kg";
                     break;
                 default:
                     data = "";
