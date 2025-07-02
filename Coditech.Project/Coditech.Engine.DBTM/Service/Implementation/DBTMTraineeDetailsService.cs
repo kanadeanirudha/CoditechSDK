@@ -1,4 +1,6 @@
-﻿using Coditech.API.Data;
+﻿using System.Collections.Specialized;
+using System.Data;
+using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -6,8 +8,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using System.Collections.Specialized;
-using System.Data;
+using Microsoft.AspNetCore.Components;
 using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.API.Service
@@ -207,7 +208,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceDataDetailsList @DBTMDeviceDataId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             DBTMActivitiesDetailsListModel listModel = new DBTMActivitiesDetailsListModel();
-
+            decimal? weight = null;
             listModel.BindPageListModel(pageListModel);
             if (dBTMActivitiesDetailsList?.Count > 0)
             {
@@ -222,6 +223,7 @@ namespace Coditech.API.Service
                         listModel.FirstName = generalPersonModel.FirstName;
                         listModel.LastName = generalPersonModel.LastName;
                         listModel.PersonCode = dBTMDeviceData.PersonCode;
+                        weight = dBTMDeviceData.Weight;
                     }
                     DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
 
@@ -246,7 +248,7 @@ namespace Coditech.API.Service
                             {
                                 string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
                                 listModel.DataTable.Columns.Add(columnName, typeof(String));
-                                newRow[columnName] = $"{ item.ParameterValue} {Unit(item.ParameterCode)}";
+                                newRow[columnName] = $"{item.ParameterValue} {Unit(item.ParameterCode)}";
                             }
                         }
 
@@ -259,7 +261,7 @@ namespace Coditech.API.Service
                         foreach (var item in calculationColumns)
                         {
                             listModel.DataTable.Columns.Add(item.CalculationName, typeof(String));
-                            Calculation(item.CalculationCode, item.CalculationName, newRow, dBTMActivitiesDetailsList);
+                            Calculation(item.CalculationCode, item.CalculationName, newRow, dBTMActivitiesDetailsList, (decimal)weight);
                         }
                         listModel.DataTable.Rows.Add(newRow);
                     }
@@ -268,8 +270,9 @@ namespace Coditech.API.Service
             return listModel;
         }
 
-        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList)
+        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList, decimal weight)
         {
+            decimal gravity = 9.80668M; // 9.81 use kel tr expected value nahi yet this value is perfect ani gravity constant ahe tr we can use that
             switch (calculationCode)
             {
                 case "CompletionTime":
@@ -287,8 +290,11 @@ namespace Coditech.API.Service
                 case "MinLap":
                     newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
-                case "Power":                  
-                    newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power")?.ParameterValue ?? 0)} {Unit(calculationCode)}";
+                case "Power":
+                    decimal jumpHeight = dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "JumpHeight")?.ParameterValue ?? 0M;
+                    decimal power = weight * (decimal)Math.Pow((double)gravity, 1.5) * (decimal)Math.Sqrt((double)(2 * jumpHeight)) / 4M;
+                    string result = $"{power:0.0} W";
+                    newRow[calculationName] = $"{power:0.#} {Unit(calculationCode)}";
                     break;
                 default:
                     newRow[calculationName] = "N/A";
@@ -312,7 +318,7 @@ namespace Coditech.API.Service
                     data = "m/s";
                     break;
                 case "Power":
-                    data = "watt"; 
+                    data = "watt";
                     break;
                 default:
                     data = "";
