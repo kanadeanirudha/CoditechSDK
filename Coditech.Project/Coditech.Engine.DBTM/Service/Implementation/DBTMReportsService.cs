@@ -84,8 +84,8 @@ namespace Coditech.API.Service
                         newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
                         newRow["Activity Status"] = item.ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
                         newRow["Date"] = item.CreatedDate.Year < 2025 ? null : item.CreatedDate;
-                        newRow["Weight"] = item.Weight;
-                        newRow["Height"] = item.Height;
+                        newRow["Weight"] = $"{item.Weight} {DBTMCustomHelper.Unit("Weight")}";
+                        newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
                         newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
@@ -172,8 +172,8 @@ namespace Coditech.API.Service
                         newRow = listModel.DataTable.NewRow();
                         newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
                         newRow["Date"] = item.CreatedDate;
-                        newRow["Weight"] = item.Weight;
-                        newRow["Height"] = item.Height;
+                        newRow["Weight"] = $"{item.Weight} {DBTMCustomHelper.Unit("Weight")}";
+                        newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}"; 
                         newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
