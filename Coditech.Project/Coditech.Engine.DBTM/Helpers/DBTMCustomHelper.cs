@@ -62,6 +62,9 @@ namespace Coditech.Engine.DBTM.Helpers
                 case "Weight":
                     data = "kg";
                     break;
+                case "Height":
+                    data = "cm";
+                    break;
                 default:
                     data = "";
                     break;
