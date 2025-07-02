@@ -40,6 +40,8 @@ namespace Coditech.Engine.DBTM.Helpers
             {
                 case "CompletionTime":
                 case "Time":
+                case "MaxLap":
+                case "MinLap":
                     data = "sec";
                     break;
                 case "Distance":
