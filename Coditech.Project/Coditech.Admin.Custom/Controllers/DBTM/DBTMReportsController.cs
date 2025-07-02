@@ -2,6 +2,7 @@
 using Coditech.Admin.ViewModel;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace Coditech.Admin.Controllers
 {
@@ -21,7 +22,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
-            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());           
             return View(batchreports, dBTMReportsViewModel);
         }
 
@@ -29,6 +30,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
             DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate);
+            dBTMReportsViewModel.IsRecordFound = dBTMReportsViewModel?.DataTable?.Rows?.Count > 0;
             return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
         }
 
