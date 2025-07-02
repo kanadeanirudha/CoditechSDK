@@ -46,6 +46,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case "Time":
                 case "MaxLap":
                 case "MinLap":
+                case "AirTime":
                     data = "sec";
                     break;
                 case "TotalDistanceCovered":
@@ -63,6 +64,9 @@ namespace Coditech.Engine.DBTM.Helpers
                     data = "kg";
                     break;
                 case "Height":
+                    data = "cm";
+                    break;
+                case "JumpHeight":
                     data = "cm";
                     break;
                 default:
