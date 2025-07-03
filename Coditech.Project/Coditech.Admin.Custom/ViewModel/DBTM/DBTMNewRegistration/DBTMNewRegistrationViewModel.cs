@@ -1,5 +1,7 @@
 ﻿using Coditech.Common.Helper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMNewRegistrationViewModel : BaseViewModel
@@ -100,5 +102,13 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public int TrainerSpecializationEnumId { get; set; }
         public string UserType { get; set; }
+        [Display(Name = "Trainer")]
+        public long GeneralTrainerMasterId { get; set; }
+
+        public string JoiningCode { get; set; }
+        public List<SelectListItem> AllTrainerList { get; set; }
+        [Display(Name = "Trainer")]
+        [Required]
+        public List<string> SelectedTrainer { get; set; }
     }
 }

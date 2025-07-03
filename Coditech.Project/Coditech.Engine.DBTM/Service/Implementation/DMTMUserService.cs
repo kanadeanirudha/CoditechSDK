@@ -1,11 +1,12 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-
+using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.API.Service
@@ -167,6 +168,24 @@ namespace Coditech.API.Service
             }
             return dbtmUserModel;
         }
+        public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode)
+        {
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMNewRegistrationModel> objStoredProc =new CoditechViewRepository<DBTMNewRegistrationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+
+            objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+
+            List<DBTMNewRegistrationModel> dBTMNewRegistrationList =objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+
+            DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel();
+
+            listModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>();
+            listModel.BindPageListModel(pageListModel);
+            return listModel;
+        }
+
+
 
     }
 }

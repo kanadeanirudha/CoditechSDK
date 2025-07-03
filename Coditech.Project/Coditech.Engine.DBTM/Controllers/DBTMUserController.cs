@@ -1,6 +1,7 @@
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
+using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -101,5 +102,27 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMUserResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMUser/GetGeneralTrainerByJoiningCode")]
+        [HttpGet]
+        [Produces(typeof(DBTMNewRegistrationListResponse))]
+        public virtual IActionResult GetGeneralTrainerByJoiningCode(string joiningCode)
+        {
+            try
+            {
+                DBTMNewRegistrationListModel list = _dbtmUserService.GetGeneralTrainerByJoiningCode(joiningCode);
+                return IsNotNull(list) ? CreateOKResponse(new DBTMNewRegistrationListResponse { DBTMNewRegistrationList = list.DBTMNewRegistrationList }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GeneralTrainerByJoiningCode", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GeneralTrainerByJoiningCode", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
     }
 }

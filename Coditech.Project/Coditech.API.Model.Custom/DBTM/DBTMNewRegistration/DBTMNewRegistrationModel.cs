@@ -70,5 +70,6 @@ namespace Coditech.Common.API.Model
         public string CallingCode { get; set; }
         [Required]
         public int TrainerSpecializationEnumId { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
     }
 }

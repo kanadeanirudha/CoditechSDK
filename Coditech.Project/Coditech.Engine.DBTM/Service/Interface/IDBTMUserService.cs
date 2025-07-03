@@ -7,5 +7,6 @@ namespace Coditech.API.Service
         DBTMUserModel Login(UserLoginModel model);
         DBTMUserModel UpdateAdditionalInformation(DBTMUserModel dbtmUserModel);
         DBTMUserModel GetDBTMTraineeDetails(long entityId);
+        DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode);
     }
 }
