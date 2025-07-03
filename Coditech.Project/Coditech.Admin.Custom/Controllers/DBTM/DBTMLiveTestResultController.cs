@@ -1,8 +1,11 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using Coditech.Common.API.Model;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Coditech.Admin.Controllers
 {
@@ -19,25 +22,39 @@ namespace Coditech.Admin.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            LiveTestResultLoginViewModel liveTestResultLoginViewModel = new LiveTestResultLoginViewModel();
-            return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml", liveTestResultLoginViewModel);
+            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = SessionHelper.GetDataFromSession<LiveTestResultDashboardViewModel>(CustomConstants.LiveResultSession);
+
+            if (liveTestResultDashboardViewModel != null && !liveTestResultDashboardViewModel.HasError)
+            {
+                return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResult.cshtml", liveTestResultDashboardViewModel);
+            }
+            else
+            {
+                LiveTestResultLoginViewModel liveTestResultLoginViewModel = new LiveTestResultLoginViewModel();
+                return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml", liveTestResultLoginViewModel);
+            }
         }
 
         [HttpPost]
         [AllowAnonymous]
         public ActionResult Index(LiveTestResultLoginViewModel liveTestResultLoginViewModel)
         {
-            LiveTestResultDashboardViewModel liveTestResultDashboardViewModel = new LiveTestResultDashboardViewModel();
             if (ModelState.IsValid)
             {
-                liveTestResultDashboardViewModel = _liveTestResultDashboardAgent.GetLiveTestResultDashboard(liveTestResultLoginViewModel);
+                LiveTestResultDashboardViewModel liveTestResultDashboardViewModel =
+                    _liveTestResultDashboardAgent.GetLiveTestResultDashboard(liveTestResultLoginViewModel);
+
                 if (!liveTestResultDashboardViewModel.HasError)
                 {
+                    SessionHelper.SaveDataInSession(CustomConstants.LiveResultSession, liveTestResultDashboardViewModel);
                     return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResult.cshtml", liveTestResultDashboardViewModel);
                 }
+
+                SetNotificationMessage(GetErrorNotificationMessage(liveTestResultDashboardViewModel.ErrorMessage));
             }
-            SetNotificationMessage(GetErrorNotificationMessage(liveTestResultDashboardViewModel.ErrorMessage));
+
             return View("~/Views/DBTM/DBTMLiveTestResult/LiveTestResultLogin.cshtml", liveTestResultLoginViewModel);
         }
+
     }
 }

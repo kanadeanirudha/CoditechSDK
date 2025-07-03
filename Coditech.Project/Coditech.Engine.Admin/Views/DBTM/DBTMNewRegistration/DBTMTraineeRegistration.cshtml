@@ -8,6 +8,15 @@
     DropdownViewModel countryDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Country.ToString(), DropdownName = "GeneralCountryMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetRegionListByCountryId()" };
     DropdownViewModel regionDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Region.ToString(), DropdownName = "GeneralRegionMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralRegionMasterId), Parameter = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetCityListByRegionId()" };
     DropdownViewModel cityDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.City.ToString(), DropdownName = "GeneralCityMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCityMasterId), Parameter = Convert.ToString(Model.GeneralRegionMasterId) };
+    DropdownViewModel trainerDropdown = new DropdownViewModel()
+    {
+        DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+        DropdownName = "GeneralTrainerMasterId",
+        Parameter = Model.JoiningCode,
+        IsCustomDropdown = true,
+        DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId)
+    };
+
     ModelPopUpViewModel termsAndConditionsModel = new ModelPopUpViewModel() { ModelPopUpId = "AddTermsAndConditionsModelPopupId", ModalContentId = "AddTermsAndConditionsContentId" };
 }
 <div class="card-body p-0 auth-content" style="max-height: 550px; overflow-y: auto;">
@@ -38,20 +47,31 @@
                             @Html.TextBoxFor(x => x.Custom1, new { @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
                             @Html.ValidationMessageFor(x => x.CentreCode)
                         </div>
+                        <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="GetTrainerDropdownByJoiningCode()" />
+
+
+
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3 multiselect-dropdown">
+                            @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
+                            @Html.ListBoxFor(m => m.SelectedTrainer, new SelectList(Model.AllTrainerList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                            @Html.ValidationMessageFor(x => x.SelectedTrainer)
+                        </div>
                     </div>
                     <div class="row">
-                    <div class="col-lg-2">
-                        <div class="mb-3">
-                            @Html.LabelFor(x => x.PersonTitle, new { @class = "form-label required" })
-                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                   {
-                       DropdownSelectedValue = Model.PersonTitle ?? string.Empty,
-                       DropdownName = "PersonTitle",
-                       GroupCode = DropdownTypeEnum.Title.ToString(),
-                       IsTextValueSame = true,
-                       IsRequired = true,
-                       IsStringProperty = true
-                   })
+                        <div class="col-lg-2">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.PersonTitle, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                {
+                                    DropdownSelectedValue = Model.PersonTitle ?? string.Empty,
+                                                        DropdownName = "PersonTitle",
+                                                        GroupCode = DropdownTypeEnum.Title.ToString(),
+                                                        IsTextValueSame = true,
+                                                        IsRequired = true,
+                                                        IsStringProperty = true
+                                                        })
                             @Html.ValidationMessageFor(x => x.PersonTitle)
                         </div>
                     </div>
@@ -69,22 +89,22 @@
                             @Html.ValidationMessageFor(x => x.LastName)
                         </div>
                     </div>
-                        <div class="col-lg-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="Custom2">Display Name</label>
-                                @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control"})
-                                @Html.ValidationMessageFor(x => x.Custom2)
-                            </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="Custom2">Display Name</label>
+                            @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.Custom2)
                         </div>
+                    </div>
                     <div class="col-lg-3">
                         <div class="mb-3">
                             @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                   {
-                       DropdownSelectedValue = Model.GenderEnumId.ToString(),
-                       DropdownName = "GenderEnumId",
-                       GroupCode = DropdownTypeEnum.Gender.ToString()
-                   })   @Html.ValidationMessageFor(x => x.GenderEnumId)
+                                                        {
+                                    DropdownSelectedValue = Model.GenderEnumId.ToString(),
+                                                        DropdownName = "GenderEnumId",
+                                                        GroupCode = DropdownTypeEnum.Gender.ToString()
+                                                        })   @Html.ValidationMessageFor(x => x.GenderEnumId)
                         </div>
                     </div>
                     <!-- Email ID -->
@@ -123,12 +143,12 @@
                         <div class="mb-3">
                             @Html.LabelFor(x => x.CallingCode, new { @class = "form-label required" })
                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                   {
-                       DropdownType = DropdownTypeEnum.CallingCode.ToString(),
-                       DropdownName = "CallingCode",
-                       DropdownSelectedValue = Model.CallingCode,
-                       IsRequired = true
-                   })
+                                                        {
+                                    DropdownType = DropdownTypeEnum.CallingCode.ToString(),
+                                                        DropdownName = "CallingCode",
+                                                        DropdownSelectedValue = Model.CallingCode,
+                                                        IsRequired = true
+                                                        })
                             @Html.ValidationMessageFor(x => x.CallingCode)
                         </div>
                     </div>
@@ -248,28 +268,27 @@
                         </div>
                     </div>
                 </div>
-                </div>
-                <div class="form-group row my-3">
-                    <div class="col-sm-6">
-                        <div class="custom-control custom-switch switch-success">
-                            <div class="col-sm-6 text-end">
-                                <button class="btn btn-primary w-100 waves-effect waves-light">Register<i class="fas fa-sign-in-alt ms-1"></i></button>
-                            </div>
-                            @*  <input type="checkbox" class="custom-control-input" id="customSwitchSuccess">
-                        <label class="form-label text-muted" for="customSwitchSuccess">Remember me</label> *@
+            </div>
+            <div class="form-group row my-3">
+                <div class="col-sm-6">
+                    <div class="custom-control custom-switch switch-success">
+                        <div class="col-sm-6 text-end">
+                            <button class="btn btn-primary w-100 waves-effect waves-light">Register<i class="fas fa-sign-in-alt ms-1"></i></button>
                         </div>
-                    </div>
-                    <div class="col-sm-6 text-end">
-                        <a href="/user/login" class="text-muted font-13"><i class="dripicons-lock"></i>Log in</a>
+                        @*  <input type="checkbox" class="custom-control-input" id="customSwitchSuccess">
+                        <label class="form-label text-muted" for="customSwitchSuccess">Remember me</label> *@
                     </div>
                 </div>
-            }
+                <div class="col-sm-6 text-end">
+                    <a href="/user/login" class="text-muted font-13"><i class="dripicons-lock"></i>Log in</a>
+                </div>
+            </div>
+                        }
         </div>
     </div>
 </div>
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", termsAndConditionsModel)
 <script src="~/js/coditech/Common/CoditechCommon.js"></script>
-
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
@@ -283,5 +302,48 @@
                 }
             });
         });
+        // function GetTrainerDropdownByJoiningCode() {
+        //     var JoiningCode = $('#Custom1').val();
+
+        //     if (JoiningCode.length === 5) {
+        //         CoditechCommon.ShowLodder();
+        //     $.ajax({
+        //     url: '/DBTMNewRegistration/GetTrainerDropdownByJoiningCode',
+        //     type: 'GET',
+        //     data: { JoiningCode: JoiningCode },
+        //     success: function (result) {
+        //         $('#GeneralTrainerMasterId').html(result);
+        //         CoditechCommon.HideLodder();
+        //     },
+        //     error: function (xhr, status, error) {
+        //         CoditechCommon.HideLodder();
+        //         alert('Error: ' + xhr.status + ' - ' + error);
+        //     }
+        // });
+
+        //     }
+        // },
+                function GetTrainerDropdownByJoiningCode() {
+            var JoiningCode = $('#Custom1').val();
+
+            if (JoiningCode.length === 5) {
+                CoditechCommon.ShowLodder();
+                $.ajax({
+                    url: '/DBTMNewRegistration/TraineeRegistration',
+                    type: 'GET',
+                    data: { JoiningCode: JoiningCode },
+                    success: function (result) {
+                        $('#TrainerDropdownContainer').html(result); // ✅ correct target
+                        $('.selectpicker').selectpicker('refresh'); // ✅ reinitialize Bootstrap-select
+                        CoditechCommon.HideLodder();
+                    },
+                    error: function (xhr, status, error) {
+                        CoditechCommon.HideLodder();
+                        alert('Error: ' + xhr.status + ' - ' + error);
+                    }
+                });
+            }
+        }
+
     </script>
 }
