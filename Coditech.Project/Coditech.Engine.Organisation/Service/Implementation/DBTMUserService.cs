@@ -161,6 +161,8 @@ namespace Coditech.API.Service
 
         public virtual GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel)
         {
+            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(generalPersonModel.Custom3);
+            generalPersonModel.Custom3 = null;
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             string userType = generalPersonModel.UserType;
             DBTMDeviceMaster dBTMDeviceMaster = null;
@@ -241,6 +243,17 @@ namespace Coditech.API.Service
 
                         dBTMSubscriptionPlanAssociatedToUser = _dBTMSubscriptionPlanAssociatedToUserRepository.Insert(dBTMSubscriptionPlanAssociatedToUser);
                     }
+                    // Insert into Trainee Details
+                    _dBTMTraineeDetailsRepository.Insert(new DBTMTraineeDetails
+                    {
+                        PersonId = generalPersonModel.PersonId,
+                        CentreCode = generalPersonModel.SelectedCentreCode,
+                        PersonCode = generalPersonModel.PersonCode,
+                        Height = dBTMCustomNewRegistrationModel.height,
+                        Weight = dBTMCustomNewRegistrationModel.weight,
+                        UserType = userType,
+                        IsActive = true
+                    });
                 }
             }
             return generalPersonModel;
