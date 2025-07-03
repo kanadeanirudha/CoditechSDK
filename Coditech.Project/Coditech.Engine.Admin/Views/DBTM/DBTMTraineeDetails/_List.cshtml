@@ -42,8 +42,15 @@
                             <td>@item.MobileNumber</td>
                             <td>@item.EmailId</td>
                             <td style="text-align: center;">
+                                @if (item.NumberOfActivityPerformed > 0)
+                                {
                                 <a href="../@controllerName/TraineeActivitiesList?SelectedParameter1=@item.PersonCode&SelectedParameter2=@Model.SelectedParameter2"><span class="badge badge-soft-info">@item.NumberOfActivityPerformed</span></a>
-                            </td>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-soft-secondary">@item.NumberOfActivityPerformed</span>
+                                }
+                            </td>                            
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
