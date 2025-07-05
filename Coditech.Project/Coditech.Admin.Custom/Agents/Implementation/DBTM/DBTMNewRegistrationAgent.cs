@@ -103,7 +103,8 @@ namespace Coditech.Admin.Agents
                 DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = new DBTMCustomNewRegistrationModel
                 {
                     weight = dBTMNewRegistrationViewModel.Weight,
-                    height = dBTMNewRegistrationViewModel.Height
+                    height = dBTMNewRegistrationViewModel.Height,
+                    GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer
                 };
 
                 dBTMNewRegistrationViewModel.Custom3 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
@@ -145,7 +146,8 @@ namespace Coditech.Admin.Agents
                 DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = new DBTMCustomNewRegistrationModel
                 {
                     weight = dBTMNewRegistrationViewModel.Weight,
-                    height = dBTMNewRegistrationViewModel.Height
+                    height = dBTMNewRegistrationViewModel.Height,
+                    GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer
                 };
 
                 dBTMNewRegistrationViewModel.Custom3 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);

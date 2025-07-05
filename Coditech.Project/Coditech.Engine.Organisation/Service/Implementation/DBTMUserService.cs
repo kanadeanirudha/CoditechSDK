@@ -247,20 +247,22 @@ namespace Coditech.API.Service
 
                         dBTMSubscriptionPlanAssociatedToUser = _dBTMSubscriptionPlanAssociatedToUserRepository.Insert(dBTMSubscriptionPlanAssociatedToUser);
                     }
-                    // Insert into Trainee Details
-                    long dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Insert(new DBTMTraineeDetails
-                    {
-                        PersonId = generalPersonModel.PersonId,
-                        CentreCode = generalPersonModel.SelectedCentreCode,
-                        PersonCode = generalPersonModel.PersonCode,
-                        Height = dBTMCustomNewRegistrationModel.height,
-                        Weight = dBTMCustomNewRegistrationModel.weight,
-                        UserType = userType,
-                        IsActive = true
-                    }).DBTMTraineeDetailId;
-
-                    List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
-                    foreach (string generalTrainerMasterId in dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds.Split(','))
+                }
+                // Insert into Trainee Details
+                long dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Insert(new DBTMTraineeDetails
+                {
+                    PersonId = generalPersonModel.PersonId,
+                    CentreCode = generalPersonModel.SelectedCentreCode,
+                    PersonCode = generalPersonModel.PersonCode,
+                    Height = dBTMCustomNewRegistrationModel.height,
+                    Weight = dBTMCustomNewRegistrationModel.weight,
+                    UserType = userType,
+                    IsActive = true
+                }).DBTMTraineeDetailId;
+                List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
+                if (generalTraineeAssociatedToTrainerList.Count > 0)
+                {
+                    foreach (string generalTrainerMasterId in dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds)
                     {
                         generalTraineeAssociatedToTrainerList.Add(new GeneralTraineeAssociatedToTrainer
                         {
@@ -270,8 +272,9 @@ namespace Coditech.API.Service
                             IsCurrentTrainer = true
                         });
                     }
-                    _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
                 }
+                _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
+
             }
             return generalPersonModel;
         }
