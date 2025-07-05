@@ -107,7 +107,7 @@ namespace Coditech.Admin.Agents
                     GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer
                 };
 
-                dBTMNewRegistrationViewModel.Custom3 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
+                dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
 
                 GeneralPersonResponse response = _userClient.IndividualRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
 
@@ -148,10 +148,11 @@ namespace Coditech.Admin.Agents
                     weight = dBTMNewRegistrationViewModel.Weight,
                     height = dBTMNewRegistrationViewModel.Height,
                     GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer,
+                    JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
                     SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId
                 };
 
-                dBTMNewRegistrationViewModel.Custom3 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
+                dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
 
                 GeneralPersonResponse response = _userClient.TraineeRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
 

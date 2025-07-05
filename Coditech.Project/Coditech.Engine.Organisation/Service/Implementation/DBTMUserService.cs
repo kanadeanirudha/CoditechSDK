@@ -166,9 +166,11 @@ namespace Coditech.API.Service
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             string userType = generalPersonModel.UserType;
             DBTMDeviceMaster dBTMDeviceMaster = null;
+            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(generalPersonModel.Custom1);
+            generalPersonModel.Custom1 = null;
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == generalPersonModel.Custom1)?.FirstOrDefault();
+                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode)?.FirstOrDefault();
 
                 if (IsNull(joiningCodeDetails))
                     throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
@@ -190,8 +192,7 @@ namespace Coditech.API.Service
 
                 generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
-            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(generalPersonModel.Custom3);
-            generalPersonModel.Custom3 = null;
+            
 
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
             if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))

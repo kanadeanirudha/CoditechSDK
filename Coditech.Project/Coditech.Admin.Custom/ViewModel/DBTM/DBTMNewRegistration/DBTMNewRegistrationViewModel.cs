@@ -112,7 +112,7 @@ namespace Coditech.Admin.ViewModel
         public decimal Height { get; set; }
         [Display(Name = "Trainer")]
         public long GeneralTrainerMasterId { get; set; }
-
+        [Required]
         public string JoiningCode { get; set; }
         public List<SelectListItem> AllTrainerList { get; set; }
         [Display(Name = "Trainer")]

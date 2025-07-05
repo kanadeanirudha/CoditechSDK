@@ -1,13 +1,10 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Helpers;
+using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
-using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMNewRegistrationController : BaseController
@@ -133,26 +130,24 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult TraineeRegistration(string JoiningCode)
+        public virtual ActionResult TraineeRegistration(string joiningCode)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-
-            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
+            if (!string.IsNullOrEmpty(joiningCode))
             {
-                JoiningCode = JoiningCode,
-                SelectedTrainer = new List<string>(), // if needed
-                AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
                 {
-                    DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                    Parameter = JoiningCode
-                }).DropdownList?.Where(x => !string.IsNullOrEmpty(x.Value))?.ToList()
-            };
-            dBTMNewRegistrationViewModel.AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-            {
-                DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                Parameter = JoiningCode,
-            }).DropdownList?.Where(x => x.Value != "")?.ToList();
+                    JoiningCode = joiningCode,
+                    AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                    {
+                        DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                        Parameter = joiningCode
+                    }).DropdownList?.Where(x => x.Value != "")?.ToList()
 
+                };
+                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+            }
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
         [HttpPost]
