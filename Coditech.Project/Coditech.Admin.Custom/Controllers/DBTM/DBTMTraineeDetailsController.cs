@@ -23,29 +23,39 @@ namespace Coditech.Admin.Controllers
 
         public virtual ActionResult List(DataTableViewModel dataTableViewModel)
         {
+            if (string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
+            {
+                dataTableViewModel.SelectedParameter1 = "0";
+            }
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
             GetListOnlyIfSingleCentre(dataTableViewModel);
+
             if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
-                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
-                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
                 }
                 else
+                {
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
+                }
             }
+
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
             list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
             list.SelectedParameter2 = dataTableViewModel.SelectedParameter1;
+
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeDetails/_List.cshtml", list);
             }
-            return View($"~/Views/DBTM/DBTMTraineeDetails/List.cshtml", list);
+
+            return View("~/Views/DBTM/DBTMTraineeDetails/List.cshtml", list);
         }
+
 
         public ActionResult ActiveMemberList(DataTableViewModel dataTableViewModel)
         {

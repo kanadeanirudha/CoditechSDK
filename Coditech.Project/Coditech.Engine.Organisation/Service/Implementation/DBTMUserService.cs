@@ -6,10 +6,9 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-using Newtonsoft.Json;
-using Twilio.TwiML.Voice;
 namespace Coditech.API.Service
 {
     public class DBTMUserService : UserService, IDBTMUserService
@@ -257,7 +256,8 @@ namespace Coditech.API.Service
                     Height = dBTMCustomNewRegistrationModel.height,
                     Weight = dBTMCustomNewRegistrationModel.weight,
                     UserType = userType,
-                    IsActive = true
+                    IsActive = true,
+                    SpecializationEnumId = dBTMCustomNewRegistrationModel.SpecializationEnumId
                 }).DBTMTraineeDetailId;
                 List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
                 if (generalTraineeAssociatedToTrainerList.Count > 0)

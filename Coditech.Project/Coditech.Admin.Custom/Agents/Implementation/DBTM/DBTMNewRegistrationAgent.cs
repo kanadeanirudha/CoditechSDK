@@ -147,7 +147,8 @@ namespace Coditech.Admin.Agents
                 {
                     weight = dBTMNewRegistrationViewModel.Weight,
                     height = dBTMNewRegistrationViewModel.Height,
-                    GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer
+                    GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer,
+                    SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId
                 };
 
                 dBTMNewRegistrationViewModel.Custom3 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);

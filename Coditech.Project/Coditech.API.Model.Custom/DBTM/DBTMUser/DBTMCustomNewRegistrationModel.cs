@@ -4,6 +4,7 @@
     {
         public decimal height { get; set; }
         public decimal weight { get; set; }
+        public int? SpecializationEnumId { get; set; }
         public List<string> GeneralTraineeAssociatedToTrainerIds { get; set; }
     }
 }
