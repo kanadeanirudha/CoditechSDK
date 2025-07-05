@@ -4,5 +4,6 @@
     {
         public decimal height { get; set; }
         public decimal weight { get; set; }
+        public string GeneralTraineeAssociatedToTrainerIds { get; set; }
     }
 }
