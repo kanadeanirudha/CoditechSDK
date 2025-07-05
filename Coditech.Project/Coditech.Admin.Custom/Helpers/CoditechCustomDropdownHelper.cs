@@ -135,8 +135,6 @@ namespace Coditech.Admin.Helpers
 
             if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != CustomConstants.DBTMTrainer)
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
-            else
-                dropdownList.Add(new SelectListItem() { Text = "-------Select Trainer-------", Value = "" });
 
             foreach (var item in list?.GeneralTrainerList)
             {
