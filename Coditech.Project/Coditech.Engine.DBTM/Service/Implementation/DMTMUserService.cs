@@ -175,13 +175,9 @@ namespace Coditech.API.Service
 
             objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-
-            List<DBTMNewRegistrationModel> dBTMNewRegistrationList =objStoredProc.ExecuteStoredProcedureList("Coditech_GetCustomGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
-
+            List<DBTMNewRegistrationModel> dBTMNewRegistrationList =objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
             DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel();
-
             listModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>();
-            listModel.BindPageListModel(pageListModel);
             return listModel;
         }
 
