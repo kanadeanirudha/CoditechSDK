@@ -58,6 +58,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetTraineeDetailsList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString()))
+            {
+                GetGeneralTrainerByJoiningCodeList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -295,6 +299,30 @@ namespace Coditech.Admin.Helpers
                     Value = item.DBTMTraineeDetailId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTraineeDetailId)
                 });
+            }
+        }
+        private static void GetGeneralTrainerByJoiningCodeList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                string joiningCode = (dropdownViewModel.Parameter);
+
+                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListModel list = new DBTMNewRegistrationListModel() { DBTMNewRegistrationList = response.DBTMNewRegistrationList };
+                foreach (var item in list?.DBTMNewRegistrationList)
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = string.Concat(item.FirstName, "", item.LastName, ""),
+                        Value = item.GeneralTrainerMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                    });
+                }
             }
         }
     }

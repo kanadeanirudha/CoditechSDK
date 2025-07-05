@@ -1,7 +1,12 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Helpers;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
+using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace Coditech.Admin.Controllers
 {
@@ -43,7 +48,7 @@ namespace Coditech.Admin.Controllers
                     {
                         TempData["FormSizeClass"] = "col-lg-4";
                         SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
-                        return RedirectToAction("Login","user");
+                        return RedirectToAction("Login", "user");
                     }
                 }
             }
@@ -128,10 +133,27 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult TraineeRegistration()
+        public virtual ActionResult TraineeRegistration(string JoiningCode)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", new DBTMNewRegistrationViewModel());
+
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+            {
+                JoiningCode = JoiningCode,
+                SelectedTrainer = new List<string>(), // if needed
+                AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                {
+                    DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                    Parameter = JoiningCode
+                }).DropdownList?.Where(x => !string.IsNullOrEmpty(x.Value))?.ToList()
+            };
+            dBTMNewRegistrationViewModel.AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                Parameter = JoiningCode,
+            }).DropdownList?.Where(x => x.Value != "")?.ToList();
+
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -148,7 +170,7 @@ namespace Coditech.Admin.Controllers
             {
                 ModelState.Remove("CentreName");
                 ModelState.Remove("CentreCode");
-                 ModelState.Remove("DeviceSerialCode");
+                ModelState.Remove("DeviceSerialCode");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
