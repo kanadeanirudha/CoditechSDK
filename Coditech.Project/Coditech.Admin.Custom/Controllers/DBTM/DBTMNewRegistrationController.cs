@@ -5,6 +5,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace Coditech.Admin.Controllers
@@ -132,23 +133,28 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult TraineeRegistration()
+        public virtual ActionResult TraineeRegistration(string JoiningCode)
         {
             TempData["FormSizeClass"] = "col-lg-8";
 
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
             {
-                SelectedTrainer = new List<string>(),
+                JoiningCode = JoiningCode,
+                SelectedTrainer = new List<string>(), // if needed
+                AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                {
+                    DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                    Parameter = JoiningCode
+                }).DropdownList?.Where(x => !string.IsNullOrEmpty(x.Value))?.ToList()
             };
             dBTMNewRegistrationViewModel.AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
             {
                 DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                Parameter = $"{dBTMNewRegistrationViewModel.JoiningCode}"
+                Parameter = JoiningCode,
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
 
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -179,49 +185,5 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
-        [HttpGet]
-        [AllowAnonymous]
-        public ActionResult GetTrainerDropdownByJoiningCode(string JoiningCode)
-        {
-            DropdownViewModel trainerDropdownByJoiningCode = new DropdownViewModel()
-            {
-                DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                DropdownName = "GeneralTrainerMasterId",
-                Parameter = JoiningCode,
-                IsCustomDropdown = true,
-            };
-
-            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdownByJoiningCode);
-        }
-
     }
 }
-
-
-
-
-//[HttpGet]
-//[AllowAnonymous]
-//public virtual ActionResult TraineeRegistration()
-//{
-//    TempData["FormSizeClass"] = "col-lg-8";
-//    //trainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-//    //{
-//    //    DropdownType = DropdownCustomTypeEnum.TrainerDetailsListByCentre.ToString(),
-//    //    Parameter = joiningCode // Or CentreCode if applicable
-//    //}).DropdownList?.ToList();
-
-//    DBTMNewRegistrationViewModel dBTMTraineeAssignmentViewModel = new DBTMNewRegistrationViewModel
-//    {
-//        //SelectedCentreCode = userModel.SelectedCentreCode,
-//        SelectedTrainer = new List<string>(),
-//        // GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0
-//    };
-//    dBTMTraineeAssignmentViewModel.AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-//    {
-//        DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-//        Parameter = $"{dBTMTraineeAssignmentViewModel.JoiningCode}"
-//    }).DropdownList?.Where(x => x.Value != "")?.ToList();
-
-//    return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMTraineeAssignmentViewModel);
-//}
