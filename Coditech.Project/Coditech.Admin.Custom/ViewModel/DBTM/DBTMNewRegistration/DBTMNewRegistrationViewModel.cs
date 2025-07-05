@@ -117,6 +117,9 @@ namespace Coditech.Admin.ViewModel
         public List<SelectListItem> AllTrainerList { get; set; }
         [Display(Name = "Trainer")]
         public List<string> SelectedTrainer { get; set; }
+        [Display(Name = "Date Of Birth")]
+        [Required]
+        public DateTime? DateOfBirth { get; set; }
         [Display(Name = "Specialization")]
         public string Specialization { get; set; }
         public int? SpecializationEnumId { get; set; }
