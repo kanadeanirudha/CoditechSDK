@@ -144,9 +144,13 @@ namespace Coditech.Admin.Controllers
                         DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
                         Parameter = joiningCode
                     }).DropdownList?.Where(x => x.Value != "")?.ToList()
-
+                   
                 };
-                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+                if (dBTMNewRegistrationViewModel.AllTrainerList?.Count == 0)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage("Joinning Code Is Invalid Or Trainer is Not Associated to Joinning Code , Please Contact Your Administrator"));
+                }
+                    return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
             }
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }

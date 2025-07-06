@@ -74,7 +74,8 @@ namespace Coditech.API.Service
                     parametersAssociatedToTestlist.Add(new DBTMParametersAssociatedToTest()
                     {
                         DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                        DBTMTestParameterId = Convert.ToByte(item)
+                        DBTMTestParameterId = Convert.ToByte(item),
+                        IsActive=true
                     });
                 }
 
