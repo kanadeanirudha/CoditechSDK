@@ -83,16 +83,20 @@
         var todate = $("#ToDate").val();
 
         $("#DBTMTestWiseReportsDivId").html("");
-        if (dBTMTestMasterId != "") {
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();
+
             $.ajax({
                 cache: false,
                 type: "GET",
                 dataType: "html",
                 url: "/DBTMReports/GetTestWiseReports",
                 data: {
-                    "dBTMTestMasterId": dBTMTestMasterId, dBTMTraineeDetailId: dBTMTraineeDetailId,
-                    "fromdate": fromdate, "todate": todate
+                    dBTMTestMasterId: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    fromdate: fromdate,
+                    todate: todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -107,9 +111,8 @@
                     CoditechCommon.HideLodder();
                 }
             });
-        }
-        else {
-            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity and trainer.", "error");
         }
     }
 };
