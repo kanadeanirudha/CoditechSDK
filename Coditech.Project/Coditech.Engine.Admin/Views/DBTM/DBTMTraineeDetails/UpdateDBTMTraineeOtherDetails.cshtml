@@ -72,19 +72,19 @@
                                         @Html.ValidationMessageFor(x => x.Weight)
                                     </div>
                                 </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.Specialization, new { @class = "form-label required" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                                                        {
-                                            DropdownSelectedValue = Model.SpecializationEnumId.ToString(),
-                                                                        DropdownName = "SpecializationEnumId",
-                                                                        GroupCode = DropdownCustomTypeEnum.Specialization.ToString(),
-                                                                        IsRequired = true,
-                                                                        })
-                                    @Html.ValidationMessageFor(x => x.SpecializationEnumId)
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Specialization, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.SpecializationEnumId.ToString(),
+                                   DropdownName = "SpecializationEnumId",
+                                   GroupCode = DropdownCustomTypeEnum.TraineeSpecialization.ToString(),
+                                   IsRequired = true,
+                               })
+                                        @Html.ValidationMessageFor(x => x.SpecializationEnumId)
+                                    </div>
                                 </div>
-                            </div>
                                 <div class="col-lg-6">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.MedicalHistory, new { @class = "form-label" })
