@@ -10,7 +10,6 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.Admin.Agents
 {
     public class DBTMTraineeAssignmentAgent : BaseAgent, IDBTMTraineeAssignmentAgent
@@ -18,13 +17,15 @@ namespace Coditech.Admin.Agents
         #region Private Variable
         protected readonly ICoditechLogging _coditechLogging;
         private readonly IDBTMTraineeAssignmentClient _dBTMTraineeAssignmentClient;
+        private readonly IDBTMTraineeDetailsClient _dBTMTraineeDetailsClient;
         #endregion
 
         #region Public Constructor
-        public DBTMTraineeAssignmentAgent(ICoditechLogging coditechLogging, IDBTMTraineeAssignmentClient dBTMTraineeAssignmentClient)
+        public DBTMTraineeAssignmentAgent(ICoditechLogging coditechLogging, IDBTMTraineeAssignmentClient dBTMTraineeAssignmentClient, IDBTMTraineeDetailsClient dBTMTraineeDetailsClient)
         {
             _coditechLogging = coditechLogging;
             _dBTMTraineeAssignmentClient = GetClient<IDBTMTraineeAssignmentClient>(dBTMTraineeAssignmentClient);
+            _dBTMTraineeDetailsClient = GetClient<IDBTMTraineeDetailsClient>(dBTMTraineeDetailsClient);
         }
         #endregion
 
@@ -41,7 +42,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("AssignmentDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("AssignmentTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-            
+
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
             DBTMTraineeAssignmentListResponse response = _dBTMTraineeAssignmentClient.List(Convert.ToInt64(dataTableModel.SelectedParameter1), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
@@ -138,13 +139,13 @@ namespace Coditech.Admin.Agents
         }
 
         //Send Reminder Assignment.
-        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId)
-        {          
+        public virtual DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
+        {
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
 
-                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId);
+                DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.SendAssignmentReminder(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId);
 
                 return response?.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
             }
@@ -165,6 +166,23 @@ namespace Coditech.Admin.Agents
                 return (DBTMTraineeAssignmentViewModel)GetViewModelWithErrorMessage(new DBTMTraineeAssignmentViewModel(), GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
             }
         }
+        public virtual DBTMActivitiesDetailsListViewModel GetAssignmentResult(long dBTMDeviceDataId, DataTableViewModel dataTableModel)
+        {
+            DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, null, null, null, dataTableModel.PageIndex, int.MaxValue);
+
+            DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
+            {
+                DataTable = response.DataTable
+            };
+
+            listViewModel.DBTMDeviceDataId = dBTMDeviceDataId;
+            listViewModel.FirstName = response.FirstName;
+            listViewModel.LastName = response.LastName;
+            listViewModel.PersonCode = response.PersonCode;
+            listViewModel.TestName = response.TestName;
+            return listViewModel;
+        }
+
 
         #region DBTMAssignmentUser
         public virtual DBTMTraineeAssignmentToUserListViewModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, DataTableViewModel dataTableModel)
@@ -201,7 +219,7 @@ namespace Coditech.Admin.Agents
             {
                 long dBTMTraineeAssignmentId = dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentId;
                 long dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentToUserViewModel.DBTMTraineeAssignmentUserId;
-              //  DBTMTraineeAssignmentToUserViewModel.UserType = UserTypeEnum.Trainee.ToString();
+                //  DBTMTraineeAssignmentToUserViewModel.UserType = UserTypeEnum.Trainee.ToString();
                 DBTMTraineeAssignmentToUserResponse response = _dBTMTraineeAssignmentClient.AssociateUnAssociateAssignmentwiseUser(dBTMTraineeAssignmentToUserViewModel.ToModel<DBTMTraineeAssignmentToUserModel>());
                 DBTMTraineeAssignmentToUserModel dBTMTraineeAssignmentToUserModel = response?.DBTMTraineeAssignmentToUserModel;
                 dBTMTraineeAssignmentToUserViewModel = IsNotNull(dBTMTraineeAssignmentToUserModel) ? dBTMTraineeAssignmentToUserModel.ToViewModel<DBTMTraineeAssignmentToUserViewModel>() : new DBTMTraineeAssignmentToUserViewModel();
@@ -249,7 +267,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Name",
+                ColumnName = "Activity Name",
                 ColumnCode = "TestName",
                 IsSortable = true,
             });
@@ -267,7 +285,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Status",
+                ColumnName = "Activity Status",
                 ColumnCode = "DBTMTestStatusEnumId",
                 IsSortable = true,
             });

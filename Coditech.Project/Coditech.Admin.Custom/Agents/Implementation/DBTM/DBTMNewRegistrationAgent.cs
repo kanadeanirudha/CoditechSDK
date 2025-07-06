@@ -6,6 +6,7 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 
@@ -36,7 +37,7 @@ namespace Coditech.Admin.Agents
             try
             {
                 dBTMNewRegistrationViewModel.CentreCode = "BlankData";
-                dBTMNewRegistrationViewModel.TrainerSpecializationEnumId =0;
+                dBTMNewRegistrationViewModel.TrainerSpecializationEnumId = 0;
                 DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.DBTMCentreRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
                 DBTMNewRegistrationModel dBTMNewRegistrationModel = response?.DBTMNewRegistrationModel;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
@@ -64,10 +65,10 @@ namespace Coditech.Admin.Agents
         //Add TrainerRegistration.
         public virtual DBTMNewRegistrationViewModel TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
-            dBTMNewRegistrationViewModel.DeviceSerialCode ="BlankData";
+            dBTMNewRegistrationViewModel.DeviceSerialCode = "BlankData";
             dBTMNewRegistrationViewModel.CentreName = "BlankData";
             try
-            { 
+            {
                 DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.TrainerRegistration(dBTMNewRegistrationViewModel.ToModel<DBTMNewRegistrationModel>());
                 DBTMNewRegistrationModel dBTMNewRegistrationModel = response?.DBTMNewRegistrationModel;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
@@ -92,15 +93,28 @@ namespace Coditech.Admin.Agents
             }
         }
 
-        //Add Individual Registration.
+        // Add Individual Registration.
         public virtual DBTMNewRegistrationViewModel IndividualRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             try
             {
                 dBTMNewRegistrationViewModel.UserType = UserTypeCustomEnum.DBTMIndividualRegister.ToString();
+
+                DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = new DBTMCustomNewRegistrationModel
+                {
+                    weight = dBTMNewRegistrationViewModel.Weight,
+                    height = dBTMNewRegistrationViewModel.Height,
+                    GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer
+                };
+
+                dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
+
                 GeneralPersonResponse response = _userClient.IndividualRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
+
                 GeneralPersonModel dBTMNewRegistrationModel = response?.GeneralPersonModel;
-                return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
+
+                return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>()
+                    : new DBTMNewRegistrationViewModel();
             }
             catch (CoditechException ex)
             {
@@ -108,7 +122,6 @@ namespace Coditech.Admin.Agents
                 switch (ex.ErrorCode)
                 {
                     case ErrorCodes.AlreadyExist:
-                        return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, ex.ErrorMessage);
                     case ErrorCodes.InvalidData:
                         return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, ex.ErrorMessage);
                     default:
@@ -122,13 +135,27 @@ namespace Coditech.Admin.Agents
             }
         }
 
+
         //Add Trainee Registration.
         public virtual DBTMNewRegistrationViewModel TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             try
             {
                 dBTMNewRegistrationViewModel.UserType = UserTypeEnum.Trainee.ToString();
+
+                DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = new DBTMCustomNewRegistrationModel
+                {
+                    weight = dBTMNewRegistrationViewModel.Weight,
+                    height = dBTMNewRegistrationViewModel.Height,
+                    GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer,
+                    JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
+                    SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId
+                };
+
+                dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
+
                 GeneralPersonResponse response = _userClient.TraineeRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
+
                 GeneralPersonModel dBTMNewRegistrationModel = response?.GeneralPersonModel;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
             }
@@ -138,7 +165,6 @@ namespace Coditech.Admin.Agents
                 switch (ex.ErrorCode)
                 {
                     case ErrorCodes.AlreadyExist:
-                        return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, ex.ErrorMessage);
                     case ErrorCodes.InvalidData:
                         return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, ex.ErrorMessage);
                     default:

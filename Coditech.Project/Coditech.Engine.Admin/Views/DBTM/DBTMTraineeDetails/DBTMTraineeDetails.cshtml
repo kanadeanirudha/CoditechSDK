@@ -54,7 +54,7 @@
                                 </div>
                             </div>
                             @Html.Partial("~/Views/Shared/GeneralPerson/_CreateEditGeneralPerson.cshtml", Model)
-                            <a href="../@controllerName/DBTMTraineeDetailsCancel?SelectedCentreCode=@Model.SelectedCentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>
                 </div>

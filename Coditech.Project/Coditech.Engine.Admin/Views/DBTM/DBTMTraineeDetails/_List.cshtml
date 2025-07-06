@@ -42,13 +42,20 @@
                             <td>@item.MobileNumber</td>
                             <td>@item.EmailId</td>
                             <td style="text-align: center;">
-                                <a href="../@controllerName/TraineeActivitiesList?SelectedParameter1=@item.PersonCode"><span class="badge badge-soft-info">@item.NumberOfActivityPerformed</span></a>
-                            </td>
+                                @if (item.NumberOfActivityPerformed > 0)
+                                {
+                                <a href="../@controllerName/TraineeActivitiesList?SelectedParameter1=@item.PersonCode&SelectedParameter2=@Model.SelectedParameter2"><span class="badge badge-soft-info">@item.NumberOfActivityPerformed</span></a>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-soft-secondary">@item.NumberOfActivityPerformed</span>
+                                }
+                            </td>                            
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center data-action">
-                                <a href="../@controllerName/UpdateDBTMTraineePersonalDetails?dBTMTraineeDetailId=@item.DBTMTraineeDetailId&personId=@item.PersonId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a>@*<span class="m-2">|</span> *@
+                                <a href="../@controllerName/UpdateDBTMTraineePersonalDetails?dBTMTraineeDetailId=@item.DBTMTraineeDetailId&personId=@item.PersonId&SelectedParameter2=@Model.SelectedParameter2" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a>@*<span class="m-2">|</span> *@
                                 @* <a href="../@controllerName/Delete?dBTMTraineeDetailIds=@item.DBTMTraineeDetailId&SelectedCentreCode=@Model.SelectedCentreCode" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
                             </td>
                         </tr>

@@ -24,7 +24,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/InsertDeviceData")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
-        public virtual IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
+        public  IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/Getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
-        public virtual IActionResult GetBatchList(long entityId, string userType)
+        public  IActionResult GetBatchList(long entityId, string userType)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetBatchDetails")]
         [HttpGet]
         [Produces(typeof(DBTMBatchResponse))]
-        public virtual IActionResult GetBatchDetails(int generalBatchMasterId)
+        public  IActionResult GetBatchDetails(int generalBatchMasterId)
         {
             try
             {
@@ -86,31 +86,10 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
-        [Route("/DBTMApi/GetBatchDetailsV2")]
-        [HttpGet]
-        [Produces(typeof(DBTMBatchResponse))]
-        public virtual IActionResult GetBatchDetailsV2(int generalBatchMasterId)
-        {
-            try
-            {
-                DBTMBatchModel model = _dBTMApiService.GetBatchDetailsV2(generalBatchMasterId);
-                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
         [Route("/DBTMApi/GetAssignmentList")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiListResponse))]
-        public virtual IActionResult GetAssignmentList(long entityId, string userType)
+        public  IActionResult GetAssignmentList(long entityId, string userType)
         {
             try
             {
@@ -132,7 +111,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetAssignmentDetails")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiResponse))]
-        public virtual IActionResult GetAssignmentDetails(long dBTMTraineeAssignmentId)
+        public  IActionResult GetAssignmentDetails(long dBTMTraineeAssignmentId)
         {
             try
             {
@@ -148,6 +127,28 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMTestDetails", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMTestApiResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/dbtmapi/gettrainerdashboard")]
+        [HttpGet]
+        [Produces(typeof(DBTMMobileDashboardResponse))]
+        public  IActionResult GetTrainerDashboard(long userMasterId)
+        {
+            try
+            {
+                DBTMMobileDashboardModel model = _dBTMApiService.GetTrainerDashboard(userMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMMobileDashboardResponse { DBTMMobileDashboardModel = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMMobileDashboard", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMMobileDashboardResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMMobileDashboard", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMMobileDashboardResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

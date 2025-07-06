@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Coditech.Common.API.Model;
-using Coditech.Common.Helper;
-using Coditech.Resources;
+﻿using Coditech.Common.Helper;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using System.ComponentModel.DataAnnotations;
+using System.Data;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMTraineeAssignmentViewModel : BaseViewModel
@@ -26,7 +24,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public int DBTMTestStatusEnumId { get; set; }
 
-        [Display(Name = "Test Status")]
+        [Display(Name = "Activity Status")]
         public string TestStatus { get; set; }
 
         public string SelectedCentreCode { get; set; }
@@ -34,8 +32,7 @@ namespace Coditech.Admin.ViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        [Display(Name = "Test Name")]
-        [Required]
+        [Display(Name = "Activity Name")]
         public string TestName { get; set; }
         public string MobileNumber { get; set; }
         public string ImagePath { get; set; }
@@ -44,5 +41,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Trainee")]
         [Required]
         public List<string> SelectedTrainee { get; set; }
+        public DataTable DataTable { get; set; }
+        public long DBTMTraineeAssignmentUserId { get; set; }
+        public long DBTMDeviceDataId { get; set; }
+
     }
 }

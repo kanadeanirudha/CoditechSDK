@@ -131,45 +131,6 @@ namespace Coditech.API.Service
 
         public DBTMBatchModel GetBatchDetails(int generalBatchMasterId)
         {
-            int dbtmTestMasterId = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId).FirstOrDefault();
-            DBTMBatchModel dBTMBatchModel = new DBTMBatchModel()
-            {
-                GeneralBatchMasterId = generalBatchMasterId,
-            };
-
-            if (dbtmTestMasterId > 0)
-            {
-                DBTMTestMaster testDetails = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dbtmTestMasterId).FirstOrDefault();
-
-                if (testDetails == null || !testDetails.IsActive)
-                {
-                    throw new Exception("The test is not active or does not exist.");
-                }
-                else
-                {
-                    dBTMBatchModel.DBTMTestApiModel = new DBTMTestApiModel();
-                    dBTMBatchModel.DBTMTestApiModel.ActivityCode = testDetails.DBTMTestMasterId;
-                    dBTMBatchModel.DBTMTestApiModel.TestName = testDetails.TestName;
-                    dBTMBatchModel.DBTMTestApiModel.TestCode = testDetails.TestCode;
-                    dBTMBatchModel.DBTMTestApiModel.MinimunPairedDevice = testDetails.MinimunPairedDevice;
-                    dBTMBatchModel.DBTMTestApiModel.LapDistance = testDetails.LapDistance;
-                    dBTMBatchModel.DBTMTestApiModel.IsLapDistanceChange = testDetails.IsLapDistanceChange;
-                    dBTMBatchModel.DBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
-                    dBTMBatchModel.DBTMTestApiModel.TestInstructions = testDetails.TestInstructions;
-                }
-                PageListModel pageListModel = new PageListModel(null, null, 0, 0);
-                CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-                objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
-                objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-                List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralBatchUserList @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
-
-                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
-            }
-            return dBTMBatchModel;
-        }
-
-        public DBTMBatchModel GetBatchDetailsV2(int generalBatchMasterId)
-        {
             List<int> dbtmTestMasterIds = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId).ToList();
             DBTMBatchModel dBTMBatchModel = new DBTMBatchModel()
             {
@@ -189,7 +150,9 @@ namespace Coditech.API.Service
                     dBTMBatchModel.DBTMBatchTestList = new List<DBTMTestApiModel>();
                     foreach (DBTMTestMaster item in testDetailList)
                     {
-                        dBTMBatchModel.DBTMBatchTestList.Add(item.FromEntityToModel<DBTMTestApiModel>());
+                        DBTMTestApiModel dbtmTestApiModel= item.FromEntityToModel<DBTMTestApiModel>();
+                        dbtmTestApiModel.ActivityCode = item.DBTMTestMasterId;
+                        dBTMBatchModel.DBTMBatchTestList.Add(dbtmTestApiModel);
                     }
                 }
                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
@@ -207,8 +170,8 @@ namespace Coditech.API.Service
         {
             long entityIds = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
             //GetGeneralAssignmentList
-            List<DBTMTestApiModel> assignmentList= new List<DBTMTestApiModel>();
-                 PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            List<DBTMTestApiModel> assignmentList = new List<DBTMTestApiModel>();
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMTestApiModel> objStoredProc = new CoditechViewRepository<DBTMTestApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@EntityId", entityIds, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
@@ -244,6 +207,31 @@ namespace Coditech.API.Service
             return dBTMTestApiModel;
         }
 
+        //Get Dashboard Details
+        public DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId)
+        {
+            if (userMasterId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "UserMasterId"));
+
+            DBTMMobileDashboardModel dBTMDashboardModel = new DBTMMobileDashboardModel();
+            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.GetParameter("@UserId", userMasterId, ParameterDirection.Input, SqlDbType.BigInt);
+            DataSet dataset = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMMobileTrainerDashboard");
+
+            dataset.Tables[0].TableName = "TraineeDetails";
+            ConvertDataTableToList dataTable = new ConvertDataTableToList();
+            dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+
+            dataset.Tables[1].TableName = "TopActivityPerformed";
+            dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
+            dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
+
+            dataset.Tables[2].TableName = "DueTodayAssignments";
+            dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
+            dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
+
+            return dBTMDashboardModel;
+        }
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)
             => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
     }

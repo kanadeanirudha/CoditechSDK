@@ -6,9 +6,9 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-using Newtonsoft.Json;
 namespace Coditech.API.Service
 {
     public class DBTMUserService : UserService, IDBTMUserService
@@ -18,6 +18,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         protected readonly ICoditechRepository<DBTMDeviceMaster> _dBTMDeviceMasterRepository;
         protected readonly ICoditechRepository<DBTMDeviceRegistrationDetails> _dBTMDeviceRegistrationDetailsRepository;
@@ -32,6 +33,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceRegistrationDetailsRepository = new CoditechRepository<DBTMDeviceRegistrationDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMSubscriptionPlanRepository = new CoditechRepository<DBTMSubscriptionPlan>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -53,7 +55,7 @@ namespace Coditech.API.Service
                 if (model.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
-                    dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y=>y.GeneralTrainerMasterId)?.FirstOrDefault();
+                    dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
                     model.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
                 }
             }
@@ -82,11 +84,11 @@ namespace Coditech.API.Service
             }
         }
 
-        protected override void InsertPersonDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList)
+        protected override void InsertPersonDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
             if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                InsertDBTMTraineeDetails(generalPersonModel, settingMasterList);
+                InsertDBTMTraineeDetails(generalPersonModel, settingMasterList, customData);
             }
             else
             {
@@ -115,15 +117,20 @@ namespace Coditech.API.Service
                 return base.ValidateUserwiseGeneralPerson(generalPersonModel, ref errorMessage, ref generalEnumaratorId);
             }
         }
-        private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList)
+        private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
+            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = !string.IsNullOrEmpty(customData) ? JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customData) : new DBTMCustomNewRegistrationModel();
             generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
             DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails()
             {
                 CentreCode = generalPersonModel.SelectedCentreCode,
                 PersonId = generalPersonModel.PersonId,
                 PersonCode = generalPersonModel.PersonCode,
-                UserType = generalPersonModel.UserType
+                UserType = generalPersonModel.UserType,
+                Height = dBTMCustomNewRegistrationModel.height,
+                Weight = dBTMCustomNewRegistrationModel.weight,
+                IsActive = true,
+                SpecializationEnumId = dBTMCustomNewRegistrationModel.SpecializationEnumId
             };
             dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Insert(dBTMTraineeDetails);
 
@@ -164,9 +171,12 @@ namespace Coditech.API.Service
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             string userType = generalPersonModel.UserType;
             DBTMDeviceMaster dBTMDeviceMaster = null;
+            string customerData = generalPersonModel.Custom1;
+            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customerData);
+            generalPersonModel.Custom1 = null;
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == generalPersonModel.Custom1)?.FirstOrDefault();
+                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode)?.FirstOrDefault();
 
                 if (IsNull(joiningCodeDetails))
                     throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
@@ -188,13 +198,15 @@ namespace Coditech.API.Service
 
                 generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
+
+
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
             if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
             }
 
-            generalPersonModel = InsertPersonInformation(generalPersonModel);
+            generalPersonModel = base.InsertPersonInformation(generalPersonModel, customerData);
 
             if (!generalPersonModel.HasError)
             {
@@ -242,6 +254,23 @@ namespace Coditech.API.Service
                         dBTMSubscriptionPlanAssociatedToUser = _dBTMSubscriptionPlanAssociatedToUserRepository.Insert(dBTMSubscriptionPlanAssociatedToUser);
                     }
                 }
+                List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = null;
+                if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count > 0)
+                {
+                    generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
+                    foreach (string generalTrainerMasterId in dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds)
+                    {
+                        generalTraineeAssociatedToTrainerList.Add(new GeneralTraineeAssociatedToTrainer
+                        {
+                            GeneralTrainerMasterId = Convert.ToInt64(generalTrainerMasterId),
+                            EntityId = generalPersonModel.EntityId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                            IsCurrentTrainer = true
+                        });
+                    }
+                    _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
+                }
+
             }
             return generalPersonModel;
         }

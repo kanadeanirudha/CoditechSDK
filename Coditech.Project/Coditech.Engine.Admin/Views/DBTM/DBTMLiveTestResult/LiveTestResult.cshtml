@@ -1,82 +1,93 @@
 ﻿@using System.Data
-@model LiveTestResultDashboardViewModel;
+@model LiveTestResultDashboardViewModel
 @{
     Layout = null;
     ViewBag.Title = "Live Test Result";
 }
-<style>
-    .table-header-light {
-        background-color: #f8f9fa;
-        color: #212529;
-    }
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="30" />
+    <title>@ViewBag.Title</title>
 
-    .card-title-black {
-        color: #000 !important;
-    }
-</style>
-<!-- App css -->
-<link href="~/css/layout/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="~/css/layout/app.min.css" rel="stylesheet" type="text/css">
-<link href="~/css/layout/site.css" rel="stylesheet" />
-<div class="page-content">
-    <div class="container-fluid">
-        <!-- Page-Title -->
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="page-title-box">
-                    <div class="row">
-                        <div class="col"></div>
+    <!-- App css -->
+    <link href="~/css/layout/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/app.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/layout/site.css" rel="stylesheet" />
+
+    <style>
+        .table-header-light {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .card-title-black {
+            color: #000 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-content">
+        <div class="container-fluid">
+            <!-- Page-Title -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="page-title-box">
+                        <div class="row">
+                            <div class="col"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="container-fluid mt-4">
-            <h2 class="text-center text-primary fw-bold mb-4">Live Test Results</h2>
+            <div class="container-fluid mt-4">
+                <h2 class="text-center text-primary fw-bold mb-4">Live Test Results</h2>
 
-            <!-- Row 1 -->
-            <div class="row g-4 justify-content-center">
-                @if (Model?.DataTableList?.Count > 0)
-                {
-                    @foreach (DataTable dataTable in Model?.DataTableList)
+                <!-- Row 1 -->
+                <div class="row g-4 justify-content-center">
+                    @if (Model?.DataTableList?.Count > 0)
                     {
-                        <div class="col-md-6 col-lg-12">
-                            <div class="card shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title text-center card-title-black">
-                                        @{
-                                            string activityName = dataTable.AsEnumerable().Select(row => row.Field<string>("Activity Name")).Distinct().FirstOrDefault();
-                                        }
-                                        @activityName
-                                    </h5>
-                                    <table class="table table-bordered table-striped text-center">
-                                        <thead class="table-header-light">
-                                            <tr>
-                                                @foreach (DataColumn datatableColumn in dataTable.Columns)
-                                                {
-                                                    <th>@datatableColumn</th>
-                                                }
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (DataRow row in dataTable.Rows)
-                                            {
+                        @foreach (DataTable dataTable in Model?.DataTableList)
+                        {
+                            <div class="col-md-6 col-lg-12">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-center card-title-black">
+                                            @{
+                                                string activityName = dataTable.AsEnumerable().Select(row => row.Field<string>("Activity Name")).Distinct().FirstOrDefault();
+                                            }
+                                            @activityName
+                                        </h5>
+                                        <table class="table table-bordered table-striped text-center">
+                                            <thead class="table-header-light">
                                                 <tr>
-                                                    @foreach (DataColumn col in dataTable.Columns)
+                                                    @foreach (DataColumn datatableColumn in dataTable.Columns)
                                                     {
-                                                        <td>@row[col]</td>
+                                                        <th>@datatableColumn</th>
                                                     }
                                                 </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (DataRow row in dataTable.Rows)
+                                                {
+                                                    <tr>
+                                                        @foreach (DataColumn col in dataTable.Columns)
+                                                        {
+                                                            <td>@row[col]</td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     }
-                }
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+</body>
+</html>

@@ -13,12 +13,12 @@ namespace Coditech.Admin.ViewModel
 
         [Required]
         [MaxLength(200)]
-        [Display(Name = "Test Name")]
+        [Display(Name = "Activity Name")]
         public string TestName { get; set; }
 
         [Required]
         [MaxLength(50)]
-        [Display(Name = "Test Code")]
+        [Display(Name = "Activity Code")]
         public string TestCode { get; set; }
 
         [Display(Name = "Is Active")]
@@ -41,10 +41,10 @@ namespace Coditech.Admin.ViewModel
         public bool IsLapDistanceChange { get; set; }
         [Display(Name = "Is Multi Test")]
         public bool IsMultiTest { get; set; }
-        [Display(Name = "Test Instructions")]
+        [Display(Name = "Activity Instructions")]
         public string TestInstructions { get; set; }
         [Required]
-        [Display(Name = "Test Media")]
+        [Display(Name = "Activity Media")]
         public long TestMediaId { get; set; }
         public string TestMediaPath { get; set; }
         public string TestMediaFileName { get; set; }

@@ -56,8 +56,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("MobileNumber", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("PersonCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-
-            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, dataTableModel.SortBy = IsNotNull(dataTableModel.SortByColumn) ? "desc" : string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
 
             DBTMTraineeDetailsListResponse response = _dBTMTraineeDetailsClient.List(dataTableModel.SelectedCentreCode, Convert.ToInt64(string.IsNullOrEmpty(dataTableModel.SelectedParameter1) ? "0" : dataTableModel.SelectedParameter1), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMTraineeDetailsListModel dBTMTraineeDetailsList = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
@@ -491,7 +490,7 @@ namespace Coditech.Admin.Agents
 
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Name",
+                ColumnName = "Activity Name",
                 ColumnCode = "TestName",
                 IsSortable = true,
             });

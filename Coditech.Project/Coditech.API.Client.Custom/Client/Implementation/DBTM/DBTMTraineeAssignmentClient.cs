@@ -4,11 +4,8 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
-
 using Newtonsoft.Json;
-
 using System.Net;
-
 namespace Coditech.API.Client
 {
     public class DBTMTraineeAssignmentClient : BaseClient, IDBTMTraineeAssignmentClient
@@ -19,14 +16,14 @@ namespace Coditech.API.Client
             dBTMTraineeAssignmentEndpoint = new DBTMTraineeAssignmentEndpoint();
         }
 
-        public virtual DBTMTraineeAssignmentListResponse List(long generalTrainerMasterId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public virtual DBTMTraineeAssignmentListResponse List(long generalTrainerMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await ListAsync(generalTrainerMasterId,expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await ListAsync(generalTrainerMasterId, expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeAssignmentListResponse> ListAsync(long generalTrainerMasterId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeAssignmentListResponse> ListAsync(long generalTrainerMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTraineeAssignmentEndpoint.ListAsync(generalTrainerMasterId,expand, filter, sort, pageIndex, pageSize);
+            string endpoint = dBTMTraineeAssignmentEndpoint.ListAsync(generalTrainerMasterId, expand, filter, sort, pageIndex, pageSize);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
@@ -356,15 +353,15 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTraineeAssignmentResponse SendAssignmentReminder(long dBTMTraineeAssignmentId)
+        public virtual DBTMTraineeAssignmentResponse SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
-            return Task.Run(async () => await SendAssignmentReminderAsync(dBTMTraineeAssignmentId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await SendAssignmentReminderAsync(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeAssignmentResponse> SendAssignmentReminderAsync(long dBTMTraineeAssignmentId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeAssignmentResponse> SendAssignmentReminderAsync(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId, CancellationToken cancellationToken)
         {
 
-            string endpoint = dBTMTraineeAssignmentEndpoint.SendAssignmentReminderAsync(dBTMTraineeAssignmentId);
+            string endpoint = dBTMTraineeAssignmentEndpoint.SendAssignmentReminderAsync(dBTMTraineeAssignmentId, dBTMTraineeAssignmentUserId);
             HttpResponseMessage response = null;
             bool disposeResponse = true;
             try

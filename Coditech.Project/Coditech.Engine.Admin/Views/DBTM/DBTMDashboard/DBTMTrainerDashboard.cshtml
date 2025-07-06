@@ -4,6 +4,79 @@
 @model DBTMDashboardViewModel
 @{
     ViewBag.Title = "Dashboard";
+    string[] xLabels = new[] { "Day1", "Day2", "Day3", "Day4", "Day5", "Day6", "Day7" };
+
+    var activityData = new Dictionary<string, List<int>>
+    {
+        { "Lap1", new List<int> { 60, 62, 59, 61, 58, 60, 63 } },
+        { "Lap2", new List<int> { 70, 72, 69, 75, 73, 70, 68 } },
+        { "Lap3", new List<int> { 80, 82, 79, 81, 78, 80, 83 } }
+    };
+
+    var colors = new[]
+    {
+        "rgba(255,99,132,1)",
+        "rgba(54,162,235,1)",
+        "rgba(255,206,86,1)"
+    };
+
+    var datasets = new List<LineGraphsDatasetViewModel>();
+    int index = 0;
+    foreach (var activity in activityData)
+    {
+        datasets.Add(new LineGraphsDatasetViewModel
+                {
+                    Label = activity.Key,
+                    Data = JsonConvert.SerializeObject(activity.Value),
+                    Color = colors[index++ % colors.Length]
+                });
+    }
+
+    var lineChart = new LineGraphsViewModel
+            {
+                LineChartId = "ActivityLineChart",
+                Title = "300 Yard Activity (Last 7 Days)",
+                XAxisLabel = "Days",
+                YAxisLabel = "Laps",
+                XValues = JsonConvert.SerializeObject(xLabels),
+                Datasets = datasets
+            };
+
+    //Bar Graphs
+    string[] XValues = { "25/6/25", "26/6/25", "27/6/25", "28/6/25", "29/6/25", "30/6/25", "1/7/25" };
+    int[] YValues = { 65, 40, 90, 81, 56, 55, 40 };
+
+    BarChartViewModel avgLapChart = new BarChartViewModel()
+            {
+                BarChartId = "AvgLapChart",
+                XValues = JsonConvert.SerializeObject(XValues),
+                YValues = JsonConvert.SerializeObject(YValues),
+                Title = "Avg Lap",
+                XAxisLabel = "Days",
+                YAxisLabel = "Avg Laps",
+                BackgroundColor = JsonConvert.SerializeObject(new[] {
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 99, 132, 0.7)"
+    })
+            };
+    //Time Spent Bar Graphs
+    string fromDate = "01/07/2025";
+    string toDate = "03/07/2025";
+    Model.TimeSpentGraph = new TimeSpentBarGraphsViewModel
+            {
+                XValues = new[] { "Ram", "Nikita", "Amit" },
+                YValues = new[] { 120, 110, 150 },
+                BackgroundColor = new[] {
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(54, 162, 235, 0.7)",
+        "rgba(255, 206, 86, 0.7)"
+    }
+            };
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -88,9 +161,9 @@
                             <table class="table mb-0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="border-top-0">Test Name</th>
+                                        <th class="border-top-0">Activity Name</th>
                                         <th class="border-top-0">Top Activity</th>
-                                        <th class="border-top-0">Test Code</th>
+                                        <th class="border-top-0">Activity Code</th>
                                     </tr><!--end tr-->
                                 </thead>
                                 <tbody>
@@ -123,23 +196,90 @@
                             <table class="table mb-0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="border-top-0">Name</th>
-                                        <th class="border-top-0">Test Name</th>
+                                        <th class="border-top-0">Trainee</th>
+                                        <th class="border-top-0">Activity</th>
+                                        <th class="border-top-0">Assignment Date</th>
+                                        <th class="border-top-0">Assignment Time</th>
+                                        <th class="border-top-0">Reminder</th>
                                     </tr><!--end tr-->
                                 </thead>
                                 <tbody>
-                                    @*  @foreach (var item in Model?.DBTMTrainerDashboardModel?.DueTodayAssignments) *@
-                                    <tr>
-                                        <td><a href="/DBTMTraineeAssignment/Edit?dBTMTraineeAssignmentId=DBTMTraineeAssignmentId" class="text-primary">Nikita G</a></td>
-                                        <td>TestName</td>
-                                    </tr>
+                                    @foreach (var item in Model?.DueTodayAssignments)
+                                    {
+                                        <tr>
+                                            <td>@item.FirstName @item.LastName</td>
+                                            <td>@item.TestName</td>
+                                            <td>@item.AssignmentDate.ToCoditechDateFormat()</td>
+                                            <td>@item.AssignmentTime.ToCoditechTimeFormat()</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-soft-danger btn-circle send-reminder-btn"
+                                                        data-assignment-id="@item.DBTMTraineeAssignmentId"
+                                                        data-user-id="@item.DBTMTraineeAssignmentUserId"
+                                                        title="Send Reminder">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </button>
+
+                                            </td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table> <!--end table-->
                         </div><!--end /div-->
                     </div><!--end card-body-->
                 </div><!--end card-->
             </div>
-            <div class="col-md-6 col-lg-9">
+           @*  <div class="col-md-12">
+                <div class="card report-card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title">300 Yard Activity (Last 7 Days)</h4>
+                    </div>
+                    <div class="card-body">
+                        @Html.Partial("~/Views/Shared/ActivityGraphs/_LineGraphs.cshtml", lineChart)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card report-card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title">Avg Lap</h4>
+                    </div>
+                    <div class="card-body">
+                        @Html.Partial("~/Views/Shared/ActivityGraphs/_BarGraphs.cshtml", avgLapChart)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card report-card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title">Time Spent by Person</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                @Html.LabelFor(x => x.TimeSpentGraph.FromDate, new { @class = "form-label" })
+                                @Html.TextBoxFor(x => x.TimeSpentGraph.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control datepicker", placeholder = "From Date" })
+                            </div>
+                            <div class="col-md-3">
+                                @Html.LabelFor(x => x.TimeSpentGraph.ToDate, new { @class = "form-label" })
+                                @Html.TextBoxFor(x => x.TimeSpentGraph.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control datepicker", placeholder = "To Date" })
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button id="filterGraphBtn" class="btn btn-primary">Show</button>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.TimeSpentGraph.FromDate) && !string.IsNullOrEmpty(Model.TimeSpentGraph.ToDate))
+                        {
+                            <div class="mb-2">
+                                <h6>Showing data from <strong>@Model.TimeSpentGraph.FromDate</strong> to <strong>@Model.TimeSpentGraph.ToDate</strong></h6>
+                            </div>
+                        }
+                        <div id="timeSpentChartContainer">
+                            @Html.Partial("~/Views/Shared/ActivityGraphs/_TimeSpentBarGraphs.cshtml", Model.TimeSpentGraph)
+                        </div>
+
+                    </div>
+                </div> *@
+                @*  <div class="col-md-6 col-lg-9">
                 <div class="card report-card">
                     <div class="card-header">
                         <div class="row align-items-center">
@@ -158,7 +298,6 @@
                                     </tr><!--end tr-->
                                 </thead>
                                 <tbody>
-                                    @* @foreach (var item in Model?.DBTMTrainerDashboardModel?.Top3Trainee) *@
                                     <tr>
                                         <td><a href="/DBTMTraineeDetails/UpdateDBTMTraineePersonalDetails?dBTMTraineeDetailId=DBTMTraineeDetailId&personId=PersonId" class="text-primary">Samruddhi Jadhav</a></td>
                                         <td>MobileNumber</td>
@@ -168,23 +307,19 @@
                         </div><!--end /div-->
                     </div><!--end card-body-->
                 </div><!--end card-->
+            </div> *@
             </div>
-        </div>
-    </div><!-- container -->
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        </div><!-- container -->
+    </div>
+    @section scripts {
+        <!-- end page content -->
+        <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
+        <script>
+            $(function () {
+                $(".datepicker").datepicker({
+                    format: "dd/mm/yyyy",
+                    autoclose: true
+                });
+            });
+        </script>
+    }

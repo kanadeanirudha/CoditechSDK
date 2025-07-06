@@ -109,6 +109,7 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.IsActive = dBTMTraineeDetailsModel.IsActive;
             dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
             dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
+            dBTMTraineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
 
             isUpdated = _dBTMTraineeDetailsRepository.Update(dBTMTraineeDetails);
             if (isUpdated)
@@ -287,8 +288,8 @@ namespace Coditech.API.Service
                 case "MinLap":
                     newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
-                case "Power":
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power").ParameterValue} {Unit(calculationCode)}";
+                case "Power":                  
+                    newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power")?.ParameterValue ?? 0)} {Unit(calculationCode)}";
                     break;
                 default:
                     newRow[calculationName] = "N/A";

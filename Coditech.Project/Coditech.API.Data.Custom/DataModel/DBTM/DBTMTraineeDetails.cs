@@ -16,8 +16,9 @@ namespace Coditech.API.Data
         public int? GroupEnumId { get; set; }
         public int? SourceEnumId { get; set; }
         public bool IsActive { get; set; }
-        public decimal Height { get; set; }
         public decimal Weight { get; set; }
+        public decimal Height { get; set; }
+        public int? SpecializationEnumId { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

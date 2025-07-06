@@ -23,27 +23,39 @@ namespace Coditech.Admin.Controllers
 
         public virtual ActionResult List(DataTableViewModel dataTableViewModel)
         {
+            if (string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
+            {
+                dataTableViewModel.SelectedParameter1 = "0";
+            }
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
             GetListOnlyIfSingleCentre(dataTableViewModel);
-           if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode))
+
+            if (!string.IsNullOrEmpty(dataTableViewModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
-                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
-                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
                 }
                 else
+                {
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel);
+                }
             }
+
             list.SelectedCentreCode = dataTableViewModel.SelectedCentreCode;
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableViewModel.SelectedParameter1;
+
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeDetails/_List.cshtml", list);
             }
-            return View($"~/Views/DBTM/DBTMTraineeDetails/List.cshtml", list);
+
+            return View("~/Views/DBTM/DBTMTraineeDetails/List.cshtml", list);
         }
+
 
         public ActionResult ActiveMemberList(DataTableViewModel dataTableViewModel)
         {
@@ -123,10 +135,11 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult UpdateDBTMTraineePersonalDetails(long dBTMTraineeDetailId, long personId)
+        public virtual ActionResult UpdateDBTMTraineePersonalDetails(long dBTMTraineeDetailId, long personId, string SelectedParameter2)
         {
             DBTMTraineeDetailsCreateEditViewModel dBTMTraineeDetailsCreateEditViewModel = _dBTMTraineeDetailsAgent.GetDBTMTraineePersonalDetails(dBTMTraineeDetailId, personId);
             dBTMTraineeDetailsCreateEditViewModel.UserType = UserTypeEnum.Trainee.ToString();
+            dBTMTraineeDetailsCreateEditViewModel.SelectedParameter2 = SelectedParameter2;
             return ActionView(createEditTraineeDetails, dBTMTraineeDetailsCreateEditViewModel);
         }
 
@@ -187,12 +200,12 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult GetAssociatedTrainerList(DataTableViewModel dataTableViewModel)
         {
             GeneralTraineeAssociatedToTrainerListViewModel list = _dBTMTraineeDetailsAgent.GetAssociatedTrainerList(Convert.ToInt64(dataTableViewModel.SelectedParameter1), Convert.ToInt64(dataTableViewModel.SelectedParameter2), dataTableViewModel);
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableViewModel.SelectedParameter2;
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/_AssociatedTrainerList.cshtml", list);
             }
-            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
-            list.SelectedParameter2 = dataTableViewModel.SelectedParameter2;
 
             return View($"~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/AssociatedTrainerList.cshtml", list);
         }
@@ -286,7 +299,7 @@ namespace Coditech.Admin.Controllers
             {
                 return PartialView("~/Views/DBTM/DBTMActivities/_List.cshtml", list);
             }
-            list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableModel.SelectedParameter2;
 
             return View($"~/Views/DBTM/DBTMActivities/List.cshtml", list);
         }
@@ -300,6 +313,7 @@ namespace Coditech.Admin.Controllers
                 return PartialView("~/Views/DBTM/DBTMActivities/_DBTMActivitiesDetailsList.cshtml", list);
             }
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableModel.SelectedParameter2;
 
             return View($"~/Views/DBTM/DBTMActivities/DBTMActivitiesDetailsList.cshtml", list);
         }
@@ -318,5 +332,15 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
         #endregion
+
+        public virtual ActionResult Cancel(string SelectedCentreCode, string GeneralTrainerMasterId)
+        {
+            DataTableViewModel dataTableViewModel = new DataTableViewModel()
+            {
+                SelectedCentreCode = SelectedCentreCode,
+                SelectedParameter1 = GeneralTrainerMasterId
+            };
+            return RedirectToAction("List", dataTableViewModel);
+        }
     }
 }

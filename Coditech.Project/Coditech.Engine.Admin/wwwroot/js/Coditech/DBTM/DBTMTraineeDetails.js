@@ -75,29 +75,25 @@
     },
 
     GetDBTMTrainerListByGeneralTrainerMasterId: function (listType) {
-        $('#DataTables_SearchById').val("")
-        if ($("#SelectedCentreCode").val() == "") {
+        $('#DataTables_SearchById').val("");
+
+        var centreCode = $("#SelectedCentreCode").val();
+        var trainerId = $("#SelectedParameter1").val();
+
+        if (!centreCode) {
             CoditechNotification.DisplayNotificationMessage("Please select centre.", "error");
+            return;
         }
-        else if ($("#SelectedParameter1").val() == "") {
+        if (trainerId === null || trainerId === "") {
             CoditechNotification.DisplayNotificationMessage("Please select trainer.", "error");
+            return;
         }
-        else if (listType == "Active") {
+        if (listType === "Active") {
             CoditechDataTable.LoadList("DBTMTraineeDetails", "ActiveMemberList");
-        }
-        else if (listType == "InActive") {
+        } else if (listType === "InActive") {
             CoditechDataTable.LoadList("DBTMTraineeDetails", "InActiveMemberList");
-        }
-        else {
+        } else {
             CoditechDataTable.LoadList("DBTMTraineeDetails", "List");
         }
     },
 }
-
-
-
-
-
-
-
-

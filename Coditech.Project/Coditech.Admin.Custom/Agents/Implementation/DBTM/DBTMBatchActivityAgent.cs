@@ -67,7 +67,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("TestName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
 
-            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, dataTableModel.SortBy = IsNotNull(dataTableModel.SortByColumn) ? "desc" : string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
 
             DBTMBatchActivityListResponse response = _dBTMBatchActivityClient.GetDBTMBatchActivityList(generalBatchMasterId, true, null, filters, sortlist, dataTableModel.PageIndex, int.MaxValue);
             DBTMBatchActivityListModel associatedTrainerList = new DBTMBatchActivityListModel { DBTMBatchActivityList = response?.DBTMBatchActivityList };
@@ -161,7 +161,7 @@ namespace Coditech.Admin.Agents
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Name",
+                ColumnName = "Activity Name",
                 ColumnCode = "TestName",
                 IsSortable = true,
             });

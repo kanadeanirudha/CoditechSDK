@@ -1,5 +1,7 @@
 ﻿using Coditech.Common.Helper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMNewRegistrationViewModel : BaseViewModel
@@ -100,5 +102,26 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public int TrainerSpecializationEnumId { get; set; }
         public string UserType { get; set; }
+        [Required]
+        [RegularExpression(@"^\d{1,3}(\.\d{1,3})?$", ErrorMessage = "Weight must be less than 999")]
+        [Display(Name = "Weight(kg)")]
+        public decimal Weight { get; set; }
+        [Required]
+        [RegularExpression(@"^\d{1,3}?$", ErrorMessage = "Height must be less than 999.")]
+        [Display(Name = "Height(cm)")]
+        public decimal Height { get; set; }
+        [Display(Name = "Trainer")]
+        public long GeneralTrainerMasterId { get; set; }
+        [Required]
+        public string JoiningCode { get; set; }
+        public List<SelectListItem> AllTrainerList { get; set; }
+        [Display(Name = "Trainer")]
+        public List<string> SelectedTrainer { get; set; }
+        [Display(Name = "Date Of Birth")]
+        [Required]
+        public DateTime? DateOfBirth { get; set; }
+        [Display(Name = "Specialization")]
+        public string Specialization { get; set; }
+        public int? SpecializationEnumId { get; set; }
     }
 }
