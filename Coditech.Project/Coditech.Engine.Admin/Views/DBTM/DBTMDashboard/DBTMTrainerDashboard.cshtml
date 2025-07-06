@@ -4,7 +4,7 @@
 @model DBTMDashboardViewModel
 @{
     ViewBag.Title = "Dashboard";
-    string[] xLabels = new[] { "Day1", "Day2", "Day3", "Day4", "Day5", "Day6", "Day7" };
+    string[] xLabels = new[] { "30/6/25", "1/7/25", "2/7/25", "3/7/25", "4/7/25", "5/7/25", "6/7/25" };
 
     var activityData = new Dictionary<string, List<int>>
     {
@@ -35,9 +35,9 @@
     var lineChart = new LineGraphsViewModel
             {
                 LineChartId = "ActivityLineChart",
-                Title = "300 Yard Activity (Last 7 Days)",
-                XAxisLabel = "Days",
-                YAxisLabel = "Laps",
+                Title = "300 Yard Activity (Last 15 Days)",
+                XAxisLabel = "Dates",
+                YAxisLabel = "Laps (in seconds)",
                 XValues = JsonConvert.SerializeObject(xLabels),
                 Datasets = datasets
             };
@@ -51,9 +51,9 @@
                 BarChartId = "AvgLapChart",
                 XValues = JsonConvert.SerializeObject(XValues),
                 YValues = JsonConvert.SerializeObject(YValues),
-                Title = "Avg Lap",
-                XAxisLabel = "Days",
-                YAxisLabel = "Avg Laps",
+                Title = "Average Velocity Lap ",
+                XAxisLabel = "Dates",
+                YAxisLabel = "Average Lap time (in seconds)",
                 BackgroundColor = JsonConvert.SerializeObject(new[] {
         "rgba(255, 99, 132, 0.7)",
         "rgba(255, 99, 132, 0.7)",
@@ -69,8 +69,10 @@
     string toDate = "03/07/2025";
     Model.TimeSpentGraph = new TimeSpentBarGraphsViewModel
             {
-                XValues = new[] { "Ram", "Nikita", "Amit" },
+                XValues = new[] { "Nikita", "Ram", "Amit" },
                 YValues = new[] { 120, 110, 150 },
+                XAxisLabel = "Trainees",
+                YAxisLabel = "Average Lap Time (in seconds)",
                 BackgroundColor = new[] {
         "rgba(255, 99, 132, 0.7)",
         "rgba(54, 162, 235, 0.7)",
@@ -228,10 +230,10 @@
                     </div><!--end card-body-->
                 </div><!--end card-->
             </div>
-           @*  <div class="col-md-12">
+            <div class="col-md-12">
                 <div class="card report-card mb-4">
                     <div class="card-header">
-                        <h4 class="card-title">300 Yard Activity (Last 7 Days)</h4>
+                        <h4 class="card-title">300 Yard Activity (Last 15 Days)</h4>
                     </div>
                     <div class="card-body">
                         @Html.Partial("~/Views/Shared/ActivityGraphs/_LineGraphs.cshtml", lineChart)
@@ -241,7 +243,7 @@
             <div class="col-md-12">
                 <div class="card report-card mb-4">
                     <div class="card-header">
-                        <h4 class="card-title">Avg Lap</h4>
+                        <h4 class="card-title">Average Velocity Lap</h4>
                     </div>
                     <div class="card-body">
                         @Html.Partial("~/Views/Shared/ActivityGraphs/_BarGraphs.cshtml", avgLapChart)
@@ -251,14 +253,10 @@
             <div class="col-md-12">
                 <div class="card report-card mb-4">
                     <div class="card-header">
-                        <h4 class="card-title">Time Spent by Person</h4>
+                        <h4 class="card-title">Top Performer Overview</h4>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
-                            <div class="col-md-3">
-                                @Html.LabelFor(x => x.TimeSpentGraph.FromDate, new { @class = "form-label" })
-                                @Html.TextBoxFor(x => x.TimeSpentGraph.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control datepicker", placeholder = "From Date" })
-                            </div>
                             <div class="col-md-3">
                                 @Html.LabelFor(x => x.TimeSpentGraph.ToDate, new { @class = "form-label" })
                                 @Html.TextBoxFor(x => x.TimeSpentGraph.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control datepicker", placeholder = "To Date" })
@@ -267,18 +265,13 @@
                                 <button id="filterGraphBtn" class="btn btn-primary">Show</button>
                             </div>
                         </div>
-                        @if (!string.IsNullOrEmpty(Model.TimeSpentGraph.FromDate) && !string.IsNullOrEmpty(Model.TimeSpentGraph.ToDate))
-                        {
-                            <div class="mb-2">
-                                <h6>Showing data from <strong>@Model.TimeSpentGraph.FromDate</strong> to <strong>@Model.TimeSpentGraph.ToDate</strong></h6>
-                            </div>
-                        }
+
                         <div id="timeSpentChartContainer">
                             @Html.Partial("~/Views/Shared/ActivityGraphs/_TimeSpentBarGraphs.cshtml", Model.TimeSpentGraph)
                         </div>
 
                     </div>
-                </div> *@
+                </div>
                 @*  <div class="col-md-6 col-lg-9">
                 <div class="card report-card">
                     <div class="card-header">

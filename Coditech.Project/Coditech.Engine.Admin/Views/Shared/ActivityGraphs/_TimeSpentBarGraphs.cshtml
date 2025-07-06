@@ -11,7 +11,7 @@
         data: {
             labels: @Html.Raw(JsonConvert.SerializeObject(Model.XValues)),
             datasets: [{
-                label: 'Time Spent (minutes)',
+                label: 'Top Performer Comparison (Time in Seconds)',
                 data: @Html.Raw(JsonConvert.SerializeObject(Model.YValues)),
                 backgroundColor: @Html.Raw(JsonConvert.SerializeObject(Model.BackgroundColor)),
                 borderWidth: 1
@@ -24,13 +24,13 @@
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Time (minutes)'
+                       text: '@Model.YAxisLabel'
                     }
                 },
                 x: {
                     title: {
                         display: true,
-                        text: 'Persons'
+                        text: '@Model.XAxisLabel'
                     }
                 }
             }
