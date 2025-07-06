@@ -13,7 +13,9 @@
         DBTMDeviceStatus,
         DBTMDeviceSerialCodeByCentreCode,
         BatchWiseReports,
-        DBTMTraineeList
+        JoiningCodewiseGeneralTrainer,
+        DBTMTraineeList,
+        Specialization
     }
     public enum DashboardFormCustomEnum
     {

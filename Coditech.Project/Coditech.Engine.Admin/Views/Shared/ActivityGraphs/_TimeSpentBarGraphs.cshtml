@@ -1,0 +1,39 @@
+﻿@using Newtonsoft.Json
+@model TimeSpentBarGraphsViewModel
+
+<canvas id="TimeSpentChart" height="100"></canvas>
+
+<script>
+    var ctx = document.getElementById('TimeSpentChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(JsonConvert.SerializeObject(Model.XValues)),
+            datasets: [{
+                label: 'Time Spent (minutes)',
+                data: @Html.Raw(JsonConvert.SerializeObject(Model.YValues)),
+                backgroundColor: @Html.Raw(JsonConvert.SerializeObject(Model.BackgroundColor)),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Time (minutes)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Persons'
+                    }
+                }
+            }
+        }
+    });
+</script>

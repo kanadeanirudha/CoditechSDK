@@ -4,7 +4,6 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Newtonsoft.Json;
 using System.Net;
-
 namespace Coditech.API.Client
 {
     public class DBTMUserClient : BaseClient, IDBTMUserClient
