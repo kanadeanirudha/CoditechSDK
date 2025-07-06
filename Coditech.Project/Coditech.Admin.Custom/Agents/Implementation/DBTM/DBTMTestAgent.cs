@@ -37,6 +37,7 @@ namespace Coditech.Admin.Agents
             {
                 filters.Add("TestName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("TestCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("DBTMTestMasterId", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
@@ -159,6 +160,12 @@ namespace Coditech.Admin.Agents
         protected virtual List<DatatableColumns> BindColumns()
         {
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Device Activity Code",
+                ColumnCode = "DBTMTestMasterId",
+                IsSortable = true,
+            });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Test Name",
