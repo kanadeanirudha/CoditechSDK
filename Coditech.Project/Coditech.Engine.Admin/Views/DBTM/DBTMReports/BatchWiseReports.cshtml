@@ -18,13 +18,13 @@
                         </div>  <!--end row-->
                     </div>
                     <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-1">
-                                    <label>Batch List</label>
-                                </div>
-                                <div class="col-md-3">
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
-                                </div>
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>Batch List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
+                            </div>
                             <div class="col-md-1">
                                 <label>Activity List</label>
                             </div>
@@ -43,12 +43,12 @@
                             <div class="col-md-1">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
-                                <div class="col-md-1">
-                                    <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMBatchWiseReports()" />
-                                </div>
-                                <div id="DBTMBatchWiseReportsDivId">
-                                </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMBatchWiseReports()" />
                             </div>
+                            <div id="DBTMBatchWiseReportsDivId" class="mt-3">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -57,6 +57,11 @@
 </div>
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <script type="text/javascript">
         $(function () {
             $("#FromDate").datepicker({
@@ -77,7 +82,7 @@
                 maxDate: new Date(),
             });
         });
-        $(function () {
+           $(function () {
             $("#ToDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
@@ -95,6 +100,21 @@
                 },
                 maxDate: new Date(),
             });
+        });
+    </script>
+    <script>
+        $(document).on('ajaxComplete', function () {
+            if ($('#datatable').length > 0) {
+                if ($.fn.DataTable.isDataTable('#datatable')) {
+                    $('#datatable').DataTable().destroy();
+                }
+                $('#datatable').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true
+                });
+            }
         });
     </script>
 }
