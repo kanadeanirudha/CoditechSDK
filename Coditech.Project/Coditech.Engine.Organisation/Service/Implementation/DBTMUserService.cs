@@ -84,11 +84,11 @@ namespace Coditech.API.Service
             }
         }
 
-        protected override void InsertPersonDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList)
+        protected override void InsertPersonDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
             if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                InsertDBTMTraineeDetails(generalPersonModel, settingMasterList);
+                InsertDBTMTraineeDetails(generalPersonModel, settingMasterList, customData);
             }
             else
             {
@@ -117,15 +117,20 @@ namespace Coditech.API.Service
                 return base.ValidateUserwiseGeneralPerson(generalPersonModel, ref errorMessage, ref generalEnumaratorId);
             }
         }
-        private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList)
+        private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
+            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = !string.IsNullOrEmpty(customData) ? JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customData) : new DBTMCustomNewRegistrationModel();
             generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
             DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails()
             {
                 CentreCode = generalPersonModel.SelectedCentreCode,
                 PersonId = generalPersonModel.PersonId,
                 PersonCode = generalPersonModel.PersonCode,
-                UserType = generalPersonModel.UserType
+                UserType = generalPersonModel.UserType,
+                Height = dBTMCustomNewRegistrationModel.height,
+                Weight = dBTMCustomNewRegistrationModel.weight,
+                IsActive = true,
+                SpecializationEnumId = dBTMCustomNewRegistrationModel.SpecializationEnumId
             };
             dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Insert(dBTMTraineeDetails);
 
@@ -166,7 +171,8 @@ namespace Coditech.API.Service
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             string userType = generalPersonModel.UserType;
             DBTMDeviceMaster dBTMDeviceMaster = null;
-            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(generalPersonModel.Custom1);
+            string customerData = generalPersonModel.Custom1;
+            DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customerData);
             generalPersonModel.Custom1 = null;
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
@@ -192,7 +198,7 @@ namespace Coditech.API.Service
 
                 generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
-            
+
 
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
             if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))
@@ -200,7 +206,7 @@ namespace Coditech.API.Service
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
             }
 
-            generalPersonModel = InsertPersonInformation(generalPersonModel);
+            generalPersonModel = base.InsertPersonInformation(generalPersonModel, customerData);
 
             if (!generalPersonModel.HasError)
             {
@@ -248,33 +254,22 @@ namespace Coditech.API.Service
                         dBTMSubscriptionPlanAssociatedToUser = _dBTMSubscriptionPlanAssociatedToUserRepository.Insert(dBTMSubscriptionPlanAssociatedToUser);
                     }
                 }
-                // Insert into Trainee Details
-                long dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Insert(new DBTMTraineeDetails
+                List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = null;
+                if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count > 0)
                 {
-                    PersonId = generalPersonModel.PersonId,
-                    CentreCode = generalPersonModel.SelectedCentreCode,
-                    PersonCode = generalPersonModel.PersonCode,
-                    Height = dBTMCustomNewRegistrationModel.height,
-                    Weight = dBTMCustomNewRegistrationModel.weight,
-                    UserType = userType,
-                    IsActive = true,
-                    SpecializationEnumId = dBTMCustomNewRegistrationModel.SpecializationEnumId
-                }).DBTMTraineeDetailId;
-                List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
-                if (generalTraineeAssociatedToTrainerList.Count > 0)
-                {
+                    generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
                     foreach (string generalTrainerMasterId in dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds)
                     {
                         generalTraineeAssociatedToTrainerList.Add(new GeneralTraineeAssociatedToTrainer
                         {
                             GeneralTrainerMasterId = Convert.ToInt64(generalTrainerMasterId),
-                            EntityId = dBTMTraineeDetailId,
+                            EntityId = generalPersonModel.EntityId,
                             UserType = UserTypeEnum.Trainee.ToString(),
                             IsCurrentTrainer = true
                         });
                     }
+                    _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
                 }
-                _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
 
             }
             return generalPersonModel;

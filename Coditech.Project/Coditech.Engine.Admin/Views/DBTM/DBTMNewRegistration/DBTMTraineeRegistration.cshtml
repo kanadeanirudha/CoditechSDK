@@ -352,8 +352,9 @@
             });
         });
         function GetTrainerDropdownByJoiningCode() {
-            const joiningCode = document.getElementById('JoiningCode').value.trim();
-            if (joiningCode.length === 5) {
+            debugger;
+            const joiningCode = $("#JoiningCode").val();
+            if (joiningCode.length >= 5) {
                 CoditechCommon.ShowLodder();
                 const url = `/DBTMNewRegistration/TraineeRegistration?joiningCode=${encodeURIComponent(joiningCode)}`;
                 window.location.href = url;
