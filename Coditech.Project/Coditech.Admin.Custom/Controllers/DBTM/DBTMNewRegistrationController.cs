@@ -117,6 +117,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("DeviceSerialCode");
                 ModelState.Remove("CentreName");
                 ModelState.Remove("CentreCode");
+                ModelState.Remove("JoiningCode");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
