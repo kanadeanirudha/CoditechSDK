@@ -44,7 +44,7 @@ namespace Coditech.Admin.Agents
             if (dBTMTestMasterId > 0)
             {
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, userModel.UserMasterId);
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, userModel.EntityId, userModel.UserType, userModel.SelectedCentreCode);
                 listViewModel.DataTable = response.DataTable;
             }
             return listViewModel;

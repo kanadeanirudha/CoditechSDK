@@ -16,12 +16,12 @@ namespace Coditech.API.Client
 
         public virtual DBTMBatchWiseReportsListResponse BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            return Task.Run(async () => await BatchWiseReportsAsync(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await BatchWiseReportsAsync(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
         public virtual async Task<DBTMBatchWiseReportsListResponse> BatchWiseReportsAsync(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.BatchWiseReportsAsync(generalBatchMasterId,dBTMTestMasterId, FromDate,ToDate);
+            string endpoint = dBTMReportsEndpoint.BatchWiseReportsAsync(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
@@ -59,14 +59,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTestWiseReportsListResponse TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long UserMasterId)
+        public virtual DBTMTestWiseReportsListResponse TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
-            return Task.Run(async () => await TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId,FromDate,ToDate, UserMasterId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long UserMasterId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.TestWiseReportsAsync(dBTMTestMasterId,dBTMTraineeDetailId, FromDate,ToDate, UserMasterId);
+            string endpoint = dBTMReportsEndpoint.TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
