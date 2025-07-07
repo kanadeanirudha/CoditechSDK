@@ -1,6 +1,7 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
@@ -121,22 +122,27 @@ namespace Coditech.API.Service
             return listModel;
         }
 
-        public virtual DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long generalTrainerMasterId)
+        public virtual DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
             if (dBTMTestMasterId <= 0)
             {
                 return new DBTMReportsListModel();
+            }
+            if (userType == UserTypeEnum.Employee.ToString())
+            {
+                entityId = 0;
             }
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
-            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
-            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
-            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@FromDate", fromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", toDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 
             listModel.BindPageListModel(pageListModel);
@@ -173,7 +179,7 @@ namespace Coditech.API.Service
                         newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
                         newRow["Date"] = item.CreatedDate;
                         newRow["Weight"] = $"{item.Weight} {DBTMCustomHelper.Unit("Weight")}";
-                        newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}"; 
+                        newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
                         newRow["Activity Performed Time"] = item.TestPerformedTime;
                     }
 
@@ -185,7 +191,7 @@ namespace Coditech.API.Service
                             {
                                 listModel.DataTable.Columns.Add(item1.CalculationName, typeof(String));
                             }
-                           DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
+                            DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
                         }
                     }
                     string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;

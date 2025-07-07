@@ -5,15 +5,15 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMReportsEndpoint : BaseEndpoint
     {
-        public string BatchWiseReportsAsync(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate,DateTime ToDate)
+        public string BatchWiseReportsAsync(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/BatchWiseReports?generalBatchMasterId={generalBatchMasterId}&dBTMTestMasterId={dBTMTestMasterId}&FromDate={FromDate}&ToDate={ToDate}";
             return endpoint;
         }
 
-        public string TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, long generalTrainerMasterId)
+        public string TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/TestWiseReports?dBTMTestMasterId={dBTMTestMasterId}&dBTMTraineeDetailId={dBTMTraineeDetailId}&FromDate={FromDate}&ToDate={ToDate}&generalTrainerMasterId={generalTrainerMasterId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/TestWiseReports?dBTMTestMasterId={dBTMTestMasterId}&dBTMTraineeDetailId={dBTMTraineeDetailId}&fromDate={fromDate}&toDate={toDate}&entityId={entityId}&userType={userType}&centreCode={centreCode}";
             return endpoint;
         }
     }

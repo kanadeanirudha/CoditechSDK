@@ -38,6 +38,10 @@ namespace Coditech.Admin.Controllers
             {
                 ModelState.Remove("CentreCode");
                 ModelState.Remove("TrainerSpecializationEnumId");
+                ModelState.Remove("JoiningCode");
+                ModelState.Remove("Weight");
+                ModelState.Remove("Height");
+                ModelState.Remove("DateOfBirth");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.DBTMCentreRegistration(dBTMNewRegistrationViewModel);
@@ -113,6 +117,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("DeviceSerialCode");
                 ModelState.Remove("CentreName");
                 ModelState.Remove("CentreCode");
+                ModelState.Remove("JoiningCode");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
