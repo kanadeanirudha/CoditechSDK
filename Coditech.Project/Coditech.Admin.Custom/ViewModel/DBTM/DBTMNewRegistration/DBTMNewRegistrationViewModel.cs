@@ -1,7 +1,6 @@
 ﻿using Coditech.Common.Helper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMNewRegistrationViewModel : BaseViewModel
