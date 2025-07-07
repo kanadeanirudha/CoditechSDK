@@ -143,21 +143,25 @@ namespace Coditech.Admin.Controllers
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
+                if (!list.HasError)
                 {
-                    JoiningCode = joiningCode,
-                    AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                    dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
                     {
-                        DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                        Parameter = joiningCode
-                    }).DropdownList?.Where(x => x.Value != "")?.ToList()
-                   
-                };
-                if (dBTMNewRegistrationViewModel.AllTrainerList?.Count == 0)
-                {
-                    SetNotificationMessage(GetErrorNotificationMessage("Joinning Code Is Invalid Or Trainer is Not Associated to Joinning Code , Please Contact Your Administrator"));
+                        JoiningCode = joiningCode,
+                        AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                        {
+                            DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                            Parameter = joiningCode
+                        }).DropdownList?.Where(x => x.Value != "")?.ToList()
+
+                    };
                 }
-                    return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+                if (list.HasError)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
+                }
+                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
             }
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
