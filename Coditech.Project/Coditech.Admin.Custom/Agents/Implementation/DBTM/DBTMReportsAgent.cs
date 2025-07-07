@@ -43,13 +43,8 @@ namespace Coditech.Admin.Agents
             DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
             if (dBTMTestMasterId > 0)
             {
-                DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
                 UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
-                {
-                    dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).Custom3);
-                }
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId));
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, userModel.EntityId, userModel.UserType, userModel.SelectedCentreCode);
                 listViewModel.DataTable = response.DataTable;
             }
             return listViewModel;

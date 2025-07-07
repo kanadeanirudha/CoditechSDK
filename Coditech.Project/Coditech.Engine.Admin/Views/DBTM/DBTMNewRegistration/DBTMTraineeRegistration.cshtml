@@ -137,7 +137,7 @@
                    {
                        DropdownSelectedValue = Model.SpecializationEnumId.ToString(),
                        DropdownName = "SpecializationEnumId",
-                       GroupCode = DropdownCustomTypeEnum.Specialization.ToString(),
+                       GroupCode = DropdownCustomTypeEnum.TraineeSpecialization.ToString(),
                        IsRequired = true,
                    })
                                 @Html.ValidationMessageFor(x => x.SpecializationEnumId)
@@ -358,10 +358,14 @@
                 CoditechCommon.ShowLodder();
                 const url = `/DBTMNewRegistration/TraineeRegistration?joiningCode=${encodeURIComponent(joiningCode)}`;
                 window.location.href = url;
-            } else {
-                $(this).removeClass('is-valid').addClass('is-invalid');
-                $error.removeClass('d-none');
-                $btn.prop('disabled', true);
+            }
+            else {
+                if (joiningCode === '') {
+                    CoditechNotification.DisplayNotificationMessage('Joining code is required.', 'error');
+                }
+                else {
+                    CoditechNotification.DisplayNotificationMessage('Joining code must be at least 5 characters.', 'error');
+                }
             }
         }
 

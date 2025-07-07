@@ -38,6 +38,10 @@ namespace Coditech.Admin.Controllers
             {
                 ModelState.Remove("CentreCode");
                 ModelState.Remove("TrainerSpecializationEnumId");
+                ModelState.Remove("JoiningCode");
+                ModelState.Remove("Weight");
+                ModelState.Remove("Height");
+                ModelState.Remove("DateOfBirth");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.DBTMCentreRegistration(dBTMNewRegistrationViewModel);
@@ -113,6 +117,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("DeviceSerialCode");
                 ModelState.Remove("CentreName");
                 ModelState.Remove("CentreCode");
+                ModelState.Remove("JoiningCode");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
@@ -144,9 +149,13 @@ namespace Coditech.Admin.Controllers
                         DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
                         Parameter = joiningCode
                     }).DropdownList?.Where(x => x.Value != "")?.ToList()
-
+                   
                 };
-                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+                if (dBTMNewRegistrationViewModel.AllTrainerList?.Count == 0)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage("Joinning Code Is Invalid Or Trainer is Not Associated to Joinning Code , Please Contact Your Administrator"));
+                }
+                    return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
             }
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }

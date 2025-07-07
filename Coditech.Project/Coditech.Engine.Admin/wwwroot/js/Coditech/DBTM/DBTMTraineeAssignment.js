@@ -40,11 +40,15 @@
 
     GetDBTMTrainerListByGeneralTrainerMasterId: function () {
         $('#DataTables_SearchById').val("")
-        if ($("#SelectedCentreCode").val() == "") {
+        var centreCode = $("#SelectedCentreCode").val();
+        var trainerId = $("#SelectedParameter1").val();
+        if (!centreCode) {
             CoditechNotification.DisplayNotificationMessage("Please select centre.", "error");
+            return;
         }
-        else if ($("#SelectedParameter1").val() == "") {
+        if (trainerId === null || trainerId === "") {
             CoditechNotification.DisplayNotificationMessage("Please select trainer.", "error");
+            return;
         }
         else {
             CoditechDataTable.LoadList("DBTMTraineeAssignment", "List");
