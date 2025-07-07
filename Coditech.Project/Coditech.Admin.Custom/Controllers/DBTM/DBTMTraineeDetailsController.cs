@@ -4,8 +4,8 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Coditech.Admin.Controllers
 {
@@ -36,6 +36,8 @@ namespace Coditech.Admin.Controllers
 
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
+                    dataTableViewModel.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "") : "";
+
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
                 }
                 else
@@ -68,7 +70,10 @@ namespace Coditech.Admin.Controllers
 
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
-                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
+                    dataTableViewModel.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "") : "";
+                    if (!string.IsNullOrWhiteSpace(dataTableViewModel.SelectedParameter1))
+
+
                         list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
                 }
                 else

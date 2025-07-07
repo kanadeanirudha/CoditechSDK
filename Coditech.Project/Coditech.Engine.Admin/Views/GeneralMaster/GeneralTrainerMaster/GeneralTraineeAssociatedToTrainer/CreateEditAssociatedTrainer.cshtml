@@ -39,6 +39,8 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.GeneralTraineeAssociatedToTrainerId)
+                            @Html.HiddenFor(m => m.FirstName)
+                            @Html.HiddenFor(m => m.LastName)
                             @Html.HiddenFor(m => m.PersonId)
                             @Html.HiddenFor(x => x.EntityId)
                             <div class="row">

@@ -11,9 +11,7 @@ namespace Coditech.Admin.ViewModel
         public string XAxisLabel { get; set; } 
         public string YAxisLabel { get; set; } 
         public string[] BackgroundColor { get; set; }
-        [Display(Name = "From Date")]
-        public string FromDate { get; set; }
-        [Display(Name = "To Date")]
+        [Display(Name = "Date")]
         public string ToDate { get; set; }
     }
 }
