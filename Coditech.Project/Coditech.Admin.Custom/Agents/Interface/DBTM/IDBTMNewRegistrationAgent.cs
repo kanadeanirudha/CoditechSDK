@@ -25,5 +25,8 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns created model.</returns>
         DBTMNewRegistrationViewModel IndividualRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel);
         DBTMNewRegistrationViewModel TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel);
+        DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode);
+
+
     }
 }

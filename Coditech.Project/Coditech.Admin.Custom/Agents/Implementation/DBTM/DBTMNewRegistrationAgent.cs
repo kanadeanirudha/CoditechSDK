@@ -1,13 +1,14 @@
-﻿using Coditech.Admin.ViewModel;
+﻿using System.Diagnostics;
+using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
+using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.Admin.Agents
@@ -176,6 +177,42 @@ namespace Coditech.Admin.Agents
             {
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TraineeRegistration.ToString(), TraceLevel.Error);
                 return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, GeneralResources.UpdateErrorMessage);
+            }
+        }
+        //GetGeneralTrainerByJoiningCode
+        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode)
+        {
+            DBTMNewRegistrationListViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationListViewModel();
+            try
+            {
+
+                DBTMNewRegistrationListResponse response = _dBTMNewRegistrationClient.GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListModel dBTMNewRegistrationList = new DBTMNewRegistrationListModel { DBTMNewRegistrationList = response?.DBTMNewRegistrationList };
+                DBTMNewRegistrationListViewModel listViewModel = new DBTMNewRegistrationListViewModel();
+                listViewModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.DBTMNewRegistrationList?.ToViewModel<DBTMNewRegistrationViewModel>().ToList();
+                return listViewModel;
+            }
+
+            catch (CoditechException ex)
+            {
+                dBTMNewRegistrationViewModel.ErrorMessage = ex.Message;
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMNewRegistrationListViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, ex.ErrorMessage);
+
+
+                    case ErrorCodes.InvalidData:
+                        return (DBTMNewRegistrationListViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMNewRegistrationListViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, GeneralResources.ErrorCodeExists);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMCentreRegistration.ToString(), TraceLevel.Error);
+                return (DBTMNewRegistrationListViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, GeneralResources.UpdateErrorMessage);
             }
         }
         #endregion
