@@ -113,6 +113,7 @@ namespace Coditech.Admin.ViewModel
         public long GeneralTrainerMasterId { get; set; }
         public string JoiningCode { get; set; }
         public List<SelectListItem> AllTrainerList { get; set; }
+        [Required]
         [Display(Name = "Trainer")]
         public List<string> SelectedTrainer { get; set; }
         [Display(Name = "Date Of Birth")]
