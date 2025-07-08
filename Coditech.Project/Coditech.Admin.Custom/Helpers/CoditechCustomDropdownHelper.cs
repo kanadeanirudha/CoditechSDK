@@ -200,7 +200,8 @@ namespace Coditech.Admin.Helpers
             else
                 dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
 
-            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) &&
+                dropdownViewModel.Parameter.ToLower() != "0~false")
             {
                 int generalBatchMasterId = Convert.ToInt32(dropdownViewModel.Parameter.Split("~")[0]);
                 bool isAssociated = Convert.ToBoolean(dropdownViewModel.Parameter.Split("~")[1]);
