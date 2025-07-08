@@ -37,7 +37,7 @@ namespace Coditech.Admin.ViewModel
 
         [MaxLength(70)]
         [Required]
-        [EmailAddress(ErrorMessage = "Please enter a valid email add    ress.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         [Display(Name = "Email Address")]
         public string EmailId { get; set; }
         public string EmailIdToken { get; set; }
