@@ -121,7 +121,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public DateTime? DateOfBirth { get; set; }
         [Display(Name = "Specialization")]
-        public string Specialization { get; set; }
+        [Required]
         public int? SpecializationEnumId { get; set; }
     }
 }

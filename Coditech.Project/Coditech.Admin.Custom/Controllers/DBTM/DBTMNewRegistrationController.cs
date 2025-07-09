@@ -42,6 +42,8 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("Weight");
                 ModelState.Remove("Height");
                 ModelState.Remove("DateOfBirth");
+                ModelState.Remove("SpecializationEnumId");
+                ModelState.Remove("SelectedTrainer");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.DBTMCentreRegistration(dBTMNewRegistrationViewModel);
@@ -81,6 +83,8 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("CentreName");
                 ModelState.Remove("DateOfBirth");
                 ModelState.Remove("JoiningCode");
+                ModelState.Remove("SpecializationEnumId");
+                ModelState.Remove("SelectedTrainer");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
@@ -120,6 +124,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("CentreName");
                 ModelState.Remove("CentreCode");
                 ModelState.Remove("JoiningCode");
+                ModelState.Remove("SelectedTrainer");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
