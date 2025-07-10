@@ -133,27 +133,27 @@
 				<div class="col-lg-3">
 					<div class="mb-3">
 						@Html.LabelFor(x => x.DateOfBirth, new { @class = "form-label required" })
-						@Html.TextBoxFor(x => x.DateOfBirth, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", id = "DateOfBirth" })
+						@Html.TextBoxFor(x => x.DateOfBirth, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", id = "DateOfBirth", @readonly = "readonly" })
 						@Html.ValidationMessageFor(x => x.DateOfBirth)
 					</div>
 				</div>
 				<div class="col-lg-3">
 					<div class="mb-3">
 						@Html.LabelFor(x => x.Weight, new { @class = "form-label required" })
-						@Html.TextBoxFor(x => x.Weight, new { @class = "form-control" })
+						@Html.TextBoxFor(x => x.Weight, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()" })
 						@Html.ValidationMessageFor(x => x.Weight)
 					</div>
 				</div>
 				<div class="col-lg-3">
 					<div class="mb-3">
 						@Html.LabelFor(x => x.Height, new { @class = "form-label required" })
-						@Html.TextBoxFor(x => x.Height, new { @class = "form-control" })
+						@Html.TextBoxFor(x => x.Height, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()" })
 						@Html.ValidationMessageFor(x => x.Height)
 					</div>
 				</div>
 				<div class="col-lg-3">
 					<div class="mb-3">
-						@Html.LabelFor(x => x.Specialization, new { @class = "form-label required" })
+						@Html.LabelFor(x => x.SpecializationEnumId, new { @class = "form-label required" })
 						@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
 												{
 									DropdownSelectedValue = Model.SpecializationEnumId.ToString(),
