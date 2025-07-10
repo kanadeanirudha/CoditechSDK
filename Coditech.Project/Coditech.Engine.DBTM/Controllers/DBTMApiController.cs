@@ -20,7 +20,12 @@ namespace Coditech.Engine.DBTM.Controllers
             _dBTMApiService = dBTMApiService;
             _coditechLogging = coditechLogging;
         }
-
+        [Route("/dbtmapi/healthcheck")]
+        [HttpGet]
+        public IActionResult HealthCheck()
+        {
+            return Ok();
+        }
         [Route("/DBTMApi/InsertDeviceData")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
