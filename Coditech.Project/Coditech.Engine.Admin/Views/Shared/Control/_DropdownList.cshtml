@@ -10,11 +10,12 @@
     }
     var htmlAttributes = new Dictionary<string, object>
     {
-        { "class", "form-select select2-dropdown " + Model.ClassName },
+        { "class", "form-select js-select2 " + Model.ClassName },
         { "onchange", Model.ChangeEvent },
-        { "id", Model.DropdownName }
+        { "id", Model.DropdownName },
+        { "tabindex", "0" }
     };
-    if (Model.IsDisabled)
+        if (Model.IsDisabled)
     {
         htmlAttributes["disabled"] = "disabled";
     }
