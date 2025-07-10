@@ -5,6 +5,7 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Logger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
@@ -20,6 +21,24 @@ namespace Coditech.Engine.DBTM.Controllers
             _dBTMApiService = dBTMApiService;
             _coditechLogging = coditechLogging;
         }
+
+        [Route("/dbtmapi/fileupload")]
+        [HttpPost]
+        public IActionResult InsertDeviceDataViaFile(IFormFile file)
+        {
+            try
+            {
+                bool result = _dBTMApiService.InsertDeviceDataViaFile(file);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = result });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging?.LogMessage(ex, "FileUpload", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
         [Route("/dbtmapi/healthcheck")]
         [HttpGet]
         public IActionResult HealthCheck()
@@ -29,7 +48,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/InsertDeviceData")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
-        public  IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
+        public IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
         {
             try
             {
@@ -50,7 +69,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/Getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
-        public  IActionResult GetBatchList(long entityId, string userType)
+        public IActionResult GetBatchList(long entityId, string userType)
         {
             try
             {
@@ -72,7 +91,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetBatchDetails")]
         [HttpGet]
         [Produces(typeof(DBTMBatchResponse))]
-        public  IActionResult GetBatchDetails(int generalBatchMasterId)
+        public IActionResult GetBatchDetails(int generalBatchMasterId)
         {
             try
             {
@@ -94,7 +113,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetAssignmentList")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiListResponse))]
-        public  IActionResult GetAssignmentList(long entityId, string userType)
+        public IActionResult GetAssignmentList(long entityId, string userType)
         {
             try
             {
@@ -116,7 +135,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetAssignmentDetails")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiResponse))]
-        public  IActionResult GetAssignmentDetails(long dBTMTraineeAssignmentId)
+        public IActionResult GetAssignmentDetails(long dBTMTraineeAssignmentId)
         {
             try
             {
@@ -138,7 +157,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/dbtmapi/gettrainerdashboard")]
         [HttpGet]
         [Produces(typeof(DBTMMobileDashboardResponse))]
-        public  IActionResult GetTrainerDashboard(long userMasterId)
+        public IActionResult GetTrainerDashboard(long userMasterId)
         {
             try
             {
