@@ -1,7 +1,6 @@
 ﻿using Coditech.Common.Helper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMNewRegistrationViewModel : BaseViewModel
@@ -38,6 +37,7 @@ namespace Coditech.Admin.ViewModel
 
         [MaxLength(70)]
         [Required]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         [Display(Name = "Email Address")]
         public string EmailId { get; set; }
         public string EmailIdToken { get; set; }
@@ -112,7 +112,6 @@ namespace Coditech.Admin.ViewModel
         public decimal Height { get; set; }
         [Display(Name = "Trainer")]
         public long GeneralTrainerMasterId { get; set; }
-        [Required]
         public string JoiningCode { get; set; }
         public List<SelectListItem> AllTrainerList { get; set; }
         [Required]
@@ -122,7 +121,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public DateTime? DateOfBirth { get; set; }
         [Display(Name = "Specialization")]
-        public string Specialization { get; set; }
+        [Required]
         public int? SpecializationEnumId { get; set; }
     }
 }

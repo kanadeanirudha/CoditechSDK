@@ -19,6 +19,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dbtmTraineeDetailsRepository;
         private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
         private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
+        protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
+
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -27,6 +29,8 @@ namespace Coditech.API.Service
             _dbtmTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
+
         }
 
         public virtual DBTMUserModel Login(UserLoginModel userLoginModel)
@@ -170,14 +174,23 @@ namespace Coditech.API.Service
         }
         public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode)
         {
-            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
-            CoditechViewRepository<DBTMNewRegistrationModel> objStoredProc =new CoditechViewRepository<DBTMNewRegistrationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
+            joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == joiningCode)?.FirstOrDefault();
 
+            if (IsNull(joiningCodeDetails))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
+
+            if (joiningCodeDetails.IsExpired)
+                throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMNewRegistrationModel> objStoredProc = new CoditechViewRepository<DBTMNewRegistrationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMNewRegistrationModel> dBTMNewRegistrationList =objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMNewRegistrationModel> dBTMNewRegistrationList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
             DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel();
             listModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>();
+            if (listModel.DBTMNewRegistrationList == null || listModel.DBTMNewRegistrationList.Count == 0)
+                throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator ");
             return listModel;
         }
 
