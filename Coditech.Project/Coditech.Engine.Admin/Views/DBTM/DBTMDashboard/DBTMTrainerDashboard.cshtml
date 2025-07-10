@@ -3,82 +3,7 @@
 @using Newtonsoft.Json
 @model DBTMDashboardViewModel
 @{
-    ViewBag.Title = "Dashboard";
-    string[] xLabels = new[] { "30/6/25", "1/7/25", "2/7/25", "3/7/25", "4/7/25", "5/7/25", "6/7/25" };
-
-    var activityData = new Dictionary<string, List<int>>
-    {
-        { "Lap1", new List<int> { 60, 62, 59, 61, 58, 60, 63 } },
-        { "Lap2", new List<int> { 70, 72, 69, 75, 73, 70, 68 } },
-        { "Lap3", new List<int> { 80, 82, 79, 81, 78, 80, 83 } }
-    };
-
-    var colors = new[]
-    {
-        "rgba(255,99,132,1)",
-        "rgba(54,162,235,1)",
-        "rgba(255,206,86,1)"
-    };
-
-    var datasets = new List<LineGraphsDatasetViewModel>();
-    int index = 0;
-    foreach (var activity in activityData)
-    {
-        datasets.Add(new LineGraphsDatasetViewModel
-                {
-                    Label = activity.Key,
-                    Data = JsonConvert.SerializeObject(activity.Value),
-                    Color = colors[index++ % colors.Length]
-                });
-    }
-
-    var lineChart = new LineGraphsViewModel
-            {
-                LineChartId = "ActivityLineChart",
-                Title = "300 Yard Activity (Last 15 Days)",
-                XAxisLabel = "Dates",
-                YAxisLabel = "Laps (in seconds)",
-                XValues = JsonConvert.SerializeObject(xLabels),
-                Datasets = datasets
-            };
-
-    //Bar Graphs
-    string[] XValues = { "25/6/25", "26/6/25", "27/6/25", "28/6/25", "29/6/25", "30/6/25", "1/7/25" };
-    int[] YValues = { 65, 40, 90, 81, 56, 55, 40 };
-
-    BarChartViewModel avgLapChart = new BarChartViewModel()
-            {
-                BarChartId = "AvgLapChart",
-                XValues = JsonConvert.SerializeObject(XValues),
-                YValues = JsonConvert.SerializeObject(YValues),
-                Title = "Average Velocity Lap ",
-                XAxisLabel = "Dates",
-                YAxisLabel = "Average Lap time (in seconds)",
-                BackgroundColor = JsonConvert.SerializeObject(new[] {
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(255, 99, 132, 0.7)"
-    })
-            };
-    //Time Spent Bar Graphs
-    string fromDate = "01/07/2025";
-    string toDate = "03/07/2025";
-    Model.TimeSpentGraph = new TimeSpentBarGraphsViewModel
-            {
-                XValues = new[] { "Nikita", "Ram", "Amit" },
-                YValues = new[] { 120, 110, 150 },
-                XAxisLabel = "Trainees",
-                YAxisLabel = "Average Lap Time (in seconds)",
-                BackgroundColor = new[] {
-        "rgba(255, 99, 132, 0.7)",
-        "rgba(54, 162, 235, 0.7)",
-        "rgba(255, 206, 86, 0.7)"
-    }
-            };
+    ViewBag.Title = "Dashboard";   
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -230,27 +155,7 @@
                     </div><!--end card-body-->
                 </div><!--end card-->
             </div>
-  @*           <div class="col-md-12">
-                <div class="card report-card mb-4">
-                    <div class="card-header">
-                        <h4 class="card-title">300 Yard Activity (Last 15 Days)</h4>
-                    </div>
-                    <div class="card-body">
-                        @Html.Partial("~/Views/Shared/ActivityGraphs/_LineGraphs.cshtml", lineChart)
-                    </div>
-                </div>
-            </div> 
-            <div class="col-md-12">
-                <div class="card report-card mb-4">
-                    <div class="card-header">
-                        <h4 class="card-title">Average Velocity Lap</h4>
-                    </div>
-                    <div class="card-body">
-                        @Html.Partial("~/Views/Shared/ActivityGraphs/_BarGraphs.cshtml", avgLapChart)
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
+           @*   <div class="col-md-12">
                 <div class="card report-card mb-4">
                     <div class="card-header">
                         <h4 class="card-title">Top Performer Overview</h4>
