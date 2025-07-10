@@ -7,6 +7,8 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using System.Collections.Generic;
+using System.Data;
 using Newtonsoft.Json;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
