@@ -80,6 +80,7 @@ namespace Coditech.API.Service
                 {
                     dBTMTraineeDetailsModel.FirstName = generalPersonModel.FirstName;
                     dBTMTraineeDetailsModel.LastName = generalPersonModel.LastName;
+                    dBTMTraineeDetailsModel.IsActive = dBTMTraineeDetails.IsActive;
                 }
             }
             return dBTMTraineeDetailsModel;
