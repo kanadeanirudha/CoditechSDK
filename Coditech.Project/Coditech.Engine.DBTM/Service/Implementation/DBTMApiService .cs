@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using System.Collections.Generic;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -44,6 +45,12 @@ namespace Coditech.API.Service
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
+        public bool InsertDeviceDataViaFile(IFormFile file)
+        {
+
+            List<DBTMDeviceDataModel> dBTMDeviceDataModelList = new List<DBTMDeviceDataModel>();
+            return InsertDeviceData(dBTMDeviceDataModelList);
+        }
         //Add DBTMDeviceData.
         public bool InsertDeviceData(List<DBTMDeviceDataModel> dBTMDeviceDataModelList)
         {
