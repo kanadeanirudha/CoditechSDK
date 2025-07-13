@@ -203,7 +203,7 @@ namespace Coditech.API.Service
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
             if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))
             {
-                generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
+                generalPersonModel.Custom2 = $"{generalPersonModel.FirstName.ToFirstLetterCapital()} {generalPersonModel.LastName.ToFirstLetterCapital()}";
             }
 
             generalPersonModel = base.InsertPersonInformation(generalPersonModel, customerData);
