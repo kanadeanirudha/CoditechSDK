@@ -107,6 +107,7 @@ namespace Coditech.Admin.Agents
                 if (IsNotNull(dBTMTraineeDetailsResponse))
                 {
                     dBTMTraineeDetailsCreateEditViewModel.SelectedCentreCode = dBTMTraineeDetailsResponse.DBTMTraineeDetailsModel.CentreCode;
+                    dBTMTraineeDetailsCreateEditViewModel.IsActive = dBTMTraineeDetailsResponse.DBTMTraineeDetailsModel.IsActive;
                 }
                 dBTMTraineeDetailsCreateEditViewModel.DBTMTraineeDetailId = dBTMTraineeDetailId;
                 dBTMTraineeDetailsCreateEditViewModel.PersonId = personId;

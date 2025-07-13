@@ -290,6 +290,23 @@ namespace Coditech.API.Service
             List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
             return generalRunningNumbersList;
         }
+        protected override void UpdateIsActiveFlagForUserType(GeneralPersonModel generalPersonModel)
+        {
+            if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == generalPersonModel.EntityId)?.FirstOrDefault();
+
+                if (dBTMTraineeDetails != null)
+                {
+                    dBTMTraineeDetails.IsActive = generalPersonModel.IsActive;
+                    _dBTMTraineeDetailsRepository.Update(dBTMTraineeDetails);
+                }
+            }
+            else
+            {
+                base.UpdateIsActiveFlagForUserType(generalPersonModel);
+            }
+        }
         #endregion
     }
 }

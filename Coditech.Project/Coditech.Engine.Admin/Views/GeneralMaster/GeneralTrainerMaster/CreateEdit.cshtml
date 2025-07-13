@@ -30,6 +30,13 @@
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
+                            @if (Model.GeneralTrainerMasterId > 0)
+                            {
+                                @Html.HiddenFor(m => m.SelectedCentreCode)
+                                @Html.HiddenFor(m => m.SelectedDepartmentId)
+                                @Html.HiddenFor(m => m.FirstName)
+                                @Html.HiddenFor(m => m.LastName)
+                            }
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="mb-3">
@@ -57,33 +64,34 @@
                                             <div class="md-3">
                                                 @Html.LabelFor(x => x.EmployeeId, new { @class = "form-label required" })
                                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                   {
-                                       DropdownType = DropdownTypeEnum.UnAssociatedTrainerEmployeeList.ToString(),
-                                       DropdownName = "EmployeeId",
-                                       DropdownSelectedValue = Model.EmployeeId
-                                        .ToString(),
-                                        IsRequired=true,
-                                       Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}" : ""
+                                                {
+                                                    DropdownType = DropdownTypeEnum.UnAssociatedTrainerEmployeeList.ToString(),
+                                                                                DropdownName = "EmployeeId",
+                                                                                DropdownSelectedValue = Model.EmployeeId
+                                                                                .ToString(),
+                                                                                IsRequired = true,
+                                                                                Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}" : ""
 
-                                   })
-                                                @Html.ValidationMessageFor(x => x.EmployeeId)
-                                            </div>
-                                        </div>
-                                    }
+                                                                                })
+                                        @Html.ValidationMessageFor(x => x.EmployeeId)
+                                    </div>
+                                </div>
+                                                                }
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             @Html.LabelFor(x => x.TrainerSpecialization, new { @class = "form-label required " })
                                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                   {
-                                       DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
-                                       DropdownName = "TrainerSpecializationEnumId",
-                                       GroupCode = DropdownTypeEnum.TrainerSpecialization.ToString()
-                                   })
-                                            @Html.ValidationMessageFor(x => x.TrainerSpecializationEnumId)
-                                        </div>
+                                            {
+                                                DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
+                                                                                DropdownName = "TrainerSpecializationEnumId",
+                                                                                IsRequired = true,
+                                                                                GroupCode = DropdownTypeEnum.TrainerSpecialization.ToString()
+                                                                                })
+                                        @Html.ValidationMessageFor(x => x.TrainerSpecializationEnumId)
                                     </div>
+                                </div>
 
-                                    @if (Model.GeneralTrainerMasterId <=0)
+                                @if (Model.GeneralTrainerMasterId <= 0)
                                     {
                                         @Html.HiddenFor(x => x.UniqueCode)
                                     }
