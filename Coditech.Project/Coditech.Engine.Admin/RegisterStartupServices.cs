@@ -131,6 +131,7 @@ namespace Coditech.Admin
             builder.Services.AddControllersWithViews(options =>
             {
                 options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+                options.Filters.Add<AuthenticationHelper>();
             });
         }
 
