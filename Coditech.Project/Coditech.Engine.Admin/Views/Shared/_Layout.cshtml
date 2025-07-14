@@ -39,7 +39,7 @@
 	<link href="~/css/layout/select2.min.css" rel="stylesheet" />
 	@if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
 	{
-		<link href="~/css/layout/@CoditechAdminSettings.ThemeColor-theme.css" rel="stylesheet" />
+		<link href="~/css/layout/theme-@CoditechAdminSettings.ThemeColor" rel="stylesheet" />
 	}
 </head>
 
@@ -179,20 +179,28 @@
 		}
 	};
 
-	 window.initializeSelect2Dropdowns = function () {
-		$('.select2-dropdown').each(function () {
-			if ($(this).hasClass('select2-hidden-accessible')) {
-				$(this).select2('destroy');
+		function initializeSelect2Dropdowns() {
+		$('select.js-select2').each(function () {
+			const $sel = $(this);
+			if ($sel.hasClass('select2-hidden-accessible')) {
+				$sel.select2('destroy');
+				$sel.attr('tabindex', 0);
 			}
-
-			$(this).select2({
-				placeholder: "-------- Select --------",
-				allowClear: true,
-				width: '100%'
+			$sel.select2({
+				allowClear: false,
+				width: 'resolve',
+				 dropdownParent: $(this).parent()
 			});
 		});
-	};
+	}
+
 	$(document).ready(function () {
 		initializeSelect2Dropdowns();
+		$(document).on('focus', '.select2-selection--single', function () {
+			const $select = $(this).closest('.select2-container').prev('select');
+			if (!$select.prop('disabled')) {
+				$select.select2('open');
+			}
+		});
 	});
 </script>

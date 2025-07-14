@@ -48,9 +48,8 @@
     <link href="~/css/layout/select2.min.css" rel="stylesheet" />
     @if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
     {
-        <link href="~/css/layout/@CoditechAdminSettings.ThemeColor-theme.css" rel="stylesheet" />
+        <link href="~/css/layout/theme-@CoditechAdminSettings.ThemeColor" rel="stylesheet" />
     }
-
 </head>
 <body data-layout="horizontal" class="account-body accountbg" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
     <!-- Log In page -->
