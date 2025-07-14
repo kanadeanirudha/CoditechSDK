@@ -14,16 +14,18 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="card-title">Batch Activity List : @Model.BatchName</span>
                         <div class="d-flex">
+                             <a class="btn btn-sm btn-soft-secondary ms-2"
+                               href="/@controllerName/List?SelectedParameter1=@Model.SelectedCentreCode"
+                               role="button">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+
                             <a class="btn btn-sm btn-soft-primary"
                                href="/@controllerName/CreateDBTMBatchActivity?generalBatchMasterId=@Model.SelectedParameter1"
                                role="button">
                                 <i class="fas fa-plus me-2"></i>Add Batch Activity
                             </a>
-                            <a class="btn btn-sm btn-soft-secondary ms-2"
-                               href="/@controllerName/List?SelectedParameter1=@Model.SelectedCentreCode"
-                               role="button">
-                                <i class="fas fa-arrow-left me-2"></i>Back
-                            </a>
+                           
                         </div>
                     </div>
                     <div class="card-body">

@@ -103,11 +103,12 @@
         });
     </script>
     <script>
-        $(document).on('ajaxComplete', function () {
-            if ($('#datatable').length > 0) {
-                if ($.fn.DataTable.isDataTable('#datatable')) {
-                    $('#datatable').DataTable().destroy();
-                }
+            $.fn.dataTable.ext.errMode = 'none';
+            $(document).on('ajaxComplete', function () {
+                if ($('#datatable').length > 0) {
+                    if ($.fn.DataTable.isDataTable('#datatable')) {
+                        $('#datatable').DataTable().destroy();
+                    }
                 $('#datatable').DataTable({
                     paging: true,
                     searching: true,

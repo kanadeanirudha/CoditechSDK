@@ -203,7 +203,7 @@ namespace Coditech.API.Service
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
             if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))
             {
-                generalPersonModel.Custom2 = $"{generalPersonModel.FirstName} {generalPersonModel.LastName}";
+                generalPersonModel.Custom2 = $"{generalPersonModel.FirstName.ToFirstLetterCapital()} {generalPersonModel.LastName.ToFirstLetterCapital()}";
             }
 
             generalPersonModel = base.InsertPersonInformation(generalPersonModel, customerData);
@@ -289,6 +289,23 @@ namespace Coditech.API.Service
             List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
             List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
             return generalRunningNumbersList;
+        }
+        protected override void UpdateIsActiveFlagForUserType(GeneralPersonModel generalPersonModel)
+        {
+            if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == generalPersonModel.EntityId)?.FirstOrDefault();
+
+                if (dBTMTraineeDetails != null)
+                {
+                    dBTMTraineeDetails.IsActive = generalPersonModel.IsActive;
+                    _dBTMTraineeDetailsRepository.Update(dBTMTraineeDetails);
+                }
+            }
+            else
+            {
+                base.UpdateIsActiveFlagForUserType(generalPersonModel);
+            }
         }
         #endregion
     }

@@ -44,9 +44,9 @@ namespace Coditech.Admin.ViewModel
         public long EntityId { get; set; }
         public long GeneralTrainerMasterId { get; set; }
         public string SelectedParameter2 { get; set; }
-        public int? SpecializationEnumId { get; set; }
+         [Required]
         [Display(Name = "Specialization")]
-        public string Specialization { get; set; }
+        public int? SpecializationEnumId { get; set; }
 
     }
 }

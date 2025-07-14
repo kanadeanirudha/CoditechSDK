@@ -74,7 +74,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.Specialization, new { @class = "form-label required" })
+                                    @Html.LabelFor(x => x.SpecializationEnumId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
                                {
                                    DropdownSelectedValue = Model.SpecializationEnumId.ToString(),
@@ -104,14 +104,6 @@
                                         @Html.LabelFor(x => x.OtherInformation, new { @class = "form-label" })
                                         @Html.TextAreaFor(x => x.OtherInformation, new { @class = "form-control", @maxlength = "500" })
                                         @Html.ValidationMessageFor(x => x.OtherInformation)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
-                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -24,11 +24,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/BatchWiseReports")]
         [Produces(typeof(DBTMBatchWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, string FromDate, string ToDate)
+        public virtual IActionResult BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, string FromDate, string ToDate, bool isMobileRequest)
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate));
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), isMobileRequest);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
@@ -48,11 +48,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/TestWiseReports")]
         [Produces(typeof(DBTMTestWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
+        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode);
+                DBTMReportsListModel list = _dBTMReportsService.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
             }

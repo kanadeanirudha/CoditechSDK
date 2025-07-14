@@ -17,7 +17,7 @@ namespace Coditech.API.Client
         {
             dBTMNewRegistrationEndpoint = new DBTMNewRegistrationEndpoint();
         }
-        
+
         public virtual DBTMNewRegistrationResponse DBTMCentreRegistration(DBTMNewRegistrationModel body)
         {
             return Task.Run(async () => await NewRegistrationAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
@@ -76,10 +76,10 @@ namespace Coditech.API.Client
 
         public virtual DBTMNewRegistrationResponse TrainerRegistration(DBTMNewRegistrationModel body)
         {
-            return Task.Run(async () => await TrainerRegistrationAsync(body,CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await TrainerRegistrationAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMNewRegistrationResponse>TrainerRegistrationAsync(DBTMNewRegistrationModel body, CancellationToken cancellationToken)
+        public virtual async Task<DBTMNewRegistrationResponse> TrainerRegistrationAsync(DBTMNewRegistrationModel body, CancellationToken cancellationToken)
         {
             string endpoint = dBTMNewRegistrationEndpoint.TrainerRegistrationAsync();
             HttpResponseMessage response = null;
@@ -162,9 +162,9 @@ namespace Coditech.API.Client
                 }
                 else
                 {
-                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    DBTMNewRegistrationListResponse typedBody = JsonConvert.DeserializeObject<DBTMNewRegistrationListResponse>(responseData);
-                    UpdateApiStatus(typedBody, status, response);
+                    string value = ((response.Content != null) ? (await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)) : null);
+                    DBTMNewRegistrationListResponse result = JsonConvert.DeserializeObject<DBTMNewRegistrationListResponse>(value);
+                    UpdateApiStatus(result, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
             }

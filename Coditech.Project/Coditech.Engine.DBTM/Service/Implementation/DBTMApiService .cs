@@ -1,4 +1,5 @@
-﻿using Coditech.API.Data;
+﻿using System.Data;
+using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -6,7 +7,9 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using System.Collections.Generic;
 using System.Data;
+using Newtonsoft.Json;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -44,6 +47,17 @@ namespace Coditech.API.Service
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
+        public bool InsertDeviceDataViaFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            using var reader = new StreamReader(file.OpenReadStream());
+            string fileContent = reader.ReadToEnd();
+            List<DBTMDeviceDataModel> dBTMDeviceDataModelList = JsonConvert.DeserializeObject<List<DBTMDeviceDataModel>>(fileContent);
+            return InsertDeviceData(dBTMDeviceDataModelList);
+
+        }
         //Add DBTMDeviceData.
         public bool InsertDeviceData(List<DBTMDeviceDataModel> dBTMDeviceDataModelList)
         {
@@ -150,7 +164,7 @@ namespace Coditech.API.Service
                     dBTMBatchModel.DBTMBatchTestList = new List<DBTMTestApiModel>();
                     foreach (DBTMTestMaster item in testDetailList)
                     {
-                        DBTMTestApiModel dbtmTestApiModel= item.FromEntityToModel<DBTMTestApiModel>();
+                        DBTMTestApiModel dbtmTestApiModel = item.FromEntityToModel<DBTMTestApiModel>();
                         dbtmTestApiModel.ActivityCode = item.DBTMTestMasterId;
                         dBTMBatchModel.DBTMBatchTestList.Add(dbtmTestApiModel);
                     }
@@ -159,7 +173,7 @@ namespace Coditech.API.Service
                 CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
                 objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
                 objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-                List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralBatchUserList @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+                List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserListForAPI @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
 
                 dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
             }
