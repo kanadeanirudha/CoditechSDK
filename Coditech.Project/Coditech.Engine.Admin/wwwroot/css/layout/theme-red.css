@@ -1,0 +1,23 @@
+:root {
+  --primaryColor: #931b1d;
+  --secondaryColor: #201E43;
+  --tertiaryColor: #eeeeee;
+  --black: #000000;
+  --white: #ffffff;
+}
+
+.update-msg .img-box, body.dark-topbar .navbar-custom, body.dark-sidenav .left-sidenav-menu li.mm-active .mm-active > a {background: var(--primaryColor) !important;}
+body.dark-topbar .topbar .brand, body.dark-sidenav .left-sidenav, .account-body .auth-header-box {background-color: var(--primaryColor) !important;}
+.topbar .navigation-menu > li > a, .navigation-menu > li a i, body.dark-topbar .navbar-custom .nav-link, .card .card-header:first-child span, .card grammarly-extension + .card-header span, .card-header .card-title, .modal-content .modal-header .modal-title {color: var(--tertiaryColor) !important;}
+body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {color: var(--black) !important;background-color: var(--primaryColor) !important;}
+.page-wrapper .page-content a .card-body i, .topbar .navigation-menu > li .submenu li a i, .boxed-footer a, .card.sidebar-card .files-nav .nav .nav-link i {color: var(--primaryColor) !important;}
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6, .topbar .navigation-menu > li .submenu li a, .page-link, .card.sidebar-card .files-nav .nav .nav-link, .card.sidebar-card .files-nav .nav .nav-link h5{color: var(--secondaryColor) !important;}
+.btn-success, .btn-success:hover {background-color: var(--primaryColor) !important; color: var(--tertiaryColor) !important;border-color: var(--primaryColor) !important;}
+.page-content .card .card-header .btn-soft-primary{background-color: var(--secondaryColor) !important; color: var(--tertiaryColor) !important;border-color: var(--secondaryColor) !important;}
+.form-control:focus {color: var(--secondaryColor) !important; background-color: var(--white) !important;border-color:var(--primaryColor) !important;}
+.form-check-input:checked {background-color: var(--primaryColor) !important;border-color: var(--primaryColor) !important;}
+.page-wrapper .page-content .card .card-header:first-child, .card grammarly-extension + .card-header {background: var(--primaryColor) !important;}
+.btn-soft-secondary {color: var(--secondaryColor) !important; background-color: var(--white) !important;border-color:var(--secondaryColor) !important;}
+@media (min-width: 992px) {
+    body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a span {background-color: var(--primaryColor) !important;color: var(--tertiaryColor) !important;}
+}

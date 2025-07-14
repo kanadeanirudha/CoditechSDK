@@ -4,12 +4,8 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
-using Coditech.Common.Service;
-using Coditech.Resources;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Specialized;
 using System.Data;
-
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -17,10 +13,13 @@ namespace Coditech.API.Service
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
+        private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         public DBTMGeneralBatchMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
+            _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
+
         }
 
         #region GeneralBatchUser
@@ -28,7 +27,7 @@ namespace Coditech.API.Service
         {
             if (generalBatchUserModel.GeneralBatchUserId == 0)
                 generalBatchUserModel.ActivityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus");
-          
+
             return base.AssociateUnAssociateBatchwiseUser(generalBatchUserModel);
         }
 
@@ -60,6 +59,20 @@ namespace Coditech.API.Service
             }
             listModel.GeneralBatchMasterId = generalBatchMasterId;
             return listModel;
+        }
+        //Delete GeneralBatchMaster.
+        public override bool DeleteGeneralBatch(ParameterModel parameterModel)
+        {
+            const string batch = "Batch";
+            int generalBatchMasterId = Convert.ToInt32(parameterModel.Ids);
+            bool isReferenced = _dBTMDeviceDataRepository.Table.Any(d => d.TablePrimaryColumnId == generalBatchMasterId && d.TypeOfRecord == batch);
+
+            if (isReferenced)
+            {
+                throw new CoditechException(ErrorCodes.AssociationDeleteError, "The batch is in use deleteion not allowed.");
+            }
+
+            return base.DeleteGeneralBatch(parameterModel);
         }
 
         #endregion

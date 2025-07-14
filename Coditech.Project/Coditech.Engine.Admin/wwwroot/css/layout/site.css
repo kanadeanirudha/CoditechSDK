@@ -380,3 +380,6 @@ td.text-center a.btn {
     max-height: calc((100vh) - 150px);
     overflow-y: auto;
 }
+body[data-layout="horizontal"] .page-wrapper .page-content {
+    margin-top: 1rem !important;
+}
