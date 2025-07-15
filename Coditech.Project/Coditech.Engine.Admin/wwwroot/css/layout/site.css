@@ -391,3 +391,6 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
     padding: 0.12rem .3rem !important;
 }
 
+.card-header {
+    padding: .35rem 1rem !important;
+}
