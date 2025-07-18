@@ -357,5 +357,96 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+        public virtual DBTMGraphMasterListResponse GetDBTMGraph()
+        {
+            return Task.Run(async () => await GetDBTMGraphAsync(System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMGraphMasterListResponse> GetDBTMGraphAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.GetDBTMGraphAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMGraphMasterListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                if (status_ == 204)
+                {
+                    return new DBTMGraphMasterListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMGraphMasterListResponse typedBody = JsonConvert.DeserializeObject<DBTMGraphMasterListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMGraphMasterListResponse DBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        {
+            return Task.Run(async () => await GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMGraphMasterListResponse> GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMGraphMasterListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMGraphMasterListResponse();
+                }
+                else
+                {
+                    string value = ((response.Content != null) ? (await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)) : null);
+                    DBTMGraphMasterListResponse result = JsonConvert.DeserializeObject<DBTMGraphMasterListResponse>(value);
+                    UpdateApiStatus(result, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

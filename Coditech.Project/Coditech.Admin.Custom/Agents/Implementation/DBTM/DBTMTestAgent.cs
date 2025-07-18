@@ -10,7 +10,6 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.Admin.Agents
 {
     public class DBTMTestAgent : BaseAgent, IDBTMTestAgent
@@ -151,6 +150,14 @@ namespace Coditech.Admin.Agents
             DBTMTestCalculationListModel dBTMTestCalculationList = new DBTMTestCalculationListModel { DBTMTestCalculationList = response?.DBTMTestCalculationList };
             DBTMTestCalculationListViewModel listViewModel = new DBTMTestCalculationListViewModel();
             listViewModel.DBTMTestCalculationList = dBTMTestCalculationList?.DBTMTestCalculationList?.ToViewModel<DBTMTestCalculationViewModel>().ToList();
+            return listViewModel;
+        }
+        public virtual DBTMGraphMasterListViewModel DBTMGraph()
+        {
+            DBTMGraphMasterListResponse response = _dBTMTestClient.GetDBTMGraph();
+            DBTMGraphMasterListModel dBTMGraphMasterList = new DBTMGraphMasterListModel { DBTMGraphMasterList = response?.DBTMGraphMasterList };
+            DBTMGraphMasterListViewModel listViewModel = new DBTMGraphMasterListViewModel();
+            listViewModel.DBTMGraphMasterList = dBTMGraphMasterList?.DBTMGraphMasterList?.ToViewModel<DBTMGraphMasterViewModel>().ToList();
             return listViewModel;
         }
 

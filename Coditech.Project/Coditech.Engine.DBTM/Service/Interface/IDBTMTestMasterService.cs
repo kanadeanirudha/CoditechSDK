@@ -14,5 +14,7 @@ namespace Coditech.API.Service
         bool DeleteDBTMTest(ParameterModel parameterModel);
         DBTMTestParameterListModel GetDBTMTestParameter();
         DBTMTestCalculationListModel GetDBTMTestCalculation();
+        DBTMGraphMasterListModel GetDBTMGraph();
+        DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId);
     }
 }
