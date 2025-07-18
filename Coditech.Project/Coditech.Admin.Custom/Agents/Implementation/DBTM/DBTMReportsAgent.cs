@@ -9,46 +9,54 @@ using Newtonsoft.Json;
 
 namespace Coditech.Admin.Agents
 {
-    public class DBTMReportsAgent : BaseAgent, IDBTMReportsAgent
-    {
-        #region Private Variable
-        protected readonly ICoditechLogging _coditechLogging;
-        private readonly IDBTMReportsClient _dBTMReportsClient;
-        #endregion
+	public class DBTMReportsAgent : BaseAgent, IDBTMReportsAgent
+	{
+		#region Private Variable
+		protected readonly ICoditechLogging _coditechLogging;
+		private readonly IDBTMReportsClient _dBTMReportsClient;
+		#endregion
 
-        #region Public Constructor
-        public DBTMReportsAgent(ICoditechLogging coditechLogging, IDBTMReportsClient dBTMReportsClient)
-        {
-            _coditechLogging = coditechLogging;
-            _dBTMReportsClient = GetClient<IDBTMReportsClient>(dBTMReportsClient);
-        }
-        #endregion
+		#region Public Constructor
+		public DBTMReportsAgent(ICoditechLogging coditechLogging, IDBTMReportsClient dBTMReportsClient)
+		{
+			_coditechLogging = coditechLogging;
+			_dBTMReportsClient = GetClient<IDBTMReportsClient>(dBTMReportsClient);
+		}
+		#endregion
 
-        #region Public Methods
-        //Batch Wise Reports 
-        public virtual DBTMReportsListViewModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
-        {
-            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
-            if (generalBatchMasterId > 0 && dBTMTestMasterId > 0)
-            {
-                DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
-                listViewModel.DataTable = response.DataTable;
-            }
-            return listViewModel;
-        }
+		#region Public Methods
+		//Batch Wise Reports 
+		public virtual DBTMReportsListViewModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
+		{
+			DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+			if (generalBatchMasterId > 0 && dBTMTestMasterId > 0)
+			{
+				DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
+				listViewModel.DataTable = response.DataTable;
+			}
+			return listViewModel;
+		}
 
-        //Test Wise Reports 
-        public virtual DBTMReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
-        {
-            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
-            if (dBTMTestMasterId > 0)
-            {
-                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, userModel.EntityId, userModel.UserType, userModel.SelectedCentreCode);
-                listViewModel.DataTable = response.DataTable;
-            }
-            return listViewModel;
-        }
-        #endregion
-    }
+		//Test Wise Reports 
+		public virtual DBTMReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+		{
+			DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+			if (dBTMTestMasterId > 0)
+			{
+				long generalTrainerMasterId = 0;
+				UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+				string usertype = userModel.UserType;
+				if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+				{
+					DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+					generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+					usertype = userModel?.Custom1;
+				}
+				DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+				listViewModel.DataTable = response.DataTable;
+			}
+			return listViewModel;
+		}
+		#endregion
+	}
 }
