@@ -317,7 +317,7 @@ namespace Coditech.Admin.Helpers
                 {
                     dropdownList.Add(new SelectListItem()
                     {
-                        Text = string.Concat(item.FirstName, "", item.LastName, ""),
+                        Text = string.Concat(item.FirstName, " ", item.LastName, ""),
                         Value = item.GeneralTrainerMasterId.ToString(),
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
                     });

@@ -17,7 +17,7 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {color: var(--bla
 .form-control:focus {color: var(--secondaryColor) !important; background-color: var(--white) !important;border-color:var(--primaryColor) !important;}
 .form-check-input:checked {background-color: var(--primaryColor) !important;border-color: var(--primaryColor) !important;}
 .page-wrapper .page-content .card .card-header:first-child, .card grammarly-extension + .card-header {background: var(--primaryColor) !important;}
-.btn-soft-secondary {color: var(--secondaryColor) !important; background-color: var(--white) !important;border-color:var(--secondaryColor) !important;}
+.btn-soft-secondary {color: var(--secondaryColor) !important; background-color: var(--white) !important;border-color:var(--secondaryColor) !important;}#LogIn_Tab button {color: var(--white); background-color: var(--primaryColor) !important; border-color: var(--primaryColor) !important;}
 @media (min-width: 992px) {
     body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a span {background-color: var(--primaryColor) !important;color: var(--tertiaryColor) !important;}
 }
