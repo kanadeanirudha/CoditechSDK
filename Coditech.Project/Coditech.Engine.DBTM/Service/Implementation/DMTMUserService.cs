@@ -94,6 +94,7 @@ namespace Coditech.API.Service
 				LastName = generalPersonModel.LastName,
 				GeneralTrainerMasterId = generalTrainerMasterId,
 				Custom1 = generalPersonModel.Custom1,
+				CentreCode = centreCode,
 			};
 			return userModel;
 		}
