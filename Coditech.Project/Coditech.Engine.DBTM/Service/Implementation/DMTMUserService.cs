@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,6 +22,7 @@ namespace Coditech.API.Service
 		private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
 		private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
 		protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
+		private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
 
 		public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
 		{
@@ -31,7 +33,7 @@ namespace Coditech.API.Service
 			_generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
 			_employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
 			_organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
-
+			_generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
 		}
 
 		public virtual DBTMUserModel Login(UserLoginModel userLoginModel)
@@ -66,15 +68,22 @@ namespace Coditech.API.Service
 					personId = data.PersonId;
 					centreCode = data.CentreCode;
 				}
+
 			}
-			GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(personId);
+			GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
 			if (IsNull(generalPersonModel))
 				throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+			long generalTrainerMasterId = 0;
+
+			if (userMasterData.UserType == UserTypeEnum.Employee.ToString() && generalPersonModel.Custom1 == CustomConstants.DBTMTrainer)
+			{
+				generalTrainerMasterId = Convert.ToInt64(_generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault());
+			}
 
 			DBTMUserModel userModel = new DBTMUserModel()
 			{
 				EntityId = userMasterData.EntityId,
-				UserType = userMasterData.UserType,
+				UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1,
 				EmailId = userMasterData.EmailId,
 				IsPasswordChange = userMasterData.IsPasswordChange,
 				IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions,
@@ -83,6 +92,7 @@ namespace Coditech.API.Service
 				FirstName = generalPersonModel.FirstName,
 				MiddleName = generalPersonModel.MiddleName,
 				LastName = generalPersonModel.LastName,
+				GeneralTrainerMasterId = generalTrainerMasterId,
 				Custom1 = generalPersonModel.Custom1,
 			};
 			return userModel;
