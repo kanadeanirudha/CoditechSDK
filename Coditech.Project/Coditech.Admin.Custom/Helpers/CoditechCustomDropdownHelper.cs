@@ -62,6 +62,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetGeneralTrainerByJoiningCodeList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphType.ToString()))
+            {
+                GetGraphType(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -322,6 +326,17 @@ namespace Coditech.Admin.Helpers
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
                     });
                 }
+            }
+        }
+
+        private static void GetGraphType(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+
+            if (dropdownViewModel.DropdownSelectedValue == "7")
+            {
+                dropdownList.Add(new SelectListItem() { Text = "Time", Value = "time" });
+                dropdownList.Add(new SelectListItem() { Text = "Velocity", Value = "velocity" });
+                dropdownList.Add(new SelectListItem() { Text = "Time and Velocity", Value = "timeandvelocity" });
             }
         }
     }

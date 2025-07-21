@@ -1,0 +1,130 @@
+﻿@model DBTMReportsListViewModel
+@{
+    ViewBag.Title = "Activity Reports";
+    DropdownViewModel testDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
+                IsCustomDropdown = true,
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()",
+            };
+    DropdownViewModel traineeDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(),
+                DropdownName = "DBTMTraineeDetailId",
+                DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(),
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()",
+                IsCustomDropdown = true
+            };
+    DropdownViewModel graphTypeDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.GraphType.ToString(),
+                DropdownName = "GraphType",
+                DropdownSelectedValue = Model.GraphType,
+                IsCustomDropdown = true,
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()"
+            };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Activity Graph Reports</h4>
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>Activity List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>Trainee List</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>Graph Type</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseGraphReports()" />
+                            </div>
+                            <div id="DBTMTestWiseGraphReportsDivId">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+@section scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#FromDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                maxDate: new Date(),
+            });
+        });
+        $(function () {
+            $("#ToDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                onClose: function (dateText, inst) {
+                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                        document.getElementById(this.id).value = '';
+                    }
+                },
+                maxDate: new Date(),
+            });
+        });
+    </script>
+}
+
+

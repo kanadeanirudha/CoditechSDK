@@ -21,5 +21,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "To Date")]
         public DateTime ToDate { get; set; }
         public bool IsRecordFound { get; set; } = true;
+        public string GraphType { get; set; }
     }
 }
