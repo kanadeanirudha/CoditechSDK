@@ -30,5 +30,7 @@ namespace Coditech.Common.API.Model
         public long TestMediaId { get; set; }
         public string TestMediaPath { get; set; }
         public string TestMediaFileName { get; set; }
+        [Required]
+        public List<string> DBTMSelectedGraph { get; set; }
     }
 }

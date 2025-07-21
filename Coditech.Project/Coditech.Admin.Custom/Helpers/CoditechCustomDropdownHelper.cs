@@ -62,6 +62,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetGeneralTrainerByJoiningCodeList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMGraph.ToString()))
+            {
+                DBTMGraphByDBTMTestMasterId(dropdownViewModel, dropdownList);
+            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphType.ToString()))
             {
                 GetGraphType(dropdownViewModel, dropdownList);
@@ -69,7 +73,6 @@ namespace Coditech.Admin.Helpers
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
-
         private static void GetDBTMActivityCategoryList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
             FilterCollection filters = new FilterCollection();
@@ -324,6 +327,30 @@ namespace Coditech.Admin.Helpers
                         Text = string.Concat(item.FirstName, " ", item.LastName, ""),
                         Value = item.GeneralTrainerMasterId.ToString(),
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                    });
+                }
+            }
+        }
+        private static void DBTMGraphByDBTMTestMasterId(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                int dBTMTestMasterId = Convert.ToInt32(dropdownViewModel.Parameter);
+
+                DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                DBTMGraphMasterListModel list = new DBTMGraphMasterListModel() { DBTMGraphMasterList = response.DBTMGraphMasterList };
+                foreach (var item in list?.DBTMGraphMasterList)
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = item.GraphName,
+                        Value = item.DBTMGraphMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
                     });
                 }
             }

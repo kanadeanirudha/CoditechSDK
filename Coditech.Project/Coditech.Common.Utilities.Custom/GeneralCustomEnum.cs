@@ -16,6 +16,7 @@
         JoiningCodewiseGeneralTrainer,
         DBTMTraineeList,
         TraineeSpecialization,
+        DBTMGraph,
         GraphType,
     }
     public enum DashboardFormCustomEnum
