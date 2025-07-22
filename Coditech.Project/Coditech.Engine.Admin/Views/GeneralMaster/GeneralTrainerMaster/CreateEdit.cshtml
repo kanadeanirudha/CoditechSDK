@@ -79,7 +79,7 @@
                                                                 }
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            @Html.LabelFor(x => x.TrainerSpecialization, new { @class = "form-label required " })
+                                            @Html.LabelFor(x => x.TrainerSpecializationEnumId, new { @class = "form-label required " })
                                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
                                             {
                                                 DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
