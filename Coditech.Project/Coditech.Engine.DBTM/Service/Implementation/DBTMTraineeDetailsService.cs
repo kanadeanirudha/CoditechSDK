@@ -5,11 +5,11 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
+using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
@@ -248,7 +248,7 @@ namespace Coditech.API.Service
                             {
                                 string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
                                 listModel.DataTable.Columns.Add(columnName, typeof(String));
-                                newRow[columnName] = $"{ item.ParameterValue} {Unit(item.ParameterCode)}";
+                                newRow[columnName] = $"{ item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
                             }
                         }
 

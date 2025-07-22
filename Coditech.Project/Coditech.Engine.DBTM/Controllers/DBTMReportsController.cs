@@ -48,7 +48,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMReports/TestWiseReports")]
         [Produces(typeof(DBTMTestWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public virtual IActionResult TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             try
             {
