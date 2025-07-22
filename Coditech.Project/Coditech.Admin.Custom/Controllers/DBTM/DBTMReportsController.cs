@@ -69,7 +69,6 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/DBTM/DBTMReports/Graph/_TestWiseGraphReports.cshtml", dBTMReportsViewModel);
         }
 
-
         public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
             DropdownViewModel testDropdownn = new DropdownViewModel
@@ -82,5 +81,19 @@ namespace Coditech.Admin.Controllers
 
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn);
         }
+
+        [HttpGet]
+        public ActionResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId)
+        {
+            DropdownViewModel dBTMGraphByDBTMTestMaster = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
+                DropdownName = "DBTMGraphMasterId",
+                Parameter = dBTMTestMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
+        }
+
     }
 }

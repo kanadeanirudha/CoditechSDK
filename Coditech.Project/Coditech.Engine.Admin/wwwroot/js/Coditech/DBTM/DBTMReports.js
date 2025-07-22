@@ -156,5 +156,30 @@
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity and trainer.", "error");
         }
+    },
+
+    GetGraphListByDBTMTestMasterId: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+
+        if (dBTMTestMasterId !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                url: '/DBTMReports/GetGraphListByDBTMTestMasterId',
+                type: 'GET',
+                dataType: 'html', 
+                data: { dBTMTestMasterId: dBTMTestMasterId },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#GraphType").html(data); 
+                    DBTMReports.GetDBTMTestWiseGraphReports(); 
+                    CoditechCommon.HideLodder();
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Failed to load graph list.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        }
     }
 };

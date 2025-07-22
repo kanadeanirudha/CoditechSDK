@@ -18,6 +18,7 @@
         TraineeSpecialization,
         DBTMGraph,
         GraphType,
+        DBTMTraineeGraphList,
     }
     public enum DashboardFormCustomEnum
     {

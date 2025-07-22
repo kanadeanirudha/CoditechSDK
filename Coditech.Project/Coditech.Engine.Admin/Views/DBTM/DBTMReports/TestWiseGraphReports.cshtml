@@ -7,11 +7,11 @@
                 DropdownName = "DBTMTestMasterId",
                 DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
                 IsCustomDropdown = true,
-                ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()",
+                ChangeEvent = "DBTMReports.GetGraphListByDBTMTestMasterId()",
             };
     DropdownViewModel traineeDropdown = new DropdownViewModel()
             {
-                DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(),
+                DropdownType = DropdownCustomTypeEnum.DBTMTraineeGraphList.ToString(),
                 DropdownName = "DBTMTraineeDetailId",
                 DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(),
                 ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()",
@@ -19,9 +19,9 @@
             };
     DropdownViewModel graphTypeDropdown = new DropdownViewModel()
             {
-                DropdownType = DropdownCustomTypeEnum.GraphType.ToString(),
-                DropdownName = "GraphType",
-                DropdownSelectedValue = Model.GraphType,
+                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
+                DropdownName = "DBTMGraphMasterId",
+                DropdownSelectedValue = Model.DBTMGraphMasterId.ToString(),
                 IsCustomDropdown = true,
                 ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()"
             };

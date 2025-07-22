@@ -22,5 +22,6 @@ namespace Coditech.Admin.ViewModel
         public DateTime ToDate { get; set; }
         public bool IsRecordFound { get; set; } = true;
         public string GraphType { get; set; }
+        public int DBTMGraphMasterId { get; set; }
     }
 }

@@ -69,7 +69,6 @@ else
             datasets.Add(new LineGraphsDatasetViewModel
             {
                 Label = "Time (" + performedOn + ")",
-                //Data = JsonConvert.SerializeObject(new List<double> { abTime, abTime + bcTime, abTime + bcTime + caTime }),
                 Data = JsonConvert.SerializeObject(new List<double> { 0, abTime, bcTime, caTime }),
                 Color = colors[colorIndex++ % colors.Count]
             });
