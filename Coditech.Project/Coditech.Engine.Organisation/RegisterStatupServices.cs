@@ -4,6 +4,7 @@ using Coditech.API.Service.DependencyRegistration;
 using Coditech.Common.API;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
+using Coditech.Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
@@ -44,8 +45,11 @@ namespace Coditech.API.Common
             builder.RegisterDI();
             builder.RegisterCustomDI();
 
-            // Configured conventional route settings.
-            builder.ConfigureRouteSettings();
+			// Register the hangfire services.
+			builder.RegisterHangfire();
+
+			// Configured conventional route settings.
+			builder.ConfigureRouteSettings();
 
             // Configured AutoMapper Services.
             builder.ConfigureAutomapperAssemblies();
@@ -212,9 +216,16 @@ namespace Coditech.API.Common
             // Assigned Translator to TranslatorExtension.
             TranslatorExtension.TranslatorInstance = CoditechDependencyResolver._staticServiceProvider?.GetService<CoditechTranslator>();
         }
-        #endregion
 
-        public static void RegisterCustomDI(this WebApplicationBuilder builder)
+		public static void RegisterHangfire(this WebApplicationBuilder builder)
+		{
+			// Configure the hangfire service
+			builder.Services.ConfigureServices(builder.Configuration);
+		}
+
+		#endregion
+
+		public static void RegisterCustomDI(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IUserService, DBTMUserService>();
             builder.Services.AddScoped<IDBTMUserService, DBTMUserService>();

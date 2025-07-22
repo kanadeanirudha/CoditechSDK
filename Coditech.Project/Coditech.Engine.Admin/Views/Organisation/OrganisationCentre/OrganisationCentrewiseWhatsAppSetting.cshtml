@@ -4,8 +4,8 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel whatsAppProviderDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.WhatsAppProvider.ToString(), DropdownName = "GeneralWhatsAppProviderId", DropdownSelectedValue = Model.GeneralWhatsAppProviderId.ToString(), ChangeEvent = $"OrganisationCentre.GetWhatsAppSettingByCentreCode('{Model.OrganisationCentreMasterId}')" };
+    ModelPopUpViewModel sendTestEmailModal = new ModelPopUpViewModel() { ModelPopUpId = "SendDetailsPopupId", ModalContentId = "SendDetailsContentId" };
 }
-
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
@@ -64,6 +64,18 @@
                                         @Html.Partial("~/Views/Organisation/OrganisationCentre/_OrganisationCentrewiseWhatsAppSetting.cshtml", Model)
                                     }
                                 </div>
+                                <div class="col-lg-12 d-flex justify-content-center">
+                                    <div class="mb-6">
+                                        <button type="button"
+                                                class="btn btn-gradient-info"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#@sendTestEmailModal.ModelPopUpId"
+                                                onclick="OrganisationTestModel.SendWhatsAppTestModel('@sendTestEmailModal.ModalContentId','@Model.CentreCode','@Model.OrganisationCentreMasterId')"
+                                                title="Send Test WhatsApp">
+                                            Send Test WhatsApp
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
@@ -75,3 +87,5 @@
     </div>
 </div>
 <script src="~/js/Coditech/Organisation/OrganisationCentre.js"></script>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", sendTestEmailModal)
+<script src="~/js/coditech/Organisation/OrganisationTestModel.js"></script>

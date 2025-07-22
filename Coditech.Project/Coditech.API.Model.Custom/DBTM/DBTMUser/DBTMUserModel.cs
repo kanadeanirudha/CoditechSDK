@@ -27,5 +27,7 @@
         public bool IsAcceptedTermsAndConditions { get; set; }
         public decimal Height { get; set; }
         public decimal Weight { get; set; }
+        public string CentreCode { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
     }
 }
