@@ -18,14 +18,16 @@ namespace Coditech.Admin.Agents
         protected readonly ICoditechLogging _coditechLogging;
         private readonly IDBTMTraineeAssignmentClient _dBTMTraineeAssignmentClient;
         private readonly IDBTMTraineeDetailsClient _dBTMTraineeDetailsClient;
+        private readonly IDBTMTestClient _dBTMTestClient;
         #endregion
 
         #region Public Constructor
-        public DBTMTraineeAssignmentAgent(ICoditechLogging coditechLogging, IDBTMTraineeAssignmentClient dBTMTraineeAssignmentClient, IDBTMTraineeDetailsClient dBTMTraineeDetailsClient)
+        public DBTMTraineeAssignmentAgent(ICoditechLogging coditechLogging, IDBTMTraineeAssignmentClient dBTMTraineeAssignmentClient, IDBTMTraineeDetailsClient dBTMTraineeDetailsClient, IDBTMTestClient dBTMTestClient)
         {
             _coditechLogging = coditechLogging;
             _dBTMTraineeAssignmentClient = GetClient<IDBTMTraineeAssignmentClient>(dBTMTraineeAssignmentClient);
             _dBTMTraineeDetailsClient = GetClient<IDBTMTraineeDetailsClient>(dBTMTraineeDetailsClient);
+            _dBTMTestClient = GetClient<IDBTMTestClient>(dBTMTestClient);
         }
         #endregion
 
@@ -51,6 +53,14 @@ namespace Coditech.Admin.Agents
             listViewModel.DBTMTraineeAssignmentList = deviceList?.DBTMTraineeAssignmentList?.ToViewModel<DBTMTraineeAssignmentViewModel>().ToList();
 
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentList.Count, BindColumns());
+            return listViewModel;
+        }
+        public virtual DBTMTestListViewModel GetDBTMTestList()
+        {
+            DBTMTestListResponse response = _dBTMTestClient.List(null, null, null, 1, int.MaxValue);
+            DBTMTestListModel dBTMTestList = new DBTMTestListModel { DBTMTestList = response?.DBTMTestList };
+            DBTMTestListViewModel listViewModel = new DBTMTestListViewModel();
+            listViewModel.DBTMTestList = dBTMTestList?.DBTMTestList?.ToViewModel<DBTMTestViewModel>().ToList();
             return listViewModel;
         }
 
@@ -183,7 +193,6 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
-
         #region DBTMAssignmentUser
         public virtual DBTMTraineeAssignmentToUserListViewModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, DataTableViewModel dataTableModel)
         {
@@ -196,7 +205,6 @@ namespace Coditech.Admin.Agents
                 filters.Add("EmailId", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("MobileNumber", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
@@ -244,9 +252,7 @@ namespace Coditech.Admin.Agents
                 return (DBTMTraineeAssignmentToUserViewModel)GetViewModelWithErrorMessage(dBTMTraineeAssignmentToUserViewModel, GeneralResources.ErrorFailedToCreate);
             }
         }
-
         #endregion
-
         #endregion
 
         #region protected

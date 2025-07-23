@@ -6,6 +6,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 namespace Coditech.Admin.Controllers
 {
@@ -52,6 +53,7 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
+            BindDBTMTest(dBTMTraineeAssignmentViewModel);
 
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
@@ -79,6 +81,7 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
+            BindDBTMTest(dBTMTraineeAssignmentViewModel);
 
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTraineeAssignmentViewModel.ErrorMessage));
             return View(createEdit, dBTMTraineeAssignmentViewModel);
@@ -88,6 +91,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult Edit(long dBTMTraineeAssignmentId)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
+            BindDBTMTest(dBTMTraineeAssignmentViewModel);
             return ActionView(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
@@ -101,6 +105,7 @@ namespace Coditech.Admin.Controllers
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
                 return RedirectToAction("Edit", new { dBTMTraineeAssignmentId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentId });
             }
+            BindDBTMTest(dBTMTraineeAssignmentViewModel);
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
@@ -214,6 +219,23 @@ namespace Coditech.Admin.Controllers
         }
         #endregion
         #region Protected
+        protected virtual void BindDBTMTest(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
+        {
+            dBTMTraineeAssignmentViewModel.DBTMTestList = dBTMTraineeAssignmentViewModel.DBTMTestList ?? new List<SelectListItem>();
+            DBTMTestListViewModel dBTMTestList = _dBTMTraineeAssignmentAgent.GetDBTMTestList();
+
+            if (dBTMTestList?.DBTMTestList != null)
+            {
+                foreach (var item in dBTMTestList.DBTMTestList)
+                {
+                    dBTMTraineeAssignmentViewModel.DBTMTestList.Add(new SelectListItem
+                    {
+                        Text = item.TestName,
+                        Value = item.DBTMTestMasterId.ToString()
+                    });
+                }
+            }
+        }
         #endregion
     }
 }
