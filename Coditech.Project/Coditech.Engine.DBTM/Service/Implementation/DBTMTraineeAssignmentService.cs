@@ -125,16 +125,23 @@ namespace Coditech.API.Service
             if (dBTMTraineeAssignmentModel.DBTMTraineeAssignmentId < 1)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentID"));
 
-            DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
+            DBTMTraineeAssignment existingAssignment = _dBTMTraineeAssignmentRepository.Table.FirstOrDefault(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentModel.DBTMTraineeAssignmentId);
 
-            //Update DBTMTraineeAssignment
-            bool isdBTMTraineeAssignmentUpdated = _dBTMTraineeAssignmentRepository.Update(dBTMTraineeAssignment);
-            if (!isdBTMTraineeAssignmentUpdated)
+            if (existingAssignment == null)
+                throw new CoditechException(ErrorCodes.NotFound, "Trainee assignment not found.");
+
+            existingAssignment.AssignmentDate = dBTMTraineeAssignmentModel.AssignmentDate;
+            existingAssignment.AssignmentTime = dBTMTraineeAssignmentModel.AssignmentTime;
+
+            bool isUpdated = _dBTMTraineeAssignmentRepository.Update(existingAssignment);
+
+            if (!isUpdated)
             {
                 dBTMTraineeAssignmentModel.HasError = true;
                 dBTMTraineeAssignmentModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
             }
-            return isdBTMTraineeAssignmentUpdated;
+
+            return isUpdated;
         }
 
         //Delete DBTMTraineeAssignment.

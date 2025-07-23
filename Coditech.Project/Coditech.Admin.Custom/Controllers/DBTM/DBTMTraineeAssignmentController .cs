@@ -88,27 +88,29 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Edit(long dBTMTraineeAssignmentId)
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
-            BindDBTMTest(dBTMTraineeAssignmentViewModel);
-            return ActionView(createEdit, dBTMTraineeAssignmentViewModel);
+            return View("~/Views/DBTM/DBTMTraineeAssignment/_EditDBTMTraineAssignment.cshtml", dBTMTraineeAssignmentViewModel);
+
         }
 
         [HttpPost]
-        public ActionResult Edit(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
+        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
         {
+            ModelState.Remove("DBTMTestStatusEnumId");
+            ModelState.Remove("SelectedTrainee");
+            ModelState.Remove("SelectedTest");
             if (ModelState.IsValid)
             {
                 SetNotificationMessage(_dBTMTraineeAssignmentAgent.UpdateDBTMTraineeAssignment(dBTMTraineeAssignmentViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { dBTMTraineeAssignmentId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentId });
+                return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentId });
             }
-            BindDBTMTest(dBTMTraineeAssignmentViewModel);
-            return View(createEdit, dBTMTraineeAssignmentViewModel);
-        }
+            return View("~/Views/DBTM/DBTMTraineeAssignment/_EditDBTMTraineAssignment.cshtml", dBTMTraineeAssignmentViewModel);
 
+        }
         public ActionResult Delete(string dBTMTraineeAssignmentIds, string selectedCentreCode)
         {
             string message = string.Empty;
