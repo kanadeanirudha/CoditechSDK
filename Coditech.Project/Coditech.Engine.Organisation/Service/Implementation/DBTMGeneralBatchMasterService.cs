@@ -4,6 +4,7 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Resources;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
@@ -14,12 +15,82 @@ namespace Coditech.API.Service
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
+        private readonly ICoditechRepository<DBTMBatchActivity> _dBTMBatchActivityRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         public DBTMGeneralBatchMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+        }
 
+        //Create GeneralBatch.
+        public override GeneralBatchModel CreateGeneralBatch(GeneralBatchModel generalBatchModel)
+        {
+            generalBatchModel = base.CreateGeneralBatch(generalBatchModel);
+            if (generalBatchModel.GeneralBatchMasterId > 0 && generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
+            {
+                foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
+                {
+                    DBTMBatchActivity dBTMBatchActivity = new DBTMBatchActivity
+                    {
+                        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                        DBTMTestMasterId = dBTMTestMasterId,
+                    };
+                    _dBTMBatchActivityRepository.Insert(dBTMBatchActivity);
+                }
+            }
+            else
+            {
+                generalBatchModel.HasError = true;
+                generalBatchModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return generalBatchModel;
+        }
+
+        //Get GeneralBatchMaster by generalBatchMaster id.
+        public override GeneralBatchModel GetGeneralBatch(int generalBatchMasterId)
+        {
+            GeneralBatchModel generalBatchModel = base.GetGeneralBatch(generalBatchMasterId);
+           
+            if (IsNull(generalBatchModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            generalBatchModel.CustomDropdownSelectedValue1 = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
+            return generalBatchModel;
+        }
+
+        //Update GeneralBatchMaster.
+        public override bool UpdateGeneralBatch(GeneralBatchModel generalBatchModel)
+        {
+            bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
+
+            if (isGeneralBatchUpdated)
+            {
+                List<DBTMBatchActivity> existingActivities = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
+
+                foreach (DBTMBatchActivity dBTMBatchActivity in existingActivities)
+                {
+                    _dBTMBatchActivityRepository.Delete(dBTMBatchActivity);
+                }
+
+                if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
+                {
+                    foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
+                    {
+                        DBTMBatchActivity newDBTMBatchActivity = new DBTMBatchActivity
+                        {
+                            GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                            DBTMTestMasterId = dBTMTestMasterId,
+                        };
+                        _dBTMBatchActivityRepository.Insert(newDBTMBatchActivity);
+                    }
+                }
+            }
+            return isGeneralBatchUpdated;
         }
 
         #region GeneralBatchUser

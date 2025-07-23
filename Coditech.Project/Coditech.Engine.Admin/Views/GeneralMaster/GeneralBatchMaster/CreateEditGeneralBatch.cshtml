@@ -66,12 +66,12 @@
                                         @Html.TextBoxFor(x => x.BatchTime, new { @class = "form-control", type = "time" })
                                         @Html.ValidationMessageFor(x => x.BatchTime)
                                     </div>
-                                </div>
-                                <div class="col-lg-4" style="display:none">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.BatchStartTime, new { @class = "form-label "})
-                                        @Html.TextBoxFor(x => x.BatchStartTime, new { @class = "form-control", type = "time" })
-                                        @Html.ValidationMessageFor(x => x.BatchStartTime)
+                                </div>                             
+                                <div class="col-lg-8">
+                                    <div class="mb-3 multiselect-dropdown">
+                                        <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
+                                        @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                        @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -82,9 +82,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-lg-4" style="display:none">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.BatchStartTime, new { @class = "form-label " })
+                                        @Html.TextBoxFor(x => x.BatchStartTime, new { @class = "form-control", type = "time" })
+                                        @Html.ValidationMessageFor(x => x.BatchStartTime)
+                                    </div>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>
                 </div>

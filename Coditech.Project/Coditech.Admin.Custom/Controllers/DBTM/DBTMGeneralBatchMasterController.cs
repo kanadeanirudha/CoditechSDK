@@ -2,7 +2,6 @@
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
-using Coditech.Common.Helper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Coditech.Admin.Controllers
@@ -11,8 +10,8 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IGeneralBatchAgent _generalBatchAgent;
         private const string createEditBatch = "~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml";
-        private readonly IDBTMBatchActivityAgent _dBTMBatchActivityAgent; 
-        private readonly IDBTMTestAgent _dBTMTestAgent; 
+        private readonly IDBTMBatchActivityAgent _dBTMBatchActivityAgent;
+        private readonly IDBTMTestAgent _dBTMTestAgent;
 
         public DBTMGeneralBatchMasterController(IGeneralBatchAgent generalBatchAgent, IDBTMBatchActivityAgent dBTMBatchActivityAgent, IDBTMTestAgent dBTMTestAgent)
         {
@@ -24,68 +23,82 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
             BindDBTMBatchActivity(generalBatchViewModel);
             return View(createEditBatch, generalBatchViewModel);
         }
 
         [HttpPost]
-        public virtual ActionResult Create(GeneralBatchViewModel generalBatchViewModel)
+        public ActionResult Create(GeneralBatchViewModel generalBatchViewModel)
         {
-            if (ModelState.IsValid)
+            if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0)
             {
-                generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
-                if (!generalBatchViewModel.HasError)
+                if (ModelState.IsValid)
                 {
-                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new { selectedCentreCode = generalBatchViewModel.CentreCode });
+                    generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
+                    if (!generalBatchViewModel.HasError)
+                    {
+                        SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                        return RedirectToAction<GeneralBatchMasterController>(x => x.List(new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode }));
+                    }
                 }
+                SetNotificationMessage(GetErrorNotificationMessage(generalBatchViewModel.ErrorMessage));
             }
-            SetNotificationMessage(GetErrorNotificationMessage(generalBatchViewModel.ErrorMessage));
+            else
+            {
+                SetNotificationMessage(GetErrorNotificationMessage("Please Select Activity."));
+            }
+            BindDBTMBatchActivity(generalBatchViewModel);
             return View(createEditBatch, generalBatchViewModel);
         }
 
         [HttpGet]
-        public virtual ActionResult UpdateGeneralBatch(int generalBatchMasterId)
+        public ActionResult UpdateGeneralBatch(int generalBatchMasterId)
         {
             GeneralBatchViewModel generalBatchViewModel = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
+            BindDBTMBatchActivity(generalBatchViewModel);
             return ActionView(createEditBatch, generalBatchViewModel);
         }
 
         [HttpPost]
-        public virtual ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel)
+        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel)
         {
-            if (ModelState.IsValid)
+            if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0)
             {
-                SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
-                ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
-                : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId });
+                if (ModelState.IsValid)
+                {
+                    SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
+                    ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                    : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId });
+                }
             }
+            else
+            {
+                SetNotificationMessage(GetErrorNotificationMessage("Please Select Activity."));
+            }
+            BindDBTMBatchActivity(generalBatchViewModel);
             return View(createEditBatch, generalBatchViewModel);
         }
 
-        protected virtual void BindDBTMBatchActivity(GeneralBatchViewModel generalBatchViewModel)
+        protected void BindDBTMBatchActivity(GeneralBatchViewModel generalBatchViewModel)
         {
             generalBatchViewModel.CustomDropdownList1 = generalBatchViewModel.CustomDropdownList1 ?? new List<SelectListItem>();
-            DataTableViewModel dataTableModel = new DataTableViewModel();
-            DBTMBatchActivityListViewModel dBTMBatchActivityList = _dBTMBatchActivityAgent.GetDBTMBatchActivityList(generalBatchViewModel.GeneralBatchMasterId, dataTableModel);
+            DataTableViewModel dataTableModel = new DataTableViewModel() { };
+            DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
 
-            if (dBTMBatchActivityList?.CustomDropdownList1 != null)
+            if (dBTMBatchActivityList?.DBTMTestList != null)
             {
-                foreach (var item in dBTMBatchActivityList.CustomDropdownList1)
+                foreach (var item in dBTMBatchActivityList.DBTMTestList)
                 {
                     generalBatchViewModel.CustomDropdownList1.Add(new SelectListItem
                     {
-                        Text = item.Text,
-                        Value = item.Value
+                        Text = item.TestName,
+                        Value = item.DBTMTestMasterId.ToString(),
                     });
                 }
             }
         }
-
-
     }
 }
 
