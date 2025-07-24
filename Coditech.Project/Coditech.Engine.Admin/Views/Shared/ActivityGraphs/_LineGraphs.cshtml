@@ -19,13 +19,16 @@
         </text>
     }
 
-    new Chart("@Model.LineChartId", {
+     new Chart("@Model.LineChartId", {
         type: "line",
         data: {
             labels: xValues,
             datasets: datasets
         },
         options: {
+            animation: {
+                duration: 0
+            },
             title: {
                 display: true,
                 text: '@Model.Title'

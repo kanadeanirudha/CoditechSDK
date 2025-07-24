@@ -244,6 +244,10 @@ label {
 .login-page-wrapper .card-body.auth-footer {
     border-radius: 0 0 4px 4px;
 }
+
+.modal-content .modal-header {
+    background-color: #1c2d41
+}
 /*Responsive*/
 @media only screen and (max-width:768px) {
     #barchart, .apex-charts {
@@ -301,13 +305,15 @@ td.text-center a.btn {
     #MediaUpload .files-nav .nav .nav-link svg path {
         fill: #ffcc66;
     }
+
 #MediaUpload .file-box-content .file-box .download-icon-link .file-download-icon {
     font-size: 13px;
     position: relative;
     top: 0;
     left: 0;
-    cursor:pointer;
+    cursor: pointer;
 }
+
 #MediaUpload .file-box-content .file-box {
     border-radius: 6px;
     padding: 10px;
@@ -317,6 +323,7 @@ td.text-center a.btn {
     margin-bottom: 0;
     background-color: #fff;
 }
+
 .card-image-info {
     display: flex;
     max-width: 120px;
@@ -325,14 +332,16 @@ td.text-center a.btn {
     align-items: center;
     border: 1px solid #eaf0f9;
 }
-.card-image-info img.img-thumbnail {
-    width: 100%;
-    height: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border: none;
-}
+
+    .card-image-info img.img-thumbnail {
+        width: 100%;
+        height: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border: none;
+    }
+
 #MediaUpload .file-box-content .file-box h6 {
     display: block;
     max-width: 100%;
@@ -345,6 +354,7 @@ td.text-center a.btn {
 #MediaUpload .file-box-content .file-box i.dripicons-cross {
     color: #f5325c;
 }
+
 #MediaUpload .file-box-content .file-box i.dripicons-download {
     color: #03d87f;
 }
@@ -354,47 +364,56 @@ td.text-center a.btn {
     right: 8px;
     cursor: pointer;
 }
+
 .search-wrapper .fa-times-circle {
     color: #f5325c;
     cursor: pointer;
 }
+
 .dataTables_paginate ul.pagination .page-link {
     font-size: 14px !important;
     border: none;
     background: transparent;
 }
-.bottom-15{
-    bottom:15px;
+
+.bottom-15 {
+    bottom: 15px;
 }
+
 .multiselect-dropdown .dropdown-toggle {
     background-color: #f1f5fa;
     border: 1px solid #e3ebf6;
     font-size: .8125rem;
     font-weight: 400;
 }
-.multiselect-dropdown .dropdown-toggle:focus {
-    outline: none !important;
-    border: 1px solid #8bb0fe;
-}
+
+    .multiselect-dropdown .dropdown-toggle:focus {
+        outline: none !important;
+        border: 1px solid #8bb0fe;
+    }
+
 .scroll-wrapper {
     max-height: calc((100vh) - 150px);
     overflow-y: auto;
 }
+
 body[data-layout="horizontal"] .page-wrapper .page-content {
     margin-top: 1rem !important;
 }
+
 .table > tbody tr {
     line-height: 30px !important;
 }
 
-.table > tbody tr td {
-    padding: 0.12rem .3rem !important;
-}
+    .table > tbody tr td {
+        padding: 0.12rem .3rem !important;
+    }
 
 .avatar-color {
     background-color: rgba(253, 60, 151, 0.08) !important;
     color: #fd3c97 !important;
 }
+
 .logo-background {
     background-color: #ffffff !important;
 }
