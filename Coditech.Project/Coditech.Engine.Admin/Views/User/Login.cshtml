@@ -17,9 +17,9 @@
             {
                 @Html.AntiForgeryToken()
                 <div class="form-group mb-2">
-                    <label class="form-label required" for="UserName">Email/UserName</label>
+                    <label class="form-label required" for="UserName">Email Address/Username</label>
                     <div class="input-group">
-                        @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", placeholder = "Email/UserName" })
+                        @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", placeholder = "Email Address/Username" })
                     </div>
                     @Html.ValidationMessageFor(m => m.UserName, null)
                 </div>
