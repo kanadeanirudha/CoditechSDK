@@ -1,8 +1,8 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -34,6 +34,7 @@ namespace Coditech.Admin.Controllers
             DBTMTestViewModel dBTMTestViewModel = new DBTMTestViewModel();
             BindDBTMTestParameter(dBTMTestViewModel);
             BindDBTMTestCalculation(dBTMTestViewModel);
+            BindDBTMGraph(dBTMTestViewModel);
             return View(createEdit, dBTMTestViewModel);
         }
 
@@ -51,6 +52,7 @@ namespace Coditech.Admin.Controllers
             }
             BindDBTMTestParameter(dBTMTestViewModel);
             BindDBTMTestCalculation(dBTMTestViewModel);
+            BindDBTMGraph(dBTMTestViewModel);
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTestViewModel.ErrorMessage));
             return View(createEdit, dBTMTestViewModel);
         }
@@ -61,6 +63,7 @@ namespace Coditech.Admin.Controllers
             DBTMTestViewModel dBTMTestViewModel = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId);
             BindDBTMTestParameter(dBTMTestViewModel);
             BindDBTMTestCalculation(dBTMTestViewModel);
+            BindDBTMGraph(dBTMTestViewModel);
             return ActionView(createEdit, dBTMTestViewModel);
         }
 
@@ -76,6 +79,7 @@ namespace Coditech.Admin.Controllers
             }
             BindDBTMTestParameter(dBTMTestViewModel);
             BindDBTMTestCalculation(dBTMTestViewModel);
+            BindDBTMGraph(dBTMTestViewModel);
             return View(createEdit, dBTMTestViewModel);
         }
 
@@ -114,7 +118,6 @@ namespace Coditech.Admin.Controllers
                 }
             }
         }
-
         protected virtual void BindDBTMTestCalculation(DBTMTestViewModel dBTMTestViewModel)
         {
             dBTMTestViewModel.DBTMTestCalculationList = dBTMTestViewModel.DBTMTestCalculationList ?? new List<SelectListItem>();
@@ -132,6 +135,36 @@ namespace Coditech.Admin.Controllers
                 }
             }
         }
+        protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)
+        {
+            dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();
+            DBTMGraphMasterListViewModel dBTMGraphMasterList = _dBTMTestAgent.DBTMGraph();
+
+            if (dBTMGraphMasterList?.DBTMGraphMasterList != null)
+            {
+                foreach (var item in dBTMGraphMasterList.DBTMGraphMasterList)
+                {
+                    dBTMTestViewModel.DBTMGraphMasterList.Add(new SelectListItem
+                    {
+                        Text = item.GraphName,
+                        Value = item.DBTMGraphMasterId.ToString()
+                    });
+                }
+            }
+        }
+        [HttpGet]
+        public ActionResult GetDBTMGraphByDBTMTestMaster(int dBTMTestMasterId)
+        {
+            DropdownViewModel dBTMGraphByDBTMTestMaster = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
+                DropdownName = "DBTMGraphMasterId",
+                Parameter = dBTMTestMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
+        }
+
         #endregion
     }
 }

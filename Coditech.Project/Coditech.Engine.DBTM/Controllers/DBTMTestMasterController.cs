@@ -183,5 +183,51 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestCalculationListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetDBTMGraph")]
+        [Produces(typeof(DBTMGraphMasterListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetDBTMGraph()
+        {
+            try
+            {
+                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraph();
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMGraphMasterListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMGraphMasterListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMGraphMasterListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [Route("/DBTMTestMaster/DBTMGraphByDBTMTestMasterId")]
+        [HttpGet]
+        [Produces(typeof(DBTMGraphMasterListResponse))]
+        public virtual IActionResult GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        {
+            try
+            {
+                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                return IsNotNull(list) ? CreateOKResponse(new DBTMGraphMasterListResponse { DBTMGraphMasterList = list.DBTMGraphMasterList }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMGraphMasterListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMGraphMasterListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
     }
 }

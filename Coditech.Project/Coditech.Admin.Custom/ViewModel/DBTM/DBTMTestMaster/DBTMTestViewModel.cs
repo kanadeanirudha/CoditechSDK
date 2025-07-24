@@ -28,9 +28,13 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Parameter")]
         public List<string> DBTMSelectedTestParameter { get; set; }
         [Required]
+        [Display(Name = "Graph")]
+        public List<string> DBTMSelectedGraph { get; set; }
+        [Required]
         [Display(Name = "Calculation")]
         public List<string> DBTMSelectedTestCalculation { get; set; }
         public List<SelectListItem> DBTMTestParameterList { get; set; }
+        public List<SelectListItem> DBTMGraphMasterList { get; set; }
         public List<SelectListItem> DBTMTestCalculationList { get; set; }
         [Display(Name = "Minimun Paired Device")]
         public short MinimunPairedDevice { get; set; }
@@ -48,5 +52,6 @@ namespace Coditech.Admin.ViewModel
         public long TestMediaId { get; set; }
         public string TestMediaPath { get; set; }
         public string TestMediaFileName { get; set; }
+        public int DBTMGraphMasterId { get; set; }
     }
 }

@@ -38,7 +38,7 @@ namespace Coditech.API.Service
             _dBTMTraineeAssignmentToUserRepository = new CoditechRepository<DBTMTraineeAssignmentToUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
-        public  DBTMTraineeAssignmentListModel GetDBTMTraineeAssignmentList(long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMTraineeAssignmentListModel GetDBTMTraineeAssignmentList(long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -59,39 +59,44 @@ namespace Coditech.API.Service
         }
 
         //Create DBTMTraineeAssignment
-        public  DBTMTraineeAssignmentModel CreateDBTMTraineeAssignment(DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel)
+        public DBTMTraineeAssignmentModel CreateDBTMTraineeAssignment(DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel)
         {
             if (IsNull(dBTMTraineeAssignmentModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+            if (IsNull(dBTMTraineeAssignmentModel.SelectedTest))
+                throw new CoditechException(ErrorCodes.InvalidData, "Selected Activity cannot be null.");
+            if (IsNull(dBTMTraineeAssignmentModel.SelectedTrainee))
+                throw new CoditechException(ErrorCodes.InvalidData, "Selected Trainee cannot be null.");
 
             DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
-            //Create new DBTMTraineeAssignment and return it.
-            DBTMTraineeAssignment dBTMTraineeAssignmentData = _dBTMTraineeAssignmentRepository.Insert(dBTMTraineeAssignment);
-            if (dBTMTraineeAssignmentData?.DBTMTraineeAssignmentId > 0)
-            {
-                int dBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString());
-                foreach (var dBTMTraineeDetailId in dBTMTraineeAssignmentModel.SelectedTrainee)
-                {
-                    DBTMTraineeAssignmentToUser dBTMTraineeAssignmentToUserData = new DBTMTraineeAssignmentToUser
-                    {
-                        DBTMTraineeAssignmentId = dBTMTraineeAssignment.DBTMTraineeAssignmentId,
-                        DBTMTraineeDetailId = Convert.ToInt64(dBTMTraineeDetailId),
-                        DBTMTestStatusEnumId = dBTMTestStatusEnumId
-                    };
-                    _dBTMTraineeAssignmentToUserRepository.Insert(dBTMTraineeAssignmentToUserData);
-                }
 
-            }
-            else
+            int dBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString());
+            List<DBTMTraineeAssignmentToUser> dBTMTraineeAssignmentToUserData = new List<DBTMTraineeAssignmentToUser>();
+            foreach (string dBTMTestMasterId in dBTMTraineeAssignmentModel.SelectedTest)
             {
-                dBTMTraineeAssignmentModel.HasError = true;
-                dBTMTraineeAssignmentModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+                dBTMTraineeAssignment.DBTMTestMasterId = Convert.ToInt32(dBTMTestMasterId);
+                dBTMTraineeAssignment.DBTMTraineeAssignmentId = 0;
+                DBTMTraineeAssignment dBTMTraineeAssignmentData = _dBTMTraineeAssignmentRepository.Insert(dBTMTraineeAssignment);
+                if (dBTMTraineeAssignmentData.DBTMTraineeAssignmentId > 0)
+                    foreach (var dBTMTraineeDetailId in dBTMTraineeAssignmentModel?.SelectedTrainee)
+                    {
+                        dBTMTraineeAssignmentToUserData.Add(new DBTMTraineeAssignmentToUser
+                        {
+                            DBTMTraineeAssignmentId = dBTMTraineeAssignmentData.DBTMTraineeAssignmentId,
+                            DBTMTraineeDetailId = Convert.ToInt64(dBTMTraineeDetailId),
+                            DBTMTestStatusEnumId = dBTMTestStatusEnumId
+                        });
+                    }
             }
+
+            if (dBTMTraineeAssignmentToUserData.Any())
+                _dBTMTraineeAssignmentToUserRepository.Insert(dBTMTraineeAssignmentToUserData);
+
             return dBTMTraineeAssignmentModel;
         }
 
         //Get DBTMTraineeAssignment by dBTMTraineeAssignment id.
-        public  DBTMTraineeAssignmentModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public DBTMTraineeAssignmentModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
         {
             if (dBTMTraineeAssignmentId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentId"));
@@ -112,7 +117,7 @@ namespace Coditech.API.Service
         }
 
         //Update DBTMTraineeAssignment.
-        public  bool UpdateDBTMTraineeAssignment(DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel)
+        public bool UpdateDBTMTraineeAssignment(DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel)
         {
             if (IsNull(dBTMTraineeAssignmentModel))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
@@ -120,33 +125,48 @@ namespace Coditech.API.Service
             if (dBTMTraineeAssignmentModel.DBTMTraineeAssignmentId < 1)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentID"));
 
-            DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
+            DBTMTraineeAssignment existingAssignment = _dBTMTraineeAssignmentRepository.Table.FirstOrDefault(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentModel.DBTMTraineeAssignmentId);
 
-            //Update DBTMTraineeAssignment
-            bool isdBTMTraineeAssignmentUpdated = _dBTMTraineeAssignmentRepository.Update(dBTMTraineeAssignment);
-            if (!isdBTMTraineeAssignmentUpdated)
+            if (existingAssignment == null)
+                throw new CoditechException(ErrorCodes.NotFound, "Trainee assignment not found.");
+
+            existingAssignment.AssignmentDate = dBTMTraineeAssignmentModel.AssignmentDate;
+            existingAssignment.AssignmentTime = dBTMTraineeAssignmentModel.AssignmentTime;
+
+            bool isUpdated = _dBTMTraineeAssignmentRepository.Update(existingAssignment);
+
+            if (!isUpdated)
             {
                 dBTMTraineeAssignmentModel.HasError = true;
                 dBTMTraineeAssignmentModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
             }
-            return isdBTMTraineeAssignmentUpdated;
+
+            return isUpdated;
         }
 
         //Delete DBTMTraineeAssignment.
-        public  bool DeleteDBTMTraineeAssignment(ParameterModel parameterModel)
+        public bool DeleteDBTMTraineeAssignment(ParameterModel parameterModel)
         {
             if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
-                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceID"));
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentUserId"));
+
+            long traineeAssignmentUserId = Convert.ToInt64(parameterModel.Ids);
+
+            long traineeAssignmentId = _dBTMTraineeAssignmentToUserRepository.Table.Where(x => x.DBTMTraineeAssignmentUserId == traineeAssignmentUserId).Select(x => x.DBTMTraineeAssignmentId).FirstOrDefault();
 
             CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("DBTMTraineeAssignmentId", parameterModel.Ids, ParameterDirection.Input, DbType.String);
+
+            objStoredProc.SetParameter("DBTMTraineeAssignmentUserId", traineeAssignmentUserId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("DBTMTraineeAssignmentId", traineeAssignmentId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+
             int status = 0;
-            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTraineeAssignment @DBTMTraineeAssignmentId,  @Status OUT", 1, out status);
+            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTraineeAssignment @DBTMTraineeAssignmentUserId, @DBTMTraineeAssignmentId, @Status OUT", 1, out status);
 
             return status == 1 ? true : false;
         }
-        public  DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
+
+        public DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
             if (dBTMTraineeAssignmentId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, $"Invalid assignment ID: {dBTMTraineeAssignmentId}");
@@ -220,7 +240,7 @@ namespace Coditech.API.Service
 
             return dBTMTraineeAssignmentReminderModel;
         }
-        public  GeneralTrainerListModel GetTrainerByCentreCode(string centreCode)
+        public GeneralTrainerListModel GetTrainerByCentreCode(string centreCode)
         {
             var list = new GeneralTrainerListModel();
 
@@ -241,7 +261,7 @@ namespace Coditech.API.Service
 
             return list;
         }
-        public  DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
+        public DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
@@ -257,7 +277,7 @@ namespace Coditech.API.Service
             return listModel;
         }
         #region DBTMTraineeAssignmentToUser
-        public  DBTMTraineeAssignmentToUserListModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMTraineeAssignmentToUserListModel GetDBTMTraineeAssignmentToUserList(long dBTMTraineeAssignmentId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -286,7 +306,7 @@ namespace Coditech.API.Service
             listModel.DBTMTraineeAssignmentId = dBTMTraineeAssignmentId;
             return listModel;
         }
-        public  bool AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel dBTMTraineeAssignmentToUserModel)
+        public bool AssociateUnAssociateAssignmentwiseUser(DBTMTraineeAssignmentToUserModel dBTMTraineeAssignmentToUserModel)
         {
             bool isAssociateUnAssociateAssignmentwiseUser = false;
 

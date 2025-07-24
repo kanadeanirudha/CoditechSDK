@@ -18,24 +18,24 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult BatchWiseReports()
+        public ActionResult BatchWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
-            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());           
+            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
             return View(batchreports, dBTMReportsViewModel);
         }
 
         [HttpGet]
-        public virtual ActionResult GetBatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetBatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId,dBTMTestMasterId,FromDate, ToDate);
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
             dBTMReportsViewModel.IsRecordFound = dBTMReportsViewModel?.DataTable?.Rows?.Count > 0;
             return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
         }
 
         [HttpGet]
-        public virtual ActionResult TestWiseReports()
+        public ActionResult TestWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
@@ -44,10 +44,29 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult GetTestWiseReports(int dBTMTestMasterId,long dBTMTraineeDetailId,DateTime FromDate,DateTime ToDate)
+        public ActionResult GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId,dBTMTraineeDetailId,FromDate,ToDate);
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate);
             return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult TestWiseGraphReports()
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = Convert.ToDateTime(DateTime.Now.AddMonths(-1).ToShortDateString());
+            dBTMReportsViewModel.ToDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+            return View("~/Views/DBTM/DBTMReports/TestWiseGraphReports.cshtml", dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string graphType)
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate);
+
+            dBTMReportsViewModel.GraphType = graphType;
+
+            return PartialView("~/Views/DBTM/DBTMReports/Graph/_TestWiseGraphReports.cshtml", dBTMReportsViewModel);
         }
 
         public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
@@ -56,11 +75,25 @@ namespace Coditech.Admin.Controllers
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
                 DropdownName = "DBTMTestMasterId",
-                Parameter = $"{generalBatchMasterId}~true", 
+                Parameter = $"{generalBatchMasterId}~true",
                 IsCustomDropdown = true
             };
 
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn);
         }
+
+        [HttpGet]
+        public ActionResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId)
+        {
+            DropdownViewModel dBTMGraphByDBTMTestMaster = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
+                DropdownName = "DBTMGraphMasterId",
+                Parameter = dBTMTestMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
+        }
+
     }
 }

@@ -42,5 +42,6 @@ namespace Coditech.API.Client
         TrueFalseResponse DeleteDBTMTest(ParameterModel body);
         DBTMTestParameterListResponse GetDBTMTestParameter();
         DBTMTestCalculationListResponse GetDBTMTestCalculation();
+        DBTMGraphMasterListResponse GetDBTMGraph();
     }
 }
