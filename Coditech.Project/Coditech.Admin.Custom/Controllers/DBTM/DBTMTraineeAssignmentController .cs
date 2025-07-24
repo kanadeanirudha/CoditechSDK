@@ -111,14 +111,14 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTraineeAssignment/_EditDBTMTraineAssignment.cshtml", dBTMTraineeAssignmentViewModel);
 
         }
-        public ActionResult Delete(string dBTMTraineeAssignmentIds, string selectedCentreCode)
+        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode)
         {
             string message = string.Empty;
             bool status = false;
 
-            if (!string.IsNullOrEmpty(dBTMTraineeAssignmentIds))
+            if (!string.IsNullOrEmpty(dBTMTraineeAssignmentUserId))
             {
-                status = _dBTMTraineeAssignmentAgent.DeleteDBTMTraineeAssignment(dBTMTraineeAssignmentIds, out message);
+                status = _dBTMTraineeAssignmentAgent.DeleteDBTMTraineeAssignment(dBTMTraineeAssignmentUserId, out message);
 
                 SetNotificationMessage(!status
                     ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)

@@ -37,7 +37,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dBTMTraineeAssignmentIds">dBTMTraineeAssignmentIds.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
-        bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentIds, out string errorMessage);
+        bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentUserIds, out string errorMessage);
         DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId);
 
         /// <summary>

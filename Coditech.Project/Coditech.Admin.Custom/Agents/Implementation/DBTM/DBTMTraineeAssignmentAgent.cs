@@ -117,14 +117,14 @@ namespace Coditech.Admin.Agents
         }
 
         //Delete DBTMTraineeAssignment.
-        public virtual bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentIds, out string errorMessage)
+        public virtual bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentUserId, out string errorMessage)
         {
             errorMessage = GeneralResources.ErrorFailedToDelete;
 
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeAssignment", TraceLevel.Info);
-                TrueFalseResponse trueFalseResponse = _dBTMTraineeAssignmentClient.DeleteDBTMTraineeAssignment(new ParameterModel { Ids = dBTMTraineeAssignmentIds });
+                TrueFalseResponse trueFalseResponse = _dBTMTraineeAssignmentClient.DeleteDBTMTraineeAssignment(new ParameterModel { Ids = dBTMTraineeAssignmentUserId });
                 return trueFalseResponse.IsSuccess;
             }
             catch (CoditechException ex)

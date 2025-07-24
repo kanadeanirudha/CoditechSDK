@@ -148,16 +148,24 @@ namespace Coditech.API.Service
         public bool DeleteDBTMTraineeAssignment(ParameterModel parameterModel)
         {
             if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
-                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceID"));
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentUserId"));
+
+            long traineeAssignmentUserId = Convert.ToInt64(parameterModel.Ids);
+
+            long traineeAssignmentId = _dBTMTraineeAssignmentToUserRepository.Table.Where(x => x.DBTMTraineeAssignmentUserId == traineeAssignmentUserId).Select(x => x.DBTMTraineeAssignmentId).FirstOrDefault();
 
             CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("DBTMTraineeAssignmentId", parameterModel.Ids, ParameterDirection.Input, DbType.String);
+
+            objStoredProc.SetParameter("DBTMTraineeAssignmentUserId", traineeAssignmentUserId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("DBTMTraineeAssignmentId", traineeAssignmentId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+
             int status = 0;
-            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTraineeAssignment @DBTMTraineeAssignmentId,  @Status OUT", 1, out status);
+            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTraineeAssignment @DBTMTraineeAssignmentUserId, @DBTMTraineeAssignmentId, @Status OUT", 1, out status);
 
             return status == 1 ? true : false;
         }
+
         public DBTMTraineeAssignmentModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
             if (dBTMTraineeAssignmentId <= 0)

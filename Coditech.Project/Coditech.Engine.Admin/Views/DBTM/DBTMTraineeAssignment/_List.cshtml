@@ -40,11 +40,11 @@
                                     <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId&dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
                                     <span class="m-2">|</span>
                                     <!-- Delete Button -->
-                                    <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.DBTMTraineeAssignmentId">
+                                    <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.DBTMTraineeAssignmentUserId">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                     <!-- Delete Confirmation Modal -->
-                                    <div class="modal fade" id="confirmDeleteModal_@item.DBTMTraineeAssignmentId" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                    <div class="modal fade" id="confirmDeleteModal_@item.DBTMTraineeAssignmentUserId" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -58,7 +58,7 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                     <!-- Delete action with selectedCentreCode parameter -->
-                                                    <a href="/@controllerName/Delete?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId&dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId" class="btn btn-outline-danger">Delete</a>
+                                                    <a href="/@controllerName/Delete?dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId" class="btn btn-outline-danger">Delete</a>
                                                 </div>
                                             </div>
                                         </div>
