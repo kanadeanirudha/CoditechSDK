@@ -1,7 +1,6 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Coditech.Admin.Controllers
 {
@@ -15,7 +14,6 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public  ActionResult TrainerRegistration()
         {
             TempData["FormSizeClass"] = "col-lg-8";
@@ -24,7 +22,6 @@ namespace Coditech.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [AllowAnonymous]
         public  ActionResult TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             TempData["FormSizeClass"] = "col-lg-8";
