@@ -24,3 +24,11 @@
         @Html.ValidationMessageFor(x => x.FromMobileNumber)
     </div>
 </div>
+<div class="col-lg-2">
+    <div class="mb-3">
+        @Html.LabelFor(x => x.IsSMSSettingEnabled, new { @class = "form-label" })
+        <div class="form-check">
+            @Html.CheckBoxFor(x => x.IsSMSSettingEnabled, new { @class = "form-check-input" })
+        </div>
+    </div>
+</div>

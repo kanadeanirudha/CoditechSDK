@@ -1,4 +1,5 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Helpers;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
@@ -12,11 +13,13 @@ namespace Coditech.Admin.Controllers
     public class DBTMTraineeDetailsController : BaseController
     {
         private readonly IDBTMTraineeDetailsAgent _dBTMTraineeDetailsAgent;
+        private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
         private const string createEditTraineeDetails = "~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeDetails.cshtml";
         private const string createEditAssociatedTrainer = "~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/CreateEditAssociatedTrainer.cshtml";
-        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent)
+        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent)
         {
             _dBTMTraineeDetailsAgent = dBTMTraineeDetailsAgent;
+            _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
         }
 
         #region DBTMTraineeDetails
@@ -346,6 +349,66 @@ namespace Coditech.Admin.Controllers
                 SelectedParameter1 = GeneralTrainerMasterId
             };
             return RedirectToAction("List", dataTableViewModel);
+        }
+
+        [HttpGet]
+        public virtual ActionResult TraineeRegistration(string joiningCode)
+        {
+            TempData["FormSizeClass"] = "col-lg-8";
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
+            if (!string.IsNullOrEmpty(joiningCode))
+            {
+                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
+                if (!list.HasError)
+                {
+                    dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+                    {
+                        JoiningCode = joiningCode,
+                        AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                        {
+                            DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                            Parameter = joiningCode
+                        }).DropdownList?.Where(x => x.Value != "")?.ToList()
+
+                    };
+                }
+                if (list.HasError)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
+                }
+                return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+            }
+            return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
+        {
+            TempData["FormSizeClass"] = "col-lg-8";
+
+            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
+            {
+                dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
+            }
+            else
+            {
+                ModelState.Remove("CentreName");
+                ModelState.Remove("CentreCode");
+                ModelState.Remove("DeviceSerialCode");
+                if (ModelState.IsValid)
+                {
+                    dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
+                    if (!dBTMNewRegistrationViewModel.HasError)
+                    {
+                        TempData["FormSizeClass"] = "col-lg-4";
+                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        return RedirectToAction("List", "DBTMTraineeDetails");
+                    }
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
+            return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }
 }

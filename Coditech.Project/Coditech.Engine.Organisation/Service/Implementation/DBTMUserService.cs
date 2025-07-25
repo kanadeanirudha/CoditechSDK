@@ -179,7 +179,7 @@ namespace Coditech.API.Service
                 joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode)?.FirstOrDefault();
 
                 if (IsNull(joiningCodeDetails))
-                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joining Code."));
 
                 if (joiningCodeDetails.IsExpired)
                     throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
