@@ -50,7 +50,7 @@ namespace Coditech.Admin.Controllers
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         TempData["FormSizeClass"] = "col-lg-4";
-                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
                         return RedirectToAction("Login", "user");
                     }
                 }
@@ -91,7 +91,7 @@ namespace Coditech.Admin.Controllers
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         TempData["FormSizeClass"] = "col-lg-4";
-                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
                         return RedirectToAction("Login", "user");
                     }
                 }
@@ -131,7 +131,7 @@ namespace Coditech.Admin.Controllers
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         TempData["FormSizeClass"] = "col-lg-4";
-                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
                         return RedirectToAction("Login", "user");
                     }
                 }
@@ -192,7 +192,7 @@ namespace Coditech.Admin.Controllers
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         TempData["FormSizeClass"] = "col-lg-4";
-                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
                         return RedirectToAction("Login", "user");
                     }
                 }
