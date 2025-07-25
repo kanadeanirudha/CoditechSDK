@@ -166,7 +166,7 @@ namespace Coditech.API.Service
 
         #region DBTMRegisterTrainee
 
-        public virtual GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel)
+        public GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel)
         {
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             string userType = generalPersonModel.UserType;
@@ -275,15 +275,15 @@ namespace Coditech.API.Service
             return generalPersonModel;
         }
 
-        public virtual DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)
+        public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)
       => _dBTMDeviceMasterRepository.Table.Where(x => x.DeviceSerialCode == deviceSerialCode && x.IsActive).FirstOrDefault();
 
-        public virtual bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
+        private bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
         {
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
         }
 
-        protected List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
+        private List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
         {
             List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
             List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
