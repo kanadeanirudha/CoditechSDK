@@ -5,7 +5,7 @@
     Layout = null;
     string controllerName = Convert.ToString(ViewContext.RouteData.Values["controller"]).ToLower();
     string actionName = Convert.ToString(ViewContext.RouteData.Values["action"]).ToLower();
-    UserMainMenuModel userMenuModel = Model?.MenuList?.FirstOrDefault(x => x.ControllerName == controllerName);
+    UserMainMenuModel userMenuModel = Model?.MenuList?.Where(x => x.ParentMenuCode != null).FirstOrDefault(x => controllerName.ToLower().Contains(x.ControllerName.ToLower()));
     List<UserMainMenuModel> menuList = userMenuModel != null ? Model?.MenuList?.Where(x => x.ModuleCode == userMenuModel.ModuleCode)?.ToList() : null;
     UserModuleModel userModuleModel = userMenuModel != null ? Model?.ModuleList?.FirstOrDefault(x => x.ModuleCode == userMenuModel.ModuleCode) : new UserModuleModel();
 }
