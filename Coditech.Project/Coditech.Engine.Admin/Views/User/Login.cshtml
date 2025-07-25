@@ -17,16 +17,16 @@
             {
                 @Html.AntiForgeryToken()
                 <div class="form-group mb-2">
-                    <label class="form-label required" for="UserName">Email Address/Username</label>
+                    @Html.LabelFor(x => x.UserName, new { @class = "form-label" })
                     <div class="input-group">
-                        @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", placeholder = "Email Address/Username" })
+                        @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", placeholder = "username..." })
                     </div>
                     @Html.ValidationMessageFor(m => m.UserName, null)
                 </div>
                 <div class="form-group mb-2">
                     @Html.LabelFor(x => x.Password, new { @class = "form-label" })
                     <div class="input-group password-input-wraper">
-                        @Html.TextBoxFor(x => x.Password, new { @class = "form-control password-input", type = "password", placeholder = "Password" })
+                        @Html.TextBoxFor(x => x.Password, new { @class = "form-control password-input", type = "password", placeholder = "Password here..." })
                         <i class="fas fa-eye view-password"></i>
                     </div>
                     @Html.ValidationMessageFor(m => m.Password, null)
@@ -49,12 +49,6 @@
                     </div>
                 </div>
                 @Html.HiddenFor(x => x.ReturnUrl)
-            }
-            @if (CoditechAdminSettings.ApplicationCode == "DBTM")
-            {
-                <div class="m-3 text-center text-muted">
-                    <p class="mb-0">Don't have an account ?  <a href="/dbtmnewregistration/centreregistration" class="text-primary ms-2">Free Register</a></p>
-                </div>
             }
         </div>
     </div>

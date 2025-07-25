@@ -43,14 +43,6 @@
                                         @Html.ValidationMessageFor(x => x.CentreCode)
                                     </div>
                                 </div>
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsSMSSettingEnabled, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsSMSSettingEnabled, new { @class = "form-check-input" })
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="col-lg-12">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.GeneralSmsProviderId, new { @class = "form-label required" })
@@ -64,21 +56,32 @@
                                         @Html.Partial("~/Views/Organisation/OrganisationCentre/_OrganisationCentrewiseSmsSetting.cshtml", Model)
                                     }
                                 </div>
-                                <div class="col-lg-12 d-flex justify-content-center">
-                                    <div class="mb-6">
-                                        <button type="button"
-                                                class="btn btn-gradient-info"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#@sendTestEmailModal.ModelPopUpId"
-                                                onclick="OrganisationTestModel.SendSmsTestModel('@sendTestEmailModal.ModalContentId','@Model.CentreCode','@Model.OrganisationCentreMasterId')"
-                                                title="Send Test SMS">
-                                            Send Test SMS
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <div class="row align-items-center">
+                                <!-- Left Side: Save + Cancel -->
+                                <div class="col text-start">
+                                    <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                                    <a href="../@controllerName/List" class="btn btn-secondary">
+                                        <i class="ft-x"></i> @AdminResources.LabelCancel
+                                    </a>
+                                </div>
+
+                                <!-- Center: Send Test SMS -->
+                                <div class="col text-center">
+                                    <button type="button"
+                                            class="btn btn-gradient-info"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#@sendTestEmailModal.ModelPopUpId"
+                                            onclick="OrganisationTestModel.SendSmsTestModel('@sendTestEmailModal.ModalContentId','@Model.CentreCode','@Model.OrganisationCentreMasterId')"
+                                            title="Send Test SMS">
+                                        Send Test SMS
+                                    </button>
+                                </div>
+
+                                <!-- Right Side Empty (for symmetry if needed) -->
+                                <div class="col"></div>
+                            </div>
+
                         }
                     </div>
                 </div>

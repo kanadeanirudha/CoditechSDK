@@ -417,3 +417,7 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
 .logo-background {
     background-color: #ffffff !important;
 }
+
+.auth-logo {
+    height: 70px;
+}

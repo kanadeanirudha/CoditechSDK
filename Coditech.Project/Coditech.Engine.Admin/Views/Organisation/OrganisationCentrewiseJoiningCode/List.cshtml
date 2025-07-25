@@ -3,9 +3,14 @@
     ViewBag.Title = "Organisation Centrewise Joining Code List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
+    DropdownViewModel centreDropdown = new DropdownViewModel()
+    {
+        DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
+        DropdownName = "SelectedCentreCode",
+        DropdownSelectedValue = Model.SelectedCentreCode,
+        ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + controllerName + "','" + actionName + "')"
+    };
 }
-<!-- Page Content-->
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
@@ -13,9 +18,11 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Joining Code List</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Create Joining Code</a>
-
+                        <a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
+                            <i class="fas fa-plus me-2"></i>Create Joining Code
+                        </a>
                     </div>
+
                     <div class="card-header">
                         <div class="row">
                             <div class="col-md-1">
@@ -25,14 +32,25 @@
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                             </div>
                             <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId"
+                                       onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
+                            </div>
+                            <div class="col-md-6 ">
+                                <label class="fw-bold">
+
+                                    Total Joining Code:  <span class="badge badge-soft-primary me-2 "><span id="TotalCodeCount"></span> </span>
+
+                                    Total Active Joining Code: <span class="badge badge-soft-success me-2"> <span id="ActiveCodeCount"></span> </span>
+
+                                    Total Used Joining Code: <span class="badge badge-soft-danger"> <span id="ExpiredCodeCount"></span> </span>
+                                </label>
                             </div>
                         </div>
                     </div>
+
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
                             @Html.Partial("~/Views/Organisation/OrganisationCentrewiseJoiningCode/_List.cshtml", Model)
-
                         </div>
                     </div>
                 </div>
@@ -40,4 +58,27 @@
         </div>
     </div>
 </div>
-<!-- end page content -->
+<!-- jQuery CDN (if not already loaded) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        const observer = new MutationObserver(function () {
+            const active = parseInt($('#AjaxActiveCodeCount').text()) || 0;
+            const expired = parseInt($('#AjaxExpiredCodeCount').text()) || 0;
+            const total = parseInt($('#AjaxTotalJoiningCodeCount').text()) || 0;
+
+            $('#ActiveCodeCount').text(active);
+            $('#ExpiredCodeCount').text(expired);
+            $('#TotalCodeCount').text(total);
+        });
+
+        const target = document.getElementById('DataTablesDivId');
+        if (target) {
+            observer.observe(target, {
+                childList: true,
+                subtree: true
+            });
+        }
+    });
+</script>
