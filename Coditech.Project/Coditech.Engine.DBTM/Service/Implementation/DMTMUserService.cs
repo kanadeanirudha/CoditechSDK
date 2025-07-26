@@ -130,6 +130,7 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
             userModel.EntityId = entityId;
+            userModel.UserType = userType;
             userModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
             userModel.PersonTitle = generalPersonModel.PersonTitle;
             userModel.FirstName = generalPersonModel.FirstName;
@@ -145,7 +146,7 @@ namespace Coditech.API.Service
             userModel.BirthMark = generalPersonModel.BirthMark;
             userModel.GeneralOccupationMasterId = generalPersonModel.GeneralOccupationMasterId;
             userModel.AnniversaryDate = generalPersonModel.AnniversaryDate;
-            userModel.BloodGroup = generalPersonModel.BloodGroup;
+            userModel.BloodGroup = generalPersonModel.BloodGroup ?? "NA";
             return userModel;
         }
 
@@ -177,7 +178,7 @@ namespace Coditech.API.Service
                     dbtmTraineeDetails.Height = dbtmUserModel.Height;
                     dbtmTraineeDetails.Weight = dbtmUserModel.Weight;
                     dbtmTraineeDetails.ModifiedBy = dbtmUserModel.ModifiedBy;
-                     status = _dbtmTraineeDetailsRepository.Update(dbtmTraineeDetails);
+                    status = _dbtmTraineeDetailsRepository.Update(dbtmTraineeDetails);
                 }
             }
             else if (dbtmUserModel.UserType == UserTypeEnum.Employee.ToString())

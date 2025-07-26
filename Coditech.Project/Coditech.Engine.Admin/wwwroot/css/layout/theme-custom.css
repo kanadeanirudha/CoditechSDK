@@ -22,6 +22,7 @@
 
 .logo-background {
     background-color: var(--logoBackgroundColor) !important;
+    width: 100px !important;
 }
 
 .update-msg .img-box, body.dark-topbar .navbar-custom, body.dark-sidenav .left-sidenav-menu li.mm-active .mm-active > a {
