@@ -40,7 +40,6 @@ namespace Coditech.Admin.Controllers
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     dataTableViewModel.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "") : "";
-
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "");
                 }
                 else
@@ -74,10 +73,7 @@ namespace Coditech.Admin.Controllers
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
                     dataTableViewModel.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "") : "";
-                    if (!string.IsNullOrWhiteSpace(dataTableViewModel.SelectedParameter1))
-
-
-                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
                 }
                 else
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "Active");
@@ -102,8 +98,8 @@ namespace Coditech.Admin.Controllers
 
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
-                    if (!string.IsNullOrEmpty(dataTableViewModel.SelectedParameter1))
-                        list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
+                    dataTableViewModel.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "") : "";
+                    list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
                 }
                 else
                     list = _dBTMTraineeDetailsAgent.GetDBTMTraineeDetailsList(dataTableViewModel, "InActive");
