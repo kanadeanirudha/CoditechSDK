@@ -17,8 +17,8 @@ on:
          type: boolean
        mediamanager_api_deploy:
          description: 'Deploy MediaManager API'
-         required: true
-         default: true
+         required: false
+         default: false
          type: boolean
        organisation_api_deploy:
          description: 'Deploy Organisation API'
@@ -32,8 +32,8 @@ on:
          type: boolean
        payment_api_deploy:
          description: 'Deploy Payment API'
-         required: true
-         default: true
+         required: false
+         default: false
          type: boolean
 
 jobs:
