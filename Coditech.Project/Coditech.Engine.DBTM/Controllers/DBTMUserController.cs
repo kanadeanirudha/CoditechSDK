@@ -84,11 +84,11 @@ namespace Coditech.API.Controllers
         [HttpGet]
         [Route("/DBTMUser/GetDBTMTraineeDetails")]
         [Produces(typeof(DBTMUserResponse))]
-        public virtual IActionResult GetDBTMTraineeDetails(long entityId)
+        public virtual IActionResult GetDBTMTraineeDetails(long entityId, string userType)
         {
             try
             {
-                DBTMUserModel dbtmUserResponse = _dbtmUserService.GetDBTMTraineeDetails(entityId);
+                DBTMUserModel dbtmUserResponse = _dbtmUserService.GetDBTMTraineeDetails(entityId, userType);
                 return IsNotNull(dbtmUserResponse) ? CreateOKResponse(new DBTMUserResponse { DBTMUserModel = dbtmUserResponse }) : CreateInternalServerErrorResponse();
             }
             catch (CoditechException ex)
