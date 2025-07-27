@@ -240,6 +240,8 @@ namespace Coditech.API.Service
                 PersonId = personId,
                 FirstName = dBTMNewRegistrationModel.FirstName,
                 LastName = dBTMNewRegistrationModel.LastName,
+                MobileNumber = dBTMNewRegistrationModel.MobileNumber,
+                EmailAddress = dBTMNewRegistrationModel.EmailId,
                 AddressLine1 = dBTMNewRegistrationModel.AddressLine1,
                 AddressLine2 = dBTMNewRegistrationModel.AddressLine2,
                 GeneralCountryMasterId = dBTMNewRegistrationModel.GeneralCountryMasterId,
