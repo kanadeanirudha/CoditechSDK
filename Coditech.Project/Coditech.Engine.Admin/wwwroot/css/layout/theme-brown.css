@@ -75,6 +75,10 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
     border-color: var(--primaryButtonBorderColor) !important;
 }
 
+.auth-logo {
+    height: 70px;
+}
+
 .btn-success, .btn-success:hover {
     color: var(--primaryButtonTextColor) !important;
     background-color: var(--primaryButtonBackgroundColor) !important;

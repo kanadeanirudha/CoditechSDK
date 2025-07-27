@@ -15,7 +15,10 @@
         BatchWiseReports,
         JoiningCodewiseGeneralTrainer,
         DBTMTraineeList,
-        TraineeSpecialization
+        TraineeSpecialization,
+        DBTMGraph,
+        GraphType,
+        DBTMTraineeGraphList,
     }
     public enum DashboardFormCustomEnum
     {

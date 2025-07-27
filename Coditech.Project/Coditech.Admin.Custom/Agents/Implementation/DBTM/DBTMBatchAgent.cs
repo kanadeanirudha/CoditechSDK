@@ -3,6 +3,7 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 
@@ -33,7 +34,6 @@ namespace Coditech.Admin.Agents
                 filters = new FilterCollection();
                 filters.Add("BatchName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("BatchTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
-                filters.Add("BatchStartTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "BatchName " : dataTableModel.SortByColumn, dataTableModel.SortBy);
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
@@ -50,6 +50,7 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
         #endregion
-
+        #region protected
+        #endregion
     }
 }

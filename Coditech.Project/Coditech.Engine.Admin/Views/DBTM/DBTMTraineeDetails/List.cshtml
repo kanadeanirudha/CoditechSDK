@@ -7,16 +7,16 @@
 
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByCentreCode('" + Model.ListType + "')" };
     DropdownViewModel trainerDropdown = new DropdownViewModel()
-    {
-        DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
-        DropdownName = "SelectedParameter1",
-        Parameter = Model.SelectedCentreCode,
-        DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId),
-        ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + Model.ListType + "')",
-        IsCustomDropdown = true,
-        SelectedText = "All",
-        SelectedValue = "0"
-    };
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "SelectedParameter1",
+                Parameter = Model.SelectedCentreCode,
+                DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId),
+                ChangeEvent = "DBTMTraineeDetails.GetDBTMTrainerListByGeneralTrainerMasterId('" + Model.ListType + "')",
+                IsCustomDropdown = true,
+                SelectedText = "All",
+                SelectedValue = "0"
+            };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -37,10 +37,8 @@
                         {
                             <span class="card-title">All Trainee Details List</span>
                         }
-                        @if (userModel?.Custom1 != CustomConstants.DBTMTrainer)
-                        {
-                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateDBTMTrainee" role="button"><i class="fas fa-plus me-2"></i>Add Trainee</a>
-                        }
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMTraineeDetails/TraineeRegistration" role="button"><i class="fas fa-plus me-2"></i>Add Trainee</a>
+
                     </div>
                     <div class="card-header">
                         <div class="row">

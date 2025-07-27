@@ -22,6 +22,7 @@ namespace Coditech.Common.API.Model
         public DataTable DataTable { get; set; }
         public long DBTMTraineeAssignmentUserId { get; set; }
         public long DBTMDeviceDataId { get; set; }
+        public List<string> SelectedTest { get; set; }
 
     }
 }

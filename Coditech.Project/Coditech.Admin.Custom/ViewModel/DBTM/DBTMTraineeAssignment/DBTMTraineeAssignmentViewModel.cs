@@ -44,6 +44,10 @@ namespace Coditech.Admin.ViewModel
         public DataTable DataTable { get; set; }
         public long DBTMTraineeAssignmentUserId { get; set; }
         public long DBTMDeviceDataId { get; set; }
+        public List<SelectListItem> DBTMTestList { get; set; }
+        [Display(Name = "Activity")]
+        [Required]
+        public List<string> SelectedTest { get; set; }
 
     }
 }

@@ -21,6 +21,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
+        private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
+        private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -31,6 +33,8 @@ namespace Coditech.API.Service
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -92,6 +96,19 @@ namespace Coditech.API.Service
                 }
 
                 _dBTMCalculationAssociatedToTestRepository.Insert(calculationAssociatedToTestlist);
+
+
+                List<DBTMTestGraph> dBTMTestGraphlist = new List<DBTMTestGraph>();
+                foreach (string dBTMGraphMasterId in dBTMTestModel.DBTMSelectedGraph)
+                {
+                    dBTMTestGraphlist.Add(new DBTMTestGraph()
+                    {
+                        DBTMGraphMasterId = Convert.ToInt32(dBTMGraphMasterId),
+                        DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
+                    });
+                }
+
+                _dBTMTestGraphRepository.Insert(dBTMTestGraphlist);
             }
 
             else
@@ -115,6 +132,7 @@ namespace Coditech.API.Service
             {
                 dBTMTestModel.DBTMSelectedTestParameter = _dBTMParametersAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMTestParameterId.ToString())?.ToList();
                 dBTMTestModel.DBTMSelectedTestCalculation = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMTestCalculationId.ToString())?.ToList();
+                dBTMTestModel.DBTMSelectedGraph = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMGraphMasterId.ToString())?.ToList();
             }
             if (dBTMTestModel.TestMediaId > 0)
             {
@@ -223,6 +241,51 @@ namespace Coditech.API.Service
                 {
                     _dBTMCalculationAssociatedToTestRepository.Delete(deleteDBTMCalculationAssociatedToTest);
                 }
+
+                List<DBTMTestGraph> deleteDBTMTestGraphList = null;
+                List<DBTMTestGraph> insertDBTMTestGraphList = null;
+
+                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();
+
+                foreach (string graphId in dBTMTestModel.DBTMSelectedGraph)
+                {
+                    if (!existingTestGraphList.Any(x => x.DBTMGraphMasterId.ToString() == graphId))
+                    {
+                        if (IsNull(insertDBTMTestGraphList))
+                        {
+                            insertDBTMTestGraphList = new List<DBTMTestGraph>();
+                        }
+
+                        insertDBTMTestGraphList.Add(new DBTMTestGraph()
+                        {
+                            DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
+                            DBTMGraphMasterId = Convert.ToInt32(graphId),
+                        });
+                    }
+                }
+
+                foreach (DBTMTestGraph item in existingTestGraphList)
+                {
+                    if (!dBTMTestModel.DBTMSelectedGraph.Any(x => x == item.DBTMGraphMasterId.ToString()))
+                    {
+                        if (IsNull(deleteDBTMTestGraphList))
+                        {
+                            deleteDBTMTestGraphList = new List<DBTMTestGraph>();
+                        }
+
+                        deleteDBTMTestGraphList.Add(item);
+                    }
+                }
+
+                if (insertDBTMTestGraphList?.Count > 0)
+                {
+                    _dBTMTestGraphRepository.Insert(insertDBTMTestGraphList);
+                }
+
+                if (deleteDBTMTestGraphList?.Count > 0)
+                {
+                    _dBTMTestGraphRepository.BatchUpdate(deleteDBTMTestGraphList);
+                }
             }
             else
             {
@@ -274,6 +337,41 @@ namespace Coditech.API.Service
             };
             return list;
         }
+        public virtual DBTMGraphMasterListModel GetDBTMGraph()
+        {
+            DBTMGraphMasterListModel list = new DBTMGraphMasterListModel
+            {
+                DBTMGraphMasterList = (from a in _dBTMGraphMasterRepository.Table
+                                           select new DBTMGraphMasterModel
+                                           {
+                                               DBTMGraphMasterId = a.DBTMGraphMasterId,
+                                               GraphName = a.GraphName,
+                                               GraphCode = a.GraphCode,
+                                           }).ToList()
+            };
+            return list;
+        }
+        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        {
+            var graphList = (from a in _dBTMTestGraphRepository.Table
+                             join b in _dBTMGraphMasterRepository.Table
+                             on a.DBTMGraphMasterId equals b.DBTMGraphMasterId
+                             where a.DBTMTestMasterId == dBTMTestMasterId
+                             select new DBTMGraphMasterModel
+                             {
+                                 DBTMGraphMasterId = b.DBTMGraphMasterId,
+                                 GraphName = b.GraphName,
+                                 GraphCode = b.GraphCode
+                             })
+                             .Distinct()
+                             .ToList();
+
+            return new DBTMGraphMasterListModel
+            {
+                DBTMGraphMasterList = graphList
+            };
+        }
+
 
         #region Protected Method
         // Check if Test Name is already present or not.

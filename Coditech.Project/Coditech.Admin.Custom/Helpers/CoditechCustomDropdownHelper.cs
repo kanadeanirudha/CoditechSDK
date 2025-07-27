@@ -62,10 +62,21 @@ namespace Coditech.Admin.Helpers
             {
                 GetGeneralTrainerByJoiningCodeList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMGraph.ToString()))
+            {
+                DBTMGraphByDBTMTestMasterId(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphType.ToString()))
+            {
+                GetGraphType(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeGraphList.ToString()))
+            {
+                GetTraineeDetailsGraphList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
-
         private static void GetDBTMActivityCategoryList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
             FilterCollection filters = new FilterCollection();
@@ -136,7 +147,7 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != CustomConstants.DBTMTrainer)
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
 
-            foreach (var item in list?.GeneralTrainerList)
+            foreach (var item in list?.GeneralTrainerList?.OrderBy(x => x.FirstName))
             {
                 dropdownList.Add(new SelectListItem()
                 {
@@ -322,6 +333,62 @@ namespace Coditech.Admin.Helpers
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
                     });
                 }
+            }
+        }
+        private static void DBTMGraphByDBTMTestMasterId(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                int dBTMTestMasterId = Convert.ToInt32(dropdownViewModel.Parameter);
+
+                DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                DBTMGraphMasterListModel list = new DBTMGraphMasterListModel() { DBTMGraphMasterList = response.DBTMGraphMasterList };
+                foreach (var item in list?.DBTMGraphMasterList)
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.GraphName}",
+                        Value = item.DBTMGraphMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
+                    });
+                }
+            }
+        }
+
+        private static void GetGraphType(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+
+            if (dropdownViewModel.DropdownSelectedValue == "7")
+            {
+                dropdownList.Add(new SelectListItem() { Text = "Time", Value = "time" });
+                dropdownList.Add(new SelectListItem() { Text = "Velocity", Value = "velocity" });
+                dropdownList.Add(new SelectListItem() { Text = "Time and Velocity", Value = "timeandvelocity" });
+            }
+        }
+        private static void GetTraineeDetailsGraphList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            string centreCode = userModel.SelectedCentreCode;
+            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).Custom3);
+            }
+            DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId), null, null, null, 1, int.MaxValue);
+            DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
+            foreach (var item in list?.DBTMTraineeDetailsList)
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = $"{item.FirstName} {item.LastName}",
+                    Value = item.DBTMTraineeDetailId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTraineeDetailId)
+                });
             }
         }
     }

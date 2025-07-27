@@ -80,6 +80,13 @@
                                         @Html.ValidationMessageFor(x => x.DBTMSelectedTestCalculation)
                                     </div>
                                 </div>
+                                 <div class="col-lg-4">
+                                    <div class="mb-3 multiselect-dropdown">
+                                        @Html.LabelFor(x => x.DBTMSelectedGraph, new { @class = "form-label required" })
+                                        @Html.ListBoxFor(x => x.DBTMSelectedGraph, new SelectList(Model.DBTMGraphMasterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                        @Html.ValidationMessageFor(x => x.DBTMSelectedGraph)
+                                    </div>
+                                </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.MinimunPairedDevice, new { @class = "form-label required" })

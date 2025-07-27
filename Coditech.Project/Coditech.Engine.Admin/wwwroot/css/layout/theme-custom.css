@@ -1,16 +1,17 @@
 :root {
-    --primaryColor: #fd894f;
-    --secondaryColor: #fd4f5b;
-    --tertiaryColor: #eeeeee;
+    --primaryColor: #4b49ac;
+    --secondaryColor: #ff4747;
+    --tertiaryColor: #ffffff;
+    --otherColor: #98bdff;
     --black: #000000;
     --white: #ffffff;
     /*button color setting*/
     --primaryButtonTextColor: #ffffff;
-    --primaryButtonBackgroundColor: #fd894f;
-    --primaryButtonBorderColor: #fd894f;
+    --primaryButtonBackgroundColor: #57b657;
+    --primaryButtonBorderColor: #57b657;
     --secondaryButtonTextColor: #ffffff;
-    --secondaryButtonBackgroundColor: #fd4f5b;
-    --secondaryButtonBorderColor: #fd4f5b;
+    --secondaryButtonBackgroundColor: #ff4747;
+    --secondaryButtonBorderColor: #ff4747;
     /*avatar color setting*/
     --avatarBackgroundColor: #ffb822;
     --avatarTextColor: #ffffff;
@@ -21,6 +22,7 @@
 
 .logo-background {
     background-color: var(--logoBackgroundColor) !important;
+    width: 100px !important;
 }
 
 .update-msg .img-box, body.dark-topbar .navbar-custom, body.dark-sidenav .left-sidenav-menu li.mm-active .mm-active > a {
@@ -66,13 +68,29 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
 }
 
 .page-wrapper .page-content .card .card-header:first-child, .card grammarly-extension + .card-header {
-    background: var(--primaryColor) !important;
+    background-image: linear-gradient(to left, var(--otherColor), var(--primaryColor)) !important;
+}
+
+.card .card-header:first-child, .card grammarly-extension + .card-header {
+    background-image: linear-gradient(to left, var(--otherColor), var(--primaryColor)) !important;
+}
+
+.modal-content .modal-header {
+    background-image: linear-gradient(to left, var(--otherColor), var(--primaryColor)) !important;
 }
 
 #LogIn_Tab button {
     color: var(--primaryButtonTextColor);
     background-color: var(--primaryButtonBackgroundColor) !important;
     border-color: var(--primaryButtonBorderColor) !important;
+}
+
+.auth-logo {
+    height: 70px;
+}
+
+[data-layout="horizontal"] .topbar .brand .logo .logo-sm {
+    height: 90% !important;
 }
 
 .btn-success, .btn-success:hover {

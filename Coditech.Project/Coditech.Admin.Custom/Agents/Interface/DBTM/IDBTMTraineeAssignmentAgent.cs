@@ -37,7 +37,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dBTMTraineeAssignmentIds">dBTMTraineeAssignmentIds.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
-        bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentIds, out string errorMessage);
+        bool DeleteDBTMTraineeAssignment(string dBTMTraineeAssignmentUserIds, out string errorMessage);
         DBTMTraineeAssignmentViewModel SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId);
 
         /// <summary>
@@ -60,5 +60,12 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMTraineeAssignmentId">dBTMTraineeAssignmentId</param>
         /// <returns>Returns DBTMTraineeAssignmentViewModel.</returns>
         DBTMActivitiesDetailsListViewModel GetAssignmentResult(long dBTMDeviceDataId, DataTableViewModel dataTableModel);
+
+        /// <summary>
+        /// Get list of DBTM Test.
+        /// </summary>
+        /// <param name="dataTableModel">DataTable ViewModel.</param>
+        /// <returns>DBTMTestListViewModel</returns>
+        DBTMTestListViewModel GetDBTMTestList();
     }
 }
