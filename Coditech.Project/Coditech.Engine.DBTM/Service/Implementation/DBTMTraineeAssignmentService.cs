@@ -94,25 +94,60 @@ namespace Coditech.API.Service
 
             return dBTMTraineeAssignmentModel;
         }
-
-        //Get DBTMTraineeAssignment by dBTMTraineeAssignment id.
+        // Get DBTMTraineeAssignment by dBTMTraineeAssignmentId.
         public DBTMTraineeAssignmentModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
         {
             if (dBTMTraineeAssignmentId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentId"));
 
-            //Get the DBTMTraineeAssignment Details based on id.
-            DBTMTraineeAssignment dBTMTraineeAssignment = _dBTMTraineeAssignmentRepository.Table.Where(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId)?.FirstOrDefault();
+            // Get the DBTMTraineeAssignment entity.
+            DBTMTraineeAssignment dBTMTraineeAssignment = _dBTMTraineeAssignmentRepository.Table
+                .FirstOrDefault(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId);
+
             DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = dBTMTraineeAssignment?.FromEntityToModel<DBTMTraineeAssignmentModel>();
+
+            // Get trainer details if assigned
             if (dBTMTraineeAssignmentModel?.GeneralTrainerMasterId > 0)
             {
-                long employeeId = _generalTrainerRepository.Table.Where(x => x.GeneralTrainerMasterId == dBTMTraineeAssignmentModel.GeneralTrainerMasterId).Select(y => y.EmployeeId).FirstOrDefault();
+                long employeeId = _generalTrainerRepository.Table
+                    .Where(x => x.GeneralTrainerMasterId == dBTMTraineeAssignmentModel.GeneralTrainerMasterId)
+                    .Select(y => y.EmployeeId)
+                    .FirstOrDefault();
+
                 GeneralPersonModel generalTrainerDetails = GetGeneralPersonDetailsByEntityType(employeeId, UserTypeEnum.Employee.ToString());
                 if (IsNotNull(generalTrainerDetails))
                 {
                     dBTMTraineeAssignmentModel.SelectedCentreCode = generalTrainerDetails.SelectedCentreCode;
                 }
             }
+            var data = (from a in _dBTMTraineeAssignmentRepository.Table
+                        join b in _dBTMTraineeAssignmentToUserRepository.Table
+                            on a.DBTMTraineeAssignmentId equals b.DBTMTraineeAssignmentId
+                        join c in _dBTMTraineeDetailsRepository.Table
+                            on b.DBTMTraineeDetailId equals c.DBTMTraineeDetailId
+                        join e in _dBTMTestRepository.Table
+                            on a.DBTMTestMasterId equals e.DBTMTestMasterId
+                        where a.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId
+                        select new
+                        {
+                            c.PersonId,
+                            e.TestName
+                        }).FirstOrDefault();
+
+            if (data != null && data.PersonId > 0)
+            {
+                var person = _generalPersonRepository.Table
+                                .Where(p => p.PersonId == data.PersonId)
+                                .Select(p => new { p.FirstName, p.LastName })
+                                .FirstOrDefault();
+
+
+                dBTMTraineeAssignmentModel.FirstName = person.FirstName;
+                dBTMTraineeAssignmentModel.LastName = person.LastName;
+                dBTMTraineeAssignmentModel.TestName = data?.TestName ?? string.Empty;
+
+            }
+
             return dBTMTraineeAssignmentModel;
         }
 
