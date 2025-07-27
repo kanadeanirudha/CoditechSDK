@@ -30,7 +30,7 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center data-action">
-                                <a href="../@controllerName/UpdateGeneralBatch?generalBatchMasterId=@item.GeneralBatchMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="../DBTMGeneralBatchMaster/UpdateGeneralBatch?generalBatchMasterId=@item.GeneralBatchMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
 
                                 <!-- Delete Button Triggering Modal -->
                                 <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralBatchMasterId"><i class="fas fa-trash-alt"></i></a>
