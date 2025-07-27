@@ -15,8 +15,7 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         public  ActionResult TrainerRegistration()
-        {
-            TempData["FormSizeClass"] = "col-lg-8";
+        {          
             return View("~/Views/DBTM/DBTMGeneralTrainerMaster/DBTMTrainerRegistration.cshtml", new DBTMNewRegistrationViewModel());
         }
 
@@ -24,8 +23,6 @@ namespace Coditech.Admin.Controllers
         [ValidateAntiForgeryToken]
         public  ActionResult TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
-            TempData["FormSizeClass"] = "col-lg-8";
-
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
@@ -43,7 +40,6 @@ namespace Coditech.Admin.Controllers
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
-                        TempData["FormSizeClass"] = "col-lg-4";
                         SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
                         return RedirectToAction("List", "GeneralTrainerMaster");
                     }
