@@ -7,6 +7,7 @@ namespace Coditech.Common.API.Model
     {
         public long DBTMTraineeAssignmentId { get; set; }
         public long GeneralTrainerMasterId { get; set; }
+        public long EntityId { get; set; }
         public int DBTMTestMasterId { get; set; }
         public DateTime AssignmentDate { get; set; }
         public TimeSpan? AssignmentTime { get; set; }

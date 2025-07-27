@@ -13,7 +13,7 @@ namespace Coditech.Admin.Controllers
     public class DBTMTraineeAssignmentController : BaseController
     {
         private readonly IDBTMTraineeAssignmentAgent _dBTMTraineeAssignmentAgent;
-        private const string createEdit = "~/Views/DBTM/DBTMTraineeAssignment/CreateEdit.cshtml";
+        private const string createEdit = "~/Views/DBTM/DBTMTraineeAssignment/Create.cshtml";
 
         public DBTMTraineeAssignmentController(IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent)
         {
@@ -45,7 +45,8 @@ namespace Coditech.Admin.Controllers
             {
                 SelectedCentreCode = userModel.SelectedCentreCode,
                 SelectedTrainee = new List<string>(),
-                GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0
+                GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
+                EntityId = userModel.Custom1 == CustomConstants.DBTMTrainer ? 0 : userModel.EntityId
             };
 
             dBTMTraineeAssignmentViewModel.AllTraineeList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
@@ -91,8 +92,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
-            return View("~/Views/DBTM/DBTMTraineeAssignment/_EditDBTMTraineAssignment.cshtml", dBTMTraineeAssignmentViewModel);
-
+            return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
         }
 
         [HttpPost]
@@ -108,7 +108,7 @@ namespace Coditech.Admin.Controllers
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
                 return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentId });
             }
-            return View("~/Views/DBTM/DBTMTraineeAssignment/_EditDBTMTraineAssignment.cshtml", dBTMTraineeAssignmentViewModel);
+            return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 
         }
         public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode)
