@@ -29,7 +29,7 @@ namespace Coditech.Admin.Controllers
                 list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
-            list.SelectedParameter2 = dataTableModel.SelectedParameter1;
+            list.SelectedParameter1 = dataTableModel.SelectedParameter1;
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", list);

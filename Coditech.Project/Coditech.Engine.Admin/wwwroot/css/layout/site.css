@@ -418,6 +418,66 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
     background-color: #ffffff !important;
 }
 
+.topbar .brand.logo-background .logo-large-wrapper {
+    display: inline-block !important;
+    height: 50px !important;
+    width: 100%;
+}
+
+    .topbar .brand.logo-background .logo-large-wrapper .logo-lg {
+        display: inline-block !important;
+        width: 88%;
+        height: auto;
+    }
+
+.topbar .brand.logo-background .logo-small-wrapper {
+    display: none !important;
+}
+
+.topbar .brand span {
+    text-align: center;
+}
+
+.topbar .navigation-menu > li > a span {
+    padding: 6px !important;
+}
+
+@media only screen and (max-width: 991px) {
+    .topbar .brand.logo-background .logo-large-wrapper {
+        display: none !important;
+    }
+
+    .topbar .brand.logo-background .logo-small-wrapper {
+        display: inline-block !important;
+        width: 100%;
+    }
+
+    [data-layout="horizontal"] .topbar .brand .logo .logo-sm {
+        height: auto;
+        width: 90%;
+    }
+
+    body[data-layout="horizontal"] .page-wrapper .page-content {
+        margin-top: 2rem !important;
+    }
+
+    .card .card-header .row [class*="col-"] {
+        margin-bottom: 8px;
+    }
+}
+
 .auth-logo {
     height: 70px;
+}
+
+a.dashboard-menu-list span {
+    background-color: transparent !important;
+}
+
+    a.dashboard-menu-list span i.fas.fa-th {
+        font-size: 25px !important;
+    }
+
+.card-header {
+    padding: .35rem 1rem !important;
 }

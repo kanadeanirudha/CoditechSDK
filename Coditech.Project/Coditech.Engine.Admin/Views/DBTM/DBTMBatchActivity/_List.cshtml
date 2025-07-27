@@ -22,7 +22,7 @@
                     {
                         <tr>
                             <td>@item.BatchName</td>
-                            <td>@item.BatchTime</td>
+                            <td>@item.BatchStartDate.ToCoditechDateFormat()</td>
                             <td>@item.BatchStartTime</td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)

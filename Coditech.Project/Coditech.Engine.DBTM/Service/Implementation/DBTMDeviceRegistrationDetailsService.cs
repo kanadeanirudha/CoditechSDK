@@ -35,7 +35,7 @@ namespace Coditech.API.Service
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
-        public virtual DBTMDeviceRegistrationDetailsListModel GetDBTMDeviceRegistrationDetailsList(long userMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMDeviceRegistrationDetailsListModel GetDBTMDeviceRegistrationDetailsList(long userMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -55,7 +55,7 @@ namespace Coditech.API.Service
         }
 
         //Create DBTMDeviceRegistrationDetails.
-        public virtual DBTMDeviceRegistrationDetailsModel CreateRegistrationDetails(DBTMDeviceRegistrationDetailsModel dBTMDeviceRegistrationDetailsModel)
+        public DBTMDeviceRegistrationDetailsModel CreateRegistrationDetails(DBTMDeviceRegistrationDetailsModel dBTMDeviceRegistrationDetailsModel)
         {
             if (IsNull(dBTMDeviceRegistrationDetailsModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
@@ -64,9 +64,12 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.InvalidData, "Device Serial Code is required.");
 
             DBTMDeviceMaster dBTMDeviceMaster = new DBTMDeviceMasterService(_coditechLogging, _serviceProvider).GetDBTMDeviceMasterDetailsByCode(dBTMDeviceRegistrationDetailsModel.DeviceSerialCode);
-           
+
             if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Device Serial Code."));
+
+            if (!dBTMDeviceMaster.IsMasterDevice)
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Please Enter Master Device Serial Code."));
 
             if (IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
@@ -118,7 +121,7 @@ namespace Coditech.API.Service
         }
 
         //Get DBTMDeviceRegistrationDetails by dBTMDeviceRegistrationDetailId.
-        public virtual DBTMDeviceRegistrationDetailsModel GetRegistrationDetails(long dBTMDeviceRegistrationDetailId)
+        public DBTMDeviceRegistrationDetailsModel GetRegistrationDetails(long dBTMDeviceRegistrationDetailId)
         {
             if (dBTMDeviceRegistrationDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceRegistrationDetailId"));
@@ -130,7 +133,7 @@ namespace Coditech.API.Service
         }
 
         //Update DBTMDeviceRegistrationDetails.
-        public virtual bool UpdateRegistrationDetails(DBTMDeviceRegistrationDetailsModel dBTMDeviceRegistrationDetailsModel)
+        public bool UpdateRegistrationDetails(DBTMDeviceRegistrationDetailsModel dBTMDeviceRegistrationDetailsModel)
         {
             if (IsNull(dBTMDeviceRegistrationDetailsModel))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
@@ -151,7 +154,7 @@ namespace Coditech.API.Service
         }
 
         //Delete DBTMDeviceRegistrationDetails.
-        public virtual bool DeleteRegistrationDetails(ParameterModel parameterModel)
+        public bool DeleteRegistrationDetails(ParameterModel parameterModel)
         {
             if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceRegistrationDetailId"));
@@ -166,11 +169,11 @@ namespace Coditech.API.Service
         }
 
         //Get device serial code list.
-        public virtual DBTMDeviceRegistrationDetailsListModel GetDeviceSerialCodeByCentreCode(string centreCode)
+        public DBTMDeviceRegistrationDetailsListModel GetDeviceSerialCodeByCentreCode(string centreCode)
         {
-          
+
             List<DBTMDeviceRegistrationDetailsModel> accSetupGLRecords = new List<DBTMDeviceRegistrationDetailsModel>();
-            CoditechViewRepository<DBTMDeviceRegistrationDetailsModel> objStoredProc = new CoditechViewRepository<DBTMDeviceRegistrationDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>() );
+            CoditechViewRepository<DBTMDeviceRegistrationDetailsModel> objStoredProc = new CoditechViewRepository<DBTMDeviceRegistrationDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
 
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
 
@@ -179,10 +182,10 @@ namespace Coditech.API.Service
             list.RegistrationDetailsList = accSetupGLRecords;
             return list;
         }
-       
+
         #region Protected Method
         //Check if DeviceSerialCode is already present or not.
-        public virtual bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
+        public bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
         {
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
         }

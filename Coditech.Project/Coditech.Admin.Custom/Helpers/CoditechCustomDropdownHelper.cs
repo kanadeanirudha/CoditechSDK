@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Coditech.Admin.Helpers
 {
-	public static class CoditechCustomDropdownHelper
+    public static class CoditechCustomDropdownHelper
     {
         public static List<UserAccessibleCentreModel> AccessibleCentreList()
         {
@@ -96,7 +96,7 @@ namespace Coditech.Admin.Helpers
                 }
                 dropdownList.Add(new SelectListItem()
                 {
-                    Text = string.Concat(item.ActivityCategoryName, " (", item.ActivityCategoryCode, ")"),
+                    Text = item.ActivityCategoryName,
                     Value = Convert.ToString(item.DBTMActivityCategoryId),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMActivityCategoryId)
                 });
@@ -147,7 +147,7 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != CustomConstants.DBTMTrainer)
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
 
-            foreach (var item in list?.GeneralTrainerList)
+            foreach (var item in list?.GeneralTrainerList?.OrderBy(x => x.FirstName))
             {
                 dropdownList.Add(new SelectListItem()
                 {
