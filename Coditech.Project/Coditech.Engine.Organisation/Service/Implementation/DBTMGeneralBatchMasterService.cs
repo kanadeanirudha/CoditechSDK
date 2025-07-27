@@ -55,11 +55,10 @@ namespace Coditech.API.Service
         public override GeneralBatchModel GetGeneralBatch(int generalBatchMasterId)
         {
             GeneralBatchModel generalBatchModel = base.GetGeneralBatch(generalBatchMasterId);
-           
             if (IsNull(generalBatchModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
             generalBatchModel.CustomDropdownSelectedValue1 = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
+            generalBatchModel.Duration = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.Duration).FirstOrDefault();
             return generalBatchModel;
         }
 
@@ -67,16 +66,13 @@ namespace Coditech.API.Service
         public override bool UpdateGeneralBatch(GeneralBatchModel generalBatchModel)
         {
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
-
             if (isGeneralBatchUpdated)
             {
                 List<DBTMBatchActivity> existingActivities = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
-
                 foreach (DBTMBatchActivity dBTMBatchActivity in existingActivities)
                 {
                     _dBTMBatchActivityRepository.Delete(dBTMBatchActivity);
                 }
-
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
                     foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))

@@ -1,5 +1,7 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Helpers;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,6 +26,17 @@ namespace Coditech.Admin.Controllers
         public ActionResult Create()
         {
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
+            generalBatchViewModel.SelectedWeekDays = !string.IsNullOrEmpty(generalBatchViewModel.WeekDays) ? generalBatchViewModel.WeekDays.Split(',').ToList() : new List<string>();
+            generalBatchViewModel.SchedulerWeekDaysList = CoditechDropdownHelper.GeneralDropdownList(new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.SchedulerWeeks.ToString(),
+                DropdownSelectedValue = generalBatchViewModel.WeekDays
+            }).DropdownList;
+
+            if (string.IsNullOrEmpty(generalBatchViewModel.BatchFrequency))
+            {
+                generalBatchViewModel.BatchFrequency = SchedulerFrequencyEnum.Daily.ToString();
+            }
             BindDBTMBatchActivity(generalBatchViewModel);
             return View(createEditBatch, generalBatchViewModel);
         }
@@ -35,6 +48,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    BindDuration(generalBatchViewModel);
                     generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
                     if (!generalBatchViewModel.HasError)
                     {
@@ -56,6 +70,12 @@ namespace Coditech.Admin.Controllers
         public ActionResult UpdateGeneralBatch(int generalBatchMasterId)
         {
             GeneralBatchViewModel generalBatchViewModel = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
+            generalBatchViewModel.SelectedWeekDays = !string.IsNullOrEmpty(generalBatchViewModel.WeekDays) ? generalBatchViewModel.WeekDays.Split(',').ToList() : new List<string>();
+            generalBatchViewModel.SchedulerWeekDaysList = CoditechDropdownHelper.GeneralDropdownList(new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.SchedulerWeeks.ToString(),
+                DropdownSelectedValue = generalBatchViewModel.WeekDays
+            }).DropdownList;
             BindDBTMBatchActivity(generalBatchViewModel);
             return ActionView(createEditBatch, generalBatchViewModel);
         }
@@ -67,6 +87,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    BindDuration(generalBatchViewModel);
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
@@ -96,6 +117,17 @@ namespace Coditech.Admin.Controllers
                         Text = item.TestName,
                         Value = item.DBTMTestMasterId.ToString(),
                     });
+                }
+            }
+        }
+        protected void BindDuration(GeneralBatchViewModel model)
+        {
+            if (!string.IsNullOrEmpty(model.DurationHours) && !string.IsNullOrEmpty(model.DurationMinutes))
+            {
+                string durationString = $"{model.DurationHours}:{model.DurationMinutes}:00";
+                if (TimeSpan.TryParse(durationString, out var duration))
+                {
+                    model.Duration = duration;
                 }
             }
         }
