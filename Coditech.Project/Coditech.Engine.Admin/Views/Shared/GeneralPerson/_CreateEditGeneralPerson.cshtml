@@ -51,16 +51,6 @@
             @Html.ValidationMessageFor(x => x.LastName)
         </div>
     </div>
-    @if (Model.UserType == UserTypeEnum.Trainee.ToString())
-    {
-    <div class="col-lg-3">
-        <div class="mb-3">
-                <label class="form-label" for="Custom2">Display Name</label>
-                @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control" })
-                @Html.ValidationMessageFor(x => x.Custom2)
-            </div>
-        </div>
-    }
     <div class="col-lg-3">
         <div class="mb-3">
             @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
@@ -102,14 +92,14 @@
     </div>
     <div class="col-lg-3">
         <div class="mb-3">
-            @Html.LabelFor(x => x.EmailId, new { @class = "form-label"})
+            @Html.LabelFor(x => x.EmailId, new { @class = "form-label" })
             @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
             @Html.ValidationMessageFor(x => x.EmailId)
         </div>
     </div>
     <div class="col-lg-3">
         <div class="mb-3 row">
-            <div class="col-lg-4">
+            <div class="col-lg-5">
                 @Html.LabelFor(x => x.CallingCode, new { @class = "form-label required" })
                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
            {
@@ -120,7 +110,7 @@
            })
                 @Html.ValidationMessageFor(x => x.CallingCode)
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 @Html.LabelFor(x => x.MobileNumber, new { @class = "form-label required" })
                 @Html.TextBoxFor(x => x.MobileNumber, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()" })
                 @Html.ValidationMessageFor(x => x.MobileNumber)
@@ -225,14 +215,6 @@
             @Html.ValidationMessageFor(x => x.GeneralOccupationMasterId)
         </div>
     </div>
-    <div class="col-lg-3">
-        <div class="mb-3">
-            @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-            <div class="form-check">
-                @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
-            </div>
-        </div>
-    </div>
     @if (Model.PersonId != 0)
     {
         <div class="col-lg-3">
@@ -243,6 +225,14 @@
             </div>
         </div>
     }
+    <div class="col-lg-3">
+        <div class="mb-3">
+            @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+            <div class="form-check">
+                @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+            </div>
+        </div>
+    </div>
 </div>
 <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
 

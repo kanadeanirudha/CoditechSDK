@@ -67,7 +67,12 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected Activity cannot be null.");
             if (IsNull(dBTMTraineeAssignmentModel.SelectedTrainee))
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected Trainee cannot be null.");
-
+            if (dBTMTraineeAssignmentModel.GeneralTrainerMasterId == 0 && dBTMTraineeAssignmentModel.EntityId > 0)
+            {
+                dBTMTraineeAssignmentModel.GeneralTrainerMasterId = _generalTrainerRepository.Table.Where(x => x.EmployeeId == dBTMTraineeAssignmentModel.EntityId)
+                    .Select(y => y.GeneralTrainerMasterId)
+                    .FirstOrDefault();
+            }
             DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
 
             int dBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString());
@@ -94,8 +99,7 @@ namespace Coditech.API.Service
 
             return dBTMTraineeAssignmentModel;
         }
-
-        //Get DBTMTraineeAssignment by dBTMTraineeAssignment id.
+        // Get DBTMTraineeAssignment by dBTMTraineeAssignmentId.
         public DBTMTraineeAssignmentModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
         {
             if (dBTMTraineeAssignmentId <= 0)

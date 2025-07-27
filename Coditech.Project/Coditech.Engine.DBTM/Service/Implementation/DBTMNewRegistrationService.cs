@@ -52,6 +52,9 @@ namespace Coditech.API.Service
             if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Device Serial Code."));
 
+            if (!dBTMDeviceMaster.IsMasterDevice)
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Please Enter Master Device Serial Code."));
+
             if (new DBTMDeviceRegistrationDetailsService(_coditechLogging, _serviceProvider).IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
 
