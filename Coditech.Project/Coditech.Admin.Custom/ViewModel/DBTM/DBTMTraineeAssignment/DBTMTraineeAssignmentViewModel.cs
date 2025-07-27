@@ -10,6 +10,7 @@ namespace Coditech.Admin.ViewModel
 
         [Required]
         public long GeneralTrainerMasterId { get; set; }
+        public long EntityId { get; set; }
 
         [Required]
         public int DBTMTestMasterId { get; set; }
