@@ -51,29 +51,6 @@ namespace Coditech.Admin.Agents
         }
         #endregion
         #region protected
-        protected override List<DatatableColumns> BindColumns()
-        {
-            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Batch Name",
-                ColumnCode = "BatchName",
-                IsSortable = true,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Batch Time",
-                ColumnCode = "BatchTime",
-                IsSortable = true,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Active",
-                ColumnCode = "IsActive",
-                IsSortable = true,
-            });
-            return datatableColumnList;
-        }
         #endregion
     }
 }
