@@ -117,17 +117,16 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTraineeAssignmentResponse GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public virtual DBTMTraineeAssignmentResponse GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
         {
-            return Task.Run(async () => await GetDBTMTraineeAssignmentAsync(dBTMTraineeAssignmentId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetDBTMTraineeAssignmentAsync(dBTMTraineeAssignmentUserId, CancellationToken.None)).GetAwaiter().GetResult();
         }
-
-        public virtual async Task<DBTMTraineeAssignmentResponse> GetDBTMTraineeAssignmentAsync(long dBTMTraineeAssignmentId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeAssignmentResponse> GetDBTMTraineeAssignmentAsync(long dBTMTraineeAssignmentUserId ,CancellationToken cancellationToken)
         {
-            if (dBTMTraineeAssignmentId <= 0)
-                throw new System.ArgumentNullException("dBTMTraineeAssignmentId");
+            if (dBTMTraineeAssignmentUserId <= 0)
+                throw new System.ArgumentNullException("dBTMTraineeAssignmentUserId");
 
-            string endpoint = dBTMTraineeAssignmentEndpoint.GetDBTMTraineeAssignmentAsync(dBTMTraineeAssignmentId);
+            string endpoint = dBTMTraineeAssignmentEndpoint.GetDBTMTraineeAssignmentAsync(dBTMTraineeAssignmentUserId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

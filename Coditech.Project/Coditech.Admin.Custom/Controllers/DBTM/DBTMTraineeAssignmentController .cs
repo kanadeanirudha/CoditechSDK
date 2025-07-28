@@ -89,9 +89,9 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
         {
-            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
+            DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
         }
 
@@ -106,7 +106,7 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTraineeAssignmentAgent.UpdateDBTMTraineeAssignment(dBTMTraineeAssignmentViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentId });
+                return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId });
             }
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 

@@ -14,8 +14,8 @@ namespace Coditech.API.Endpoint
         public string CreateDBTMTraineeAssignmentAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/CreateDBTMTraineeAssignment";
 
-        public string GetDBTMTraineeAssignmentAsync(long dBTMTraineeAssignmentId) =>
-            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetDBTMTraineeAssignment?dBTMTraineeAssignmentId={dBTMTraineeAssignmentId}";
+        public string GetDBTMTraineeAssignmentAsync(long dBTMTraineeAssignmentUserId) =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetDBTMTraineeAssignment?dBTMTraineeAssignmentUserId={dBTMTraineeAssignmentUserId}";
 
         public string UpdateDBTMTraineeAssignmentAsync() =>
                $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/UpdateDBTMTraineeAssignment";
