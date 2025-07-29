@@ -46,5 +46,7 @@ namespace Coditech.Admin.ViewModel
         [MaxLength(500)]
         [Display(Name = "Additional Features")]
         public string AdditionalFeatures { get; set; }
+        [Display(Name = "Registered")]
+        public bool IsRegistered { get; set; }
     }
 }

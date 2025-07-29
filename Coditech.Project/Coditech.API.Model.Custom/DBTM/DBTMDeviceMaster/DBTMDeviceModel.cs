@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
 namespace Coditech.Common.API.Model
 {
     public class DBTMDeviceModel : BaseModel
@@ -27,5 +26,6 @@ namespace Coditech.Common.API.Model
         [MaxLength(500)]
         public string AdditionalFeatures { get; set; }
         public string DBTMDeviceStatus { get; set; }
-    }
+        public bool IsRegistered { get; set; }
+}
 }
