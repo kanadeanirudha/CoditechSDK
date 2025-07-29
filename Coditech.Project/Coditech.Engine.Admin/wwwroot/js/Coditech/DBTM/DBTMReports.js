@@ -41,7 +41,7 @@
         }
         else
         {
-            CoditechNotification.DisplayNotificationMessage("Please select batch and test.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select batch and activity.", "error");
 
         }
     },
@@ -107,12 +107,12 @@
                     if (xhr.status == "401" || xhr.status == "403") {
                         location.reload();
                     }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Test Reports.", "error");
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error");
                     CoditechCommon.HideLodder();
                 }
             });
         } else {
-            CoditechNotification.DisplayNotificationMessage("Please select activity and trainer.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select activity and trainee.", "error");
         }
     },
 
