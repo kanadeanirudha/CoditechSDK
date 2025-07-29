@@ -92,9 +92,9 @@ namespace Coditech.Admin.Agents
         }
 
         //Get DBTMTraineeAssignment by dBTMTraineeAssignment id.
-        public virtual DBTMTraineeAssignmentViewModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public virtual DBTMTraineeAssignmentViewModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
         {
-            DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
+            DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
             return response?.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
         }
 
