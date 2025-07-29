@@ -113,7 +113,7 @@ namespace Coditech.Admin.Controllers
         protected void BindDBTMBatchActivity(GeneralBatchViewModel generalBatchViewModel)
         {
             generalBatchViewModel.CustomDropdownList1 = generalBatchViewModel.CustomDropdownList1 ?? new List<SelectListItem>();
-            DataTableViewModel dataTableModel = new DataTableViewModel();
+            DataTableViewModel dataTableModel = new DataTableViewModel() { PageSize = int.MaxValue };
             DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
             if (dBTMBatchActivityList?.DBTMTestList != null)
             {

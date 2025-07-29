@@ -7,7 +7,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTraineeDetailsController : BaseController
@@ -224,18 +223,34 @@ namespace Coditech.Admin.Controllers
         [HttpPost]
         public virtual ActionResult InsertAssociatedTrainer(GeneralTraineeAssociatedToTrainerViewModel generalTraineeAssociatedToTrainerViewModel)
         {
-            if (ModelState.IsValid)
+            if (string.IsNullOrEmpty(generalTraineeAssociatedToTrainerViewModel.SelectedDepartmentId))
             {
-                generalTraineeAssociatedToTrainerViewModel = _dBTMTraineeDetailsAgent.InsertAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel);
-                if (!generalTraineeAssociatedToTrainerViewModel.HasError)
-                {
-                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("GetAssociatedTrainerList", new { SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId, SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId });
-                }
+                SetNotificationMessage(GetErrorNotificationMessage("Please select department."));
             }
-            SetNotificationMessage(GetErrorNotificationMessage(generalTraineeAssociatedToTrainerViewModel.ErrorMessage));
+            else if (generalTraineeAssociatedToTrainerViewModel.GeneralTrainerMasterId == 0)
+            {
+                SetNotificationMessage(GetErrorNotificationMessage("Please select trainer."));
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    generalTraineeAssociatedToTrainerViewModel = _dBTMTraineeDetailsAgent.InsertAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel);
+                    if (!generalTraineeAssociatedToTrainerViewModel.HasError)
+                    {
+                        SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                        return RedirectToAction("GetAssociatedTrainerList", new
+                        {
+                            SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId,
+                            SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId
+                        });
+                    }
+                }
+                SetNotificationMessage(GetErrorNotificationMessage(generalTraineeAssociatedToTrainerViewModel.ErrorMessage));
+            }
             return View(createEditAssociatedTrainer, generalTraineeAssociatedToTrainerViewModel);
         }
+
 
         [HttpGet]
         public virtual ActionResult UpdateAssociatedTrainer(long generalTraineeAssociatedToTrainerId, long dBTMTraineeDetailId, long personId)
