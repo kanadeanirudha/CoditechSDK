@@ -68,7 +68,7 @@
                                         @Html.ValidationMessageFor(x => x.BatchFrequency)
                                     </div>
                                 </div>
-                                <div class="row">                              
+                                <div class="row">
                                     <div class="col-lg-12" id="weeklyDiv">
                                         <div class="mb-3 multiselect-dropdown">
                                             @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
@@ -125,6 +125,16 @@
                                         @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
                                     </div>
                                 </div>
+                                @if (Model.GeneralBatchMasterId == 0)
+                                {
+                                    <div class="col-lg-12">
+                                        <div class="mb-3 multiselect-dropdown">
+                                            <label class="form-label required" for="CustomDropdownSelectedValue2">Batch User</label>
+                                            @Html.ListBoxFor(x => x.CustomDropdownSelectedValue2, new SelectList(Model.CustomDropdownList2, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                            @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue2)
+                                        </div>
+                                    </div>
+                                }
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
@@ -153,7 +163,7 @@
             }
         }
         $(document).ready(function () {
-            updateExpiryDate(); 
+            updateExpiryDate();
             $("#BatchFrequency").change(function () {
                 updateExpiryDate();
             });
@@ -175,7 +185,7 @@
                     var validationSpan = $('[data-valmsg-for="Duration"]');
                     validationSpan.text("Duration cannot be 00 Hours and 00 Minutes.");
                     validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
-                    e.preventDefault(); 
+                    e.preventDefault();
                 } else {
                     var validationSpan = $('[data-valmsg-for="Duration"]');
                     validationSpan.text("");

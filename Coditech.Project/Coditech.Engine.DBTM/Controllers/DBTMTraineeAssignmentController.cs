@@ -73,11 +73,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeAssignment/GetDBTMTraineeAssignment")]
         [HttpGet]
         [Produces(typeof(DBTMTraineeAssignmentResponse))]
-        public virtual IActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public virtual IActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
         {
             try
             {
-                DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = _dBTMTraineeAssignmentService.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
+                DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = _dBTMTraineeAssignmentService.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
                 return IsNotNull(dBTMTraineeAssignmentModel) ? CreateOKResponse(new DBTMTraineeAssignmentResponse { DBTMTraineeAssignmentModel = dBTMTraineeAssignmentModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)

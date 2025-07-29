@@ -74,7 +74,7 @@ namespace Coditech.Admin.Helpers
             {
                 GetTraineeDetailsGraphList(dropdownViewModel, dropdownList);
             }
-            dropdownViewModel.DropdownList = dropdownList;
+            dropdownViewModel.DropdownList = dropdownList = dropdownList.OrderBy(x => x.Text ?? string.Empty).ToList();
             return dropdownViewModel;
         }
         private static void GetDBTMActivityCategoryList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)

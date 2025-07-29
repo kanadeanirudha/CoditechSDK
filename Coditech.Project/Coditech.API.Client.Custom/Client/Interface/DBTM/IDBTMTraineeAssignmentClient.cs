@@ -11,7 +11,7 @@ namespace Coditech.API.Client
         /// Get list of DBTMTraineeAssignment.
         /// </summary>
         /// <returns>DBTMTraineeAssignmentListResponse</returns>
-        DBTMTraineeAssignmentListResponse List(long generalTrainerMasterId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMTraineeAssignmentListResponse List(long generalTrainerMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
 
         /// <summary>
         /// Create DBTMTraineeAssignment.
@@ -25,7 +25,7 @@ namespace Coditech.API.Client
         /// </summary>
         /// <param name="dBTMTraineeAssignmentId">dBTMTraineeAssignmentId</param>
         /// <returns>Returns DBTMTraineeAssignmentResponse.</returns>
-        DBTMTraineeAssignmentResponse GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId);
+        DBTMTraineeAssignmentResponse GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId);
 
         /// <summary>
         /// Update DBTMTraineeAssignment.

@@ -100,14 +100,34 @@ namespace Coditech.API.Service
             return dBTMTraineeAssignmentModel;
         }
         // Get DBTMTraineeAssignment by dBTMTraineeAssignmentId.
-        public DBTMTraineeAssignmentModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public DBTMTraineeAssignmentModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
         {
-            if (dBTMTraineeAssignmentId <= 0)
+            if (dBTMTraineeAssignmentUserId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeAssignmentId"));
 
+            DBTMTraineeAssignmentToUser dBTMTraineeAssignmentToUser = _dBTMTraineeAssignmentToUserRepository.Table.Where(x => x.DBTMTraineeAssignmentUserId == dBTMTraineeAssignmentUserId)?.FirstOrDefault();
+
             //Get the DBTMTraineeAssignment Details based on id.
-            DBTMTraineeAssignment dBTMTraineeAssignment = _dBTMTraineeAssignmentRepository.Table.Where(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId)?.FirstOrDefault();
+            DBTMTraineeAssignment dBTMTraineeAssignment = _dBTMTraineeAssignmentRepository.Table.Where(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentToUser.DBTMTraineeAssignmentId)?.FirstOrDefault();
+
+            DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeAssignmentToUser.DBTMTraineeDetailId)?.FirstOrDefault();
+
+            DBTMTestMaster dBTMTestMaster = _dBTMTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTraineeAssignment.DBTMTestMasterId).FirstOrDefault();
+
             DBTMTraineeAssignmentModel dBTMTraineeAssignmentModel = dBTMTraineeAssignment?.FromEntityToModel<DBTMTraineeAssignmentModel>();
+            if (dBTMTraineeDetails?.PersonId > 0)
+            {
+                GeneralPerson person = _generalPersonRepository.Table.Where(p => p.PersonId == dBTMTraineeDetails.PersonId)
+                                 .Select(p => new GeneralPerson
+                                 {
+                                     FirstName = p.FirstName,
+                                     LastName = p.LastName,
+                                 }).FirstOrDefault();
+                dBTMTraineeAssignmentModel.FirstName = person.FirstName;
+                dBTMTraineeAssignmentModel.LastName = person.LastName;
+                dBTMTraineeAssignmentModel.TestName = dBTMTestMaster.TestName;
+            }
+
             if (dBTMTraineeAssignmentModel?.GeneralTrainerMasterId > 0)
             {
                 long employeeId = _generalTrainerRepository.Table.Where(x => x.GeneralTrainerMasterId == dBTMTraineeAssignmentModel.GeneralTrainerMasterId).Select(y => y.EmployeeId).FirstOrDefault();

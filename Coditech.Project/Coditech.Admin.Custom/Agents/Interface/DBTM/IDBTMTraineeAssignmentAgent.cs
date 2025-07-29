@@ -23,7 +23,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dBTMTraineeAssignmentId">dBTMTraineeAssignmentId</param>
         /// <returns>Returns DBTMTraineeAssignmentViewModel.</returns>
-        DBTMTraineeAssignmentViewModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId);
+        DBTMTraineeAssignmentViewModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId);
 
         /// <summary>
         /// Update DBTMTraineeAssignment.
