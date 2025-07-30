@@ -9,7 +9,6 @@
     keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
 
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.GeneralBatchMasterId > 0 };
-
     DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring" } };
 }
 <!-- Page Content-->
