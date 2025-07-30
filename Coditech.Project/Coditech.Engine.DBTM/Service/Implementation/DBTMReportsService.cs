@@ -77,6 +77,35 @@ namespace Coditech.API.Service
             return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
         }
 
+        public DBTMGraphListModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            if (dBTMTestMasterId <= 0)
+            {
+                return new DBTMGraphListModel();
+            }
+            if (userType == UserTypeEnum.Employee.ToString())
+            {
+                entityId = 0;
+            }
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@FromDate", fromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", toDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            DBTMReportsListModel reportsModel = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
+            DBTMGraphListModel graphListModel = new DBTMGraphListModel()
+            {
+               
+            };
+            return graphListModel;
+        }
+
         public DBTMReportsListModel BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList)
         {
             DBTMReportsListModel listModel = new DBTMReportsListModel();

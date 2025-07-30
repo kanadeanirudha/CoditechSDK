@@ -1,10 +1,10 @@
 ﻿@using Newtonsoft.Json
 @using System.Data
-@model DBTMReportsListViewModel
+@model DBTMGraphListViewModel
 @{
     Layout = null;
 
-    var xValues = JsonConvert.SerializeObject(new List<int> { 0, 5, 15, 20 });
+    var xValues = JsonConvert.SerializeObject(new List<int> { 0, 5, 10, 15, 20 });
     var datasets = new List<LineGraphsDatasetViewModel>();
 
     var colors = new List<string> {
@@ -39,7 +39,7 @@ else
         double bcVelocity = Convert.ToDouble(row["B-C-Velocity"].ToString().Split(' ')[0]);
         double caVelocity = Convert.ToDouble(row["C-A-Velocity"].ToString().Split(' ')[0]);
 
-        if (Model.GraphType == "time")
+        if (Model.GraphType == "DistanceTime")
         {
             title = "5-10-5 Agility Test (TIME)";
             yAxis = "Time (sec)";
@@ -50,7 +50,7 @@ else
                 Color = colors[colorIndex++ % colors.Count]
             });
         }
-        else if (Model.GraphType == "velocity")
+        else if (Model.GraphType == "DistanceVelocity")
         {
             title = "5-10-5 Agility Test (VELOCITY)";
             yAxis = "Velocity (m/s)";
@@ -61,7 +61,7 @@ else
                 Color = colors[colorIndex++ % colors.Count]
             });
         }
-        else if (Model.GraphType == "timeandvelocity")
+        else if (Model.GraphType == "TimeAndVelocity")
         {
             title = "5-10-5 Agility Test (TIME & VELOCITY)";
             yAxis = "Time and Velocity";
