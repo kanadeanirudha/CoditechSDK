@@ -5,10 +5,10 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMGeneralBatchMasterController : BaseController
@@ -27,6 +27,12 @@ namespace Coditech.Admin.Controllers
             _dBTMBatchAgent = dBTMBatchAgent;
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult CreateCustom(string token)
+        {
+            return Create();
+        }
         [HttpGet]
         public ActionResult Create()
         {
@@ -144,7 +150,7 @@ namespace Coditech.Admin.Controllers
             string CentreCode = userModel.SelectedCentreCode;
             long GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0;
             generalBatchViewModel.CustomDropdownList2 = generalBatchViewModel.CustomDropdownList2 ?? new List<SelectListItem>();
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() {PageIndex = int.MaxValue };
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { PageIndex = int.MaxValue };
             GeneralBatchUserListViewModel list = _dBTMBatchAgent.GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(CentreCode, GeneralTrainerMasterId, generalBatchViewModel.GeneralBatchMasterId);
             if (list?.GeneralBatchUserList != null)
             {

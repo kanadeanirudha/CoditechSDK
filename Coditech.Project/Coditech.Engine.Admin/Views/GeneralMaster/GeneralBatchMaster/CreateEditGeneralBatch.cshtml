@@ -1,5 +1,6 @@
 ﻿@model GeneralBatchViewModel
 @{
+    Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
     ViewBag.Title = Model.GeneralBatchMasterId > 0 ? "Update Batch Details" : "Add Batch";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
