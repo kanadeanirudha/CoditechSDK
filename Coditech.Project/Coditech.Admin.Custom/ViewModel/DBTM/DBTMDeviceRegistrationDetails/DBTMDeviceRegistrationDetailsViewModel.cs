@@ -20,6 +20,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Warranty Expiration Date")]
         public DateTime WarrantyExpirationDate { get; set; }
         public bool IsMasterDevice { get; set; }
-
+        public string SlaveDeviceCode { get; set; }
     }
 }

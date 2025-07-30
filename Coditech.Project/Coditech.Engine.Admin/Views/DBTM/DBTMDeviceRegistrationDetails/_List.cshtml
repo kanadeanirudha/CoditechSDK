@@ -20,6 +20,7 @@
                         <tr>
                             <td>@item.DeviceName</td>
                             <td>@item.DeviceSerialCode</td>
+                            <td>@item.SlaveDeviceCode</td>
                             <td>@item.PurchaseDate.ToCoditechDateFormat()</td>
                             <td>@item.WarrantyExpirationDate.ToCoditechDateFormat()</td>
                             <td> @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsMasterDevice)</td>
