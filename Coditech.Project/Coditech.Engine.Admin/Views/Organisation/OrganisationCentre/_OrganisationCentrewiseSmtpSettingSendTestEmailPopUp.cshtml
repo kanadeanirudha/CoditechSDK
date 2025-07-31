@@ -12,7 +12,7 @@
     <h6 class="modal-title m-0" id="exampleModalDefaultLabel">Send Test Email</h6>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
-@using (Html.BeginForm("SendTestEmailModel", controllerName, FormMethod.Post, new { id = "frmSendDetails" }))
+@using (Html.BeginForm("SendTestEmail", controllerName, FormMethod.Post, new { id = "frmSendDetails" }))
 {
     @Html.HiddenFor(m => m.CentreCode)
     @Html.HiddenFor(m => m.OrganisationCentreMasterId)
@@ -65,5 +65,5 @@
 @Html.Partial("_ValidationScriptsPartial")
 @section scripts {
     <!-- end page content -->
-    <script src="~/js/coditech/Organisation/OrganisationTestModel.js"></script>
+    <script src="~/js/coditech/Organisation/OrganisationCentre.js"></script>
 }

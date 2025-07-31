@@ -1,10 +1,13 @@
 ﻿@model GeneralBatchViewModel
 @{
-    Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    if (!string.IsNullOrEmpty(Model.Custom5))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     ViewBag.Title = Model.GeneralBatchMasterId > 0 ? "Update Batch Details" : "Add Batch";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string css = Model.GeneralBatchMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    string css = Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom5) ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
 
@@ -15,7 +18,7 @@
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            @if (Model.GeneralBatchMasterId > 0)
+            @if (Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom5))
             {
                 <div class="col-lg-2">
                     @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
@@ -42,6 +45,7 @@
                         {
                             @Html.HiddenFor(m => m.GeneralBatchMasterId)
                             @Html.HiddenFor(x => x.WeekDays)
+                            @Html.HiddenFor(x => x.Custom5)
                             @if (Model.GeneralBatchMasterId > 0)
                             {
                                 @Html.HiddenFor(x => x.CentreCode)
@@ -137,7 +141,10 @@
                                 }
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            if (string.IsNullOrEmpty(Model.Custom5))
+                            {
+                                <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            }
                         }
                     </div>
                 </div>
@@ -190,6 +197,16 @@
                     var validationSpan = $('[data-valmsg-for="Duration"]');
                     validationSpan.text("");
                     validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
+                }
+                var frequency = $("#BatchFrequency").val();
+                if (frequency === "Weekly") {
+                    var selectedWeekDays = $("#SelectedWeekDays option:selected").length;
+                    if (selectedWeekDays === 0) {
+                        var validationSpan = $('[data-valmsg-for="SelectedWeekDays"]');
+                        validationSpan.text("Please select at least one Week Day.");
+                        validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+                        e.preventDefault();
+                    }
                 }
             });
         });

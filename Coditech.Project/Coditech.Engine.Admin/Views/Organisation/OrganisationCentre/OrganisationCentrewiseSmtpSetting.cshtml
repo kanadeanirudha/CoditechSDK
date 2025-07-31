@@ -3,7 +3,7 @@
     ViewBag.Title = "Organisation Centrewise Smtp Setting";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    ModelPopUpViewModel sendTestEmailModal = new ModelPopUpViewModel() { ModelPopUpId = "SendDetailsPopupId", ModalContentId = "SendDetailsContentId" };
+    ModelPopUpViewModel sendTestEmail = new ModelPopUpViewModel() { ModelPopUpId = "SendDetailsPopupId", ModalContentId = "SendDetailsContentId" };
 }
 <div class="page-content mt-5">
     <div class="container-fluid">
@@ -113,8 +113,8 @@
                                         <button type="button"
                                                 class="btn btn-gradient-info"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#@sendTestEmailModal.ModelPopUpId"
-                                                onclick="OrganisationTestModel.SendTestEmailModel('@sendTestEmailModal.ModalContentId','@Model.CentreCode','@Model.OrganisationCentreMasterId')"
+                                                data-bs-target="#@sendTestEmail.ModelPopUpId"
+                                                onclick="OrganisationCentre.SendTestEmail('@sendTestEmail.ModalContentId','@Model.CentreCode','@Model.OrganisationCentreMasterId')"
                                                 title="Send Test Email">
                                             Send Test Email
                                         </button>
@@ -130,5 +130,5 @@
         </div>
     </div>
 </div>
-@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", sendTestEmailModal)
-<script src="~/js/coditech/Organisation/OrganisationTestModel.js"></script>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", sendTestEmail)
+<script src="~/js/Coditech/Organisation/OrganisationCentre.js"></script>

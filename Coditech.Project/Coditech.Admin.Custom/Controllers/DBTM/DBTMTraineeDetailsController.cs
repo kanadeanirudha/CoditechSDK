@@ -365,7 +365,6 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult TraineeRegistration(string joiningCode)
         {
-            TempData["FormSizeClass"] = "col-lg-8";
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
@@ -396,8 +395,6 @@ namespace Coditech.Admin.Controllers
         [ValidateAntiForgeryToken]
         public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
-            TempData["FormSizeClass"] = "col-lg-8";
-
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
@@ -412,7 +409,6 @@ namespace Coditech.Admin.Controllers
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
-                        TempData["FormSizeClass"] = "col-lg-4";
                         SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
                         return RedirectToAction("List", "DBTMTraineeDetails");
                     }
