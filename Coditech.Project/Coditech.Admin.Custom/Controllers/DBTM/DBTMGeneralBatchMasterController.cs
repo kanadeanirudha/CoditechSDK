@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using static Coditech.Common.Helper.HelperUtility;
+
 namespace Coditech.Admin.Controllers
 {
     public class DBTMGeneralBatchMasterController : BaseController
@@ -27,19 +29,27 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public ActionResult CreateCustom(string token)
+        public ActionResult Create(string token = null)
         {
-            return Create();
-        }
-        [HttpGet]
-        public ActionResult Create()
-        {
-            GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();        
+            if (!string.IsNullOrEmpty(token))
+            {
+                SessionHelper.RemoveDataFromSession(AdminConstants.UserDataSession);
+                if (IsNull(SessionProxyHelper.GetUserDetails(token)))
+                {
+                    return View("~/Views/User/UnauthorizedRequest.cshtml");
+                }
+            }
+            else if (IsNull(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)))
+            {
+                return View("~/Views/User/UnauthorizedRequest.cshtml");
+            }
+            GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel() { Custom5 = token };
             BindDropdown(generalBatchViewModel);
             return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult Create(GeneralBatchViewModel generalBatchViewModel)
         {
             if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0 &&
@@ -57,11 +67,14 @@ namespace Coditech.Admin.Controllers
             }
             else if (ModelState.IsValid)
             {
-                BindDuration(generalBatchViewModel);
                 generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
                 if (!generalBatchViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                    if (!string.IsNullOrEmpty(generalBatchViewModel.Custom5))
+                    {
+                        return RedirectToAction<DBTMGeneralBatchMasterController>(x => x.UpdateGeneralBatch(generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom5));
+                    }
                     return RedirectToAction<GeneralBatchMasterController>(x => x.List(new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode }));
                 }
             }
@@ -71,21 +84,35 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult UpdateGeneralBatch(int generalBatchMasterId)
+        [AllowAnonymous]
+        public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string token = null)
         {
+            if (!string.IsNullOrEmpty(token))
+            {
+                SessionHelper.RemoveDataFromSession(AdminConstants.UserDataSession);
+                if (IsNull(SessionProxyHelper.GetUserDetails(token)))
+                {
+                    return View("~/Views/User/UnauthorizedRequest.cshtml");
+                }
+            }
+            else if (IsNull(SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession)))
+            {
+                return View("~/Views/User/UnauthorizedRequest.cshtml");
+            }
             GeneralBatchViewModel generalBatchViewModel = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
+            generalBatchViewModel.Custom5 = token;
             BindDropdown(generalBatchViewModel);
             return ActionView(createEditBatch, generalBatchViewModel);
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel)
         {
             if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0)
             {
                 if (ModelState.IsValid)
                 {
-                    BindDuration(generalBatchViewModel);
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
@@ -164,6 +191,7 @@ namespace Coditech.Admin.Controllers
         }
         protected void BindDropdown(GeneralBatchViewModel generalBatchViewModel)
         {
+            BindDuration(generalBatchViewModel);
             BindFrequency(generalBatchViewModel);
             BindDBTMBatchActivity(generalBatchViewModel);
             BindDBTMBatchUserList(generalBatchViewModel);
