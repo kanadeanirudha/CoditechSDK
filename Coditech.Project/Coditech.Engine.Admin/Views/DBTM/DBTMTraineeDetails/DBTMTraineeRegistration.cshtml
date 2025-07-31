@@ -162,7 +162,7 @@
                                     <!-- Email ID -->
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            @Html.LabelFor(x => x.EmailId, new { @class = "form-label required" })
+                                    <label class="form-label required" for="EmailId">Email Address</label>
                                             @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control" })
                                             @Html.ValidationMessageFor(x => x.EmailId)
                                         </div>
