@@ -49,6 +49,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Activity")]
         [Required]
         public List<string> SelectedTest { get; set; }
-
+        public string AssignedBy { get; set; }
     }
 }
