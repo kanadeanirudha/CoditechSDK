@@ -66,10 +66,6 @@ namespace Coditech.Admin.Helpers
             {
                 DBTMGraphByDBTMTestMasterId(dropdownViewModel, dropdownList);
             }
-            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphType.ToString()))
-            {
-                GetGraphType(dropdownViewModel, dropdownList);
-            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeGraphList.ToString()))
             {
                 GetTraineeDetailsGraphList(dropdownViewModel, dropdownList);
@@ -198,7 +194,7 @@ namespace Coditech.Admin.Helpers
                 }
                 dropdownList.Add(new SelectListItem()
                 {
-                    Text = string.Concat(item.TestName, " (", item.TestCode, ")"),
+                    Text = $"{item.TestName}",
                     Value = Convert.ToString(item.DBTMTestMasterId),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestMasterId)
                 });
@@ -353,21 +349,10 @@ namespace Coditech.Admin.Helpers
                     dropdownList.Add(new SelectListItem()
                     {
                         Text = $"{item.GraphName}",
-                        Value = item.DBTMGraphMasterId.ToString(),
+                        Value = item.GraphCode,
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
                     });
                 }
-            }
-        }
-
-        private static void GetGraphType(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
-        {
-
-            if (dropdownViewModel.DropdownSelectedValue == "7")
-            {
-                dropdownList.Add(new SelectListItem() { Text = "Time", Value = "time" });
-                dropdownList.Add(new SelectListItem() { Text = "Velocity", Value = "velocity" });
-                dropdownList.Add(new SelectListItem() { Text = "Time and Velocity", Value = "timeandvelocity" });
             }
         }
         private static void GetTraineeDetailsGraphList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)

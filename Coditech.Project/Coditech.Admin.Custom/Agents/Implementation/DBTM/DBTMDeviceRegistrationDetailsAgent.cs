@@ -41,6 +41,7 @@ namespace Coditech.Admin.Agents
                 {
                     filters.Add("DeviceName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                     filters.Add("DeviceSerialCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                    filters.Add("SlaveDeviceCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
 
                 }
                 SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? " " : dataTableModel.SortByColumn, dataTableModel.SortBy);
@@ -164,9 +165,14 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Device Serial Code",
+                ColumnName = "Master Device Serial Code",
                 ColumnCode = "DeviceSerialCode",
                 IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Slave Device Serial Code",
+                ColumnCode = "SlaveDeviceCode",
             });
             datatableColumnList.Add(new DatatableColumns()
             {

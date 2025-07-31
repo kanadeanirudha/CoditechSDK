@@ -1,4 +1,4 @@
-﻿@model DBTMReportsListViewModel
+﻿@model DBTMGraphListViewModel
 @{
     ViewBag.Title = "Activity Reports";
     DropdownViewModel testDropdown = new DropdownViewModel()
@@ -44,7 +44,7 @@
                             <div class="col-md-1">
                                 <label>Activity List</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
                             </div>
                             <div class="col-md-1">

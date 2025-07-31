@@ -51,8 +51,25 @@ namespace Coditech.API.Service
             return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
         }
 
-   
+
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+        }
+
+        public DBTMGraphListModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            DBTMReportsListModel DBTMReportsListModel = GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+            DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.FirstOrDefault();
+            DBTMGraphListModel graphListModel = new DBTMGraphListModel()
+            {
+                dbtmReportsListModel = DBTMReportsListModel,
+                dbtmTestModel = dBTMTestMaster?.FromEntityToModel<DBTMTestModel>()
+            };
+            return graphListModel;
+        }
+
+        private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             if (dBTMTestMasterId <= 0)
             {
@@ -77,7 +94,7 @@ namespace Coditech.API.Service
             return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
         }
 
-        public DBTMReportsListModel BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList)
+        private DBTMReportsListModel BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList)
         {
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 

@@ -121,7 +121,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var graphType = $("#GraphType").val(); 
+        var graphType = $("#DBTMGraphMasterId").val(); 
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
@@ -171,7 +171,7 @@
                 data: { dBTMTestMasterId: dBTMTestMasterId },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#GraphType").html(data); 
+                    $("#DBTMGraphMasterId").html(data); 
                     DBTMReports.GetDBTMTestWiseGraphReports(); 
                     CoditechCommon.HideLodder();
                 },

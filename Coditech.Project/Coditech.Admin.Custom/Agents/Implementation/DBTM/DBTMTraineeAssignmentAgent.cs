@@ -279,6 +279,12 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Assigned By",
+                ColumnCode = "AssignedBy",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Assignment Date",
                 ColumnCode = "AssignmentDate",
                 IsSortable = true,

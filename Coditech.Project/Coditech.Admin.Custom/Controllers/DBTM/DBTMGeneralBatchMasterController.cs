@@ -5,10 +5,10 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMGeneralBatchMasterController : BaseController
@@ -28,49 +28,52 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
+        public ActionResult CreateCustom(string token)
+        {
+            return Create();
+        }
+        [HttpGet]
         public ActionResult Create()
         {
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
-            generalBatchViewModel.SelectedWeekDays = !string.IsNullOrEmpty(generalBatchViewModel.WeekDays) ? generalBatchViewModel.WeekDays.Split(',').ToList() : new List<string>();
-            generalBatchViewModel.SchedulerWeekDaysList = CoditechDropdownHelper.GeneralDropdownList(new DropdownViewModel()
-            {
-                DropdownType = DropdownTypeEnum.SchedulerWeeks.ToString(),
-                DropdownSelectedValue = generalBatchViewModel.WeekDays
-            }).DropdownList;
-
-            if (string.IsNullOrEmpty(generalBatchViewModel.BatchFrequency))
-            {
-                generalBatchViewModel.BatchFrequency = SchedulerFrequencyEnum.Daily.ToString();
-            }
+            BindFrequency(generalBatchViewModel);
             BindDBTMBatchActivity(generalBatchViewModel);
             BindDBTMBatchUserList(generalBatchViewModel);
-            return View(createEditBatch, generalBatchViewModel);
+            return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
 
         [HttpPost]
         public ActionResult Create(GeneralBatchViewModel generalBatchViewModel)
         {
-            if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0 && generalBatchViewModel?.CustomDropdownSelectedValue2?.Count > 0)
+            if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0 &&
+                (generalBatchViewModel?.CustomDropdownSelectedValue2?.Count ?? 0) == 0)
             {
-                if (ModelState.IsValid)
+                generalBatchViewModel.ErrorMessage = "Please select at least one Activity and one Batch User.";
+            }
+            else if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
+            {
+                generalBatchViewModel.ErrorMessage = "Please select at least one Activity.";
+            }
+            else if ((generalBatchViewModel?.CustomDropdownSelectedValue2?.Count ?? 0) == 0)
+            {
+                generalBatchViewModel.ErrorMessage = "Please select at least one Batch User.";
+            }
+            else if (ModelState.IsValid)
+            {
+                generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
+                if (!generalBatchViewModel.HasError)
                 {
-                    BindDuration(generalBatchViewModel);
-                    generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
-                    if (!generalBatchViewModel.HasError)
-                    {
-                        SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                        return RedirectToAction<GeneralBatchMasterController>(x => x.List(new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode }));
-                    }
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                    return RedirectToAction<GeneralBatchMasterController>(x => x.List(new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode }));
                 }
-                SetNotificationMessage(GetErrorNotificationMessage(generalBatchViewModel.ErrorMessage));
             }
-            else
-            {
-                SetNotificationMessage(GetErrorNotificationMessage("Please Select Activity and User"));
-            }
+            BindFrequency(generalBatchViewModel);
+            BindDuration(generalBatchViewModel);
             BindDBTMBatchActivity(generalBatchViewModel);
             BindDBTMBatchUserList(generalBatchViewModel);
-            return View(createEditBatch, generalBatchViewModel);
+            SetNotificationMessage(GetErrorNotificationMessage(generalBatchViewModel.ErrorMessage));
+            return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
 
         [HttpGet]
@@ -109,7 +112,7 @@ namespace Coditech.Admin.Controllers
             BindDBTMBatchActivity(generalBatchViewModel);
             return View(createEditBatch, generalBatchViewModel);
         }
-
+       
         protected void BindDBTMBatchActivity(GeneralBatchViewModel generalBatchViewModel)
         {
             generalBatchViewModel.CustomDropdownList1 = generalBatchViewModel.CustomDropdownList1 ?? new List<SelectListItem>();
@@ -144,7 +147,7 @@ namespace Coditech.Admin.Controllers
             string CentreCode = userModel.SelectedCentreCode;
             long GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0;
             generalBatchViewModel.CustomDropdownList2 = generalBatchViewModel.CustomDropdownList2 ?? new List<SelectListItem>();
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() {PageIndex = int.MaxValue };
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { PageIndex = int.MaxValue };
             GeneralBatchUserListViewModel list = _dBTMBatchAgent.GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(CentreCode, GeneralTrainerMasterId, generalBatchViewModel.GeneralBatchMasterId);
             if (list?.GeneralBatchUserList != null)
             {
@@ -156,6 +159,20 @@ namespace Coditech.Admin.Controllers
                         Value = item.EntityId.ToString(),
                     });
                 }
+            }
+        }
+        protected void BindFrequency(GeneralBatchViewModel generalBatchViewModel)
+        {
+            generalBatchViewModel.SelectedWeekDays = !string.IsNullOrEmpty(generalBatchViewModel.WeekDays) ? generalBatchViewModel.WeekDays.Split(',').ToList() : new List<string>();
+            generalBatchViewModel.SchedulerWeekDaysList = CoditechDropdownHelper.GeneralDropdownList(new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.SchedulerWeeks.ToString(),
+                DropdownSelectedValue = generalBatchViewModel.WeekDays
+            }).DropdownList;
+
+            if (string.IsNullOrEmpty(generalBatchViewModel.BatchFrequency))
+            {
+                generalBatchViewModel.BatchFrequency = SchedulerFrequencyEnum.Daily.ToString();
             }
         }
     }
