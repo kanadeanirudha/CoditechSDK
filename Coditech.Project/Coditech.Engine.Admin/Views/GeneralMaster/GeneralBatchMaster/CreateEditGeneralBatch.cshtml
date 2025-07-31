@@ -191,6 +191,16 @@
                     validationSpan.text("");
                     validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
                 }
+                var frequency = $("#BatchFrequency").val();
+                    if (frequency === "Weekly") {
+                        var selectedWeekDays = $("#SelectedWeekDays option:selected").length;
+                            if (selectedWeekDays === 0) {
+                                var validationSpan = $('[data-valmsg-for="SelectedWeekDays"]');
+                                    validationSpan.text("Please select at least one Week Day.");
+                                    validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+                                    e.preventDefault();
+                        }
+                   }
             });
         });
     </script>
