@@ -11,5 +11,6 @@
         public DateTime PurchaseDate { get; set; }
         public DateTime WarrantyExpirationDate { get; set; }
         public bool IsMasterDevice { get; set; }
+        public string SlaveDeviceCode { get; set; }
     }
 }
