@@ -1,6 +1,5 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Helpers;
-using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Authorization;
@@ -179,7 +178,31 @@ namespace Coditech.Admin.Controllers
 
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
+                if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
+                {
+                    var generalcountrymasterid = dBTMNewRegistrationViewModel.GeneralCountryMasterId;
+                    var generalcitymasterid = dBTMNewRegistrationViewModel.GeneralCityMasterId;
+                    var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
+                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode);
+                    if (!list.HasError)
+                    {
+                        dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+                        {
+                            JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
+                            AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                            {
+                                DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                                Parameter = dBTMNewRegistrationViewModel.JoiningCode
+                            }).DropdownList?.Where(x => x.Value != "")?.ToList()
+
+                        };
+                    }
+                    dBTMNewRegistrationViewModel.GeneralRegionMasterId = regionmasterid;
+                    dBTMNewRegistrationViewModel.GeneralCountryMasterId = generalcountrymasterid;
+                    dBTMNewRegistrationViewModel.GeneralCityMasterId = generalcitymasterid;
+                }
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
+
             }
             else
             {
@@ -198,6 +221,7 @@ namespace Coditech.Admin.Controllers
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
+           
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }
