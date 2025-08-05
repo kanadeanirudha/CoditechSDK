@@ -395,13 +395,15 @@ namespace Coditech.Admin.Controllers
         [ValidateAntiForgeryToken]
         public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
-            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
+            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
                 {
                     var generalcountrymasterid = dBTMNewRegistrationViewModel.GeneralCountryMasterId;
                     var generalcitymasterid = dBTMNewRegistrationViewModel.GeneralCityMasterId;
                     var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
+                    var isTermsAndCondition = dBTMNewRegistrationViewModel.IsTermsAndCondition;
+
                     DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode);
                     if (!list.HasError)
                     {
@@ -419,9 +421,13 @@ namespace Coditech.Admin.Controllers
                     dBTMNewRegistrationViewModel.GeneralRegionMasterId = regionmasterid;
                     dBTMNewRegistrationViewModel.GeneralCountryMasterId = generalcountrymasterid;
                     dBTMNewRegistrationViewModel.GeneralCityMasterId = generalcitymasterid;
+                    dBTMNewRegistrationViewModel.IsTermsAndCondition = isTermsAndCondition;
                 }
-                dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
 
+                if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
+                {
+                    dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
+                }
             }
             else
             {
