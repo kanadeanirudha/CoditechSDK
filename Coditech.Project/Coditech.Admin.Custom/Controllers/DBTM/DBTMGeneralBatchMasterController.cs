@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMGeneralBatchMasterController : BaseController
@@ -67,6 +66,7 @@ namespace Coditech.Admin.Controllers
             }
             else if (ModelState.IsValid)
             {
+                BindDuration(generalBatchViewModel);
                 generalBatchViewModel = _generalBatchAgent.CreateGeneralBatch(generalBatchViewModel);
                 if (!generalBatchViewModel.HasError)
                 {
@@ -113,6 +113,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    BindDuration(generalBatchViewModel);
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
@@ -135,7 +136,6 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownTypeEnum.SchedulerWeeks.ToString(),
                 DropdownSelectedValue = generalBatchViewModel.WeekDays
             }).DropdownList;
-
             if (string.IsNullOrEmpty(generalBatchViewModel.BatchFrequency))
             {
                 generalBatchViewModel.BatchFrequency = SchedulerFrequencyEnum.Daily.ToString();
@@ -191,7 +191,6 @@ namespace Coditech.Admin.Controllers
         }
         protected void BindDropdown(GeneralBatchViewModel generalBatchViewModel)
         {
-            BindDuration(generalBatchViewModel);
             BindFrequency(generalBatchViewModel);
             BindDBTMBatchActivity(generalBatchViewModel);
             BindDBTMBatchUserList(generalBatchViewModel);
