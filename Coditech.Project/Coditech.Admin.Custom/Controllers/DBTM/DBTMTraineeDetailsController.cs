@@ -439,7 +439,7 @@ namespace Coditech.Admin.Controllers
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
-                        SetNotificationMessage(GetSuccessNotificationMessage("Your Registration successfully."));
+                        SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
                         return RedirectToAction("List", "DBTMTraineeDetails");
                     }
                 }
