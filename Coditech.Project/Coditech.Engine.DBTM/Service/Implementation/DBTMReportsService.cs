@@ -59,22 +59,31 @@ namespace Coditech.API.Service
 
         public DBTMGraphListModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
-            DBTMReportsListModel DBTMReportsListModel = GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
-            DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.FirstOrDefault();
-            DBTMGraphListModel graphListModel = new DBTMGraphListModel()
+            DBTMGraphListModel graphListModel = new DBTMGraphListModel();
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
+            if (dBTMReportsList.Any())
             {
-                dbtmReportsListModel = DBTMReportsListModel,
-                dbtmTestModel = dBTMTestMaster?.FromEntityToModel<DBTMTestModel>()
-            };
+                DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.FirstOrDefault();
+                graphListModel.dbtmTestModel = dBTMTestMaster?.FromEntityToModel<DBTMTestModel>();
+            }
+          
             return graphListModel;
         }
 
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
+
+            return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
+        }
+
+        private List<DBTMReportsModel> GetTestWiseReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
+        {
             if (dBTMTestMasterId <= 0)
             {
-                return new DBTMReportsListModel();
+                return new List<DBTMReportsModel>();
             }
+            List<DBTMReportsModel> dBTMReportsList = new List<DBTMReportsModel>();
             if (userType == UserTypeEnum.Employee.ToString())
             {
                 entityId = 0;
@@ -89,9 +98,8 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
-
-            return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
+            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            return dBTMReportsList;
         }
 
         private DBTMReportsListModel BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList)
