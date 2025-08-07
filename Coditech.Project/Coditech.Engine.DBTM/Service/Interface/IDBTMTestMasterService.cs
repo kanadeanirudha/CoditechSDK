@@ -1,8 +1,7 @@
-﻿using Coditech.Common.API.Model;
+﻿using Coditech.API.Data;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
-
 using System.Collections.Specialized;
-
 namespace Coditech.API.Service
 {
     public interface IDBTMTestMasterService
@@ -16,5 +15,7 @@ namespace Coditech.API.Service
         DBTMTestCalculationListModel GetDBTMTestCalculation();
         DBTMGraphMasterListModel GetDBTMGraph();
         DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId);
+        DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
+
     }
 }

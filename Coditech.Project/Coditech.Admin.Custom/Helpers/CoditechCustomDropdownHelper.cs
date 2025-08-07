@@ -70,6 +70,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetTraineeDetailsGraphList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMPerformanceMatrix.ToString()))
+            {
+                GetDBTMPerformanceMatrix(dropdownViewModel, dropdownList);
+            }
 
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
@@ -374,6 +378,22 @@ namespace Coditech.Admin.Helpers
                     Text = $"{item.FirstName} {item.LastName}",
                     Value = item.DBTMTraineeDetailId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTraineeDetailId)
+                });
+            }
+        }
+        private static void GetDBTMPerformanceMatrix(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-------Select-------"});
+
+            DBTMPerformanceMatrixListResponse response = new DBTMTestClient().GetDBTMPerformanceMatrixList(null, null, null, 1, int.MaxValue);
+            DBTMPerformanceMatrixListModel list = new DBTMPerformanceMatrixListModel() { DBTMPerformanceMatrixList = response.DBTMPerformanceMatrixList };
+            foreach (var item in list?.DBTMPerformanceMatrixList.OrderBy(x => x.PerformanceMatrix))
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = $"{item.PerformanceMatrix}",
+                    Value = item.DBTMPerformanceMatrixId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMPerformanceMatrixId)
                 });
             }
         }

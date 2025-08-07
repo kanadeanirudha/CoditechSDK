@@ -7,11 +7,9 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Mvc;
-
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.Engine.DBTM.Controllers
 {
     public class DBTMTestMasterController : BaseController
@@ -228,6 +226,28 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMGraphMasterListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
-
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetDBTMPerformanceMatrixList")]
+        [Produces(typeof(DBTMPerformanceMatrixListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetDBTMPerformanceMatrixList(FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        {
+            try
+            {
+                DBTMPerformanceMatrixListModel list = _dBTMTestMasterService.GetDBTMPerformanceMatrixList(filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMPerformanceMatrixListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMPerformanceMatrix", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMPerformanceMatrixListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMPerformanceMatrix", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMPerformanceMatrixListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
