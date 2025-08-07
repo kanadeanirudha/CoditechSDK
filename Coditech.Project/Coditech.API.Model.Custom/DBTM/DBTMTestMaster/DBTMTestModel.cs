@@ -6,6 +6,7 @@ namespace Coditech.Common.API.Model
     {
         public int DBTMTestMasterId { get; set; }
         public short DBTMActivityCategoryId { get; set; }
+        public byte DBTMPerformanceMatrixId { get; set; }
 
         [Required]
         [MaxLength(200)]

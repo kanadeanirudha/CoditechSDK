@@ -3,6 +3,7 @@
     ViewBag.Title = Model.DBTMTestMasterId > 0 ? "Update DBTM Test" : "Add DBTM Test";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel dBTMPerformanceMatrix = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMPerformanceMatrix.ToString(), DropdownName = "DBTMPerformanceMatrixId", DropdownSelectedValue = Convert.ToString(Model.DBTMPerformanceMatrixId), IsCustomDropdown = true, IsRequired = true  };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -85,6 +86,13 @@
                                         @Html.LabelFor(x => x.DBTMSelectedGraph, new { @class = "form-label required" })
                                         @Html.ListBoxFor(x => x.DBTMSelectedGraph, new SelectList(Model.DBTMGraphMasterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
                                         @Html.ValidationMessageFor(x => x.DBTMSelectedGraph)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.DBTMPerformanceMatrixId, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", dBTMPerformanceMatrix)
+                                        @Html.ValidationMessageFor(x => x.DBTMPerformanceMatrixId)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
