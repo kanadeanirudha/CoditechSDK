@@ -11,8 +11,7 @@
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         $("#DBTMBatchWiseReportsDivId").html("");
-        if (generalBatchMasterId != "" && dBTMTestMasterId != "")
-        {
+        if (generalBatchMasterId != "" && dBTMTestMasterId != "") {
             CoditechCommon.ShowLodder();
             $.ajax({
                 cache: false,
@@ -22,8 +21,8 @@
                 data: {
                     "generalBatchMasterId": generalBatchMasterId,
                     "dBTMTestMasterId": dBTMTestMasterId,
-                    "FromDate": fromdate,  
-                    "ToDate": todate    
+                    "FromDate": fromdate,
+                    "ToDate": todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -39,10 +38,14 @@
                 }
             });
         }
-        else
-        {
+        else if (generalBatchMasterId == "" || generalBatchMasterId == "0") {
+            CoditechNotification.DisplayNotificationMessage("Please select a batch.", "error");
+        }
+        else if (dBTMTestMasterId == "") {
+            CoditechNotification.DisplayNotificationMessage("Please select an activity.", "error");
+        }
+        else {
             CoditechNotification.DisplayNotificationMessage("Please select batch and activity.", "error");
-
         }
     },
 
@@ -60,7 +63,7 @@
                 data: { generalBatchMasterId: selectedItem },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DBTMTestMasterId").html(data); 
+                    $("#DBTMTestMasterId").html(data);
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -72,7 +75,7 @@
                 }
             });
         } else {
-            $("#DBTMTestMasterId").html(""); 
+            $("#DBTMTestMasterId").html("");
         }
     },
 
@@ -112,7 +115,7 @@
                 }
             });
         } else {
-            CoditechNotification.DisplayNotificationMessage("Please select activity and trainee.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },
 
@@ -121,7 +124,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var graphType = $("#DBTMGraphMasterId").val(); 
+        var graphType = $("#DBTMGraphMasterId").val();
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
@@ -138,7 +141,7 @@
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
                     fromdate: fromdate,
                     todate: todate,
-                    graphType: graphType 
+                    graphType: graphType
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -167,12 +170,12 @@
                 cache: false,
                 url: '/DBTMReports/GetGraphListByDBTMTestMasterId',
                 type: 'GET',
-                dataType: 'html', 
+                dataType: 'html',
                 data: { dBTMTestMasterId: dBTMTestMasterId },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DBTMGraphMasterId").html(data); 
-                    DBTMReports.GetDBTMTestWiseGraphReports(); 
+                    $("#DBTMGraphMasterId").html(data);
+                    DBTMReports.GetDBTMTestWiseGraphReports();
                     CoditechCommon.HideLodder();
                 },
                 error: function () {
