@@ -354,7 +354,7 @@ namespace Coditech.Admin.Helpers
                     dropdownList.Add(new SelectListItem()
                     {
                         Text = $"{item.GraphName}",
-                        Value = item.GraphCode,
+                        Value = item.DBTMGraphMasterId.ToString(),
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
                     });
                 }
