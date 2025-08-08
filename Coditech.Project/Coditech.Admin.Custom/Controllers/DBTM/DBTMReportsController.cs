@@ -58,13 +58,11 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string graphType)
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate )
         {
-            DBTMGraphListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate);
-            dBTMReportsViewModel.GraphType = graphType;
+            DBTMGraphListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate);      
             return PartialView("~/Views/DBTM/DBTMReports/Graph/_TestWiseGraphReports.cshtml", dBTMReportsViewModel);
         }
-
         public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
             DropdownViewModel testDropdownn = new DropdownViewModel

@@ -59,7 +59,7 @@ namespace Coditech.Admin.Agents
 		}
 
         //Graph Reports
-        public virtual DBTMGraphListViewModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMGraphListViewModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
         {
             DBTMGraphListViewModel listViewModel = new DBTMGraphListViewModel();
             if (dBTMTestMasterId > 0)
@@ -73,8 +73,9 @@ namespace Coditech.Admin.Agents
                     generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
                     usertype = userModel?.Custom1;
                 }
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
                 listViewModel.DataTable = response.DataTable;
+                //listViewModel.DBTMGraphListModel = response.DBTMGraphListModel;
             }
             return listViewModel;
         }

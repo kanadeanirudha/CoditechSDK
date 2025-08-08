@@ -121,7 +121,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var graphType = $("#DBTMGraphMasterId").val(); 
+        var dBTMGraphMasterId = $("#DBTMGraphMasterId").val(); 
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
@@ -138,7 +138,7 @@
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
                     fromdate: fromdate,
                     todate: todate,
-                    graphType: graphType 
+                    dBTMGraphMasterId: dBTMGraphMasterId 
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {

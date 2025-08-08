@@ -19,6 +19,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
+        private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -30,8 +31,8 @@ namespace Coditech.API.Service
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
-
         public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
             if (dBTMTestMasterId <= 0)
@@ -51,16 +52,46 @@ namespace Coditech.API.Service
             return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
         }
 
-
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
         }
 
-        public DBTMGraphListModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public DBTMGraphListModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId,DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             DBTMGraphListModel graphListModel = new DBTMGraphListModel();
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
+            graphListModel.DBTMGraphMasterId = dBTMGraphMasterId;
+            graphListModel.XValuesList = new List<string> { "0", "5", "10", "15", "20" };
+            graphListModel.XAxisLabel = "Distance (m)";
+            graphListModel.Colors = new List<string>
+    {
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(153, 102, 255, 1)",
+        "rgba(255, 159, 64, 1)"
+    };
+
+            string graphCode = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).Select(x => x.GraphCode).FirstOrDefault();
+
+            if (graphCode == "DistanceTime")
+            {
+                graphListModel.Title = "5-10-5 Agility Test (TIME)";
+                graphListModel.YAxisLabel = "Time (sec)";
+            }
+            else if (graphCode == "DistanceVelocity")
+            {
+                graphListModel.Title = "5-10-5 Agility Test (VELOCITY)";
+                graphListModel.YAxisLabel = "Velocity (m/s)";
+            }
+            else if (graphCode == "TimeAndVelocity")
+            {
+                graphListModel.Title = "5-10-5 Agility Test (TIME & VELOCITY)";
+                graphListModel.YAxisLabel = "Time and Velocity";
+            }
+
             if (dBTMReportsList.Any())
             {
                 DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.FirstOrDefault();

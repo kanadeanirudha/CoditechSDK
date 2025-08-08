@@ -104,14 +104,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTestWiseReportsListResponse TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
+        public virtual DBTMTestWiseReportsListResponse TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
-            return Task.Run(async () => await TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseGraphReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseGraphReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode);
+            string endpoint = dBTMReportsEndpoint.TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, entityId, userType, centreCode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
