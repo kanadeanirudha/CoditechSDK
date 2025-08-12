@@ -52,6 +52,13 @@
                     .addClass("is-invalid")
                     .after('<div class="invalid-feedback">Please enter mobile number.</div>');
             }
+            else if (mobileNumber.length < 10) {
+                isValid = false;
+                $("#MobileNumber")
+                    .addClass("is-invalid")
+                    .after('<div class="invalid-feedback">Mobile number must be 10 digits.</div>');
+            }
+
         } else if (sendOTPOn === "email") {
             if (!emailId) {
                 isValid = false;
