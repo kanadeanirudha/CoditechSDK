@@ -175,7 +175,9 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-
+            ModelState.Remove("CentreName");
+            ModelState.Remove("CentreCode");
+            ModelState.Remove("DeviceSerialCode");
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
