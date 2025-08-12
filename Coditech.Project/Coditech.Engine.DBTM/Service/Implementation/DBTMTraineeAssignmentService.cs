@@ -67,12 +67,9 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected Activity cannot be null.");
             if (IsNull(dBTMTraineeAssignmentModel.SelectedTrainee))
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected Trainee cannot be null.");
-            if (dBTMTraineeAssignmentModel.GeneralTrainerMasterId == 0 && dBTMTraineeAssignmentModel.EntityId > 0)
-            {
-                dBTMTraineeAssignmentModel.GeneralTrainerMasterId = _generalTrainerRepository.Table.Where(x => x.EmployeeId == dBTMTraineeAssignmentModel.EntityId)
-                    .Select(y => y.GeneralTrainerMasterId)
-                    .FirstOrDefault();
-            }
+            if (IsNull(dBTMTraineeAssignmentModel.GeneralTrainerMasterId))
+                throw new CoditechException(ErrorCodes.InvalidData, "GeneralTrainerMasterId cannot be null.");
+            
             DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
 
             int dBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString());
