@@ -4,9 +4,7 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
-
 using Newtonsoft.Json;
-
 namespace Coditech.API.Client
 {
     public class DBTMTraineeDetailsClient : BaseClient, IDBTMTraineeDetailsClient
@@ -285,6 +283,54 @@ namespace Coditech.API.Client
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMActivitiesDetailsListResponse typedBody = JsonConvert.DeserializeObject<DBTMActivitiesDetailsListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTraineeProfileResponse GetProfileDetails(long dBTMTraineeDetailId)
+        {
+            return Task.Run(async () => await GetProfileDetailsAsync(dBTMTraineeDetailId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMTraineeProfileResponse> GetProfileDetailsAsync(long dBTMTraineeDetailId, CancellationToken cancellationToken)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new System.ArgumentNullException("dBTMTraineeDetailId");
+
+            string endpoint = dBTMTraineeDetailsEndpoint.GetProfileDetailsAsync(dBTMTraineeDetailId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeProfileResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                if (status_ == 204)
+                {
+                    return new DBTMTraineeProfileResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTraineeProfileResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeProfileResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }

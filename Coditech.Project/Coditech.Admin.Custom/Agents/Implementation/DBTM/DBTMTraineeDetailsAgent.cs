@@ -8,7 +8,6 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
-
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
@@ -388,6 +387,14 @@ namespace Coditech.Admin.Agents
             listViewModel.PersonCode = response.PersonCode;
             listViewModel.TestName = response.TestName;
             return listViewModel;
+        }
+        #endregion
+        #region Profile
+        public virtual DBTMTraineeProfileViewModel GetProfileDetails(long dBTMTraineeDetailId)
+        {
+            DBTMTraineeProfileResponse response = _dBTMTraineeDetailsClient.GetProfileDetails(dBTMTraineeDetailId);
+            DBTMTraineeProfileViewModel dBTMTraineeProfileViewModel = response?.DBTMTraineeProfileModel.ToViewModel<DBTMTraineeProfileViewModel>();
+            return dBTMTraineeProfileViewModel;
         }
         #endregion
 

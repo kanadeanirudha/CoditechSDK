@@ -32,5 +32,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetTraineeActivitiesDetailsList?dBTMDeviceDataId={dBTMDeviceDataId}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
+
+        public string GetProfileDetailsAsync(long dBTMTraineeDetailId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetProfileDetails?dBTMTraineeDetailId={dBTMTraineeDetailId}";
+
     }
 }
