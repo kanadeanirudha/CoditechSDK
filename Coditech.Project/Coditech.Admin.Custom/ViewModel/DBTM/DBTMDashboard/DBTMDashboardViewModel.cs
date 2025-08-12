@@ -18,5 +18,9 @@ namespace Coditech.Admin.ViewModel
         public List<DBTMTraineeAssignmentModel> DueTodayAssignments { get; set; }
         public List<DBTMTraineeDetailsModel> Top3Trainee { get; set; }
         public TimeSpentBarGraphsViewModel TimeSpentGraph { get; set; }
+        public int NumberOfKits { get; set; }
+        public decimal WeeklyDeviceLoad { get; set; }
+        public int TotalBatches { get; set; }
+        public int TotalTrainees { get; set; }
     }
 }
