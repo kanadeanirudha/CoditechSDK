@@ -395,6 +395,9 @@ namespace Coditech.Admin.Controllers
         [ValidateAntiForgeryToken]
         public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
+            ModelState.Remove("CentreName");
+            ModelState.Remove("CentreCode");
+            ModelState.Remove("DeviceSerialCode");
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))

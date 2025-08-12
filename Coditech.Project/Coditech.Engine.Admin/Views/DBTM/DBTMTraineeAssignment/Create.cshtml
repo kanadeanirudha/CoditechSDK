@@ -1,12 +1,11 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
-    ViewBag.Title = Model.DBTMTraineeAssignmentId > 0 ? "Update Trainee Assignment" : "Add Trainee Assignment";
+    ViewBag.Title = "Add Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.DBTMTraineeAssignmentId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTraineeAssignmentId", Model.DBTMTraineeAssignmentId.ToString());
-    // DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()", IsDisabled = Model.DBTMTraineeAssignmentId > 0 };
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "GeneralTrainerMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), Parameter = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTraineeListByCentreCodeAndTrainerMasterId()", IsDisabled = Model.DBTMTraineeAssignmentId > 0, IsCustomDropdown = true };
 }
 <!-- Page Content-->

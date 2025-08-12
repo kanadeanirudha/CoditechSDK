@@ -52,7 +52,7 @@ namespace Coditech.API.Service
                 {
                     model.Custom1 = generalPersonModel.Custom1;
                 }
-                if (model.Custom1 == CustomConstants.DBTMTrainer)
+                if (model.Custom1 == CustomConstants.DBTMTrainer || model.Custom1 == CustomConstants.DBTMCentreOwner)
                 {
                     DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
                     dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
