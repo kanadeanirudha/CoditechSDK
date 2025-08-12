@@ -4,21 +4,10 @@
 @{
     Layout = null;
 
-    var xValues = JsonConvert.SerializeObject(new List<int> { 0, 5, 10, 15, 20 });
+    var xValues = Model.XValues;
     var datasets = new List<LineGraphsDatasetViewModel>();
-
-    var colors = new List<string> {
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)"
-        };
-
+    var colors = Model.Colors;
     int colorIndex = 0;
-    string title = "";
-    string yAxis = "";
 }
 @if (!Model.IsRecordFound || Model.DataTable?.Rows.Count == 0)
 {
@@ -26,8 +15,7 @@
 }
 else
 {
-    
-    @foreach (DataRow row in Model.DataTable.Rows)
+    foreach (DataRow row in Model.DataTable.Rows)
     {
         string performedOn = row["Activity Performed"]?.ToString();
 
@@ -41,58 +29,52 @@ else
 
         if (Model.GraphType == "DistanceTime")
         {
-            title = "5-10-5 Agility Test (TIME)";
-            yAxis = "Time (sec)";
             datasets.Add(new LineGraphsDatasetViewModel
-            {
-                Label = "Time(" + performedOn + ")",
-                Data = JsonConvert.SerializeObject(new List<double> { 0, abTime,  bcTime,  caTime }),
-                Color = colors[colorIndex++ % colors.Count]
-            });
+                        {
+                            Label = $"Time ({performedOn})",
+                            Data = JsonConvert.SerializeObject(new List<double> { 0, abTime, bcTime, caTime }),
+                            Color = colors[colorIndex++ % colors.Count]
+                        });
         }
         else if (Model.GraphType == "DistanceVelocity")
         {
-            title = "5-10-5 Agility Test (VELOCITY)";
-            yAxis = "Velocity (m/s)";
             datasets.Add(new LineGraphsDatasetViewModel
-            {
-                Label = "Velocity (" + performedOn + ")",
-                Data = JsonConvert.SerializeObject(new List<double> { 0, abVelocity, bcVelocity, caVelocity }),
-                Color = colors[colorIndex++ % colors.Count]
-            });
+                        {
+                            Label = $"Velocity ({performedOn})",
+                            Data = JsonConvert.SerializeObject(new List<double> { 0, abVelocity, bcVelocity, caVelocity }),
+                            Color = colors[colorIndex++ % colors.Count]
+                        });
         }
         else if (Model.GraphType == "TimeAndVelocity")
         {
-            title = "5-10-5 Agility Test (TIME & VELOCITY)";
-            yAxis = "Time and Velocity";
+            datasets.Add(new LineGraphsDatasetViewModel
+                        {
+                            Label = $"Time ({performedOn})",
+                            Data = JsonConvert.SerializeObject(new List<double> { 0, abTime, bcTime, caTime }),
+                            Color = colors[colorIndex++ % colors.Count]
+                        });
 
             datasets.Add(new LineGraphsDatasetViewModel
-            {
-                Label = "Time (" + performedOn + ")",
-                Data = JsonConvert.SerializeObject(new List<double> { 0, abTime, bcTime, caTime }),
-                Color = colors[colorIndex++ % colors.Count]
-            });
-
-            datasets.Add(new LineGraphsDatasetViewModel
-            {
-                Label = "Velocity (" + performedOn + ")",
-                Data = JsonConvert.SerializeObject(new List<double> { 0, abVelocity, bcVelocity, caVelocity }),
-                Color = colors[colorIndex++ % colors.Count]
-            });
+                        {
+                            Label = $"Velocity ({performedOn})",
+                            Data = JsonConvert.SerializeObject(new List<double> { 0, abVelocity, bcVelocity, caVelocity }),
+                            Color = colors[colorIndex++ % colors.Count]
+                        });
         }
     }
 
     if (datasets.Any())
     {
         var chartModel = new LineGraphsViewModel
-        {
-            LineChartId = "multiLineChart_" + Guid.NewGuid().ToString("N"),
-            Title = title,
-            XAxisLabel = "Distance (m)",
-            YAxisLabel = yAxis,
-            XValues = xValues,
-            Datasets = datasets
-        };
+                    {
+                        LineChartId = "multiLineChart_" + Guid.NewGuid().ToString("N"),
+                        Title = Model.Title,
+                        XAxisLabel = Model.XAxisLabel,
+                        YAxisLabel = Model.YAxisLabel,
+                        XValues = Model.XValues,
+                        Datasets = datasets
+                    };
+
         @Html.Partial("~/Views/Shared/ActivityGraphs/_LineGraphs.cshtml", chartModel)
     }
 }

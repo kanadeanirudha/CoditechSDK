@@ -53,5 +53,8 @@ namespace Coditech.Admin.ViewModel
         public string TestMediaPath { get; set; }
         public string TestMediaFileName { get; set; }
         public int DBTMGraphMasterId { get; set; }
+        [Required]
+        [Display(Name = "Performance Matrix")]
+        public byte DBTMPerformanceMatrixId { get; set; }
     }
 }

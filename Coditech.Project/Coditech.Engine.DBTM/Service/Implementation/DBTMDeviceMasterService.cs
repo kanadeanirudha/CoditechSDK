@@ -7,7 +7,6 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Collections.Specialized;
 using System.Data;
-
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -45,10 +44,12 @@ namespace Coditech.API.Service
         //Create DBTMDevice.
         public virtual DBTMDeviceModel CreateDBTMDevice(DBTMDeviceModel dBTMDeviceModel)
         {
-           
-
             if (IsNull(dBTMDeviceModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            if (IsDBTMDeviceSerialCodeAlreadyExist(dBTMDeviceModel.DeviceSerialCode, dBTMDeviceModel.DBTMDeviceMasterId))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Serial Code"));
+
             dBTMDeviceModel.DBTMParentDeviceMasterId = dBTMDeviceModel.IsMasterDevice ? 0 : dBTMDeviceModel.DBTMParentDeviceMasterId;
             DBTMDeviceMaster dBTMDeviceMaster = dBTMDeviceModel.FromModelToEntity<DBTMDeviceMaster>();
 
@@ -129,8 +130,11 @@ namespace Coditech.API.Service
 
         public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)
        => _dBTMDeviceMasterRepository.Table.Where(x => x.DeviceSerialCode == deviceSerialCode && x.IsActive).FirstOrDefault();
-        
+
         #region Protected Method
+        protected virtual bool IsDBTMDeviceSerialCodeAlreadyExist(string deviceSerialCode, long dBTMDeviceMasterId = 0)
+        => _dBTMDeviceMasterRepository.Table.Any(x => x.DeviceSerialCode == deviceSerialCode && (x.DBTMDeviceMasterId != dBTMDeviceMasterId || dBTMDeviceMasterId == 0));
+
 
         #endregion
     }

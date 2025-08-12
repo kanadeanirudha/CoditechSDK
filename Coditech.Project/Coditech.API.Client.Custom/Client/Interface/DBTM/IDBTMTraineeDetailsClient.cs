@@ -36,5 +36,8 @@ namespace Coditech.API.Client
 
         DBTMActivitiesListResponse GetTraineeActivitiesList(string personCode,int numberOfDaysRecord, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
         DBTMActivitiesDetailsListResponse GetTraineeActivitiesDetailsList(long dBTMDeviceDataId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMTraineeProfileResponse GetProfileDetails(long dBTMTraineeDetailId);
+
+
     }
 }
