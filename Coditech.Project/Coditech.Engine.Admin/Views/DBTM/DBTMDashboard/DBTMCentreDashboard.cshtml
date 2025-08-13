@@ -163,148 +163,50 @@
                 </div>
             </div>
             <div class="row g-3 mb-4">
-                <div class="col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="text-center">
-                                <img class="me-3 rounded-circle thumb-xl" src="assets/images/users/user-4.jpg" alt="">
-                                <div class="">
-                                    <ul class="list-unstyled my-1">
-                                        <li>
-                                            <h5 class="mb-0">Shashank Sharma</h5>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Master Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Gym Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Certificate No</small>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <p class="text-muted px-3">
-                                    <ul class="list-unstyled personal-detail mb-0">
-                                        <li class="mt-2">Date of Joining: 05/02/2023</li>
-                                        <li class="mt-2">Total Duration Completed: 1Y 2M 15D</li>
-                                        <li class="mt-2">Linked DBTMS: 3</li>
-                                        <li class="mt-2">Number of Trainers Linked: 5</li>
-                                        <li class="mt-2">Number of Batches: 8</li>
-                                        <li class="mt-2">Weekly Working Hrs: 40</li>
-                                    </ul>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="text-center">
-                                <img class="me-3 rounded-circle thumb-xl" src="assets/images/users/user-4.jpg" alt="">
-                                <div class="">
-                                    <ul class="list-unstyled my-1">
-                                        <li>
-                                            <h5 class="mb-0">Shashank Sharma</h5>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Master Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Gym Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Certificate No</small>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <p class="text-muted px-3">
-                                    <ul class="list-unstyled personal-detail mb-0">
-                                        <li class="mt-2">Date of Joining: 05/02/2023</li>
-                                        <li class="mt-2">Total Duration Completed: 1Y 2M 15D</li>
-                                        <li class="mt-2">Linked DBTMS: 3</li>
-                                        <li class="mt-2">Number of Trainers Linked: 5</li>
-                                        <li class="mt-2">Number of Batches: 8</li>
-                                        <li class="mt-2">Weekly Working Hrs: 40</li>
-                                    </ul>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="text-center">
-                                <img class="me-3 rounded-circle thumb-xl" src="assets/images/users/user-4.jpg" alt="">
-                                <div class="">
-                                    <ul class="list-unstyled my-1">
-                                        <li>
-                                            <h5 class="mb-0">Shashank Sharma</h5>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Master Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Gym Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Certificate No</small>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <p class="text-muted px-3">
-                                    <ul class="list-unstyled personal-detail mb-0">
-                                        <li class="mt-2">Date of Joining: 05/02/2023</li>
-                                        <li class="mt-2">Total Duration Completed: 1Y 2M 15D</li>
-                                        <li class="mt-2">Linked DBTMS: 3</li>
-                                        <li class="mt-2">Number of Trainers Linked: 5</li>
-                                        <li class="mt-2">Number of Batches: 8</li>
-                                        <li class="mt-2">Weekly Working Hrs: 40</li>
-                                    </ul>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @foreach (var trainer in Model.TrainersList)
+                {
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center">
+                                    <div class="position-relative" style="width: 110px; height: 110px; margin: 0 auto;">
+                                        @if (!string.IsNullOrEmpty(trainer.PhotoMediaPath))
+                                        {
+                                            <img src="@trainer.PhotoMediaPath" alt="Trainer Image"
+                                                 class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle bg-soft-primary text-white w-100 h-100
+                                        d-flex align-items-center justify-content-center"
+                                                 style="font-size: 36px; object-fit: cover;">
+                                                @trainer.FirstName.Substring(0, 1)@trainer.LastName.Substring(0, 1)
+                                            </div>
+                                        }
+                                    </div>
 
-                <div class="col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="text-center">
-                                <img class="me-3 rounded-circle thumb-xl" src="assets/images/users/user-4.jpg" alt="">
-                                <div class="">
-                                    <ul class="list-unstyled my-1">
-                                        <li>
-                                            <h5 class="mb-0">Shashank Sharma</h5>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Master Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Gym Trainer</small>
-                                        </li>
-                                        <li>
-                                            <small class="text-muted">Certificate No</small>
-                                        </li>
+                                    <ul class="list-unstyled my-1 mt-2">
+                                        <li><h5 class="mb-0">@trainer.FirstName @trainer.LastName</h5></li>
+                                        <li><small class="text-muted">@trainer.EmployeeDesignation</small></li>
+                                        <li><small class="text-muted">@trainer.TrainerSpecialization</small></li>
+                                        <li><small class="text-muted">CertificateNo</small></li>
                                     </ul>
                                 </div>
-                                <p class="text-muted px-3">
-                                    <ul class="list-unstyled personal-detail mb-0">
-                                        <li class="mt-2">Date of Joining: 05/02/2023</li>
-                                        <li class="mt-2">Total Duration Completed: 1Y 2M 15D</li>
-                                        <li class="mt-2">Linked DBTMS: 3</li>
-                                        <li class="mt-2">Number of Trainers Linked: 5</li>
-                                        <li class="mt-2">Number of Batches: 8</li>
-                                        <li class="mt-2">Weekly Working Hrs: 40</li>
-                                    </ul>
-                                </p>
+                                <ul class="list-unstyled personal-detail mb-0 text-center">
+                                    <li class="mt-2"><b>Date of Joining:</b> @trainer.DateOfJoining.ToString("dd/MM/yyyy")</li>
+                                    <li class="mt-2"><b>Total Duration Completed:</b> @trainer.DurationWithUs</li>
+                                    <li class="mt-2"><b>Number of Trainers Linked:</b> @trainer.NumberOfTrainees</li>
+                                    <li class="mt-2"><b>Number of Batches:</b> @trainer.NumberOfBatchesCreated</li>
+                                    <li class="mt-2"><b>Weekly Working Hrs:</b> @trainer.WeeklyWorkingHours</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+
+
