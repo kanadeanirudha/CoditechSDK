@@ -7,15 +7,16 @@
 
     // Yearly Trainee Overview
     string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
-    string[] XValuesBarYearlyTraineeTrainedOverview = new string[]
-        {
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        };
-
-    int[] YValuesBarYearlyTraineeTrainedOverview = new int[12];
-    int count = 0;
-
+    int monthCount = Model.YearlyTraineeOverviewList.Count();
+    string[] XValuesBarYearlyTraineeTrainedOverview = new string[monthCount];
+    decimal[] YValuesBarYearlyTraineeTrainedOverview = new decimal[monthCount];
+    int count1 = 0;
+    foreach (var item in Model.YearlyTraineeOverviewList)
+    {
+        XValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToString(item.MonthName);
+        YValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToInt32(item.TotalTrainee);
+        count1++;
+    }
     BarChartViewModel traineeTrainedviewModel = new BarChartViewModel()
             {
                 BarChartId = "YearlyTraineeTrainedOverviewChart",
@@ -36,7 +37,7 @@
                             <div class="row d-flex justify-content-center">
                                 <div class="col">
                                     <p class="text-dark mb-0 fw-semibold">Peak Fast Pro</p>
-                                    <h3 class="m-0">@Model.NumberOfKits</h3>
+                                    <h3 class="m-0">@Model.NumberOfKitPurchase</h3>
                                 </div>
                                 <div class="col-auto align-self-center">
                                     <div class="report-main-icon bg-light-alt">
@@ -55,7 +56,7 @@
                             <div class="row d-flex justify-content-center">
                                 <div class="col">
                                     <p class="text-dark mb-0 fw-semibold">Weekly device load</p>
-                                    <h3 class="m-0">xx %</h3>
+                                    <h3 class="m-0">@Model.WeeklyDeviceLoad %</h3>
                                 </div>
                                 <div class="col-auto align-self-center">
                                     <div class="report-main-icon bg-light-alt">
@@ -112,7 +113,7 @@
                             <div class="row d-flex justify-content-center">
                                 <div class="col">
                                     <p class="text-dark mb-0 fw-semibold">Total Number Of Batches</p>
-                                    <h3 class="m-0">@Model.TotalBatches</h3>
+                                    <h3 class="m-0">@Model.NumberOfBatches</h3>
                                 </div>
                                 <div class="col-auto align-self-center">
                                     <div class="report-main-icon bg-light-alt">
@@ -131,7 +132,7 @@
                             <div class="row d-flex justify-content-center">
                                 <div class="col">
                                     <p class="text-dark mb-0 fw-semibold">Top Athlete</p>
-                                    <h3 class="m-0">Anika Rao</h3>
+                                    <h3 class="m-0">@Model.TopAthletsName</h3>
                                 </div>
                                 <div class="col-auto align-self-center">
                                     <div class="report-main-icon bg-light-alt">
@@ -185,12 +186,12 @@
                                 </div>
                                 <p class="text-muted px-3">
                                     <ul class="list-unstyled personal-detail mb-0">
-                                    <li class="mt-2">Date of Joining: 05/02/2023</li>
-                                    <li class="mt-2">Total Duration Completed: 1Y 2M 15D</li>
-                                    <li class="mt-2">Linked DBTMS: 3</li>
-                                    <li class="mt-2">Number of Trainers Linked: 5</li>
-                                    <li class="mt-2">Number of Batches: 8</li>
-                                    <li class="mt-2">Weekly Working Hrs: 40</li>
+                                        <li class="mt-2">Date of Joining: 05/02/2023</li>
+                                        <li class="mt-2">Total Duration Completed: 1Y 2M 15D</li>
+                                        <li class="mt-2">Linked DBTMS: 3</li>
+                                        <li class="mt-2">Number of Trainers Linked: 5</li>
+                                        <li class="mt-2">Number of Batches: 8</li>
+                                        <li class="mt-2">Weekly Working Hrs: 40</li>
                                     </ul>
                                 </p>
                             </div>
@@ -251,7 +252,7 @@
                                         <li>
                                             <small class="text-muted">Certificate No</small>
                                         </li>
-                                    </ul>                                   
+                                    </ul>
                                 </div>
                                 <p class="text-muted px-3">
                                     <ul class="list-unstyled personal-detail mb-0">
