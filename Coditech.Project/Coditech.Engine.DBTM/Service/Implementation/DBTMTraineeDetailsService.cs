@@ -39,7 +39,7 @@ namespace Coditech.API.Service
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
-        public virtual DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             string listType = "";
             string isActive = filters?.Find(x => string.Equals(x.FilterName, FilterKeys.IsActive, StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
@@ -68,7 +68,7 @@ namespace Coditech.API.Service
         }
 
         //Get DBTM Trainee Other Details
-        public virtual DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId)
+        public DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
@@ -89,7 +89,7 @@ namespace Coditech.API.Service
         }
 
         //Update DBTM Trainee Other Details
-        public virtual bool UpdateDBTMTraineeOtherDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
+        public bool UpdateDBTMTraineeOtherDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
         {
             if (IsNull(dBTMTraineeDetailsModel))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
@@ -128,7 +128,7 @@ namespace Coditech.API.Service
         }
 
         //Delete DBTM Trainee Details
-        public virtual bool DeleteDBTMTraineeDetails(ParameterModel parameterModel)
+        public bool DeleteDBTMTraineeDetails(ParameterModel parameterModel)
         {
             if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
@@ -143,7 +143,7 @@ namespace Coditech.API.Service
         }
 
         //TraineeActivitiesList
-        public virtual DBTMActivitiesListModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMActivitiesListModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -176,29 +176,7 @@ namespace Coditech.API.Service
             listModel.PersonCode = personCode;
             return listModel;
         }
-
-        private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
-        {
-            long personId = 0;
-            string centreCode = string.Empty;
-            string personCode = string.Empty;
-            short generalDepartmentMasterId = 0;
-            if (entityType == UserTypeEnum.Trainee.ToString())
-            {
-                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
-                if (IsNotNull(dbtmTraineeDetails))
-                {
-                    personId = dbtmTraineeDetails.PersonId;
-                    centreCode = dbtmTraineeDetails.CentreCode;
-                }
-                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
-            }
-            else
-            {
-                return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
-            }
-        }
-        public virtual DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -271,6 +249,67 @@ namespace Coditech.API.Service
             }
             return listModel;
         }
+        //Get ProfileDetails
+        public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate }).FirstOrDefault();
+            if (dBTMTraineeDetailsData == null)
+                return null;
+
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel();
+            if (dBTMTraineeProfileModel == null)
+                return null;
+
+            // Inline variable assignment for clarity and slight performance
+            GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(Convert.ToInt64(dBTMTraineeDetailsData.PersonId));
+
+            if (generalPersonModel != null)
+            {
+                dBTMTraineeProfileModel.FirstName = generalPersonModel.FirstName;
+                dBTMTraineeProfileModel.LastName = generalPersonModel.LastName;
+                dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
+                dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
+            }
+
+            dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
+            dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetailsData.CreatedDate;
+
+            // Use ternary for brevity
+            dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
+                ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
+                : "N/A";
+
+            CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<Coditech_Entities>());
+            objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
+            dBTMTraineeProfileModel.TraineeProfiles = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
+            return dBTMTraineeProfileModel;
+        }
+
+        private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
+        {
+            long personId = 0;
+            string centreCode = string.Empty;
+            string personCode = string.Empty;
+            short generalDepartmentMasterId = 0;
+            if (entityType == UserTypeEnum.Trainee.ToString())
+            {
+                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
+                if (IsNotNull(dbtmTraineeDetails))
+                {
+                    personId = dbtmTraineeDetails.PersonId;
+                    centreCode = dbtmTraineeDetails.CentreCode;
+                }
+                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
+            }
+            else
+            {
+                return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
+            }
+        }
+
 
         private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList)
         {
@@ -323,57 +362,7 @@ namespace Coditech.API.Service
             }
             return data;
         }
-        //Get ProfileDetails
-        public virtual DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
-        {
-            if (dBTMTraineeDetailId <= 0)
-                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId);
-
-            if (dBTMTraineeDetails == null)
-                return null;
-
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = dBTMTraineeDetails.FromEntityToModel<DBTMTraineeProfileModel>();
-
-            if (dBTMTraineeProfileModel == null)
-                return null;
-
-            GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(dBTMTraineeProfileModel.PersonId);
-            GeneralEnumaratorMaster generalEnumaratorMaster = _generalEnumaratorMasterRepository.Table.FirstOrDefault(x => x.GeneralEnumaratorId == dBTMTraineeDetails.SpecializationEnumId);
-
-            if (generalPersonModel != null)
-            {
-                dBTMTraineeProfileModel.FirstName = generalPersonModel.FirstName;
-                dBTMTraineeProfileModel.LastName = generalPersonModel.LastName;
-                dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
-                dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
-            }
-
-            dBTMTraineeProfileModel.Specialization = generalEnumaratorMaster?.EnumDisplayText ?? "N/A";
-            dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetails.CreatedDate;
-
-            if (dBTMTraineeProfileModel.DateOfJoining.HasValue)
-            {
-                dBTMTraineeProfileModel.TotalDuration = CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now);
-            }
-            else
-            {
-                dBTMTraineeProfileModel.TotalDuration = "N/A";
-            }
-
-            List<DBTMTraineeProfileModel> traineeProfiles = new List<DBTMTraineeProfileModel>();
-            CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<Coditech_Entities>());
-            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
-            objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
-
-            traineeProfiles = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
-
-            //  Assign to the profile model
-            dBTMTraineeProfileModel.TraineeProfiles = traineeProfiles;
-
-            return dBTMTraineeProfileModel;
-        }
         private string CalculateDuration(DateTime fromDate, DateTime toDate)
         {
             int years = toDate.Year - fromDate.Year;
