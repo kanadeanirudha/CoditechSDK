@@ -31,13 +31,14 @@
 
 		GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
 		PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
-		Custom5=Model.GeneralBatchList.FirstOrDefault()?.Custom5
+		Custom5 = Model.GeneralBatchList.FirstOrDefault()?.Custom5
 	};
 	DBTMTraineeAssignmentListViewModel dBTMTraineeAssignmentListViewModel = new DBTMTraineeAssignmentListViewModel
 	{
 
 		DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
-		PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel
+		PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
+		SelectedParameter1 = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.SelectedParameter1
 	};
 
 }
@@ -199,7 +200,6 @@
 			</div>
 		</div>
 		<div class="row">
-
 			<ul class="nav nav-tabs" id="myTab" role="tablist">
 				<li class="nav-item" role="presentation">
 					<button class="nav-link active"
@@ -236,8 +236,9 @@
 					<div>	@Html.Partial("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", generalBatchListViewModel)</div>
 				</div>
 				<div class="tab-pane fade" id="assignmentPane" role="tabpanel" aria-labelledby="assignment-tab">
-					<div class="loading">Loading assignment...</div>
-					@* <div class="loading">	@Html.Partial("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", dBTMTraineeAssignmentListViewModel)</div> *@
+					<div>
+						@Html.Partial("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", dBTMTraineeAssignmentListViewModel)
+					</div>
 				</div>
 			</div>
 
@@ -299,42 +300,43 @@
             </div> *@
 		</div><!-- container -->
 	</div>
+</div>
 @section scripts {
-		<!-- end page content -->
-		<script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
-		<script>
-			$(function () {
-				$(".datepicker").datepicker({
-					format: "dd/mm/yyyy",
-					autoclose: true
-				});
-						loadTabContent($("#myTab .nav-link.active"));
-
-			// When switching tabs
-				$('#myTab .nav-link').on('shown.bs.tab', function (e) {
-					loadTabContent($(e.target));
-				});
+	<!-- end page content -->
+	<script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
+	<script>
+		$(function () {
+			$(".datepicker").datepicker({
+				format: "dd/mm/yyyy",
+				autoclose: true
 			});
+					loadTabContent($("#myTab .nav-link.active"));
 
-
-			function loadTabContent(tabButton) {
-			var targetPaneId = tabButton.attr("data-bs-target");
-			var targetPane = $(targetPaneId);
-			var methodName = tabButton.data("method");
-
-			targetPane.html("<div class='loading'>Loading...</div>");
-
-			$.ajax({
-				url: `/DBTMDashboard/${methodName}`,
-				type: 'POST',
-				success: function (data) {
-					targetPane.html(data);
-				},
-				error: function (xhr) {
-					targetPane.html("<div class='text-danger'>Failed to load data</div>");
-					console.error("Error:", xhr.responseText);
-				}
+		// When switching tabs
+			$('#myTab .nav-link').on('shown.bs.tab', function (e) {
+				loadTabContent($(e.target));
 			});
+		});
+
+
+		function loadTabContent(tabButton) {
+		var targetPaneId = tabButton.attr("data-bs-target");
+		var targetPane = $(targetPaneId);
+		var methodName = tabButton.data("method");
+
+		targetPane.html("<div class='loading'>Loading...</div>");
+
+		$.ajax({
+			url: `/DBTMDashboard/${methodName}`,
+			type: 'POST',
+			success: function (data) {
+				targetPane.html(data);
+			},
+			error: function (xhr) {
+				targetPane.html("<div class='text-danger'>Failed to load data</div>");
+				console.error("Error:", xhr.responseText);
 			}
-		</script>
+		});
+		}
+	</script>
 }
