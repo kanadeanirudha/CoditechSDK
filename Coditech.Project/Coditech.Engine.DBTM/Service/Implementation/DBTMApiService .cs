@@ -20,6 +20,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
+        private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
         private readonly ICoditechRepository<DBTMBatchActivity> _dBTMBatchActivityRepository;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
         private readonly ICoditechRepository<DBTMTraineeAssignment> _dBTMTraineeAssignmentRepository;
@@ -37,6 +39,8 @@ namespace Coditech.API.Service
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeAssignmentRepository = new CoditechRepository<DBTMTraineeAssignment>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -131,15 +135,32 @@ namespace Coditech.API.Service
 
         public List<DBTMBatchModel> GetBatchList(long entityId, string userType)
         {
-            long userId = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
-            List<DBTMBatchModel> batcheslist = _generalBatchRepository.Table.Where(x => x.CreatedBy == userId && x.IsActive)?
-                .Select(b => new DBTMBatchModel
-                {
-                    GeneralBatchMasterId = b.GeneralBatchMasterId,
-                    BatchName = b.BatchName,
-                    BatchStartTime = b.BatchStartTime,
-                })?.ToList();
-
+            List<DBTMBatchModel> batcheslist = new List<DBTMBatchModel>();
+            var employeeData = _employeeMasterRepository.Table.Where(x => x.EmployeeId == entityId).Select(x => new { x.PersonId, x.CentreCode }).FirstOrDefault();
+            string custom1 = _generalPersonRepository.Table.Where(x => x.PersonId == employeeData.PersonId).Select(x => x.Custom1).FirstOrDefault();
+            if (custom1 == CustomConstants.DBTMTrainer)
+            {
+                long userId = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
+                batcheslist = _generalBatchRepository.Table.Where(x => x.CreatedBy == userId && x.IsActive)?
+                    .Select(b => new DBTMBatchModel
+                    {
+                        GeneralBatchMasterId = b.GeneralBatchMasterId,
+                        BatchName = b.BatchName,
+                        BatchStartTime = b.BatchStartTime,
+                    })?.ToList();
+            }
+            else if (custom1 == CustomConstants.DBTMCentreOwner)
+            {
+                batcheslist = (from b in _generalBatchRepository.Table
+                               join u in _userMasterRepository.Table on b.CreatedBy equals u.UserMasterId
+                               where b.CentreCode == employeeData.CentreCode && b.IsActive
+                               select new DBTMBatchModel
+                               {
+                                   GeneralBatchMasterId = b.GeneralBatchMasterId,
+                                   BatchName = $"{b.BatchName}({u.FirstName} {u.LastName})",
+                                   BatchStartTime = b.BatchStartTime,
+                               })?.ToList();
+            }
             return batcheslist ?? new List<DBTMBatchModel>();
         }
 
