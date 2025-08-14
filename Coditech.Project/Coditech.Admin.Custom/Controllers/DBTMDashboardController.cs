@@ -1,28 +1,37 @@
-﻿using Coditech.Admin.Agents;
-using Coditech.Admin.ViewModel;
+﻿using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
+using Coditech.Admin.Agents;
+using Coditech.Admin.Utilities;
+using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
-
+using Newtonsoft.Json;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMDashboardController : BaseController
     {
         private readonly IDashboardAgent _dashboardAgent;
+        private readonly IGeneralBatchAgent _generalBatchAgent;
+        private readonly IUserAgent _userAgent;
         private readonly IDBTMDashboardAgent _dBTMDashboardAgent;
         private readonly IDBTMTraineeAssignmentAgent _dBTMTraineeAssignmentAgent;
 
-        public DBTMDashboardController(IDashboardAgent dashboardAgent, IDBTMDashboardAgent dBTMDashboardAgent, IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent)
+        public DBTMDashboardController(IDashboardAgent dashboardAgent, IDBTMDashboardAgent dBTMDashboardAgent, IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent, IUserAgent userAgent, IGeneralBatchAgent generalBatchAgent)
         {
             _dashboardAgent = dashboardAgent;
+            _userAgent = userAgent;
             _dBTMDashboardAgent = dBTMDashboardAgent;
             _dBTMTraineeAssignmentAgent = dBTMTraineeAssignmentAgent;
+            _generalBatchAgent = generalBatchAgent;
         }
 
         [HttpGet]
         public IActionResult Index(short numberOfDaysRecord)
         {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             DashboardViewModel dashboardViewModel = _dashboardAgent.GetDashboardDetails();
             if (IsNotNull(dashboardViewModel) && !string.IsNullOrEmpty(dashboardViewModel.DashboardFormEnumCode))
             {
@@ -33,13 +42,83 @@ namespace Coditech.Admin.Controllers
                 }
                 else if (dashboardViewModel.DashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
+                    DataTableViewModel dataTableModel = new DataTableViewModel();
                     DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetDBTMDashboardDetails(numberOfDaysRecord);
+                    UserProfileViewModel userProfileViewModel = _userAgent.GetUserProfile();
+                    GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
+                    TempData.Keep();
+                    dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
+                    dBTMDashboardViewModel.GeneralBatchList.Add(list);
+                    if (IsNotNull(userProfileViewModel))
+                    {
+                        dBTMDashboardViewModel.UserProfileModel = new List<UserProfileViewModel>();
+                    }
+                    dBTMDashboardViewModel.UserProfileModel.Add(userProfileViewModel);
                     return View("~/Views/DBTM/DBTMDashboard/DBTMTrainerDashboard.cshtml", dBTMDashboardViewModel);
                 }
             }
             return View("~/Views/Dashboard/GeneralDashboard.cshtml");
         }
+        [HttpPost]
+        public ActionResult LoadBatchesPartial(DataTableViewModel dataTableModel)
+        {
 
+            GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
+            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
+            //DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] as DBTMDashboardViewModel ?? new DBTMDashboardViewModel();
+            TempData.Keep();
+            TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
+
+            dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
+            dBTMDashboardViewModel.GeneralBatchList.Add(list);
+
+            TempData.Keep("DBTMModel");
+            return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
+        }
+
+        [HttpPost]
+        public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel)
+        {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            DBTMTraineeAssignmentListViewModel list = new DBTMTraineeAssignmentListViewModel();
+            GetListOnlyIfSingleCentre(dataTableModel);
+            if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
+            {
+                list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
+            }
+            list.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : string.Empty;
+            list.Custom5 = "Mobile View";
+            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+            list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            DBTMDashboardViewModel dashboardModel = TempData["DBTMModel"] as DBTMDashboardViewModel ?? new DBTMDashboardViewModel();
+            TempData.Keep();
+            dashboardModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
+            dashboardModel.DBTMTraineeAssignmentList.Add(list);
+            TempData["DBTMModel"] = dashboardModel;
+            TempData.Keep();
+            return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", list);
+        }
+
+        private GeneralBatchListViewModel GetBatchListData(DataTableViewModel dataTableModel)
+        {
+            GeneralBatchListViewModel list = new GeneralBatchListViewModel();
+            GetListOnlyIfSingleCentre(dataTableModel);
+            if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
+            {
+                list = _generalBatchAgent.GetBatchList(dataTableModel);
+            }
+            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+            list.Custom5 = "Mobile View";
+            return list;
+        }
+
+
+        //public virtual ActionResult LoadAssignmentPartial()
+        //{
+        //    //var model = GetProfileModel(); // fetch data
+        //    //return PartialView("_ProfilePartialView", model);
+        //    return null;
+        //}
 
         public ActionResult Index()
         {
@@ -89,7 +168,7 @@ namespace Coditech.Admin.Controllers
             {
                 // Initialization.  
                 string line = string.Empty;
-              //  string srcFilePath = "";
+                //  string srcFilePath = "";
                 var rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
                 //var fullPath = Path.Combine(rootPath, srcFilePath);
                 var fullPath = Path.Combine(rootPath);
@@ -133,7 +212,7 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
         {
 
-            DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel() 
+            DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel()
             {
                 DBTMTraineeAssignmentId = dBTMTraineeAssignmentId,
                 DBTMTraineeAssignmentUserId = dBTMTraineeAssignmentUserId
@@ -149,7 +228,7 @@ namespace Coditech.Admin.Controllers
             else
             {
                 SetNotificationMessage(GetErrorNotificationMessage("Failed to Send Reminder."));
-                return Json(new { success = false});
+                return Json(new { success = false });
             }
         }
         #endregion
