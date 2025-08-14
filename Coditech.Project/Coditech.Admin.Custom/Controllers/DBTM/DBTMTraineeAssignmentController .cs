@@ -24,17 +24,31 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeAssignmentListViewModel list = new DBTMTraineeAssignmentListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
-            if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
+
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                dataTableModel.SelectedParameter1 = JsonConvert
+                    .DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?
+                    .GeneralTrainerMasterId?.ToString() ?? "";
+
+                list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
+            }
+            else if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
             {
                 list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
+
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", list);
             }
-            return View($"~/Views/DBTM/DBTMTraineeAssignment/List.cshtml", list);
+
+            return View("~/Views/DBTM/DBTMTraineeAssignment/List.cshtml", list);
         }
 
         [HttpGet]
