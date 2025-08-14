@@ -78,9 +78,6 @@ namespace Coditech.API.Service
                     dataset.Tables[2].TableName = "DueTodayAssignments";
                     dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
                     dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
-                    //ToDo Aniruddha 
-                    dBTMDashboardModel.TopAthletes = "Anurag Jambhulkar";
-                    dBTMDashboardModel.TotalNumberOfActivityPerformedDuringMonth = 100;
                 }
             }
             return dBTMDashboardModel;

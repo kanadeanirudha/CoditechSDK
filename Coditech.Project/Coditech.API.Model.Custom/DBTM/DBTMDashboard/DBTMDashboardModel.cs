@@ -19,7 +19,14 @@
         public int NumberOfBatches { get; set; }
         public int TotalTrainees { get; set; }
         public string TopAthletsName { get; set; }
+        public string EmployeeDesignation { get; set; }
+        public string TrainerSpecialization { get; set; }
+        public DateTime DateOfJoining { get; set; }
+        public string DurationWithUs { get; set; }
+        public int NumberOfBatchesCreated { get; set; }
+        public TimeSpan WeeklyWorkingHours { get; set; }
         public List<DBTMYearlyTraineeOverviewModel> YearlyTraineeOverviewList { get; set; }
         public List<DBTMTrainerDetailsModel> TrainersList { get; set; }
+        public DBTMTrainerDetailsModel TrainersDetails { get; set; }
     }
 }
