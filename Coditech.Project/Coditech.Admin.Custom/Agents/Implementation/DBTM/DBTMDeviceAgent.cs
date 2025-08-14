@@ -10,7 +10,6 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-
 namespace Coditech.Admin.Agents
 {
     public class DBTMDeviceAgent : BaseAgent, IDBTMDeviceAgent
@@ -191,6 +190,11 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "IsMasterDevice",
                 IsSortable = true,
             }); datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Registered",
+                ColumnCode = "IsRegistered",
+            });
+            datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Is Active",
                 ColumnCode = "IsActive",

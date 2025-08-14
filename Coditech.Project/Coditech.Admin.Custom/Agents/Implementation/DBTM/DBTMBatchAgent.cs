@@ -9,18 +9,20 @@ using Coditech.Common.Logger;
 
 namespace Coditech.Admin.Agents
 {
-    public class DBTMBatchAgent : GeneralBatchAgent
+    public class DBTMBatchAgent : GeneralBatchAgent, IDBTMBatchAgent
     {
         #region Private Variable
         protected readonly ICoditechLogging _coditechLogging;
         private readonly IGeneralBatchClient _generalBatchClient;
+        private readonly IDBTMBatchClient _dBTMBatchClient;
         #endregion
 
         #region Public Constructor
-        public DBTMBatchAgent(ICoditechLogging coditechLogging, IGeneralBatchClient generalBatchClient, ITaskSchedulerClient taskSchedulerClient) : base(coditechLogging, generalBatchClient, taskSchedulerClient)
+        public DBTMBatchAgent(ICoditechLogging coditechLogging, IGeneralBatchClient generalBatchClient, IDBTMBatchClient dBTMBatchClient, ITaskSchedulerClient taskSchedulerClient) : base(coditechLogging, generalBatchClient, taskSchedulerClient)
         {
             _coditechLogging = coditechLogging;
             _generalBatchClient = GetClient<IGeneralBatchClient>(generalBatchClient);
+            _dBTMBatchClient = GetClient<IDBTMBatchClient>(dBTMBatchClient);
         }
         #endregion
 
@@ -33,7 +35,9 @@ namespace Coditech.Admin.Agents
             {
                 filters = new FilterCollection();
                 filters.Add("BatchName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
-                filters.Add("BatchTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("BatchStartDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("BatchStartTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("BatchFrequency", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "BatchName " : dataTableModel.SortByColumn, dataTableModel.SortBy);
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
@@ -49,8 +53,16 @@ namespace Coditech.Admin.Agents
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.GeneralBatchList.Count, BindColumns());
             return listViewModel;
         }
+        #region GeneralBatchUserList
+        public virtual GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId,int generalBatchMasterId)
+        {
+            GeneralBatchUserListResponse response = _dBTMBatchClient.GetDBTMBatchUserList(selectedCentreCode, generalTrainerMasterId,generalBatchMasterId);
+            GeneralBatchUserListModel generalBatchUserList = new GeneralBatchUserListModel { GeneralBatchUserList = response?.GeneralBatchUserList };
+            GeneralBatchUserListViewModel listViewModel = new GeneralBatchUserListViewModel();
+            listViewModel.GeneralBatchUserList = generalBatchUserList?.GeneralBatchUserList?.ToViewModel<GeneralBatchUserViewModel>().ToList();
+            return listViewModel;
+        }
         #endregion
-        #region protected
         #endregion
     }
 }

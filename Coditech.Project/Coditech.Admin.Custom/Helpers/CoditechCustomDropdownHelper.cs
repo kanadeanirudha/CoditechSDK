@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Coditech.Admin.Helpers
 {
-	public static class CoditechCustomDropdownHelper
+    public static class CoditechCustomDropdownHelper
     {
         public static List<UserAccessibleCentreModel> AccessibleCentreList()
         {
@@ -66,14 +66,15 @@ namespace Coditech.Admin.Helpers
             {
                 DBTMGraphByDBTMTestMasterId(dropdownViewModel, dropdownList);
             }
-            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphType.ToString()))
-            {
-                GetGraphType(dropdownViewModel, dropdownList);
-            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeGraphList.ToString()))
             {
                 GetTraineeDetailsGraphList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMPerformanceMatrix.ToString()))
+            {
+                GetDBTMPerformanceMatrix(dropdownViewModel, dropdownList);
+            }
+
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -88,7 +89,7 @@ namespace Coditech.Admin.Helpers
                 dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
 
             DBTMActivityCategoryListModel list = new DBTMActivityCategoryListModel { DBTMActivityCategoryList = response.DBTMActivityCategoryList };
-            foreach (var item in list.DBTMActivityCategoryList)
+            foreach (var item in list.DBTMActivityCategoryList.OrderBy(x => x.ActivityCategoryName))
             {
                 if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && Convert.ToInt16(dropdownViewModel.Parameter) > 0 && item.DBTMActivityCategoryId == Convert.ToInt16(dropdownViewModel.Parameter))
                 {
@@ -96,7 +97,7 @@ namespace Coditech.Admin.Helpers
                 }
                 dropdownList.Add(new SelectListItem()
                 {
-                    Text = string.Concat(item.ActivityCategoryName, " (", item.ActivityCategoryCode, ")"),
+                    Text = item.ActivityCategoryName,
                     Value = Convert.ToString(item.DBTMActivityCategoryId),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMActivityCategoryId)
                 });
@@ -109,7 +110,7 @@ namespace Coditech.Admin.Helpers
             dropdownList.Add(new SelectListItem() { Text = "-------Select Registration Details-------" });
 
             DBTMDeviceListModel list = new DBTMDeviceListModel { DBTMDeviceList = response.DBTMDeviceList };
-            foreach (var item in list.DBTMDeviceList)
+            foreach (var item in list.DBTMDeviceList.OrderBy(x => x.DeviceName))
             {
                 if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && Convert.ToInt16(dropdownViewModel.Parameter) > 0 && item.DBTMDeviceMasterId == Convert.ToInt16(dropdownViewModel.Parameter))
                 {
@@ -170,7 +171,7 @@ namespace Coditech.Admin.Helpers
                 list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             }
             dropdownList.Add(new SelectListItem() { Text = "-------Select Trainee Details-------", Value = "" });
-            foreach (var item in list?.DBTMTraineeDetailsList)
+            foreach (var item in list?.DBTMTraineeDetailsList.OrderBy(x => x.FirstName))
             {
                 dropdownList.Add(new SelectListItem()
                 {
@@ -190,7 +191,7 @@ namespace Coditech.Admin.Helpers
             else
                 dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
             DBTMTestListModel list = new DBTMTestListModel { DBTMTestList = response.DBTMTestList };
-            foreach (var item in list.DBTMTestList)
+            foreach (var item in list.DBTMTestList.OrderBy(x => x.TestName))
             {
                 if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && Convert.ToInt16(dropdownViewModel.Parameter) > 0 && item.DBTMTestMasterId == Convert.ToInt16(dropdownViewModel.Parameter))
                 {
@@ -198,7 +199,7 @@ namespace Coditech.Admin.Helpers
                 }
                 dropdownList.Add(new SelectListItem()
                 {
-                    Text = string.Concat(item.TestName, " (", item.TestCode, ")"),
+                    Text = $"{item.TestName}",
                     Value = Convert.ToString(item.DBTMTestMasterId),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestMasterId)
                 });
@@ -219,7 +220,7 @@ namespace Coditech.Admin.Helpers
 
                 DBTMBatchActivityListResponse response = new DBTMBatchActivityClient().GetDBTMBatchActivityList(generalBatchMasterId, isAssociated, null, null, null, 1, int.MaxValue);
                 DBTMBatchActivityListModel list = new DBTMBatchActivityListModel() { DBTMBatchActivityList = response.DBTMBatchActivityList };
-                foreach (var item in list?.DBTMBatchActivityList)
+                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.TestName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
@@ -251,7 +252,7 @@ namespace Coditech.Admin.Helpers
                 list = new DBTMDeviceRegistrationDetailsListModel { RegistrationDetailsList = response?.RegistrationDetailsList };
             }
             dropdownList.Add(new SelectListItem() { Text = "-------Select Device Serial Code-------", Value = "" });
-            foreach (var item in list?.RegistrationDetailsList)
+            foreach (var item in list?.RegistrationDetailsList.OrderBy(x => x.DeviceSerialCode))
             {
                 dropdownList.Add(new SelectListItem()
                 {
@@ -271,7 +272,7 @@ namespace Coditech.Admin.Helpers
             string userType = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserType;
             DBTMBatchListResponse response = new DBTMBatchClient().GetBatchList(entityId, userType);
             DBTMBatchListModel list = new DBTMBatchListModel() { DBTMBatchList = response.DBTMBatchList };
-            foreach (var item in list?.DBTMBatchList)
+            foreach (var item in list?.DBTMBatchList.OrderBy(x => x.BatchName))
             {
                 dropdownList.Add(new SelectListItem()
                 {
@@ -301,7 +302,7 @@ namespace Coditech.Admin.Helpers
             //        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
             //}
 
-            foreach (var item in list?.DBTMTraineeDetailsList)
+            foreach (var item in list?.DBTMTraineeDetailsList.OrderBy(x => x.FirstName))
             {
                 dropdownList.Add(new SelectListItem()
                 {
@@ -324,7 +325,7 @@ namespace Coditech.Admin.Helpers
 
                 DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode);
                 DBTMNewRegistrationListModel list = new DBTMNewRegistrationListModel() { DBTMNewRegistrationList = response.DBTMNewRegistrationList };
-                foreach (var item in list?.DBTMNewRegistrationList)
+                foreach (var item in list?.DBTMNewRegistrationList.OrderBy(x => x.FirstName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
@@ -348,7 +349,7 @@ namespace Coditech.Admin.Helpers
 
                 DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
                 DBTMGraphMasterListModel list = new DBTMGraphMasterListModel() { DBTMGraphMasterList = response.DBTMGraphMasterList };
-                foreach (var item in list?.DBTMGraphMasterList)
+                foreach (var item in list?.DBTMGraphMasterList.OrderBy(x => x.GraphName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
@@ -357,17 +358,6 @@ namespace Coditech.Admin.Helpers
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
                     });
                 }
-            }
-        }
-
-        private static void GetGraphType(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
-        {
-
-            if (dropdownViewModel.DropdownSelectedValue == "7")
-            {
-                dropdownList.Add(new SelectListItem() { Text = "Time", Value = "time" });
-                dropdownList.Add(new SelectListItem() { Text = "Velocity", Value = "velocity" });
-                dropdownList.Add(new SelectListItem() { Text = "Time and Velocity", Value = "timeandvelocity" });
             }
         }
         private static void GetTraineeDetailsGraphList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
@@ -381,13 +371,29 @@ namespace Coditech.Admin.Helpers
             }
             DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId), null, null, null, 1, int.MaxValue);
             DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
-            foreach (var item in list?.DBTMTraineeDetailsList)
+            foreach (var item in list?.DBTMTraineeDetailsList.OrderBy(x => x.FirstName))
             {
                 dropdownList.Add(new SelectListItem()
                 {
                     Text = $"{item.FirstName} {item.LastName}",
                     Value = item.DBTMTraineeDetailId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTraineeDetailId)
+                });
+            }
+        }
+        private static void GetDBTMPerformanceMatrix(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-------Select-------"});
+
+            DBTMPerformanceMatrixListResponse response = new DBTMTestClient().GetDBTMPerformanceMatrixList(null, null, null, 1, int.MaxValue);
+            DBTMPerformanceMatrixListModel list = new DBTMPerformanceMatrixListModel() { DBTMPerformanceMatrixList = response.DBTMPerformanceMatrixList };
+            foreach (var item in list?.DBTMPerformanceMatrixList.OrderBy(x => x.PerformanceMatrix))
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = $"{item.PerformanceMatrix}",
+                    Value = item.DBTMPerformanceMatrixId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMPerformanceMatrixId)
                 });
             }
         }

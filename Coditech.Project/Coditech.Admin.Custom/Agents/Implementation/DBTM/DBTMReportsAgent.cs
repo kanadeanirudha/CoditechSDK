@@ -57,6 +57,28 @@ namespace Coditech.Admin.Agents
 			}
 			return listViewModel;
 		}
-		#endregion
-	}
+
+        //Graph Reports
+        public virtual DBTMGraphListViewModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMGraphListViewModel listViewModel = new DBTMGraphListViewModel();
+            if (dBTMTestMasterId > 0)
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                listViewModel.DataTable = response.DataTable;
+                //listViewModel.DBTMGraphListModel = response.DBTMGraphListModel;
+            }
+            return listViewModel;
+        }
+        #endregion
+    }
 }

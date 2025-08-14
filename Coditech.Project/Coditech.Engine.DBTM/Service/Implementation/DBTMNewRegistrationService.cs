@@ -52,6 +52,9 @@ namespace Coditech.API.Service
             if (dBTMDeviceMaster == null || dBTMDeviceMaster.DBTMDeviceMasterId <= 0)
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Device Serial Code."));
 
+            if (!dBTMDeviceMaster.IsMasterDevice)
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Please Enter Master Device Serial Code."));
+
             if (new DBTMDeviceRegistrationDetailsService(_coditechLogging, _serviceProvider).IsDeviceSerialCodeAlreadyExist(dBTMDeviceMaster.DBTMDeviceMasterId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Device Already Added"));
 
@@ -110,7 +113,7 @@ namespace Coditech.API.Service
                 InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
 
                 //Insert Admin Role
-                InsertAdminRole(currentDate, ApiCustomSettings.DirectorDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.DirectorDesignationId, DashboardFormCustomEnum.DBTMCentreDashboard.ToString(), ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList(), out sanctionPostCode);
+                sanctionPostCode= sanctionPostCode = InsertAdminRole(currentDate, ApiCustomSettings.DirectorDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.DirectorDesignationId, DashboardFormCustomEnum.DBTMCentreDashboard.ToString(), ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList());
 
                 //DBTM Device Registration Details
                 InsertDBTMDeviceRegistration(dBTMNewRegistrationModel, currentDate, employeeId, dBTMDeviceMaster.DBTMDeviceMasterId);
@@ -146,7 +149,7 @@ namespace Coditech.API.Service
             OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMNewRegistrationModel.CentreCode)?.FirstOrDefault();
 
             if (IsNull(joiningCodeDetails))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joining Code."));
 
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
@@ -195,7 +198,7 @@ namespace Coditech.API.Service
                     else
                     {
                         //Insert Admin Role
-                        InsertAdminRole(currentDate, ApiCustomSettings.TrainerDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.TrainerDesignationId, DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), ApiCustomSettings.DBTMTrainerMenuCode.Split(",").ToList(), out sanctionPostCode);
+                        sanctionPostCode = InsertAdminRole(currentDate, ApiCustomSettings.TrainerDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.TrainerDesignationId, DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), ApiCustomSettings.DBTMTrainerMenuCode.Split(",").ToList());
                     }
                     InsertDBTMTrainerRegistration(dBTMNewRegistrationModel, currentDate, employeeId);
 
@@ -240,6 +243,8 @@ namespace Coditech.API.Service
                 PersonId = personId,
                 FirstName = dBTMNewRegistrationModel.FirstName,
                 LastName = dBTMNewRegistrationModel.LastName,
+                MobileNumber = dBTMNewRegistrationModel.MobileNumber,
+                EmailAddress = dBTMNewRegistrationModel.EmailId,
                 AddressLine1 = dBTMNewRegistrationModel.AddressLine1,
                 AddressLine2 = dBTMNewRegistrationModel.AddressLine2,
                 GeneralCountryMasterId = dBTMNewRegistrationModel.GeneralCountryMasterId,
@@ -510,89 +515,97 @@ namespace Coditech.API.Service
         }
 
         //Create adminSanctionPost.
-        private void InsertAdminRole(DateTime currentDate, short departmentId, string centreCode, long employeeId, short designationId, string dashboardFormCustomEnum, List<string> associateMenus, out string sanctionPostCode)
+        private string InsertAdminRole(DateTime currentDate, short departmentId, string centreCode, long employeeId, short designationId, string dashboardFormCustomEnum, List<string> associateMenus)
         {
-            sanctionPostCode = string.Empty;
-            AdminSanctionPostModel adminSanctionPostModel = new AdminSanctionPostModel()
+            int adminRoleMasterId = 0;
+            string sanctionPostCode = _adminSanctionPostRepository.Table
+                       .Where(x => x.CentreCode == centreCode && x.DesignationId == designationId && x.DepartmentId == departmentId && x.IsActive)
+                       ?.Select(y => y.SanctionPostCode)?.FirstOrDefault();
+            if (string.IsNullOrEmpty(sanctionPostCode))
             {
-                DesignationId = designationId,
-                DepartmentId = departmentId,
-                NoOfPost = 1,
-                IsActive = true,
-                CentreCode = centreCode,
-                DesignationType = "Regular",
-                PostType = "Permanent",
-                CreatedDate = currentDate,
-                ModifiedDate = currentDate
-            };
-            EmployeeDesignationMaster employeeDesignationMaster = GetDesignationDetails(adminSanctionPostModel.DesignationId);
-            GeneralDepartmentMaster generalDepartmentMaster = GetDepartmentDetails(adminSanctionPostModel.DepartmentId);
-
-            sanctionPostCode = adminSanctionPostModel.SanctionPostCode = $"{employeeDesignationMaster.ShortCode}-{generalDepartmentMaster.DepartmentShortCode}-{adminSanctionPostModel.CentreCode}";
-            adminSanctionPostModel.SanctionedPostDescription = $"{employeeDesignationMaster.Description}-{generalDepartmentMaster.DepartmentName}-{adminSanctionPostModel.PostType}-{adminSanctionPostModel.DesignationType}";
-            AdminSanctionPost adminSanctionPostEntity = adminSanctionPostModel.FromModelToEntity<AdminSanctionPost>();
-
-            //Create new adminSanctionPost and return it.
-            AdminSanctionPost adminSanctionPostData = new CoditechRepository<AdminSanctionPost>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminSanctionPostEntity);
-            if (adminSanctionPostData?.AdminSanctionPostId > 0)
-            {
-                adminSanctionPostModel.AdminSanctionPostId = adminSanctionPostData.AdminSanctionPostId;
-
-                AdminRoleMaster adminRoleMaster = new AdminRoleMaster()
+                AdminSanctionPostModel adminSanctionPostModel = new AdminSanctionPostModel()
                 {
-                    AdminSanctionPostId = adminSanctionPostModel.AdminSanctionPostId,
-                    SanctionPostName = adminSanctionPostModel.SanctionedPostDescription,
-                    MonitoringLevel = APIConstant.Self,
-                    AdminRoleCode = adminSanctionPostModel.SanctionPostCode,
-                    OthCentreLevel = string.Empty,
+                    DesignationId = designationId,
+                    DepartmentId = departmentId,
+                    NoOfPost = 1,
                     IsActive = true,
-                    DashboardFormEnumId = GetEnumIdByEnumCode(dashboardFormCustomEnum, GeneralEnumaratorGroupCodeEnum.DashboardForm.ToString()),
+                    CentreCode = centreCode,
+                    DesignationType = "Regular",
+                    PostType = "Permanent",
                     CreatedDate = currentDate,
                     ModifiedDate = currentDate
                 };
-                //Create new adminRoleMaster
-                adminRoleMaster = new CoditechRepository<AdminRoleMaster>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMaster);
-                AdminRoleCentreRights adminRoleCentreRight = new AdminRoleCentreRights()
-                {
-                    AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
-                    CentreCode = adminSanctionPostModel.CentreCode,
-                    IsActive = true,
-                    CreatedDate = currentDate,
-                    ModifiedDate = currentDate
-                };
+                EmployeeDesignationMaster employeeDesignationMaster = GetDesignationDetails(adminSanctionPostModel.DesignationId);
+                GeneralDepartmentMaster generalDepartmentMaster = GetDepartmentDetails(adminSanctionPostModel.DepartmentId);
 
-                //Create new adminRoleCentreRight
-                adminRoleCentreRight = new CoditechRepository<AdminRoleCentreRights>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleCentreRight);
-                AdminRoleApplicableDetails adminRoleApplicableDetails = new AdminRoleApplicableDetails()
-                {
-                    AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
-                    EmployeeId = employeeId,
-                    IsActive = true,
-                    RoleType = "Regular",
-                    CreatedDate = currentDate,
-                    ModifiedDate = currentDate
-                };
-                new CoditechRepository<AdminRoleApplicableDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleApplicableDetails);
+                sanctionPostCode = adminSanctionPostModel.SanctionPostCode = $"{employeeDesignationMaster.ShortCode}-{generalDepartmentMaster.DepartmentShortCode}-{adminSanctionPostModel.CentreCode}";
+                adminSanctionPostModel.SanctionedPostDescription = $"{employeeDesignationMaster.Description}-{generalDepartmentMaster.DepartmentName}-{adminSanctionPostModel.PostType}-{adminSanctionPostModel.DesignationType}";
+                AdminSanctionPost adminSanctionPostEntity = adminSanctionPostModel.FromModelToEntity<AdminSanctionPost>();
 
-                //insert admin Role Menu Detail
-                List<UserMainMenuMaster> menuList = new CoditechRepository<UserMainMenuMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => associateMenus.Contains(x.MenuCode)).ToList();
-                List<AdminRoleMenuDetails> adminRoleMenuDetailList = new List<AdminRoleMenuDetails>();
-                foreach (var menu in menuList)
+                //Create new adminSanctionPost and return it.
+                AdminSanctionPost adminSanctionPostData = _adminSanctionPostRepository.Insert(adminSanctionPostEntity);
+                if (adminSanctionPostData?.AdminSanctionPostId > 0)
                 {
-                    adminRoleMenuDetailList.Add(new AdminRoleMenuDetails()
+                    adminSanctionPostModel.AdminSanctionPostId = adminSanctionPostData.AdminSanctionPostId;
+
+                    AdminRoleMaster adminRoleMaster = new AdminRoleMaster()
+                    {
+                        AdminSanctionPostId = adminSanctionPostModel.AdminSanctionPostId,
+                        SanctionPostName = adminSanctionPostModel.SanctionedPostDescription,
+                        MonitoringLevel = APIConstant.Self,
+                        AdminRoleCode = adminSanctionPostModel.SanctionPostCode,
+                        OthCentreLevel = string.Empty,
+                        IsActive = true,
+                        DashboardFormEnumId = GetEnumIdByEnumCode(dashboardFormCustomEnum, GeneralEnumaratorGroupCodeEnum.DashboardForm.ToString()),
+                        CreatedDate = currentDate,
+                        ModifiedDate = currentDate
+                    };
+                    //Create new adminRoleMaster
+                    adminRoleMaster = _adminRoleMasterRepository.Insert(adminRoleMaster);
+                    adminRoleMasterId = adminRoleMaster.AdminRoleMasterId;
+                    AdminRoleCentreRights adminRoleCentreRight = new AdminRoleCentreRights()
                     {
                         AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
-                        AdminRoleCode = adminRoleMaster.AdminRoleCode,
-                        ModuleCode = menu.ModuleCode,
-                        MenuCode = menu.MenuCode,
-                        EnableDate = currentDate,
+                        CentreCode = adminSanctionPostModel.CentreCode,
                         IsActive = true,
                         CreatedDate = currentDate,
                         ModifiedDate = currentDate
-                    });
+                    };
+                    //Create new adminRoleCentreRight
+                    adminRoleCentreRight = new CoditechRepository<AdminRoleCentreRights>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleCentreRight);
+                    //insert admin Role Menu Detail
+                    List<UserMainMenuMaster> menuList = new CoditechRepository<UserMainMenuMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => associateMenus.Contains(x.MenuCode)).ToList();
+                    List<AdminRoleMenuDetails> adminRoleMenuDetailList = new List<AdminRoleMenuDetails>();
+                    foreach (var menu in menuList)
+                    {
+                        adminRoleMenuDetailList.Add(new AdminRoleMenuDetails()
+                        {
+                            AdminRoleMasterId = adminRoleMaster.AdminRoleMasterId,
+                            AdminRoleCode = adminRoleMaster.AdminRoleCode,
+                            ModuleCode = menu.ModuleCode,
+                            MenuCode = menu.MenuCode,
+                            EnableDate = currentDate,
+                            IsActive = true,
+                            CreatedDate = currentDate,
+                            ModifiedDate = currentDate
+                        });
+                    }
+                    new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMenuDetailList);
                 }
-                new CoditechRepository<AdminRoleMenuDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleMenuDetailList);
             }
+
+            adminRoleMasterId = adminRoleMasterId != 0 ? adminRoleMasterId : _adminRoleMasterRepository.Table.Where(x => x.AdminRoleCode == sanctionPostCode).Select(y => y.AdminRoleMasterId).FirstOrDefault();
+            AdminRoleApplicableDetails adminRoleApplicableDetails = new AdminRoleApplicableDetails()
+            {
+                AdminRoleMasterId = adminRoleMasterId,
+                EmployeeId = employeeId,
+                IsActive = true,
+                RoleType = "Regular",
+                CreatedDate = currentDate,
+                ModifiedDate = currentDate
+            };
+            new CoditechRepository<AdminRoleApplicableDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleApplicableDetails);
+            return sanctionPostCode;
         }
         private List<DBTMTraineeAssignmentModel> GetTraineesForCentre(string centreCode)
         {

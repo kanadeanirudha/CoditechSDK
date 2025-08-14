@@ -10,6 +10,7 @@ namespace Coditech.Admin.ViewModel
 
         [Required]
         public long GeneralTrainerMasterId { get; set; }
+        public long EntityId { get; set; }
 
         [Required]
         public int DBTMTestMasterId { get; set; }
@@ -48,6 +49,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Activity")]
         [Required]
         public List<string> SelectedTest { get; set; }
-
+        public string AssignedBy { get; set; }
     }
 }

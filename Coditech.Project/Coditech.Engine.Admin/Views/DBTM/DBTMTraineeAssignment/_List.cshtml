@@ -21,9 +21,8 @@
                         <tr>
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
-                            <td style="text-align: center;">
-                                <a href="../@controllerName/Edit?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="Update"><span class="badge badge-soft-info">@item.TestName</span></a>
-                            </td>
+                            <td><span class="badge badge-soft-info">@item.TestName</span></td>
+                            <td>@item.AssignedBy</td>
                             <td>@item.AssignmentDate.ToCoditechDateFormat()</td>
                             <td>@item.AssignmentTime</td>
                             <td class="text-center">
@@ -32,7 +31,7 @@
                             <td class="text-center">
                                 @if (string.Equals(item.TestStatus, "Pending"))
                                 {
-                                    <a href="../@controllerName/GetDBTMTraineeAssignment?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <a href="../@controllerName/GetDBTMTraineeAssignment?dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
                                         <i class="fas fa-edit"> </i>
                                     </a>
                                     <span class="m-2">|</span>

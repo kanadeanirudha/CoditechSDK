@@ -35,5 +35,10 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DBTMGraphByDBTMTestMasterId?dBTMTestMasterId={dBTMTestMasterId}";
             return endpoint;
         }
+        public string GetDBTMPerformanceMatrixListAsync(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMPerformanceMatrixList{BuildEndpointQueryString(expand, filter, sort, pageIndex, pageSize)}";
+            return endpoint;
+        }
     }
 }

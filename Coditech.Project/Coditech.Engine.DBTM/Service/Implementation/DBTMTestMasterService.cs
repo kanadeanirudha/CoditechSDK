@@ -23,6 +23,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
+        private readonly ICoditechRepository<DBTMPerformanceMatrix> _dBTMPerformanceMatrixRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -35,6 +36,7 @@ namespace Coditech.API.Service
             _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMPerformanceMatrixRepository = new CoditechRepository<DBTMPerformanceMatrix>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -79,7 +81,7 @@ namespace Coditech.API.Service
                     {
                         DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
                         DBTMTestParameterId = Convert.ToByte(item),
-                        IsActive=true
+                        IsActive = true
                     });
                 }
 
@@ -342,12 +344,12 @@ namespace Coditech.API.Service
             DBTMGraphMasterListModel list = new DBTMGraphMasterListModel
             {
                 DBTMGraphMasterList = (from a in _dBTMGraphMasterRepository.Table
-                                           select new DBTMGraphMasterModel
-                                           {
-                                               DBTMGraphMasterId = a.DBTMGraphMasterId,
-                                               GraphName = a.GraphName,
-                                               GraphCode = a.GraphCode,
-                                           }).ToList()
+                                       select new DBTMGraphMasterModel
+                                       {
+                                           DBTMGraphMasterId = a.DBTMGraphMasterId,
+                                           GraphName = a.GraphName,
+                                           GraphCode = a.GraphCode,
+                                       }).ToList()
             };
             return list;
         }
@@ -370,6 +372,19 @@ namespace Coditech.API.Service
             {
                 DBTMGraphMasterList = graphList
             };
+        }
+        public virtual DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        {
+            DBTMPerformanceMatrixListModel list = new DBTMPerformanceMatrixListModel
+            {
+                DBTMPerformanceMatrixList = (from a in _dBTMPerformanceMatrixRepository.Table
+                                             select new DBTMPerformanceMatrixModel
+                                             {
+                                                 DBTMPerformanceMatrixId = a.DBTMPerformanceMatrixId,
+                                                 PerformanceMatrix = a.PerformanceMatrix,
+                                             }).ToList()
+            };
+            return list;
         }
 
 

@@ -45,7 +45,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("AssignmentTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
 
-            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, dataTableModel.SortBy = IsNotNull(dataTableModel.SortByColumn) ? "desc" : string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
 
             DBTMTraineeAssignmentListResponse response = _dBTMTraineeAssignmentClient.List(Convert.ToInt64(dataTableModel.SelectedParameter1), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMTraineeAssignmentListModel deviceList = new DBTMTraineeAssignmentListModel { DBTMTraineeAssignmentList = response?.DBTMTraineeAssignmentList };
@@ -92,9 +92,9 @@ namespace Coditech.Admin.Agents
         }
 
         //Get DBTMTraineeAssignment by dBTMTraineeAssignment id.
-        public virtual DBTMTraineeAssignmentViewModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentId)
+        public virtual DBTMTraineeAssignmentViewModel GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
         {
-            DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.GetDBTMTraineeAssignment(dBTMTraineeAssignmentId);
+            DBTMTraineeAssignmentResponse response = _dBTMTraineeAssignmentClient.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
             return response?.DBTMTraineeAssignmentModel.ToViewModel<DBTMTraineeAssignmentViewModel>();
         }
 
@@ -275,6 +275,12 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Activity Name",
                 ColumnCode = "TestName",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Assigned By",
+                ColumnCode = "AssignedBy",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()

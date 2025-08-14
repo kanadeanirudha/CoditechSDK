@@ -1,100 +1,212 @@
-﻿@using Coditech.Admin.Utilities;
-@using Coditech.Common.API.Model;
+﻿@using Coditech.Admin.Utilities
+@using Coditech.Common.API.Model
 @using Newtonsoft.Json
 @model DBTMDashboardViewModel
 @{
     ViewBag.Title = "Dashboard";
-    CalendarViewModel calendarViewModel = new CalendarViewModel();
+    // Yearly Trainee Overview
+    string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+    int monthCount = Model.YearlyTraineeOverviewList.Count();
+    string[] XValuesBarYearlyTraineeTrainedOverview = new string[monthCount];
+    decimal[] YValuesBarYearlyTraineeTrainedOverview = new decimal[monthCount];
+    int count1 = 0;
+    foreach (var item in Model.YearlyTraineeOverviewList)
+    {
+        XValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToString(item.MonthName);
+        YValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToInt32(item.TotalTrainee);
+        count1++;
+    }
+    BarChartViewModel traineeTrainedviewModel = new BarChartViewModel()
+            {
+                BarChartId = "YearlyTraineeTrainedOverviewChart",
+                XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+                YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
+                XAxisLabel = "Months",
+                YAxisLabel = "Trainees Count",
+                BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
+            };
 }
 <div class="page-content">
     <div class="container-fluid">
-        <!-- Page-Title -->
         <div class="row">
-            <div class="col-sm-12">
-                <div class="page-title-box">
-                    <div class="row">
-                        <div class="col">
+            <div class="col-lg-6 d-flex flex-column h-100">
+                <div class="row flex-grow-1">
+                    <div class="col-md-6 mb-3">
+                        <a href="/dbtmdeviceregistrationdetails/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Peak Fast Pro</p>
+                                            <h3 class="m-0">@Model.NumberOfKitPurchase</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        @* <a href="/DBTMTraineeDetails/list"> *@
+                        <div class="card report-card">
+                            <div class="card-body">
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col">
+                                        <p class="text-dark mb-0 fw-semibold">Weekly device load</p>
+                                        <h3 class="m-0">@Model.WeeklyDeviceLoad %</h3>
+                                        <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                    </div>
+                                    <div class="col-auto align-self-center">
+                                        <div class="report-main-icon bg-light-alt">
+                                            <i class="fas fa-chalkboard-teacher"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-auto align-self-center">
-                            <a href="#" class="btn btn-sm btn-outline-primary" id="Dash_Date">
-                                <span class="day-name" id="Day_Name">Today:</span>&nbsp;
-                                <span class="" id="Select_date">@System.DateTime.Now.ToCoditechDateFormat()</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar align-self-center icon-xs ms-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            </a>
+                        @* </a> *@
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/generaltrainermaster/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Number Of Trainer</p>
+                                            <h3 class="m-0">@Model.NumberOfTrainers</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/dbtmtraineedetails/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Number Of Trainees</p>
+                                            <h3 class="m-0">@Model.NumberOfTrainees</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/generalbatchmaster/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Total Number Of Batches</p>
+                                            <h3 class="m-0">@Model.NumberOfBatches</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-user-friends"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        @* <a href="/DBTMBatchDetails/list"> *@
+                        <div class="card report-card">
+                            <div class="card-body">
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col">
+                                        <p class="text-dark mb-0 fw-semibold">Top Athlete</p>
+                                        <h3 class="m-0">@Model.TopAthletsName</h3>
+                                        <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                    </div>
+                                    <div class="col-auto align-self-center">
+                                        <div class="report-main-icon bg-light-alt">
+                                            <i class="fas fa-user-graduate"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @* </a> *@
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 h-100">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h4 class="card-title">Number of Trainees per Month</h4>
+                    </div>
+                    <div class="card-body">
+                        @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", traineeTrainedviewModel)
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (Model.TrainersList != null && Model.TrainersList.Any())
+        {
+            <div class="row">
+                @foreach (var trainer in Model.TrainersList)
+                {
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center">
+                                    <div class="position-relative" style="width: 110px; height: 110px; margin: 0 auto;">
+                                        @if (!string.IsNullOrEmpty(trainer.PhotoMediaPath))
+                                        {
+                                            <img src="@trainer.PhotoMediaPath" alt="Trainer Image"
+                                                 class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle bg-soft-primary text-white w-100 h-100
+                                                d-flex align-items-center justify-content-center"
+                                                 style="font-size: 36px; object-fit: cover;">
+                                                @trainer.FirstName.Substring(0, 1)@trainer.LastName.Substring(0, 1)
+                                            </div>
+                                        }
+                                    </div>
+                                    <ul class="list-unstyled my-1 mt-2">
+                                        <li><h5 class="mb-0">@trainer.FirstName @trainer.LastName</h5></li>
+                                        <li><small class="text-muted">@trainer.EmployeeDesignation</small></li>
+                                        @* <li><small class="text-muted">CertificateNo</small></li> *@
+                                    </ul>
+                                </div>
+                                <ul class="list-unstyled personal-detail mb-0 text-center">
+                                    <li class="mt-2"><b>Specialization:</b> @trainer.TrainerSpecialization</li>
+                                    <li class="mt-2"><b>Date of Joining:</b> @trainer.DateOfJoining.ToCoditechDateFormat()</li>
+                                    <li class="mt-2"><b>Total Duration Completed:</b> @trainer.DurationWithUs</li>
+                                    <li class="mt-2"><b>Number of Trainers Linked:</b> @trainer.NumberOfTrainees</li>
+                                    <li class="mt-2"><b>Number of Batches:</b> @trainer.NumberOfBatchesCreated</li>
+                                    <li class="mt-2"><b>Weekly Working Hrs:</b> @trainer.WeeklyWorkingHours</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div><!--end page-title-box-->
+                }
             </div>
-        </div>
-        <!-- end page title end breadcrumb -->
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-3">
-                <a href="/GeneralTrainerMaster/list">
-                    <div class="card report-card">
-                        <div class="card-body">
-                            <div class="row d-flex justify-content-center">
-                                <div class="col">
-                                    <p class="text-dark mb-0 fw-semibold">Number Of Trainers</p>
-                                    <h3 class="m-0">@Model.NumberOfTrainers</h3>
-                                    <p class="mb-0 text-truncate text-muted">&nbsp;</p>
-                                </div>
-                                <div class="col-auto align-self-center">
-                                    <div class="report-main-icon bg-light-alt">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div><!--end card-body-->
-                    </div><!--end card-->
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <a href="/DBTMTraineeDetails/list">
-                    <div class="card report-card">
-                        <div class="card-body">
-                            <div class="row d-flex justify-content-center">
-                                <div class="col">
-                                    <p class="text-dark mb-0 fw-semibold">Number Of Trainees</p>
-                                    <h3 class="m-0">@Model.NumberOfTrainees</h3>
-                                    <p class="mb-0 text-truncate text-muted">&nbsp;</p>
-                                </div>
-                                <div class="col-auto align-self-center">
-                                    <div class="report-main-icon bg-light-alt">
-                                        <i class="fas fa-user-minus"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div><!--end card-body-->
-                    </div><!--end card-->
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <a href="/DBTMTraineeAssignment/list">
-                    <div class="card report-card">
-                        <div class="card-body">
-                            <div class="row d-flex justify-content-center">
-                                <div class="col">
-                                    <p class="text-dark mb-0 fw-semibold">Assignments</p>
-                                    <h3 class="m-0">@Model.Assignments</h3>
-                                    <p class="mb-0 text-truncate text-muted">&nbsp;</p> <!-- Add this for consistency -->
-                                </div>
-                                <div class="col-auto align-self-center">
-                                    <div class="report-main-icon bg-light-alt">
-                                        <i class="fas fa-user-friends"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div><!--end card-body-->
-                    </div><!--end card-->
-                </a>
-            </div>
-            <div id="calendar" class="row mb-3">
-                <div class="col-lg-9">
-                    <div class="text-center" style="position: relative; padding-top:0px !important">
-                        @Html.Partial("~/Views/Shared/Calendar/_Calendar.cshtml", calendarViewModel)
-                    </div><!--end card-body-->
-                </div>
-            </div><!--end row-->
-        </div>
-    </div><!-- container -->
+        }
+    </div>
 </div>

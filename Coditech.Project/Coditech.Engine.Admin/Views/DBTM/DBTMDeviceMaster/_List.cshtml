@@ -27,6 +27,9 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsMasterDevice)
                             </td>
                             <td>
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsRegistered)
+                            </td>
+                            <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center">

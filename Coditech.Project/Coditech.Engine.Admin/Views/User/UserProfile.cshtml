@@ -1,0 +1,324 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@model UserProfileViewModel
+@{
+    ViewBag.Title = "User Profile";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="dastone-profile">
+                            <div class="row">
+                                <div class="col-lg-4 align-self-center mb-3 mb-lg-0">
+                                    <div class="dastone-profile-main">
+                                        <div class="dastone-profile-main-pic position-relative" style="width: 110px; height: 110px;">
+                                            @if (!string.IsNullOrEmpty(Model.PhotoMediaPath))
+                                            {
+                                                <img id="imagePreview" src="@Model.PhotoMediaPath" alt="User Image" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div id="imagePreview" class="rounded-circle bg-soft-primary text-white w-100 h-100 d-flex align-items-center justify-content-center" style="font-size: 36px; object-fit: cover;">
+                                                    @Model.FirstName.Substring(0, 1)@Model.LastName.Substring(0, 1)
+                                                </div>
+                                            }
+
+                                            @*  <!-- Camera icon overlay -->
+                                            <span class="camera-overlay position-absolute bottom-0 end-0 bg-white rounded-circle p-2" style="cursor: pointer;" id="triggerUpload">
+                                                <i class="fas fa-camera text-dark"></i>
+                                            </span>
+
+                                            <!-- Hidden file input -->
+                                            <input type="file" id="imageUpload" accept="image/*" class="d-none" />
+
+                                            <!-- Hidden strongly-typed field for media ID -->
+                                            @Html.HiddenFor(m => m.PhotoMediaId) *@
+                                        </div>
+
+                                        <div class="dastone-profile_user-detail">
+                                            <h5 class="dastone-user-name"> @Model.FirstName @Model.LastName</h5>
+                                            <p class="mb-0 dastone-user-name-post">@Model.Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 ms-auto align-self-center">
+                                    <ul class="list-unstyled personal-detail mb-0">
+                                        <li><i class="ti ti-mobile me-2 text-secondary font-16 align-middle"></i> <b>Mobile No.</b>: @Model.MobileNumber</li>
+                                        <li class="mt-2"><i class="ti ti-email text-secondary font-16 align-middle me-2"></i> <b>Email</b>: @Model.EmailId</li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 align-self-center">
+                                    <div class="row"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <!-- PERSONAL INFORMATION FORM -->
+            <div class="col-lg-6 col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Personal Information</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("UserProfile", controllerName, FormMethod.Post))
+                    {
+                        @Html.HiddenFor(m => m.UserMasterId)
+                        @Html.HiddenFor(m => m.UserType)
+                        @Html.HiddenFor(m => m.MobileNumber)
+                        @Html.HiddenFor(m => m.PhotoMediaId)
+                        @Html.AntiForgeryToken()
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-lg-6 mb-4">
+                                    @Html.LabelFor(x => x.FirstName, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.FirstName)
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    @Html.LabelFor(x => x.LastName, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.LastName)
+                                </div>
+                                <div class="col-lg-4 mb-4">
+                                    @Html.LabelFor(x => x.EmailId, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.EmailId)
+                                </div>
+                                <div class="col-lg-4 mb-4">
+                                    @Html.LabelFor(x => x.EmergencyContact, new { @class = "form-label" })
+                                    @Html.TextBoxFor(x => x.EmergencyContact, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.EmergencyContact)
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.DateOfBirth, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.DateOfBirth, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(x => x.DateOfBirth)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 mb-4">
+                                    @Html.LabelFor(x => x.MaritalStatus, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                    {
+                                        DropdownType = DropdownTypeEnum.MaritalStatus.ToString(),
+                                                                DropdownName = "MaritalStatus",
+                                                                DropdownSelectedValue = Model.MaritalStatus ?? string.Empty,
+                                                                })
+                                @Html.ValidationMessageFor(x => x.MaritalStatus)
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        <a href="..@dashboardUrl" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                    </div>
+                                        }
+                </div>
+            </div>
+
+            <!-- CHANGE PASSWORD FORM -->
+            <div class="col-lg-6 col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Change Password</h4>
+                    </div>
+
+                    <div class="card-body d-flex justify-content-center">
+                        <form id="changePasswordForm" class="w-50">
+
+                            <div class="form-group mb-2">
+                                @Html.LabelFor(x => x.CurrentPassword, new { @class = "form-label required" })
+                                <div class="input-group">
+                                    @Html.PasswordFor(x => x.CurrentPassword, new { @class = "form-control" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.CurrentPassword, null)
+                            </div>
+                            <div class="form-group mb-2">
+                                @Html.LabelFor(x => x.NewPassword, new { @class = "form-label required" })
+                                <div class="input-group">
+                                    @Html.PasswordFor(x => x.NewPassword, new { @class = "form-control" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.NewPassword, null)
+                            </div>
+                            <div class="form-group mb-2">
+                                @Html.LabelFor(x => x.ConfirmPassword, new { @class = "form-label required" })
+                                <div class="input-group password-input-wraper">
+                                    @Html.PasswordFor(x => x.ConfirmPassword, new { @class = "form-control password-input", type = "Password", placeholder = "Confirm Password" })
+                                    <i class="fas fa-eye view-password"></i>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.ConfirmPassword, null)
+                                @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <!-- Empty row for spacing -->
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            <a href="..@dashboardUrl" class="btn btn-secondary"><i class="ft-x"></i> @AdminResources.LabelCancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+    //     // Trigger file input when camera icon is clicked
+    // $('#triggerUpload').click(function () {
+    //     $('#imageUpload').click();
+    // });
+
+    // // Handle image upload
+    // $('#imageUpload').change(function () {
+    //     var formData = new FormData();
+    //     var fileInput = $('#imageUpload')[0];
+
+    //     $("#notificationDivId").hide();
+
+    //     if (fileInput.files.length > 0) {
+    //         CoditechCommon.ShowLodder();
+
+    //         formData.append('files', fileInput.files[0]);
+
+    //         $.ajax({
+    //             url: '/GeneralCommon/UploadMedia',
+    //             type: 'POST',
+    //             data: formData,
+    //             processData: false,
+    //             contentType: false,
+    //                success: function (response) {
+    //                     if (response.status == true || response.status == "true") {
+    //                         $('#imagePreview').replaceWith(`
+    //                             <img id="imagePreview" src="${response.imageUrl}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+    //                         `);
+    //                         $('input[name="PhotoMediaId"]').val(response.photoMediaId);
+    //                     } else {
+    //                         CoditechNotification.DisplayNotificationMessage(response.message, "error");
+    //                     }
+    //                     CoditechCommon.HideLodder();
+    //                 },
+
+    //             error: function (jqXHR, textStatus, errorThrown) {
+    //                 console.error('Error uploading file:', textStatus, errorThrown);
+    //                 CoditechCommon.HideLodder();
+    //             }
+    //         });
+    //     }
+    // });
+
+        // Change Password Handler
+        $('#changePasswordForm').on('submit', function (e) {
+            e.preventDefault();
+            ChangePassword(); // call the function
+        });
+
+        // Initialize DatePicker
+        $("#DateOfBirth").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+100",
+            dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+            language: "en",
+            autoSize: true,
+            gotoCurrent: true,
+            clearBtn: true,
+            showButtonPanel: true,
+            closeText: 'Clear',
+            onClose: function (dateText, inst) {
+                if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
+                    document.getElementById(this.id).value = '';
+                }
+            },
+            minDate: "-80Y",
+            maxDate: new Date()
+        });
+
+        // When DOB changes, calculate age
+        $('#DateOfBirth').change(function () {
+            var now = new Date();
+            var past = new Date($('#DateOfBirth').val());
+
+            var nowYear = now.getFullYear();
+            var pastYear = past.getFullYear();
+
+            var age = nowYear - pastYear;
+            $('#Age').val(age);
+        });
+
+        // When Age changes, auto-fill DOB
+        $('#Age').change(function () {
+            var age = $('#Age').val();
+            var dob = calculateDOB(age);
+            $('#DateOfBirth').datepicker('setDate', dob);
+        });
+
+        function calculateDOB(age) {
+            var now = new Date();
+            var birthYear = now.getFullYear() - age;
+            return new Date(birthYear, 0, 1);
+        }
+
+         // View PassWord
+         $(".view-password").click(function () {
+                $(this).toggleClass("fa fa-eye-slash");
+                var inputAttribute = $('.password-input');
+                if (inputAttribute.attr("type") == "password") {
+                    inputAttribute.attr("type", "text");
+                } else {
+                    inputAttribute.attr("type", "password");
+                }
+            });
+    });
+
+    // Change Password Function
+    function ChangePassword() {
+        var form = $("#changePasswordForm");
+        CoditechCommon.ShowLodder();
+
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: "/User/PasswordChange",
+            data: form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    CoditechNotification.DisplayNotificationMessage(response.message, "success");
+                    form[0].reset();
+                } else {
+                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+                }
+                CoditechCommon.HideLodder();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                if (xhr.status == "401" || xhr.status == "403") {
+                    location.reload();
+                } else {
+                    var message = xhr.responseText || "Failed to change password.";
+                    CoditechNotification.DisplayNotificationMessage(message, "error");
+                }
+                CoditechCommon.HideLodder();
+            }
+        });
+    }
+</script>

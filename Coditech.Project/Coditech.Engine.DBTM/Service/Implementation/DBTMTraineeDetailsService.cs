@@ -23,6 +23,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
+        private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
 
         public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -35,9 +36,10 @@ namespace Coditech.API.Service
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
-        public virtual DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             string listType = "";
             string isActive = filters?.Find(x => string.Equals(x.FilterName, FilterKeys.IsActive, StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
@@ -66,7 +68,7 @@ namespace Coditech.API.Service
         }
 
         //Get DBTM Trainee Other Details
-        public virtual DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId)
+        public DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
@@ -87,7 +89,7 @@ namespace Coditech.API.Service
         }
 
         //Update DBTM Trainee Other Details
-        public virtual bool UpdateDBTMTraineeOtherDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
+        public bool UpdateDBTMTraineeOtherDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
         {
             if (IsNull(dBTMTraineeDetailsModel))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
@@ -126,7 +128,7 @@ namespace Coditech.API.Service
         }
 
         //Delete DBTM Trainee Details
-        public virtual bool DeleteDBTMTraineeDetails(ParameterModel parameterModel)
+        public bool DeleteDBTMTraineeDetails(ParameterModel parameterModel)
         {
             if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
@@ -141,7 +143,7 @@ namespace Coditech.API.Service
         }
 
         //TraineeActivitiesList
-        public virtual DBTMActivitiesListModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMActivitiesListModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -174,29 +176,7 @@ namespace Coditech.API.Service
             listModel.PersonCode = personCode;
             return listModel;
         }
-
-        private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
-        {
-            long personId = 0;
-            string centreCode = string.Empty;
-            string personCode = string.Empty;
-            short generalDepartmentMasterId = 0;
-            if (entityType == UserTypeEnum.Trainee.ToString())
-            {
-                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
-                if (IsNotNull(dbtmTraineeDetails))
-                {
-                    personId = dbtmTraineeDetails.PersonId;
-                    centreCode = dbtmTraineeDetails.CentreCode;
-                }
-                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
-            }
-            else
-            {
-                return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
-            }
-        }
-        public virtual DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -248,7 +228,7 @@ namespace Coditech.API.Service
                             {
                                 string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
                                 listModel.DataTable.Columns.Add(columnName, typeof(String));
-                                newRow[columnName] = $"{ item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
+                                newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
                             }
                         }
 
@@ -269,6 +249,67 @@ namespace Coditech.API.Service
             }
             return listModel;
         }
+        //Get ProfileDetails
+        public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate }).FirstOrDefault();
+            if (dBTMTraineeDetailsData == null)
+                return null;
+
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel();
+            if (dBTMTraineeProfileModel == null)
+                return null;
+
+            // Inline variable assignment for clarity and slight performance
+            GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(Convert.ToInt64(dBTMTraineeDetailsData.PersonId));
+
+            if (generalPersonModel != null)
+            {
+                dBTMTraineeProfileModel.FirstName = generalPersonModel.FirstName;
+                dBTMTraineeProfileModel.LastName = generalPersonModel.LastName;
+                dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
+                dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
+            }
+
+            dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
+            dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetailsData.CreatedDate;
+
+            // Use ternary for brevity
+            dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
+                ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
+                : "N/A";
+
+            CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<Coditech_Entities>());
+            objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
+            dBTMTraineeProfileModel.TraineeProfiles = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
+            return dBTMTraineeProfileModel;
+        }
+
+        private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
+        {
+            long personId = 0;
+            string centreCode = string.Empty;
+            string personCode = string.Empty;
+            short generalDepartmentMasterId = 0;
+            if (entityType == UserTypeEnum.Trainee.ToString())
+            {
+                DBTMTraineeDetails dbtmTraineeDetails = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
+                if (IsNotNull(dbtmTraineeDetails))
+                {
+                    personId = dbtmTraineeDetails.PersonId;
+                    centreCode = dbtmTraineeDetails.CentreCode;
+                }
+                return base.BindGeneralPersonInformation(personId, centreCode, personCode, generalDepartmentMasterId, dbtmTraineeDetails.IsActive);
+            }
+            else
+            {
+                return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
+            }
+        }
+
 
         private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList)
         {
@@ -289,7 +330,7 @@ namespace Coditech.API.Service
                 case "MinLap":
                     newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
-                case "Power":                  
+                case "Power":
                     newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power")?.ParameterValue ?? 0)} {Unit(calculationCode)}";
                     break;
                 default:
@@ -297,7 +338,6 @@ namespace Coditech.API.Service
                     break;
             }
         }
-
         private string Unit(string parameterCode)
         {
             string data = string.Empty;
@@ -314,13 +354,34 @@ namespace Coditech.API.Service
                     data = "m/s";
                     break;
                 case "Power":
-                    data = "watt"; 
+                    data = "watt";
                     break;
                 default:
                     data = "";
                     break;
             }
             return data;
+        }
+
+        private string CalculateDuration(DateTime fromDate, DateTime toDate)
+        {
+            int years = toDate.Year - fromDate.Year;
+            int months = toDate.Month - fromDate.Month;
+            int days = toDate.Day - fromDate.Day;
+
+            if (days < 0)
+            {
+                months--;
+                days += DateTime.DaysInMonth(toDate.Year, toDate.Month == 1 ? 12 : toDate.Month - 1);
+            }
+
+            if (months < 0)
+            {
+                years--;
+                months += 12;
+            }
+
+            return $"{years} years {months} months {days} days";
         }
     }
 }

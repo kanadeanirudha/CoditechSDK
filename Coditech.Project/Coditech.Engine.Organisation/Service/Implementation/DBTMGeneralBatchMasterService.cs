@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -10,13 +11,14 @@ using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
-    public class DBTMGeneralBatchMasterService : GeneralBatchMasterService
+    public class DBTMGeneralBatchMasterService : GeneralBatchMasterService, IDBTMBatchMasterService
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         private readonly ICoditechRepository<DBTMBatchActivity> _dBTMBatchActivityRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         public DBTMGeneralBatchMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -25,13 +27,16 @@ namespace Coditech.API.Service
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         //Create GeneralBatch.
         public override GeneralBatchModel CreateGeneralBatch(GeneralBatchModel generalBatchModel)
         {
+            if (IsNull(generalBatchModel.CustomDropdownSelectedValue2))
+                throw new CoditechException(ErrorCodes.InvalidData, "Selected User cannot be null.");
             generalBatchModel = base.CreateGeneralBatch(generalBatchModel);
-            if (generalBatchModel.GeneralBatchMasterId > 0 && generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
+            if (generalBatchModel.GeneralBatchMasterId > 0 && generalBatchModel.CustomDropdownSelectedValue1?.Count > 0 && generalBatchModel.CustomDropdownSelectedValue2?.Count > 0)
             {
                 foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
                 {
@@ -41,6 +46,16 @@ namespace Coditech.API.Service
                         DBTMTestMasterId = dBTMTestMasterId,
                     };
                     _dBTMBatchActivityRepository.Insert(dBTMBatchActivity);
+                }
+                foreach (long traineeEntityId in generalBatchModel.CustomDropdownSelectedValue2.Select(long.Parse))
+                {
+                    GeneralBatchUser generalBatchUser = new GeneralBatchUser
+                    {
+                        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                        EntityId = traineeEntityId,
+                        UserType = UserTypeEnum.Trainee.ToString(),
+                    };
+                    _generalBatchUserRepository.Insert(generalBatchUser);
                 }
             }
             else
@@ -55,11 +70,11 @@ namespace Coditech.API.Service
         public override GeneralBatchModel GetGeneralBatch(int generalBatchMasterId)
         {
             GeneralBatchModel generalBatchModel = base.GetGeneralBatch(generalBatchMasterId);
-           
             if (IsNull(generalBatchModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
             generalBatchModel.CustomDropdownSelectedValue1 = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
+            generalBatchModel.CustomDropdownSelectedValue2 = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.EntityId.ToString()).ToList();
+            generalBatchModel.Duration = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.Duration).FirstOrDefault();
             return generalBatchModel;
         }
 
@@ -67,16 +82,13 @@ namespace Coditech.API.Service
         public override bool UpdateGeneralBatch(GeneralBatchModel generalBatchModel)
         {
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
-
             if (isGeneralBatchUpdated)
             {
                 List<DBTMBatchActivity> existingActivities = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
-
                 foreach (DBTMBatchActivity dBTMBatchActivity in existingActivities)
                 {
                     _dBTMBatchActivityRepository.Delete(dBTMBatchActivity);
                 }
-
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
                     foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
@@ -146,6 +158,19 @@ namespace Coditech.API.Service
             return base.DeleteGeneralBatch(parameterModel);
         }
 
+        public virtual GeneralBatchUserListModel GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId,int generalBatchMasterId)
+        {
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<GeneralBatchUserModel> objStoredProc = new CoditechViewRepository<GeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@CentreCode", selectedCentreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<GeneralBatchUserModel> batchList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchUserList @CentreCode,@GeneralTrainerMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
+            GeneralBatchUserListModel listModel = new GeneralBatchUserListModel();
+            listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList : new List<GeneralBatchUserModel>();
+            return listModel;
+        }      
         #endregion
     }
 }

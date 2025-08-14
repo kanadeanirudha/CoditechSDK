@@ -67,7 +67,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Pin code")]
         public string Pincode { get; set; }
         [Required]
-        [RegularExpression("([1-9][0-9]*)", ErrorMessage = "Please enter valid Mobile number")]
+        [RegularExpression("^[0-9]{10}$", ErrorMessage = "Please enter valid Mobile number")]
         [MaxLength(10)]
         [Display(Name = "Mobile Number")]
         public string MobileNumber { get; set; }

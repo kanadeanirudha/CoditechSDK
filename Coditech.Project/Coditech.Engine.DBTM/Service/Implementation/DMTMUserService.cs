@@ -72,13 +72,14 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
             long generalTrainerMasterId = 0;
 
-            if (userMasterData.UserType == UserTypeEnum.Employee.ToString() && generalPersonModel.Custom1 == CustomConstants.DBTMTrainer)
+            if (userMasterData.UserType == UserTypeEnum.Employee.ToString() && (generalPersonModel.Custom1 == CustomConstants.DBTMTrainer || generalPersonModel.Custom1 == CustomConstants.DBTMCentreOwner))
             {
                 generalTrainerMasterId = Convert.ToInt64(_generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault());
             }
 
             DBTMUserModel userModel = new DBTMUserModel()
             {
+                UserMasterId = userMasterData.UserMasterId,
                 EntityId = userMasterData.EntityId,
                 UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1,
                 EmailId = userMasterData.EmailId,

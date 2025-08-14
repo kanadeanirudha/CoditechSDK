@@ -20,7 +20,7 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-lg-9">
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     @Html.LabelFor(x => x.EmailId, new { @class = "form-label " })
                     @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
                     @Html.ValidationMessageFor(x => x.EmailId)
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="col-lg-3">
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     @Html.LabelFor(x => x.CallingCode, new { @class = "form-label" })
                     @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
            {
@@ -56,7 +56,7 @@
             <div class="col-lg-6">
                 <div class="mb-3">
                     @Html.LabelFor(x => x.MobileNumber, new { @class = "form-label" })
-                    @Html.TextBoxFor(x => x.MobileNumber, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()" })
+                @Html.TextBoxFor(x => x.MobileNumber, new { @class = "form-control", id = "MobileNumber", onkeypress = "return CoditechCommon.ValidNumeric()" })
                     @Html.ValidationMessageFor(x => x.MobileNumber)
                 </div>
             </div>
@@ -75,6 +75,40 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     </div>
 }
+<style>
+    .form-control.is-invalid {
+        background-image: none !important;
+        padding-right: 0.75rem;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .form-control.is-invalid ~ .invalid-feedback,
+    select.is-invalid ~ .invalid-feedback {
+        position: absolute;
+        bottom: -18px; /* Adjust height if needed */
+        left: 0;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* MobileNumber field  */
+    #MobileNumber.is-invalid ~ .invalid-feedback {
+        position: absolute;
+        bottom: -18px;
+        left: 0;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* Ensure mb-3 container is position-relative */
+    .mb-3 {
+        position: relative;
+    }
+
+</style>
 @Html.Partial("_ValidationScriptsPartial")
 @section scripts {
     <!-- end page content -->

@@ -1,6 +1,6 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
-    ViewBag.Title = null;
+    ViewBag.Title = "Update Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
@@ -13,7 +13,7 @@
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h4 class="card-title">Update Trainee Assignment </h4>
+                                <h4 class="card-title">Update Trainee Assignment - @Model.FirstName @Model.LastName - @Model.TestName </h4>
                             </div><!--end col-->
                         </div> <!--end row-->
                     </div>
@@ -23,6 +23,7 @@
                             @Html.HiddenFor(m => m.DBTMTraineeAssignmentId)
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @Html.HiddenFor(x => x.SelectedCentreCode)
+                            @Html.HiddenFor(x => x.DBTMTraineeAssignmentUserId)
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">

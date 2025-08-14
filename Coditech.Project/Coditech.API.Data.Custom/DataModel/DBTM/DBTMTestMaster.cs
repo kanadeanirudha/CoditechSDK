@@ -7,6 +7,7 @@ namespace Coditech.API.Data
         [Key]
         public int DBTMTestMasterId { get; set; }
         public short DBTMActivityCategoryId { get; set; }
+        public byte DBTMPerformanceMatrixId { get; set; }
         public string TestName { get; set; }
         public string TestCode { get; set; }
         public short? MinimunPairedDevice { get; set; }
