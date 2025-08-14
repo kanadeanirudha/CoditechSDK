@@ -24,17 +24,31 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeAssignmentListViewModel list = new DBTMTraineeAssignmentListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
-            if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
+
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                dataTableModel.SelectedParameter1 = JsonConvert
+                    .DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?
+                    .GeneralTrainerMasterId?.ToString() ?? "";
+
+                list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
+            }
+            else if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
             {
                 list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
+
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", list);
             }
-            return View($"~/Views/DBTM/DBTMTraineeAssignment/List.cshtml", list);
+
+            return View("~/Views/DBTM/DBTMTraineeAssignment/List.cshtml", list);
         }
 
         [HttpGet]
@@ -71,7 +85,7 @@ namespace Coditech.Admin.Controllers
                     return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId) });
                 }
             }
-            
+
             dBTMTraineeAssignmentViewModel.AllTraineeList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
             {
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
@@ -106,7 +120,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 
         }
-        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode)
+        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode, string selectedParameter1)
         {
             string message = string.Empty;
             bool status = false;
@@ -118,7 +132,7 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                     ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1 });
             }
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
