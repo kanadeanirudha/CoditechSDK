@@ -248,22 +248,44 @@ namespace Coditech.API.Service
             if (userMasterId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "UserMasterId"));
 
-            DBTMMobileDashboardModel dBTMDashboardModel = new DBTMMobileDashboardModel();
-            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.GetParameter("@UserId", userMasterId, ParameterDirection.Input, SqlDbType.BigInt);
-            DataSet dataset = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMMobileTrainerDashboard");
+            DBTMMobileDashboardModel dBTMDashboardModel = new DBTMMobileDashboardModel()
+            {
+                DateOfJoining = DateTime.Now,
+                DurationWithUs = "1 Y 3M 5 D",
+                TopAthlete = "",
+                NumberOfTrainees = 3,
+                NumberOfBatches = 3,
+                NumberOfAssignments = 3,
+                ActivityCategories = new List<DBTMMobileActivityCategoryModel>()
+            };
 
-            dataset.Tables[0].TableName = "TraineeDetails";
-            ConvertDataTableToList dataTable = new ConvertDataTableToList();
-            dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+            dBTMDashboardModel.ActivityCategories.Add(new DBTMMobileActivityCategoryModel()
+            {
+                CategoryName = "Standard Test",
+                DBTMActivityCategoryId = 1
+            });
 
-            dataset.Tables[1].TableName = "TopActivityPerformed";
-            dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
-            dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
+            dBTMDashboardModel.ActivityCategories.Add(new DBTMMobileActivityCategoryModel()
+            {
+                CategoryName = "Sport",
+                DBTMActivityCategoryId = 2
+            });
+            //DBTMMobileDashboardModel dBTMDashboardModel = new DBTMMobileDashboardModel();
+            //ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            //objStoredProc.GetParameter("@UserId", userMasterId, ParameterDirection.Input, SqlDbType.BigInt);
+            //DataSet dataset = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMMobileTrainerDashboard");
 
-            dataset.Tables[2].TableName = "DueTodayAssignments";
-            dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
-            dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
+            //dataset.Tables[0].TableName = "TraineeDetails";
+            //ConvertDataTableToList dataTable = new ConvertDataTableToList();
+            //dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+
+            //dataset.Tables[1].TableName = "TopActivityPerformed";
+            //dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
+            //dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
+
+            //dataset.Tables[2].TableName = "DueTodayAssignments";
+            //dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
+            //dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
 
             return dBTMDashboardModel;
         }

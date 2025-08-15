@@ -70,11 +70,11 @@ namespace Coditech.API.Service
                     dataset.Tables[0].TableName = "TraineeDetails";
                     ConvertDataTableToList dataTable = new ConvertDataTableToList();
                     dBTMDashboardModel = dataTable.ConvertDataTable<DBTMDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
-                   
+
                     dataset.Tables[1].TableName = "TopActivityPerformed";
                     dBTMDashboardModel.TopActivityPerformed = new List<DBTMTestModel>();
                     dBTMDashboardModel.TopActivityPerformed = dataTable.ConvertDataTable<DBTMTestModel>(dataset.Tables["TopActivityPerformed"])?.ToList();
-                   
+
                     dataset.Tables[2].TableName = "DueTodayAssignments";
                     dBTMDashboardModel.DueTodayAssignments = new List<DBTMTraineeAssignmentModel>();
                     dBTMDashboardModel.DueTodayAssignments = dataTable.ConvertDataTable<DBTMTraineeAssignmentModel>(dataset.Tables["DueTodayAssignments"])?.ToList();
@@ -90,7 +90,7 @@ namespace Coditech.API.Service
             return objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMCenterOwenerDashboard");
         }
 
-        protected virtual DataSet GetDBTMTrainerDashboardDetailsByUserId(short numberOfDaysRecord,long userId)
+        protected virtual DataSet GetDBTMTrainerDashboardDetailsByUserId(short numberOfDaysRecord, long userId)
         {
             ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.GetParameter("@UserId", userId, ParameterDirection.Input, SqlDbType.BigInt);

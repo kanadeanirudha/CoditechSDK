@@ -29,6 +29,8 @@
         public decimal Height { get; set; }
         public decimal Weight { get; set; }
         public string CentreCode { get; set; }
+        public string CentreName { get; set; }
+        public string EmployeeDesignation { get; set; }
         public long GeneralTrainerMasterId { get; set; }
     }
 }
