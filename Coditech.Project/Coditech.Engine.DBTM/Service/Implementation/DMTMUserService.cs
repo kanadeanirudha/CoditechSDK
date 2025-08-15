@@ -47,35 +47,38 @@ namespace Coditech.API.Service
             else if (!userMasterData.IsActive)
                 throw new CoditechException(ErrorCodes.ContactAdministrator, null);
 
-            long personId = 0; string centreCode = string.Empty;
+            long personId = 0; string centreCode = string.Empty; string employeeDesignation = string.Empty;
 
             if (userMasterData.UserType == UserTypeEnum.Trainee.ToString())
             {
-                var data = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode })?.FirstOrDefault();
+                var data = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode, x.SpecializationEnumId })?.FirstOrDefault();
                 if (data != null)
                 {
                     centreCode = data.CentreCode;
                     personId = data.PersonId;
+                    employeeDesignation = GetEnumDisplayTextByEnumId(Convert.ToInt32(data.SpecializationEnumId));
                 }
             }
             else if (userMasterData.UserType == UserTypeEnum.Employee.ToString())
             {
-                var data = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode })?.FirstOrDefault();
+                var data = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode, x.EmployeeDesignationMasterId })?.FirstOrDefault();
                 if (data != null)
                 {
                     personId = data.PersonId;
                     centreCode = data.CentreCode;
+                    employeeDesignation = GetEnumDisplayTextByEnumId(data.EmployeeDesignationMasterId);
                 }
             }
             GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
+
             if (IsNull(generalPersonModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
             long generalTrainerMasterId = 0;
 
+            generalPersonModel.CentreName = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.Select(x => x.CentreName)?.FirstOrDefault();
+
             if (userMasterData.UserType == UserTypeEnum.Employee.ToString() && (generalPersonModel.Custom1 == CustomConstants.DBTMTrainer || generalPersonModel.Custom1 == CustomConstants.DBTMCentreOwner))
-            {
                 generalTrainerMasterId = Convert.ToInt64(_generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault());
-            }
 
             DBTMUserModel userModel = new DBTMUserModel()
             {
@@ -93,6 +96,8 @@ namespace Coditech.API.Service
                 GeneralTrainerMasterId = generalTrainerMasterId,
                 Custom1 = generalPersonModel.Custom1,
                 CentreCode = centreCode,
+                CentreName = generalPersonModel.CentreName,
+                EmployeeDesignation = employeeDesignation,
             };
             return userModel;
         }

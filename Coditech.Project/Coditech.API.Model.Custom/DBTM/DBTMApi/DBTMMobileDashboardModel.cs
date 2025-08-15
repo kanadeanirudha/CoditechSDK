@@ -1,14 +1,19 @@
 ﻿namespace Coditech.Common.API.Model
 {
-    public class DBTMMobileDashboardModel 
+    public class DBTMMobileDashboardModel
     {
-        public DBTMMobileDashboardModel()
-        {
-        }
-        public int NumberOfTrainers { get; set; }
         public int NumberOfTrainees { get; set; }
-        public int TotalNumberOfActivityPerformedDuringWeek { get; set; }
-        public List<DBTMTestModel> TopActivityPerformed { get; set; }
-        public List<DBTMTraineeAssignmentModel> DueTodayAssignments { get; set; }
+        public int NumberOfBatches { get; set; }
+        public int NumberOfAssignments { get; set; }
+        public DateTime DateOfJoining { get; set; }
+        public string DurationWithUs { get; set; }
+        public string TopAthlete { get; set; }
+        public List<DBTMMobileActivityCategoryModel> ActivityCategories { get; set; }
+    }
+
+    public class DBTMMobileActivityCategoryModel
+    {
+        public short DBTMActivityCategoryId { get; set; }
+        public string CategoryName { get; set; }
     }
 }
