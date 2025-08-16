@@ -24,14 +24,10 @@ namespace Coditech.Admin.ViewModel
         public List<DBTMTraineeAssignmentListViewModel> DBTMTraineeAssignmentList { get; set; } = new List<DBTMTraineeAssignmentListViewModel>();
         public TimeSpentBarGraphsViewModel TimeSpentGraph { get; set; }
         public int NumberOfKitPurchase { get; set; }
-        public int WeeklyDeviceLoad { get; set; }
-        public int TotalTrainees { get; set; }
+        public int WeeklyDeviceLoad { get; set; }      
+        public int NumberOfActiveTrainees { get; set; }
+        public int NumberOfTotalTrainees { get; set; }
         public string TopAthletsName { get; set; }
-        public string EmployeeDesignation { get; set; }
-        public string TrainerSpecialization { get; set; }
-        public DateTime DateOfJoining { get; set; }
-        public string DurationWithUs { get; set; }
-        public int NumberOfBatchesCreated { get; set; }
         public TimeSpan WeeklyWorkingHours { get; set; }
         public List<DBTMYearlyTraineeOverviewModel> YearlyTraineeOverviewList { get; set; }
         public List<DBTMTrainerDetailsModel> TrainersList { get; set; }
