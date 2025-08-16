@@ -58,10 +58,6 @@ namespace Coditech.API.Service
                         {
                             trainer.PhotoMediaPath = trainer.PhotoMediaPath;
                         }
-                        else
-                        {
-                            trainer.PhotoMediaPath = GetImagePath(trainer.PhotoMediaId); 
-                        }
                     }
                 }
                 else if (dashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))

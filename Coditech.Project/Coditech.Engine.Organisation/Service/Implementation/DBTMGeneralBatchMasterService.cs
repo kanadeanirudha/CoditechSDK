@@ -84,21 +84,69 @@ namespace Coditech.API.Service
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
             if (isGeneralBatchUpdated)
             {
-                List<DBTMBatchActivity> existingActivities = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
-                foreach (DBTMBatchActivity dBTMBatchActivity in existingActivities)
-                {
-                    _dBTMBatchActivityRepository.Delete(dBTMBatchActivity);
-                }
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
-                    foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
+                    //List<DBTMBatchActivity> existingActivities = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
+                    //foreach (DBTMBatchActivity dBTMBatchActivity in existingActivities)
+                    //{
+                    //    _dBTMBatchActivityRepository.Delete(dBTMBatchActivity);
+                    //}
+
+                    //foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
+                    //{
+                    //    DBTMBatchActivity newDBTMBatchActivity = new DBTMBatchActivity
+                    //    {
+                    //        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                    //        DBTMTestMasterId = dBTMTestMasterId,
+                    //    };
+                    //    _dBTMBatchActivityRepository.Insert(newDBTMBatchActivity);
+                    //}
+                    // Get current and new test master IDs
+                    var currentIds = _dBTMBatchActivityRepository.Table
+                        .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId)
+                        .Select(x => x.DBTMTestMasterId)
+                        .ToList();
+
+                    var newIds = generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse).ToList();
+
+                    // Delete activities not in newIds
+                    var idsToDelete = currentIds.Except(newIds).ToList();
+                    foreach (var id in idsToDelete)
                     {
-                        DBTMBatchActivity newDBTMBatchActivity = new DBTMBatchActivity
+                        var activityToDelete = _dBTMBatchActivityRepository.Table
+                            .FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId && x.DBTMTestMasterId == id);
+                        if (activityToDelete != null)
+                            _dBTMBatchActivityRepository.Delete(activityToDelete);
+                    }
+
+                    // Insert activities that are new
+                    var idsToInsert = newIds.Except(currentIds).ToList();
+                    foreach (var id in idsToInsert)
+                    {
+                        var newActivity = new DBTMBatchActivity
                         {
                             GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
-                            DBTMTestMasterId = dBTMTestMasterId,
+                            DBTMTestMasterId = id,
                         };
-                        _dBTMBatchActivityRepository.Insert(newDBTMBatchActivity);
+                        _dBTMBatchActivityRepository.Insert(newActivity);
+                    }
+                }
+                if (generalBatchModel.CustomDropdownSelectedValue2 != null && generalBatchModel.CustomDropdownSelectedValue2.Any())
+                {
+                    List<GeneralBatchUser> existingUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
+                    foreach (GeneralBatchUser generalBatchUser in existingUsers)
+                    {
+                        _generalBatchUserRepository.Delete(generalBatchUser);
+                    }
+                    foreach (long traineeEntityId in generalBatchModel.CustomDropdownSelectedValue2.Select(long.Parse))
+                    {
+                        GeneralBatchUser newGeneralBatchUser = new GeneralBatchUser
+                        {
+                            GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                            EntityId = traineeEntityId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                        };
+                        _generalBatchUserRepository.Insert(newGeneralBatchUser);
                     }
                 }
             }
@@ -134,11 +182,7 @@ namespace Coditech.API.Service
 
             if (generalBatchMasterId > 0)
             {
-                GeneralBatchModel model = GetGeneralBatch(generalBatchMasterId);
-                if (IsNotNull(listModel))
-                {
-                    listModel.BatchName = model.BatchName;
-                }
+                listModel.BatchName= _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.BatchName).FirstOrDefault();
             }
             listModel.GeneralBatchMasterId = generalBatchMasterId;
             return listModel;
@@ -158,7 +202,7 @@ namespace Coditech.API.Service
             return base.DeleteGeneralBatch(parameterModel);
         }
 
-        public virtual GeneralBatchUserListModel GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId,int generalBatchMasterId)
+        public virtual GeneralBatchUserListModel GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
@@ -170,7 +214,7 @@ namespace Coditech.API.Service
             GeneralBatchUserListModel listModel = new GeneralBatchUserListModel();
             listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList : new List<GeneralBatchUserModel>();
             return listModel;
-        }      
+        }
         #endregion
     }
 }
