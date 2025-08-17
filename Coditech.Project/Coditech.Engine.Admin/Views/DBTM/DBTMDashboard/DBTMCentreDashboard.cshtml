@@ -38,7 +38,7 @@
                                     <div class="row d-flex justify-content-center">
                                         <div class="col">
                                             <p class="text-dark mb-0 fw-semibold">Peak Fast Pro</p>
-                                            <h3 class="m-0">@Model.NumberOfKitPurchase</h3>
+                                            <h3 class="m-0">@Model.NumberOfKitPurchase Kit</h3>
                                             <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                         </div>
                                         <div class="col-auto align-self-center">
@@ -57,7 +57,7 @@
                             <div class="card-body">
                                 <div class="row d-flex justify-content-center">
                                     <div class="col">
-                                        <p class="text-dark mb-0 fw-semibold">Weekly device load</p>
+                                        <p class="text-dark mb-0 fw-semibold">Weekly Device Load</p>
                                         <h3 class="m-0">@Model.WeeklyDeviceLoad %</h3>
                                         <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                     </div>
@@ -77,7 +77,7 @@
                                 <div class="card-body">
                                     <div class="row d-flex justify-content-center">
                                         <div class="col">
-                                            <p class="text-dark mb-0 fw-semibold">Number Of Trainer</p>
+                                            <p class="text-dark mb-0 fw-semibold">Trainer</p>
                                             <h3 class="m-0">@Model.NumberOfTrainers</h3>
                                             <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                         </div>
@@ -97,7 +97,7 @@
                                 <div class="card-body">
                                     <div class="row d-flex justify-content-center">
                                         <div class="col">
-                                            <p class="text-dark mb-0 fw-semibold">Number Of Trainees</p>
+                                            <p class="text-dark mb-0 fw-semibold">Trainees</p>
                                             <h3 class="m-0">@Model.NumberOfTrainees</h3>
                                             <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                         </div>
@@ -117,7 +117,7 @@
                                 <div class="card-body">
                                     <div class="row d-flex justify-content-center">
                                         <div class="col">
-                                            <p class="text-dark mb-0 fw-semibold">Total Number Of Batches</p>
+                                            <p class="text-dark mb-0 fw-semibold">Batches</p>
                                             <h3 class="m-0">@Model.NumberOfBatches</h3>
                                             <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                         </div>
@@ -156,7 +156,7 @@
             <div class="col-lg-6 h-100">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h4 class="card-title">Number of Trainees per Month</h4>
+                        <h4 class="card-title">Trainees Per Month</h4>
                     </div>
                     <div class="card-body">
                         @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", traineeTrainedviewModel)
@@ -196,11 +196,14 @@
                                 </div>
                                 <ul class="list-unstyled personal-detail mb-0 text-center">
                                     <li class="mt-2"><b>Specialization:</b> @trainer.TrainerSpecialization</li>
-                                    <li class="mt-2"><b>Date of Joining:</b> @trainer.DateOfJoining.ToCoditechDateFormat()</li>
+                                    <li class="mt-2"><b>Date Of Joining:</b> @trainer.DateOfJoining.ToCoditechDateFormat()</li>
                                     <li class="mt-2"><b>Total Duration Completed:</b> @trainer.DurationWithUs</li>
-                                    <li class="mt-2"><b>Number of Trainers Linked:</b> @trainer.NumberOfTrainees</li>
-                                    <li class="mt-2"><b>Number of Batches:</b> @trainer.NumberOfBatchesCreated</li>
+                                    <li class="mt-2"><b>Number Of Trainees Linked:</b> @trainer.NumberOfTrainees</li>
+                                    <li class="mt-2"><b>Number Of Batches:</b> @trainer.NumberOfBatchesCreated</li>
                                     <li class="mt-2"><b>Weekly Working Hrs:</b> @trainer.WeeklyWorkingHours</li>
+                                   @*  <div class="text-center mt-3">
+                                        <a href="#" class="btn btn-sm btn-soft-primary">More Detail</a>
+                                    </div> *@
                                 </ul>
                             </div>
                         </div>
