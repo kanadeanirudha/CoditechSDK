@@ -1,5 +1,4 @@
 ﻿using Coditech.API.Data;
-using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -35,28 +34,35 @@ namespace Coditech.API.Service
         {
             if (IsNull(generalBatchModel.CustomDropdownSelectedValue2))
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected User cannot be null.");
+
             generalBatchModel = base.CreateGeneralBatch(generalBatchModel);
             if (generalBatchModel.GeneralBatchMasterId > 0 && generalBatchModel.CustomDropdownSelectedValue1?.Count > 0 && generalBatchModel.CustomDropdownSelectedValue2?.Count > 0)
             {
+                List<DBTMBatchActivity> activityList = new List<DBTMBatchActivity>();
                 foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
                 {
-                    DBTMBatchActivity dBTMBatchActivity = new DBTMBatchActivity
+                    activityList.Add(new DBTMBatchActivity
                     {
                         GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
                         DBTMTestMasterId = dBTMTestMasterId,
-                    };
-                    _dBTMBatchActivityRepository.Insert(dBTMBatchActivity);
+                    });
                 }
+                _dBTMBatchActivityRepository.Insert(activityList);
+
+                int activityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus");
+
+                List<GeneralBatchUser> userList = new List<GeneralBatchUser>();
                 foreach (long traineeEntityId in generalBatchModel.CustomDropdownSelectedValue2.Select(long.Parse))
                 {
-                    GeneralBatchUser generalBatchUser = new GeneralBatchUser
+                    userList.Add(new GeneralBatchUser
                     {
                         GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                        ActivityStatusEnumId = activityStatusEnumId,
                         EntityId = traineeEntityId,
                         UserType = UserTypeEnum.Trainee.ToString(),
-                    };
-                    _generalBatchUserRepository.Insert(generalBatchUser);
+                    });
                 }
+                _generalBatchUserRepository.Insert(userList);
             }
             else
             {
@@ -86,21 +92,6 @@ namespace Coditech.API.Service
             {
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
-                    //List<DBTMBatchActivity> existingActivities = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
-                    //foreach (DBTMBatchActivity dBTMBatchActivity in existingActivities)
-                    //{
-                    //    _dBTMBatchActivityRepository.Delete(dBTMBatchActivity);
-                    //}
-
-                    //foreach (int dBTMTestMasterId in generalBatchModel.CustomDropdownSelectedValue1.Select(int.Parse))
-                    //{
-                    //    DBTMBatchActivity newDBTMBatchActivity = new DBTMBatchActivity
-                    //    {
-                    //        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
-                    //        DBTMTestMasterId = dBTMTestMasterId,
-                    //    };
-                    //    _dBTMBatchActivityRepository.Insert(newDBTMBatchActivity);
-                    //}
                     // Get current and new test master IDs
                     var currentIds = _dBTMBatchActivityRepository.Table
                         .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId)
@@ -111,43 +102,64 @@ namespace Coditech.API.Service
 
                     // Delete activities not in newIds
                     var idsToDelete = currentIds.Except(newIds).ToList();
-                    foreach (var id in idsToDelete)
-                    {
-                        var activityToDelete = _dBTMBatchActivityRepository.Table
-                            .FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId && x.DBTMTestMasterId == id);
-                        if (activityToDelete != null)
-                            _dBTMBatchActivityRepository.Delete(activityToDelete);
-                    }
+
+                    var activityToDelete = _dBTMBatchActivityRepository.Table
+                            .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId && idsToDelete.Contains(x.DBTMTestMasterId));
+
+                    if (activityToDelete != null)
+                        _dBTMBatchActivityRepository.Delete(activityToDelete);
 
                     // Insert activities that are new
                     var idsToInsert = newIds.Except(currentIds).ToList();
-                    foreach (var id in idsToInsert)
+
+                    if (idsToInsert?.Count > 0)
                     {
-                        var newActivity = new DBTMBatchActivity
+                        List<DBTMBatchActivity> activityList = new List<DBTMBatchActivity>();
+                        foreach (int dBTMTestMasterId in idsToInsert)
                         {
-                            GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
-                            DBTMTestMasterId = id,
-                        };
-                        _dBTMBatchActivityRepository.Insert(newActivity);
+                            activityList.Add(new DBTMBatchActivity
+                            {
+                                GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                                DBTMTestMasterId = dBTMTestMasterId,
+                            });
+                        }
+                        _dBTMBatchActivityRepository.Insert(activityList);
                     }
                 }
                 if (generalBatchModel.CustomDropdownSelectedValue2 != null && generalBatchModel.CustomDropdownSelectedValue2.Any())
                 {
-                    List<GeneralBatchUser> existingUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId).ToList();
-                    foreach (GeneralBatchUser generalBatchUser in existingUsers)
+                    // Get current and new trainee entity IDs
+                    var currentUserIds = _generalBatchUserRepository.Table
+                        .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId)
+                        .Select(x => x.EntityId)
+                        .ToList();
+
+                    var newUserIds = generalBatchModel.CustomDropdownSelectedValue2.Select(long.Parse).ToList();
+
+                    // Delete users not in new selection
+                    var idsToDelete = currentUserIds.Except(newUserIds).ToList();
+                    var userToDelete = _generalBatchUserRepository.Table
+                          .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId && idsToDelete.Contains(x.EntityId));
+                    if (userToDelete != null)
+                        _generalBatchUserRepository.Delete(userToDelete);
+
+                    // Insert users that are new
+                    var idsToInsert = newUserIds.Except(currentUserIds).ToList();
+                    List<GeneralBatchUser> userList = new List<GeneralBatchUser>();
+                    int activityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus");
+
+                    foreach (var id in idsToInsert)
                     {
-                        _generalBatchUserRepository.Delete(generalBatchUser);
-                    }
-                    foreach (long traineeEntityId in generalBatchModel.CustomDropdownSelectedValue2.Select(long.Parse))
-                    {
-                        GeneralBatchUser newGeneralBatchUser = new GeneralBatchUser
+                        userList.Add(new GeneralBatchUser
                         {
                             GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
-                            EntityId = traineeEntityId,
+                            EntityId = id,
+                            ActivityStatusEnumId = activityStatusEnumId,
                             UserType = UserTypeEnum.Trainee.ToString(),
-                        };
-                        _generalBatchUserRepository.Insert(newGeneralBatchUser);
+                        });
                     }
+                    if (userList?.Count > 0)
+                        _generalBatchUserRepository.Insert(userList);
                 }
             }
             return isGeneralBatchUpdated;
@@ -182,7 +194,7 @@ namespace Coditech.API.Service
 
             if (generalBatchMasterId > 0)
             {
-                listModel.BatchName= _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.BatchName).FirstOrDefault();
+                listModel.BatchName = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.BatchName).FirstOrDefault();
             }
             listModel.GeneralBatchMasterId = generalBatchMasterId;
             return listModel;
