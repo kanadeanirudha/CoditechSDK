@@ -1,82 +1,105 @@
 ﻿@model OrganisationCentrewiseJoiningCodeListViewModel
 @{
-	ViewBag.Title = "Organisation Centrewise Joining Code List";
-	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-	string actionName = ViewContext.RouteData.Values["action"].ToString();
-	DropdownViewModel centreDropdown = new DropdownViewModel()
-	{
-		DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
-		DropdownName = "SelectedCentreCode",
-		DropdownSelectedValue = Model.SelectedCentreCode,
-		ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + controllerName + "','" + actionName + "')"
-	};
+    ViewBag.Title = "Organisation Centrewise Joining Code List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel centreDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
+                DropdownName = "SelectedCentreCode",
+                DropdownSelectedValue = Model.SelectedCentreCode,
+                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+            };
+
+    DropdownViewModel joiningCodeType = new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
+                DropdownName = "JoiningCodeTypeEnumId",
+                DropdownSelectedValue = string.IsNullOrEmpty(Model.JoiningCodeTypeEnumId.ToString())
+                || Model.JoiningCodeTypeEnumId == 0
+                ? "0" // All
+                : Model.JoiningCodeTypeEnumId.ToString(),
+                GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
+                SelectedText = "All",
+                SelectedValue = "0",
+                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+            };
+
 }
 <div class="page-content mt-5">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-12">
-				<div class="card">
-					<div class="card-header">
-						<span class="card-title">Joining Code List</span>
-						<a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
-							<i class="fas fa-plus me-2"></i>Create Joining Code
-						</a>
-					</div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Joining Code List</span>
+                        <a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
+                            <i class="fas fa-plus me-2"></i>Create Joining Code
+                        </a>
+                    </div>
 
-					<div class="card-header">
-						<div class="row">
-							<div class="col-md-1">
-								<label>@AdminResources.LabelCentre</label>
-							</div>
-							<div class="col-md-4">
-								@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-							</div>
-							<div class="col-md-1">
-								<input type="button" class="btn btn-success" value="Show" id="ShowDataId"
-									   onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
-							</div>
-							<div class="col-md-6 ">
-								<label class="fw-bold">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label>Joining Code Type</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", joiningCodeType)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId"
+                                       onclick="OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()" />
+                            </div>
+                            <div class="col-md-5">
+                                <label class="fw-bold">
 
-									Total Joining Code:  <span class="badge badge-soft-primary me-2 "><span id="TotalCodeCount"></span> </span>
+                                    Total Joining Code:  <span class="badge badge-soft-primary me-2 "><span id="TotalCodeCount"></span> </span>
 
-									Total Active Joining Code: <span class="badge badge-soft-success me-2"> <span id="ActiveCodeCount"></span> </span>
+                                    Total Active Joining Code: <span class="badge badge-soft-success me-2"> <span id="ActiveCodeCount"></span> </span>
 
-									Total Used Joining Code: <span class="badge badge-soft-danger"> <span id="ExpiredCodeCount"></span> </span>
-								</label>
-							</div>
-						</div>
-					</div>
+                                    Total Used Joining Code: <span class="badge badge-soft-danger"> <span id="ExpiredCodeCount"></span> </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-					<div class="card-body">
-						<div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-							@Html.Partial("~/Views/Organisation/OrganisationCentrewiseJoiningCode/_List.cshtml", Model)
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/Organisation/OrganisationCentrewiseJoiningCode/_List.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- jQuery CDN (if not already loaded) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/js/coditech/Organisation/OrganisationCentrewiseJoiningCode.js"></script>
 
 <script>
-	$(document).ready(function () {
-		const checkCounts = setInterval(function () {
-		const $active = $('#AjaxActiveCodeCount');
-		const $expired = $('#AjaxExpiredCodeCount');
-		const $total = $('#AjaxTotalJoiningCodeCount');
-		if ($active.length && $expired.length && $total.length &&
-			$active.text().trim() !== '' && $expired.text().trim() !== '' && $total.text().trim() !== '') {
-			const active = parseInt($active.text()) || 0;
-			const expired = parseInt($expired.text()) || 0;
-			const total = parseInt($total.text()) || 0;
-			$('#ActiveCodeCount').text(active);
-			$('#ExpiredCodeCount').text(expired);
-			$('#TotalCodeCount').text(total);
-			clearInterval(checkCounts); 
-		}
-	}, 300);
-	});
+    $(document).ready(function () {
+        const checkCounts = setInterval(function () {
+            const $active = $('#AjaxActiveCodeCount');
+            const $expired = $('#AjaxExpiredCodeCount');
+            const $total = $('#AjaxTotalJoiningCodeCount');
+            if ($active.length && $expired.length && $total.length &&
+                $active.text().trim() !== '' && $expired.text().trim() !== '' && $total.text().trim() !== '') {
+                const active = parseInt($active.text()) || 0;
+                const expired = parseInt($expired.text()) || 0;
+                const total = parseInt($total.text()) || 0;
+                $('#ActiveCodeCount').text(active);
+                $('#ExpiredCodeCount').text(expired);
+                $('#TotalCodeCount').text(total);
+                clearInterval(checkCounts);
+            }
+        }, 300);
+    });
+
 </script>
