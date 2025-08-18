@@ -4,6 +4,8 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode };
+    DropdownViewModel joiningCodeType = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "OrganisationCentrewiseJoiningCodeType", DropdownSelectedValue = Model.JoiningCodeType };
+
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -32,6 +34,17 @@
                                         @Html.ValidationMessageFor(x => x.CentreCode)
                                     </div>
                                 </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.JoiningCodeType, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                        {
+                                            DropdownSelectedValue = Model.JoiningCodeTypeEnumId.ToString(),
+                                            DropdownName = "JoiningCodeTypeEnumId",
+                                             GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString()
+                                         })        @Html.ValidationMessageFor(x => x.JoiningCodeTypeEnumId)
+                                    </div>
+                                </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.Quantity, new { @class = "form-label required" })
@@ -39,7 +52,7 @@
                                         @Html.ValidationMessageFor(x => x.Quantity)
                                     </div>
                                 </div>
-                            </div>
+                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }

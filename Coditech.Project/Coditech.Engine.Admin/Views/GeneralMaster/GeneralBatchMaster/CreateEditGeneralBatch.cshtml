@@ -182,35 +182,37 @@
         }
         $(document).ready(function () {
             // Start Date Datepicker
-            $("#BatchStartDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                minDate: new Date(2025, 0, 1),
-                maxDate: new Date(2035, 11, 31),
-                onSelect: function () {
-                    updateExpiryDate();
-                }
-            });
+           $("#BatchStartDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+            language: "en",
+            autoSize: true,
+            minDate: 0,
+            maxDate: new Date(2035, 11, 31),
+            onSelect: function (dateText) {
+                var startDate = $(this).datepicker("getDate");
+                $("#BatchExpireDate").datepicker("option", "minDate", startDate);
+                updateExpiryDate();
+            }
+        });
 
-            var startVal = $("#BatchStartDate").val();
+        var startVal = $("#BatchStartDate").val();
             if (startVal) {
                 $("#BatchStartDate").datepicker("setDate", startVal);
             }
-            // Expiry Date Datepicker
-            $("#BatchExpireDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                yearRange: "2022:2035",
-                minDate: new Date(2025, 0, 1),
-                maxDate: new Date(2035, 11, 31)
-            });
-            updateExpiryDate(); 
+             // Expiry Date Datepicker
+             $("#BatchExpireDate").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                    language: "en",
+                    autoSize: true,
+                    yearRange: "2025:2035",
+                    minDate: 0,
+                    maxDate: new Date(2035, 11, 31)
+             });
+             updateExpiryDate();
         });
 
         $('form').submit(function (e) {
@@ -236,6 +238,19 @@
                                     e.preventDefault();
                            }
                     }
-            });
+                var startDate = $("#BatchStartDate").datepicker("getDate");
+                var expiryDate = $("#BatchExpireDate").datepicker("getDate");
+
+                if (startDate && expiryDate && expiryDate < startDate) {
+                    var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
+                        validationSpan.text("Expiry Date cannot be before Start Date.");
+                        validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+                        e.preventDefault();
+                } else {
+                            var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
+                                validationSpan.text("");
+                                validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
+                        }
+             });
     </script>
 }
