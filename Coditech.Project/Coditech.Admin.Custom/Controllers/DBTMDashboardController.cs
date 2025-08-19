@@ -45,8 +45,10 @@ namespace Coditech.Admin.Controllers
                     DataTableViewModel dataTableModel = new DataTableViewModel();
                     DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetDBTMDashboardDetails(numberOfDaysRecord);
                     UserProfileViewModel userProfileViewModel = _userAgent.GetUserProfile();
+                    DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
                     GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
-                    TempData.Keep();
+                    dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
+                    dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
                     dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
                     dBTMDashboardViewModel.GeneralBatchList.Add(list);
                     if (IsNotNull(userProfileViewModel))
@@ -65,7 +67,6 @@ namespace Coditech.Admin.Controllers
 
             GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
             DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
-            //DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] as DBTMDashboardViewModel ?? new DBTMDashboardViewModel();
             TempData.Keep();
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
 
@@ -75,30 +76,19 @@ namespace Coditech.Admin.Controllers
             TempData.Keep("DBTMModel");
             return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
         }
-
         [HttpPost]
         public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel)
         {
-            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-            DBTMTraineeAssignmentListViewModel list = new DBTMTraineeAssignmentListViewModel();
-            GetListOnlyIfSingleCentre(dataTableModel);
-            if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
-            {
-                list = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
-            }
-            list.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : string.Empty;
-            list.Custom5 = "Mobile View";
-            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
-            list.SelectedParameter1 = dataTableModel.SelectedParameter1;
-            DBTMDashboardViewModel dashboardModel = TempData["DBTMModel"] as DBTMDashboardViewModel ?? new DBTMDashboardViewModel();
+            DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
+            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
             TempData.Keep();
-            dashboardModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
-            dashboardModel.DBTMTraineeAssignmentList.Add(list);
-            TempData["DBTMModel"] = dashboardModel;
-            TempData.Keep();
-            return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", list);
+            TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
+            dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
+            dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
+            TempData.Keep("DBTMModel");
+            return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
         }
-
+        [HttpGet]
         private GeneralBatchListViewModel GetBatchListData(DataTableViewModel dataTableModel)
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
@@ -112,14 +102,22 @@ namespace Coditech.Admin.Controllers
             return list;
         }
 
-
-        //public virtual ActionResult LoadAssignmentPartial()
-        //{
-        //    //var model = GetProfileModel(); // fetch data
-        //    //return PartialView("_ProfilePartialView", model);
-        //    return null;
-        //}
-
+        public virtual DBTMTraineeAssignmentListViewModel GetAssignmentListData(DataTableViewModel dataTableModel)
+        {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            GetListOnlyIfSingleCentre(dataTableModel);
+            dataTableModel.SelectedParameter1 = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "";
+            DBTMTraineeAssignmentListViewModel assignmentList = new DBTMTraineeAssignmentListViewModel();
+            if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
+            {
+                assignmentList = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
+            }
+            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : string.Empty;
+            assignmentList.Custom5 = "Mobile View";
+            assignmentList.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+            assignmentList.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            return assignmentList;
+        }
         public ActionResult Index()
         {
             // Info.  

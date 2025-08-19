@@ -20,25 +20,6 @@
                         <span class="card-title">Trainee Assignment List</span>
                         <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
                     </div>
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-md-1">
-                                <label>@AdminResources.LabelCentre</label>
-                            </div>
-                            <div class="col-md-4">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                            </div>
-                            <div class="col-md-1">
-                                <label>Trainer</label>
-                            </div>
-                            <div class="col-md-3">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
-                            </div>
-                            <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('@controllerName','@actionName')" />
-                            </div>
-                        </div>
-                    </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
                             @Html.Partial("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", Model)
