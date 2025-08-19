@@ -480,3 +480,21 @@ a.dashboard-menu-list span {
 .card-header {
     padding: .35rem 1rem !important;
 }
+
+.tooltip-square.bs-tooltip-top .tooltip-arrow::before,
+.tooltip-square.bs-tooltip-bottom .tooltip-arrow::before {
+    border-width: 6px;
+}
+
+.tooltip-square .tooltip-inner {
+    max-width: 220px;
+    white-space: pre-wrap;
+    text-align: left;
+    border-radius: 6px;
+    background-color: #2c2c2c; /* dark gray */
+    color: #fff; /* white text */
+    padding: 10px 14px;
+    font-size: 13px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    border: 1px solid #444;
+}

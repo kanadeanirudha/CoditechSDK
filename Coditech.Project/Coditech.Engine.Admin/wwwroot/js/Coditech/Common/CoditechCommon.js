@@ -159,7 +159,7 @@
             cache: false,
             type: "GET",
             dataType: "html",
-            url: "/GeneralCommon/GetTermsAndCondition",
+            url: "/DBTMCommonCustom/GetTermsAndCondition",
             contentType: "application/json; charset=utf-8",
             success: function (result) {
                 // Populate the modal content with the fetched data

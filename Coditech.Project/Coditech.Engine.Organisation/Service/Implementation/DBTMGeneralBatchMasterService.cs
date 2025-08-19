@@ -34,7 +34,11 @@ namespace Coditech.API.Service
         {
             if (IsNull(generalBatchModel.CustomDropdownSelectedValue2))
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected User cannot be null.");
-
+            //ToDo Anirudha sir
+            if (generalBatchModel.BatchExpireDate == null)
+            {
+                generalBatchModel.BatchExpireDate = generalBatchModel.BatchStartDate.AddYears(1);
+            }
             generalBatchModel = base.CreateGeneralBatch(generalBatchModel);
             if (generalBatchModel.GeneralBatchMasterId > 0 && generalBatchModel.CustomDropdownSelectedValue1?.Count > 0 && generalBatchModel.CustomDropdownSelectedValue2?.Count > 0)
             {
