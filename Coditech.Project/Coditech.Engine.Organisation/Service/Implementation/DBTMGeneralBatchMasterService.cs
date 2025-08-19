@@ -91,6 +91,11 @@ namespace Coditech.API.Service
         //Update GeneralBatchMaster.
         public override bool UpdateGeneralBatch(GeneralBatchModel generalBatchModel)
         {
+            //ToDo Anirudha sir
+            if (generalBatchModel.BatchExpireDate == null)
+            {
+                generalBatchModel.BatchExpireDate = generalBatchModel.BatchStartDate.AddYears(1);
+            }
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
             if (isGeneralBatchUpdated)
             {
