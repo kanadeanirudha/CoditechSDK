@@ -5,11 +5,13 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = "";
 }
-
-<div class="row">
-    @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
-    @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
-</div>
+@if (string.IsNullOrEmpty(Model.Custom5))
+{
+    <div class="row">
+        @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
+        @Html.Partial("~/Views/Shared/Datatable/_DatatableSearchData.cshtml", Model.PageListViewModel.SearchBy)
+    </div>
+}
 
 <div class="row">
     <div class="col-sm-12 table-responsive">
