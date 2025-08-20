@@ -21,6 +21,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
         protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        private readonly ICoditechRepository<EmployeeDesignationMaster> _employeeDesignationMasterRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -32,6 +33,7 @@ namespace Coditech.API.Service
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _employeeDesignationMasterRepository = new CoditechRepository<EmployeeDesignationMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public virtual DBTMUserModel Login(UserLoginModel userLoginModel)
@@ -47,35 +49,38 @@ namespace Coditech.API.Service
             else if (!userMasterData.IsActive)
                 throw new CoditechException(ErrorCodes.ContactAdministrator, null);
 
-            long personId = 0; string centreCode = string.Empty;
+            long personId = 0; string centreCode = string.Empty; string employeeDesignation = string.Empty;
 
             if (userMasterData.UserType == UserTypeEnum.Trainee.ToString())
             {
-                var data = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode })?.FirstOrDefault();
+                var data = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode, x.SpecializationEnumId })?.FirstOrDefault();
                 if (data != null)
                 {
                     centreCode = data.CentreCode;
                     personId = data.PersonId;
+                    employeeDesignation = GetEnumDisplayTextByEnumId(Convert.ToInt32(data.SpecializationEnumId));
                 }
             }
             else if (userMasterData.UserType == UserTypeEnum.Employee.ToString())
             {
-                var data = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode })?.FirstOrDefault();
+                var data = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode, x.EmployeeDesignationMasterId })?.FirstOrDefault();
                 if (data != null)
                 {
                     personId = data.PersonId;
                     centreCode = data.CentreCode;
+                    employeeDesignation = _employeeDesignationMasterRepository.Table.Where(x=>x.EmployeeDesignationMasterId ==data.EmployeeDesignationMasterId)?.Select(x=>x.Description)?.FirstOrDefault();
                 }
             }
             GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
+
             if (IsNull(generalPersonModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
             long generalTrainerMasterId = 0;
 
+            generalPersonModel.CentreName = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.Select(x => x.CentreName)?.FirstOrDefault();
+
             if (userMasterData.UserType == UserTypeEnum.Employee.ToString() && (generalPersonModel.Custom1 == CustomConstants.DBTMTrainer || generalPersonModel.Custom1 == CustomConstants.DBTMCentreOwner))
-            {
                 generalTrainerMasterId = Convert.ToInt64(_generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault());
-            }
 
             DBTMUserModel userModel = new DBTMUserModel()
             {
@@ -93,6 +98,8 @@ namespace Coditech.API.Service
                 GeneralTrainerMasterId = generalTrainerMasterId,
                 Custom1 = generalPersonModel.Custom1,
                 CentreCode = centreCode,
+                CentreName = generalPersonModel.CentreName,
+                EmployeeDesignation = employeeDesignation,
             };
             return userModel;
         }

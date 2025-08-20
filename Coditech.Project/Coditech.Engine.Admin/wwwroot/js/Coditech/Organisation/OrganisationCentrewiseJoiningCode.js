@@ -107,5 +107,46 @@
         });
 
     },
+    JoiningCodeListByCentreCodeList: function () {
+        var selectedCentreCode = $("#SelectedCentreCode").val();
+        var selectedParameter1 = $("#JoiningCodeTypeEnumId").val();
+        if (selectedCentreCode !== "" && selectedParameter1 !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/OrganisationCentrewiseJoiningCode/List",
+                data: {
+                    "selectedCentreCode": selectedCentreCode,
+                    "selectedParameter1": selectedParameter1
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DataTablesDivId").html("").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Joining Code list.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select Centre and Joining Code Type.", "error");
+        }
+    },
 
-};
+    GetOrganisationCentrewiseJoiningCodeListByCentreCode: function (listType) {
+        $('#DataTables_SearchById').val("");
+        var selectedCentreCode = $("#SelectedCentreCode").val();
+        var selectedParameter1 = $("#JoiningCodeTypeEnumId").val();
+        if (listType === "General") {
+            CoditechDataTable.LoadList("OrganisationCentrewiseJoiningCode", "JoiningCodeListByCentreCodeList");
+        } else {
+            CoditechDataTable.LoadList("OrganisationCentrewiseJoiningCode", "List");
+        }
+    },
+}

@@ -12,7 +12,8 @@
     keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
 
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.GeneralBatchMasterId > 0 };
-    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring" } };
+
+    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring", "Weekly" } };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -61,7 +62,7 @@
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.BatchName, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.BatchName, new { @class = "form-control" })
+                                        @Html.TextBoxFor(x => x.BatchName, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowAlphabetWithSpacingAndNumbers()" })
                                         @Html.ValidationMessageFor(x => x.BatchName)
                                     </div>
                                 </div>
@@ -72,7 +73,7 @@
                                         @Html.ValidationMessageFor(x => x.BatchFrequency)
                                     </div>
                                 </div>
-                                <div class="row">
+                                @* <div class="row">                              
                                     <div class="col-lg-12" id="weeklyDiv">
                                         <div class="mb-3 multiselect-dropdown">
                                             @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
@@ -80,7 +81,7 @@
                                             @Html.ValidationMessageFor(x => x.SelectedWeekDays)
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
                                 <div class="col-lg-2">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.BatchStartDate, new { @class = "form-label required" })
@@ -90,15 +91,22 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="mb-3">
+                                        @Html.LabelFor(x => x.BatchExpireDate, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.BatchExpireDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.BatchExpireDate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
                                         @Html.LabelFor(x => x.BatchStartTime, new { @class = "form-label required" })
                                         @Html.TextBoxFor(x => x.BatchStartTime, new { @class = "form-control", type = "time" })
                                         @Html.ValidationMessageFor(x => x.BatchStartTime)
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-2">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.Duration, new { @class = "form-label required" })
-                                        <div class="d-flex gap-2">
+                                        <div class="d-flex gap-3">
                                             @Html.DropDownListFor(x => x.DurationHours,
                                                      new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
                                                      "Value", "Text"),
@@ -121,8 +129,7 @@
                                             @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-12">
+                                </div>     <div class="col-lg-12">
                                     <div class="mb-3 multiselect-dropdown">
                                         <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
                                         @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
@@ -153,6 +160,8 @@
     </div>
 </div>
 @section scripts {
+    <script src="~/js/coditech/Common/CoditechCommon.js"></script>
+
     <script type="text/javascript">
         function updateExpiryDate() {
             var selectedFrequency = $("#BatchFrequency").val();
@@ -165,29 +174,50 @@
             if (selectedFrequency === "OneTime" && startDate) {
                 $("#BatchExpireDate").datepicker("setDate", startDate);
                 $("#BatchExpireDate").prop("readonly", true);
+                $("#BatchExpireDate").datepicker("option", "beforeShow", function () { return false; });
             } else {
                 $("#BatchExpireDate").prop("readonly", false);
+                $("#BatchExpireDate").datepicker("option", "beforeShow", null);
             }
         }
         $(document).ready(function () {
-            updateExpiryDate();
-            $("#BatchFrequency").change(function () {
-                updateExpiryDate();
-            });
             // Start Date Datepicker
-            $("#BatchStartDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                language: "en",
-                autoSize: true,
-                minDate: new Date(),
-                maxDate: new Date(2035, 11, 31),
-            });
-            $('form').submit(function (e) {
-                var hours = $('#DurationHours').val();
-                var minutes = $('#DurationMinutes').val();
+           $("#BatchStartDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+            language: "en",
+            autoSize: true,
+            minDate: 0,
+            maxDate: new Date(2035, 11, 31),
+            onSelect: function (dateText) {
+                var startDate = $(this).datepicker("getDate");
+                $("#BatchExpireDate").datepicker("option", "minDate", startDate);
+                updateExpiryDate();
+            }
+        });
 
+        var startVal = $("#BatchStartDate").val();
+            if (startVal) {
+                $("#BatchStartDate").datepicker("setDate", startVal);
+            }
+             // Expiry Date Datepicker
+             $("#BatchExpireDate").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                    language: "en",
+                    autoSize: true,
+                    yearRange: "2025:2035",
+                    minDate: 0,
+                    maxDate: new Date(2035, 11, 31)
+             });
+             updateExpiryDate();
+        });
+
+        $('form').submit(function (e) {
+            var hours = $('#DurationHours').val();
+            var minutes = $('#DurationMinutes').val();
                 if (hours === "00" && minutes === "00") {
                     var validationSpan = $('[data-valmsg-for="Duration"]');
                     validationSpan.text("Duration cannot be 00 Hours and 00 Minutes.");
@@ -199,16 +229,28 @@
                     validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
                 }
                 var frequency = $("#BatchFrequency").val();
-                if (frequency === "Weekly") {
-                    var selectedWeekDays = $("#SelectedWeekDays option:selected").length;
-                    if (selectedWeekDays === 0) {
-                        var validationSpan = $('[data-valmsg-for="SelectedWeekDays"]');
-                        validationSpan.text("Please select at least one Week Day.");
+                    if (frequency === "Weekly") {
+                        var selectedWeekDays = $("#SelectedWeekDays option:selected").length;
+                            if (selectedWeekDays === 0) {
+                                var validationSpan = $('[data-valmsg-for="SelectedWeekDays"]');
+                                    validationSpan.text("Please select at least one Week Day.");
+                                    validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+                                    e.preventDefault();
+                           }
+                    }
+                var startDate = $("#BatchStartDate").datepicker("getDate");
+                var expiryDate = $("#BatchExpireDate").datepicker("getDate");
+
+                if (startDate && expiryDate && expiryDate < startDate) {
+                    var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
+                        validationSpan.text("Expiry Date cannot be before Start Date.");
                         validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
                         e.preventDefault();
-                    }
-                }
-            });
-        });
+                } else {
+                            var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
+                                validationSpan.text("");
+                                validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
+                        }
+             });
     </script>
 }

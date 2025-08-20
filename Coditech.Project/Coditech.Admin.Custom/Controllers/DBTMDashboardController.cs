@@ -46,7 +46,8 @@ namespace Coditech.Admin.Controllers
                     UserProfileViewModel userProfileViewModel = _userAgent.GetUserProfile();
                     DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
                     GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
-                    TempData.Keep();
+                    dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
+                    dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
                     dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
                     dBTMDashboardViewModel.GeneralBatchList.Add(list);
                     dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
@@ -76,7 +77,6 @@ namespace Coditech.Admin.Controllers
             TempData.Keep("DBTMModel");
             return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
         }
-
         [HttpPost]
         public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel)
         {
@@ -89,7 +89,7 @@ namespace Coditech.Admin.Controllers
             TempData.Keep("DBTMModel");
             return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
         }
-
+        [HttpGet]
         private GeneralBatchListViewModel GetBatchListData(DataTableViewModel dataTableModel)
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
@@ -102,7 +102,6 @@ namespace Coditech.Admin.Controllers
             list.Custom5 = "Mobile View";
             return list;
         }
-
 
         public virtual DBTMTraineeAssignmentListViewModel GetAssignmentListData(DataTableViewModel dataTableModel)
         {
@@ -120,7 +119,6 @@ namespace Coditech.Admin.Controllers
             assignmentList.SelectedParameter1 = dataTableModel.SelectedParameter1;
             return assignmentList;
         }
-
         public ActionResult Index()
         {
             // Info.  
