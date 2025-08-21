@@ -44,14 +44,6 @@ namespace Coditech.Admin.Controllers
                     DataTableViewModel dataTableModel = new DataTableViewModel();
                     DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetDBTMDashboardDetails(numberOfDaysRecord);
                     UserProfileViewModel userProfileViewModel = _userAgent.GetUserProfile();
-                    DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
-                    GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
-                    dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
-                    dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
-                    dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
-                    dBTMDashboardViewModel.GeneralBatchList.Add(list);
-                    dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
-                    dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
                     if (IsNotNull(userProfileViewModel))
                     {
                         dBTMDashboardViewModel.UserProfileModel = new List<UserProfileViewModel>();
@@ -62,33 +54,55 @@ namespace Coditech.Admin.Controllers
             }
             return View("~/Views/Dashboard/GeneralDashboard.cshtml");
         }
-        [HttpPost]
+        [HttpGet, HttpPost]
         public ActionResult LoadBatchesPartial(DataTableViewModel dataTableModel)
         {
+            // If no model came from GET, create a default one
+            if (dataTableModel == null)
+            {
+                dataTableModel = new DataTableViewModel();
+            }
 
             GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
-            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
-            TempData.Keep();
+
+            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null
+                ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString())
+                : new DBTMDashboardViewModel();
+
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
 
             dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
             dBTMDashboardViewModel.GeneralBatchList.Add(list);
 
             TempData.Keep("DBTMModel");
+
             return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
         }
-        [HttpPost]
+
+        [HttpGet, HttpPost]
         public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel)
         {
+            if (dataTableModel == null)
+            {
+                dataTableModel = new DataTableViewModel();
+            }
+
             DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
-            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
-            TempData.Keep();
+
+            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null
+                ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString())
+                : new DBTMDashboardViewModel();
+
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
+
             dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
             dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
+
             TempData.Keep("DBTMModel");
+
             return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
         }
+
         [HttpGet]
         private GeneralBatchListViewModel GetBatchListData(DataTableViewModel dataTableModel)
         {
@@ -103,6 +117,7 @@ namespace Coditech.Admin.Controllers
             return list;
         }
 
+        [HttpGet]
         public virtual DBTMTraineeAssignmentListViewModel GetAssignmentListData(DataTableViewModel dataTableModel)
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);

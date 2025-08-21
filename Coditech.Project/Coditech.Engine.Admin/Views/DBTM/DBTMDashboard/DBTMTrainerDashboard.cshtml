@@ -254,11 +254,7 @@
                             data-bs-toggle="tab"
                             data-bs-target="#batchesPane"
                             type="button"
-                            role="tab"
-                            aria-controls="batchesPane"
-                            aria-selected="true"
-                            data-method="LoadBatchesPartial"
-                            data-method-type="GET">
+                            role="tab">
                         Batches
                     </button>
                 </li>
@@ -268,16 +264,41 @@
                             data-bs-toggle="tab"
                             data-bs-target="#assignmentPane"
                             type="button"
-                            role="tab"
-                            aria-controls="assignmentPane"
-                            aria-selected="false"
-                            data-method="LoadAssignmentPartial"
-                            data-method-type="POST">
+                            role="tab">
                         Assignment
                     </button>
                 </li>
             </ul>
 
+            <div class="tab-content p-3" id="myTabContent">
+                <div class="tab-pane fade show active" id="batchesPane" role="tabpanel">
+                    <iframe src="/DBTMDashboard/LoadBatchesPartial"
+                            width="100%" height="500" frameborder="0"></iframe>
+                </div>
+                <div class="tab-pane fade" id="assignmentPane" role="tabpanel">
+                    <iframe src="/DBTMDashboard/LoadAssignmentPartial"
+                            width="100%" height="500" frameborder="0"></iframe>
+                </div>
+            </div>
+            @* <div class="tab-content p-3" id="myTabContent">
+                <!-- Batch Tab -->
+                <div class="tab-pane fade show active" id="batchesPane" role="tabpanel" aria-labelledby="batches-tab">
+                    <iframe src="/DBTMDashboard/LoadBatchesPartial"
+                            width="100%"
+                            height="500px"
+                            frameborder="0"
+                            scrolling="yes"></iframe>
+                </div>
+
+                <!-- Assignment Tab -->
+                <div class="tab-pane fade" id="assignmentPane" role="tabpanel" aria-labelledby="assignment-tab">
+                    <iframe src="/DBTMDashboard/LoadAssignmentPartial"
+                            width="100%"
+                            height="500px"
+                            frameborder="0"
+                            scrolling="yes"></iframe>
+                </div>
+            </div>
             <div class="tab-content p-3" id="myTabContent">
                 <div class="tab-pane fade show active" id="batchesPane" role="tabpanel" aria-labelledby="batches-tab">
                     <div>	@Html.Partial("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", generalBatchListViewModel)</div>
@@ -287,8 +308,8 @@
                         @Html.Partial("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", dBTMTraineeAssignmentListViewModel)
                     </div>
                 </div>
-            </div>
-
+            </div> *@
+            
 
         </div>
         <!-- end page title end breadcrumb -->
@@ -352,37 +373,50 @@
         <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
         <script>
             $(function () {
+                // Initialize datepicker
                 $(".datepicker").datepicker({
                     format: "dd/mm/yyyy",
                     autoclose: true
                 });
-                        loadTabContent($("#myTab .nav-link.active"));
 
-            // When switching tabs
-                $('#myTab .nav-link').on('shown.bs.tab', function (e) {
-                    loadTabContent($(e.target));
+                // Handle tab shown event
+                $('#myTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                        e.preventDefault();
+                    var $tabBtn = $(this);
+                    var method = $tabBtn.data('method');          // e.g. "LoadBatchesPartial"
+                    var methodType = $tabBtn.data('method-type'); // "GET" or "POST"
+                    var targetPaneId = $tabBtn.data('bs-target'); // e.g. "#batchesPane"
+
+                    // Find iframe inside target pane
+                    var $iframe = $(targetPaneId).find("iframe");
+
+                    if ($iframe.length) {
+                        if (methodType.toUpperCase() === "GET") {
+                            // Simply set iframe src for GET
+                            $iframe.attr("src", "/DBTMDashboard/" + method);
+                        } else if (methodType.toUpperCase() === "POST") {
+                            // For POST, simulate form submission into iframe
+                            var iframeName = $iframe.attr("name");
+                            if (!iframeName) {
+                                iframeName = "iframe_" + Date.now();
+                                $iframe.attr("name", iframeName);
+                            }
+
+                            var $form = $('<form>', {
+                                method: 'POST',
+                                action: "/DBTMDashboard/" + method,
+                                target: iframeName
+                            }).appendTo('body');
+
+                            $form.submit();
+                            $form.remove();
+                        }
+                    }
                 });
+
+                // Trigger the first active tab so iframe loads on page load
+                $('#myTab button.active').trigger('shown.bs.tab');
             });
-
-
-            function loadTabContent(tabButton) {
-            var targetPaneId = tabButton.attr("data-bs-target");
-            var targetPane = $(targetPaneId);
-            var methodName = tabButton.data("method");
-
-            targetPane.html("<div class='loading'>Loading...</div>");
-
-            $.ajax({
-                url: `/DBTMDashboard/${methodName}`,
-                type: 'POST',
-                success: function (data) {
-                    targetPane.html(data);
-                },
-                error: function (xhr) {
-                    targetPane.html("<div class='text-danger'>Failed to load data</div>");
-                    console.error("Error:", xhr.responseText);
-                }
-            });
-            }
         </script>
+
 }
