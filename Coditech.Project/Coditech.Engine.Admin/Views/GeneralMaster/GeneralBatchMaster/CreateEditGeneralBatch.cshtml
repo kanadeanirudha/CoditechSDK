@@ -19,7 +19,7 @@
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-            @if (Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom5))
+            @if (Model.GeneralBatchMasterId > 0)
             {
                 <div class="col-lg-2">
                     @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
@@ -108,35 +108,35 @@
                                         @Html.LabelFor(x => x.Duration, new { @class = "form-label required" })
                                         <div class="d-flex gap-3">
                                             @Html.DropDownListFor(x => x.DurationHours,
-                                                     new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                                     "Value", "Text"),
-                                                     "HH",
-                                                     new { @class = "form-select", id = "DurationHours" })
+                                            new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+                                            "Value", "Text"),
+                                                                                "HH",
+                                                                                new { @class = "form-select", id = "DurationHours" })
 
-                                            @Html.DropDownListFor(x => x.DurationMinutes,
-                                                     new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                                     "Value", "Text"),
-                                                     "MM",
-                                                     new { @class = "form-select", id = "DurationMinutes" })
-                                        </div>
-                                        @Html.ValidationMessageFor(x => x.Duration)
+                                        @Html.DropDownListFor(x => x.DurationMinutes,
+                                                                                new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+                                                                                "Value", "Text"),
+                                                                                "MM",
+                                                                                new { @class = "form-select", id = "DurationMinutes" })
+                                    </div>
+                                    @Html.ValidationMessageFor(x => x.Duration)
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
                                     </div>
                                 </div>
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
-                                        </div>
-                                    </div>
-                                </div>     <div class="col-lg-12">
-                                    <div class="mb-3 multiselect-dropdown">
-                                        <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
-                                        @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
-                                        @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
-                                    </div>
+                            </div>     <div class="col-lg-12">
+                                <div class="mb-3 multiselect-dropdown">
+                                    <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
+                                    @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                    @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
                                 </div>
-                                @if (Model.GeneralBatchMasterId == 0)
+                            </div>
+                            @if (Model.GeneralBatchMasterId == 0)
                                 {
                                     <div class="col-lg-12">
                                         <div class="mb-3 multiselect-dropdown">
@@ -148,10 +148,9 @@
                                 }
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            if (string.IsNullOrEmpty(Model.Custom5))
-                            {
-                                <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                            }
+
+                            <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+
                         }
                     </div>
                 </div>

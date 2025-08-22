@@ -28,6 +28,8 @@ namespace Coditech.Admin.ViewModel
         public int NumberOfActiveTrainees { get; set; }
         public int NumberOfTotalTrainees { get; set; }
         public string TopAthletsName { get; set; }
+        public string SelectedParameter1 { get; set; }
+        public string SelectedParameter2 { get; set; }
         public TimeSpan WeeklyWorkingHours { get; set; }
         public List<DBTMYearlyTraineeOverviewModel> YearlyTraineeOverviewList { get; set; }
         public List<DBTMTrainerDetailsModel> TrainersList { get; set; }

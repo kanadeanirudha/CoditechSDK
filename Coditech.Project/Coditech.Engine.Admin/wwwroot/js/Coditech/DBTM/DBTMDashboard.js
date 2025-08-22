@@ -44,6 +44,36 @@
                 }
             }
         });
+    },
+    GetTrainerDashboard: function (modelPopContentId, numberOfDaysRecord, generalTrainerMasterId, adminRoleMasterId, userMasterId) {
+        CoditechCommon.ShowLodder();
+
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMDashboard/GetTrainerDashBoard",
+            data: {
+                numberOfDaysRecord: numberOfDaysRecord,
+                generalTrainerMasterId: generalTrainerMasterId,
+                adminRoleMasterId: adminRoleMasterId,
+                userMasterId: userMasterId
+            },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                $('#' + modelPopContentId).html(result);
+
+                var modalId = $('#' + modelPopContentId).closest('.modal').attr('id');
+                var myModal = new bootstrap.Modal(document.getElementById(modalId));
+                myModal.show();
+
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load details.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
     }
 };
 
