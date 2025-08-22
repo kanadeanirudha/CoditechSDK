@@ -21,6 +21,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
         protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        private readonly ICoditechRepository<EmployeeDesignationMaster> _employeeDesignationMasterRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -32,6 +33,7 @@ namespace Coditech.API.Service
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _employeeDesignationMasterRepository = new CoditechRepository<EmployeeDesignationMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public virtual DBTMUserModel Login(UserLoginModel userLoginModel)
@@ -66,7 +68,7 @@ namespace Coditech.API.Service
                 {
                     personId = data.PersonId;
                     centreCode = data.CentreCode;
-                    employeeDesignation = GetEnumDisplayTextByEnumId(data.EmployeeDesignationMasterId);
+                    employeeDesignation = _employeeDesignationMasterRepository.Table.Where(x=>x.EmployeeDesignationMasterId ==data.EmployeeDesignationMasterId)?.Select(x=>x.Description)?.FirstOrDefault();
                 }
             }
             GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
