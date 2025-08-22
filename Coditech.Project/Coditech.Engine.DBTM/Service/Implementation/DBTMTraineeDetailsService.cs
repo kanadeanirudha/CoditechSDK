@@ -255,7 +255,7 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate,x.Weight }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
@@ -272,10 +272,13 @@ namespace Coditech.API.Service
                 dBTMTraineeProfileModel.LastName = generalPersonModel.LastName;
                 dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
                 dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
+                dBTMTraineeProfileModel.Weight = dBTMTraineeDetailsData.Weight;
             }
 
             dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
             dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetailsData.CreatedDate;
+            
+
 
             // Use ternary for brevity
             dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
