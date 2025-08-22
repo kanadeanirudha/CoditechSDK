@@ -1,79 +1,79 @@
 ﻿@model GeneralBatchViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom5))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
-    ViewBag.Title = Model.GeneralBatchMasterId > 0 ? "Update Batch Details" : "Add Batch";
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string css = Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom5) ? "col-lg-10" : "col-lg-12";
-    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-    keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
+	if (!string.IsNullOrEmpty(Model.Custom5))
+	{
+		Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+	}
+	ViewBag.Title = Model.GeneralBatchMasterId > 0 ? "Update Batch Details" : "Add Batch";
+	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+	string actionName = ViewContext.RouteData.Values["action"].ToString();
+	string css = Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom5) ? "col-lg-10" : "col-lg-12";
+	Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+	keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
 
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.GeneralBatchMasterId > 0 };
+	DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.GeneralBatchMasterId > 0 };
 
-    DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring", "Weekly" } };
+	DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring", "Weekly" } };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
-    <div class="container-fluid">
-        <div class="row">
-            @if (Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom5))
-            {
-                <div class="col-lg-2">
-                    @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
-                </div>
-            }
-            <div class="@css">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.GeneralBatchMasterId > 0)
-                                {
-                                    <h4 class="card-title">Update Batch Details</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Batch</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
-                    <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
-                        {
-                            @Html.HiddenFor(m => m.GeneralBatchMasterId)
-                            @Html.HiddenFor(x => x.WeekDays)
-                            @Html.HiddenFor(x => x.Custom5)
-                            @if (Model.GeneralBatchMasterId > 0)
-                            {
-                                @Html.HiddenFor(x => x.CentreCode)
-                            }
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                                        @Html.ValidationMessageFor(x => x.CentreCode)
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.BatchName, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.BatchName, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowAlphabetWithSpacingAndNumbers()" })
-                                        @Html.ValidationMessageFor(x => x.BatchName)
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.BatchFrequency, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", frequencyDropdown)
-                                        @Html.ValidationMessageFor(x => x.BatchFrequency)
-                                    </div>
-                                </div>
-                                @* <div class="row">                              
+	<div class="container-fluid">
+		<div class="row">
+			@if (Model.GeneralBatchMasterId > 0)
+			{
+				<div class="col-lg-2">
+					@Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
+				</div>
+			}
+			<div class="@css">
+				<div class="card">
+					<div class="card-header">
+						<div class="row align-items-center">
+							<div class="col">
+								@if (Model.GeneralBatchMasterId > 0)
+								{
+									<h4 class="card-title">Update Batch Details</h4>
+								}
+								else
+								{
+									<h4 class="card-title">Create Batch</h4>
+								}
+							</div><!--end col-->
+						</div>  <!--end row-->
+					</div>
+					<div class="card-body">
+						@using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+						{
+							@Html.HiddenFor(m => m.GeneralBatchMasterId)
+							@Html.HiddenFor(x => x.WeekDays)
+							@Html.HiddenFor(x => x.Custom5)
+							@if (Model.GeneralBatchMasterId > 0)
+							{
+								@Html.HiddenFor(x => x.CentreCode)
+							}
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+										@Html.ValidationMessageFor(x => x.CentreCode)
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.BatchName, new { @class = "form-label required" })
+										@Html.TextBoxFor(x => x.BatchName, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowAlphabetWithSpacingAndNumbers()" })
+										@Html.ValidationMessageFor(x => x.BatchName)
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.BatchFrequency, new { @class = "form-label required" })
+										@Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", frequencyDropdown)
+										@Html.ValidationMessageFor(x => x.BatchFrequency)
+									</div>
+								</div>
+								@* <div class="row">                              
                                     <div class="col-lg-12" id="weeklyDiv">
                                         <div class="mb-3 multiselect-dropdown">
                                             @Html.LabelFor(x => x.SelectedWeekDays, new { @class = "form-label required" })
@@ -82,175 +82,179 @@
                                         </div>
                                     </div>
                                 </div> *@
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.BatchStartDate, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.BatchStartDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readOnly" })
-                                        @Html.ValidationMessageFor(x => x.BatchStartDate)
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.BatchExpireDate, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.BatchExpireDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.BatchExpireDate)
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.BatchStartTime, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.BatchStartTime, new { @class = "form-control", type = "time" })
-                                        @Html.ValidationMessageFor(x => x.BatchStartTime)
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.Duration, new { @class = "form-label required" })
-                                        <div class="d-flex gap-3">
-                                            @Html.DropDownListFor(x => x.DurationHours,
-                                                     new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                                     "Value", "Text"),
-                                                     "HH",
-                                                     new { @class = "form-select", id = "DurationHours" })
+								<div class="col-lg-2">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.BatchStartDate, new { @class = "form-label required" })
+										@Html.TextBoxFor(x => x.BatchStartDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readOnly" })
+										@Html.ValidationMessageFor(x => x.BatchStartDate)
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.BatchExpireDate, new { @class = "form-label" })
+										@Html.TextBoxFor(x => x.BatchExpireDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
+										@Html.ValidationMessageFor(x => x.BatchExpireDate)
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.BatchStartTime, new { @class = "form-label required" })
+										@Html.TextBoxFor(x => x.BatchStartTime, new { @class = "form-control", type = "time" })
+										@Html.ValidationMessageFor(x => x.BatchStartTime)
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="mb-3">
+										@Html.LabelFor(x => x.Duration, new { @class = "form-label required" })
+										<div class="d-flex gap-3">
+											@Html.DropDownListFor(x => x.DurationHours,
+											new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+											"Value", "Text"),
+																				"HH",
+																				new { @class = "form-select", id = "DurationHours" })
 
-                                            @Html.DropDownListFor(x => x.DurationMinutes,
-                                                     new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                                     "Value", "Text"),
-                                                     "MM",
-                                                     new { @class = "form-select", id = "DurationMinutes" })
-                                        </div>
-                                        @Html.ValidationMessageFor(x => x.Duration)
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
-                                        </div>
-                                    </div>
-                                </div>     <div class="col-lg-12">
-                                    <div class="mb-3 multiselect-dropdown">
-                                        <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
-                                        @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
-                                        @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
-                                    </div>
-                                </div>
-                                @if (Model.GeneralBatchMasterId == 0)
-                                {
-                                    <div class="col-lg-12">
-                                        <div class="mb-3 multiselect-dropdown">
-                                            <label class="form-label required" for="CustomDropdownSelectedValue2">Batch User</label>
-                                            @Html.ListBoxFor(x => x.CustomDropdownSelectedValue2, new SelectList(Model.CustomDropdownList2, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
-                                            @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue2)
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            if (string.IsNullOrEmpty(Model.Custom5))
-                            {
-                                <a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                            }
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+										@Html.DropDownListFor(x => x.DurationMinutes,
+																				new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+																				"Value", "Text"),
+																				"MM",
+																				new { @class = "form-select", id = "DurationMinutes" })
+									</div>
+									@Html.ValidationMessageFor(x => x.Duration)
+								</div>
+							</div>
+							<div class="col-lg-2">
+								<div class="mb-3">
+									@Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+									<div class="form-check">
+										@Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+									</div>
+								</div>
+							</div>     <div class="col-lg-12">
+								<div class="mb-3 multiselect-dropdown">
+									<label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
+									@Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+									@Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
+								</div>
+							</div>
+							@if (Model.GeneralBatchMasterId == 0)
+								{
+									<div class="col-lg-12">
+										<div class="mb-3 multiselect-dropdown">
+											<label class="form-label required" for="CustomDropdownSelectedValue2">Batch User</label>
+											@Html.ListBoxFor(x => x.CustomDropdownSelectedValue2, new SelectList(Model.CustomDropdownList2, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+											@Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue2)
+										</div>
+									</div>
+								}
+							</div>
+							<button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+							if (!string.IsNullOrEmpty(Model.Custom5))
+							{
+								<a href="../DBTMGeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+							}
+							else
+							{
+								<a href="../GeneralBatchMaster/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+							}
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 @section scripts {
-    <script src="~/js/coditech/Common/CoditechCommon.js"></script>
+	<script src="~/js/coditech/Common/CoditechCommon.js"></script>
 
-    <script type="text/javascript">
-        function updateExpiryDate() {
-            var selectedFrequency = $("#BatchFrequency").val();
-            var startDate = $("#BatchStartDate").datepicker("getDate");
-            if (selectedFrequency === "Weekly") {
-                $("#weeklyDiv").show();
-            } else {
-                $("#weeklyDiv").hide();
-            }
-            if (selectedFrequency === "OneTime" && startDate) {
-                $("#BatchExpireDate").datepicker("setDate", startDate);
-                $("#BatchExpireDate").prop("readonly", true);
-                $("#BatchExpireDate").datepicker("option", "beforeShow", function () { return false; });
-            } else {
-                $("#BatchExpireDate").prop("readonly", false);
-                $("#BatchExpireDate").datepicker("option", "beforeShow", null);
-            }
-        }
-        $(document).ready(function () {
-            // Start Date Datepicker
-           $("#BatchStartDate").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-            language: "en",
-            autoSize: true,
-            minDate: 0,
-            maxDate: new Date(2035, 11, 31),
-            onSelect: function (dateText) {
-                var startDate = $(this).datepicker("getDate");
-                $("#BatchExpireDate").datepicker("option", "minDate", startDate);
-                updateExpiryDate();
-            }
-        });
+	<script type="text/javascript">
+		function updateExpiryDate() {
+			var selectedFrequency = $("#BatchFrequency").val();
+			var startDate = $("#BatchStartDate").datepicker("getDate");
+			if (selectedFrequency === "Weekly") {
+				$("#weeklyDiv").show();
+			} else {
+				$("#weeklyDiv").hide();
+			}
+			if (selectedFrequency === "OneTime" && startDate) {
+				$("#BatchExpireDate").datepicker("setDate", startDate);
+				$("#BatchExpireDate").prop("readonly", true);
+				$("#BatchExpireDate").datepicker("option", "beforeShow", function () { return false; });
+			} else {
+				$("#BatchExpireDate").prop("readonly", false);
+				$("#BatchExpireDate").datepicker("option", "beforeShow", null);
+			}
+		}
+		$(document).ready(function () {
+			// Start Date Datepicker
+		   $("#BatchStartDate").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+			language: "en",
+			autoSize: true,
+			minDate: 0,
+			maxDate: new Date(2035, 11, 31),
+			onSelect: function (dateText) {
+				var startDate = $(this).datepicker("getDate");
+				$("#BatchExpireDate").datepicker("option", "minDate", startDate);
+				updateExpiryDate();
+			}
+		});
 
-        var startVal = $("#BatchStartDate").val();
-            if (startVal) {
-                $("#BatchStartDate").datepicker("setDate", startVal);
-            }
-             // Expiry Date Datepicker
-             $("#BatchExpireDate").datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-                    language: "en",
-                    autoSize: true,
-                    yearRange: "2025:2035",
-                    minDate: 0,
-                    maxDate: new Date(2035, 11, 31)
-             });
-             updateExpiryDate();
-        });
+		var startVal = $("#BatchStartDate").val();
+			if (startVal) {
+				$("#BatchStartDate").datepicker("setDate", startVal);
+			}
+			 // Expiry Date Datepicker
+			 $("#BatchExpireDate").datepicker({
+					changeMonth: true,
+					changeYear: true,
+					dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+					language: "en",
+					autoSize: true,
+					yearRange: "2025:2035",
+					minDate: 0,
+					maxDate: new Date(2035, 11, 31)
+			 });
+			 updateExpiryDate();
+		});
 
-        $('form').submit(function (e) {
-            var hours = $('#DurationHours').val();
-            var minutes = $('#DurationMinutes').val();
-                if (hours === "00" && minutes === "00") {
-                    var validationSpan = $('[data-valmsg-for="Duration"]');
-                    validationSpan.text("Duration cannot be 00 Hours and 00 Minutes.");
-                    validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
-                    e.preventDefault();
-                } else {
-                    var validationSpan = $('[data-valmsg-for="Duration"]');
-                    validationSpan.text("");
-                    validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
-                }
-                var frequency = $("#BatchFrequency").val();
-                    if (frequency === "Weekly") {
-                        var selectedWeekDays = $("#SelectedWeekDays option:selected").length;
-                            if (selectedWeekDays === 0) {
-                                var validationSpan = $('[data-valmsg-for="SelectedWeekDays"]');
-                                    validationSpan.text("Please select at least one Week Day.");
-                                    validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
-                                    e.preventDefault();
-                           }
-                    }
-                var startDate = $("#BatchStartDate").datepicker("getDate");
-                var expiryDate = $("#BatchExpireDate").datepicker("getDate");
+		$('form').submit(function (e) {
+			var hours = $('#DurationHours').val();
+			var minutes = $('#DurationMinutes').val();
+				if (hours === "00" && minutes === "00") {
+					var validationSpan = $('[data-valmsg-for="Duration"]');
+					validationSpan.text("Duration cannot be 00 Hours and 00 Minutes.");
+					validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+					e.preventDefault();
+				} else {
+					var validationSpan = $('[data-valmsg-for="Duration"]');
+					validationSpan.text("");
+					validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
+				}
+				var frequency = $("#BatchFrequency").val();
+					if (frequency === "Weekly") {
+						var selectedWeekDays = $("#SelectedWeekDays option:selected").length;
+							if (selectedWeekDays === 0) {
+								var validationSpan = $('[data-valmsg-for="SelectedWeekDays"]');
+									validationSpan.text("Please select at least one Week Day.");
+									validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+									e.preventDefault();
+						   }
+					}
+				var startDate = $("#BatchStartDate").datepicker("getDate");
+				var expiryDate = $("#BatchExpireDate").datepicker("getDate");
 
-                if (startDate && expiryDate && expiryDate < startDate) {
-                    var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
-                        validationSpan.text("Expiry Date cannot be before Start Date.");
-                        validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
-                        e.preventDefault();
-                } else {
-                            var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
-                                validationSpan.text("");
-                                validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
-                        }
-             });
-    </script>
+				if (startDate && expiryDate && expiryDate < startDate) {
+					var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
+						validationSpan.text("Expiry Date cannot be before Start Date.");
+						validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
+						e.preventDefault();
+				} else {
+							var validationSpan = $('[data-valmsg-for="BatchExpireDate"]');
+								validationSpan.text("");
+								validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
+						}
+			 });
+	</script>
 }

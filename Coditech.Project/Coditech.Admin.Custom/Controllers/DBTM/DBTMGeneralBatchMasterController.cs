@@ -163,9 +163,14 @@ namespace Coditech.Admin.Controllers
             BindFrequency(generalBatchViewModel);
             BindDBTMBatchActivity(generalBatchViewModel);
             BindDBTMBatchUserList(generalBatchViewModel);
+
         }
+        public virtual ActionResult Cancel(string SelectedCentreCode)
+        {
+            string custom5 = "MobileView";
+            return RedirectToAction<DBTMGeneralBatchMasterController>(x => x.Create(custom5));
+        }
+
         #endregion
     }
 }
-
-

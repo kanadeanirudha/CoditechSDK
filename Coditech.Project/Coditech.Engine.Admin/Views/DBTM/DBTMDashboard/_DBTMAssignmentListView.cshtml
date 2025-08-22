@@ -1,40 +1,38 @@
 ﻿@model DBTMTraineeAssignmentListViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom5))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
-    ViewBag.Title = "DBTM Trainee Assignment List";
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
-    if (!string.IsNullOrEmpty(Model.Custom5))
-    {
-        controllerName = "dbtmtraineeassignment";
-        actionName = "list";
-    }
-    
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()" };
-    DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true, SelectedText = "-------Select Trainer-------", SelectedValue = "" };
+	if (!string.IsNullOrEmpty(Model.Custom5))
+	{
+		Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+	}
+	ViewBag.Title = "DBTM Trainee Assignment List";
+	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+	string actionName = ViewContext.RouteData.Values["action"].ToString();
+	controllerName = "DBTMTraineeAssignment";
+	actionName = "list";
+
+
+	DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()" };
+	DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true, SelectedText = "-------Select Trainer-------", SelectedValue = "" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Trainee Assignment List</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMTraineeAssignment/Create" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
-                    </div>
-                    <div class="card-body">
-                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                            @Html.Partial("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", Model)
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<span class="card-title">Trainee Assignment List</span>
+						<a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("Create", "DBTMTraineeAssignment", new { custom5 = "Mobile View" })" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
+					</div>
+					<div class="card-body">
+						<div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+							@Html.Partial("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", Model)
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <!-- end page content -->
 <script src="~/js/coditech/DBTM/DBTMTraineeAssignment.js"></script>
