@@ -24,5 +24,6 @@
         public List<DBTMYearlyTraineeOverviewModel> YearlyTraineeOverviewList { get; set; }
         public List<DBTMTrainerDetailsModel> TrainersList { get; set; }
         public DBTMTrainerDetailsModel TrainersDetails { get; set; }
+        public List<DBTMCalendarModel> CalendarEvent { get; set; }
     }
 }

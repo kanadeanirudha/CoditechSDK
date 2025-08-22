@@ -140,7 +140,7 @@ namespace Coditech.Admin.Controllers
             try
             {
                 // Loading.  
-                List<CalendarViewModel> data = this.LoadData();
+                List<DBTMCalendarViewModel> data = this.LoadData();
 
                 // Processing.  
                 result = this.Json(data, System.Web.Mvc.JsonRequestBehavior.AllowGet);
@@ -159,10 +159,10 @@ namespace Coditech.Admin.Controllers
         /// Load data method.  
         /// </summary>  
         /// <returns>Returns - Data</returns>  
-        private List<CalendarViewModel> LoadData()
+        private List<DBTMCalendarViewModel> LoadData()
         {
             // Initialization.  
-            List<CalendarViewModel> lst = new List<CalendarViewModel>();
+            List<DBTMCalendarViewModel> lst = new List<DBTMCalendarViewModel>();
 
             try
             {
@@ -179,7 +179,7 @@ namespace Coditech.Admin.Controllers
                 while ((line = sr.ReadLine()) != null)
                 {
                     // Initialization.  
-                    CalendarViewModel infoObj = new CalendarViewModel();
+                    DBTMCalendarViewModel infoObj = new DBTMCalendarViewModel();
                     string[] info = line.Split(',');
 
                     // Setting.  
@@ -205,6 +205,53 @@ namespace Coditech.Admin.Controllers
 
             // info.  
             return lst;
+        }
+
+        [HttpGet]
+        public ActionResult DBTMCalendar()
+        {
+            var model = new DBTMDashboardViewModel();
+
+            model.CalendarEvent = new List<DBTMCalendarViewModel>
+            {
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 1,
+                    Title = "New Event",
+                    Desc = "Static test event",
+                    Start_Date = "2025-08-05",
+                    End_Date = "2025-08-08",
+                    BackgroundColor = "#f39c12"
+                },
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 2,
+                    Title = "Holiday",
+                    Desc = "Static holiday",
+                    Start_Date = "2025-08-15",
+                    End_Date = "2025-08-16",
+                    BackgroundColor = "#00a65a"
+                },
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 3,
+                    Title = "Conference",
+                    Desc = "Static conference",
+                    Start_Date = "2025-08-27",
+                    End_Date = "2025-08-28",
+                    BackgroundColor = "#0073b7"
+                },
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 3,
+                    Title = "My Birthday",
+                    Desc = "Birthday",
+                    Start_Date = "2025-09-05",
+                    End_Date = "2025-09-06",
+                    BackgroundColor = "#0073b7"
+                }
+            };
+            return View("~/Views/DBTM/DBTMDashboard/DBTMCalendar.cshtml", model);
         }
 
         #region Send Reminder
