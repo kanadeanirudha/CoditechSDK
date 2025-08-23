@@ -17,14 +17,15 @@
         count1++;
     }
     BarChartViewModel traineeTrainedviewModel = new BarChartViewModel()
-            {
-                BarChartId = "YearlyTraineeTrainedOverviewChart",
-                XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
-                YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
-                XAxisLabel = "Months",
-                YAxisLabel = "Trainees Count",
-                BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
-            };
+    {
+        BarChartId = "YearlyTraineeTrainedOverviewChart",
+        XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+        YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
+        XAxisLabel = "Months",
+        YAxisLabel = "Trainees Count",
+        BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
+    };
+    ModelPopUpViewModel getTrainerDashboard = new ModelPopUpViewModel() { ModelPopUpId = "GetTrainerDashboard", ModalContentId = "GetTrainerDashboardContentId" };
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -182,7 +183,7 @@
                                         else
                                         {
                                             <div class="rounded-circle bg-soft-primary text-white w-100 h-100
-                                                d-flex align-items-center justify-content-center"
+                                                            d-flex align-items-center justify-content-center"
                                                  style="font-size: 36px; object-fit: cover;">
                                                 @trainer.FirstName.Substring(0, 1)@trainer.LastName.Substring(0, 1)
                                             </div>
@@ -204,6 +205,22 @@
                                     @*  <div class="text-center mt-3">
                                         <a href="#" class="btn btn-sm btn-soft-primary">More Detail</a>
                                     </div> *@
+                                    <div class="text-center mt-3">
+                                        <div class="mb-6">
+                                            <button type="button"
+                                                    class="btn btn-gradient-info"
+                                                    onclick="DBTMDashboard.GetTrainerDashboard(
+                                                        '@getTrainerDashboard.ModalContentId',
+                                                        '@Model.NumberOfDaysRecord',
+                                                        '@trainer.GeneralTrainerMasterId',
+                                                        '@trainer.AdminRoleMasterId',
+                                                        '@trainer.UserMasterId')"
+                                                    title="More Detail">
+                                                More Detail
+                                            </button>
+                                        </div>
+                                    </div>
+
                                 </ul>
                             </div>
                         </div>
@@ -213,3 +230,5 @@
         }
     </div>
 </div>
+@Html.Partial("~/Views/Shared/_ModelFullScreenPopUp.cshtml", getTrainerDashboard)
+<script src="~/js/Coditech/DBTM/DBTMDashboard.js"></script>
