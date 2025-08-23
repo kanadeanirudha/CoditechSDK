@@ -148,7 +148,7 @@ namespace Coditech.API.Service
                 years--;
                 months += 12;
             }
-            return $"{years} years {months} months {days} days";
+            return $"{years} Y {months} M {days} D";
         }
         #endregion
     }
