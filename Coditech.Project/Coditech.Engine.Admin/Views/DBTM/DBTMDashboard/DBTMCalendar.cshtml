@@ -1,0 +1,57 @@
+﻿@using Newtonsoft.Json
+@model DBTMDashboardViewModel
+
+<div class="row">
+    <div class="col-md-8">
+        <div id="calendar" style="margin-top:20px;"></div>
+    </div>
+
+    <div class="col-md-4">
+        <div id="eventDetails" class="card p-3 shadow-sm">
+            <h5>Event Details</h5>
+            <p><strong>Title:</strong> <span id="detailTitle">--</span></p>
+            <p><strong>Description:</strong> <span id="detailDesc">--</span></p>
+            <p><strong>Start:</strong> <span id="detailStart">--</span></p>
+            <p><strong>End:</strong> <span id="detailEnd">--</span></p>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var events = @Html.Raw(JsonConvert.SerializeObject(
+            Model.CalendarEvent.Select(e => new
+            {
+                id = e.CalendarId,
+                title = e.Title,
+                start = e.Start_Date,
+                end = e.End_Date,
+                backgroundColor = string.IsNullOrEmpty(e.BackgroundColor) ? "#378006" : e.BackgroundColor,
+                description = e.Desc
+            })
+        ));
+        // console.log("Loaded events:", events);
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: events,
+            eventClick: function(info) {
+                document.getElementById('detailTitle').innerText = info.event.title;
+                document.getElementById('detailDesc').innerText = info.event.extendedProps.description;
+                document.getElementById('detailStart').innerText = info.event.start.toISOString().split('T')[0];
+                document.getElementById('detailEnd').innerText = info.event.end
+                    ? info.event.end.toISOString().split('T')[0]
+                    : '';
+            }
+        });
+        calendar.render();
+    });
+</script>

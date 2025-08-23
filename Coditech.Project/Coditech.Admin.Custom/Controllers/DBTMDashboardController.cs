@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization;
-using Coditech.Admin.Agents;
+﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Reflection;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Admin.Controllers
 {
@@ -110,7 +108,7 @@ namespace Coditech.Admin.Controllers
             GetListOnlyIfSingleCentre(dataTableModel);
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
-                list = _generalBatchAgent.GetBatchList(dataTableModel);
+                list = _dBTMDashboardAgent.GetBatchList(dataTableModel);
             }
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             list.Custom5 = "Mobile View";
@@ -121,19 +119,29 @@ namespace Coditech.Admin.Controllers
         public virtual DBTMTraineeAssignmentListViewModel GetAssignmentListData(DataTableViewModel dataTableModel)
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+            if (string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
+            {
+                dataTableModel.SelectedParameter1 = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "";
+            }
+
             GetListOnlyIfSingleCentre(dataTableModel);
-            dataTableModel.SelectedParameter1 = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "";
+
             DBTMTraineeAssignmentListViewModel assignmentList = new DBTMTraineeAssignmentListViewModel();
+
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
             {
                 assignmentList = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
-            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : string.Empty;
+
+            // Additional assignments
+            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : dataTableModel.SelectedParameter1;   // keep client value if not trainer
             assignmentList.Custom5 = "Mobile View";
             assignmentList.SelectedCentreCode = dataTableModel.SelectedCentreCode;
-            assignmentList.SelectedParameter1 = dataTableModel.SelectedParameter1;
+
             return assignmentList;
         }
+
         public ActionResult Index()
         {
             // Info.  
@@ -154,7 +162,7 @@ namespace Coditech.Admin.Controllers
             try
             {
                 // Loading.  
-                List<CalendarViewModel> data = this.LoadData();
+                List<DBTMCalendarViewModel> data = this.LoadData();
 
                 // Processing.  
                 result = this.Json(data, System.Web.Mvc.JsonRequestBehavior.AllowGet);
@@ -173,10 +181,10 @@ namespace Coditech.Admin.Controllers
         /// Load data method.  
         /// </summary>  
         /// <returns>Returns - Data</returns>  
-        private List<CalendarViewModel> LoadData()
+        private List<DBTMCalendarViewModel> LoadData()
         {
             // Initialization.  
-            List<CalendarViewModel> lst = new List<CalendarViewModel>();
+            List<DBTMCalendarViewModel> lst = new List<DBTMCalendarViewModel>();
 
             try
             {
@@ -193,7 +201,7 @@ namespace Coditech.Admin.Controllers
                 while ((line = sr.ReadLine()) != null)
                 {
                     // Initialization.  
-                    CalendarViewModel infoObj = new CalendarViewModel();
+                    DBTMCalendarViewModel infoObj = new DBTMCalendarViewModel();
                     string[] info = line.Split(',');
 
                     // Setting.  
@@ -219,6 +227,70 @@ namespace Coditech.Admin.Controllers
 
             // info.  
             return lst;
+        }
+        #region Trainer DashBoard
+        [HttpGet]
+        public virtual ActionResult GetTrainerDashBoard(short numberOfDaysRecord, long generalTrainerMasterId, int adminRoleMasterId, long userMasterId)
+        {
+            TempData["FormSizeClass"] = "col-lg-8";
+            DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetTrainerDashBoard(numberOfDaysRecord, generalTrainerMasterId, adminRoleMasterId, userMasterId);
+            UserProfileViewModel userProfileViewModel = _dBTMDashboardAgent.GetUserProfile(userMasterId);
+            dBTMDashboardViewModel.SelectedParameter1 = generalTrainerMasterId.ToString();
+            dBTMDashboardViewModel.SelectedParameter2 = userMasterId.ToString();
+            if (IsNotNull(userProfileViewModel))
+            {
+                dBTMDashboardViewModel.UserProfileModel = new List<UserProfileViewModel>();
+            }
+            dBTMDashboardViewModel.UserProfileModel.Add(userProfileViewModel);
+            return View("~/Views/DBTM/DBTMDashboard/_dBTMTrainerDashboardPopUp.cshtml", dBTMDashboardViewModel);
+        }
+        #endregion
+
+        [HttpGet]
+        public ActionResult DBTMCalendar()
+        {
+            var model = new DBTMDashboardViewModel();
+
+            model.CalendarEvent = new List<DBTMCalendarViewModel>
+            {
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 1,
+                    Title = "New Event",
+                    Desc = "Static test event",
+                    Start_Date = "2025-08-05",
+                    End_Date = "2025-08-08",
+                    BackgroundColor = "#f39c12"
+                },
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 2,
+                    Title = "Holiday",
+                    Desc = "Static holiday",
+                    Start_Date = "2025-08-15",
+                    End_Date = "2025-08-16",
+                    BackgroundColor = "#00a65a"
+                },
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 3,
+                    Title = "Conference",
+                    Desc = "Static conference",
+                    Start_Date = "2025-08-27",
+                    End_Date = "2025-08-28",
+                    BackgroundColor = "#0073b7"
+                },
+                new DBTMCalendarViewModel
+                {
+                    CalendarId = 3,
+                    Title = "My Birthday",
+                    Desc = "Birthday",
+                    Start_Date = "2025-09-05",
+                    End_Date = "2025-09-06",
+                    BackgroundColor = "#0073b7"
+                }
+            };
+            return View("~/Views/DBTM/DBTMDashboard/DBTMCalendar.cshtml", model);
         }
 
         #region Send Reminder

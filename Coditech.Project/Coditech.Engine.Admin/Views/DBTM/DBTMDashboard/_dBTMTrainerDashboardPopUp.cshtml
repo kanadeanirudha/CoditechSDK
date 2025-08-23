@@ -1,0 +1,370 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@using Newtonsoft.Json
+@model DBTMDashboardViewModel
+@{
+    Layout = null;
+    ViewBag.Title = "Dashboard";
+    // Yearly Trainee Overview
+    string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+    int monthCount = Model.YearlyTraineeOverviewList.Count();
+    string[] XValuesBarYearlyTraineeTrainedOverview = new string[monthCount];
+    decimal[] YValuesBarYearlyTraineeTrainedOverview = new decimal[monthCount];
+    int count1 = 0;
+    foreach (var item in Model.YearlyTraineeOverviewList)
+    {
+        XValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToString(item.MonthName);
+        YValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToInt32(item.TotalTrainee);
+        count1++;
+    }
+    BarChartViewModel trainerviewModel = new BarChartViewModel()
+    {
+        BarChartId = "YearlyTraineeTrainedOverviewChart",
+        XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+        YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
+        XAxisLabel = "Months",
+        YAxisLabel = "Trainees Count",
+        BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
+    };
+    GeneralBatchListViewModel generalBatchListViewModel = new GeneralBatchListViewModel
+    {
+
+        GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
+        PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
+        Custom5 = Model.GeneralBatchList.FirstOrDefault()?.Custom5
+    };
+    DBTMTraineeAssignmentListViewModel dBTMTraineeAssignmentListViewModel = new DBTMTraineeAssignmentListViewModel
+    {
+        DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
+        PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
+        Custom5 = Model.GeneralBatchList.FirstOrDefault()?.Custom5
+    };
+}
+<div class="modal-header">
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="page-content">
+    <div class="container-fluid">
+        <!-- Page-Title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="dastone-profile">
+                            <div class="row">
+                                <div class="col-lg-4 align-self-center mb-3 mb-lg-0">
+                                    <div class="dastone-profile-main">
+                                        <div class="dastone-profile-main-pic position-relative" style="width: 110px; height: 110px;">
+                                            @if (!string.IsNullOrEmpty(Model.UserProfileModel.FirstOrDefault().PhotoMediaPath))
+                                            {
+                                                <img id="imagePreview" src="@Model.UserProfileModel[0].PhotoMediaPath" alt="User Image" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div id="imagePreview" class="rounded-circle bg-soft-primary text-white w-100 h-100 d-flex align-items-center justify-content-center" style="font-size: 36px; object-fit: cover;">
+                                                    @Model.UserProfileModel.FirstOrDefault().FirstName.Substring(0, 1)@Model.UserProfileModel.FirstOrDefault().LastName.Substring(0, 1)
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="dastone-profile_user-detail">
+                                            <h5 class="dastone-user-name"> @Model.UserProfileModel.FirstOrDefault().FirstName @Model.UserProfileModel.FirstOrDefault().LastName</h5>
+                                            <p class="mb-0 dastone-user-name-post">@Model.UserProfileModel.FirstOrDefault().Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 ms-auto align-self-center">
+                                    <ul class="list-unstyled personal-detail mb-0">
+                                        <li class="mt-2">
+                                            <i class="ti ti-mobile me-2 text-secondary font-16 align-middle"></i><b>Mobile Number:</b> @Model.TrainersDetails.MobileNumber
+                                        </li>
+                                        <li class="mt-2">
+                                            <i class="ti ti-email text-secondary font-16 align-middle me-2"></i><b>Email:</b> @Model.TrainersDetails.EmailId
+                                        </li>
+                                        <li class="mt-2">
+                                            <i class="fas fa-id-badge me-2 text-secondary font-16 align-middle"></i>
+                                            <b>Specialization:</b>  @Model.TrainersDetails.TrainerSpecialization
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 align-self-center">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="page-title-box">
+                                                <div class="row">
+                                                    <ul class="list-unstyled personal-detail mb-0">
+                                                        <li class="mt-2">
+                                                            <i class="fas fa-calendar-check me-2 text-secondary font-16 align-middle"></i>
+                                                            <b>Date Of Joining</b>: @Model.TrainersDetails.DateOfJoining.ToCoditechDateFormat()
+                                                        </li>
+                                                        <li class="mt-2">
+                                                            <i class="fas fa-clock me-2 text-secondary font-16 align-middle"></i>
+                                                            <b>Total Duration Completed:</b> @Model.TrainersDetails.DurationWithUs
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div><!--end page-title-box-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 d-flex flex-column h-100">
+                <div class="row flex-grow-1">
+                    <div class="col-md-6 mb-3">
+                        <a href="/dbtmtraineedetails/activememberlist">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Active Trainees</p>
+                                            <h3 class="m-0">@Model.NumberOfActiveTrainees</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/dbtmtraineedetails/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Trainees Trained</p>
+                                            <h3 class="m-0">@Model.NumberOfTotalTrainees</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/generalbatchmaster/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Batches</p>
+                                            <h3 class="m-0">@Model.NumberOfBatches</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-layer-group"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/generalbatchmaster/list">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Activity Performed During Week</p>
+                                            <h3 class="m-0">@Model.TotalNumberOfActivityPerformedDuringMonth</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-tasks"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="#">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Top Athlete</p>
+                                            <h3 class="m-0">@Model.TopAthletsName</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-trophy"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="#">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Weekly Working Hrs</p>
+                                            <h3 class="m-0">@Model.WeeklyWorkingHours</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-hourglass-half"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 h-100">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h4 class="card-title">Trainees Trained Per Month</h4>
+                    </div>
+                    <div class="card-body">
+                        @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", trainerviewModel)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active"
+                            id="batches-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#batchesPane"
+                            data-method="LoadBatchesPartial"
+                            data-method-type="POST"
+                            type="button"
+                            role="tab">
+                        Batches
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link"
+                            id="assignment-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#assignmentPane"
+                            data-method="LoadAssignmentPartial"
+                            data-method-type="POST"
+                            type="button"
+                            role="tab">
+                        Assignment
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content p-3" id="myTabContent">
+                @* ✅ Hidden fields for both parameters *@
+                @Html.Hidden("dataTableModel.SelectedParameter1", Model.SelectedParameter1, new { id = "hdnSelectedParameter1" })
+                @Html.Hidden("dataTableModel.SelectedParameter2", Model.SelectedParameter2, new { id = "hdnSelectedParameter2" })
+
+                <div class="tab-pane fade show active" id="batchesPane" role="tabpanel">
+                    <iframe name="batchesFrame"
+                            src="/DBTMDashboard/LoadBatchesPartial"
+                            width="100%" height="500" frameborder="0"></iframe>
+                </div>
+                <div class="tab-pane fade" id="assignmentPane" role="tabpanel">
+                    <iframe name="assignmentFrame"
+                            src="/DBTMDashboard/LoadAssignmentPartial"
+                            width="100%" height="500" frameborder="0"></iframe>
+                </div>
+            </div>
+        </div><!-- container -->
+    </div>
+
+    <!-- end page content -->
+    <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
+    <script>
+        $(function () {
+          // Initialize datepicker (if needed)
+          $(".datepicker").datepicker({
+              format: "dd/mm/yyyy",
+              autoclose: true
+          });
+
+          // Handle tab switch and iframe loading
+          $('#myTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var $btn = $(this);
+            var pane = $btn.data('bs-target'); // "#batchesPane" / "#assignmentPane"
+            var method = $btn.data('method') || ($btn.attr('id') === 'batches-tab' ? 'LoadBatchesPartial' : 'LoadAssignmentPartial');
+            var methodType = String($btn.data('method-type') || 'POST').toUpperCase();
+
+            var $iframe = $(pane).find('iframe');
+            if (!$iframe.length) return;
+
+            // ensure iframe has a name so target works
+            var iframeName = $iframe.attr('name');
+            if (!iframeName) {
+              iframeName = 'iframe_' + Date.now();
+              $iframe.attr('name', iframeName);
+            }
+
+            // read values from hidden fields
+            var selectedVal1 = $('#hdnSelectedParameter1').val() || '';
+            var selectedVal2 = $('#hdnSelectedParameter2').val() || '';
+
+            if (methodType === 'POST') {
+              // POST into iframe
+              var $form = $('<form>', {
+                method: 'POST',
+                action: '/DBTMDashboard/' + method,
+                target: iframeName
+              });
+
+              // send both params for model binding
+              $form.append($('<input>', {
+                type: 'hidden',
+                name: 'dataTableModel.SelectedParameter1',
+                value: selectedVal1
+              }));
+              $form.append($('<input>', {
+                type: 'hidden',
+                name: 'dataTableModel.SelectedParameter2',
+                value: selectedVal2
+              }));
+
+              // add antiforgery token if present
+              var $aft = $('input[name="__RequestVerificationToken"]').first();
+              if ($aft.length) $form.append($aft.clone());
+
+              $('body').append($form);
+              $form.trigger('submit').remove();
+            } else {
+              // GET fallback with querystring
+              var url = '/DBTMDashboard/' + method + '?' + $.param({
+                'dataTableModel.SelectedParameter1': selectedVal1,
+                'dataTableModel.SelectedParameter2': selectedVal2
+              });
+              $iframe.attr('src', url);
+            }
+          });
+
+          // initial load for the first active tab
+          $('#myTab button.active').trigger('shown.bs.tab');
+        });
+    </script>
