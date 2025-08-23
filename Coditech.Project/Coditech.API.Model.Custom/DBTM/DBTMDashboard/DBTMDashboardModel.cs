@@ -20,9 +20,13 @@
         public int NumberOfBatches { get; set; }
         public int NumberOfTotalTrainees { get; set; }
         public string TopAthletsName { get; set; }
+        public int AdminRoleMasterId { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
+        public long UserMasterId { get; set; }
         public TimeSpan WeeklyWorkingHours { get; set; }
         public List<DBTMYearlyTraineeOverviewModel> YearlyTraineeOverviewList { get; set; }
         public List<DBTMTrainerDetailsModel> TrainersList { get; set; }
         public DBTMTrainerDetailsModel TrainersDetails { get; set; }
+        public List<DBTMCalendarModel> CalendarEvent { get; set; }
     }
 }

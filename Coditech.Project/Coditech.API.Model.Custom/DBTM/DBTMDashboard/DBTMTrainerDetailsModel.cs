@@ -24,5 +24,7 @@
         public string PhoneNumber { get; set; }
         public string CallingCode { get; set; }
         public string MobileNumber { get; set; }
+        public int AdminRoleMasterId { get; set; }
+        public long UserMasterId { get; set; }
     }
 }

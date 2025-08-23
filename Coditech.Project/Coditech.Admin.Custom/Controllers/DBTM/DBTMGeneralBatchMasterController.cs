@@ -27,9 +27,11 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Create(string custom5)
         {
+
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
+            generalBatchViewModel.Custom5 = custom5;
             BindDropdown(generalBatchViewModel);
             return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
@@ -57,10 +59,6 @@ namespace Coditech.Admin.Controllers
                 if (!generalBatchViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    if (!string.IsNullOrEmpty(generalBatchViewModel.Custom5))
-                    {
-                        return RedirectToAction<DBTMGeneralBatchMasterController>(x => x.UpdateGeneralBatch(generalBatchViewModel.GeneralBatchMasterId));
-                    }
                     return RedirectToAction<GeneralBatchMasterController>(x => x.List(new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode }));
                 }
             }
@@ -165,9 +163,14 @@ namespace Coditech.Admin.Controllers
             BindFrequency(generalBatchViewModel);
             BindDBTMBatchActivity(generalBatchViewModel);
             BindDBTMBatchUserList(generalBatchViewModel);
+
         }
+        public virtual ActionResult Cancel(string SelectedCentreCode)
+        {
+            string custom5 = "MobileView";
+            return RedirectToAction<DBTMGeneralBatchMasterController>(x => x.Create(custom5));
+        }
+
         #endregion
     }
 }
-
-
