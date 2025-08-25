@@ -111,7 +111,7 @@ namespace Coditech.Admin.Controllers
                 list = _dBTMDashboardAgent.GetBatchList(dataTableModel);
             }
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
-            list.Custom5 = "Mobile View";
+            list.Custom4 = "Mobile View";
             return list;
         }
 
@@ -131,12 +131,14 @@ namespace Coditech.Admin.Controllers
 
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
             {
+                string isPopUpView = Convert.ToString(TempData["IsPopUpView"]);
+                dataTableModel.SelectedParameter3 = isPopUpView;
                 assignmentList = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
 
             // Additional assignments
-            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : dataTableModel.SelectedParameter1;   // keep client value if not trainer
-            assignmentList.Custom5 = "Mobile View";
+            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : dataTableModel.SelectedParameter1;
+            assignmentList.Custom4 = "Mobile View";
             assignmentList.SelectedCentreCode = dataTableModel.SelectedCentreCode;
 
             return assignmentList;
@@ -232,11 +234,12 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult GetTrainerDashBoard(short numberOfDaysRecord, long generalTrainerMasterId, int adminRoleMasterId, long userMasterId)
         {
-            TempData["FormSizeClass"] = "col-lg-8";
             DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetTrainerDashBoard(numberOfDaysRecord, generalTrainerMasterId, adminRoleMasterId, userMasterId);
             UserProfileViewModel userProfileViewModel = _dBTMDashboardAgent.GetUserProfile(userMasterId);
             dBTMDashboardViewModel.SelectedParameter1 = generalTrainerMasterId.ToString();
             dBTMDashboardViewModel.SelectedParameter2 = userMasterId.ToString();
+            TempData["IsPopUpView"] = "data";
+            TempData.Keep();
             if (IsNotNull(userProfileViewModel))
             {
                 dBTMDashboardViewModel.UserProfileModel = new List<UserProfileViewModel>();

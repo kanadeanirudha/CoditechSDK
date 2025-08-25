@@ -51,8 +51,15 @@ namespace Coditech.Admin.Agents
             DBTMTraineeAssignmentListModel deviceList = new DBTMTraineeAssignmentListModel { DBTMTraineeAssignmentList = response?.DBTMTraineeAssignmentList };
             DBTMTraineeAssignmentListViewModel listViewModel = new DBTMTraineeAssignmentListViewModel();
             listViewModel.DBTMTraineeAssignmentList = deviceList?.DBTMTraineeAssignmentList?.ToViewModel<DBTMTraineeAssignmentViewModel>().ToList();
-
-            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentList.Count, BindColumns());
+           
+            if (!string.IsNullOrEmpty(dataTableModel.SelectedParameter3))
+            {
+                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentList.Count, BindColumns(false), false);
+            }
+            else
+            {
+                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentList.Count, BindColumns(true), true);
+            }
             return listViewModel;
         }
         public virtual DBTMTestListViewModel GetDBTMTestList()
@@ -256,50 +263,50 @@ namespace Coditech.Admin.Agents
         #endregion
 
         #region protected
-        protected virtual List<DatatableColumns> BindColumns()
+        protected virtual List<DatatableColumns> BindColumns(bool isSortable)
         {
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "First Name",
                 ColumnCode = "FirstName",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Last Name",
                 ColumnCode = "LastName",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Activity Name",
                 ColumnCode = "TestName",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Assigned By",
                 ColumnCode = "AssignedBy",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Assignment Date",
                 ColumnCode = "AssignmentDate",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Assignment Time",
                 ColumnCode = "AssignmentTime",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Activity Status",
                 ColumnCode = "DBTMTestStatusEnumId",
-                IsSortable = true,
+                IsSortable = isSortable,
             });
             return datatableColumnList;
         }
