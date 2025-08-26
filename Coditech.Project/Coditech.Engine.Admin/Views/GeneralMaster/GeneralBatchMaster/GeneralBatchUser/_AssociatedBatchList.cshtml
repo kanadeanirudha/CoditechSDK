@@ -1,6 +1,10 @@
 ﻿@using Coditech.Admin.Utilities;
 @model GeneralBatchUserListViewModel
 @{
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     Layout = null;
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
@@ -16,6 +20,7 @@
             @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
             @Html.HiddenFor(x => x.SelectedParameter1)
             @Html.HiddenFor(x => x.SelectedParameter2)
+            @Html.HiddenFor(x => x.Custom4)
             <tbody>
                 @if (Model?.GeneralBatchUserList?.Count > 0)
                 {

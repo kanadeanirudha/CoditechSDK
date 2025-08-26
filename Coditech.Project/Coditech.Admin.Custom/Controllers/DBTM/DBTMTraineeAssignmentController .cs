@@ -42,7 +42,7 @@ namespace Coditech.Admin.Controllers
 
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
-            list.Custom5 = dataTableModel.SelectedParameter1;
+            list.Custom4 = dataTableModel.SelectedParameter4;
 
             if (AjaxHelper.IsAjaxRequest)
             {
@@ -53,14 +53,14 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create(string custom5)
+        public ActionResult Create(string custom4)
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel
             {
                 SelectedCentreCode = userModel.SelectedCentreCode,
                 SelectedTrainee = new List<string>(),
-                Custom5 =custom5,
+                Custom4 =custom4,
                 GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
             };
 
@@ -84,7 +84,7 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMTraineeAssignmentViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom5) });
+                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
                 }
             }
 
@@ -100,10 +100,10 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId , string custom5)
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId , string custom4)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
-            dBTMTraineeAssignmentViewModel.Custom5 = custom5;
+            dBTMTraineeAssignmentViewModel.Custom4 = custom4;
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
         }
 
