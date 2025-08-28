@@ -5,6 +5,10 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = "";
     string isPopUpView = Convert.ToString(TempData["IsPopUpView"]);
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        controllerName = "dbtmgeneralbatchmaster";
+    }
 }
 @if (string.IsNullOrEmpty(isPopUpView))
 {
@@ -55,7 +59,7 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <!-- Delete action with cityIds parameter -->
-                                                <a href="../@controllerName/Delete?generalBatchMasterIds=@item.GeneralBatchMasterId&selectedCentreCode=@Model.SelectedCentreCode" class="btn btn-outline-danger">Delete</a>
+                                                <a href="../@controllerName/Delete?generalBatchMasterIds=@item.GeneralBatchMasterId&selectedCentreCode=@Model.SelectedCentreCode&custom4=@Model.Custom4" class="btn btn-outline-danger">Delete</a>
                                             </div>
                                         </div>
                                     </div>

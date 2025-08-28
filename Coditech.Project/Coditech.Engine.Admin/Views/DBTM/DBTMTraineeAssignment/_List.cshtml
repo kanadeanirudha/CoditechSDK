@@ -1,6 +1,9 @@
 ﻿@model DBTMTraineeAssignmentListViewModel
 @{
-    Layout = null;
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string isPopUpView = Convert.ToString(TempData["IsPopUpView"]);
@@ -43,7 +46,7 @@
                                             <i class="fas fa-edit"> </i>
                                         </a>
                                         <span class="m-2">|</span>
-                                        <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId&dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
+                                        <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId&dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId&custom4=@Model.Custom4" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
                                         <span class="m-2">|</span>
                                         <!-- Delete Button -->
                                         <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.DBTMTraineeAssignmentUserId">
@@ -64,7 +67,7 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                         <!-- Delete action with selectedCentreCode parameter -->
-                                                        <a href="/@controllerName/Delete?dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId&selectedCentreCode=@Model.SelectedCentreCode&selectedParameter1=@Model.SelectedParameter1" class="btn btn-outline-danger">Delete</a>
+                                                        <a href="/@controllerName/Delete?dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId&selectedCentreCode=@Model.SelectedCentreCode&selectedParameter1=@Model.SelectedParameter1&custom4=@Model.Custom4" class="btn btn-outline-danger">Delete</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -72,7 +75,7 @@
                                     }
                                     else
                                     {
-                                        <a href="../@controllerName/GetAssignmentResult?SelectedParameter1=@item.DBTMDeviceDataId&SelectedParameter2=@Model.SelectedParameter2&SelectedCentreCode=@Model.SelectedCentreCode" title="View Assignment Result" class="btn btn-sm btn-soft-warning btn-circle"><i class="fas fa-eye"></i></a>
+                                        <a href="../@controllerName/GetAssignmentResult?SelectedParameter1=@item.DBTMDeviceDataId&SelectedParameter2=@Model.SelectedParameter2&SelectedCentreCode=@Model.SelectedCentreCode&custom4=@Model.Custom4" title="View Assignment Result" class="btn btn-sm btn-soft-warning btn-circle"><i class="fas fa-eye"></i></a>
                                     }
                                 </td>
                             }

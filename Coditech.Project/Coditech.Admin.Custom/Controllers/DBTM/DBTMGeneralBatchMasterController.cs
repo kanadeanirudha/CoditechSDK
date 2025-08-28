@@ -25,7 +25,7 @@ namespace Coditech.Admin.Controllers
             _dBTMTestAgent = dBTMTestAgent;
             _dBTMBatchAgent = dBTMBatchAgent;
         }
-        [HttpGet]
+        [HttpGet ,HttpPost]
         public ActionResult List(DataTableViewModel dataTableModel)
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
@@ -203,7 +203,21 @@ namespace Coditech.Admin.Controllers
             DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode , SelectedParameter4=custom4 };
             return RedirectToAction("List", dataTableViewModel);
         }
-
+        public virtual ActionResult Delete(string generalBatchMasterIds, string selectedCentreCode, string custom4)
+        {
+            string message = string.Empty;
+            bool status = false;
+            if (!string.IsNullOrEmpty(generalBatchMasterIds))
+            {
+                status = _generalBatchAgent.DeleteGeneralBatch(generalBatchMasterIds, out message);
+                SetNotificationMessage(!status
+                ? GetErrorNotificationMessage(string.IsNullOrEmpty(message) ? GeneralResources.DeleteErrorMessage : message)
+                : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4=custom4 });
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4= custom4 });
+        }
         #endregion
     }
 }

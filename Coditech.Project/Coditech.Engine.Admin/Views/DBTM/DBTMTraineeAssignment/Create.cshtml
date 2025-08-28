@@ -11,7 +11,7 @@
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTraineeAssignmentId", Model.DBTMTraineeAssignmentId.ToString());
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "GeneralTrainerMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), Parameter = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTraineeListByCentreCodeAndTrainerMasterId()", IsDisabled = Model.DBTMTraineeAssignmentId > 0, IsCustomDropdown = true };
-   
+
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -82,7 +82,10 @@
                             {
                                 <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId&SelectedParameter1=@Model.Custom4" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                             }
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            else
+                            {
+                                <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            }
                         }
                     </div>
                 </div>

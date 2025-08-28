@@ -1,5 +1,9 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     ViewBag.Title = "Update Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
@@ -24,6 +28,7 @@
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @Html.HiddenFor(x => x.SelectedCentreCode)
                             @Html.HiddenFor(x => x.DBTMTraineeAssignmentUserId)
+                            @Html.HiddenFor(x => x.Custom4)
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
@@ -41,7 +46,14 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            if (!string.IsNullOrEmpty(Model.Custom4))
+                            {
+                                <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId&SelectedParameter1=@Model.Custom4" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            }
+                            else
+                            {
+                                <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            }
                         }
                     </div>
                 </div>
