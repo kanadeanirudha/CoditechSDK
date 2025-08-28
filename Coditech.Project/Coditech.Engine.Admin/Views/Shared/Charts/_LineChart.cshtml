@@ -1,10 +1,11 @@
-﻿@model LineChartViewModel
+﻿@model LineChartModel
 @{
     Layout = null;
 }
 <canvas id="@Model.LineChartId"></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script>
+
     var xValues = @Html.Raw(@Model.XValues);
     var yValues = @Html.Raw(Model.YValues);
     new Chart("@Model.LineChartId", {
@@ -12,9 +13,10 @@
         data: {
             labels: xValues,
             datasets: [{
-                backgroundColor: backgroundColor,
+                backgroundColor: @Html.Raw(@Model.BackgroundColor),
                 borderColor: "rgba(75, 192, 192, 1)",
                 borderWidth: 1,
+                fill: false,
                 data: yValues
             }]
         },

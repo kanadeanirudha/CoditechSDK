@@ -25,6 +25,7 @@
                 IsCustomDropdown = true,
                 ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()"
             };
+              string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -32,60 +33,139 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
+                  @*   <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
                                 <h4 class="card-title">Activity Graph Reports</h4>
                             </div><!--end col-->
                         </div>  <!--end row-->
+                    </div> *@
+                      <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title">Activity Graph Reports</span>
+                        <div class="d-flex align-items-center">
+                            <!-- Toggle Switch -->
+                            <div class="form-check form-switch me-3">
+                                <div class="switch-field">
+                                    <input type="radio" id="radio-tile" name="switch-tile-list" value="tile" onclick="window.open(@url/dbtmreports/TestWiseGraphReports', '_blank');" />
+                                    <label for="radio-tile">Graph</label>
+                                    <input type="radio" id="radio-list" name="switch-tile-list" value="list" checked onclick="window.open(@url/dbtmreports/testwisereports', '_blank');" />
+                                    <label for="radio-list">List</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-1">
-                                <label>Activity List</label>
+                                <label class = "form-label">Activity List</label>
                             </div>
                             <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
                             </div>
-                            <div class="col-md-1">
-                                <label>Trainee List</label>
-                            </div>
-                            <div class="col-md-2">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
-                            </div>
-                            <div class="col-md-1">
-                                <label>Graph Type</label>
+                             <div class="col-md-1">
+                                <label class = "form-label">Graph Type</label>
                             </div>
                             <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
                             </div>
                             <div class="col-md-1">
+                                <label class = "form-label">Trainee List</label>
+                            </div>
+                            <div class="col-md-5">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseGraphReports()" />
                             </div>
-                            <div id="DBTMTestWiseGraphReportsDivId">
-                            </div>
                         </div>
+                        <div class="row  mt-3">
+                            <div class="col-lg-6 h-100">
+                         <div id="DBTMTestWiseGraphReportsDivId">
+
+                         </div>
+                         </div>
+                          
+                        </div
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+ <style>
+    .switch-field {
+        display: flex;
+        overflow: hidden;
+    }
+
+        .switch-field input {
+            position: absolute !important;
+            clip: rect(0, 0, 0, 0);
+            height: 1px;
+            width: 1px;
+            border: 0;
+            overflow: hidden;
+        }
+
+        .switch-field label {
+            background-color: #e4e4e4;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 14px;
+            line-height: 1;
+            text-align: center;
+            padding: 8px 16px;
+            margin-right: -1px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.1s ease-in-out;
+        }
+
+            .switch-field label:hover {
+                cursor: pointer;
+            }
+
+        .switch-field input:checked + label {
+            background-color: #9ba7ca;
+            box-shadow: none;
+        }
+
+        .switch-field label:first-of-type {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .switch-field label:last-of-type {
+            border-radius: 0 4px 4px 0;
+        }
+
+</style>
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <script type="text/javascript">
+         function ShowHideDiv(type) {
+        if (type == "list") {
+         
+        }
+        else {
+           
+        }
+        $("#SelectedParameter2").val(type);
+    }
         $(function () {
             $("#FromDate").datepicker({
                 changeMonth: true,
@@ -126,5 +206,3 @@
         });
     </script>
 }
-
-
