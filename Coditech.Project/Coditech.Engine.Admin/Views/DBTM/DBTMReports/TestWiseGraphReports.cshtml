@@ -46,9 +46,9 @@
                             <!-- Toggle Switch -->
                             <div class="form-check form-switch me-3">
                                 <div class="switch-field">
-                                    <input type="radio" id="radio-tile" name="switch-tile-list" value="tile" onclick="window.open(@url/dbtmreports/TestWiseGraphReports', '_blank');" />
+                                    <input type="radio" id="radio-tile" name="switch-tile-list" value="tile" onclick="window.open('@($"{url}/dbtmreports/TestWiseGraphReports")', '_self');" />
                                     <label for="radio-tile">Graph</label>
-                                    <input type="radio" id="radio-list" name="switch-tile-list" value="list" checked onclick="window.open(@url/dbtmreports/testwisereports', '_blank');" />
+                                    <input type="radio" id="radio-list" name="switch-tile-list" value="list" checked onclick="window.open('@($"{url}/dbtmreports/testwisereports")', '_self');" />
                                     <label for="radio-list">List</label>
                                 </div>
                             </div>
