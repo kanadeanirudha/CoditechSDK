@@ -1,6 +1,6 @@
 ﻿@model GeneralBatchListViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom5))
+    if (!string.IsNullOrEmpty(Model.Custom4))
     {
         Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
     }
@@ -18,7 +18,7 @@
                     <div class="card-header">
                         <span class="card-title">All Batch Details List</span>
 
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMGeneralBatchMaster/Create" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMGeneralBatchMaster/Create?custom4=@Model.Custom4" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
                     </div>
                     <div class="card-header">
                         <div class="row">

@@ -25,13 +25,32 @@ namespace Coditech.Admin.Controllers
             _dBTMTestAgent = dBTMTestAgent;
             _dBTMBatchAgent = dBTMBatchAgent;
         }
+        [HttpGet]
+        public ActionResult List(DataTableViewModel dataTableModel)
+        {
+            GeneralBatchListViewModel list = new GeneralBatchListViewModel();
+            GetListOnlyIfSingleCentre(dataTableModel);
+
+            {
+                list = _generalBatchAgent.GetBatchList(dataTableModel);
+            }
+            list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+            list.Custom4 = dataTableModel.SelectedParameter4;
+
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", list);
+            }
+
+            return View("~/Views/GeneralMaster/GeneralBatchMaster/List.cshtml", list);
+        }
 
         [HttpGet]
-        public ActionResult Create(string custom5)
+        public ActionResult Create(string custom4)
         {
 
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
-            generalBatchViewModel.Custom5 = custom5;
+            generalBatchViewModel.Custom4 = custom4;
             BindDropdown(generalBatchViewModel);
             return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
@@ -59,7 +78,7 @@ namespace Coditech.Admin.Controllers
                 if (!generalBatchViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction<GeneralBatchMasterController>(x => x.List(new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode }));
+                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
                 }
             }
             BindDropdown(generalBatchViewModel);
@@ -68,10 +87,24 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult UpdateGeneralBatch(int generalBatchMasterId)
+        public virtual ActionResult GetGeneralBatchUserList(DataTableViewModel dataTableViewModel)
+        {
+            GeneralBatchUserListViewModel list = _generalBatchAgent.GetGeneralBatchUserList(Convert.ToInt32(dataTableViewModel.SelectedParameter1), Convert.ToString(dataTableViewModel.SelectedParameter2), dataTableViewModel);
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/_AssociatedBatchList.cshtml", list);
+            }
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            list.SelectedParameter2 = dataTableViewModel.SelectedParameter2;
+            list.Custom4 = dataTableViewModel.SelectedParameter4;
+            return View($"~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/AssociatedBatchList.cshtml", list);
+        }
+        [HttpGet]
+        public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string custom4)
         {
             GeneralBatchViewModel generalBatchViewModel = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
             BindDropdown(generalBatchViewModel);
+            generalBatchViewModel.Custom4 = custom4;
             return ActionView(createEditBatch, generalBatchViewModel);
         }
 
@@ -86,7 +119,7 @@ namespace Coditech.Admin.Controllers
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                    return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId });
+                    return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom4 });
                 }
             }
             else
@@ -165,10 +198,10 @@ namespace Coditech.Admin.Controllers
             BindDBTMBatchUserList(generalBatchViewModel);
 
         }
-        public virtual ActionResult Cancel(string SelectedCentreCode)
+        public virtual ActionResult Cancel(string SelectedCentreCode ,string custom4)
         {
-            string custom5 = "MobileView";
-            return RedirectToAction<DBTMGeneralBatchMasterController>(x => x.Create(custom5));
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode , SelectedParameter4=custom4 };
+            return RedirectToAction("List", dataTableViewModel);
         }
 
         #endregion

@@ -1,6 +1,6 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom5))
+    if (!string.IsNullOrEmpty(Model.Custom4))
     {
         Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
     }
@@ -11,6 +11,7 @@
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTraineeAssignmentId", Model.DBTMTraineeAssignmentId.ToString());
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "GeneralTrainerMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), Parameter = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTraineeListByCentreCodeAndTrainerMasterId()", IsDisabled = Model.DBTMTraineeAssignmentId > 0, IsCustomDropdown = true };
+   
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -45,7 +46,7 @@
                             @Html.HiddenFor(m => m.DBTMTraineeAssignmentId)
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @Html.HiddenFor(x => x.SelectedCentreCode)
-                            @Html.HiddenFor(x => x.Custom5)
+                            @Html.HiddenFor(x => x.Custom4)
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="mb-12 multiselect-dropdown">
@@ -77,6 +78,10 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            if (!string.IsNullOrEmpty(Model.Custom4))
+                            {
+                                <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId&SelectedParameter1=@Model.Custom4" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            }
                             <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>

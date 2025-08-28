@@ -1,11 +1,17 @@
 ﻿@using Coditech.Admin.Utilities;
 @model GeneralBatchUserListViewModel
 @{
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     ViewBag.Title = " Batch User List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
+    keyValuePairs.Add("Custom4", Model.Custom4?.ToString() ?? string.Empty);
+
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
