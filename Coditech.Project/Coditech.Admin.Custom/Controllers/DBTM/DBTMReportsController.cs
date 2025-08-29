@@ -59,11 +59,27 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId, DateTime FromDate, DateTime ToDate )
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
         {
-            GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate);      
-            return PartialView("~/Views/Shared/Charts/_LineChart.cshtml", graphModel.LineChartModel);
+            GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate);
+            if (graphModel.IsRecordFound)
+            {
+                if (graphModel.GraphType == "LineChart")
+                {
+                    return PartialView("~/Views/Shared/Charts/_LineChart.cshtml", graphModel.LineChartModel);
+                }
+                else if (graphModel.GraphType == "BarChart")
+                {
+                    return PartialView("~/Views/Shared/Charts/_BarChart.cshtml", graphModel.BarChartModel);
+                }
+                else if (graphModel.GraphType == "PieChart")
+                {
+                    return PartialView("~/Views/Shared/Charts/_PieChart.cshtml", graphModel.PieChartModel);
+                }
+            }
+            return Content("No Record Found.");
         }
+
         public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
             DropdownViewModel testDropdownn = new DropdownViewModel

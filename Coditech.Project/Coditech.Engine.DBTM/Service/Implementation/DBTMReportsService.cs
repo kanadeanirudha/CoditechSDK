@@ -64,30 +64,66 @@ namespace Coditech.API.Service
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, ref entityId, userType, centreCode);
             if (dBTMReportsList?.Count > 0)
             {
-                string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
-
-                graphModel.LineChartModel = new LineChartModel();
+                DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
                 DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
-
-                string[] XValuesList = {  "5", "15", "20" };
-
-                int count = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue.ToString()).Count();
-
-                decimal[] YValuesList = new decimal[count];
-                int count1 = 0;
-                foreach (var item in dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue).ToList())
+                string[] XValuesList = null;
+                if (graphMaster.XParameter == "Date")
                 {
-                    YValuesList[count1] = item;
-                    count1++;
+                    int daysDifference = (toDate - fromDate).Days;
+                    List<string> xValues = new List<string>();
+                    for (int i = 0; i <= daysDifference; i++)
+                    {
+                        xValues.Add(fromDate.AddDays(i).ToString("yyyy-MM-dd"));
+                    }
+                    XValuesList = xValues.ToArray();
                 }
-                graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
-                graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
-                graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
-                graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
-                graphModel.IsRecordFound = true;
-                graphModel.GraphType = "LineChart";
-                graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
-                graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
+                else if (graphMaster.XParameter == "Distance")
+                {
+                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
+                        XValuesList = new string[] { "5", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
+                        XValuesList = new string[] { "10", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
+                        XValuesList = new string[] { "10", "30" };
+                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    {
+                        List<string> xValues = new List<string>();
+
+                        for (int i = 25; i <= (25 * 12); i = i + 5)
+                        {
+                            xValues.Add(i.ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
+                }
+                else if (graphMaster.XParameter == "Attempt")
+                {
+
+                }
+
+                if (XValuesList != null)
+                {
+
+                    int count = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue.ToString()).Count();
+
+                    decimal[] YValuesList = new decimal[count];
+                    int count1 = 0;
+                    foreach (var item in dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue).ToList())
+                    {
+                        YValuesList[count1] = item;
+                        count1++;
+                    }
+                    graphModel.LineChartModel = new LineChartModel();
+                    string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+                    graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
+                    graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
+                    graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
+                    graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = "LineChart";
+                    graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
+                    graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
+                }
             }
             return graphModel;
         }
