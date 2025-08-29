@@ -53,9 +53,9 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
         #region GeneralBatchUserList
-        public virtual GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId,int generalBatchMasterId)
+        public virtual GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId)
         {
-            GeneralBatchUserListResponse response = _dBTMBatchClient.GetDBTMBatchUserList(selectedCentreCode, generalTrainerMasterId,generalBatchMasterId);
+            GeneralBatchUserListResponse response = _dBTMBatchClient.GetDBTMBatchUserList(selectedCentreCode, generalTrainerMasterId, generalBatchMasterId);
             GeneralBatchUserListModel generalBatchUserList = new GeneralBatchUserListModel { GeneralBatchUserList = response?.GeneralBatchUserList };
             GeneralBatchUserListViewModel listViewModel = new GeneralBatchUserListViewModel();
             listViewModel.GeneralBatchUserList = generalBatchUserList?.GeneralBatchUserList?.ToViewModel<GeneralBatchUserViewModel>().ToList();

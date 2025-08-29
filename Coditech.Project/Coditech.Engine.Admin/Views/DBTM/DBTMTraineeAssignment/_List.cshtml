@@ -6,7 +6,7 @@
     }
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string isPopUpView = Convert.ToString(TempData["IsPopUpView"]);
+    string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
 }
 @if (string.IsNullOrEmpty(isPopUpView))
 {
