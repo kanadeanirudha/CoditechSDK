@@ -5,6 +5,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
+using Newtonsoft.Json;
 using System.Data;
 namespace Coditech.API.Service
 {
@@ -57,48 +58,74 @@ namespace Coditech.API.Service
             return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
         }
 
-        public DBTMGraphListModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId,DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
-            DBTMGraphListModel graphListModel = new DBTMGraphListModel();
-            List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
-            graphListModel.DBTMGraphMasterId = dBTMGraphMasterId;
-            graphListModel.XValuesList = new List<string> { "0", "5", "10", "15", "20" };
-            graphListModel.XAxisLabel = "Distance (m)";
-            graphListModel.Colors = new List<string>
-    {
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 159, 64, 1)"
-    };
+            GraphModel graphModel = new GraphModel();
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, ref entityId, userType, centreCode);
+            if (dBTMReportsList?.Count > 0)
+            {
+                DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
+                DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
+                string[] XValuesList = null;
+                if (graphMaster.XParameter == "Date")
+                {
+                    int daysDifference = (toDate - fromDate).Days;
+                    List<string> xValues = new List<string>();
+                    for (int i = 0; i <= daysDifference; i++)
+                    {
+                        xValues.Add(fromDate.AddDays(i).ToString("yyyy-MM-dd"));
+                    }
+                    XValuesList = xValues.ToArray();
+                }
+                else if (graphMaster.XParameter == "Distance")
+                {
+                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
+                        XValuesList = new string[] { "5", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
+                        XValuesList = new string[] { "10", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
+                        XValuesList = new string[] { "10", "30" };
+                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    {
+                        List<string> xValues = new List<string>();
 
-            string graphCode = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).Select(x => x.GraphCode).FirstOrDefault();
+                        for (int i = 25; i <= (25 * 12); i = i + 5)
+                        {
+                            xValues.Add(i.ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
+                }
+                else if (graphMaster.XParameter == "Attempt")
+                {
 
-            if (graphCode == "DistanceTime")
-            {
-                graphListModel.Title = "5-10-5 Agility Test (TIME)";
-                graphListModel.YAxisLabel = "Time (sec)";
-            }
-            else if (graphCode == "DistanceVelocity")
-            {
-                graphListModel.Title = "5-10-5 Agility Test (VELOCITY)";
-                graphListModel.YAxisLabel = "Velocity (m/s)";
-            }
-            else if (graphCode == "TimeAndVelocity")
-            {
-                graphListModel.Title = "5-10-5 Agility Test (TIME & VELOCITY)";
-                graphListModel.YAxisLabel = "Time and Velocity";
-            }
+                }
 
-            if (dBTMReportsList.Any())
-            {
-                DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.FirstOrDefault();
-                graphListModel.dbtmTestModel = dBTMTestMaster?.FromEntityToModel<DBTMTestModel>();
+                if (XValuesList != null)
+                {
+
+                    int count = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue.ToString()).Count();
+
+                    decimal[] YValuesList = new decimal[count];
+                    int count1 = 0;
+                    foreach (var item in dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue).ToList())
+                    {
+                        YValuesList[count1] = item;
+                        count1++;
+                    }
+                    graphModel.LineChartModel = new LineChartModel();
+                    string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+                    graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
+                    graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
+                    graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
+                    graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = "LineChart";
+                    graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
+                    graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
+                }
             }
-          
-            return graphListModel;
+            return graphModel;
         }
 
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
@@ -130,6 +157,32 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            return dBTMReportsList;
+        }
+
+        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
+        {
+            if (dBTMTestMasterId <= 0)
+            {
+                return new List<DBTMReportsModel>();
+            }
+            List<DBTMReportsModel> dBTMReportsList = new List<DBTMReportsModel>();
+            if (userType == UserTypeEnum.Employee.ToString())
+            {
+                entityId = 0;
+            }
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@DBTMGraphMasterId", dBTMGraphMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@FromDate", fromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", toDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@DBTMGraphMasterId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
             return dBTMReportsList;
         }
 

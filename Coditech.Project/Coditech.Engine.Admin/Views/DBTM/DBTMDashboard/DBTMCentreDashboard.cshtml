@@ -17,14 +17,15 @@
         count1++;
     }
     BarChartViewModel traineeTrainedviewModel = new BarChartViewModel()
-            {
-                BarChartId = "YearlyTraineeTrainedOverviewChart",
-                XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
-                YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
-                XAxisLabel = "Months",
-                YAxisLabel = "Trainees Count",
-                BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
-            };
+    {
+        BarChartId = "YearlyTraineeTrainedOverviewChart",
+        XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+        YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
+        XAxisLabel = "Months",
+        YAxisLabel = "Trainees Count",
+        BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
+    };
+    ModelPopUpViewModel getTrainerDashboard = new ModelPopUpViewModel() { ModelPopUpId = "GetTrainerDashboard", ModalContentId = "GetTrainerDashboardContentId" };
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -43,7 +44,7 @@
                                         </div>
                                         <div class="col-auto align-self-center">
                                             <div class="report-main-icon bg-light-alt">
-                                                <i class="fas fa-user-check"></i>
+                                                <i class="fas fa-toolbox"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -52,24 +53,24 @@
                         </a>
                     </div>
                     <div class="col-md-6 mb-3">
-                        @* <a href="/DBTMTraineeDetails/list"> *@
-                        <div class="card report-card">
-                            <div class="card-body">
-                                <div class="row d-flex justify-content-center">
-                                    <div class="col">
-                                        <p class="text-dark mb-0 fw-semibold">Weekly Device Load</p>
-                                        <h3 class="m-0">@Model.WeeklyDeviceLoad %</h3>
-                                        <p class="mb-0 text-truncate text-muted">&nbsp;</p>
-                                    </div>
-                                    <div class="col-auto align-self-center">
-                                        <div class="report-main-icon bg-light-alt">
-                                            <i class="fas fa-chalkboard-teacher"></i>
+                        <a href="#">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Weekly Device Load</p>
+                                            <h3 class="m-0">@Model.WeeklyDeviceLoad %</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-upload"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        @* </a> *@
+                        </a>
                     </div>
                     <div class="col-md-6 mb-3">
                         <a href="/generaltrainermaster/list">
@@ -123,7 +124,7 @@
                                         </div>
                                         <div class="col-auto align-self-center">
                                             <div class="report-main-icon bg-light-alt">
-                                                <i class="fas fa-user-friends"></i>
+                                                <i class="fas fa-layer-group"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -131,26 +132,26 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        @* <a href="/DBTMBatchDetails/list"> *@
-                        <div class="card report-card">
-                            <div class="card-body">
-                                <div class="row d-flex justify-content-center">
-                                    <div class="col">
-                                        <p class="text-dark mb-0 fw-semibold">Top Athlete</p>
-                                        <h3 class="m-0">@Model.TopAthletsName</h3>
-                                        <p class="mb-0 text-truncate text-muted">&nbsp;</p>
-                                    </div>
-                                    <div class="col-auto align-self-center">
-                                        <div class="report-main-icon bg-light-alt">
-                                            <i class="fas fa-user-graduate"></i>
+                   @*  <div class="col-md-6 mb-3">
+                        <a href="#">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col">
+                                            <p class="text-dark mb-0 fw-semibold">Top Athlete</p>
+                                            <h3 class="m-0">@Model.TopAthletsName</h3>
+                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="report-main-icon bg-light-alt">
+                                                <i class="fas fa-trophy"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        @* </a> *@
-                    </div>
+                        </a>
+                    </div> *@
                 </div>
             </div>
             <div class="col-lg-6 h-100">
@@ -182,7 +183,7 @@
                                         else
                                         {
                                             <div class="rounded-circle bg-soft-primary text-white w-100 h-100
-                                                d-flex align-items-center justify-content-center"
+                                                            d-flex align-items-center justify-content-center"
                                                  style="font-size: 36px; object-fit: cover;">
                                                 @trainer.FirstName.Substring(0, 1)@trainer.LastName.Substring(0, 1)
                                             </div>
@@ -201,9 +202,25 @@
                                     <li class="mt-2"><b>Number Of Trainees Linked:</b> @trainer.NumberOfTrainees</li>
                                     <li class="mt-2"><b>Number Of Batches:</b> @trainer.NumberOfBatchesCreated</li>
                                     <li class="mt-2"><b>Weekly Working Hrs:</b> @trainer.WeeklyWorkingHours</li>
-                                   @*  <div class="text-center mt-3">
+                                    @*  <div class="text-center mt-3">
                                         <a href="#" class="btn btn-sm btn-soft-primary">More Detail</a>
                                     </div> *@
+                                    <div class="text-center mt-3">
+                                        <div class="mb-6">
+                                            <button type="button"
+                                                    class="btn btn-gradient-info"
+                                                    onclick="DBTMDashboard.GetTrainerDashboard(
+                                                        '@getTrainerDashboard.ModalContentId',
+                                                        '@Model.NumberOfDaysRecord',
+                                                        '@trainer.GeneralTrainerMasterId',
+                                                        '@trainer.AdminRoleMasterId',
+                                                        '@trainer.UserMasterId')"
+                                                    title="More Detail">
+                                                More Detail
+                                            </button>
+                                        </div>
+                                    </div>
+
                                 </ul>
                             </div>
                         </div>
@@ -213,3 +230,5 @@
         }
     </div>
 </div>
+@Html.Partial("~/Views/Shared/_ModelFullScreenPopUp.cshtml", getTrainerDashboard)
+<script src="~/js/Coditech/DBTM/DBTMDashboard.js"></script>

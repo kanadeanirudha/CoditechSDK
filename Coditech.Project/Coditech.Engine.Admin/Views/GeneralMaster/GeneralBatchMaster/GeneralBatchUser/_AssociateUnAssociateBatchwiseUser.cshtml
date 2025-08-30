@@ -1,6 +1,10 @@
 ﻿@using Coditech.Admin.Utilities;
 @model GeneralBatchUserViewModel
 @{
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     Layout = null;
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
 }

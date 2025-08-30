@@ -42,6 +42,7 @@ namespace Coditech.Admin.Controllers
 
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            list.Custom4 = dataTableModel.SelectedParameter4;
 
             if (AjaxHelper.IsAjaxRequest)
             {
@@ -52,13 +53,14 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Create(string custom4)
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel
             {
                 SelectedCentreCode = userModel.SelectedCentreCode,
                 SelectedTrainee = new List<string>(),
+                Custom4 =custom4,
                 GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
             };
 
@@ -82,7 +84,7 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMTraineeAssignmentViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId) });
+                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
                 }
             }
 
@@ -98,14 +100,15 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId)
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId , string custom4)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
+            dBTMTraineeAssignmentViewModel.Custom4 = custom4;
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
         }
 
         [HttpPost]
-        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
+        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel )
         {
             ModelState.Remove("DBTMTestStatusEnumId");
             ModelState.Remove("SelectedTrainee");
@@ -120,7 +123,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 
         }
-        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode, string selectedParameter1)
+        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode, string selectedParameter1, string custom4)
         {
             string message = string.Empty;
             bool status = false;
@@ -132,14 +135,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                     ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1 });
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1 ,SelectedParameter4 = custom4 });
             }
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode , SelectedParameter4 = custom4 });
         }
 
-        public ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId)
+        public ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId, string custom4)
         {
 
             DBTMTraineeAssignmentViewModel model = new DBTMTraineeAssignmentViewModel();
@@ -154,7 +157,7 @@ namespace Coditech.Admin.Controllers
             {
                 SetNotificationMessage(GetErrorNotificationMessage(model.ErrorMessage));
             }
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId) });
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId), SelectedParameter4=custom4 });
         }
 
         public ActionResult GetTrainerByCentreCode(string centreCode)
@@ -181,9 +184,9 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDetailsDropdown);
         }
 
-        public virtual ActionResult Cancel(string SelectedCentreCode, string GeneralTrainerMasterId)
+        public virtual ActionResult Cancel(string SelectedCentreCode, string GeneralTrainerMasterId, string custom4)
         {
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId };
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId , SelectedParameter4 = custom4 };
             return RedirectToAction("List", dataTableViewModel);
         }
 

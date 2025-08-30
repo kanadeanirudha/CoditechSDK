@@ -1,9 +1,18 @@
 ﻿@model GeneralBatchListViewModel
 @{
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    }
     ViewBag.Title = "All Batch Details List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        controllerName = "generalbatchmaster";
+        actionName = "list";
+    }
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -14,7 +23,7 @@
                     <div class="card-header">
                         <span class="card-title">All Batch Details List</span>
 
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMGeneralBatchMaster/Create" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMGeneralBatchMaster/Create?custom4=@Model.Custom4" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
                     </div>
                     <div class="card-header">
                         <div class="row">

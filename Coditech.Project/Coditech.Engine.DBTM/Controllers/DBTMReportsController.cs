@@ -1,4 +1,3 @@
-using Coditech.API.Data;
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
@@ -7,7 +6,7 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-
+using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Engine.DBTM.Controllers
 {
     public class DBTMReportsController : BaseController
@@ -70,25 +69,23 @@ namespace Coditech.Engine.DBTM.Controllers
 
         [HttpGet]
         [Route("/DBTMReports/TestWiseGraphReports")]
-        [Produces(typeof(DBTMTestWiseReportsListResponse))]
-        [TypeFilter(typeof(BindQueryFilter))]
+        [Produces(typeof(GraphResponse))]
         public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId,string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             try
             {
-                DBTMGraphListModel list = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
-                string data = ApiHelper.ToJson(list);
-                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                return IsNotNull(model) ? CreateOKResponse(new GraphResponse { GraphModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseGraphReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new GraphResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseGraphReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new GraphResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

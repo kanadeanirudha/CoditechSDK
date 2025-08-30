@@ -128,7 +128,7 @@
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
-        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "" && dBTMGraphMasterId.trim() !== "") {
             CoditechCommon.ShowLodder();
 
             $.ajax({
@@ -175,7 +175,6 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     $("#DBTMGraphMasterId").html(data);
-                    DBTMReports.GetDBTMTestWiseGraphReports();
                     CoditechCommon.HideLodder();
                 },
                 error: function () {
