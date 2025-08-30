@@ -108,9 +108,10 @@ namespace Coditech.Admin.Controllers
             GetListOnlyIfSingleCentre(dataTableModel);
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
-                list = _dBTMDashboardAgent.GetBatchList(dataTableModel);
+                list = _generalBatchAgent.GetBatchList(dataTableModel);
             }
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
+            string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
             list.Custom4 = "Mobile View";
             return list;
         }
@@ -131,7 +132,7 @@ namespace Coditech.Admin.Controllers
 
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode) && !string.IsNullOrEmpty(dataTableModel.SelectedParameter1))
             {
-                string isPopUpView = Convert.ToString(TempData["IsPopUpView"]);
+                string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
                 dataTableModel.SelectedParameter3 = isPopUpView;
                 assignmentList = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignmentList(dataTableModel);
             }
@@ -238,7 +239,7 @@ namespace Coditech.Admin.Controllers
             UserProfileViewModel userProfileViewModel = _dBTMDashboardAgent.GetUserProfile(userMasterId);
             dBTMDashboardViewModel.SelectedParameter1 = generalTrainerMasterId.ToString();
             dBTMDashboardViewModel.SelectedParameter2 = userMasterId.ToString();
-            TempData["IsPopUpView"] = "data";
+            TempData["IsMobileCustom"] = "data";
             TempData.Keep();
             if (IsNotNull(userProfileViewModel))
             {

@@ -9,6 +9,11 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()" };
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true, SelectedText = "-------Select Trainer-------", SelectedValue = "" };
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        controllerName = "DBTMTraineeAssignment";
+
+    }
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -18,7 +23,7 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Trainee Assignment List</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create?custom=@Model.Custom4" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
                     </div>
                     <div class="card-header">
                         <div class="row">

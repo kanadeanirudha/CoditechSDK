@@ -1,36 +1,40 @@
 ﻿@model GeneralBatchListViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
-    ViewBag.Title = "All Batch Details List";
-    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        controllerName = "generalbatchmaster";
-        actionName = "list";
-    }
+	if (!string.IsNullOrEmpty(Model.Custom4))
+	{
+		Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+	}
+	ViewBag.Title = "All Batch Details List";
+	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+	string actionName = ViewContext.RouteData.Values["action"].ToString();
+	string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
+	DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
+	if (!string.IsNullOrEmpty(Model.Custom4))
+	{
+		controllerName = "generalbatchmaster";
+		actionName = "list";
+	}
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">All Batch Details List</span>
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("Create", "DBTMGeneralBatchMaster", new { custom4 = "Mobile View" })" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
-                    </div>
-                    <div class="card-body">
-                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                            @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", Model)
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<span class="card-title">All Batch Details List</span>
+						@if (string.IsNullOrEmpty(isPopUpView))
+						{
+							<a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("Create", "DBTMGeneralBatchMaster", new { custom4 = "Mobile View" })" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
+						}
+					</div>
+					<div class="card-body">
+						<div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+							@Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", Model)
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

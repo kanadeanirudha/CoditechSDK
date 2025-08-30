@@ -1,5 +1,6 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,11 +59,27 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate )
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMGraphListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate);      
-            return PartialView("~/Views/DBTM/DBTMReports/Graph/_TestWiseGraphReports.cshtml", dBTMReportsViewModel);
+            GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate);
+            if (graphModel.IsRecordFound)
+            {
+                if (graphModel.GraphType == "LineChart")
+                {
+                    return PartialView("~/Views/Shared/Charts/_LineChart.cshtml", graphModel.LineChartModel);
+                }
+                else if (graphModel.GraphType == "BarChart")
+                {
+                    return PartialView("~/Views/Shared/Charts/_BarChart.cshtml", graphModel.BarChartModel);
+                }
+                else if (graphModel.GraphType == "PieChart")
+                {
+                    return PartialView("~/Views/Shared/Charts/_PieChart.cshtml", graphModel.PieChartModel);
+                }
+            }
+            return Content("No Record Found.");
         }
+
         public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
             DropdownViewModel testDropdownn = new DropdownViewModel
