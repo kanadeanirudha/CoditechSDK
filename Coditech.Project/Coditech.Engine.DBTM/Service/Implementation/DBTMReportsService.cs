@@ -113,14 +113,15 @@ namespace Coditech.API.Service
                         YValuesList[count1] = item;
                         count1++;
                     }
-                    graphModel.LineChartModel = new LineChartModel();
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = "LineChart";
                     string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+
+                    graphModel.LineChartModel = new LineChartModel();
                     graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
                     graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
                     graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
                     graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
-                    graphModel.IsRecordFound = true;
-                    graphModel.GraphType = "LineChart";
                     graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
                     graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
                 }
