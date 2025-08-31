@@ -113,14 +113,15 @@ namespace Coditech.API.Service
                         YValuesList[count1] = item;
                         count1++;
                     }
-                    graphModel.LineChartModel = new LineChartModel();
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = "LineChart";
                     string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+
+                    graphModel.LineChartModel = new LineChartModel();
                     graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
                     graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
                     graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
                     graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
-                    graphModel.IsRecordFound = true;
-                    graphModel.GraphType = "LineChart";
                     graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
                     graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
                 }
@@ -196,9 +197,9 @@ namespace Coditech.API.Service
                 if (isMobileRequest)
                 {
                     displayColumn.Add("Person Name");
-                    displayColumn.Add("Weight");
-                    displayColumn.Add("Height");
-                    displayColumn.Add("Activity Performed");
+                    //displayColumn.Add("Weight");
+                    //displayColumn.Add("Height");
+                    displayColumn.Add("Activity Time");
                 }
                 else
                 {
@@ -206,7 +207,7 @@ namespace Coditech.API.Service
                     displayColumn.Add("Activity Status");
                     displayColumn.Add("Weight");
                     displayColumn.Add("Height");
-                    displayColumn.Add("Activity Performed");
+                    displayColumn.Add("Activity Time");
                 }
                 foreach (string item in displayColumn)
                     listModel.DataTable.Columns.Add(item, typeof(String));
@@ -253,8 +254,8 @@ namespace Coditech.API.Service
                                 case "Height":
                                     newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
                                     break;
-                                case "Activity Performed":
-                                    newRow["Activity Performed"] = item.TestPerformedTime;
+                                case "Activity Time":
+                                    newRow["Activity Time"] = item.TestPerformedTime;
                                     break;
                             }
                         }
