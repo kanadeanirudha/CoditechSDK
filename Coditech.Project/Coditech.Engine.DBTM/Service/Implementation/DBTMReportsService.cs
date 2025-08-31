@@ -85,6 +85,8 @@ namespace Coditech.API.Service
                         XValuesList = new string[] { "10", "15", "20" };
                     else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
                         XValuesList = new string[] { "10", "30" };
+                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
+                        XValuesList = new string[] { "10", "20", "30", "40" };
                     else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
                     {
                         List<string> xValues = new List<string>();
@@ -103,7 +105,6 @@ namespace Coditech.API.Service
 
                 if (XValuesList != null)
                 {
-
                     int count = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue.ToString()).Count();
 
                     decimal[] YValuesList = new decimal[count];
