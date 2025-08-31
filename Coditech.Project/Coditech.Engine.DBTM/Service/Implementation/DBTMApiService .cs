@@ -70,6 +70,11 @@ namespace Coditech.API.Service
             if (IsNull(dBTMDeviceDataModelList))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            if(dBTMDeviceDataModelList.Any(x=>x.PersonCode == "DryRun"))
+            {
+                return true;
+            }
+
             if (dBTMDeviceDataModelList.Count > 0)
             {
                 DateTime createdDate = DateTime.Now;

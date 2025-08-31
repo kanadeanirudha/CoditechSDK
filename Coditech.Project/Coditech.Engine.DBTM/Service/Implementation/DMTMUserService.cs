@@ -100,6 +100,7 @@ namespace Coditech.API.Service
                 CentreCode = centreCode,
                 CentreName = generalPersonModel.CentreName,
                 EmployeeDesignation = employeeDesignation,
+                DateOfBirth = generalPersonModel.DateOfBirth,
             };
             return userModel;
         }
@@ -230,6 +231,7 @@ namespace Coditech.API.Service
             }
             return dbtmUserModel;
         }
+
         public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode)
         {
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
@@ -251,8 +253,5 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator ");
             return listModel;
         }
-
-
-
     }
 }
