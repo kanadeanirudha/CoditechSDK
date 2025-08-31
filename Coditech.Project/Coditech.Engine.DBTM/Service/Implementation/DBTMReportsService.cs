@@ -197,9 +197,9 @@ namespace Coditech.API.Service
                 if (isMobileRequest)
                 {
                     displayColumn.Add("Person Name");
-                    displayColumn.Add("Weight");
-                    displayColumn.Add("Height");
-                    displayColumn.Add("Activity Performed");
+                    //displayColumn.Add("Weight");
+                    //displayColumn.Add("Height");
+                    displayColumn.Add("Activity Time");
                 }
                 else
                 {
@@ -207,7 +207,7 @@ namespace Coditech.API.Service
                     displayColumn.Add("Activity Status");
                     displayColumn.Add("Weight");
                     displayColumn.Add("Height");
-                    displayColumn.Add("Activity Performed");
+                    displayColumn.Add("Activity Time");
                 }
                 foreach (string item in displayColumn)
                     listModel.DataTable.Columns.Add(item, typeof(String));
@@ -254,8 +254,8 @@ namespace Coditech.API.Service
                                 case "Height":
                                     newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
                                     break;
-                                case "Activity Performed":
-                                    newRow["Activity Performed"] = item.TestPerformedTime;
+                                case "Activity Time":
+                                    newRow["Activity Time"] = item.TestPerformedTime;
                                     break;
                             }
                         }
