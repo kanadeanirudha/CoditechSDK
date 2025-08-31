@@ -14,6 +14,6 @@
         public string LastName { get; set; }
         public string PersonName { get; set; }
         public string ActivityStatus { get; set; }
-        public DateTime? TestPerformedTime { get; set; }
+        public DateTime TestPerformedTime { get; set; }
     }
 }
