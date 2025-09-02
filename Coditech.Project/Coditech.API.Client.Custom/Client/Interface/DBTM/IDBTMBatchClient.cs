@@ -15,5 +15,6 @@ namespace Coditech.API.Client
         /// </summary>
         /// <returns>GeneralBatchUserListResponse</returns>
         GeneralBatchUserListResponse GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId);
+        GeneralBatchListResponse GetCalendarBatches(string centreCode, long userMasterId, DateTime startDate, DateTime endDate);
     }
 }

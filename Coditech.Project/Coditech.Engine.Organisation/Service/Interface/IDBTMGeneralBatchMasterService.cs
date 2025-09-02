@@ -6,5 +6,6 @@ namespace Coditech.API.Service
     public interface IDBTMBatchMasterService
     {
         GeneralBatchUserListModel GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId);
+        GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate);
     }
 }

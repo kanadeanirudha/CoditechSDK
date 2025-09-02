@@ -29,6 +29,26 @@ namespace Coditech.API.Service
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
+        public GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate)
+        {
+        
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<GeneralBatchModel> objStoredProc = new CoditechViewRepository<GeneralBatchModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@UserMasterId", userId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@StartDate", startDate, ParameterDirection.Input, DbType.DateTime);
+            objStoredProc.SetParameter("@EndDate", endDate, ParameterDirection.Input, DbType.DateTime);
+            objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<GeneralBatchModel> batchList = objStoredProc.ExecuteStoredProcedureList("Custom_Coditech_GetCalendarBatches @CentreCode, @UserMasterId, @StartDate, @EndDate, @WhereClause, @Rows, @PageNo, @Order_BY, @RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
+            GeneralBatchListModel listModel = new GeneralBatchListModel();
+            listModel.GeneralBatchList = batchList?.Count > 0 ? batchList : new List<GeneralBatchModel>();
+            return listModel;
+        }
+
         //Create GeneralBatch.
         public override GeneralBatchModel CreateGeneralBatch(GeneralBatchModel generalBatchModel)
         {
