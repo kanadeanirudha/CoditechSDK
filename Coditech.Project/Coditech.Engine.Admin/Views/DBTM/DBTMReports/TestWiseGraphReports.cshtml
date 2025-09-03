@@ -25,7 +25,7 @@
                 IsCustomDropdown = true,
                 ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()"
             };
-              string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
+    string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -33,14 +33,14 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                  @*   <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="card-title">Activity Graph Reports</h4>
-                            </div><!--end col-->
-                        </div>  <!--end row-->
+                    @*   <div class="card-header">
+                    <div class="row align-items-center">
+                    <div class="col">
+                    <h4 class="card-title">Activity Graph Reports</h4>
+                    </div><!--end col-->
+                    </div>  <!--end row-->
                     </div> *@
-                      <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="card-title">Activity Graph Reports</span>
                         <div class="d-flex align-items-center">
                             <!-- Toggle Switch -->
@@ -57,19 +57,19 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-1">
-                                <label class = "form-label">Activity List</label>
+                                <label class="form-label">Activity List</label>
                             </div>
                             <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
                             </div>
-                             <div class="col-md-1">
-                                <label class = "form-label">Graph Type</label>
+                            <div class="col-md-1">
+                                <label class="form-label">Graph Type</label>
                             </div>
                             <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
                             </div>
                             <div class="col-md-1">
-                                <label class = "form-label">Trainee List</label>
+                                <label class="form-label">Trainee List</label>
                             </div>
                             <div class="col-md-5">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
@@ -93,13 +93,11 @@
                             </div>
                         </div>
                         <div class="row  mt-3">
-                            <div class="col-lg-6 h-100">
-                         <div id="DBTMTestWiseGraphReportsDivId">
-
-                         </div>
-                         </div>
-                          
-                        </div
+                            <div class="col-lg-12 h-100">
+                                <div id="DBTMTestWiseGraphReportsDivId">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -108,7 +106,7 @@
 </div>
 
 
- <style>
+<style>
     .switch-field {
         display: flex;
         overflow: hidden;
@@ -157,15 +155,15 @@
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <script type="text/javascript">
-         function ShowHideDiv(type) {
-        if (type == "list") {
-         
+        function ShowHideDiv(type) {
+            if (type == "list") {
+
+            }
+            else {
+
+            }
+            $("#SelectedParameter2").val(type);
         }
-        else {
-           
-        }
-        $("#SelectedParameter2").val(type);
-    }
         $(function () {
             $("#FromDate").datepicker({
                 changeMonth: true,

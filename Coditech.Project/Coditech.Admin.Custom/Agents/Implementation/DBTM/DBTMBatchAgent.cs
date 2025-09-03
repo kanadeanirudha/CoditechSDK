@@ -62,6 +62,17 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
         #endregion
+        #region Calendar
+        public virtual GeneralBatchListViewModel GetCalendarBatches(string centreCode, long userMasterId, DateTime startDate, DateTime endDate)
+        {
+            userMasterId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserMasterId;
+            GeneralBatchListResponse response = _dBTMBatchClient.GetCalendarBatches(centreCode, userMasterId, startDate, endDate);
+            GeneralBatchListModel generalBatchList = new GeneralBatchListModel { GeneralBatchList = response?.GeneralBatchList };
+            GeneralBatchListViewModel listViewModel = new GeneralBatchListViewModel();
+            listViewModel.GeneralBatchList = generalBatchList?.GeneralBatchList?.ToViewModel<GeneralBatchViewModel>().ToList();
+            return listViewModel;
+        }
+        #endregion
         #endregion
     }
 }

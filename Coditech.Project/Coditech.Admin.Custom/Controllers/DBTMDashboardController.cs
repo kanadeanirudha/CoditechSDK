@@ -39,6 +39,7 @@ namespace Coditech.Admin.Controllers
                 }
                 else if (dashboardViewModel.DashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
+                    TempData.Remove("IsMobileCustom");
                     DataTableViewModel dataTableModel = new DataTableViewModel();
                     DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetDBTMDashboardDetails(numberOfDaysRecord);
                     UserProfileViewModel userProfileViewModel = _userAgent.GetUserProfile();
@@ -71,8 +72,15 @@ namespace Coditech.Admin.Controllers
 
             dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
             dBTMDashboardViewModel.GeneralBatchList.Add(list);
-
+            string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
+            if (!string.IsNullOrEmpty(isPopUpView))
+            {
+                list.PageListViewModel.IsActionColumn = false;
+                list.PageListViewModel.DatatableColumnList.FirstOrDefault().IsSortable = false;
+                TempData.Keep();
+            }
             TempData.Keep("DBTMModel");
+
 
             return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
         }

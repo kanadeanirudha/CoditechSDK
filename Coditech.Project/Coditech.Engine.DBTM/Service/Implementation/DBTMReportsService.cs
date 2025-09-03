@@ -50,7 +50,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
 
-            return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
+            return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, FromDate, ToDate);
         }
 
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
@@ -85,6 +85,8 @@ namespace Coditech.API.Service
                         XValuesList = new string[] { "10", "15", "20" };
                     else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
                         XValuesList = new string[] { "10", "30" };
+                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
+                        XValuesList = new string[] { "10", "20", "30", "40" };
                     else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
                     {
                         List<string> xValues = new List<string>();
@@ -103,7 +105,6 @@ namespace Coditech.API.Service
 
                 if (XValuesList != null)
                 {
-
                     int count = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue.ToString()).Count();
 
                     decimal[] YValuesList = new decimal[count];
@@ -113,14 +114,15 @@ namespace Coditech.API.Service
                         YValuesList[count1] = item;
                         count1++;
                     }
-                    graphModel.LineChartModel = new LineChartModel();
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = "LineChart";
                     string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
+
+                    graphModel.LineChartModel = new LineChartModel();
                     graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
                     graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
                     graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
                     graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
-                    graphModel.IsRecordFound = true;
-                    graphModel.GraphType = "LineChart";
                     graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
                     graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
                 }
@@ -132,7 +134,7 @@ namespace Coditech.API.Service
         {
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
 
-            return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList);
+            return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate);
         }
 
         private List<DBTMReportsModel> GetTestWiseReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
@@ -186,7 +188,7 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
-        private DBTMReportsListModel BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList)
+        private DBTMReportsListModel BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
         {
             DBTMReportsListModel listModel = new DBTMReportsListModel();
 
@@ -196,9 +198,9 @@ namespace Coditech.API.Service
                 if (isMobileRequest)
                 {
                     displayColumn.Add("Person Name");
-                    displayColumn.Add("Weight");
-                    displayColumn.Add("Height");
-                    displayColumn.Add("Activity Performed");
+                    //displayColumn.Add("Weight");
+                    //displayColumn.Add("Height");
+                    displayColumn.Add("Activity Time");
                 }
                 else
                 {
@@ -206,7 +208,7 @@ namespace Coditech.API.Service
                     displayColumn.Add("Activity Status");
                     displayColumn.Add("Weight");
                     displayColumn.Add("Height");
-                    displayColumn.Add("Activity Performed");
+                    displayColumn.Add("Activity Time");
                 }
                 foreach (string item in displayColumn)
                     listModel.DataTable.Columns.Add(item, typeof(String));
@@ -253,8 +255,10 @@ namespace Coditech.API.Service
                                 case "Height":
                                     newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
                                     break;
-                                case "Activity Performed":
-                                    newRow["Activity Performed"] = item.TestPerformedTime;
+                                case "Activity Time":
+                                    newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date/* && fromDate.Date.Date == DateTime.Now.Date*/
+                                        ? item.TestPerformedTime.ToString("hh:mm tt")
+                                        : item.TestPerformedTime;
                                     break;
                             }
                         }

@@ -11,8 +11,8 @@
             <h5>Event Details</h5>
             <p><strong>Title:</strong> <span id="detailTitle">--</span></p>
             <p><strong>Description:</strong> <span id="detailDesc">--</span></p>
-            <p><strong>Start:</strong> <span id="detailStart">--</span></p>
-            <p><strong>End:</strong> <span id="detailEnd">--</span></p>
+            <p><strong>Start Batch:</strong> <span id="detailStart">--</span></p>
+            <p><strong>End Batch:</strong> <span id="detailEnd">--</span></p>
         </div>
     </div>
 </div>
@@ -21,36 +21,50 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+       document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
 
-        var events = @Html.Raw(JsonConvert.SerializeObject(
-            Model.CalendarEvent.Select(e => new
-            {
-                id = e.CalendarId,
-                title = e.Title,
-                start = e.Start_Date,
-                end = e.End_Date,
-                backgroundColor = string.IsNullOrEmpty(e.BackgroundColor) ? "#378006" : e.BackgroundColor,
-                description = e.Desc
-            })
-        ));
-        // console.log("Loaded events:", events);
         var calendar = new FullCalendar.Calendar(calendarEl, {
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            events: events,
-            eventClick: function(info) {
-                document.getElementById('detailTitle').innerText = info.event.title;
-                document.getElementById('detailDesc').innerText = info.event.extendedProps.description;
-                document.getElementById('detailStart').innerText = info.event.start.toISOString().split('T')[0];
-                document.getElementById('detailEnd').innerText = info.event.end
-                    ? info.event.end.toISOString().split('T')[0]
-                    : '';
-            }
+            events: function (fetchInfo, successCallback, failureCallback) {
+
+                var midDate = new Date(fetchInfo.start);
+                    midDate.setDate(midDate.getDate() + 15);
+
+                var year = midDate.getFullYear();
+                var month = midDate.getMonth();
+
+                var firstDay = new Date(year, month, 1);
+                var lastDay = new Date(year, month + 1, 0);
+
+                $.ajax({
+                    url: '/DBTMGeneralBatchMaster/GetCalendarData',
+                    data: {
+                        startDate: firstDay.toISOString().split('T')[0],
+                        endDate: lastDay.toISOString().split('T')[0]
+                    },
+                    success: function (data) {
+                        successCallback(data);
+                    },
+                    error: function () {
+                        failureCallback();
+                    }
+                });
+            },
+                eventClick: function(info) {
+                    document.getElementById('detailTitle').innerText = info.event.title;
+                    document.getElementById('detailDesc').innerText = info.event.extendedProps.description;
+
+                    let start = info.event.start;
+                    let end = info.event.end;
+
+                    document.getElementById('detailStart').innerText = start? start.toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }): '';
+                    document.getElementById('detailEnd').innerText = end? end.toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }): '';
+                }
         });
         calendar.render();
     });

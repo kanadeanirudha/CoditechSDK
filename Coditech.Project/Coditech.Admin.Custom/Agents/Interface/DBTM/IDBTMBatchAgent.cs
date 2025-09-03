@@ -1,5 +1,4 @@
 ﻿using Coditech.Admin.ViewModel;
-using Coditech.Common.Helper.Utilities;
 
 namespace Coditech.Admin.Agents
 {
@@ -13,5 +12,6 @@ namespace Coditech.Admin.Agents
         /// <param name="generalBatchMasterId">GeneralBatchMasterId.</param>
         /// <returns>GeneralBatchUserListViewModel</returns>
         GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId);
+        GeneralBatchListViewModel GetCalendarBatches(string centreCode, long userMasterId, DateTime startDate, DateTime endDate);
     }
 }
