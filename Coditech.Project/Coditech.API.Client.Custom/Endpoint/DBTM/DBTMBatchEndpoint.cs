@@ -16,5 +16,10 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralBatchMaster/GetDBTMBatchUserList?selectedCentreCode={selectedCentreCode}&generalTrainerMasterId={generalTrainerMasterId}&generalBatchMasterId={generalBatchMasterId}{BuildEndpointQueryString(true)}";
             return endpoint;
         }
+        public string GetCalendarBatchesAsync(string centreCode, long userMasterId, DateTime startDate, DateTime endDate)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralBatchMaster/GetCalendarBatches?centreCode={centreCode}&userMasterId={userMasterId}&startDate={startDate}&endDate={endDate}{BuildEndpointQueryString(true)}";
+            return endpoint;
+        }
     }
 }

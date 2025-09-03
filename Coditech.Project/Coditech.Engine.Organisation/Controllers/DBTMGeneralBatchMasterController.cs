@@ -45,5 +45,29 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new GeneralBatchUserListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMGeneralBatchMaster/GetCalendarBatches")]
+        [Produces(typeof(GeneralBatchListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                GeneralBatchListModel list = _dbtmGeneralBatchMasterService.GetCalendarBatches(centreCode, userId, startDate, endDate);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<GeneralBatchListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.GeneralBatchUser.ToString(), TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new GeneralBatchListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.GeneralBatchUser.ToString(), TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new GeneralBatchListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

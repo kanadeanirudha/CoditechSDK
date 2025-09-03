@@ -202,7 +202,7 @@ namespace Coditech.API.Service
                 }
                 if (deleteDBTMParametersAssociatedToTest?.Count > 0)
                 {
-                    _dBTMParametersAssociatedToTestRepository.BatchUpdate(deleteDBTMParametersAssociatedToTest);
+                    _dBTMParametersAssociatedToTestRepository.Delete(deleteDBTMParametersAssociatedToTest);
                 }
 
                 List<DBTMCalculationAssociatedToTest> deleteDBTMCalculationAssociatedToTest = null;
@@ -286,7 +286,7 @@ namespace Coditech.API.Service
 
                 if (deleteDBTMTestGraphList?.Count > 0)
                 {
-                    _dBTMTestGraphRepository.BatchUpdate(deleteDBTMTestGraphList);
+                    _dBTMTestGraphRepository.Delete(deleteDBTMTestGraphList);
                 }
             }
             else
