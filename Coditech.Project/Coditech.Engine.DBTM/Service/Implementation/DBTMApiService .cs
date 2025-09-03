@@ -77,9 +77,9 @@ namespace Coditech.API.Service
 
             if (dBTMDeviceDataModelList.Count > 0)
             {
-                DateTime createdDate = DateTime.Now;
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
+                    DateTime createdDate = DateTime.Now;
                     DBTMTraineeDetails dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
                     if (IsNull(dBTMTraineeDetails))
                         throw new CoditechException(ErrorCodes.InvalidData, "Invalid Person Code");
@@ -99,7 +99,7 @@ namespace Coditech.API.Service
                         CreatedDate = createdDate
                     };
 
-                    DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData);
+                    DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
 
                     if (DBTMDeviceDataDetails?.DBTMDeviceDataId > 0)
                     {
