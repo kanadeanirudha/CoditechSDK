@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Coditech.API.Data;
+﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -7,9 +6,8 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using System.Collections.Generic;
-using System.Data;
 using Newtonsoft.Json;
+using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -70,16 +68,17 @@ namespace Coditech.API.Service
             if (IsNull(dBTMDeviceDataModelList))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            if(dBTMDeviceDataModelList.Any(x=>x.PersonCode == "DryRun"))
+            if (dBTMDeviceDataModelList.Any(x => x.PersonCode == "DryRun"))
             {
                 return true;
             }
 
             if (dBTMDeviceDataModelList.Count > 0)
             {
+                DateTime? createdDate = null;
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
-                    DateTime createdDate = DateTime.Now;
+                    createdDate = DateTime.Now;
                     DBTMTraineeDetails dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
                     if (IsNull(dBTMTraineeDetails))
                         throw new CoditechException(ErrorCodes.InvalidData, "Invalid Person Code");
