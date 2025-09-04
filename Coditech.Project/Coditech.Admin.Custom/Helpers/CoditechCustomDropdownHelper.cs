@@ -66,6 +66,10 @@ namespace Coditech.Admin.Helpers
             {
                 DBTMGraphByDBTMTestMasterId(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphType.ToString()))
+            {
+                DBTMGraphTypeList(dropdownViewModel, dropdownList);
+            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeGraphList.ToString()))
             {
                 GetTraineeDetailsGraphList(dropdownViewModel, dropdownList);
@@ -394,6 +398,22 @@ namespace Coditech.Admin.Helpers
                     Text = $"{item.PerformanceMatrix}",
                     Value = item.DBTMPerformanceMatrixId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMPerformanceMatrixId)
+                });
+            }
+        }
+        private static void DBTMGraphTypeList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            foreach (DBTMGraphCustomEnum graphType in Enum.GetValues(typeof(DBTMGraphCustomEnum)))
+            {
+                if (dropdownViewModel.ExcludedValues != null && dropdownViewModel.ExcludedValues.Any(x => x.Contains(graphType.ToString())))
+                {
+                    continue;
+                }
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = graphType.ToString(),
+                    Value = graphType.ToString(),
+                    Selected = graphType.ToString() == dropdownViewModel.DropdownSelectedValue
                 });
             }
         }
