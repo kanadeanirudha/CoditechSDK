@@ -119,12 +119,17 @@ namespace Coditech.API.Service
                     string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
 
                     graphModel.LineChartModel = new LineChartModel();
+                    graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
                     graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
                     graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
                     graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
-                    graphModel.LineChartModel.YValues = JsonConvert.SerializeObject(YValuesList);
-                    graphModel.LineChartModel.BackgroundColor = JsonConvert.SerializeObject(backgroundColor);
-                    graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
+                    graphModel.LineChartModel.Datasets = new List<LineGraphsDatasetModel>();
+                    graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                    {
+                        Color = "rgba(42, 118, 244, 1)",
+                        Label   = graphMaster?.YParameter,
+                        Data = JsonConvert.SerializeObject(YValuesList),
+                    });
                 }
             }
             return graphModel;
