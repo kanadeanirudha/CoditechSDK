@@ -7,6 +7,7 @@ using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Newtonsoft.Json;
 using System.Data;
+using System.Drawing;
 namespace Coditech.API.Service
 {
     public class DBTMReportsService : BaseService, IDBTMReportsService
@@ -105,18 +106,8 @@ namespace Coditech.API.Service
 
                 if (XValuesList != null)
                 {
-                    int count = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue.ToString()).Count();
-
-                    decimal[] YValuesList = new decimal[count];
-                    int count1 = 0;
-                    foreach (var item in dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).Select(x => x.ParameterValue).ToList())
-                    {
-                        YValuesList[count1] = item;
-                        count1++;
-                    }
                     graphModel.IsRecordFound = true;
                     graphModel.GraphType = "LineChart";
-                    string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
 
                     graphModel.LineChartModel = new LineChartModel();
                     graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
@@ -124,12 +115,22 @@ namespace Coditech.API.Service
                     graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
                     graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
                     graphModel.LineChartModel.Datasets = new List<LineGraphsDatasetModel>();
-                    graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+
+                    int colorIndex = 0;
+                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.CreatedDate);
+                    string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
+
+                    foreach (var group in groupedReports)
                     {
-                        Color = "rgba(42, 118, 244, 1)",
-                        Label   = graphMaster?.YParameter,
-                        Data = JsonConvert.SerializeObject(YValuesList),
-                    });
+                        List<decimal> YValuesList = group.Select(x => x.ParameterValue).ToList();
+                        graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                        {
+                            Color = colorPalette[colorIndex % colorPalette.Length],
+                            Label = fromDate.Date == toDate.Date ? $"{graphMaster?.YParameter} {group.Key:hh:mm:ss tt}" : $"{graphMaster?.YParameter} {group.Key:yyyy-MM-dd HH:mm:ss}",
+                            Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
+                        });
+                        colorIndex++;
+                    }
                 }
             }
             return graphModel;
@@ -261,8 +262,8 @@ namespace Coditech.API.Service
                                     newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
                                     break;
                                 case "Activity Time":
-                                    newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date/* && fromDate.Date.Date == DateTime.Now.Date*/
-                                        ? item.TestPerformedTime.ToString("hh:mm tt")
+                                    newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
+                                        ? item.TestPerformedTime.ToString("hh:mm:ss tt")
                                         : item.TestPerformedTime;
                                     break;
                             }
