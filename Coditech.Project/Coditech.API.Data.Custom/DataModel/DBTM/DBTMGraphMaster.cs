@@ -9,6 +9,8 @@ namespace Coditech.API.Data
         public string GraphCode { get; set; }
         public string XParameter { get; set; }
         public string YParameter { get; set; }
+        public string TestCode { get; set; }
+        public string GraphType { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
