@@ -107,29 +107,56 @@ namespace Coditech.API.Service
                 if (XValuesList != null)
                 {
                     graphModel.IsRecordFound = true;
-                    graphModel.GraphType = "LineChart";
-
-                    graphModel.LineChartModel = new LineChartModel();
-                    graphModel.LineChartModel.LineChartId = dBTMTestMasterId.ToString();
-                    graphModel.LineChartModel.XAxisLabel = graphMaster?.XParameter;
-                    graphModel.LineChartModel.XValues = JsonConvert.SerializeObject(XValuesList);
-                    graphModel.LineChartModel.YAxisLabel = graphMaster?.YParameter;
-                    graphModel.LineChartModel.Datasets = new List<LineGraphsDatasetModel>();
-
+                    graphModel.GraphType = graphMaster.GraphType;
                     int colorIndex = 0;
                     var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.CreatedDate);
                     string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
 
-                    foreach (var group in groupedReports)
+                    if (graphModel.GraphType == "LineChart")
                     {
-                        List<decimal> YValuesList = group.Select(x => x.ParameterValue).ToList();
-                        graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                        graphModel.LineChartModel = new LineChartModel()
                         {
-                            Color = colorPalette[colorIndex % colorPalette.Length],
-                            Label = fromDate.Date == toDate.Date ? $"{graphMaster?.YParameter} {group.Key:hh:mm:ss tt}" : $"{graphMaster?.YParameter} {group.Key:yyyy-MM-dd HH:mm:ss}",
-                            Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
-                        });
-                        colorIndex++;
+                            LineChartId = dBTMTestMasterId.ToString(),
+                            XAxisLabel = graphMaster?.XParameter,
+                            XValues = JsonConvert.SerializeObject(XValuesList),
+                            YAxisLabel = graphMaster?.YParameter,
+                            Datasets = new List<LineGraphsDatasetModel>()
+                        };
+
+                        foreach (var group in groupedReports)
+                        {
+                            List<decimal> YValuesList = group.Select(x => x.ParameterValue).ToList();
+                            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                            {
+                                Color = colorPalette[colorIndex % colorPalette.Length],
+                                Label = fromDate.Date == toDate.Date ? $"{graphMaster?.YParameter} {group.Key:hh:mm:ss tt}" : $"{graphMaster?.YParameter} {group.Key:yyyy-MM-dd HH:mm:ss}",
+                                Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
+                            });
+                            colorIndex++;
+                        }
+                    }
+                    else if (graphModel.GraphType == "BarChart")
+                    {
+                        graphModel.BarChartModel = new BarChartModel()
+                        {
+                            BarChartId = dBTMTestMasterId.ToString(),
+                            XAxisLabel = graphMaster?.XParameter,
+                            XValues = JsonConvert.SerializeObject(XValuesList),
+                            YAxisLabel = graphMaster?.YParameter,
+                            Datasets = new List<BarGraphsDatasetModel>()
+                        };
+
+                        foreach (var group in groupedReports)
+                        {
+                            List<decimal> YValuesList = group.Select(x => x.ParameterValue).ToList();
+                            graphModel.BarChartModel.Datasets.Add(new BarGraphsDatasetModel()
+                            {
+                                Color = colorPalette[colorIndex % colorPalette.Length],
+                                Label = fromDate.Date == toDate.Date ? $"{graphMaster?.YParameter} {group.Key:hh:mm:ss tt}" : $"{graphMaster?.YParameter} {group.Key:yyyy-MM-dd HH:mm:ss}",
+                                Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
+                            });
+                            colorIndex++;
+                        }
                     }
                 }
             }
