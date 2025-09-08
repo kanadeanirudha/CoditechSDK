@@ -7,7 +7,6 @@ using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Newtonsoft.Json;
 using System.Data;
-using System.Drawing;
 namespace Coditech.API.Service
 {
     public class DBTMReportsService : BaseService, IDBTMReportsService
@@ -230,18 +229,18 @@ namespace Coditech.API.Service
                 List<string> displayColumn = new List<string>();
                 if (isMobileRequest)
                 {
+                    displayColumn.Add("Activity Time");
                     displayColumn.Add("Person Name");
                     //displayColumn.Add("Weight");
                     //displayColumn.Add("Height");
-                    displayColumn.Add("Activity Time");
                 }
                 else
                 {
+                    displayColumn.Add("Activity Time");
                     displayColumn.Add("Person Name");
                     displayColumn.Add("Activity Status");
                     displayColumn.Add("Weight");
                     displayColumn.Add("Height");
-                    displayColumn.Add("Activity Time");
                 }
                 foreach (string item in displayColumn)
                     listModel.DataTable.Columns.Add(item, typeof(String));
