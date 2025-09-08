@@ -16,15 +16,23 @@
         YValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToInt32(item.TotalTrainee);
         count1++;
     }
-    BarChartViewModel traineeTrainedviewModel = new BarChartViewModel()
+    var traineeDataset = new List<BarGraphsDatasetModel>
     {
-        BarChartId = "YearlyTraineeTrainedOverviewChart",
-        XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
-        YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
-        XAxisLabel = "Months",
-        YAxisLabel = "Trainees Count",
-        BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
+        new BarGraphsDatasetModel
+        {
+            Label = "Trainees",
+            Data = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
+            Color = JsonConvert.SerializeObject(backgroundColor) 
+        }
     };
+    BarChartModel traineeTrainedviewModel = new BarChartModel()
+            {
+                BarChartId = "YearlyTraineeTrainedOverviewChart",
+                XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+                XAxisLabel = "Months",
+                YAxisLabel = "Trainees Count",
+                Datasets = traineeDataset
+            };
     ModelPopUpViewModel getTrainerDashboard = new ModelPopUpViewModel() { ModelPopUpId = "GetTrainerDashboard", ModalContentId = "GetTrainerDashboardContentId" };
 }
 <div class="page-content">
@@ -132,7 +140,7 @@
                             </div>
                         </a>
                     </div>
-                   @*  <div class="col-md-6 mb-3">
+                    @*  <div class="col-md-6 mb-3">
                         <a href="#">
                             <div class="card report-card">
                                 <div class="card-body">
@@ -157,10 +165,10 @@
             <div class="col-lg-6 h-100">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h4 class="card-title">Trainees Per Month</h4>
+                        <h4 class="card-title">Trainees Trained Per Month</h4>
                     </div>
                     <div class="card-body">
-                        @* @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", traineeTrainedviewModel) *@
+                        @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", traineeTrainedviewModel)
                     </div>
                 </div>
             </div>
