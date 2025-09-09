@@ -1,15 +1,15 @@
 ﻿namespace Coditech.Common.API.Model
 {
-    public class LineChartModel : BaseModel
+    public class BarChartModel : BaseModel
     {
-        public string LineChartId { get; set; }
+        public string BarChartId { get; set; }
         public string XValues { get; set; }
         public string XAxisLabel { get; set; }
         public string YAxisLabel { get; set; }
         public string Title { get; set; } = string.Empty;
-        public List<LineGraphsDatasetModel> Datasets { get; set; }
+        public List<BarGraphsDatasetModel> Datasets { get; set; }
     }
-    public class LineGraphsDatasetModel
+    public class BarGraphsDatasetModel
     {
         public string Label { get; set; }
         public string Data { get; set; }

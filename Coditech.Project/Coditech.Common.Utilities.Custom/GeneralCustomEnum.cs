@@ -56,5 +56,12 @@
     public enum UserTypeCustomEnum
     {
         DBTMIndividualRegister
-    }   
+    }
+    public enum DBTMGraphCustomEnum
+    {
+        LineChart,
+        BarChart,
+        PieChart,
+        RadarChart,
+    }
 }
