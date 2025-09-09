@@ -11,44 +11,47 @@
     @foreach (var dataset in Model.Datasets)
     {
         <text>
-            datasets.push({
-                label: "@dataset.Label",
-                data: @Html.Raw(dataset.Data),
-                fill: false,
-                borderColor: "@dataset.Color",
-                borderWidth: 2,
-                tension: 0.4
-            });
+                datasets.push({
+                    label: "@dataset.Label",
+                    data: @Html.Raw(dataset.Data),
+                    fill: false,
+                    borderColor: "@dataset.Color",
+                    backgroundColor: "rgba(42, 118, 244, 0.2)",   
+                    borderColor: "rgba(42, 118, 244, 0.5)",
+                    borderWidth: 1,
+                    tension: 0.4
+                });
         </text>
     }
 
-        new Chart("@Model.BarChartId", {
-            type: "bar",
-            data: {
-                labels: xValues,
-                datasets: datasets
+    new Chart("@Model.BarChartId", {
+        type: "bar",
+        data: {
+            labels: xValues,
+            datasets: datasets
+        },
+        options: {
+            title: {
+                display: true,
+                text: '@Model.Title'
             },
-            options: {
-                title: {
+            scales: {
+                xAxes: [{
                     display: true,
-                    text: '@Model.Title'
-                },
-                scales: {
-                    xAxes: [{
+                    scaleLabel: {
                         display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '@Model.XAxisLabel'
-                        }
-                    }],
-                    yAxes: [{
+                        labelString: '@Model.XAxisLabel'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    beginAtZero: true,
+                    scaleLabel: {
                         display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '@Model.YAxisLabel'
-                        }
-                    }]
-                }
+                        labelString: '@Model.YAxisLabel'
+                    }
+                }]
             }
-        });
+        }
+    });
 </script>

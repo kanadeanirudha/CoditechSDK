@@ -189,12 +189,6 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Test Code",
-                ColumnCode = "TestCode",
-                IsSortable = true,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
                 ColumnName = "Graph Type",
                 ColumnCode = "GraphType",
                 IsSortable = true,

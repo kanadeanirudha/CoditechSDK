@@ -118,7 +118,7 @@ namespace Coditech.API.Service
                             LineChartId = dBTMTestMasterId.ToString(),
                             XAxisLabel = graphMaster?.XParameter,
                             XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = graphMaster?.YParameter,
+                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
                             Datasets = new List<LineGraphsDatasetModel>()
                         };
 
