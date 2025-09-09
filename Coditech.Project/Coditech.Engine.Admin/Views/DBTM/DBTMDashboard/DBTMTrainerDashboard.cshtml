@@ -187,7 +187,7 @@
 									<div class="row d-flex justify-content-center">
 										<div class="col">
 											<p class="text-dark mb-0 fw-semibold">Activity Performed During Week</p>
-											<h3 class="m-0">@Model.TotalNumberOfActivityPerformedDuringMonth</h3>
+											<h3 class="m-0">@Model.TotalNumberOfActivityPerformedDuringWeek</h3>
 											<p class="mb-0 text-truncate text-muted">&nbsp;</p>
 										</div>
 										<div class="col-auto align-self-center">
@@ -245,7 +245,7 @@
 			<div class="col-lg-6 h-100">
 				<div class="card h-100">
 					<div class="card-header">
-						<h4 class="card-title">Trainees Trained Per Month</h4>
+						<h4 class="card-title">Trainees Trained By Month</h4>
 					</div>
 					<div class="card-body">
 						@Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", trainerviewModel)

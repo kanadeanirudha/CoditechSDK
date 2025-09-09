@@ -46,11 +46,19 @@
                 yAxes: [{
                     display: true,
                     beginAtZero: true,
+                    ticks: {
+                                stepSize: 1,            
+                                callback: function(value) {
+                                if (Number.isInteger(value)) {
+                                return value;     
+                            }
+                        }
+                    },
                     scaleLabel: {
                         display: true,
                         labelString: '@Model.YAxisLabel'
                     }
-                }]
+                }]                 
             }
         }
     });
