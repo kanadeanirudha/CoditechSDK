@@ -54,22 +54,19 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/Dashboard/GeneralDashboard.cshtml");
         }
         [HttpGet, HttpPost]
-        public ActionResult LoadBatchesPartial(DataTableViewModel dataTableModel)
+        public ActionResult LoadBatchesPartial(DataTableViewModel dataTableModel, bool isIframe = false)
         {
             // If no model came from GET, create a default one
             if (dataTableModel == null)
             {
                 dataTableModel = new DataTableViewModel();
             }
-
             GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
-
             DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null
                 ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString())
                 : new DBTMDashboardViewModel();
 
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
-
             dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
             dBTMDashboardViewModel.GeneralBatchList.Add(list);
             string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
@@ -80,33 +77,31 @@ namespace Coditech.Admin.Controllers
                 TempData.Keep();
             }
             TempData.Keep("DBTMModel");
+            if (isIframe)
+                return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
 
-
-            return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
+            return View("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
         }
 
         [HttpGet, HttpPost]
-        public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel)
+        public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel, bool isIframe = false)
         {
             if (dataTableModel == null)
             {
                 dataTableModel = new DataTableViewModel();
             }
-
             DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
-
-            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null
-                ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString())
-                : new DBTMDashboardViewModel();
+            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
 
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
-
             dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
             dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
-
             TempData.Keep("DBTMModel");
+            if (isIframe)
+                return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
 
-            return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
+            return View("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
+
         }
 
         [HttpGet]
