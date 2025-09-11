@@ -63,43 +63,54 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script type="text/javascript">
-        $(function () {
+        function updateToDate() {
+            var fromDate = $("#FromDate").datepicker("getDate");
+            if (fromDate) {
+                $("#ToDate").datepicker("option", "minDate", fromDate);
+
+                var toDate = $("#ToDate").datepicker("getDate");
+                if (toDate && toDate < fromDate) {
+                    $("#ToDate").datepicker("setDate", fromDate);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
+            // FromDate
             $("#FromDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                dateFormat: dateFormat,
                 language: "en",
                 autoSize: true,
                 gotoCurrent: true,
                 clearBtn: true,
                 showButtonPanel: true,
                 closeText: 'Clear',
-                onClose: function (dateText, inst) {
-                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
-                        document.getElementById(this.id).value = '';
-                    }
-                },
                 maxDate: new Date(),
+                onSelect: function () {
+                    updateToDate();
+                }
             });
-        });
-           $(function () {
+
+            // ToDate
             $("#ToDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
-                dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
+                dateFormat: dateFormat,
                 language: "en",
                 autoSize: true,
                 gotoCurrent: true,
                 clearBtn: true,
                 showButtonPanel: true,
                 closeText: 'Clear',
-                onClose: function (dateText, inst) {
-                    if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
-                        document.getElementById(this.id).value = '';
-                    }
-                },
                 maxDate: new Date(),
+                onSelect: function () {
+                    updateToDate();
+                }
             });
+            updateToDate();
         });
     </script>
     <script>
