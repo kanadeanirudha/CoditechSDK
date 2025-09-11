@@ -18,13 +18,13 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Y Parameter")]
         public string YParameter { get; set; }
-        [Display(Name = "Test Code")]
+        [Display(Name = "Test Name")]
         public string TestCode { get; set; }
         [Required]
         [Display(Name = "Graph Type")]
         public string GraphType { get; set; }
         [Required]
-        [Display(Name = "Test Code")]
+        [Display(Name = "Test Name")]
         public List<string> DBTMSelectedTestCode { get; set; } = new List<string>();
         public List<SelectListItem> DBTMTestList { get; set; }
     }

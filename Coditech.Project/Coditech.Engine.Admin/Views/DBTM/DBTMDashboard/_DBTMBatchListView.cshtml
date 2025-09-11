@@ -1,9 +1,6 @@
 ﻿@model GeneralBatchListViewModel
 @{
-	if (!string.IsNullOrEmpty(Model.Custom4))
-	{
-		Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-	}
+	Layout = null;
 	ViewBag.Title = "All Batch Details List";
 	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
 	string actionName = ViewContext.RouteData.Values["action"].ToString();

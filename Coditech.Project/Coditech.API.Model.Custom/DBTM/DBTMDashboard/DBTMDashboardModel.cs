@@ -11,7 +11,7 @@
         public int NumberOfActiveTrainees { get; set; }
         public int Assignments { get; set; }
         public string TopAthletes { get; set; }
-        public int? TotalNumberOfActivityPerformedDuringMonth { get; set; }
+        public int? TotalNumberOfActivityPerformedDuringWeek { get; set; }
         public List<DBTMTestModel> TopActivityPerformed { get; set; }
         public List<DBTMTraineeAssignmentModel> DueTodayAssignments { get; set; }
         public List<DBTMTraineeDetailsModel> Top3Trainee { get; set; }

@@ -1,37 +1,43 @@
-﻿@model BarChartViewModel
+﻿@model BarChartModel
 @{
     Layout = null;
 }
 <canvas id="@Model.BarChartId"></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script>
-    var xValues = @Html.Raw(@Model.XValues);
-    var yValues = @Html.Raw(Model.YValues);
+    var xValues = @Html.Raw(Model.XValues);
+    var datasets = [];
+
+    @foreach (var dataset in Model.Datasets)
+    {
+        <text>
+                datasets.push({
+                    label: "@dataset.Label",
+                    data: @Html.Raw(dataset.Data),
+                    fill: false,
+                    borderColor: "@dataset.Color",
+                    backgroundColor: "rgba(42, 118, 244, 0.2)",   
+                    borderColor: "rgba(42, 118, 244, 0.5)",
+                    borderWidth: 1,
+                    tension: 0.4
+                });
+        </text>
+    }
+
     new Chart("@Model.BarChartId", {
         type: "bar",
         data: {
             labels: xValues,
-            datasets: [{
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
-                borderColor: "rgba(75, 192, 192, 1)",
-                borderWidth: 1,
-                data: yValues
-            }]
+            datasets: datasets
         },
         options: {
-            legend: { display: false },
             title: {
                 display: true,
                 text: '@Model.Title'
             },
             scales: {
                 xAxes: [{
-                    beginAtZero: true,
                     display: true,
-                    gridLines: {
-                        display: false,
-                        drawBorder: true
-                    },
                     scaleLabel: {
                         display: true,
                         labelString: '@Model.XAxisLabel'
@@ -40,16 +46,20 @@
                 yAxes: [{
                     display: true,
                     beginAtZero: true,
-                    gridLines: {
-                        display: false,
-                        drawBorder: true
+                    ticks: {
+                                stepSize: 1,            
+                                callback: function(value) {
+                                if (Number.isInteger(value)) {
+                                return value;     
+                            }
+                        }
                     },
                     scaleLabel: {
                         display: true,
                         labelString: '@Model.YAxisLabel'
                     }
-                }]
-            },
+                }]                 
+            }
         }
     });
 </script>

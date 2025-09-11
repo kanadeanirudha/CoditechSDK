@@ -103,8 +103,8 @@ namespace Coditech.Admin.Controllers
                 {
                     dBTMGraphMasterViewModel.DBTMTestList.Add(new SelectListItem
                     {
-                        Text = item.TestCode,
-                        Value = item.DBTMTestMasterId.ToString()
+                        Text = item.TestName,
+                        Value = Convert.ToString(item.DBTMTestMasterId)
                     });
                 }
             }

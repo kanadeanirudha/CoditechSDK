@@ -1,17 +1,12 @@
 ﻿@model DBTMTraineeAssignmentListViewModel
 @{
-	if (!string.IsNullOrEmpty(Model.Custom4))
-	{
-		Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-	}
+	Layout = null;
 	ViewBag.Title = "DBTM Trainee Assignment List";
 	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
 	string actionName = ViewContext.RouteData.Values["action"].ToString();
 	string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
 	controllerName = "DBTMTraineeAssignment";
 	actionName = "list";
-
-
 	DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()" };
 	DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true, SelectedText = "-------Select Trainer-------", SelectedValue = "" };
 }
