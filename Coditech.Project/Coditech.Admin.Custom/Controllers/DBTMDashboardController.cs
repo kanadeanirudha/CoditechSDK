@@ -236,7 +236,7 @@ namespace Coditech.Admin.Controllers
         }
         #region Trainer DashBoard
         [HttpGet]
-        public virtual ActionResult GetTrainerDashBoard(short numberOfDaysRecord, long generalTrainerMasterId, int adminRoleMasterId, long userMasterId)
+        public virtual ActionResult GetTrainerDashBoard(short numberOfDaysRecord, long generalTrainerMasterId, int adminRoleMasterId, long userMasterId, bool isIframe = false)
         {
             DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetTrainerDashBoard(numberOfDaysRecord, generalTrainerMasterId, adminRoleMasterId, userMasterId);
             UserProfileViewModel userProfileViewModel = _dBTMDashboardAgent.GetUserProfile(userMasterId);
@@ -249,6 +249,9 @@ namespace Coditech.Admin.Controllers
                 dBTMDashboardViewModel.UserProfileModel = new List<UserProfileViewModel>();
             }
             dBTMDashboardViewModel.UserProfileModel.Add(userProfileViewModel);
+            if (isIframe)
+                return PartialView("~/Views/DBTM/DBTMDashboard/_dBTMTrainerDashboardPopUp.cshtml", dBTMDashboardViewModel);
+
             return View("~/Views/DBTM/DBTMDashboard/_dBTMTrainerDashboardPopUp.cshtml", dBTMDashboardViewModel);
         }
         #endregion
