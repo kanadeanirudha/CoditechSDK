@@ -15,5 +15,7 @@
         public string PersonName { get; set; }
         public string ActivityStatus { get; set; }
         public DateTime TestPerformedTime { get; set; }
+        public int RowCountPerDate { get; set; }
+        public int RowOrder { get; set; }
     }
 }

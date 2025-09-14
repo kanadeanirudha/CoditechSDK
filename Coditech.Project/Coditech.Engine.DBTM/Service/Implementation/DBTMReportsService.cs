@@ -61,19 +61,25 @@ namespace Coditech.API.Service
         public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             GraphModel graphModel = new GraphModel();
-            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, ref entityId, userType, centreCode);
+            DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, graphMaster.XParameter, graphMaster.YParameter, fromDate, toDate, ref entityId, userType, centreCode);
             if (dBTMReportsList?.Count > 0)
             {
+                string dateTimeFormat = "yyyy-MM-dd";
+                int rowCountPerDate = dBTMReportsList.Max(x => x.RowCountPerDate);
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
-                DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
                 string[] XValuesList = null;
+                List<DateTime> testPerformedDateList = new List<DateTime>();
+                foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
+                {
+                    testPerformedDateList.Add(item.Date);
+                }
                 if (graphMaster.XParameter == "Date")
                 {
-                    int daysDifference = (toDate - fromDate).Days;
                     List<string> xValues = new List<string>();
-                    for (int i = 0; i <= daysDifference; i++)
+                    foreach (var item in testPerformedDateList)
                     {
-                        xValues.Add(fromDate.AddDays(i).ToString("yyyy-MM-dd"));
+                        xValues.Add(item.ToString(dateTimeFormat));
                     }
                     XValuesList = xValues.ToArray();
                 }
@@ -90,8 +96,8 @@ namespace Coditech.API.Service
                     else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
                     {
                         List<string> xValues = new List<string>();
-
-                        for (int i = 25; i <= (25 * 12); i = i + 5)
+                        short distance = 25;
+                        for (int i = distance; i <= (distance * 12); i = i + distance)
                         {
                             xValues.Add(i.ToString());
                         }
@@ -108,9 +114,8 @@ namespace Coditech.API.Service
                     graphModel.IsRecordFound = true;
                     graphModel.GraphType = graphMaster.GraphType;
                     int colorIndex = 0;
-                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.CreatedDate);
+                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.TestPerformedTime.Date);
                     string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
-
                     if (graphModel.GraphType == "LineChart")
                     {
                         graphModel.LineChartModel = new LineChartModel()
@@ -122,14 +127,19 @@ namespace Coditech.API.Service
                             Datasets = new List<LineGraphsDatasetModel>()
                         };
 
-                        foreach (var group in groupedReports)
+                        for (int i = 1; i <= rowCountPerDate; i++)
                         {
-                            List<decimal> YValuesList = group.Select(x => x.ParameterValue).ToList();
+                            List<decimal> yValuesList = new List<decimal>();
+                            foreach (DateTime date in testPerformedDateList)
+                            {
+                                yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
+                            }
+
                             graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
                             {
                                 Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = fromDate.Date == toDate.Date ? $"{graphMaster?.YParameter} {group.Key:hh:mm:ss tt}" : $"{graphMaster?.YParameter} {group.Key:yyyy-MM-dd HH:mm:ss}",
-                                Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
+                                Label = $"Number Of Turns: {i}",
+                                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
                             });
                             colorIndex++;
                         }
@@ -141,17 +151,22 @@ namespace Coditech.API.Service
                             BarChartId = dBTMTestMasterId.ToString(),
                             XAxisLabel = graphMaster?.XParameter,
                             XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = graphMaster?.YParameter,
+                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
                             Datasets = new List<BarGraphsDatasetModel>()
                         };
-
-                        foreach (var group in groupedReports)
+                        // dataset will create based on rowCountPerDate count and dataset value will will bind based on testPerformedDateList
+                        for (int i = 1; i <= rowCountPerDate; i++)
                         {
-                            List<decimal> YValuesList = group.Select(x => x.ParameterValue).ToList();
+                            List<decimal> YValuesList = new List<decimal>();
+                            foreach (DateTime date in testPerformedDateList)
+                            {
+                                YValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
+                            }
+
                             graphModel.BarChartModel.Datasets.Add(new BarGraphsDatasetModel()
                             {
                                 Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = fromDate.Date == toDate.Date ? $"{graphMaster?.YParameter} {group.Key:hh:mm:ss tt}" : $"{graphMaster?.YParameter} {group.Key:yyyy-MM-dd HH:mm:ss}",
+                                Label = $"Number Of Turns: {i}",
                                 Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
                             });
                             colorIndex++;
@@ -194,7 +209,7 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
-        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
+        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, string xParameter, string yParameter, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
         {
             if (dBTMTestMasterId <= 0)
             {
@@ -210,13 +225,14 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
-            objStoredProc.SetParameter("@DBTMGraphMasterId", dBTMGraphMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@XParameter", xParameter, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@YParameter", yParameter, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@FromDate", fromDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@ToDate", toDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@DBTMGraphMasterId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
+            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@XParameter,@YParameter,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
             return dBTMReportsList;
         }
 
