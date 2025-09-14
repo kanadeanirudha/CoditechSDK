@@ -94,6 +94,7 @@ namespace Coditech.API.Service
                         Height = dBTMTraineeDetails.Height,
                         Weight = dBTMTraineeDetails.Weight,
                         TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
+                        NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
                         CreatedBy = dBTMDeviceDataModel.CreatedBy,
                         CreatedDate = createdDate
                     };
@@ -186,7 +187,7 @@ namespace Coditech.API.Service
                                    select new DBTMBatchModel
                                    {
                                        GeneralBatchMasterId = b.GeneralBatchMasterId,
-                                       BatchName = b.BatchName + "(" + u.FirstName + " " + u.LastName + ")",
+                                       BatchName = b.BatchName + "(" + (u.EntityId == entityId ? u.FirstName + " " + u.LastName + ")" : "Self" + ")"),
                                        BatchStartTime = b.BatchStartTime,
                                    })
                                    .ToList();
