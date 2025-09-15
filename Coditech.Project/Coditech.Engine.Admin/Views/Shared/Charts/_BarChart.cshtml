@@ -11,55 +11,54 @@
     @foreach (var dataset in Model.Datasets)
     {
         <text>
-                datasets.push({
-                    label: "@dataset.Label",
-                    data: @Html.Raw(dataset.Data),
-                    fill: false,
-                    borderColor: "@dataset.Color",
-                    backgroundColor: "rgba(42, 118, 244, 0.2)",   
-                    borderColor: "rgba(42, 118, 244, 0.5)",
-                    borderWidth: 1,
-                    tension: 0.4
-                });
+            datasets.push({
+                label: "@dataset.Label",
+                data: @Html.Raw(dataset.Data),
+                fill: false,
+                backgroundColor: "@dataset.Color",
+                borderColor: "rgba(42, 118, 244, 0.5)",
+                borderWidth: 1,
+                tension: 0.4
+            });
         </text>
     }
 
-    new Chart("@Model.BarChartId", {
-        type: "bar",
-        data: {
-            labels: xValues,
-            datasets: datasets
-        },
-        options: {
-            title: {
-                display: true,
-                text: '@Model.Title'
+        new Chart("@Model.BarChartId", {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: datasets
             },
-            scales: {
-                xAxes: [{
+            options: {
+                title: {
                     display: true,
-                    scaleLabel: {
+                    text: '@Model.Title'
+                },
+                scales: {
+                    xAxes: [{
                         display: true,
-                        labelString: '@Model.XAxisLabel'
-                    }
-                }],
-                yAxes: [{
-                    display: true,
-                    beginAtZero: true,
-                    ticks: {
-                                stepSize: 1,            
-                                callback: function(value) {
-                                if (Number.isInteger(value)) {
-                                return value;     
-                            }
+                        scaleLabel: {
+                            display: true,
+                            labelString: '@Model.XAxisLabel'
                         }
-                    },
-                    scaleLabel: {
+                    }],
+                    yAxes: [{
                         display: true,
-                        labelString: '@Model.YAxisLabel'
-                    }
-                }]                 
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function (value) {
+                                if (Number.isInteger(value)) {
+                                    return value;
+                                }
+                            }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: '@Model.YAxisLabel'
+                        }
+                    }]
+                }
             }
-        }
-    });
+        });
 </script>
