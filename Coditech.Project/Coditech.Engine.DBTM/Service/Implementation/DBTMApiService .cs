@@ -187,7 +187,7 @@ namespace Coditech.API.Service
                                    select new DBTMBatchModel
                                    {
                                        GeneralBatchMasterId = b.GeneralBatchMasterId,
-                                       BatchName = b.BatchName + "(" + (u.EntityId == entityId ? u.FirstName + " " + u.LastName + ")" : "Self" + ")"),
+                                       BatchName = u.EntityId == entityId ? $"{b.BatchName}(Self)" : $"{b.BatchName}({u.FirstName} {u.LastName})",
                                        BatchStartTime = b.BatchStartTime,
                                    })
                                    .ToList();
