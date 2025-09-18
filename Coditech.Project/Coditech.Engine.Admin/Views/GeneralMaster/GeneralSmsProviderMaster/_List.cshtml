@@ -21,11 +21,19 @@
                             <td>@item.ProviderName</td>
                             <td>@item.ProviderCode</td>
                             <td>@item.IsActive</td>
-                            
+
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?generalSmsProviderId=@item.GeneralSmsProviderId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
-                                <a href="../@controllerName/Delete?generalSmsProviderId=@item.GeneralSmsProviderId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
+                                <a href="@Url.Action("Edit", controllerName, new { generalSmsProviderId = item.GeneralSmsProviderId })"
+                                   title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <span class="m-2">|</span>
+                                <a href="@Url.Action("Delete", controllerName, new { generalSmsProviderId = item.GeneralSmsProviderId })"
+                                   title="Delete" class="btn btn-sm btn-soft-danger btn-circle">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </td>
+
                         </tr>
                     }
                 }

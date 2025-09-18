@@ -22,7 +22,11 @@
                             <td>@item.TaxGroupRate</td>
                             <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsOtherState)</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?taxGroupMasterId=@item.GeneralTaxGroupMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="@Url.Action("Edit", controllerName, new { taxGroupMasterId = item.GeneralTaxGroupMasterId })"
+                                   title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <span class="m-2">|</span>
                                 <!-- Delete Button Triggering Modal -->
                                 <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralTaxGroupMasterId"><i class="fas fa-trash-alt"></i></a>
                                 <!-- Delete Confirmation Modal -->
@@ -40,10 +44,14 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <!-- Delete action with GeneralDepartmentMasterId parameter -->
-                                                <a href="/@controllerName/Delete?taxGroupMasterIds=@item.GeneralTaxGroupMasterId" class="btn btn-outline-danger">Delete</a>
+                                                <a href="@Url.Action("Delete", controllerName, new { taxGroupMasterIds = item.GeneralTaxGroupMasterId })"
+                                                   class="btn btn-outline-danger">
+                                                    Delete
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                             </td>
                         </tr>
                     }

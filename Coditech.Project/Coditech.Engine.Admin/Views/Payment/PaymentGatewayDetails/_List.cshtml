@@ -22,13 +22,13 @@
                             <td class="text-center data-action">
                                 @if (item.PaymentGatewayDetailId > 0)
                                 {
-                                    <a href="../@controllerName/Edit?paymentGatewayDetailId=@item.PaymentGatewayDetailId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <a href="@Url.Action("Edit", controllerName, new { paymentGatewayDetailId = @item.PaymentGatewayDetailId })" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 }
                                 else
                                 {
-                                    <a href="../@controllerName/Create?centreCode=@Model.SelectedCentreCode&paymentGatewayId=@Model.SelectedParameter1&isLiveMode=@item.IsLiveMode&paymentCode=@item.PaymentCode" title="Create" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <a href="@Url.Action("Create", controllerName, new { centreCode = @Model.SelectedCentreCode, paymentGatewayId = @Model.SelectedParameter1, isLiveMode = @item.IsLiveMode, paymentCode = @item.PaymentCode })" title="Create" class="btn btn-sm btn-soft-success btn-circle me-2">
                                         <i class="fas fa-plus"></i>
                                     </a>
                                 }

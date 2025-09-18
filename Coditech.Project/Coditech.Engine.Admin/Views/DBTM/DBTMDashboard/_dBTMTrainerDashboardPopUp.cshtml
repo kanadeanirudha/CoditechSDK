@@ -192,7 +192,6 @@
                                         <div class="col">
                                             <p class="text-dark mb-0 fw-semibold">Activity Performed During Week</p>
                                             <h3 class="m-0">@Model.TotalNumberOfActivityPerformedDuringWeek</h3>
-                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                         </div>
                                         <div class="col-auto align-self-center">
                                             <div class="report-main-icon bg-light-alt">
@@ -286,20 +285,21 @@
                 </li>
             </ul>
 
-            <div class="tab-content p-3" id="myTabContent">
+            <div class="tab-content" id="myTabContent">
                 @* ✅ Hidden fields for both parameters *@
                 @Html.Hidden("dataTableModel.SelectedParameter1", Model.SelectedParameter1, new { id = "hdnSelectedParameter1" })
                 @Html.Hidden("dataTableModel.SelectedParameter2", Model.SelectedParameter2, new { id = "hdnSelectedParameter2" })
-
                 <div class="tab-pane fade show active" id="batchesPane" role="tabpanel">
                     <iframe name="batchesFrame"
                             src="/DBTMDashboard/LoadBatchesPartial"
-                            width="900px" height="800px" frameborder="0"></iframe>
+                            frameborder="0"
+                            onload="resizeIframe(this)"></iframe>
                 </div>
                 <div class="tab-pane fade" id="assignmentPane" role="tabpanel">
                     <iframe name="assignmentFrame"
                             src="/DBTMDashboard/LoadAssignmentPartial"
-                            width="900px" height="800px" frameborder="0"></iframe>
+                            frameborder="0"
+                            onload="resizeIframe(this)"></iframe>
                 </div>
             </div>
         </div><!-- container -->
@@ -308,17 +308,28 @@
         body[data-layout="horizontal"] {
             display: block !important;
         }
+        #myTabContent {
+            padding: 0 !important;
+        }
+        #myTabContent iframe {
+            width: 100% !important;
+            border: none;
+            display: block;
+            margin-top: 15px !important;
+        }
     </style>
     <!-- end page content -->
     <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
     <script>
+        function resizeIframe(iframe) {
+            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+        }
         $(function () {
           // Initialize datepicker (if needed)
           $(".datepicker").datepicker({
               format: "dd/mm/yyyy",
               autoclose: true
-          });
-
+          });                 
           // Handle tab switch and iframe loading
           $('#myTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             var $btn = $(this);

@@ -24,8 +24,16 @@
                             </td>
                             <td>@Convert.ToDateTime(@item.CreatedDate).ToCoditechDateWithTimeFormat()</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?ticketMasterId=@item.TicketMasterId" title="View" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fa fa-eye"></i></a>@* <span class="m-2">|</span> *@
+                                <a href="@Url.Action(
+                                               "Edit",
+                                               controllerName,
+                                               new { ticketMasterId = item.TicketMasterId })"
+                                   title="View"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fa fa-eye"></i>
+                                </a>
                             </td>
+
                         </tr>
                     }
                 }

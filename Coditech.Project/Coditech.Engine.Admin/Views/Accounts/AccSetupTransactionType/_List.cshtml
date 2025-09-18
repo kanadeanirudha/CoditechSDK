@@ -24,9 +24,13 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?accSetupTransactionTypeId=@item.AccSetupTransactionTypeId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                <a href="@Url.Action("Edit", controllerName, new { accSetupTransactionTypeId = item.AccSetupTransactionTypeId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
                                     <i class="fas fa-edit"></i>
+                                </a>
                             </td>
+
                         </tr>
                     }
                 }

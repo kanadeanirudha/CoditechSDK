@@ -29,21 +29,24 @@
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.DBTMTestMasterId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
-                                   DropdownName = "DBTMTestMasterId",
-                                   DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
-                                   Parameter = $"{Model.GeneralBatchMasterId}~false",
-                                   IsCustomDropdown = true
-                               })
-                                        @Html.ValidationMessageFor(x => x.DBTMTestMasterId)
-                                    </div>
+                                        {
+                                            DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
+                                                                        DropdownName = "DBTMTestMasterId",
+                                                                        DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
+                                                                        Parameter = $"{Model.GeneralBatchMasterId}~false",
+                                                                        IsCustomDropdown = true
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.DBTMTestMasterId)
                                 </div>
                             </div>
+                        </div>
 
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/GetDBTMBatchActivityList?SelectedParameter1=@Model.GeneralBatchMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                        }
+                        <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        <a href="@Url.Action("GetDBTMBatchActivityList", controllerName, new { SelectedParameter1 = Model.GeneralBatchMasterId })"
+                           class="btn btn-secondary">
+                            <i class="ft-x"></i>@AdminResources.LabelCancel
+                        </a>
+                                                }
                     </div>
                 </div>
             </div>

@@ -6,7 +6,6 @@
     string css = Model.TaskSchedulerMasterId > 0 || Model.ConfiguratorId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.ConfiguratorId.ToString());
-
     DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "SchedulerFrequency", DropdownSelectedValue = Model.SchedulerFrequency, ExcludedValues = new string[] { "Recurring" } };
 }
 <!-- Page Content-->
@@ -88,8 +87,11 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                        }
+                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.CentreCode })"
+                               class="btn btn-secondary">
+                                <i class="ft-x"></i>@AdminResources.LabelCancel
+                            </a>
+                           }
                     </div>
                 </div>
             </div>
@@ -118,7 +120,6 @@
 
         $(document).ready(function () {
             updateExpiryDate(); // Ensure correct state on page load
-
             $("#SchedulerFrequency").change(function () {
                 updateExpiryDate();
             });
@@ -133,12 +134,8 @@
                 yearRange: "2022:2035",
                 minDate: new Date(2022, 0, 1),
                 maxDate: new Date(2035, 11, 31),
-             onSelect: function () {
-                    updateExpiryDate();
-                }
             });
-
-                          // Make textbox readonly but allow calendar popup
+                         
             $("#ExpireDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
@@ -154,8 +151,6 @@
             $("#ExpireDate").on("keydown paste", function (e) {
                 e.preventDefault();
             });
-
-
         });
     </script>
 }

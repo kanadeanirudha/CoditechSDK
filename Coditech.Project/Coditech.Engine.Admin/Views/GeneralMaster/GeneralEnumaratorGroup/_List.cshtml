@@ -21,9 +21,19 @@
                             <td>@item.EnumGroupCode</td>
                             <td>@item.DisplayText</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?generalEnumaratorGroupId=@item.GeneralEnumaratorGroupId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
-                                <a href="../@controllerName/Delete?enumaratorGroupIds=@item.GeneralEnumaratorGroupId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
+                                <a href="@Url.Action("Edit", controllerName, new { generalEnumaratorGroupId = item.GeneralEnumaratorGroupId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <span class="m-2">|</span>
+                                <a href="@Url.Action("Delete", controllerName, new { enumaratorGroupIds = item.GeneralEnumaratorGroupId })"
+                                   title="Delete"
+                                   class="btn btn-sm btn-soft-danger btn-circle">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </td>
+
                         </tr>
                     }
                 }

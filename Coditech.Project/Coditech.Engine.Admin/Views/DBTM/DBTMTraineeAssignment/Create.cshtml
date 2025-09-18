@@ -80,11 +80,24 @@
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             if (!string.IsNullOrEmpty(Model.Custom4))
                             {
-                                <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId&SelectedParameter1=@Model.Custom4" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                                    <a href="@Url.Action("Cancel", controllerName, new { 
+                                            SelectedCentreCode = Model.SelectedCentreCode,
+                                            GeneralTrainerMasterId = Model.GeneralTrainerMasterId,
+                                            SelectedParameter1 = Model.Custom4
+                                         })"
+                                       class="btn btn-secondary">
+                                        <i class="ft-x"></i>@AdminResources.LabelCancel
+                                    </a>
                             }
                             else
                             {
-                                <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.GeneralTrainerMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                                <a href="@Url.Action("Cancel", controllerName, new { 
+                                        SelectedCentreCode = Model.SelectedCentreCode,
+                                        GeneralTrainerMasterId = Model.GeneralTrainerMasterId
+                                     })"
+                                   class="btn btn-secondary">
+                                    <i class="ft-x"></i>@AdminResources.LabelCancel
+                                </a>
                             }
                         }
                     </div>

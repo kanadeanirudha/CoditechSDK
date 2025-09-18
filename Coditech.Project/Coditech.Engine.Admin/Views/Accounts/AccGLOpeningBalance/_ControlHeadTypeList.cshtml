@@ -1,4 +1,4 @@
-﻿ @model ACCGLOpeningBalanceViewModel
+﻿@model ACCGLOpeningBalanceViewModel
 @{
     Layout = null;
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
@@ -24,8 +24,8 @@
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
-                        foreach (var item in Model.ACCGLOpeningBalanceList)
-                        {
+                    foreach (var item in Model.ACCGLOpeningBalanceList)
+                    {
                         <tr>
                             <td class="text-center">@item.GLName</td>
                             <td class="col-auto">
@@ -33,25 +33,35 @@
                                     <input class="form-control form-control-sm text-center opening-balance"
                                            type="text"
                                            value="@item.ClosingBalance"
-                                        @(item.ClosingBalance > 0 ? "readonly" : "") />
+                                           @(item.ClosingBalance > 0 ? "readonly" : "") />
                                 </div>
                             </td>
                             <td class="text-center">
-                                    @if (item.DebitCreditEnum == 0)
-                                    {
+                                @if (item.DebitCreditEnum == 0)
+                                {
                                     <span style="color: red; font-weight: bold;">Debit</span>
-                                    }
-                                    else if (item.DebitCreditEnum == 1)
-                                    {
+                                }
+                                else if (item.DebitCreditEnum == 1)
+                                {
                                     <span style="color: green; font-weight: bold;">Credit</span>
-                                    }
+                                }
                             </td>
                             <td class="text-center">
-                                <a href="../@controllerName/IndividualOpeningBalance?accSetupBalanceSheetId=@item.AccSetupBalanceSheetId&&userTypeId=@item.UserTypeId&&generalFinancialYearId=@Model.GeneralFinancialYearModel?.GeneralFinancialYearId&&accSetupGLId=@item.AccSetupGLId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>
+                                <a href="@Url.Action("IndividualOpeningBalance", controllerName, new { 
+                                        accSetupBalanceSheetId = item.AccSetupBalanceSheetId,
+                                        userTypeId = item.UserTypeId,
+                                        generalFinancialYearId = Model.GeneralFinancialYearModel?.GeneralFinancialYearId,
+                                        accSetupGLId = item.AccSetupGLId
+                                    })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
                             </td>
                         </tr>
-                        }
                     }
+                }
                 </tbody>
             </table>
         }

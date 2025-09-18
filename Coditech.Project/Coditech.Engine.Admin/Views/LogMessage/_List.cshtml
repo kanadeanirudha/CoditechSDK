@@ -23,8 +23,8 @@
                             <td>@item.TraceLevel</td>
                             <td>@item.CreatedDate</td>
                             <td class="text-center">
-                                <a href="../@controllerName/GetLogMessage?logMessageId=@item.LogMessageId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
-                                <a href="../@controllerName/Delete?logMessageIds=@item.LogMessageId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
+                                <a href="@Url.Action("GetLogMessage", controllerName, new { logMessageId = @item.LogMessageId })" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="@Url.Action("Delete", controllerName, new { logMessageIds = @item.LogMessageId })" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
                             </td>
                         </tr>
                     }

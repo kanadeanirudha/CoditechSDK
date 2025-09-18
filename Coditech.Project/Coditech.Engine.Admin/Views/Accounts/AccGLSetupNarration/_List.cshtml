@@ -27,15 +27,18 @@
 							<td class="text-center data-action">
 								@if (item.AccGLSetupNarrationId > 0)
 								{
-									<a href="../@controllerName/Edit?accGLSetupNarrationId=@item.AccGLSetupNarrationId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+									<a href="@Url.Action("Edit",controllerName ,new {accGLSetupNarrationId=@item.AccGLSetupNarrationId})" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
 										<i class="fas fa-edit"></i>
 									</a>
 								}
 								else
 								{
-									<a href="../@controllerName/Create?centreCode=@Model.SelectedCentreCode&narrationType=@item.NarrationType" title="Create" class="btn btn-sm btn-soft-success btn-circle me-2">
+									<a href="@Url.Action("Create", controllerName, new { centreCode = Model.SelectedCentreCode, narrationType = item.NarrationType })"
+									   title="Create"
+									   class="btn btn-sm btn-soft-success btn-circle me-2">
 										<i class="fas fa-plus"></i>
 									</a>
+
 								}
 							</td>
 						</tr>

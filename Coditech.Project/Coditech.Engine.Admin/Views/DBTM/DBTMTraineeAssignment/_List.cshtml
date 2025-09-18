@@ -42,12 +42,26 @@
                                 <td class="text-center">
                                     @if (string.Equals(item.TestStatus, "Pending"))
                                     {
-                                        <a href="../@controllerName/GetDBTMTraineeAssignment?dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId&custom4=@Model.Custom4" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
-                                            <i class="fas fa-edit"> </i>
+                                       <a href="@Url.Action("GetDBTMTraineeAssignment", controllerName, new { 
+                                                dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId, 
+                                                custom4 = Model.Custom4 
+                                             })"
+                                           title="Update" 
+                                           class="btn btn-sm btn-soft-success btn-circle me-2">
+                                             <i class="fas fa-edit"> </i>
+                                       </a>
+
+                                        <span class="m-2">|</span>
+                                       <a href="@Url.Action("SendAssignmentReminder", controllerName, new { 
+                                                dBTMTraineeAssignmentId = item.DBTMTraineeAssignmentId,
+                                                dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId,
+                                                custom4 = Model.Custom4
+                                             })"
+                                           title="Send Reminder"
+                                           class="btn btn-sm btn-soft-danger btn-circle">
+                                            <i class="fas fa-exclamation-triangle"></i>
                                         </a>
-                                        <span class="m-2">|</span>
-                                        <a href="../@controllerName/SendAssignmentReminder?dBTMTraineeAssignmentId=@item.DBTMTraineeAssignmentId&dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId&custom4=@Model.Custom4" title="Send Reminder" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-exclamation-triangle"></i></a>
-                                        <span class="m-2">|</span>
+                                           <span class="m-2">|</span>
                                         <!-- Delete Button -->
                                         <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.DBTMTraineeAssignmentUserId">
                                             <i class="fas fa-trash-alt"></i>
@@ -67,15 +81,32 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                         <!-- Delete action with selectedCentreCode parameter -->
-                                                        <a href="/@controllerName/Delete?dBTMTraineeAssignmentUserId=@item.DBTMTraineeAssignmentUserId&selectedCentreCode=@Model.SelectedCentreCode&selectedParameter1=@Model.SelectedParameter1&custom4=@Model.Custom4" class="btn btn-outline-danger">Delete</a>
-                                                    </div>
+                                                       <a href="@Url.Action("Delete", controllerName, new { 
+                                                                dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId,
+                                                                selectedCentreCode = Model.SelectedCentreCode,
+                                                                selectedParameter1 = Model.SelectedParameter1,
+                                                                custom4 = Model.Custom4
+                                                             })"
+                                                           class="btn btn-outline-danger">
+                                                            Delete
+                                                        </a>
+                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     }
                                     else
                                     {
-                                        <a href="../@controllerName/GetAssignmentResult?SelectedParameter1=@item.DBTMDeviceDataId&SelectedParameter2=@Model.SelectedParameter2&SelectedCentreCode=@Model.SelectedCentreCode&custom4=@Model.Custom4" title="View Assignment Result" class="btn btn-sm btn-soft-warning btn-circle"><i class="fas fa-eye"></i></a>
+                                           <a href="@Url.Action("GetAssignmentResult", controllerName, new { 
+                                                    SelectedParameter1 = item.DBTMDeviceDataId,
+                                                    SelectedParameter2 = Model.SelectedParameter2,
+                                                    SelectedCentreCode = Model.SelectedCentreCode,
+                                                    custom4 = Model.Custom4
+                                                 })"
+                                               title="View Assignment Result" 
+                                               class="btn btn-sm btn-soft-warning btn-circle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                     }
                                 </td>
                             }

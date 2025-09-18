@@ -84,7 +84,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public virtual ActionResult GetGeneralBatchUserList(DataTableViewModel dataTableViewModel)
         {
             GeneralBatchUserListViewModel list = _generalBatchAgent.GetGeneralBatchUserList(Convert.ToInt32(dataTableViewModel.SelectedParameter1), Convert.ToString(dataTableViewModel.SelectedParameter2), dataTableViewModel);

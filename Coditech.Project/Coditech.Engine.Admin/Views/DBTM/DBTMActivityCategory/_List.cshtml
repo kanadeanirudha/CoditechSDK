@@ -22,8 +22,12 @@
                             <td>@item.ActivityCategoryCode</td>
                             <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?dBTMActivityCategoryId=@item.DBTMActivityCategoryId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2"></span>
-                               @*  <a href="../@controllerName/Delete?dBTMActivityCategoryIds=@item.DBTMActivityCategoryId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
+                                <a href="@Url.Action("Edit", controllerName, new { dBTMActivityCategoryId = item.DBTMActivityCategoryId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @*  <a href="../@controllerName/Delete?dBTMActivityCategoryIds=@item.DBTMActivityCategoryId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
                             </td>
                         </tr>
                     }
