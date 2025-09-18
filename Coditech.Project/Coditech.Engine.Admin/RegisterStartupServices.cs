@@ -5,6 +5,7 @@ using Coditech.Admin.Custom;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Coditech.Admin.Middleware;
 
 namespace Coditech.Admin
 {
@@ -78,6 +79,9 @@ namespace Coditech.Admin
 
             // Adds a middleware type to the application's request pipeline.
             app.UseMiddleware<RequestMiddleware>();
+
+            // Adds EncryptedQueryMiddleware
+            app.UseMiddleware<EncryptedQueryMiddleware>();
 
             // Adds the static file configurations with custom path.
             app.UseStaticFiles(builder);
