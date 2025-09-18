@@ -26,7 +26,8 @@
                             <td>@item.WorkFromDate.ToCoditechDateFormat()</td>
                             <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)</td>
                             <td class="text-center">
-                                <a href="../@controllerName/GetAssociateUnAssociateAdminRoleToUser?adminRoleMasterId=@item.AdminRoleMasterId&adminRoleApplicableDetailId=@item.AdminRoleApplicableDetailId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>
+                                <a href="@Url.Action("GetAssociateUnAssociateAdminRoleToUser", controllerName, new { adminRoleMasterId = @item.AdminRoleMasterId, adminRoleApplicableDetailId = @item.AdminRoleApplicableDetailId})"
+                                   title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>
                             </td>
                         </tr>
                     }

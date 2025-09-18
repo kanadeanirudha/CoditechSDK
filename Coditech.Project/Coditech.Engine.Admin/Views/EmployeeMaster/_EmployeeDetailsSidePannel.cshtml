@@ -10,18 +10,30 @@
     <div class="card-body">
         <div class="files-nav">
             <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
-                <a class="nav-link" href="/EmployeeMaster/UpdateEmployeePersonalDetails?employeeId=@employeeId&personId=@personId" aria-selected="true">
+                <a class="nav-link"
+                   href="@Url.Action("UpdateEmployeePersonalDetails", "EmployeeMaster", new { employeeId = employeeId, personId = personId })"
+                   aria-selected="true">
                     <i class="ti-menu"></i><h5 class="m-0 ps-2">Personal Details</h5>
                 </a>
-                <a class="nav-link" href="/EmployeeMaster/GetEmployeeOtherDetail?employeeId=@employeeId&personId=@personId" aria-selected="true">
+
+                <a class="nav-link"
+                   href="@Url.Action("GetEmployeeOtherDetail", "EmployeeMaster", new { employeeId = employeeId, personId = personId })"
+                   aria-selected="true">
                     <i class="fas fa-address-card"></i><h5 class="m-0 ps-2">Other Details</h5>
                 </a>
-                <a class="nav-link" href="/EmployeeMaster/EmployeeServiceList?employeeId=@employeeId&personId=@personId" aria-selected="true">
+
+                <a class="nav-link"
+                   href="@Url.Action("EmployeeServiceList", "EmployeeMaster", new { employeeId = employeeId, personId = personId })"
+                   aria-selected="true">
                     <i class="fas fa-user-cog"></i><h5 class="m-0 ps-2">Service Details</h5>
                 </a>
-                <a class="nav-link" href="/EmployeeMaster/CreateEditEmployeeAddress?employeeId=@employeeId&personId=@personId" aria-selected="true">
+
+                <a class="nav-link"
+                   href="@Url.Action("CreateEditEmployeeAddress", "EmployeeMaster", new { employeeId = employeeId, personId = personId })"
+                   aria-selected="true">
                     <i class="fas fa-map-marker-alt"></i><h5 class="m-0 ps-2">Address</h5>
                 </a>
+
             </div>
         </div>
     </div>

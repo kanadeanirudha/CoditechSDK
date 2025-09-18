@@ -68,8 +68,14 @@
                             <div class="row mb-3">
                                 <div class="col-lg-12">
                                     <button type="submit" class="btn btn-success" id="saveDropdownValues" onclick="TaskApprovalSetting.SaveData()">@AdminResources.LabelSave</button>
-                                    <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                                </div>
+                                    <a href="@Url.Action(
+                                               "Cancel",
+                                               controllerName,
+                                               new { SelectedCentreCode = Model.CentreCode })"
+                                       class="btn btn-secondary">
+                                        <i class="ft-x"></i>@AdminResources.LabelCancel
+                                    </a>
+                            </div>
                             </div>
                         }                      
                     </div>

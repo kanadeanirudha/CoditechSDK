@@ -115,8 +115,14 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                        <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.ConfiguratorId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                    }
+                            <a href="@Url.Action(
+                                       "Cancel",
+                                       controllerName,
+                                       new { SelectedCentreCode = Model.ConfiguratorId })"
+                               class="btn btn-secondary">
+                                <i class="ft-x"></i>@AdminResources.LabelCancel
+                            </a>
+                       }
                 </div>
             </div>
         </div>

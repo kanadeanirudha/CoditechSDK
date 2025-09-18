@@ -24,7 +24,11 @@
                             <td>@item.Grade</td>
                             <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?designationId=@item.EmployeeDesignationMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="@Url.Action("Edit", controllerName, new { designationId = item.EmployeeDesignationMasterId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <!-- Delete Button Triggering Modal -->
                                 <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.EmployeeDesignationMasterId"><i class="fas fa-trash-alt"></i></a>
                                 <!-- Delete Confirmation Modal -->
@@ -42,7 +46,10 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <!-- Delete action with EmployeeDesignationMasterId parameter -->
-                                                <a href="/@controllerName/Delete?designationIds=@item.EmployeeDesignationMasterId" class="btn btn-outline-danger">Delete</a>
+                                                <a href="@Url.Action("Delete", controllerName, new { designationIds = item.EmployeeDesignationMasterId })"
+                                                   class="btn btn-outline-danger">
+                                                    Delete
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
