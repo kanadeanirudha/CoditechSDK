@@ -26,15 +26,34 @@
                             <td class="text-center data-action">
                                 @if (item.IsAssociated)
                                 {
-                                    <a href="../@controllerName/UpdateTaskApprovalSetting?taskMasterId=@item.TaskMasterId&centreCode=@Model.SelectedCentreCode&taskApprovalSettingId=@item.TaskApprovalSettingId" title="UpdateTaskApprovalSetting" class="btn btn-sm btn-soft-success btn-circle">
+                                   <a href="@Url.Action(
+                                            "UpdateTaskApprovalSetting",
+                                            controllerName,
+                                            new { 
+                                                taskMasterId = item.TaskMasterId, 
+                                                centreCode = Model.SelectedCentreCode, 
+                                                taskApprovalSettingId = item.TaskApprovalSettingId 
+                                            })" 
+                                       title="UpdateTaskApprovalSetting" 
+                                       class="btn btn-sm btn-soft-success btn-circle">
                                         <i class="fas fa-edit"></i>
-                                    </a>
+                                   </a>
+
                                 }
                                 else
                                 {
-                                    <a href="../@controllerName/AddUpdateTaskApprovalSetting?taskMasterId=@item.TaskMasterId&centreCode=@Model.SelectedCentreCode" title="AddTaskApprovalSetting" class="btn btn-sm btn-soft-success btn-circle">
+                                   <a href="@Url.Action(
+                                            "AddUpdateTaskApprovalSetting",
+                                            controllerName,
+                                            new { 
+                                                taskMasterId = item.TaskMasterId, 
+                                                centreCode = Model.SelectedCentreCode 
+                                            })" 
+                                       title="AddTaskApprovalSetting" 
+                                       class="btn btn-sm btn-soft-success btn-circle">
                                         <i class="fas fa-plus"></i>
                                     </a>
+
                                 }
 
                             </td>

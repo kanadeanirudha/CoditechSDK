@@ -41,7 +41,11 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center">
-                                <a href="../@controllerName/UpdateEmployeePersonalDetails?employeeId=@item.EmployeeId&personId=@item.PersonId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a>@* <span class="m-2">|</span> *@
+                                <a href="@Url.Action("UpdateEmployeePersonalDetails", controllerName, new { employeeId = item.EmployeeId, personId = item.PersonId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 @* <a href="../@controllerName/Delete?employeeIds=@item.EmployeeId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a> *@
                             </td>
                         </tr>

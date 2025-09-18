@@ -21,9 +21,9 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">All Batch Details List</span>
-
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMGeneralBatchMaster/Create?custom4=@Model.Custom4" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
+                            <span class="card-title">All Batch Details List</span>
+                        
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("Create", "DBTMGeneralBatchMaster", new { custom4 = @Model.Custom4 })" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
                     </div>
                     <div class="card-header">
                         <div class="row">

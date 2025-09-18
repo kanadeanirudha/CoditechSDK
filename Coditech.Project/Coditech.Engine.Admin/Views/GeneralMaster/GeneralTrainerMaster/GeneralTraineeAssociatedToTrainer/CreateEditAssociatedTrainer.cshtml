@@ -61,19 +61,19 @@
                                     <div class="md-3">
                                         @Html.LabelFor(x => x.GeneralTrainerMasterId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                        {
-                                            DropdownType = DropdownTypeEnum.UnAssociatedTrainerList.ToString(),
-                                                                        DropdownName = "GeneralTrainerMasterId",
-                                                                        DropdownSelectedValue = Model.GeneralTrainerMasterId.ToString(),
-                                                                        Parameter = Model.GeneralTraineeAssociatedToTrainerId == 0
-                                                                        ? $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId ?? "0"}~{Model.EntityId}~{DropdownCustomTypeEnum.Trainee}~false"
-                                                                        : $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}~{Model.EntityId}~{DropdownCustomTypeEnum.Trainee}~true",
-                                                                        IsStringProperty = true,
-                                                                        IsRequired = true,
-                                                                        IsDisabled = Model.GeneralTraineeAssociatedToTrainerId > 0
-                                                                        })
-                                    @Html.ValidationMessageFor(x => x.GeneralTrainerMasterId)
-                                    @if (Model.GeneralTraineeAssociatedToTrainerId > 0)
+                               {
+                                   DropdownType = DropdownTypeEnum.UnAssociatedTrainerList.ToString(),
+                                   DropdownName = "GeneralTrainerMasterId",
+                                   DropdownSelectedValue = Model.GeneralTrainerMasterId.ToString(),
+                                   Parameter = Model.GeneralTraineeAssociatedToTrainerId == 0
+                                    ? $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId ?? "0"}~{Model.EntityId}~{DropdownCustomTypeEnum.Trainee}~false"
+                                    : $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}~{Model.EntityId}~{DropdownCustomTypeEnum.Trainee}~true",
+                                   IsStringProperty = true,
+                                   IsRequired = true,
+                                   IsDisabled = Model.GeneralTraineeAssociatedToTrainerId > 0
+                               })
+                                        @Html.ValidationMessageFor(x => x.GeneralTrainerMasterId)
+                                        @if (Model.GeneralTraineeAssociatedToTrainerId > 0)
                                         {
                                             @Html.HiddenFor(x => x.GeneralTrainerMasterId)
                                         }
@@ -90,7 +90,16 @@
                             </div>
 
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/GetAssociatedTrainerList?SelectedParameter1=@Model.EntityId&SelectedParameter2=@Model.PersonId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="@Url.Action(
+                                    "GetAssociatedTrainerList",
+                                    controllerName,
+                                    new {
+                                        SelectedParameter1 = Model.EntityId,
+                                        SelectedParameter2 = Model.PersonId
+                                    })"
+                               class="btn btn-secondary">
+                                <i class="ft-x"></i>@AdminResources.LabelCancel
+                            </a>
                         }
                     </div>
                 </div>

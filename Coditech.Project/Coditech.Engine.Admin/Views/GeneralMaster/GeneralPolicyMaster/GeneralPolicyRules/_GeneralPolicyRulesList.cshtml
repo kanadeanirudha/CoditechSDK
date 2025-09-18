@@ -22,9 +22,15 @@
                             <td>@item.PolicyAnsType</td>
                             <td>@item.RangeSeparateBy</td>
                             <td class="text-center">
-                                <a href="../@controllerName/EditRules?generalPolicyRulesId=@item.GeneralPolicyRulesId&policyApplicableStatus=@item.PolicyApplicableStatus" title="Update" class="btn btn-sm btn-soft-success btn-circle">
+                               <a href="@Url.Action("EditRules", controllerName, new { 
+                                        generalPolicyRulesId = item.GeneralPolicyRulesId, 
+                                        policyApplicableStatus = item.PolicyApplicableStatus 
+                                    })"
+                                   title="Update" 
+                                   class="btn btn-sm btn-soft-success btn-circle">
                                     <i class="fas fa-edit"></i>
                                 </a>
+
                                 <span class="m-2">|</span>
                                 <!-- Delete Button Triggering Modal -->
                                 <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralPolicyRulesId"><i class="fas fa-trash-alt"></i></a>
@@ -43,7 +49,10 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <!-- Delete action with TaskSchedulerMasterId parameter -->
-                                                <a href="../@controllerName/DeleteRules?generalPolicyRulesIds=@item.GeneralPolicyRulesId" class="btn btn-outline-danger">Delete</a>
+                                                   <a href="@Url.Action("DeleteRules", controllerName, new { generalPolicyRulesIds = item.GeneralPolicyRulesId })"
+                                                       class="btn btn-outline-danger">
+                                                        Delete
+                                                    </a>
                                             </div>
                                         </div>
                                     </div>

@@ -42,7 +42,7 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                     <!-- Delete action with TaskSchedulerMasterId parameter -->
-                                                    <a href="../@controllerName/DeleteCentrewisePolicy?generalPolicyRulesIds=@item.GeneralPolicyRulesId" class="btn btn-outline-danger">Delete</a>
+                                                    <a href="@Url.Action("DeleteCentrewisePolicy", controllerName, new { generalPolicyRulesIds = @item.GeneralPolicyRulesId })" class="btn btn-outline-danger">Delete</a>
                                                 </div>
                                             </div>
                                         </div>
