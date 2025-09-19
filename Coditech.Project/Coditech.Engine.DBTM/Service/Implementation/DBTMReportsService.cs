@@ -62,7 +62,8 @@ namespace Coditech.API.Service
             foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
             {
                 DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest);
-                dBTMReportsListModel.DataTableList.Add(list.DataTable);
+                if (list?.DataTable?.Rows?.Count > 0)
+                    dBTMReportsListModel.DataTableList.Add(list.DataTable);
             }
             return dBTMReportsListModel;
         }
@@ -70,6 +71,30 @@ namespace Coditech.API.Service
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+        }
+
+        public DBTMReportsListModel TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            {
+                DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+                if (list?.DataTable?.Rows?.Count > 0)
+                    dBTMReportsListModel.DataTableList.Add(list.DataTable);
+            }
+            return dBTMReportsListModel;
+        }
+
+        public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            {
+                DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+                if (list?.DataTable?.Rows?.Count > 0)
+                    dBTMReportsListModel.DataTableList.Add(list.DataTable);
+            }
+            return dBTMReportsListModel;
         }
 
         public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
