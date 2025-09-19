@@ -49,8 +49,22 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
-
             return BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, FromDate, ToDate);
+        }
+
+        public DBTMReportsListModel BatchWiseMultipleReports(int generalBatchMasterId, string dBTMTestMasterIds, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
+        {
+            if (generalBatchMasterId <= 0)
+            {
+                return new DBTMReportsListModel();
+            }
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            {
+                DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest);
+                dBTMReportsListModel.DataTableList.Add(list.DataTable);
+            }
+            return dBTMReportsListModel;
         }
 
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
