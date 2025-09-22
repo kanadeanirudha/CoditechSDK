@@ -61,11 +61,18 @@ namespace Coditech.API.Service
                 return new DBTMReportsListModel();
             }
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
+            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
             foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
             {
                 DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest);
                 if (list?.DataTable?.Rows?.Count > 0)
-                    dBTMReportsListModel.DataTableList.Add(list.DataTable);
+                {
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>
+                    {
+                        new KeyValuePair<string, DataTable>(testList.FirstOrDefault(x =>x.DBTMTestMasterId == Convert.ToInt32(testId)).TestName, list.DataTable),
+                    };
+                }
             }
             return dBTMReportsListModel;
         }
@@ -78,11 +85,18 @@ namespace Coditech.API.Service
         public DBTMReportsListModel TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
+            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
             foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
             {
                 DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
                 if (list?.DataTable?.Rows?.Count > 0)
-                    dBTMReportsListModel.DataTableList.Add(list.DataTable);
+                {
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>
+                    {
+                        new KeyValuePair<string, DataTable>(testList.FirstOrDefault(x =>x.DBTMTestMasterId == Convert.ToInt32(testId)).TestName, list.DataTable),
+                    };
+                }
             }
             return dBTMReportsListModel;
         }
@@ -90,11 +104,18 @@ namespace Coditech.API.Service
         public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
+            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
             foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
             {
                 DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
                 if (list?.DataTable?.Rows?.Count > 0)
-                    dBTMReportsListModel.DataTableList.Add(list.DataTable);
+                {
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>
+                    {
+                        new KeyValuePair<string, DataTable>(testList.FirstOrDefault(x =>x.DBTMTestMasterId == Convert.ToInt32(testId)).TestName, list.DataTable),
+                    };
+                }
             }
             return dBTMReportsListModel;
         }
@@ -284,24 +305,12 @@ namespace Coditech.API.Service
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
-                List<string> displayColumn = new List<string>();
-                if (isMobileRequest)
-                {
-                    displayColumn.Add("Activity Time");
-                    displayColumn.Add("Person Name");
-                    //displayColumn.Add("Weight");
-                    //displayColumn.Add("Height");
-                }
-                else
-                {
-                    displayColumn.Add("Activity Time");
-                    displayColumn.Add("Person Name");
-                    displayColumn.Add("Activity Status");
-                    displayColumn.Add("Weight");
-                    displayColumn.Add("Height");
-                }
-                foreach (string item in displayColumn)
-                    dataTable.Columns.Add(item, typeof(String));
+                List<string> displayColumn = isMobileRequest
+                       ? new List<string> { "Activity Time", "Person Name" }
+                       : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight", "Height" };
+
+                foreach (var item in displayColumn)
+                    dataTable.Columns.Add(item, typeof(string));
 
                 var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                                       join b in _dBTMTestParameterRepository.Table
@@ -383,10 +392,10 @@ namespace Coditech.API.Service
                     dateTime = item.CreatedDate;
                 }
 
-                //foreach (DataColumn col in dataTable.Columns)
-                //{
-                //    col.ColumnName = $"{col.ColumnName} {DBTMCustomHelper.Unit(col.ColumnName)}";
-                //}
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    col.ColumnName = $"{col.ColumnName} {DBTMCustomHelper.Unit(col.ColumnName)}";
+                }
             }
             return dataTable;
         }
