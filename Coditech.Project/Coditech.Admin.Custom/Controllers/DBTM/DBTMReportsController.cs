@@ -3,17 +3,20 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMReportsController : BaseController
     {
         private readonly IDBTMReportsAgent _dBTMReportsAgent;
+        private readonly IDBTMTestAgent _dBTMTestAgent;
         private const string batchreports = "~/Views/DBTM/DBTMReports/BatchWiseReports.cshtml";
         private const string testreports = "~/Views/DBTM/DBTMReports/TestWiseReports.cshtml";
-        public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent)
+        private const string namereports = "~/Views/DBTM/DBTMReports/NameWiseReports.cshtml";
+        public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
+            _dBTMTestAgent = dBTMTestAgent;
         }
 
         [HttpGet]
@@ -104,5 +107,46 @@ namespace Coditech.Admin.Controllers
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
         }
+
+        [HttpGet]
+        public ActionResult NameWiseReports()
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = DateTime.Today;
+            dBTMReportsViewModel.ToDate = DateTime.Today;
+            BindDBTMBatchActivity(dBTMReportsViewModel);
+            return View(namereports, dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetNameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
+        }
+
+        #region Protected Methods
+        protected void BindDBTMBatchActivity(DBTMReportsListViewModel dBTMReportsViewModel)
+        {
+            dBTMReportsViewModel.CustomDropdownList1 = dBTMReportsViewModel.CustomDropdownList1 ?? new List<SelectListItem>();
+            DataTableViewModel dataTableModel = new DataTableViewModel() { PageSize = int.MaxValue };
+            DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
+            dBTMReportsViewModel.CustomDropdownList1.Add(new SelectListItem
+            {
+                Text = "All", Value = "0"
+            });
+            if (dBTMBatchActivityList?.DBTMTestList != null)
+            {
+                foreach (var item in dBTMBatchActivityList.DBTMTestList)
+                {
+                    dBTMReportsViewModel.CustomDropdownList1.Add(new SelectListItem
+                    {
+                        Text = item.TestName,
+                        Value = item.DBTMTestMasterId.ToString(),
+                    });
+                }
+            }
+        }
+        #endregion
     }
 }
