@@ -14,14 +14,16 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public  ActionResult TrainerRegistration()
-        {          
-            return View("~/Views/DBTM/DBTMGeneralTrainerMaster/DBTMTrainerRegistration.cshtml", new DBTMNewRegistrationViewModel());
+        public ActionResult TrainerRegistration(string joiningCode)
+        {
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
+            dBTMNewRegistrationViewModel.CentreCode = joiningCode;
+            return View("~/Views/DBTM/DBTMGeneralTrainerMaster/DBTMTrainerRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public  ActionResult TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
+        public ActionResult TrainerRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {

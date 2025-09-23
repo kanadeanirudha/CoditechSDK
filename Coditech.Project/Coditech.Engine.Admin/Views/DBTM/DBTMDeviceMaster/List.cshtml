@@ -26,10 +26,11 @@
                             <span class="card-title">DBTM Device Master List</span>
                             <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Master Device</a>
                         }
-                        else if (Model.DBTMDeviceMasterId > 0 && Model.DBTMParentDeviceMasterId==0)
+                        else if (Model.DBTMDeviceMasterId > 0 && Model.DBTMParentDeviceMasterId == 0)
                         {
                             <span class="card-title">DBTM Device Slave List</span>
-                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateSlave?dBTMDeviceId=@Model.DBTMDeviceMasterId" role="button"><i class="fas fa-plus me-2"></i>Add Slave Device </a>
+                            @* <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/CreateSlave?dBTMDeviceId=@Model.DBTMDeviceMasterId" role="button"><i class="fas fa-plus me-2"></i>Add Slave Device </a> *@
+                            <a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("CreateSlave", controllerName, new { dBTMDeviceId = @Model.DBTMDeviceMasterId })" role="button"><i class="fas fa-plus me-2"></i>Add Slave Device </a>
                         }
                     </div>
                     <div class="card-body">
