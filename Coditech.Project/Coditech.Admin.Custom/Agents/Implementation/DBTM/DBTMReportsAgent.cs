@@ -79,6 +79,50 @@ namespace Coditech.Admin.Agents
             }
             return graphModel;
         }
+
+        //Name Wise Reports 
+        public virtual DBTMReportsListViewModel NameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (!string.IsNullOrEmpty(dBTMTestMasterIds))
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                listViewModel.DataTable = response.DataTable;
+                listViewModel.DataTableList = response.DataTableList;
+            }
+            return listViewModel;
+        }
+
+        //Test Wise Reports 
+        public virtual DBTMReportsListViewModel TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (!string.IsNullOrEmpty(dBTMTestMasterIds))
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                listViewModel.DataTable = response.DataTable;
+                listViewModel.DataTableList = response.DataTableList;
+            }
+            return listViewModel;
+        }
         #endregion
     }
 }

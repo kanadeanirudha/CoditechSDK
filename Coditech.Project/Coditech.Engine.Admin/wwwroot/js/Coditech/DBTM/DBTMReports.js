@@ -183,5 +183,91 @@
                 }
             });
         }
-    }
+    },
+
+    GetDBTMNameWiseReports: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+
+        $("#DBTMTestWiseReportsDivId").html("");
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetNameWiseReports",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId, 
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    FromDate: fromdate,  
+                    ToDate: todate      
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMNameWiseReportsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+
+    GetDBTMTestWiseMultiReports: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+
+        $("#DBTMTestWiseMultiReportsDivId").html("");
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetTestWiseMultipleReports",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    FromDate: fromdate,
+                    ToDate: todate
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMTestWiseMultiReportsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
 };

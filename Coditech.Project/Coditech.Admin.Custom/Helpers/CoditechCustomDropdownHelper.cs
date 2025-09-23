@@ -298,7 +298,10 @@ namespace Coditech.Admin.Helpers
             }
             DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId), null, null, null, 1, int.MaxValue);
             DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
-            dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
+            if (dropdownViewModel.ExcludedValues == null || !dropdownViewModel.ExcludedValues.Contains("0"))
+            {
+                dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
+            }
             //if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             //{
             //    list.DBTMTraineeDetailsList = list.DBTMTraineeDetailsList?.Where(x =>
