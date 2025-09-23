@@ -63,15 +63,22 @@ namespace Coditech.API.Service
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
             List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
             var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
-            foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {
-                DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest);
-                if (list?.DataTable?.Rows?.Count > 0)
+                if (dBTMReportsListModel.DataTableList == null)
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
+
+                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
                 {
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>
+                    if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        new KeyValuePair<string, DataTable>(testList.FirstOrDefault(x =>x.DBTMTestMasterId == Convert.ToInt32(testId)).TestName, list.DataTable),
-                    };
+                        DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest);
+                        if (list?.DataTable?.Rows?.Count > 0)
+                        {
+                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
+                            dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                        }
+                    }
                 }
             }
             return dBTMReportsListModel;
@@ -87,15 +94,22 @@ namespace Coditech.API.Service
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
             List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
             var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
-            foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {
-                DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
-                if (list?.DataTable?.Rows?.Count > 0)
+                if (dBTMReportsListModel.DataTableList == null)
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
+
+                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
                 {
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>
+                    if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        new KeyValuePair<string, DataTable>(testList.FirstOrDefault(x =>x.DBTMTestMasterId == Convert.ToInt32(testId)).TestName, list.DataTable),
-                    };
+                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+                        if (list?.DataTable?.Rows?.Count > 0)
+                        {
+                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
+                            dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                        }
+                    }
                 }
             }
             return dBTMReportsListModel;
@@ -104,17 +118,24 @@ namespace Coditech.API.Service
         public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
+            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList(); 
             var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
-            foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {
-                DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
-                if (list?.DataTable?.Rows?.Count > 0)
+                if (dBTMReportsListModel.DataTableList == null)
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
+
+                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
                 {
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>
+                    if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        new KeyValuePair<string, DataTable>(testList.FirstOrDefault(x =>x.DBTMTestMasterId == Convert.ToInt32(testId)).TestName, list.DataTable),
-                    };
+                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+                        if (list?.DataTable?.Rows?.Count > 0)
+                        {
+                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
+                            dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                        }
+                    }
                 }
             }
             return dBTMReportsListModel;

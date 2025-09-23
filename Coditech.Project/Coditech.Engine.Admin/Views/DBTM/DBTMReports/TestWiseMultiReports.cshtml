@@ -1,0 +1,245 @@
+﻿@model DBTMReportsListViewModel
+@{
+    ViewBag.Title = "TestWiseMulti Reports";
+    DropdownViewModel testDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
+                IsCustomDropdown = true,
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseMultiReports()",
+            };
+    DropdownViewModel traineeDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(),
+                DropdownName = "DBTMTraineeDetailId",
+                DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(),
+                ChangeEvent = "DBTMReports.GetDBTMTestWiseMultiReports()",
+                IsCustomDropdown = true,
+            };
+    string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    @* <div class="card-header">
+                    <div class="row align-items-center">
+                    <div class="col">
+                    <h4 class="card-title">Activity Reports</h4>
+                    </div><!--end col-->
+                    </div>  <!--end row-->
+                    </div> *@
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title">TestWise Multi Reports</span>
+                         <div class="d-flex align-items-center">
+                            <!-- Toggle Switch -->
+                            <div class="form-check form-switch me-3">
+                                <div class="switch-field">
+                                    <input type="radio" id="radio-list" name="switch-tile-list" value="list" checked onclick="window.open('@($"{url}/dbtmreports/testwisereports")', '_self');" />
+                                    <label for="radio-list">List</label>
+                                    <input type="radio" id="radio-tile" name="switch-tile-list" value="tile" onclick="window.open('@($"{url}/dbtmreports/TestWiseGraphReports")', '_self');" />
+                                    <label for="radio-tile">Graph</label>                                 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label class="form-label required" for="CustomDropdownSelectedValue1">Activity List</label>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="mb-3 multiselect-dropdown">
+                                    @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTestMasterId", multiple = "multiple", data_live_search = "true" })
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <label>Trainee List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
+                            </div>
+                            <div class="col-md-2">
+                                @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-2">
+                                @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseMultiReports()" />
+                            </div>
+                            <div id="DBTMTestWiseMultiReportsDivId">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .switch-field {
+        display: flex;
+        overflow: hidden;
+    }
+
+        .switch-field input {
+            position: absolute !important;
+            clip: rect(0, 0, 0, 0);
+            height: 1px;
+            width: 1px;
+            border: 0;
+            overflow: hidden;
+        }
+
+        .switch-field label {
+            background-color: #e4e4e4;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 14px;
+            line-height: 1;
+            text-align: center;
+            padding: 8px 16px;
+            margin-right: -1px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+            .switch-field label:hover {
+                background-color: rgba(255, 184, 34, 0.6);
+                color: #000;
+            }
+
+        .switch-field input:checked + label {
+            background-color: rgb(255, 184, 34);
+            color: #000;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            border-color: rgb(230, 165, 30);
+        }
+
+        .switch-field label:active {
+            background-color: rgb(230, 165, 30);
+            color: #fff;
+        }
+
+        .switch-field label:first-of-type {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .switch-field label:last-of-type {
+            border-radius: 0 4px 4px 0;
+        }
+
+</style>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+@section scripts {
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript">
+        function updateToDate() {
+            var fromDate = $("#FromDate").datepicker("getDate");
+            if (fromDate) {
+                $("#ToDate").datepicker("option", "minDate", fromDate);
+
+                var toDate = $("#ToDate").datepicker("getDate");
+                if (toDate && toDate < fromDate) {
+                    $("#ToDate").datepicker("setDate", fromDate);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
+            // FromDate
+            $("#FromDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: dateFormat,
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                maxDate: new Date(),
+                onSelect: function () {
+                    updateToDate();
+                }
+            });
+
+            // ToDate
+            $("#ToDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: dateFormat,
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                maxDate: new Date(),
+                onSelect: function () {
+                    updateToDate();
+                }
+            });
+            updateToDate();
+        });
+    </script>
+    <script>
+        $.fn.dataTable.ext.errMode = 'none';
+        $(document).on('ajaxComplete', function () {
+            if ($('#datatable').length > 0) {
+                if ($.fn.DataTable.isDataTable('#datatable')) {
+                    $('#datatable').DataTable().destroy();
+                }
+                $('#datatable').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true
+                });
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#DBTMTestMasterId').on('changed.bs.select', function (e, clickedIndex, isSelected) {
+                var $select = $(this);
+                var selectedValues = $select.val() || [];
+                var allValue = "0"; 
+                var totalOptions = $select.find('option').length - 1; 
+                if (clickedIndex === 0) {
+                    if (isSelected) {
+                        $select.find('option').prop('selected', true);
+                    } else {
+                        $select.find('option').prop('selected', false);
+                    }
+                    $select.selectpicker('refresh');
+                    return;
+                }
+                var selectedWithoutAll = selectedValues.filter(v => v !== allValue);
+                if (selectedWithoutAll.length !== totalOptions) {
+                    $select.find('option[value="' + allValue + '"]').prop('selected', false);
+                }
+                if (selectedWithoutAll.length === totalOptions) {
+                    $select.find('option[value="' + allValue + '"]').prop('selected', true);
+                }
+                $select.selectpicker('refresh');
+            });
+        });
+    </script>
+}

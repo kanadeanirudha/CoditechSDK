@@ -13,6 +13,7 @@ namespace Coditech.Admin.Controllers
         private const string batchreports = "~/Views/DBTM/DBTMReports/BatchWiseReports.cshtml";
         private const string testreports = "~/Views/DBTM/DBTMReports/TestWiseReports.cshtml";
         private const string namereports = "~/Views/DBTM/DBTMReports/NameWiseReports.cshtml";
+        private const string testwisemultireports = "~/Views/DBTM/DBTMReports/TestWiseMultiReports.cshtml";
         public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
@@ -122,6 +123,23 @@ namespace Coditech.Admin.Controllers
         public ActionResult GetNameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
             DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult TestWiseMultipleReports()
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = DateTime.Today;
+            dBTMReportsViewModel.ToDate = DateTime.Today;
+            BindDBTMBatchActivity(dBTMReportsViewModel);
+            return View(testwisemultireports, dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetTestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
 
