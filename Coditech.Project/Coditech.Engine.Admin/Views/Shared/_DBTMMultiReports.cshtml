@@ -2,56 +2,75 @@
 @model DBTMReportsListViewModel
 @{
     Layout = null;
+    var tableIndex = 1;
 }
-<div class="row">
-    <div class="col-sm-12 table-responsive">
 
-        @if (Model?.DataTableList != null && Model.DataTableList.Count > 0)
+<div class="accordion" id="accordionExample">
+    @if (Model?.DataTableList != null && Model.DataTableList.Count > 0)
+    {
+        foreach (var keyValue in Model.DataTableList)
         {
-            var tableIndex = 1;
-            foreach (var keyValue in Model.DataTableList)
-            {
-                <h5 class="mt-3 mb-2 fw-bold">@keyValue.Key</h5>
-                <table class="action-set table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline"
-                       style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid">
-                    <thead>
-                        <tr>
-                            @foreach (DataColumn col in keyValue.Value.Columns)
-                            {
-                                <th>@col.ColumnName</th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (keyValue.Value.Rows.Count > 0)
-                        {
-                            foreach (DataRow row in keyValue.Value.Rows)
-                            {
-                                <tr>
-                                    @foreach (DataColumn col in keyValue.Value.Columns)
+            var collapseId = $"collapse{tableIndex}";
+            var headingId = $"heading{tableIndex}";
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="@headingId">
+                    <button class="accordion-button @(tableIndex > 1 ? "collapsed" : "")"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#@collapseId"
+                            aria-expanded="@(tableIndex == 1 ? "true" : "false")"
+                            aria-controls="@collapseId">
+                        @keyValue.Key
+                    </button>
+                </h2>
+                <div id="@collapseId"
+                     class="accordion-collapse collapse @(tableIndex == 1 ? "show" : "")"
+                     aria-labelledby="@headingId"
+                     data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="table-responsive">
+                            <table class="action-set table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline"
+                                   style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid">
+                                <thead>
+                                    <tr>
+                                        @foreach (DataColumn col in keyValue.Value.Columns)
+                                        {
+                                            <th>@col.ColumnName</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (keyValue.Value.Rows.Count > 0)
                                     {
-                                        <td>@row[col]</td>
+                                        foreach (DataRow row in keyValue.Value.Rows)
+                                        {
+                                            <tr>
+                                                @foreach (DataColumn col in keyValue.Value.Columns)
+                                                {
+                                                    <td>@row[col]</td>
+                                                }
+                                            </tr>
+                                        }
                                     }
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="@keyValue.Value.Columns.Count" class="text-danger fw-bold text-center">
-                                    No Result Found
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-
-                tableIndex++;
-            }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="@keyValue.Value.Columns.Count" class="text-danger fw-bold text-center">
+                                                No Result Found
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            tableIndex++;
         }
-        else
-        {
-            <div class="text-danger fw-bold text-center">No Data Found</div>
-        }
-    </div>
+    }
+    else
+    {
+        <div class="text-danger fw-bold text-center">No Data Found</div>
+    }
 </div>
