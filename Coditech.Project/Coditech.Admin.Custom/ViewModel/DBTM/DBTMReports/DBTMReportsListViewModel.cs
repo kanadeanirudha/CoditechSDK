@@ -23,5 +23,6 @@ namespace Coditech.Admin.ViewModel
         public bool IsRecordFound { get; set; } = true;
         public string GraphType { get; set; }
         public int DBTMGraphMasterId { get; set; }
+        public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
     }
 }

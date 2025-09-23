@@ -46,8 +46,28 @@
                                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                                         </svg>
                                     </a>
+
+                                    @if (item.JoiningCodeType == "Trainer")
+                                    {
+                                        <span class="m-2">|</span>
+                                        <a href="@Url.Action("TrainerRegistration", "DBTMGeneralTrainerMaster", new { joiningCode = item.JoiningCode })"
+                                           title="Add Trainer"
+                                           class="btn btn-sm btn-soft-info btn-circle">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    }
+                                    else if (item.JoiningCodeType == "Trainee")
+                                    {
+                                        <span class="m-2">|</span>
+                                        <a href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails", new { joiningCode = item.JoiningCode })"
+                                           title="Add Trainee"
+                                           class="btn btn-sm btn-soft-info btn-circle">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    }
                                 }
                             </td>
+
                         </tr>
                     }
                 }

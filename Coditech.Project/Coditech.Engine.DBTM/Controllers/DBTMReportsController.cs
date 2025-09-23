@@ -88,5 +88,53 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new GraphResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMReports/NameWiseReports")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult NameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.NameWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMReports/TestWiseMultipleReports")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
