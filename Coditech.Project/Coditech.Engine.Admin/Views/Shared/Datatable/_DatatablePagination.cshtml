@@ -6,8 +6,8 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     int a = Model.Page == 1 ? Model.Page : ((Model.RecordPerPage * (Model.Page - 1)) + 1);
     int b = Model.Page == 1 ? Model.TotalRecordCount : ((Model.RecordPerPage * (Model.Page - 1)) + Model.TotalRecordCount);
-    string pointerEventFirstPrevious = Model.Page == 1 ? "pointer-events: none" : "";
-    string pointerEventNextLast = Model.TotalPages == Model.Page ? "pointer-events: none" : "";
+    string pointerEventFirstPrevious = Model.Page == 1 ? "pointer-events: none; cursor: pointer;" : "cursor: pointer;";
+    string pointerEventNextLast = Model.TotalPages == Model.Page ? "pointer-events: none; cursor: pointer;" : "cursor: pointer;";
     int nextpage = Model.Page + 1;
     int previouspage = Model.Page - 1;
 }
