@@ -391,6 +391,16 @@ td.text-center a.btn {
         border: 1px solid #8bb0fe;
     }
 
+/* ✅ Checkmark on left hand side*/
+.multiselect-dropdown .dropdown-menu li a .check-mark {
+    right: auto !important;
+    left: 1rem !important;
+}
+
+.multiselect-dropdown .dropdown-menu li a span.text {
+    margin-left: 1rem !important;
+}
+
 .scroll-wrapper {
     max-height: calc((100vh) - 150px);
     overflow-y: auto;
