@@ -1,0 +1,119 @@
+﻿@using Coditech.Admin.Utilities
+@model BindAddressToPostalCodeViewModel
+
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+}
+
+<div class="modal-header">
+    <h6 class="modal-title m-0" id="exampleModalDefaultLabel">Select Address</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+@using (Html.BeginForm("CreateEditGeneralPersonalAddress", "EmployeeMaster", FormMethod.Post, new { id = "frmSendDetails" }))
+{
+    @Html.Hidden("PersonId", Model.PersonId)
+    @Html.Hidden("EntityId", Model.EntityId)
+    @Html.Hidden("AddressData", Model.AddressData)
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12 table-responsive">
+                <table class="table table-striped table-bordered dt-responsive nowrap" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Name</th>
+                            <th>District</th>
+                            <th>Division</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th>Pincode</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.BindAddressToPostalCodeList?.Count > 0)
+                        {
+                            foreach (var item in Model.BindAddressToPostalCodeList)
+                            {
+                                var value = $"{item.Name}|{item.District}|{item.Division}|{item.State}|{item.Country}|{item.Pincode}";
+                                <tr>
+                                    <td class="text-center">
+                                        <input type="radio" name="SelectedAddress" value="@value" />
+                                    </td>
+                                    <td>@item.Name</td>
+                                    <td>@item.District</td>
+                                    <td>@item.Division</td>
+                                    <td>@item.State</td>
+                                    <td>@item.Country</td>
+                                    <td>@item.Pincode</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-danger">No address data found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Hidden fields to bind selected address to Model -->
+    <div class="modal-footer d-flex justify-content-lg-start">
+        <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        $('#frmSendDetails').on('submit', function (e) {
+            e.preventDefault();
+            const selected = $('input[name="SelectedAddress"]:checked').val();
+            if (!selected) {
+                alert("Please select an address before saving.");
+                return;
+            }
+            CoditechCommon.ShowLodder();
+            $('#postalCodeModal').modal('hide');
+            const parts = selected.split('|');
+            const userAddress = {
+                Name: parts[0] || '',
+                District: parts[1] || '',
+                Division: parts[2] || '',
+                State: parts[3] || '',
+                Country: parts[4] || '',
+                Pincode: parts[5] || ''
+            };
+            const backendData = {
+                Postalcode: $('input[name="Postalcode"]').val(),
+                PersonId: $('input[name="PersonId"]').val(),
+                EntityId: $('input[name="EntityId"]').val(),
+                ControllerName: $('input[name="ControllerName"]').val(),
+                EntityType: $('input[name="EntityType"]').val(),
+                GeneralCountryMasterId: $('select[name="GeneralCountryMasterId"]').val(),
+                AddressTypeEnum: $('input[name="AddressTypeEnum"]').val()
+            };
+            const merged = { ...userAddress, ...backendData };
+            $.ajax({
+                url: '/GeneralCommon/ValidateAddress',
+                type: 'POST',
+                data: { addressData: JSON.stringify(merged) },
+                success: function (response) {
+                     CoditechCommon.HideLodder();
+                     location.reload();
+                },
+                error: function (xhr) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to display record.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        });
+    });
+</script>
+
