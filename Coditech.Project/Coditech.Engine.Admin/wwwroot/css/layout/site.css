@@ -401,7 +401,6 @@ td.text-center a.btn {
     margin-left: 1rem !important;
 }
 
-
 .scroll-wrapper {
     max-height: calc((100vh) - 150px);
     overflow-y: auto;
