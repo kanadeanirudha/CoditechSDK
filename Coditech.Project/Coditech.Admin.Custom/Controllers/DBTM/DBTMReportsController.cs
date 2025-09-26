@@ -14,6 +14,7 @@ namespace Coditech.Admin.Controllers
         private const string testreports = "~/Views/DBTM/DBTMReports/TestWiseReports.cshtml";
         private const string namereports = "~/Views/DBTM/DBTMReports/NameWiseReports.cshtml";
         private const string testwisemultireports = "~/Views/DBTM/DBTMReports/TestWiseMultiReports.cshtml";
+        private const string batchwisemultireports = "~/Views/DBTM/DBTMReports/BatchWiseMultiReports.cshtml";
         public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
@@ -84,18 +85,6 @@ namespace Coditech.Admin.Controllers
             return Content("No Record Found.");
         }
 
-        public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
-        {
-            DropdownViewModel testDropdownn = new DropdownViewModel
-            {
-                DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
-                DropdownName = "DBTMTestMasterId",
-                Parameter = $"{generalBatchMasterId}~true",
-                IsCustomDropdown = true
-            };
-            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn);
-        }
-
         [HttpGet]
         public ActionResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId)
         {
@@ -143,7 +132,51 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
 
+        [HttpGet]
+        public ActionResult BatchWiseMultipleReports()
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = DateTime.Today;
+            dBTMReportsViewModel.ToDate = DateTime.Today;
+            dBTMReportsViewModel.CustomDropdownList1 = new List<SelectListItem>();
+            return View(batchwisemultireports, dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetBatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
+        }
+
         #region Protected Methods
+        public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
+        {
+            DropdownViewModel testDropdownn = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                Parameter = $"{generalBatchMasterId}~true",
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn);
+        }
+
+        public ActionResult GetMultiTestByGeneralBatchMasterId(int generalBatchMasterId)
+        {
+            DBTMReportsListViewModel batchreports = new DBTMReportsListViewModel();
+            BindDBTMBatchActivity(batchreports);          
+            DropdownViewModel testDropdown = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                Parameter = $"{generalBatchMasterId}~true",
+                IsCustomDropdown = true
+            };
+            ViewBag.CustomDropdownList1 = batchreports.CustomDropdownList1;
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown);
+        }
+
         protected void BindDBTMBatchActivity(DBTMReportsListViewModel dBTMReportsViewModel)
         {
             dBTMReportsViewModel.CustomDropdownList1 = dBTMReportsViewModel.CustomDropdownList1 ?? new List<SelectListItem>();

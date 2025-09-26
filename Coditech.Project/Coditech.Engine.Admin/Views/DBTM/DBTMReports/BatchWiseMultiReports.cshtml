@@ -1,0 +1,173 @@
+﻿@model DBTMReportsListViewModel
+@{
+    ViewBag.Title = "Batchwisemulti Reports";
+    DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMMultiTestListByGeneralBatchMasterId()", IsCustomDropdown = true };
+    DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.GeneralBatchMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMBatchWiseMultiReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
+}
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title">Batchwise Reports</h4>
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>Batch List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label" for="CustomDropdownSelectedValue1">Activity List</label>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="mb-3 multiselect-dropdown">
+                                    @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTestMasterId", multiple = "multiple", data_live_search = "true" })
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
+                            </div>
+                            <div class="col-md-1">
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMBatchWiseMultiReports()" />
+                            </div>
+                            <div id="DBTMBatchWiseMultiReportsDivId" class="mt-3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+@section scripts {
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript">
+        function updateToDate() {
+            var fromDate = $("#FromDate").datepicker("getDate");
+            if (fromDate) {
+                $("#ToDate").datepicker("option", "minDate", fromDate);
+
+                var toDate = $("#ToDate").datepicker("getDate");
+                if (toDate && toDate < fromDate) {
+                    $("#ToDate").datepicker("setDate", fromDate);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
+            // FromDate
+            $("#FromDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: dateFormat,
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                maxDate: new Date(),
+                onSelect: function () {
+                    updateToDate();
+                }
+            });
+
+            // ToDate
+            $("#ToDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: dateFormat,
+                language: "en",
+                autoSize: true,
+                gotoCurrent: true,
+                clearBtn: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                maxDate: new Date(),
+                onSelect: function () {
+                    updateToDate();
+                }
+            });
+            updateToDate();
+        });
+    </script>
+    <script>
+            $.fn.dataTable.ext.errMode = 'none';
+            $(document).on('ajaxComplete', function () {
+                if ($('#datatable').length > 0) {
+                    if ($.fn.DataTable.isDataTable('#datatable')) {
+                        $('#datatable').DataTable().destroy();
+                    }
+                $('#datatable').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true,
+                    order: [[4, 'desc']]
+                });
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            $("#DBTMTestMasterId").prop("disabled", true);
+
+            $("#GeneralBatchMasterId").on("change", function () {
+                var batchId = $(this).val();
+                    if (batchId) {
+                        $("#DBTMTestMasterId").prop("disabled", false);
+                    } else {
+                        $("#DBTMTestMasterId").prop("disabled", true);
+                    }
+            });
+            $('#DBTMTestMasterId').on('changed.bs.select', function (e, clickedIndex, isSelected) {
+                var $select = $(this);
+                var selectedValues = $select.val() || [];
+                var allValue = "0";
+                var totalOptions = $select.find('option').length - 1;
+                if (clickedIndex === 0) {
+                    if (isSelected) {
+                        $select.find('option').prop('selected', true);
+                    } else {
+                        $select.find('option').prop('selected', false);
+                    }
+                    $select.selectpicker('refresh');
+                    return;
+                }
+                var selectedWithoutAll = selectedValues.filter(v => v !== allValue);
+                if (selectedWithoutAll.length !== totalOptions) {
+                    $select.find('option[value="' + allValue + '"]').prop('selected', false);
+                }
+                if (selectedWithoutAll.length === totalOptions) {
+                    $select.find('option[value="' + allValue + '"]').prop('selected', true);
+                }
+                $select.selectpicker('refresh');
+            });
+        });
+    </script>
+}

@@ -46,6 +46,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMBatchActivityList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.BatchWiseMultiReports.ToString()))
+            {
+                GetDBTMMultiBatchActivityList(dropdownViewModel, dropdownList);
+            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMDeviceSerialCodeByCentreCode.ToString()))
             {
                 GetCentrewiseDeviceSerialCodeList(dropdownViewModel, dropdownList);
@@ -218,6 +222,38 @@ namespace Coditech.Admin.Helpers
 
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) &&
                 dropdownViewModel.Parameter.ToLower() != "0~false")
+            {
+                int generalBatchMasterId = Convert.ToInt32(dropdownViewModel.Parameter.Split("~")[0]);
+                bool isAssociated = Convert.ToBoolean(dropdownViewModel.Parameter.Split("~")[1]);
+
+                DBTMBatchActivityListResponse response = new DBTMBatchActivityClient().GetDBTMBatchActivityList(generalBatchMasterId, isAssociated, null, null, null, 1, int.MaxValue);
+                DBTMBatchActivityListModel list = new DBTMBatchActivityListModel() { DBTMBatchActivityList = response.DBTMBatchActivityList };
+                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.TestName))
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.TestName}",
+                        Value = item.DBTMTestMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestMasterId)
+                    });
+                }
+            }
+        }
+
+        private static void GetDBTMMultiBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.DropdownType == DropdownCustomTypeEnum.BatchWiseMultiReports.ToString())
+                if (dropdownViewModel.IsRequired)
+                {
+                    dropdownList.Add(new SelectListItem { Value = "0", Text = "All" });
+                }
+                else
+                {
+                    dropdownList.Add(new SelectListItem { Value = "0", Text = GeneralResources.SelectLabel });
+                }
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) &&
+            dropdownViewModel.Parameter.ToLower() != "0~false")
             {
                 int generalBatchMasterId = Convert.ToInt32(dropdownViewModel.Parameter.Split("~")[0]);
                 bool isAssociated = Convert.ToBoolean(dropdownViewModel.Parameter.Split("~")[1]);
