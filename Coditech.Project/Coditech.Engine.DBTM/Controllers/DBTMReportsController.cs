@@ -136,5 +136,29 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMReports/BatchWiseMultipleReports")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, string fromDate, string toDate, bool isMobileRequest)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), isMobileRequest);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace Coditech.API.Service
             return dBTMReportsListModel;
         }
 
-        public DBTMReportsListModel BatchWiseMultipleReports(int generalBatchMasterId, string dBTMTestMasterIds, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
+        public DBTMReportsListModel BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
             if (generalBatchMasterId <= 0)
             {

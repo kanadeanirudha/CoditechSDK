@@ -123,6 +123,28 @@ namespace Coditech.Admin.Agents
             }
             return listViewModel;
         }
+
+        //Batch Wise Reports 
+        public virtual DBTMReportsListViewModel BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (!string.IsNullOrEmpty(dBTMTestMasterIds))
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate);
+                listViewModel.DataTable = response.DataTable;
+                listViewModel.DataTableList = response.DataTableList;
+            }
+            return listViewModel;
+        }
         #endregion
     }
 }
