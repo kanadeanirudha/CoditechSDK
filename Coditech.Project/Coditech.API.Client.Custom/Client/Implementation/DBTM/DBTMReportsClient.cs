@@ -14,14 +14,14 @@ namespace Coditech.API.Client
             dBTMReportsEndpoint = new DBTMReportsEndpoint();
         }
 
-        public virtual DBTMBatchWiseReportsListResponse BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMTestWiseReportsListResponse BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate)
         {
-            return Task.Run(async () => await BatchWiseReportsAsync(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await BatchWiseMultipleReportsAsync(dBTMTestMasterIds, generalBatchMasterId, fromDate, toDate, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMBatchWiseReportsListResponse> BatchWiseReportsAsync(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWiseReportsListResponse> BatchWiseMultipleReportsAsync(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.BatchWiseReportsAsync(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
+            string endpoint = dBTMReportsEndpoint.BatchWiseMultipleReportsAsync(dBTMTestMasterIds, generalBatchMasterId, fromDate, toDate);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
@@ -33,7 +33,7 @@ namespace Coditech.API.Client
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMBatchWiseReportsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWiseReportsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
                         throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
@@ -42,12 +42,12 @@ namespace Coditech.API.Client
                 }
                 else if (status_ == 204)
                 {
-                    return new DBTMBatchWiseReportsListResponse();
+                    return new DBTMTestWiseReportsListResponse();
                 }
                 else
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    DBTMBatchWiseReportsListResponse typedBody = JsonConvert.DeserializeObject<DBTMBatchWiseReportsListResponse>(responseData);
+                    DBTMTestWiseReportsListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWiseReportsListResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
@@ -59,14 +59,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTestWiseReportsListResponse TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
+        public virtual DBTMTestWiseReportsListResponse TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
-            return Task.Run(async () => await TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await TestWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseMultipleReportsAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.TestWiseReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode);
+            string endpoint = dBTMReportsEndpoint.TestWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
@@ -157,96 +157,6 @@ namespace Coditech.API.Client
         public virtual async Task<DBTMTestWiseReportsListResponse> NameWiseReportsAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
         {
             string endpoint = dBTMReportsEndpoint.NameWiseReportsAsync(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode);
-            HttpResponseMessage response = null;
-            var disposeResponse = true;
-            try
-            {
-                ApiStatus status = new ApiStatus();
-
-                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
-                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
-                var status_ = (int)response.StatusCode;
-                if (status_ == 200)
-                {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWiseReportsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
-                    if (objectResponse.Object == null)
-                    {
-                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
-                    }
-                    return objectResponse.Object;
-                }
-                else if (status_ == 204)
-                {
-                    return new DBTMTestWiseReportsListResponse();
-                }
-                else
-                {
-                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    DBTMTestWiseReportsListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWiseReportsListResponse>(responseData);
-                    UpdateApiStatus(typedBody, status, response);
-                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
-                }
-            }
-            finally
-            {
-                if (disposeResponse)
-                    response.Dispose();
-            }
-        }
-
-        public virtual DBTMTestWiseReportsListResponse TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
-        {
-            return Task.Run(async () => await TestWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
-        }
-
-        public virtual async Task<DBTMTestWiseReportsListResponse> TestWiseMultipleReportsAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
-        {
-            string endpoint = dBTMReportsEndpoint.TestWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode);
-            HttpResponseMessage response = null;
-            var disposeResponse = true;
-            try
-            {
-                ApiStatus status = new ApiStatus();
-
-                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
-                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
-                var status_ = (int)response.StatusCode;
-                if (status_ == 200)
-                {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWiseReportsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
-                    if (objectResponse.Object == null)
-                    {
-                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
-                    }
-                    return objectResponse.Object;
-                }
-                else if (status_ == 204)
-                {
-                    return new DBTMTestWiseReportsListResponse();
-                }
-                else
-                {
-                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    DBTMTestWiseReportsListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWiseReportsListResponse>(responseData);
-                    UpdateApiStatus(typedBody, status, response);
-                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
-                }
-            }
-            finally
-            {
-                if (disposeResponse)
-                    response.Dispose();
-            }
-        }
-
-        public virtual DBTMTestWiseReportsListResponse BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate)
-        {
-            return Task.Run(async () => await BatchWiseMultipleReportsAsync(dBTMTestMasterIds, generalBatchMasterId, fromDate, toDate, CancellationToken.None)).GetAwaiter().GetResult();
-        }
-
-        public virtual async Task<DBTMTestWiseReportsListResponse> BatchWiseMultipleReportsAsync(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
-        {
-            string endpoint = dBTMReportsEndpoint.BatchWiseMultipleReportsAsync(dBTMTestMasterIds, generalBatchMasterId, fromDate, toDate);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

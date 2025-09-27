@@ -26,62 +26,7 @@ namespace Coditech.Admin.Agents
 
         #region Public Methods
         //Batch Wise Reports 
-        public virtual DBTMReportsListViewModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
-        {
-            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
-            if (generalBatchMasterId > 0 && dBTMTestMasterId > 0)
-            {
-                DBTMBatchWiseReportsListResponse response = _dBTMReportsClient.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
-                listViewModel.DataTable = response.DataTable;
-            }
-            return listViewModel;
-        }
-
-        //Test Wise Reports 
-        public virtual DBTMReportsListViewModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
-        {
-            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
-            if (dBTMTestMasterId > 0)
-            {
-                long generalTrainerMasterId = 0;
-                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-                string usertype = userModel.UserType;
-                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
-                {
-                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
-                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
-                    usertype = userModel?.Custom1;
-                }
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
-                listViewModel.DataTable = response.DataTable;
-            }
-            return listViewModel;
-        }
-
-        //Graph Reports
-        public virtual GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
-        {
-            GraphModel graphModel = new GraphModel();
-            if (dBTMTestMasterId > 0)
-            {
-                long generalTrainerMasterId = 0;
-                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-                string usertype = userModel.UserType;
-                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
-                {
-                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
-                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
-                    usertype = userModel?.Custom1;
-                }
-                GraphResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
-                graphModel = response.GraphModel;
-
-            }
-            return graphModel;
-        }
-
-        //Name Wise Reports 
-        public virtual DBTMReportsListViewModel NameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMReportsListViewModel BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
             DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
             if (!string.IsNullOrEmpty(dBTMTestMasterIds))
@@ -95,7 +40,7 @@ namespace Coditech.Admin.Agents
                     generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
                     usertype = userModel?.Custom1;
                 }
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate);
                 listViewModel.DataTable = response.DataTable;
                 listViewModel.DataTableList = response.DataTableList;
             }
@@ -124,8 +69,8 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
-        //Batch Wise Reports 
-        public virtual DBTMReportsListViewModel BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
+        //Name Wise Reports 
+        public virtual DBTMReportsListViewModel NameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
             DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
             if (!string.IsNullOrEmpty(dBTMTestMasterIds))
@@ -139,12 +84,34 @@ namespace Coditech.Admin.Agents
                     generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
                     usertype = userModel?.Custom1;
                 }
-                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate);
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
                 listViewModel.DataTable = response.DataTable;
                 listViewModel.DataTableList = response.DataTableList;
             }
             return listViewModel;
         }
+
+        //Graph Reports
+        public virtual GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
+        {
+            GraphModel graphModel = new GraphModel();
+            if (dBTMTestMasterId > 0)
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                GraphResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                graphModel = response.GraphModel;
+
+            }
+            return graphModel;
+        }       
         #endregion
     }
 }
