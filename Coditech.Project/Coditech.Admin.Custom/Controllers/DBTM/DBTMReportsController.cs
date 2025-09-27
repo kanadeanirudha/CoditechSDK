@@ -10,8 +10,6 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IDBTMReportsAgent _dBTMReportsAgent;
         private readonly IDBTMTestAgent _dBTMTestAgent;
-        private const string batchreports = "~/Views/DBTM/DBTMReports/BatchWiseReports.cshtml";
-        private const string testreports = "~/Views/DBTM/DBTMReports/TestWiseReports.cshtml";
         private const string namereports = "~/Views/DBTM/DBTMReports/NameWiseReports.cshtml";
         private const string testwisemultireports = "~/Views/DBTM/DBTMReports/TestWiseMultiReports.cshtml";
         private const string batchwisemultireports = "~/Views/DBTM/DBTMReports/BatchWiseMultiReports.cshtml";
@@ -21,39 +19,43 @@ namespace Coditech.Admin.Controllers
             _dBTMTestAgent = dBTMTestAgent;
         }
 
+        //Batchwise Reports
         [HttpGet]
         public ActionResult BatchWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
-            return View(batchreports, dBTMReportsViewModel);
+            dBTMReportsViewModel.CustomDropdownList1 = new List<SelectListItem>();
+            return View(batchwisemultireports, dBTMReportsViewModel);
         }
 
         [HttpGet]
-        public ActionResult GetBatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetBatchWiseReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, FromDate, ToDate);
-            dBTMReportsViewModel.IsRecordFound = dBTMReportsViewModel?.DataTable?.Rows?.Count > 0;
-            return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
 
+        //Test Wise Reports 
         [HttpGet]
         public ActionResult TestWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
-            return View(testreports, dBTMReportsViewModel);
+            BindDBTMBatchActivity(dBTMReportsViewModel);
+            return View(testwisemultireports, dBTMReportsViewModel);
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetTestWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
-            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, FromDate, ToDate);
-            return PartialView("~/Views/Shared/_DBTMReports.cshtml", dBTMReportsViewModel);
+            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
 
+        //TestWise Graph Reports
         [HttpGet]
         public ActionResult TestWiseGraphReports()
         {
@@ -98,6 +100,7 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
         }
 
+        //NameWise Reports
         [HttpGet]
         public ActionResult NameWiseReports()
         {
@@ -114,54 +117,8 @@ namespace Coditech.Admin.Controllers
             DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
-
-        [HttpGet]
-        public ActionResult TestWiseMultipleReports()
-        {
-            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
-            dBTMReportsViewModel.FromDate = DateTime.Today;
-            dBTMReportsViewModel.ToDate = DateTime.Today;
-            BindDBTMBatchActivity(dBTMReportsViewModel);
-            return View(testwisemultireports, dBTMReportsViewModel);
-        }
-
-        [HttpGet]
-        public ActionResult GetTestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
-        {
-            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
-            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
-        }
-
-        [HttpGet]
-        public ActionResult BatchWiseMultipleReports()
-        {
-            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
-            dBTMReportsViewModel.FromDate = DateTime.Today;
-            dBTMReportsViewModel.ToDate = DateTime.Today;
-            dBTMReportsViewModel.CustomDropdownList1 = new List<SelectListItem>();
-            return View(batchwisemultireports, dBTMReportsViewModel);
-        }
-
-        [HttpGet]
-        public ActionResult GetBatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate)
-        {
-            DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate);
-            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
-        }
-
+      
         #region Protected Methods
-        public ActionResult GetTestByGeneralBatchMasterId(int generalBatchMasterId)
-        {
-            DropdownViewModel testDropdownn = new DropdownViewModel
-            {
-                DropdownType = DropdownCustomTypeEnum.DBTMBatchActivity.ToString(),
-                DropdownName = "DBTMTestMasterId",
-                Parameter = $"{generalBatchMasterId}~true",
-                IsCustomDropdown = true
-            };
-            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdownn);
-        }
-
         public ActionResult GetMultiTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
             DBTMReportsListViewModel batchreports = new DBTMReportsListViewModel();

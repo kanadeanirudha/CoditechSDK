@@ -5,12 +5,40 @@
     constructor: function () {
     },
 
-    GetDBTMBatchWiseReports: function () {
+    GetDBTMMultiTestListByGeneralBatchMasterId: function () {
+        var selectedItem = $("#GeneralBatchMasterId").val();
+        if (selectedItem != "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "/DBTMReports/GetMultiTestByGeneralBatchMasterId",
+                data: { generalBatchMasterId: selectedItem },
+                success: function (data) {
+                    $("#DBTMTestMasterId").html(data);
+                    $('#DBTMTestMasterId').selectpicker('refresh');
+
+                    CoditechCommon.HideLodder();
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            $("#DBTMTestMasterId").html("");
+            $('#DBTMTestMasterId').selectpicker('refresh');
+        }
+    },
+
+    GetDBTMBatchWiseMultiReports: function () {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        $("#DBTMBatchWiseReportsDivId").html("");
+        $("#DBTMBatchWiseMultiReportsDivId").html("");
         if (generalBatchMasterId != "" && dBTMTestMasterId != "") {
             CoditechCommon.ShowLodder();
             $.ajax({
@@ -20,13 +48,13 @@
                 url: "/DBTMReports/GetBatchWiseReports",
                 data: {
                     "generalBatchMasterId": generalBatchMasterId,
-                    "dBTMTestMasterId": dBTMTestMasterId,
+                    "dBTMTestMasterIds": dBTMTestMasterId,
                     "FromDate": fromdate,
                     "ToDate": todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DBTMBatchWiseReportsDivId").html(data);
+                    $("#DBTMBatchWiseMultiReportsDivId").html(data);
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -49,43 +77,15 @@
         }
     },
 
-    GetDBTMTestListByGeneralBatchMasterId: function () {
-        var selectedItem = $("#GeneralBatchMasterId").val();
-
-        if (selectedItem != "") {
-            CoditechCommon.ShowLodder();
-
-            $.ajax({
-                cache: false,
-                type: "GET",
-                dataType: "html",
-                url: "/DBTMReports/GetTestByGeneralBatchMasterId",
-                data: { generalBatchMasterId: selectedItem },
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#DBTMTestMasterId").html(data);
-                    CoditechCommon.HideLodder();
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    if (xhr.status === 401 || xhr.status === 403) {
-                        location.reload();
-                    }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
-                    CoditechCommon.HideLodder();
-                }
-            });
-        } else {
-            $("#DBTMTestMasterId").html("");
-        }
-    },
-
-    GetDBTMTestWiseReports: function () {
+    GetDBTMTestWiseMultiReports: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
 
-        $("#DBTMTestWiseReportsDivId").html("");
+        $("#DBTMTestWiseMultiReportsDivId").html("");
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();
@@ -96,14 +96,14 @@
                 dataType: "html",
                 url: "/DBTMReports/GetTestWiseReports",
                 data: {
-                    dBTMTestMasterId: dBTMTestMasterId,
+                    dBTMTestMasterIds: dBTMTestMasterId,
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
-                    fromdate: fromdate,
-                    todate: todate
+                    FromDate: fromdate,
+                    ToDate: todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DBTMTestWiseReportsDivId").html(data);
+                    $("#DBTMTestWiseMultiReportsDivId").html(data);
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -114,6 +114,7 @@
                     CoditechCommon.HideLodder();
                 }
             });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
@@ -124,7 +125,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var dBTMGraphMasterId = $("#DBTMGraphMasterId").val(); 
+        var dBTMGraphMasterId = $("#DBTMGraphMasterId").val();
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
@@ -141,7 +142,7 @@
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
                     fromdate: fromdate,
                     todate: todate,
-                    dBTMGraphMasterId: dBTMGraphMasterId 
+                    dBTMGraphMasterId: dBTMGraphMasterId
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -204,10 +205,10 @@
                 dataType: "html",
                 url: "/DBTMReports/GetNameWiseReports",
                 data: {
-                    dBTMTestMasterIds: dBTMTestMasterId, 
+                    dBTMTestMasterIds: dBTMTestMasterId,
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
-                    FromDate: fromdate,  
-                    ToDate: todate      
+                    FromDate: fromdate,
+                    ToDate: todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -225,121 +226,6 @@
         } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
-        }
-    },
-
-    GetDBTMTestWiseMultiReports: function () {
-        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
-        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
-
-        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
-        var fromdate = $("#FromDate").val();
-        var todate = $("#ToDate").val();
-
-        $("#DBTMTestWiseMultiReportsDivId").html("");
-
-        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
-            CoditechCommon.ShowLodder();
-
-            $.ajax({
-                cache: false,
-                type: "GET",
-                dataType: "html",
-                url: "/DBTMReports/GetTestWiseMultipleReports",
-                data: {
-                    dBTMTestMasterIds: dBTMTestMasterId,
-                    dBTMTraineeDetailId: dBTMTraineeDetailId,
-                    FromDate: fromdate,
-                    ToDate: todate
-                },
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#DBTMTestWiseMultiReportsDivId").html(data);
-                    CoditechCommon.HideLodder();
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    if (xhr.status == "401" || xhr.status == "403") {
-                        location.reload();
-                    }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error");
-                    CoditechCommon.HideLodder();
-                }
-            });
-        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
-        } else {
-            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
-        }
-    },
-
-    GetDBTMMultiTestListByGeneralBatchMasterId: function () {
-        var selectedItem = $("#GeneralBatchMasterId").val();
-        if (selectedItem != "") {
-            CoditechCommon.ShowLodder();
-            $.ajax({
-                cache: false,
-                type: "GET",
-                url: "/DBTMReports/GetMultiTestByGeneralBatchMasterId",
-                data: { generalBatchMasterId: selectedItem },
-                success: function (data) {
-                    $("#DBTMTestMasterId").html(data);
-                    $('#DBTMTestMasterId').selectpicker('refresh');
-
-                    CoditechCommon.HideLodder();
-                },
-                error: function () {
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
-                    CoditechCommon.HideLodder();
-                }
-            });
-        } else {
-            $("#DBTMTestMasterId").html("");
-            $('#DBTMTestMasterId').selectpicker('refresh');
-        }
-    },
-
-    GetDBTMBatchWiseMultiReports: function () {
-        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
-        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
-        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
-
-        var fromdate = $("#FromDate").val();
-        var todate = $("#ToDate").val();
-        $("#DBTMBatchWiseMultiReportsDivId").html("");
-        if (generalBatchMasterId != "" && dBTMTestMasterId != "") {
-            CoditechCommon.ShowLodder();
-            $.ajax({
-                cache: false,
-                type: "GET",
-                dataType: "html",
-                url: "/DBTMReports/GetBatchWiseMultipleReports",
-                data: {
-                    "generalBatchMasterId": generalBatchMasterId,
-                    "dBTMTestMasterIds": dBTMTestMasterId,
-                    "FromDate": fromdate,
-                    "ToDate": todate
-                },
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#DBTMBatchWiseMultiReportsDivId").html(data);
-                    CoditechCommon.HideLodder();
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    if (xhr.status == "401" || xhr.status == "403") {
-                        location.reload();
-                    }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Batch Reports.", "error");
-                    CoditechCommon.HideLodder();
-                }
-            });
-        }
-        else if (generalBatchMasterId == "" || generalBatchMasterId == "0") {
-            CoditechNotification.DisplayNotificationMessage("Please select a batch.", "error");
-        }
-        else if (dBTMTestMasterId == "") {
-            CoditechNotification.DisplayNotificationMessage("Please select an activity.", "error");
-        }
-        else {
-            CoditechNotification.DisplayNotificationMessage("Please select batch and activity.", "error");
         }
     },
 };
