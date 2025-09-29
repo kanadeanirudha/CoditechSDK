@@ -1,6 +1,6 @@
 ﻿@model DBTMReportsListViewModel
 @{
-    ViewBag.Title = "Batchwisemulti Reports";
+    ViewBag.Title = "Batchwise Multiple Reports";
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMMultiTestListByGeneralBatchMasterId()", IsCustomDropdown = true };
     DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.GeneralBatchMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMBatchWiseMultiReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
 }
@@ -57,6 +57,22 @@
         </div>
     </div>
 </div>
+<style>
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 8px;
+        margin-bottom: 0;
+        text-align: right;
+    }
+
+    .table-responsive {
+        padding-bottom: 4px !important;
+        box-sizing: border-box;
+    }
+</style>
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <!-- DataTables CSS -->
@@ -117,20 +133,19 @@
     </script>
     <script>
             $.fn.dataTable.ext.errMode = 'none';
-            $(document).on('ajaxComplete', function () {
-                if ($('#datatable').length > 0) {
-                    if ($.fn.DataTable.isDataTable('#datatable')) {
-                        $('#datatable').DataTable().destroy();
+               $(document).on('ajaxComplete', function () {
+                 $("table[id^='datatable-']").each(function () {
+                    if ($.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable().destroy();
                     }
-                $('#datatable').DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    responsive: true,
-                    order: [[4, 'desc']]
+                    $(this).DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        responsive: true
+                    });
                 });
-            }
-        });
+            });
     </script>
     <script>
         $(document).ready(function () {
