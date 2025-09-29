@@ -1,6 +1,6 @@
 ﻿@model DBTMReportsListViewModel
 @{
-    ViewBag.Title = "Namewise Reports";
+    ViewBag.Title = "Namewise Multiple Reports";
     DropdownViewModel testDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMTest.ToString(),
@@ -142,6 +142,20 @@
             border-radius: 0 4px 4px 0;
         }
 
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 8px;
+        margin-bottom: 0;
+        text-align: right;
+    }
+
+    .table-responsive {
+        padding-bottom: 4px !important;
+        box-sizing: border-box;
+    }
 </style>
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
@@ -203,27 +217,27 @@
     </script>
     <script>
         $.fn.dataTable.ext.errMode = 'none';
-        $(document).on('ajaxComplete', function () {
-            if ($('#datatable').length > 0) {
-                if ($.fn.DataTable.isDataTable('#datatable')) {
-                    $('#datatable').DataTable().destroy();
-                }
-                $('#datatable').DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    responsive: true
+          $(document).on('ajaxComplete', function () {
+                $("table[id^='datatable-']").each(function () {
+                    if ($.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable().destroy();
+                    }
+                    $(this).DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        responsive: true
+                    });
                 });
-            }
-        });
+          });
     </script>
     <script>
         $(document).ready(function () {
             $('#DBTMTestMasterId').on('changed.bs.select', function (e, clickedIndex, isSelected) {
                 var $select = $(this);
                 var selectedValues = $select.val() || [];
-                var allValue = "0"; 
-                var totalOptions = $select.find('option').length - 1; 
+                var allValue = "0";
+                var totalOptions = $select.find('option').length - 1;
                 if (clickedIndex === 0) {
                     if (isSelected) {
                         $select.find('option').prop('selected', true);
