@@ -79,7 +79,10 @@ namespace Coditech.API.Service
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
                     createdDate = DateTime.Now;
-                    DBTMTraineeDetails dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
+                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails() ;
+                    if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
+                        dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
+
                     if (IsNull(dBTMTraineeDetails))
                         throw new CoditechException(ErrorCodes.InvalidData, "Invalid Person Code");
 
@@ -91,8 +94,8 @@ namespace Coditech.API.Service
                         PersonCode = dBTMDeviceDataModel.PersonCode,
                         TestCode = dBTMDeviceDataModel.TestCode,
                         Comments = dBTMDeviceDataModel.Comments,
-                        Height = dBTMTraineeDetails.Height,
-                        Weight = dBTMTraineeDetails.Weight,
+                        Height = dBTMDeviceDataModel.Height == 0 ? dBTMTraineeDetails.Height : dBTMDeviceDataModel.Height,
+                        Weight = dBTMDeviceDataModel.Weight == 0 ? dBTMTraineeDetails.Weight : dBTMDeviceDataModel.Weight,
                         TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
                         NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
                         CreatedBy = dBTMDeviceDataModel.CreatedBy,

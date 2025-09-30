@@ -17,6 +17,9 @@ namespace Coditech.Common.API.Model
         [MaxLength(200)]
         [Required]
         public string PersonCode { get; set; }
+        public decimal Weight { get; set; }
+        public decimal Height { get; set; }
+
         [MaxLength(50)]
         [Required]
         public string TestCode { get; set; }
