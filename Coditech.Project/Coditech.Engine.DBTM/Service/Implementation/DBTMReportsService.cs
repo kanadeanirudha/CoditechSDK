@@ -1,4 +1,5 @@
-﻿using Coditech.API.Data;
+﻿using ClosedXML.Excel;
+using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
@@ -111,14 +112,61 @@ namespace Coditech.API.Service
                         }
                     }
                 }
-            }
+            }        
             return dBTMReportsListModel;
+        }
+
+        public DBTMReportsListModel TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
+        {
+            var reportData = TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+            if (reportData?.DataTableList == null || reportData.DataTableList.Count == 0)
+                return reportData;
+            string currentDir = Directory.GetCurrentDirectory();
+            string dataFolder = Path.Combine(currentDir, "data");
+            if (!Directory.Exists(dataFolder))
+                Directory.CreateDirectory(dataFolder);
+            string fileName = $"ActivityData_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            string filePath = Path.Combine(dataFolder, fileName);
+            // Create workbook using ClosedXML
+            using (var workbook = new XLWorkbook())
+            {
+                foreach (var table in reportData.DataTableList)
+                {
+                    var replacements = new Dictionary<string, string>
+                    {
+                        { "300", "Threehundres" },
+                        { "5-0-5 ", "FiveZeroFiveAgilityTest" },
+                        { "5-10-5", "ProAgilityTest" },
+                        { "3", "ThreeGateSprint" }
+                    };
+                    string sheetName = table.Key;
+                    foreach (var kv in replacements)
+                    {
+                        sheetName = sheetName.Replace(kv.Key, kv.Value);
+                    }
+                    char[] invalidChars = new char[] { ':', '\\', '/', '?', '*', '[', ']' };
+                    foreach (var c in invalidChars)
+                    {
+                        sheetName = sheetName.Replace(c.ToString(), "");
+                    }
+                    sheetName = sheetName.Trim();
+                    if (sheetName.Length > 31)
+                        sheetName = sheetName.Substring(0, 31);
+                    var worksheet = workbook.Worksheets.Add(sheetName);
+                    worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
+                }
+                // Save the workbook
+                workbook.SaveAs(filePath);
+            }
+            reportData.FilePath = filePath;
+            reportData.FileName = fileName;
+            return reportData;
         }
 
         public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList(); 
+            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
             var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
             if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {

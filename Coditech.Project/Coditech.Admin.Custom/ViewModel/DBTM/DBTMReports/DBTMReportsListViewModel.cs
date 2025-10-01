@@ -24,5 +24,7 @@ namespace Coditech.Admin.ViewModel
         public string GraphType { get; set; }
         public int DBTMGraphMasterId { get; set; }
         public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
+        public string FilePath { get; set; }   
+        public string FileName { get; set; }
     }
 }

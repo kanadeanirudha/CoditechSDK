@@ -69,6 +69,30 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
+        //Test Wise Reports File
+        public virtual DBTMReportsListViewModel TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string ReportType)
+        {
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (!string.IsNullOrEmpty(dBTMTestMasterIds))
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode, ReportType);
+                listViewModel.DataTable = response.DataTable;
+                listViewModel.DataTableList = response.DataTableList;
+                listViewModel.FilePath = response.FilePath;
+                listViewModel.FileName = response.FileName;
+            }
+            return listViewModel;
+        }
+
         //Name Wise Reports 
         public virtual DBTMReportsListViewModel NameWiseReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
