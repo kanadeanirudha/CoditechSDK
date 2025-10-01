@@ -55,6 +55,21 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
 
+        [HttpGet]
+        public ActionResult GetTestWiseReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string reportType)
+        {
+            DBTMReportsListViewModel datalist = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, reportType);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", datalist);
+        }
+
+        [HttpGet]
+        public ActionResult DownloadReport(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, string reportType)
+        {
+            DBTMReportsListViewModel reportData = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, reportType);
+            var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportData.FileName);
+        }
+
         //TestWise Graph Reports
         [HttpGet]
         public ActionResult TestWiseGraphReports()
@@ -117,12 +132,12 @@ namespace Coditech.Admin.Controllers
             DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
-      
+
         #region Protected Methods
         public ActionResult GetMultiTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
             DBTMReportsListViewModel batchreports = new DBTMReportsListViewModel();
-            BindDBTMBatchActivity(batchreports);          
+            BindDBTMBatchActivity(batchreports);
             DropdownViewModel testDropdown = new DropdownViewModel
             {
                 DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(),

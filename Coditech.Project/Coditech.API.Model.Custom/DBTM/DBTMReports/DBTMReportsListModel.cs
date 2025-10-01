@@ -10,5 +10,7 @@ namespace Coditech.Common.API.Model
         {
             DataTable = new DataTable();
         }
+        public string FilePath { get; set; }   
+        public string FileName { get; set; }
     }
 }

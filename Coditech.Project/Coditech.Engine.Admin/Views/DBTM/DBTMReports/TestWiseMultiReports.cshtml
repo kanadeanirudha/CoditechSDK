@@ -74,11 +74,24 @@
                             <div class="col-md-3">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseMultiReports()" />
                             </div>
-                            <div id="DBTMTestWiseMultiReportsDivId" class="mt-3">
+                            <!-- Buttons -->
+                            <div class="col-md-3">
+                                <!-- View in new tab -->
+                           @*      <button type="button" class="btn btn-success" onclick="DBTMReports.GetDBTMTestWiseMultiReportsFile()">View in xls</button> *@
+                                
+                                <!-- Download latest -->
+                                <a href="javascript:void(0);"
+                                   class="btn btn-success"
+                                   onclick="DBTMReports.DownloadExcelReport()">
+                                    <i class="fa fa-download"></i> Download
+                                </a>
+                                
                             </div>
+                        </div>
+                        <div id="DBTMTestWiseMultiReportsDivId" class="mt-3">
                         </div>
                     </div>
                 </div>

@@ -6,5 +6,7 @@ namespace Coditech.Common.API.Model.Response
     {
         public DataTable DataTable { get; set; }
         public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
     }
 }

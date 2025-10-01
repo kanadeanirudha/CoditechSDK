@@ -228,4 +228,72 @@
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },
+
+    GetDBTMTestWiseMultiReportsFile: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val();
+
+        $("#DBTMTestWiseMultiReportsDivId").html("");
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetTestWiseReportsFile",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    FromDate: fromdate,
+                    ToDate: todate,
+                    ReportType: reportType
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMTestWiseMultiReportsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Error while downloading report.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+
+    DownloadExcelReport: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val();
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            var url = "/DBTMReports/DownloadReport"
+                + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                + "&dBTMTraineeDetailId=" + encodeURIComponent(dBTMTraineeDetailId)
+                + "&fromDate=" + encodeURIComponent(fromdate)
+                + "&toDate=" + encodeURIComponent(todate)
+                + "&reportType=" + encodeURIComponent(reportType);
+
+            window.location.href = url;
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    }
 };
