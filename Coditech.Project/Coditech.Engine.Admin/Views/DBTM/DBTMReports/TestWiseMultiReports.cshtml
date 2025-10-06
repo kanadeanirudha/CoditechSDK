@@ -83,9 +83,7 @@
                            @*      <button type="button" class="btn btn-success" onclick="DBTMReports.GetDBTMTestWiseMultiReportsFile()">View in xls</button> *@
                                 
                                 <!-- Download latest -->
-                                <a href="javascript:void(0);"
-                                   class="btn btn-success"
-                                   onclick="DBTMReports.DownloadExcelReport()">
+                                <a id="DownloadBtn" class="btn btn-success" onclick="DBTMReports.DownloadExcelReport()">
                                     <i class="fa fa-download"></i> Download
                                 </a>
                                 
@@ -99,6 +97,7 @@
         </div>
     </div>
 </div>
+<iframe id="hiddenDownloader" style="display:none;"></iframe>
 <style>
     .switch-field {
         display: flex;

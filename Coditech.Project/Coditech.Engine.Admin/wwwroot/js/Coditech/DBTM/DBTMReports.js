@@ -277,21 +277,43 @@
     DownloadExcelReport: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
-
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         var reportType = $("#ReportType").val();
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
-            var url = "/DBTMReports/DownloadReport"
-                + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
-                + "&dBTMTraineeDetailId=" + encodeURIComponent(dBTMTraineeDetailId)
-                + "&fromDate=" + encodeURIComponent(fromdate)
-                + "&toDate=" + encodeURIComponent(todate)
-                + "&reportType=" + encodeURIComponent(reportType);
-
-            window.location.href = url;
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                url: "/DBTMReports/CheckReportAvailability",
+                type: "GET",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    fromDate: fromdate,
+                    toDate: todate,
+                    reportType: reportType
+                },
+                success: function (response) {
+                    if (response.success) {
+                        var downloadUrl = "/DBTMReports/DownloadReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&dBTMTraineeDetailId=" + encodeURIComponent(dBTMTraineeDetailId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.HideLodder();
+                        $("#hiddenDownloader").attr("src", downloadUrl);                       
+                    } else {
+                        CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
+                        CoditechCommon.HideLodder();
+                    }
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
