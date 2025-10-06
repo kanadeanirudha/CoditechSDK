@@ -122,10 +122,10 @@ namespace Coditech.API.Service
             if (reportData?.DataTableList == null || reportData.DataTableList.Count == 0)
                 return reportData;
             string currentDir = Directory.GetCurrentDirectory();
-            string dataFolder = Path.Combine(currentDir, "data");
+            string dataFolder = Path.Combine(currentDir, "data", "ActivityReport");
             if (!Directory.Exists(dataFolder))
                 Directory.CreateDirectory(dataFolder);
-            string fileName = $"ActivityData_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            string fileName = $"ActivityReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
             string filePath = Path.Combine(dataFolder, fileName);
             // Create workbook using ClosedXML
             using (var workbook = new XLWorkbook())
