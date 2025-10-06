@@ -59,7 +59,7 @@
                                     else if (item.JoiningCodeType == "Trainee")
                                     {
                                         <span class="m-2">|</span>
-                                        <a href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails", new { joiningCode = item.JoiningCode })"
+                                        <a href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails", new { joiningCode = item.JoiningCode, custom1 = item.Custom1 })"
                                            title="Add Trainee"
                                            class="btn btn-sm btn-soft-info btn-circle">
                                             <i class="fas fa-plus"></i>
