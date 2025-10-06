@@ -66,13 +66,20 @@
                     </div>
                     @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                     {
-                        <div class="col-lg-6">
-                            <div class="mb-3 multiselect-dropdown">
-                                @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
-                                @Html.ListBoxFor(m => m.SelectedTrainer, new SelectList(Model.AllTrainerList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
-                                @Html.ValidationMessageFor(x => x.SelectedTrainer)
-                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3 multiselect-dropdown">
+                                    @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
+
+                                    @Html.ListBoxFor(
+                                    m => m.SelectedTrainer,
+                                                    new MultiSelectList(Model.AllTrainerList, "Value", "Text", Model.SelectedTrainer),
+                                                    new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" }
+                                                    )
+
+                            @Html.ValidationMessageFor(x => x.SelectedTrainer)
                         </div>
+                </div>
+
                     }
                 </div>
                 @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTraineeRegistration.cshtml", Model)
