@@ -7,7 +7,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-
 namespace Coditech.API.Common
 {
     /// <summary>
@@ -232,6 +231,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<IGeneralTrainerMasterService, DBTMGeneralTrainerMasterService>();
             builder.Services.AddScoped<IGeneralBatchMasterService, DBTMGeneralBatchMasterService>();
             builder.Services.AddScoped<IDBTMBatchMasterService, DBTMGeneralBatchMasterService>();
+            builder.Services.AddScoped<IOrganisationCentrewiseJoiningCodeService, DBTMOrganisationCentrewiseJoiningCodeService>();
         }
     }
 }

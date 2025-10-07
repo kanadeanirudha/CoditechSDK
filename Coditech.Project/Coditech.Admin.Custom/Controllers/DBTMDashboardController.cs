@@ -302,6 +302,17 @@ namespace Coditech.Admin.Controllers
             };
             return View("~/Views/DBTM/DBTMDashboard/DBTMCalendar.cshtml", model);
         }
+        public ActionResult GetDBTMTrainerListByCentreCode(string centreCode)
+        {
+            DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTrainerCentrewise.ToString(),
+                DropdownName = "Custom1",
+                Parameter = centreCode,
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
+        }
 
         #region Send Reminder
         [HttpPost]

@@ -22,6 +22,7 @@
         Trainee,
         DBTMPerformanceMatrix,
         BatchWiseMultiReports,
+        DBTMTrainerCentrewise,
     }
     public enum DashboardFormCustomEnum
     {

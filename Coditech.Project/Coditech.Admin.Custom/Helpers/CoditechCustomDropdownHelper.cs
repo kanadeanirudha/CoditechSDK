@@ -34,6 +34,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetCentrewiseDBTMTrainerList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTrainerCentrewise.ToString()))
+            {
+                GetDBTMTrainerListByCentreCode(dropdownViewModel, dropdownList);
+            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString()))
             {
                 GetTraineeDetailByCentreCodeAndGeneralTrainerList(dropdownViewModel, dropdownList);
@@ -426,7 +430,7 @@ namespace Coditech.Admin.Helpers
         }
         private static void GetDBTMPerformanceMatrix(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            dropdownList.Add(new SelectListItem() { Text = "-------Select-------"});
+            dropdownList.Add(new SelectListItem() { Text = "-------Select-------" });
 
             DBTMPerformanceMatrixListResponse response = new DBTMTestClient().GetDBTMPerformanceMatrixList(null, null, null, 1, int.MaxValue);
             DBTMPerformanceMatrixListModel list = new DBTMPerformanceMatrixListModel() { DBTMPerformanceMatrixList = response.DBTMPerformanceMatrixList };
@@ -454,6 +458,31 @@ namespace Coditech.Admin.Helpers
                     Value = graphType.ToString(),
                     Selected = graphType.ToString() == dropdownViewModel.DropdownSelectedValue
                 });
+            }
+        }
+        private static void GetDBTMTrainerListByCentreCode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            GeneralTrainerListModel list = new GeneralTrainerListModel();
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
+
+                GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
+                list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
+                foreach (var item in list?.GeneralTrainerList?.OrderBy(x => x.FirstName))
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.FirstName} {item.LastName}",
+                        Value = item.GeneralTrainerMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                    });
+                }
             }
         }
     }

@@ -29,6 +29,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IGeneralBatchAgent, DBTMBatchAgent>();
             builder.Services.AddScoped<IDBTMBatchAgent, DBTMBatchAgent>();
             builder.Services.AddScoped<IDBTMGraphAgent, DBTMGraphAgent>();
+            builder.Services.AddScoped<IOrganisationCentrewiseJoiningCodeAgent, DBTMOrganisationCentrewiseJoiningCodeAgent>();
             #endregion
             #endregion Agent
 
