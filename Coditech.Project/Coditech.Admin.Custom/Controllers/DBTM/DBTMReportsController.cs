@@ -76,6 +76,10 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public ActionResult DownloadReport(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, string reportType)
         {
+            if (string.IsNullOrWhiteSpace(reportType) || reportType == "undefined")
+            {
+                reportType = "excel";
+            }
             DBTMReportsListViewModel reportData = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, reportType);
             if (reportData == null || string.IsNullOrEmpty(reportData.FilePath) || !System.IO.File.Exists(reportData.FilePath))
             { 
