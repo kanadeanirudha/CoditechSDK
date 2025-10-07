@@ -125,7 +125,7 @@ namespace Coditech.API.Service
             string dataFolder = Path.Combine(currentDir, "data", "ActivityReport");
             if (!Directory.Exists(dataFolder))
                 Directory.CreateDirectory(dataFolder);
-            string fileName = $"ActivityReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            string fileName = $"Activity_Report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
             string filePath = Path.Combine(dataFolder, fileName);
             // Create workbook using ClosedXML
             using (var workbook = new XLWorkbook())

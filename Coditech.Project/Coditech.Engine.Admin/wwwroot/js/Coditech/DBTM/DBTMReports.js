@@ -292,7 +292,6 @@
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
                     fromDate: fromdate,
                     toDate: todate,
-                    reportType: reportType
                 },
                 success: function (response) {
                     if (response.success) {

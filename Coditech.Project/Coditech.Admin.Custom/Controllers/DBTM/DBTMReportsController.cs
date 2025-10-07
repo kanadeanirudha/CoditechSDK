@@ -63,10 +63,10 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public JsonResult CheckReportAvailability(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, string reportType)
+        public JsonResult CheckReportAvailability(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate)
         {
-            DBTMReportsListViewModel reportData = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, reportType);
-            if (reportData == null || string.IsNullOrEmpty(reportData.FilePath) || !System.IO.File.Exists(reportData.FilePath))
+            DBTMReportsListViewModel reportData = _dBTMReportsAgent.TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate);
+            if (reportData == null || reportData.DataTableList == null || reportData.DataTableList.Count == 0)
             {
                 return Json(new { success = false, message = "No data available for download." });
             }
@@ -77,8 +77,14 @@ namespace Coditech.Admin.Controllers
         public ActionResult DownloadReport(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, string reportType)
         {
             DBTMReportsListViewModel reportData = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, reportType);
+            if (reportData == null || string.IsNullOrEmpty(reportData.FilePath) || !System.IO.File.Exists(reportData.FilePath))
+            { 
+                return Content("Report not found.");
+            }
             var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
-            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportData.FileName);
+            var fileName = reportData.FileName;
+            System.IO.File.Delete(reportData.FilePath);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         //TestWise Graph Reports
@@ -167,7 +173,8 @@ namespace Coditech.Admin.Controllers
             DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
             dBTMReportsViewModel.CustomDropdownList1.Add(new SelectListItem
             {
-                Text = "All", Value = "0"
+                Text = "All",
+                Value = "0"
             });
             if (dBTMBatchActivityList?.DBTMTestList != null)
             {
