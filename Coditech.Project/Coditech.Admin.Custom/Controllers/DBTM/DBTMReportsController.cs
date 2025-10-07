@@ -87,7 +87,6 @@ namespace Coditech.Admin.Controllers
             }
             var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             var fileName = reportData.FileName;
-            System.IO.File.Delete(reportData.FilePath);
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
