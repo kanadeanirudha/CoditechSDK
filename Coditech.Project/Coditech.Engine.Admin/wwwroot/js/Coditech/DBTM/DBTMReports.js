@@ -280,7 +280,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var reportType = $("#ReportType").val();
+        var reportType = $("#ReportType").val() || "excel"; 
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();
