@@ -280,7 +280,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var reportType = $("#ReportType").val() || "excel"; 
+        var reportType = $("#ReportType").val() || "excel";
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();
@@ -303,6 +303,50 @@
                             + "&reportType=" + encodeURIComponent(reportType);
                         CoditechCommon.HideLodder();
                         $("#hiddenDownloader").attr("src", downloadUrl);                       
+                    } else {
+                        CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
+                        CoditechCommon.HideLodder();
+                    }
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+
+    DownloadBatchExcelReport: function () {
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val() || "excel";
+
+        if (dBTMTestMasterId !== "" && generalBatchMasterId && generalBatchMasterId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                url: "/DBTMReports/CheckBatchReportAvailability",
+                type: "GET",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    generalBatchMasterId: generalBatchMasterId,
+                    fromDate: fromdate,
+                    toDate: todate,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        var downloadUrl = "/DBTMReports/DownloadBatchReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&generalBatchMasterId=" + encodeURIComponent(generalBatchMasterId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.HideLodder();
+                        $("#hiddenDownloader").attr("src", downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
                         CoditechCommon.HideLodder();

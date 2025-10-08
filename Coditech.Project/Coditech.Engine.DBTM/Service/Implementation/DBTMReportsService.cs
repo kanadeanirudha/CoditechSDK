@@ -22,6 +22,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -34,6 +35,7 @@ namespace Coditech.API.Service
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
         public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
@@ -82,6 +84,97 @@ namespace Coditech.API.Service
                     }
                 }
             }
+            return dBTMReportsListModel;
+        }
+
+        public DBTMReportsListModel BatchWiseMultipleReportsFile(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
+        {
+            if (generalBatchMasterId <= 0)
+            {
+                return new DBTMReportsListModel();
+            }
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
+            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName }).ToList();
+            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            {
+                if (dBTMReportsListModel.DataTableList == null)
+                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
+
+                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+                {
+                    if (!string.IsNullOrWhiteSpace(testId))
+                    {
+                        DBTMReportsListModel list = BatchWiseReports(
+                            generalBatchMasterId,
+                            Convert.ToInt32(testId),
+                            fromDate,
+                            toDate,
+                            isMobileRequest);
+
+                        if (list?.DataTable?.Rows?.Count > 0)
+                        {
+                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
+                            dBTMReportsListModel.DataTableList.Add(
+                                new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                        }
+                    }
+                }
+            }
+
+            if (dBTMReportsListModel?.DataTableList == null || dBTMReportsListModel.DataTableList.Count == 0)
+            {
+                return dBTMReportsListModel;
+            }
+
+            GeneralBatchMaster batch = _generalBatchMasterRepository.Table.FirstOrDefault(b => b.GeneralBatchMasterId == generalBatchMasterId);
+            string batchName = batch != null ? batch.BatchName : "";
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                batchName = batchName.Replace(c.ToString(), "");
+            }
+            string currentDir = Directory.GetCurrentDirectory();
+            string dataFolder = Path.Combine(currentDir, "data", "BatchReport");
+            if (!Directory.Exists(dataFolder))
+            {
+                Directory.CreateDirectory(dataFolder);
+            }
+
+            string fileName = $"Batch_Report_{batchName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            string filePath = Path.Combine(dataFolder, fileName);
+
+            // Create Excel workbook
+            using (var workbook = new XLWorkbook())
+            {
+                foreach (var table in dBTMReportsListModel.DataTableList)
+                {
+                    var replacements = new Dictionary<string, string>
+                    {
+                        { "300", "Threehundres" },
+                        { "5-0-5 ", "FiveZeroFiveAgilityTest" },
+                        { "5-10-5", "ProAgilityTest" },
+                        { "3", "ThreeGateSprint" }
+                    };
+                    string sheetName = table.Key;
+                    foreach (var kv in replacements)
+                    {
+                        sheetName = sheetName.Replace(kv.Key, kv.Value);
+                    }
+                    char[] invalidChars = new char[] { ':', '\\', '/', '?', '*', '[', ']' };
+                    foreach (var c in invalidChars)
+                    {
+                        sheetName = sheetName.Replace(c.ToString(), "");
+                    }
+                    sheetName = sheetName.Trim();
+                    if (sheetName.Length > 31)
+                        sheetName = sheetName.Substring(0, 31);
+                    var worksheet = workbook.Worksheets.Add(sheetName);
+                    worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
+                }
+                workbook.SaveAs(filePath);
+            }
+            dBTMReportsListModel.FilePath = filePath;
+            dBTMReportsListModel.FileName = fileName;
             return dBTMReportsListModel;
         }
 
