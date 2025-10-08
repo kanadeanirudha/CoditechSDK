@@ -48,6 +48,16 @@
                             <div class="col-md-1">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMBatchWiseMultiReports()" />
                             </div>
+                            <div class="col-md-3">
+                                <!-- View in new tab -->
+                                @*      <button type="button" class="btn btn-success" onclick="DBTMReports.GetDBTMBatchWiseMultiReportsFile()">View in xls</button> *@
+
+                                <!-- Download latest -->
+                                <a id="DownloadBtn" class="btn btn-success" onclick="DBTMReports.DownloadBatchExcelReport()">
+                                    <i class="fa fa-download"></i> Download
+                                </a>
+
+                            </div>
                             <div id="DBTMBatchWiseMultiReportsDivId" class="mt-3">
                             </div>
                         </div>
@@ -57,6 +67,7 @@
         </div>
     </div>
 </div>
+<iframe id="hiddenDownloader" style="display:none;"></iframe>
 <style>
     .dataTables_wrapper .dataTables_filter {
         margin-bottom: 15px;

@@ -59,6 +59,7 @@
 
 	<ItemGroup>
 	  <Folder Include="data\ActivityReport\" />
+	  <Folder Include="data\BatchReport\" />
 	</ItemGroup>
 
 </Project>

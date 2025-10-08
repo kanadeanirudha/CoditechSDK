@@ -37,6 +37,37 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
         }
 
+        [HttpGet]
+        public ActionResult GetBatchWiseMultipleReportsFile(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate, string reportType)
+        {
+            DBTMReportsListViewModel datalist = _dBTMReportsAgent.BatchWiseMultipleReportsFile(dBTMTestMasterIds, generalBatchMasterId, FromDate, ToDate, reportType);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", datalist);
+        }
+
+        [HttpGet]
+        public JsonResult CheckBatchReportAvailability(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate)
+        {
+            DBTMReportsListViewModel reportData = _dBTMReportsAgent.BatchWiseMultipleReports(dBTMTestMasterIds, generalBatchMasterId, fromDate, toDate);
+            if (reportData == null || reportData.DataTableList == null || reportData.DataTableList.Count == 0)
+            {
+                return Json(new { success = false, message = "No data available for download." });
+            }
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public ActionResult DownloadBatchReport(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, string reportType)
+        {
+            DBTMReportsListViewModel reportData = _dBTMReportsAgent.BatchWiseMultipleReportsFile(dBTMTestMasterIds, generalBatchMasterId, fromDate, toDate, reportType);
+            if (reportData == null || string.IsNullOrEmpty(reportData.FilePath) || !System.IO.File.Exists(reportData.FilePath))
+            {
+                return Content("Report not found.");
+            }
+            var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
+            var fileName = reportData.FileName;
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
         //Test Wise Reports 
         [HttpGet]
         public ActionResult TestWiseReports()
