@@ -1,13 +1,25 @@
 ﻿@model DropdownViewModel
 @{
-    if (Model.IsCustomDropdown)
+    if (Model.DropdownList == null || !Model.DropdownList.Any())
     {
-        CoditechCustomDropdownHelper.GeneralDropdownList(Model);
+        if (Model.IsCustomDropdown)
+        {
+            CoditechCustomDropdownHelper.GeneralDropdownList(Model);
+        }
+        else
+        {
+            CoditechDropdownHelper.GeneralDropdownList(Model);
+        }
     }
-    else
+
+    // Apply ExcludedValues filtering
+    if (Model.ExcludedValues != null && Model.ExcludedValues.Length > 0)
     {
-        CoditechDropdownHelper.GeneralDropdownList(Model);
+        Model.DropdownList = Model.DropdownList
+            .Where(x => !Model.ExcludedValues.Contains(x.Text, StringComparer.OrdinalIgnoreCase))
+            .ToList();
     }
+
     var htmlAttributes = new Dictionary<string, object>
     {
         { "class", "form-select js-select2 " + Model.ClassName },
@@ -15,7 +27,8 @@
         { "id", Model.DropdownName },
         { "tabindex", "0" }
     };
-        if (Model.IsDisabled)
+
+    if (Model.IsDisabled)
     {
         htmlAttributes["disabled"] = "disabled";
     }
