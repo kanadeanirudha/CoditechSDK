@@ -40,7 +40,7 @@ namespace Coditech.Admin.Agents
             }
             if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
             {
-                filters.Add("JoiningCode", ProcedureFilterOperators.Equals, dataTableModel.SearchBy);
+                filters.Add("JoiningCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "IsExpired" : dataTableModel.SortByColumn, dataTableModel.SortBy);
