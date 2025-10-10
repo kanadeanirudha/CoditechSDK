@@ -6,6 +6,7 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Coditech.Admin.Agents
 {
@@ -159,7 +160,25 @@ namespace Coditech.Admin.Agents
 
             }
             return graphModel;
-        }       
+        }
+
+        //Delete Report .
+        public virtual bool DeleteTestWiseMultipleReportsFile(string fileName, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTestWiseReports", TraceLevel.Info);
+                TrueFalseResponse response = _dBTMReportsClient.DeleteTestWiseMultipleReportsFile(new ParameterModel { Ids = fileName });
+                return response?.IsSuccess ?? false;
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseReports", TraceLevel.Error);
+                return false;
+            }
+        }
         #endregion
     }
 }
