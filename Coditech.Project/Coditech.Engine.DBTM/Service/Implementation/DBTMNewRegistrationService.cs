@@ -172,7 +172,7 @@ namespace Coditech.API.Service
                 if (employeeId > 0)
                 {
                     //Insert Employee Address
-                    InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
+                    //InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
 
 
                     int adminSanctionPostId = _adminSanctionPostRepository.Table.Where(x => x.CentreCode == dBTMNewRegistrationModel.CentreCode && x.DepartmentId == ApiCustomSettings.TrainerDepartmentId && x.DesignationId == ApiCustomSettings.TrainerDesignationId).Select(y => y.AdminSanctionPostId).FirstOrDefault();

@@ -26,19 +26,15 @@ namespace Coditech.Common.API.Model
         [Display(Name = "Email Address")]
         public string EmailId { get; set; }
 
-        [Required]
         [Display(Name = "City")]
         public int GeneralCityMasterId { get; set; }
-        [Required]
         [Display(Name = "Country")]
         public short GeneralCountryMasterId { get; set; }
 
-        [Required]
         [Display(Name = "Region")]
         public short GeneralRegionMasterId { get; set; }
 
         [MaxLength(200)]
-        [Required]
         [Display(Name = "Address1")]
         public string AddressLine1 { get; set; }
 
@@ -47,7 +43,6 @@ namespace Coditech.Common.API.Model
         public string AddressLine2 { get; set; }
 
         [MaxLength(50)]
-        [Required]
         [Display(Name = "Pin code")]
         public string Pincode { get; set; }
 

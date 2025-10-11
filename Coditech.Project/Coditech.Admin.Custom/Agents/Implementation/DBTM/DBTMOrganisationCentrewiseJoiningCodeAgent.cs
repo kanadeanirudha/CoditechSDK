@@ -3,6 +3,7 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Newtonsoft.Json;
@@ -16,12 +17,12 @@ namespace Coditech.Admin.Agents
         #endregion
 
         #region Public Constructor
-        public DBTMOrganisationCentrewiseJoiningCodeAgent(ICoditechLogging coditechLogging, IOrganisationCentrewiseJoiningCodeClient organisationCentrewiseJoiningCodeClient, IUserClient userClient) : base(coditechLogging, organisationCentrewiseJoiningCodeClient, userClient)
+        public DBTMOrganisationCentrewiseJoiningCodeAgent(ICoditechLogging coditechLogging, IOrganisationCentrewiseJoiningCodeClient organisationCentrewiseJoiningCodeClient, IUserClient userClient)
+            : base(coditechLogging, organisationCentrewiseJoiningCodeClient, userClient)
         {
             _coditechLogging = coditechLogging;
             _organisationCentrewiseJoiningCodeClient = GetClient<IOrganisationCentrewiseJoiningCodeClient>(organisationCentrewiseJoiningCodeClient);
         }
-
         #endregion
 
         #region Public Methods
@@ -39,7 +40,7 @@ namespace Coditech.Admin.Agents
             }
             if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
             {
-                filters.Add("JoiningCode", ProcedureFilterOperators.Equals, dataTableModel.SearchBy);
+                filters.Add("JoiningCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "IsExpired" : dataTableModel.SortByColumn, dataTableModel.SortBy);
@@ -51,6 +52,38 @@ namespace Coditech.Admin.Agents
 
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.OrganisationCentrewiseJoiningCodeList.Count, BindColumns());
             return listViewModel;
+        }
+        #endregion
+
+        #region Protected Methods
+        protected virtual List<DatatableColumns> BindColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Joining Code",
+                ColumnCode = "JoiningCode",
+                IsSortable = false,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Joining Code Type ",
+                ColumnCode = "JoiningCodeType",
+                IsSortable = false,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Trainer",
+                ColumnCode = "Custom2",
+                IsSortable = false,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Active Joining Code",
+                ColumnCode = "IsExpired",
+                IsSortable = false,
+            });
+            return datatableColumnList;
         }
         #endregion
     }
