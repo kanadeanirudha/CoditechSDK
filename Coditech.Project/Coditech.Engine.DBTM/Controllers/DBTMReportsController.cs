@@ -208,5 +208,28 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMReports/DeleteReportsFile")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult DeleteReportsFile([FromBody] ParameterModel parameterModel)
+        {
+            try
+            {
+                string fileName = parameterModel?.Ids;
+                bool deleted = _dBTMReportsService.DeleteReportsFile(fileName);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMReports", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

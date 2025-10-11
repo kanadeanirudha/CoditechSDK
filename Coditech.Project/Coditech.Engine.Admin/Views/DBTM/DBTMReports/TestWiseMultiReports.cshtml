@@ -25,13 +25,6 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    @* <div class="card-header">
-                    <div class="row align-items-center">
-                    <div class="col">
-                    <h4 class="card-title">Activity Reports</h4>
-                    </div><!--end col-->
-                    </div>  <!--end row-->
-                    </div> *@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="card-title">Activity Reports</span>
                         <div class="d-flex align-items-center">
@@ -65,28 +58,20 @@
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
-                            <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseMultiReports()" />
-                            </div>
-                            <!-- Buttons -->
-                            <div class="col-md-3">
-                                <!-- View in new tab -->
-                           @*      <button type="button" class="btn btn-success" onclick="DBTMReports.GetDBTMTestWiseMultiReportsFile()">View in xls</button> *@
-                                
-                                <!-- Download latest -->
+                            <div class="col-md-2 align-items-end">
+                                <input type="button" class="btn btn-success me-3" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseMultiReports()" />
                                 <a id="DownloadBtn" class="btn btn-success" onclick="DBTMReports.DownloadExcelReport()">
                                     <i class="fa fa-download"></i> Download
                                 </a>
-                                
                             </div>
                         </div>
                         <div id="DBTMTestWiseMultiReportsDivId" class="mt-3">

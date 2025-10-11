@@ -65,6 +65,7 @@ namespace Coditech.Admin.Controllers
             }
             var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             var fileName = reportData.FileName;
+            _dBTMReportsAgent.DeleteReportsFile(fileName);
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -113,11 +114,12 @@ namespace Coditech.Admin.Controllers
             }
             DBTMReportsListViewModel reportData = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, reportType);
             if (reportData == null || string.IsNullOrEmpty(reportData.FilePath) || !System.IO.File.Exists(reportData.FilePath))
-            { 
+            {
                 return Content("Report not found.");
             }
-            var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
-            var fileName = reportData.FileName;
+            byte[] fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
+            string fileName = reportData.FileName;
+            _dBTMReportsAgent.DeleteReportsFile(fileName);
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 

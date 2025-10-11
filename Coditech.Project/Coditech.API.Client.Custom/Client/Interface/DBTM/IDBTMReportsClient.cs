@@ -1,4 +1,5 @@
-﻿using Coditech.Common.API.Model.Response;
+﻿using Coditech.Common.API.Model;
+using Coditech.Common.API.Model.Response;
 
 namespace Coditech.API.Client
 {
@@ -10,5 +11,6 @@ namespace Coditech.API.Client
         DBTMTestWiseReportsListResponse BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate);
         DBTMTestWiseReportsListResponse TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType);
         DBTMTestWiseReportsListResponse BatchWiseMultipleReportsFile(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType);
+        TrueFalseResponse DeleteReportsFile(ParameterModel body);
     }
 }

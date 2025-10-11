@@ -256,6 +256,35 @@ namespace Coditech.API.Service
             return reportData;
         }
 
+        // Delete Report File from Data folder
+        public virtual bool DeleteReportsFile(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return false;
+
+            try
+            {
+                string currentDir = Directory.GetCurrentDirectory();
+                string activityPath = Path.Combine(currentDir, "data", "ActivityReport", fileName);
+                string batchPath = Path.Combine(currentDir, "data", "BatchReport", fileName);
+                if (System.IO.File.Exists(activityPath))
+                {
+                    System.IO.File.Delete(activityPath);
+                    return true;
+                }
+                if (System.IO.File.Exists(batchPath))
+                {
+                    System.IO.File.Delete(batchPath);
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();

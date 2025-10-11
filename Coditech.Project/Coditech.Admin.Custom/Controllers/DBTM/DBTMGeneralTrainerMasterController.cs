@@ -1,7 +1,6 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMGeneralTrainerMasterController : BaseController
@@ -37,6 +36,11 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("JoiningCode");
                 ModelState.Remove("SpecializationEnumId");
                 ModelState.Remove("SelectedTrainer");
+                ModelState.Remove("GeneralCityMasterId");
+                ModelState.Remove("GeneralCountryMasterId");
+                ModelState.Remove("GeneralRegionMasterId");
+                ModelState.Remove("AddressLine1");
+                ModelState.Remove("Pincode");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);

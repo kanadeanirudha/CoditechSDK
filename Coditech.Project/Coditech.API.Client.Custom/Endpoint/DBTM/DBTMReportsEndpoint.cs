@@ -37,5 +37,7 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/BatchWiseMultipleReportsFile?dBTMTestMasterIds={dBTMTestMasterIds}&generalBatchMasterId={generalBatchMasterId}&fromDate={fromDate}&toDate={toDate}&entityId={entityId}&userType={userType}&centreCode={centreCode}&reportType={reportType}";
             return endpoint;
         }
+        public string DeleteReportsFileAsync() =>
+                 $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/DeleteReportsFile";
     }
 }
