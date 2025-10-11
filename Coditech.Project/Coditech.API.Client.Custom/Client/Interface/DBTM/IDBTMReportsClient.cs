@@ -11,6 +11,6 @@ namespace Coditech.API.Client
         DBTMTestWiseReportsListResponse BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate);
         DBTMTestWiseReportsListResponse TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType);
         DBTMTestWiseReportsListResponse BatchWiseMultipleReportsFile(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType);
-        TrueFalseResponse DeleteTestWiseMultipleReportsFile(ParameterModel body);
+        TrueFalseResponse DeleteReportsFile(ParameterModel body);
     }
 }

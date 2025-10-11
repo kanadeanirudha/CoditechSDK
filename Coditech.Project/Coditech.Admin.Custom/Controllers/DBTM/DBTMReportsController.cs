@@ -65,7 +65,7 @@ namespace Coditech.Admin.Controllers
             }
             var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             var fileName = reportData.FileName;
-            _dBTMReportsAgent.DeleteTestWiseMultipleReportsFile(fileName, out _);
+            _dBTMReportsAgent.DeleteReportsFile(fileName);
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -119,7 +119,7 @@ namespace Coditech.Admin.Controllers
             }
             byte[] fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             string fileName = reportData.FileName;
-            _dBTMReportsAgent.DeleteTestWiseMultipleReportsFile(fileName, out _);
+            _dBTMReportsAgent.DeleteReportsFile(fileName);
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 

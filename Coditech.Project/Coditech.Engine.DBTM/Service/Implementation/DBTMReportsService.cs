@@ -256,8 +256,8 @@ namespace Coditech.API.Service
             return reportData;
         }
 
-        // Delete Report File from ActivityReport folder
-        public virtual bool DeleteTestWiseMultipleReportsFile(string fileName)
+        // Delete Report File from Data folder
+        public virtual bool DeleteReportsFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
                 return false;

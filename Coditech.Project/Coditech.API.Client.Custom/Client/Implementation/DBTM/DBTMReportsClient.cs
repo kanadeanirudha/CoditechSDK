@@ -285,14 +285,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual TrueFalseResponse DeleteTestWiseMultipleReportsFile(ParameterModel body)
+        public virtual TrueFalseResponse DeleteReportsFile(ParameterModel body)
         {
-            return Task.Run(async () => await DeleteTestWiseMultipleReportsFileAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await DeleteReportsFileAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<TrueFalseResponse> DeleteTestWiseMultipleReportsFileAsync(ParameterModel body, CancellationToken cancellationToken)
+        public virtual async Task<TrueFalseResponse> DeleteReportsFileAsync(ParameterModel body, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.DeleteTestWiseMultipleReportsFileAsync();
+            string endpoint = dBTMReportsEndpoint.DeleteReportsFileAsync();
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

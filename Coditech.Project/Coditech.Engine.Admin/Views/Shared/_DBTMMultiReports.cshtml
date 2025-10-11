@@ -14,7 +14,7 @@
             var headingId = $"heading{tableIndex}";
             <div class="accordion-item">
                 <h2 class="accordion-header" id="@headingId">
-                    <button class="accordion-button @(tableIndex > 1 ? "collapsed" : "")"
+                    <button class="accordion-button fw-bold @(tableIndex > 1 ? "collapsed" : "")"
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#@collapseId"

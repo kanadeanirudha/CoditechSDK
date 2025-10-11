@@ -209,15 +209,15 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
-        [Route("/DBTMReports/DeleteTestWiseMultipleReportsFile")]
+        [Route("/DBTMReports/DeleteReportsFile")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
-        public virtual IActionResult DeleteTestWiseMultipleReportsFile([FromBody] ParameterModel parameterModel)
+        public virtual IActionResult DeleteReportsFile([FromBody] ParameterModel parameterModel)
         {
             try
             {
                 string fileName = parameterModel?.Ids;
-                bool deleted = _dBTMReportsService.DeleteTestWiseMultipleReportsFile(fileName);
+                bool deleted = _dBTMReportsService.DeleteReportsFile(fileName);
                 return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
             }
             catch (CoditechException ex)

@@ -163,14 +163,12 @@ namespace Coditech.Admin.Agents
         }
 
         //Delete Report .
-        public virtual bool DeleteTestWiseMultipleReportsFile(string fileName, out string errorMessage)
+        public virtual bool DeleteReportsFile(string fileName)
         {
-            errorMessage = string.Empty;
-
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTestWiseReports", TraceLevel.Info);
-                TrueFalseResponse response = _dBTMReportsClient.DeleteTestWiseMultipleReportsFile(new ParameterModel { Ids = fileName });
+                TrueFalseResponse response = _dBTMReportsClient.DeleteReportsFile(new ParameterModel { Ids = fileName });
                 return response?.IsSuccess ?? false;
             }
             catch (Exception ex)
