@@ -3,54 +3,51 @@
     ViewBag.Title = Model.GeneralNationalityMasterId > 0 ? "Update Nationality" : "Add Nationality";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
+}
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                        <div class="col">
-                            @if (Model.GeneralNationalityMasterId > 0)
-                            {
-                                <h4 class="card-title">Update Nationality</h4>
-                            }
-                            else
-                            {
-                                <h4 class="card-title">Create Nationality</h4>
-                            }
-                        </div><!--end col-->
-                    </div><!--end row-->
-                </div>
-                    <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
-                        {
-                            @Html.HiddenFor(m => m.GeneralNationalityMasterId)
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.Description, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.Description, new { @class = "form-control"})
-                                        @Html.ValidationMessageFor(x => x.Description)
-                                    </div>
+                <div class="card-body">
+                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                    {
+                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                        @Html.HiddenFor(m => m.GeneralNationalityMasterId)
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.Description, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Description)
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.DefaultFlag, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.DefaultFlag, new { @class = "form-check-input" })
-                                        </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.DefaultFlag, new { @class = "form-label" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.DefaultFlag, new { @class = "form-check-input" })
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                        }
-                    </div>
+                        </div>
+                       @*  <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
+                    }
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>

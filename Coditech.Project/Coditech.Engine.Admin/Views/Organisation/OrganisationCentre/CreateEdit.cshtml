@@ -5,12 +5,21 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.OrganisationCentreMasterId > 0 ? "col-lg-10" : "col-lg-12";
     DropdownViewModel officetypedropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.RegionalOffice.ToString(), DropdownName = "HoCoRoScFlag", DropdownSelectedValue = Convert.ToString(Model.HoCoRoScFlag), IsDisabled = Model.OrganisationCentreMasterId > 0 };
-
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = @Url.Action("List", controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid  mt-5">
         <div class="row">
             @if (Model.OrganisationCentreMasterId > 0)
             {
@@ -20,23 +29,10 @@
             }
             <div class="@css">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.OrganisationCentreMasterId > 0)
-                                {
-                                    <h4 class="card-title">Update Organisation Centre</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Organisation Centre</h4>
-                                }
-                            </div><!--end col-->
-                        </div><!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.OrganisationCentreMasterId)
                             @Html.HiddenFor(m => m.LogoMediaId)
                             @Html.HiddenFor(m => m.LogoSmallMediaId)
@@ -46,27 +42,27 @@
                                 <div class="mb-3">
                                     @Html.LabelFor(x => x.OrganisationId, new { @class = "form-label required" })
                                     @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                    {
-                                        DropdownType = DropdownTypeEnum.Organisation.ToString(),
-                                                                DropdownName = "OrganisationId",
-                                                                DropdownSelectedValue = Model.OrganisationCentreMasterId
-                                                                .ToString()
-                                                                })
-                                @Html.ValidationMessageFor(x => x.OrganisationId)
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.CentreName, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.CentreName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.CentreName)
+                           {
+                               DropdownType = DropdownTypeEnum.Organisation.ToString(),
+                               DropdownName = "OrganisationId",
+                               DropdownSelectedValue = Model.OrganisationCentreMasterId
+                                .ToString()
+                           })
+                                    @Html.ValidationMessageFor(x => x.OrganisationId)
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
-                                    @if (Model.OrganisationCentreMasterId > 0)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.CentreName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.CentreName)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                        @if (Model.OrganisationCentreMasterId > 0)
                                         {
                                             @Html.TextBoxFor(x => x.CentreCode, new { @class = "form-control", @readonly = "readonly", onkeypress = "return CoditechCommon.AvoidSpacing()" })
                                         }
@@ -213,87 +209,87 @@
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.GeneralCityMasterId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                        {
-                                            DropdownType = DropdownTypeEnum.AllCities.ToString(),
-                                                                        DropdownName = "GeneralCityMasterId",
-                                                                        DropdownSelectedValue = Model.GeneralCityMasterId
-                                                                        .ToString()
-                                                                        })
-                                    @Html.ValidationMessageFor(x => x.GeneralCityMasterId)
+                               {
+                                   DropdownType = DropdownTypeEnum.AllCities.ToString(),
+                                   DropdownName = "GeneralCityMasterId",
+                                   DropdownSelectedValue = Model.GeneralCityMasterId
+                                    .ToString()
+                               })
+                                        @Html.ValidationMessageFor(x => x.GeneralCityMasterId)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.Pincode, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.Pincode, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
-                                    @Html.ValidationMessageFor(x => x.Pincode)
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Pincode, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.Pincode, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
+                                        @Html.ValidationMessageFor(x => x.Pincode)
+                                    </div>
                                 </div>
-                            </div>
-                            @* <div class="col-lg-4">
+                                @* <div class="col-lg-4">
                             <div class="mb-3">
                             @Html.LabelFor(x => x.FaxNumber, new { @class = "form-label" })
                             @Html.TextBoxFor(x => x.FaxNumber, new { @class = "form-control" })
                             @Html.ValidationMessageFor(x => x.FaxNumber)
                             </div>
                             </div> *@
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.PhoneNumberOffice, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.PhoneNumberOffice, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.PhoneNumberOffice)
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.PhoneNumberOffice, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.PhoneNumberOffice, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.PhoneNumberOffice)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CellPhone, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.CellPhone, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
+                                        @Html.ValidationMessageFor(x => x.CellPhone)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CampusArea, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.CampusArea, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.CampusArea)
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.CellPhone, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.CellPhone, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
-                                    @Html.ValidationMessageFor(x => x.CellPhone)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-6">
+                                        @Html.LabelFor(x => x.LogoMediaId, new { @class = "form-label" })
+                                        <input type="file" id="logoUpload" class="form-control" />
+                                        <img id="logoPreview" src="#" alt="Uploaded Logo" style="display:none;width:100px;height:100px;margin-top:10px;" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-6">
+                                        @Html.LabelFor(x => x.LogoSmallMediaId, new { @class = "form-label" })
+                                        <input type="file" id="logoSmallUpload" class="form-control" />
+                                        <img id="logoSmallPreview" src="#" alt="Uploaded Logo Small" style="display:none;width:100px;height:100px;margin-top:10px;" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.CampusArea, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.CampusArea, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.CampusArea)
+                            <br />
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.LogoCss, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.LogoCss, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.LogoCss)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SmallLogoCss, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.SmallLogoCss, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.SmallLogoCss)
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="mb-6">
-                                    @Html.LabelFor(x => x.LogoMediaId, new { @class = "form-label" })
-                                    <input type="file" id="logoUpload" class="form-control" />
-                                    <img id="logoPreview" src="#" alt="Uploaded Logo" style="display:none;width:100px;height:100px;margin-top:10px;" />
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="mb-6">
-                                    @Html.LabelFor(x => x.LogoSmallMediaId, new { @class = "form-label" })
-                                    <input type="file" id="logoSmallUpload" class="form-control" />
-                                    <img id="logoSmallPreview" src="#" alt="Uploaded Logo Small" style="display:none;width:100px;height:100px;margin-top:10px;" />
-                                </div>
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.LogoCss, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.LogoCss, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.LogoCss)
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.SmallLogoCss, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.SmallLogoCss, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.SmallLogoCss)
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                        <a href="@Url.Action("List", controllerName)" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                                                }
+                            @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button> *@
+                            @* <a href="@Url.Action("List", controllerName)" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
+                        }
                     </div>
                 </div>
             </div>

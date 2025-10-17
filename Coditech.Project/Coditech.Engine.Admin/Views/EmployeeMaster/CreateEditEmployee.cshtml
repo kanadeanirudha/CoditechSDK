@@ -11,10 +11,22 @@
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()", IsDisabled = Model.EmployeeId > 0 };
     DropdownViewModel departmentDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(), DropdownName = "SelectedDepartmentId", DropdownSelectedValue = Convert.ToString(Model.SelectedDepartmentId), Parameter = Model.SelectedCentreCode, IsDisabled = Model.EmployeeId > 0 };
     DropdownViewModel designationDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Designation.ToString(), DropdownName = "EmployeeDesignationMasterId", DropdownSelectedValue = Convert.ToString(Model.EmployeeDesignationMasterId), IsDisabled = Model.EmployeeId > 0 };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = Model.EmployeeId > 0
+        ? $"{ViewBag.Title} : {Model.FirstName} {Model.LastName}"
+        : ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = @Url.Action(AdminConstants.ActionRedirectToList, controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             @if (Model.EmployeeId > 0)
             {
@@ -24,23 +36,10 @@
             }
             <div class="@css">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.EmployeeId > 0)
-                                {
-                                    <h4 class="card-title"><span>Update Employee : @Model.FirstName @Model.LastName</span></h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Employee</h4>
-                                }
-                            </div>
-                        </div>
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.EmployeeId)
                             @if (Model.EmployeeId > 0)
                             {
@@ -71,10 +70,10 @@
                                 </div>
                             </div>
                             @Html.Partial("~/Views/Shared/GeneralPerson/_CreateEditGeneralPerson.cshtml", Model)
-                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId })"
+                            @* <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId })"
                                class="btn btn-secondary">
                                 <i class="ft-x"></i>@AdminResources.LabelCancel
-                            </a>
+                            </a> *@
                         }
                     </div>
                 </div>

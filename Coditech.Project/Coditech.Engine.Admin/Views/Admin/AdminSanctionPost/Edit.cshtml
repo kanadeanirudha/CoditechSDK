@@ -3,6 +3,16 @@
     ViewBag.Title = "Update Admin Sanction Post";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = @Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.CentreCode, SelectedDepartmentId = @Model.DepartmentId }),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -16,8 +26,9 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.AdminSanctionPostId)
                             ;
                             @Html.HiddenFor(m => m.SelectedCentreCode)
@@ -65,8 +76,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId})" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button> *@
+                            @* <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId})" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
                         }
                     </div>
                 </div>

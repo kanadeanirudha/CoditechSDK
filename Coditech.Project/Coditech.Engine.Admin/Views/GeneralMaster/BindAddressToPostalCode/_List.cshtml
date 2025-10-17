@@ -16,6 +16,8 @@
     @Html.Hidden("PersonId", Model.PersonId)
     @Html.Hidden("EntityId", Model.EntityId)
     @Html.Hidden("AddressData", Model.AddressData)
+    @Html.Hidden("Postalcode", Model.Pincode)
+    @Html.Hidden("AddressTypeEnum", Model.AddressTypeEnum)
     <div class="modal-body">
         <div class="row">
             <div class="col-sm-12 table-responsive">
@@ -67,53 +69,5 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     </div>
 }
-<script>
-    $(document).ready(function () {
-        $('#frmSendDetails').on('submit', function (e) {
-            e.preventDefault();
-            const selected = $('input[name="SelectedAddress"]:checked').val();
-            if (!selected) {
-                alert("Please select an address before saving.");
-                return;
-            }
-            CoditechCommon.ShowLodder();
-            $('#postalCodeModal').modal('hide');
-            const parts = selected.split('|');
-            const userAddress = {
-                Name: parts[0] || '',
-                District: parts[1] || '',
-                Division: parts[2] || '',
-                State: parts[3] || '',
-                Country: parts[4] || '',
-                Pincode: parts[5] || ''
-            };
-            const backendData = {
-                Postalcode: $('input[name="Postalcode"]').val(),
-                PersonId: $('input[name="PersonId"]').val(),
-                EntityId: $('input[name="EntityId"]').val(),
-                ControllerName: $('input[name="ControllerName"]').val(),
-                EntityType: $('input[name="EntityType"]').val(),
-                GeneralCountryMasterId: $('select[name="GeneralCountryMasterId"]').val(),
-                AddressTypeEnum: $('input[name="AddressTypeEnum"]').val()
-            };
-            const merged = { ...userAddress, ...backendData };
-            $.ajax({
-                url: '/GeneralCommon/ValidateAddress',
-                type: 'POST',
-                data: { addressData: JSON.stringify(merged) },
-                success: function (response) {
-                     CoditechCommon.HideLodder();
-                     location.reload();
-                },
-                error: function (xhr) {
-                    if (xhr.status == "401" || xhr.status == "403") {
-                        location.reload();
-                    }
-                    CoditechNotification.DisplayNotificationMessage("Failed to display record.", "error");
-                    CoditechCommon.HideLodder();
-                }
-            });
-        });
-    });
-</script>
+<script src="~/js/coditech/General/AddressHandler.js"></script>
 
