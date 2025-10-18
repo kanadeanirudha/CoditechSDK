@@ -17,28 +17,36 @@
         YValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToInt32(item.TotalTrainee);
         count1++;
     }
-    BarChartViewModel trainerviewModel = new BarChartViewModel()
+    var traineeDataset = new List<BarGraphsDatasetModel>
     {
-        BarChartId = "YearlyTraineeTrainedOverviewChart",
-        XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
-        YValues = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
-        XAxisLabel = "Months",
-        YAxisLabel = "Trainees Count",
-        BackgroundColor = JsonConvert.SerializeObject(backgroundColor),
+        new BarGraphsDatasetModel
+        {
+            Label = "Trainees",
+            Data = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
+            Color = JsonConvert.SerializeObject(backgroundColor)
+        }
     };
+    BarChartModel trainerviewModel = new BarChartModel()
+            {
+                BarChartId = "YearlyTraineeTrainedOverviewChart",
+                XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+                XAxisLabel = "Months",
+                YAxisLabel = "Trainees Count",
+                Datasets = traineeDataset
+            };
     GeneralBatchListViewModel generalBatchListViewModel = new GeneralBatchListViewModel
-    {
+            {
 
-        GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
-        PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
-        Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
-    };
+                GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
+                PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
+                Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
+            };
     DBTMTraineeAssignmentListViewModel dBTMTraineeAssignmentListViewModel = new DBTMTraineeAssignmentListViewModel
-    {
-        DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
-        PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
-        Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
-    };
+            {
+                DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
+                PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
+                Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
+            };
 }
 <div class="modal-header">
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -184,7 +192,6 @@
                                         <div class="col">
                                             <p class="text-dark mb-0 fw-semibold">Activity Performed During Week</p>
                                             <h3 class="m-0">@Model.TotalNumberOfActivityPerformedDuringWeek</h3>
-                                            <p class="mb-0 text-truncate text-muted">&nbsp;</p>
                                         </div>
                                         <div class="col-auto align-self-center">
                                             <div class="report-main-icon bg-light-alt">
@@ -196,7 +203,7 @@
                             </div>
                         </a>
                     </div>
-                   @*  <div class="col-md-6 mb-3">
+                    @*  <div class="col-md-6 mb-3">
                         <a href="#">
                             <div class="card report-card">
                                 <div class="card-body">
@@ -278,35 +285,51 @@
                 </li>
             </ul>
 
-            <div class="tab-content p-3" id="myTabContent">
+            <div class="tab-content" id="myTabContent">
                 @* ✅ Hidden fields for both parameters *@
                 @Html.Hidden("dataTableModel.SelectedParameter1", Model.SelectedParameter1, new { id = "hdnSelectedParameter1" })
                 @Html.Hidden("dataTableModel.SelectedParameter2", Model.SelectedParameter2, new { id = "hdnSelectedParameter2" })
-
                 <div class="tab-pane fade show active" id="batchesPane" role="tabpanel">
                     <iframe name="batchesFrame"
                             src="/DBTMDashboard/LoadBatchesPartial"
-                            width="900px" height="800px" frameborder="0"></iframe>
+                            frameborder="0"
+                            onload="resizeIframe(this)"></iframe>
                 </div>
                 <div class="tab-pane fade" id="assignmentPane" role="tabpanel">
                     <iframe name="assignmentFrame"
                             src="/DBTMDashboard/LoadAssignmentPartial"
-                            width="900px" height="800px" frameborder="0"></iframe>
+                            frameborder="0"
+                            onload="resizeIframe(this)"></iframe>
                 </div>
             </div>
         </div><!-- container -->
     </div>
-
+    <style>
+        body[data-layout="horizontal"] {
+            display: block !important;
+        }
+        #myTabContent {
+            padding: 0 !important;
+        }
+        #myTabContent iframe {
+            width: 100% !important;
+            border: none;
+            display: block;
+            margin-top: 15px !important;
+        }
+    </style>
     <!-- end page content -->
     <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
     <script>
+        function resizeIframe(iframe) {
+            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+        }
         $(function () {
           // Initialize datepicker (if needed)
           $(".datepicker").datepicker({
               format: "dd/mm/yyyy",
               autoclose: true
-          });
-
+          });                 
           // Handle tab switch and iframe loading
           $('#myTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             var $btn = $(this);

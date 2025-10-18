@@ -79,7 +79,10 @@ namespace Coditech.API.Service
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
                     createdDate = DateTime.Now;
-                    DBTMTraineeDetails dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
+                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails() ;
+                    if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
+                        dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
+
                     if (IsNull(dBTMTraineeDetails))
                         throw new CoditechException(ErrorCodes.InvalidData, "Invalid Person Code");
 
@@ -91,9 +94,10 @@ namespace Coditech.API.Service
                         PersonCode = dBTMDeviceDataModel.PersonCode,
                         TestCode = dBTMDeviceDataModel.TestCode,
                         Comments = dBTMDeviceDataModel.Comments,
-                        Height = dBTMTraineeDetails.Height,
-                        Weight = dBTMTraineeDetails.Weight,
+                        Height = dBTMDeviceDataModel.Height == 0 ? dBTMTraineeDetails.Height : dBTMDeviceDataModel.Height,
+                        Weight = dBTMDeviceDataModel.Weight == 0 ? dBTMTraineeDetails.Weight : dBTMDeviceDataModel.Weight,
                         TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
+                        NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
                         CreatedBy = dBTMDeviceDataModel.CreatedBy,
                         CreatedDate = createdDate
                     };
@@ -186,7 +190,7 @@ namespace Coditech.API.Service
                                    select new DBTMBatchModel
                                    {
                                        GeneralBatchMasterId = b.GeneralBatchMasterId,
-                                       BatchName = b.BatchName + "(" + u.FirstName + " " + u.LastName + ")",
+                                       BatchName = u.EntityId == entityId ? $"{b.BatchName}(Self)" : $"{b.BatchName}({u.FirstName} {u.LastName})",
                                        BatchStartTime = b.BatchStartTime,
                                    })
                                    .ToList();
@@ -281,7 +285,7 @@ namespace Coditech.API.Service
             return dBTMTestApiModel;
         }
 
-        //Get Dashboard Details
+        //Get Trainer Dashboard Details
         public DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId)
         {
             if (userMasterId <= 0)
@@ -303,6 +307,24 @@ namespace Coditech.API.Service
                                                          CategoryName = a.ActivityCategoryName,
                                                          DBTMActivityCategoryId = a.DBTMActivityCategoryId
                                                      }).ToList();
+            return dBTMDashboardModel;
+        }
+
+        //Get Trainee Dashboard Details
+        public DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId)
+        {
+            if (userMasterId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "UserMasterId"));
+
+            DBTMMobileTraineeDashboardModel dBTMDashboardModel = new DBTMMobileTraineeDashboardModel();
+
+            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.GetParameter("@UserId", userMasterId, ParameterDirection.Input, SqlDbType.BigInt);
+            DataSet dataset = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMMobileTraineeDashboard");
+
+            dataset.Tables[0].TableName = "TraineeDetails";
+            ConvertDataTableToList dataTable = new ConvertDataTableToList();
+            dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)

@@ -23,11 +23,16 @@
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
-                            
+
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?userTypeId=@item.UserTypeId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">
+                                <a href="@Url.Action("Edit", controllerName, new { userTypeId = item.UserTypeId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <span class="m-2"></span>
                                 <!-- Delete Button Triggering Modal -->
-                              @*   <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralCurrencyMasterId"><i class="fas fa-trash-alt"></i></a>
+                                @*   <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralCurrencyMasterId"><i class="fas fa-trash-alt"></i></a>
                                 <!-- Delete Confirmation Modal -->
                                 <div class="modal fade" id="confirmDeleteModal_@item.GeneralCurrencyMasterId" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;" role="document">

@@ -21,7 +21,11 @@
                             <td>@item.DistrictName</td>
                             <td>@item.RegionName</td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?generalDistrictId=@item.GeneralDistrictMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
+                                <a href="@Url.Action("Edit", controllerName, new { generalDistrictId = item.GeneralDistrictMasterId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
                                 <!-- Delete Button Triggering Modal -->
                                 <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralDistrictMasterId"><i class="fas fa-trash-alt"></i></a>
@@ -40,7 +44,10 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <!-- Delete action with GeneralTaxMasterId parameter -->
-                                                <a href="/@controllerName/Delete?districtIds=@item.GeneralDistrictMasterId" class="btn btn-outline-danger">Delete</a>
+                                                <a href="@Url.Action("Delete", controllerName, new { districtIds = item.GeneralDistrictMasterId })"
+                                                   class="btn btn-outline-danger">
+                                                    Delete
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

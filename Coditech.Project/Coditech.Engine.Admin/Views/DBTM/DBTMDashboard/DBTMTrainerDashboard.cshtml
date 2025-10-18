@@ -34,18 +34,18 @@
 				Datasets = traineeDataset
 			};
 	GeneralBatchListViewModel generalBatchListViewModel = new GeneralBatchListViewModel
-	{
+			{
 
-		GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
-		PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
-		Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
-	};
+				GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
+				PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
+				Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
+			};
 	DBTMTraineeAssignmentListViewModel dBTMTraineeAssignmentListViewModel = new DBTMTraineeAssignmentListViewModel
-	{
-		DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
-		PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
-		Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
-	};
+			{
+				DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
+				PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
+				Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
+			};
 }
 <div class="page-content">
 	<div class="container-fluid">
@@ -289,21 +289,34 @@
 
 				<div class="tab-pane fade show active" id="batchesPane" role="tabpanel">
 					<iframe name="batchesFrame"
-							src="/DBTMDashboard/LoadBatchesPartial"
-							width="100%" height="800px" frameborder="0"></iframe>
+							src="/DBTMDashboard/LoadBatchesPartial?isIframe=true"
+							width="100%" frameborder="0"
+							onload="resizeIframe(this)"></iframe>
 				</div>
 				<div class="tab-pane fade" id="assignmentPane" role="tabpanel">
 					<iframe name="assignmentFrame"
-							src="/DBTMDashboard/LoadAssignmentPartial"
-							width="100%" height="800px" frameborder="0"></iframe>
+							src="/DBTMDashboard/LoadAssignmentPartial?isIframe=true"
+							width="100%" frameborder="0"
+							onload="resizeIframe(this)"></iframe>
 				</div>
 			</div>
 		</div><!-- container -->
 	</div>
-@section scripts {
+	<style>
+		iframe {
+			display: block;
+			width: 100% !important;
+		}
+	</style>
+	@section scripts {
 		<!-- end page content -->
 		<script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
 		<script>
+						function resizeIframe(obj) {
+				if (obj && obj.contentWindow && obj.contentWindow.document.body) {
+					obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+				}
+			}
 			$(function () {
 			  // Initialize datepicker (if needed)
 			  $(".datepicker").datepicker({
@@ -373,4 +386,4 @@
 			});
 		</script>
 
-}
+	}

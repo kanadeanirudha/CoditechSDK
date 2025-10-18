@@ -10,6 +10,7 @@ namespace Coditech.API.Service
         List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType);
         DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId);
         DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId);
+        DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId);
         bool InsertDeviceDataViaFile(IFormFile file);
     }
 }

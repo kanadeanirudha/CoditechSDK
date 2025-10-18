@@ -38,10 +38,26 @@
                                                 <td>@item.EnumValue</td>
                                                 <td>@item.SequenceNumber</td>
                                                 <td class="text-center">@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)</td>
-                                                <td class="text-center">
-                                                    <a href="../@controllerName/CreateEditEnumarator?generalEnumaratorGroupId=@item.GeneralEnumaratorGroupId&generalEnumaratorId=@item.GeneralEnumaratorId" title="Update Enum" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a><span class="m-2">|</span>
-                                                    <a href="../@controllerName/DeleteEnumarator?generalEnumaratorGroupId=@item.GeneralEnumaratorGroupId&generalEnumaratorIds=@item.GeneralEnumaratorId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
+                                               <td class="text-center">
+                                                    <a href="@Url.Action("CreateEditEnumarator", controllerName, new { 
+                                                            generalEnumaratorGroupId = item.GeneralEnumaratorGroupId, 
+                                                            generalEnumaratorId = item.GeneralEnumaratorId 
+                                                        })" 
+                                                       title="Update Enum" 
+                                                       class="btn btn-sm btn-soft-success btn-circle me-2">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <span class="m-2">|</span>
+                                                    <a href="@Url.Action("DeleteEnumarator", controllerName, new { 
+                                                            generalEnumaratorGroupId = item.GeneralEnumaratorGroupId, 
+                                                            generalEnumaratorIds = item.GeneralEnumaratorId 
+                                                        })" 
+                                                       title="Delete" 
+                                                       class="btn btn-sm btn-soft-danger btn-circle">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
                                                 </td>
+
                                             </tr>
                                         }
                                     }

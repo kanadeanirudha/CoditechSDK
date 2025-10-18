@@ -43,7 +43,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<GeneralBatchModel> batchList = objStoredProc.ExecuteStoredProcedureList("Custom_Coditech_GetCalendarBatches @CentreCode, @UserMasterId, @StartDate, @EndDate, @WhereClause, @Rows, @PageNo, @Order_BY, @RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
+            List<GeneralBatchModel> batchList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCalendarBatches @CentreCode, @UserMasterId, @StartDate, @EndDate, @WhereClause, @Rows, @PageNo, @Order_BY, @RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
             GeneralBatchListModel listModel = new GeneralBatchListModel();
             listModel.GeneralBatchList = batchList?.Count > 0 ? batchList : new List<GeneralBatchModel>();
             return listModel;

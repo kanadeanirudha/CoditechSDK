@@ -26,7 +26,7 @@
                             <td>@item.Date.ToCoditechDateWithTimeFormat()</td>
                             <td>@item.DeviceSerialCode</td>
                             <td class="text-center">
-                                <a href="../@controllerName/TraineeActivitiesDetailsList?SelectedParameter1=@item.DBTMDeviceDataId&SelectedParameter2=@Model.SelectedParameter2" title="View" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fa fa-eye"></i></a>@* <span class="m-2">|</span> *@
+                                <a href="@Url.Action("TraineeActivitiesDetailsList", controllerName, new { SelectedParameter1 = item.DBTMDeviceDataId, SelectedParameter2 = Model.SelectedParameter2 })" title="View" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fa fa-eye"></i></a>
                             </td>
                         </tr>
                     }

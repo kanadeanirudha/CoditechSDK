@@ -5,12 +5,40 @@
     constructor: function () {
     },
 
-    GetDBTMBatchWiseReports: function () {
+    GetDBTMMultiTestListByGeneralBatchMasterId: function () {
+        var selectedItem = $("#GeneralBatchMasterId").val();
+        if (selectedItem != "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "/DBTMReports/GetMultiTestByGeneralBatchMasterId",
+                data: { generalBatchMasterId: selectedItem },
+                success: function (data) {
+                    $("#DBTMTestMasterId").html(data);
+                    $('#DBTMTestMasterId').selectpicker('refresh');
+
+                    CoditechCommon.HideLodder();
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            $("#DBTMTestMasterId").html("");
+            $('#DBTMTestMasterId').selectpicker('refresh');
+        }
+    },
+
+    GetDBTMBatchWiseMultiReports: function () {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        $("#DBTMBatchWiseReportsDivId").html("");
+        $("#DBTMBatchWiseMultiReportsDivId").html("");
         if (generalBatchMasterId != "" && dBTMTestMasterId != "") {
             CoditechCommon.ShowLodder();
             $.ajax({
@@ -20,13 +48,13 @@
                 url: "/DBTMReports/GetBatchWiseReports",
                 data: {
                     "generalBatchMasterId": generalBatchMasterId,
-                    "dBTMTestMasterId": dBTMTestMasterId,
+                    "dBTMTestMasterIds": dBTMTestMasterId,
                     "FromDate": fromdate,
                     "ToDate": todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DBTMBatchWiseReportsDivId").html(data);
+                    $("#DBTMBatchWiseMultiReportsDivId").html(data);
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -49,43 +77,15 @@
         }
     },
 
-    GetDBTMTestListByGeneralBatchMasterId: function () {
-        var selectedItem = $("#GeneralBatchMasterId").val();
-
-        if (selectedItem != "") {
-            CoditechCommon.ShowLodder();
-
-            $.ajax({
-                cache: false,
-                type: "GET",
-                dataType: "html",
-                url: "/DBTMReports/GetTestByGeneralBatchMasterId",
-                data: { generalBatchMasterId: selectedItem },
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#DBTMTestMasterId").html(data);
-                    CoditechCommon.HideLodder();
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    if (xhr.status === 401 || xhr.status === 403) {
-                        location.reload();
-                    }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
-                    CoditechCommon.HideLodder();
-                }
-            });
-        } else {
-            $("#DBTMTestMasterId").html("");
-        }
-    },
-
-    GetDBTMTestWiseReports: function () {
+    GetDBTMTestWiseMultiReports: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
 
-        $("#DBTMTestWiseReportsDivId").html("");
+        $("#DBTMTestWiseMultiReportsDivId").html("");
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();
@@ -96,14 +96,14 @@
                 dataType: "html",
                 url: "/DBTMReports/GetTestWiseReports",
                 data: {
-                    dBTMTestMasterId: dBTMTestMasterId,
+                    dBTMTestMasterIds: dBTMTestMasterId,
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
-                    fromdate: fromdate,
-                    todate: todate
+                    FromDate: fromdate,
+                    ToDate: todate
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DBTMTestWiseReportsDivId").html(data);
+                    $("#DBTMTestWiseMultiReportsDivId").html(data);
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -114,6 +114,7 @@
                     CoditechCommon.HideLodder();
                 }
             });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
@@ -124,7 +125,7 @@
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
-        var dBTMGraphMasterId = $("#DBTMGraphMasterId").val(); 
+        var dBTMGraphMasterId = $("#DBTMGraphMasterId").val();
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
@@ -141,7 +142,7 @@
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
                     fromdate: fromdate,
                     todate: todate,
-                    dBTMGraphMasterId: dBTMGraphMasterId 
+                    dBTMGraphMasterId: dBTMGraphMasterId
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -182,6 +183,182 @@
                     CoditechCommon.HideLodder();
                 }
             });
+        }
+    },
+
+    GetDBTMNameWiseReports: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+
+        $("#DBTMTestWiseReportsDivId").html("");
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetNameWiseReports",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    FromDate: fromdate,
+                    ToDate: todate
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMNameWiseReportsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+
+    GetDBTMTestWiseMultiReportsFile: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val();
+
+        $("#DBTMTestWiseMultiReportsDivId").html("");
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetTestWiseReportsFile",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    FromDate: fromdate,
+                    ToDate: todate,
+                    ReportType: reportType
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMTestWiseMultiReportsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Error while downloading report.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+
+    DownloadExcelReport: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val() || "excel";
+
+        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                url: "/DBTMReports/CheckReportAvailability",
+                type: "GET",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMTraineeDetailId: dBTMTraineeDetailId,
+                    fromDate: fromdate,
+                    toDate: todate,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        var downloadUrl = "/DBTMReports/DownloadReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&dBTMTraineeDetailId=" + encodeURIComponent(dBTMTraineeDetailId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.HideLodder();
+                        $("#hiddenDownloader").attr("src", downloadUrl);                       
+                    } else {
+                        CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
+                        CoditechCommon.HideLodder();
+                    }
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+
+    DownloadBatchExcelReport: function () {
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val() || "excel";
+
+        if (dBTMTestMasterId !== "" && generalBatchMasterId && generalBatchMasterId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                url: "/DBTMReports/CheckBatchReportAvailability",
+                type: "GET",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    generalBatchMasterId: generalBatchMasterId,
+                    fromDate: fromdate,
+                    toDate: todate,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        var downloadUrl = "/DBTMReports/DownloadBatchReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&generalBatchMasterId=" + encodeURIComponent(generalBatchMasterId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.HideLodder();
+                        $("#hiddenDownloader").attr("src", downloadUrl);
+                    } else {
+                        CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
+                        CoditechCommon.HideLodder();
+                    }
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     }
 };

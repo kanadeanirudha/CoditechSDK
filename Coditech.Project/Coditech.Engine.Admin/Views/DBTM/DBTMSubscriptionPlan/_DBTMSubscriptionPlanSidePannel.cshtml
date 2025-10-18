@@ -9,12 +9,18 @@
     <div class="card-body">
         <div class="files-nav">
             <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
-                <a class="nav-link" href="/DBTMSubscriptionPlan/UpdateDBTMSubscriptionPlan?dBTMSubscriptionPlanId=@dBTMSubscriptionPlanId" aria-selected="true">
+                <a class="nav-link"
+                   href="@Url.Action("UpdateDBTMSubscriptionPlan", "DBTMSubscriptionPlan", new { dBTMSubscriptionPlanId = dBTMSubscriptionPlanId })"
+                   aria-selected="true">
                     <i class="ti-menu"></i><h5 class="m-0 ps-2">Plan Details</h5>
                 </a>
-                <a class="nav-link" href="/DBTMSubscriptionPlan/GetDBTMSubscriptionPlanActivityList?SelectedParameter1=@dBTMSubscriptionPlanId" aria-selected="true">
+
+                <a class="nav-link"
+                   href="@Url.Action("GetDBTMSubscriptionPlanActivityList", "DBTMSubscriptionPlan", new { SelectedParameter1 = dBTMSubscriptionPlanId })"
+                   aria-selected="true">
                     <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Plan Activity</h5>
                 </a>
+
             </div>
         </div>
     </div>

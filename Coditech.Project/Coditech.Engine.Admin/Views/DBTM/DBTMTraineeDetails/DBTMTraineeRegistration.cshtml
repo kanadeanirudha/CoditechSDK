@@ -17,6 +17,9 @@
                                 <h4 class="card-title">Trainee Registration</h4>
                             </div><!--end col-->
                         </div>  <!--end row-->
+                        <a class="btn btn-sm btn-soft-secondary float-end" href="/DBTMTraineeDetails/List" role="button">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
                     </div>
                     <div class="card-body">
                         @using (Html.BeginForm("TraineeRegistration", controllerName, FormMethod.Post))
@@ -82,11 +85,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 text-end">
-                                    <a class="btn btn-sm btn-soft-secondary ms-2" href="/DBTMTraineeDetails/List" role="button">
-                                        <i class="fas fa-arrow-left me-2"></i>Back
-                                    </a>
-                                </div>
+
                             </div>
                         }
                     </div>

@@ -24,8 +24,9 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?paymentGatewayId=@item.PaymentGatewayId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i>@* </a><span class="m-2">|</span> *@
-                               @*  <!-- Delete Button Triggering Modal -->
+                                <a href="@Url.Action("Edit", controllerName, new { paymentGatewayId = @item.PaymentGatewayId })" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>@* </a><span class="m-2">|</span> *@
+                                    @*  <!-- Delete Button Triggering Modal -->
                                 <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.PaymentGatewayId"><i class="fas fa-trash-alt"></i></a>
                                 <!-- Delete Confirmation Modal -->
                                 <div class="modal fade" id="confirmDeleteModal_@item.PaymentGatewayId" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">

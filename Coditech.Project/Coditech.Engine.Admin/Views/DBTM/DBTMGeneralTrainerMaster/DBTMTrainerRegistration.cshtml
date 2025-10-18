@@ -4,20 +4,24 @@
     ViewBag.Title = "Trainer Registration";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    }
+}
 <!-- Page Content-->
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
-                <div class="col-lg-12">
+            <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
-                                    <h4 class="card-title">Trainer Registration</h4>
-                            </div>
-                        </div>
+                                <h4 class="card-title">Trainer Registration</h4>
+                            </div><!--end col-->
+                        </div>  <!--end row-->
+                        <a class="btn btn-sm btn-soft-secondary float-end" href="/GeneralTrainerMaster/List" role="button">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
                     </div>
+
                     <div class="card-body">
                         @using (Html.BeginForm("TrainerRegistration", "DBTMGeneralTrainerMaster", FormMethod.Post))
                         {
@@ -31,11 +35,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 text-end">
-                                    <a class="btn btn-sm btn-soft-secondary ms-2" href="/GeneralTrainerMaster/List" role="button">
-                                        <i class="fas fa-arrow-left me-2"></i>Back
-                                    </a>
-                                </div>
+
                             </div>
                         }
                     </div>

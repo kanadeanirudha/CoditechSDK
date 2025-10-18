@@ -1,9 +1,6 @@
 ﻿@model GeneralBatchListViewModel
 @{
-	if (!string.IsNullOrEmpty(Model.Custom4))
-	{
-		Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-	}
+	Layout = null;
 	ViewBag.Title = "All Batch Details List";
 	string controllerName = ViewContext.RouteData.Values["controller"].ToString();
 	string actionName = ViewContext.RouteData.Values["action"].ToString();
@@ -16,7 +13,7 @@
 	}
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
+<div class="page-content">
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-12">
@@ -38,3 +35,8 @@
 		</div>
 	</div>
 </div>
+<style>
+		body[data-layout="horizontal"] {
+			display: block !important;
+		}
+</style>

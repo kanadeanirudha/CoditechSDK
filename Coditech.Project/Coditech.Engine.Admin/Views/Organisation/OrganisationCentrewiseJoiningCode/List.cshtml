@@ -3,29 +3,39 @@
     ViewBag.Title = "Organisation Centrewise Joining Code List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    bool IsCentre = false;
+
     DropdownViewModel centreDropdown = new DropdownViewModel()
-            {
-                DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
-                DropdownName = "SelectedCentreCode",
-                DropdownSelectedValue = Model.SelectedCentreCode,
-                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
-            };
+    {
+        DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
+        DropdownName = "SelectedCentreCode",
+        DropdownSelectedValue = Model.SelectedCentreCode,
+        ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+    };
 
     DropdownViewModel joiningCodeType = new DropdownViewModel()
-            {
-                DropdownType = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
-                DropdownName = "JoiningCodeTypeEnumId",
-                DropdownSelectedValue = string.IsNullOrEmpty(Model.JoiningCodeTypeEnumId.ToString())
+    {
+        DropdownType = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
+        DropdownName = "JoiningCodeTypeEnumId",
+        DropdownSelectedValue = string.IsNullOrEmpty(Model.JoiningCodeTypeEnumId.ToString())
                 || Model.JoiningCodeTypeEnumId == 0
-                ? "0" // All
+                ? "0" 
                 : Model.JoiningCodeTypeEnumId.ToString(),
-                GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
-                SelectedText = "All",
-                SelectedValue = "0",
-                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
-            };
+        GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
+        SelectedText = "All",
+        SelectedValue = "0",
+        ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+    };
 
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+    if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+    {
+        IsCentre = true;
+    }
 }
+<!-- Hidden field to pass user type to JS -->
+<input type="hidden" id="DBTMCurrentUserType" value="@userModel?.Custom1" />
+
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
@@ -33,9 +43,12 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Joining Code List</span>
-                        <a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
-                            <i class="fas fa-plus me-2"></i>Create Joining Code
-                        </a>
+                        @if (IsCentre)
+                        {
+                            <a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
+                                <i class="fas fa-plus me-2"></i>Create Joining Code
+                            </a>
+                        }
                     </div>
 
                     <div class="card-header">
@@ -58,11 +71,8 @@
                             </div>
                             <div class="col-md-5">
                                 <label class="fw-bold">
-
                                     Total Joining Code:  <span class="badge badge-soft-primary me-2 "><span id="TotalCodeCount"></span> </span>
-
                                     Total Active Joining Code: <span class="badge badge-soft-success me-2"> <span id="ActiveCodeCount"></span> </span>
-
                                     Total Used Joining Code: <span class="badge badge-soft-danger"> <span id="ExpiredCodeCount"></span> </span>
                                 </label>
                             </div>
@@ -79,12 +89,49 @@
         </div>
     </div>
 </div>
+
 <!-- jQuery CDN (if not already loaded) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="~/js/coditech/Organisation/OrganisationCentrewiseJoiningCode.js"></script>
 
 <script>
     $(document).ready(function () {
+        // ===== Dynamic JoiningCodeTypeEnumId dropdown logic =====
+        var userType = $("#DBTMCurrentUserType").val(); // "dbtmtrainer" ya normal user
+        var $dropdown = $("#JoiningCodeTypeEnumId");
+
+        if(userType && userType.toLowerCase() === "dbtmtrainer") {
+            // Remove "All" and "Trainer" options
+            $dropdown.find('option').each(function() {
+                var text = $(this).text().trim();
+                if(text === "All" || text === "Trainer") {
+                    $(this).remove();
+                }
+            });
+
+            // Default select "Trainee"
+            var traineeOption = $dropdown.find('option').filter(function() {
+                return $(this).text().trim() === "Trainee";
+            });
+            if(traineeOption.length) {
+                $dropdown.val(traineeOption.val());
+            }
+        } else {
+            // Normal user select "All"
+            var allOption = $dropdown.find('option').filter(function() {
+                return $(this).text().trim() === "All";
+            });
+            if(allOption.length) {
+                $dropdown.val(allOption.val());
+            }
+        }
+
+        // Refresh Bootstrap selectpicker if used
+        if($dropdown.hasClass("selectpicker")) {
+            $dropdown.selectpicker('refresh');
+        }
+
+        // ===== Update total counts after AJAX =====
         const checkCounts = setInterval(function () {
             const $active = $('#AjaxActiveCodeCount');
             const $expired = $('#AjaxExpiredCodeCount');
@@ -101,5 +148,4 @@
             }
         }, 300);
     });
-
 </script>

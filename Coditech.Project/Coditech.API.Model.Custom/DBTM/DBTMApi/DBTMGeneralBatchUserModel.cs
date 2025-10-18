@@ -8,6 +8,8 @@
         public string DBTMActivityStatus { get; set; }
         public string PersonCode { get; set; }
         public string DisplayName { get; set; }
+        public decimal Weight { get; set; }
+        public decimal Height { get; set; }
     }
 }
 

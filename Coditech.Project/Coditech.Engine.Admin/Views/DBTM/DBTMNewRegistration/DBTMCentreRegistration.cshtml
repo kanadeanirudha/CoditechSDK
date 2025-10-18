@@ -269,17 +269,22 @@
 <script src="~/js/coditech/Common/CoditechCommon.js"></script>
 @section Scripts {
     <script type="text/javascript">
-        $(document).ready(function () {
+                $(document).ready(function () {
             $(".view-password").click(function () {
-                $(this).toggleClass("fa fa-eye-slash");
-                var inputAttribute = $('.password-input');
-                if (inputAttribute.attr("type") == "password") {
+                $(this).toggleClass("fa-eye fa-eye-slash");
+
+                // Sirf isi icon ke sath wala input change hoga
+                var inputAttribute = $(this).siblings(".password-input");
+
+                if (inputAttribute.attr("type") === "password") {
                     inputAttribute.attr("type", "text");
                 } else {
                     inputAttribute.attr("type", "password");
                 }
             });
+
             CoditechCommon.InitializeLocationDropdowns();
         });
+
     </script>
 }

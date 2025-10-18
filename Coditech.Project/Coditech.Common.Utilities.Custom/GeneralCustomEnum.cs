@@ -20,7 +20,9 @@
         GraphType,
         DBTMTraineeGraphList,
         Trainee,
-        DBTMPerformanceMatrix
+        DBTMPerformanceMatrix,
+        BatchWiseMultiReports,
+        DBTMTrainerCentrewise,
     }
     public enum DashboardFormCustomEnum
     {

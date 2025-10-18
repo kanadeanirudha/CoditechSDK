@@ -28,7 +28,11 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsConverted)
                             </td>
                             <td class="text-center">
-                                <a href="../@controllerName/Edit?generalLeadGenerationId=@item.GeneralLeadGenerationMasterId" title="Update" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>
+                                <a href="@Url.Action("Edit", controllerName, new { generalLeadGenerationId = item.GeneralLeadGenerationMasterId })"
+                                   title="Update"
+                                   class="btn btn-sm btn-soft-success btn-circle me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 @if (!item.IsConverted)
                                 {
                                     <span class="m-2">|</span>
@@ -49,8 +53,11 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <!-- Delete action with selectedCentreCode parameter -->
-                                                    <a href="/@controllerName/Delete?LeadGenerationIds=@item.GeneralLeadGenerationMasterId&selectedCentreCode=@Model.SelectedCentreCode" class="btn btn-outline-danger">Delete</a>
-                                            </div>
+                                                    <a href="@Url.Action("Delete", controllerName, new { LeadGenerationIds = item.GeneralLeadGenerationMasterId, selectedCentreCode = Model.SelectedCentreCode })"
+                                                       class="btn btn-outline-danger">
+                                                        Delete
+                                                    </a>
+                                                </div>
                                         </div>
                                     </div>
                                 </div>

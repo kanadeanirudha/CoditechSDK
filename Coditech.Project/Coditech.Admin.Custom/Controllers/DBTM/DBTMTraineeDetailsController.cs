@@ -363,23 +363,37 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult TraineeRegistration(string joiningCode)
+        public virtual ActionResult TraineeRegistration(string joiningCode, string custom1)
         {
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
+
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
+                var list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
+
                 if (!list.HasError)
                 {
+                 var  allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                    {
+                        DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                        Parameter = joiningCode
+                    }).DropdownList?.Where(x => x.Value != "").ToList();
+
+                    // Multi-select: set Selected property based on custom1 (comma-separated)
+                    if (!string.IsNullOrEmpty(custom1) && allTrainerList != null)
+                    {
+                        var selectedIds = custom1.Split(','); // e.g., "7,8,12"
+                        foreach (var item in allTrainerList)
+                        {
+                            item.Selected = selectedIds.Contains(item.Value);
+                        }
+                    }
+
                     dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
                     {
                         JoiningCode = joiningCode,
-                        AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-                        {
-                            DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                            Parameter = joiningCode
-                        }).DropdownList?.Where(x => x.Value != "")?.ToList()
-
+                        AllTrainerList = allTrainerList,
+                        SelectedTrainer = !string.IsNullOrEmpty(custom1) ? custom1.Split(',').ToList() : new List<string>()
                     };
                 }
                 if (list.HasError)
@@ -398,13 +412,18 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("CentreName");
             ModelState.Remove("CentreCode");
             ModelState.Remove("DeviceSerialCode");
+            ModelState.Remove("GeneralCityMasterId");
+            ModelState.Remove("GeneralCountryMasterId");
+            ModelState.Remove("GeneralRegionMasterId");
+            ModelState.Remove("AddressLine1");
+            ModelState.Remove("Pincode");
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
                 {
-                    var generalcountrymasterid = dBTMNewRegistrationViewModel.GeneralCountryMasterId;
-                    var generalcitymasterid = dBTMNewRegistrationViewModel.GeneralCityMasterId;
-                    var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
+                    //var generalcountrymasterid = dBTMNewRegistrationViewModel.GeneralCountryMasterId;
+                    //var generalcitymasterid = dBTMNewRegistrationViewModel.GeneralCityMasterId;
+                    //var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
                     var isTermsAndCondition = dBTMNewRegistrationViewModel.IsTermsAndCondition;
 
                     DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode);
@@ -421,9 +440,9 @@ namespace Coditech.Admin.Controllers
 
                         };
                     }
-                    dBTMNewRegistrationViewModel.GeneralRegionMasterId = regionmasterid;
-                    dBTMNewRegistrationViewModel.GeneralCountryMasterId = generalcountrymasterid;
-                    dBTMNewRegistrationViewModel.GeneralCityMasterId = generalcitymasterid;
+                    //dBTMNewRegistrationViewModel.GeneralRegionMasterId = regionmasterid;
+                    //dBTMNewRegistrationViewModel.GeneralCountryMasterId = generalcountrymasterid;
+                    //dBTMNewRegistrationViewModel.GeneralCityMasterId = generalcitymasterid;
                     dBTMNewRegistrationViewModel.IsTermsAndCondition = isTermsAndCondition;
                 }
 

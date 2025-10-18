@@ -35,11 +35,16 @@
                             <td class="text-center">
                                 @if (item.IsCurrentPosition || item.CurrentEmployeeServiceId == item.EmployeeServiceId)
                                 {
-                                    <a href="../@controllerName/GetEmployeeService?employeeId=@item.EmployeeId&personId=@Model.PersonId&employeeServiceId=@item.EmployeeServiceId" title="Update" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-edit"></i></a>
-                                    @*   <span class="m-2">|</span>
+                                    <a href="@Url.Action("GetEmployeeService", controllerName,
+                                                                                       new { employeeId = item.EmployeeId, personId = Model.PersonId, employeeServiceId = item.EmployeeServiceId })"
+                           title="Update"
+                           class="btn btn-sm btn-soft-success btn-circle">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        @*   <span class="m-2">|</span>
                         <a href="../@controllerName/Delete?employeeIds=@item.EmployeeId" title="Delete" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-trash-alt"></i></a>
                         *@
-                                }
+                                                }
                             </td>
                         </tr>
                     }

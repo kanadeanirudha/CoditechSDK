@@ -1,9 +1,9 @@
 ﻿@using Coditech.Admin.ViewModel
 @model DBTMNewRegistrationViewModel
 @{
-    DropdownViewModel countryDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Country.ToString(), DropdownName = "GeneralCountryMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetRegionListByCountryId()" };
-    DropdownViewModel regionDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Region.ToString(), DropdownName = "GeneralRegionMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralRegionMasterId), Parameter = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetCityListByRegionId()" };
-    DropdownViewModel cityDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.City.ToString(), DropdownName = "GeneralCityMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCityMasterId), Parameter = Convert.ToString(Model.GeneralRegionMasterId) };
+    // DropdownViewModel countryDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Country.ToString(), DropdownName = "GeneralCountryMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetRegionListByCountryId()" };
+    // DropdownViewModel regionDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Region.ToString(), DropdownName = "GeneralRegionMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralRegionMasterId), Parameter = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetCityListByRegionId()" };
+    // DropdownViewModel cityDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.City.ToString(), DropdownName = "GeneralCityMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCityMasterId), Parameter = Convert.ToString(Model.GeneralRegionMasterId) };
     ModelPopUpViewModel termsAndConditionsModel = new ModelPopUpViewModel() { ModelPopUpId = "AddTermsAndConditionsModelPopupId", ModalContentId = "AddTermsAndConditionsContentId" };
 }
 <div class="row">
@@ -145,14 +145,14 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-6">
+   @*  <div class="col-lg-6">
         <div class="mb-3">
             @Html.LabelFor(x => x.AddressLine1, new { @class = "form-label required" })
             @Html.TextAreaFor(x => x.AddressLine1, new { @class = "form-control" })
             @Html.ValidationMessageFor(x => x.AddressLine1)
         </div>
-    </div>
-    <div class="col-lg-6">
+    </div> *@
+   @*  <div class="col-lg-6">
         <div class="mb-3">
             @Html.LabelFor(x => x.AddressLine2, new { @class = "form-label" })
             @Html.TextAreaFor(x => x.AddressLine2, new { @class = "form-control" })
@@ -186,7 +186,7 @@
             @Html.TextBoxFor(x => x.Pincode, new { @class = "form-control" })
             @Html.ValidationMessageFor(x => x.Pincode)
         </div>
-    </div>
+    </div> *@
     <div class="col-lg-6">
         <div class="form-group mb-3">
             @Html.LabelFor(x => x.Password, new { @class = "form-label required" })

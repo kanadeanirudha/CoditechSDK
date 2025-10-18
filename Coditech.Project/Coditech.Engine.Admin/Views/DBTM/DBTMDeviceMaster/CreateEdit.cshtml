@@ -150,11 +150,17 @@
                             }
                             else if (Model.DBTMDeviceMasterId > 0 && Model.DBTMParentDeviceMasterId > 0)
                             {
-                                <a href="../@controllerName/CancelSlave?dBTMDeviceId=@Model.DBTMParentDeviceMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                                <a href="@Url.Action("CancelSlave", controllerName, new { dBTMDeviceId = Model.DBTMParentDeviceMasterId })"
+                                   class="btn btn-secondary">
+                                    <i class="ft-x"></i>@AdminResources.LabelCancel
+                                </a>
                             }
                             else
                             {
-                                <a href="../@controllerName/CancelSlave?dBTMDeviceId=@Model.DBTMParentDeviceMasterId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                                <a href="@Url.Action("CancelSlave", controllerName, new { dBTMDeviceId = Model.DBTMParentDeviceMasterId })"
+                                   class="btn btn-secondary">
+                                    <i class="ft-x"></i>@AdminResources.LabelCancel
+                                </a>
                             }
                         }
                     </div>

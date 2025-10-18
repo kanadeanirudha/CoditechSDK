@@ -28,9 +28,15 @@
                             <td class="text-center">
                                 @if (item.TaskSchedulerMasterId > 0)
                                 {
-                                    <a href="../@controllerName/UpdateTaskSchedulerDetails?configuratorId=@item.TaskSchedulerMasterId&schedulerCallFor=@item.SchedulerCallFor" title="Update" class="btn btn-sm btn-soft-success btn-circle">
+                                    <a href="@Url.Action(
+                                               "UpdateTaskSchedulerDetails",
+                                               controllerName,
+                                               new { configuratorId = item.TaskSchedulerMasterId, schedulerCallFor = item.SchedulerCallFor })"
+                                       title="Update"
+                                       class="btn btn-sm btn-soft-success btn-circle">
                                         <i class="fas fa-edit"></i>
                                     </a>
+
                                     <span class="m-2">|</span>
                                     <!-- Delete Button Triggering Modal -->
                                     <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.TaskSchedulerMasterId"><i class="fas fa-trash-alt"></i></a>
@@ -49,17 +55,29 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                                     <!-- Delete action with TaskSchedulerMasterId parameter -->
-                                                    <a href="../@controllerName/Delete?taskSchedulerMasterIds=@item.TaskSchedulerMasterId" class="btn btn-outline-danger">Delete</a>
-                                                </div>
+                                                    <a href="@Url.Action(
+                                                       "Delete",
+                                                       controllerName,
+                                                                   new { taskSchedulerMasterIds = item.TaskSchedulerMasterId })"
+                                                           class="btn btn-outline-danger">
+                                                            Delete
+                                                    </a>
+                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 }
                                 else
                                 {
-                                    <a href="../@controllerName/CreateTaskScheduler?schedulerCallFor=@item.SchedulerCallFor" title="Create" class="btn btn-sm btn-soft-success btn-circle">
+                                    <a href="@Url.Action(
+                                               "CreateTaskScheduler",
+                                               controllerName,
+                                               new { schedulerCallFor = item.SchedulerCallFor })"
+                                       title="Create"
+                                       class="btn btn-sm btn-soft-success btn-circle">
                                         <i class="fas fa-plus"></i>
                                     </a>
+
                                 }
                             </td>
                         </tr>

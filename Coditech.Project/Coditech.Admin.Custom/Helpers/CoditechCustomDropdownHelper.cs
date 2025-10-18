@@ -34,6 +34,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetCentrewiseDBTMTrainerList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTrainerCentrewise.ToString()))
+            {
+                GetDBTMTrainerListByCentreCode(dropdownViewModel, dropdownList);
+            }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString()))
             {
                 GetTraineeDetailByCentreCodeAndGeneralTrainerList(dropdownViewModel, dropdownList);
@@ -45,6 +49,10 @@ namespace Coditech.Admin.Helpers
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMBatchActivity.ToString()))
             {
                 GetDBTMBatchActivityList(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.BatchWiseMultiReports.ToString()))
+            {
+                GetDBTMMultiBatchActivityList(dropdownViewModel, dropdownList);
             }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMDeviceSerialCodeByCentreCode.ToString()))
             {
@@ -236,6 +244,38 @@ namespace Coditech.Admin.Helpers
             }
         }
 
+        private static void GetDBTMMultiBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.DropdownType == DropdownCustomTypeEnum.BatchWiseMultiReports.ToString())
+                if (dropdownViewModel.IsRequired)
+                {
+                    dropdownList.Add(new SelectListItem { Value = "0", Text = "All" });
+                }
+                else
+                {
+                    dropdownList.Add(new SelectListItem { Value = "0", Text = GeneralResources.SelectLabel });
+                }
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) &&
+            dropdownViewModel.Parameter.ToLower() != "0~false")
+            {
+                int generalBatchMasterId = Convert.ToInt32(dropdownViewModel.Parameter.Split("~")[0]);
+                bool isAssociated = Convert.ToBoolean(dropdownViewModel.Parameter.Split("~")[1]);
+
+                DBTMBatchActivityListResponse response = new DBTMBatchActivityClient().GetDBTMBatchActivityList(generalBatchMasterId, isAssociated, null, null, null, 1, int.MaxValue);
+                DBTMBatchActivityListModel list = new DBTMBatchActivityListModel() { DBTMBatchActivityList = response.DBTMBatchActivityList };
+                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.TestName))
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.TestName}",
+                        Value = item.DBTMTestMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestMasterId)
+                    });
+                }
+            }
+        }
+
         private static string SpiltCentreCode(string centreCode)
         {
             centreCode = !string.IsNullOrEmpty(centreCode) && centreCode.Contains(":") ? centreCode.Split(':')[0] : centreCode;
@@ -298,7 +338,10 @@ namespace Coditech.Admin.Helpers
             }
             DBTMTraineeDetailsListResponse response = new DBTMTraineeDetailsClient().List(centreCode, Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId), null, null, null, 1, int.MaxValue);
             DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
-            dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
+            if (dropdownViewModel.ExcludedValues == null || !dropdownViewModel.ExcludedValues.Contains("0"))
+            {
+                dropdownList.Add(new SelectListItem() { Text = "All", Value = "0" });
+            }
             //if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             //{
             //    list.DBTMTraineeDetailsList = list.DBTMTraineeDetailsList?.Where(x =>
@@ -387,7 +430,7 @@ namespace Coditech.Admin.Helpers
         }
         private static void GetDBTMPerformanceMatrix(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
-            dropdownList.Add(new SelectListItem() { Text = "-------Select-------"});
+            dropdownList.Add(new SelectListItem() { Text = "-------Select-------" });
 
             DBTMPerformanceMatrixListResponse response = new DBTMTestClient().GetDBTMPerformanceMatrixList(null, null, null, 1, int.MaxValue);
             DBTMPerformanceMatrixListModel list = new DBTMPerformanceMatrixListModel() { DBTMPerformanceMatrixList = response.DBTMPerformanceMatrixList };
@@ -415,6 +458,31 @@ namespace Coditech.Admin.Helpers
                     Value = graphType.ToString(),
                     Selected = graphType.ToString() == dropdownViewModel.DropdownSelectedValue
                 });
+            }
+        }
+        private static void GetDBTMTrainerListByCentreCode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            GeneralTrainerListModel list = new GeneralTrainerListModel();
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
+
+                GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
+                list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
+                foreach (var item in list?.GeneralTrainerList?.OrderBy(x => x.FirstName))
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.FirstName} {item.LastName}",
+                        Value = item.GeneralTrainerMasterId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                    });
+                }
             }
         }
     }

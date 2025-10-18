@@ -3,7 +3,7 @@
     ViewBag.Title = Model.OrganisationCentrewiseBuildingMasterId > 0 ? "Update Building" : "Add Building";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-        DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "HospitalDoctors.GetOrganisationCentrewiseBuildingAndRoomByCentreCode()", IsDisabled = Model.OrganisationCentrewiseBuildingMasterId > 0 };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "HospitalDoctors.GetOrganisationCentrewiseBuildingAndRoomByCentreCode()", IsDisabled = Model.OrganisationCentrewiseBuildingMasterId > 0 };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -13,18 +13,18 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center">
-                        <div class="col">
-                            @if (Model.OrganisationCentrewiseBuildingMasterId > 0)
-                            {
-                                <h4 class="card-title">Update Building</h4>
-                            }
-                            else
-                            {
-                                <h4 class="card-title">Create Building</h4>
-                            }
-                        </div><!--end col-->
-                    </div><!--end row-->
-                </div>
+                            <div class="col">
+                                @if (Model.OrganisationCentrewiseBuildingMasterId > 0)
+                                {
+                                    <h4 class="card-title">Update Building</h4>
+                                }
+                                else
+                                {
+                                    <h4 class="card-title">Create Building</h4>
+                                }
+                            </div><!--end col-->
+                        </div><!--end row-->
+                    </div>
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                         {
@@ -57,7 +57,7 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.CentreCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.CentreCode })" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>
                 </div>

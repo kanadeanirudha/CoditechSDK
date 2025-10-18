@@ -71,7 +71,10 @@
                                 </div>
                             </div>
                             @Html.Partial("~/Views/Shared/GeneralPerson/_CreateEditGeneralPerson.cshtml", Model)
-                            <a href="../@controllerName/Cancel?SelectedCentreCode=@Model.SelectedCentreCode&SelectedDepartmentId=@Model.SelectedDepartmentId" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId })"
+                               class="btn btn-secondary">
+                                <i class="ft-x"></i>@AdminResources.LabelCancel
+                            </a>
                         }
                     </div>
                 </div>

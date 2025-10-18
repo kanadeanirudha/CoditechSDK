@@ -37,7 +37,7 @@
                                                         <td>@item.UserType</td>
                                                         <td>@item.UserNameBasedOn</td>
                                                         <td class="text-center">
-                                                            <a href="../@controllerName/CentrewiseUserNameRegistration?organisationCentreId=@Model.OrganisationCentreMasterId&organisationCentrewiseUserNameRegistrationId=@item.OrganisationCentrewiseUserNameRegistrationId" title="Edit" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>
+                                                            <a href="@Url.Action("CentrewiseUserNameRegistration", controllerName, new { organisationCentreId=@Model.OrganisationCentreMasterId, organisationCentrewiseUserNameRegistrationId=@item.OrganisationCentrewiseUserNameRegistrationId })" title="Edit" class="btn btn-sm btn-soft-success btn-circle me-2"><i class="fas fa-edit"></i></a>
                                                         </td>
                                                     </tr>
                                                 }

@@ -109,7 +109,10 @@
                                 }
                             </div>
                             <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/GetGeneralPolicyRulesList?policyCode=@Model.PolicyCode" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            <a href="@Url.Action("GetGeneralPolicyRulesList", controllerName, new { policyCode = Model.PolicyCode })"
+                               class="btn btn-secondary">
+                                <i class="ft-x"></i>@AdminResources.LabelCancel
+                            </a>
                         }
                     </div>
                 </div>
