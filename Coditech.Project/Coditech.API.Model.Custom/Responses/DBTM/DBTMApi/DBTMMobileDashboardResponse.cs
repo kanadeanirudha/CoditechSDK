@@ -4,5 +4,10 @@
     {
         public DBTMMobileDashboardModel DBTMMobileDashboardModel { get; set; }
     }
+
+    public class DBTMMobileTraineeDashboardResponse : BaseResponse
+    {
+        public DBTMMobileTraineeDashboardModel DBTMMobileTraineeDashboardModel { get; set; }
+    }
 }
 
