@@ -117,6 +117,9 @@ namespace Coditech.API.Service
                                 ParameterValue = item.ParameterValue,
                                 FromTo = item.FromTo,
                                 Row = item.Row,
+                                Comment1 = item.Comment1,
+                                Comment2 = item.Comment2,
+                                Comment3 = item.Comment3,
                                 CreatedBy = dBTMDeviceDataModel.CreatedBy,
                                 CreatedDate = createdDate
                             };
