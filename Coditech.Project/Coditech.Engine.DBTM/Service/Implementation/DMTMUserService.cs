@@ -49,16 +49,17 @@ namespace Coditech.API.Service
             else if (!userMasterData.IsActive)
                 throw new CoditechException(ErrorCodes.ContactAdministrator, null);
 
-            long personId = 0; string centreCode = string.Empty; string employeeDesignation = string.Empty;
+            DBTMUserModel userModel = new DBTMUserModel();
+            long personId = 0; 
 
             if (userMasterData.UserType == UserTypeEnum.Trainee.ToString())
             {
                 var data = _dbtmTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == userMasterData.EntityId).Select(x => new { x.PersonId, x.CentreCode, x.SpecializationEnumId })?.FirstOrDefault();
                 if (data != null)
                 {
-                    centreCode = data.CentreCode;
+                    userModel.CentreCode = data.CentreCode;
                     personId = data.PersonId;
-                    employeeDesignation = GetEnumDisplayTextByEnumId(Convert.ToInt32(data.SpecializationEnumId));
+                    userModel.EmployeeDesignation = GetEnumDisplayTextByEnumId(Convert.ToInt32(data.SpecializationEnumId));
                 }
             }
             else if (userMasterData.UserType == UserTypeEnum.Employee.ToString())
@@ -67,8 +68,8 @@ namespace Coditech.API.Service
                 if (data != null)
                 {
                     personId = data.PersonId;
-                    centreCode = data.CentreCode;
-                    employeeDesignation = _employeeDesignationMasterRepository.Table.Where(x=>x.EmployeeDesignationMasterId ==data.EmployeeDesignationMasterId)?.Select(x=>x.Description)?.FirstOrDefault();
+                    userModel.CentreCode = data.CentreCode;
+                    userModel.EmployeeDesignation = _employeeDesignationMasterRepository.Table.Where(x => x.EmployeeDesignationMasterId == data.EmployeeDesignationMasterId)?.Select(x => x.Description)?.FirstOrDefault();
                 }
             }
             GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
@@ -77,31 +78,27 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
             long generalTrainerMasterId = 0;
 
-            generalPersonModel.CentreName = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode)?.Select(x => x.CentreName)?.FirstOrDefault();
+            generalPersonModel.CentreName = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == userModel.CentreCode)?.Select(x => x.CentreName)?.FirstOrDefault();
 
             if (userMasterData.UserType == UserTypeEnum.Employee.ToString() && (generalPersonModel.Custom1 == CustomConstants.DBTMTrainer || generalPersonModel.Custom1 == CustomConstants.DBTMCentreOwner))
                 generalTrainerMasterId = Convert.ToInt64(_generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault());
 
-            DBTMUserModel userModel = new DBTMUserModel()
-            {
-                UserMasterId = userMasterData.UserMasterId,
-                EntityId = userMasterData.EntityId,
-                UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1,
-                EmailId = userMasterData.EmailId,
-                IsPasswordChange = userMasterData.IsPasswordChange,
-                IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions,
-                PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId),
-                PersonTitle = generalPersonModel.PersonTitle,
-                FirstName = generalPersonModel.FirstName,
-                MiddleName = generalPersonModel.MiddleName,
-                LastName = generalPersonModel.LastName,
-                GeneralTrainerMasterId = generalTrainerMasterId,
-                Custom1 = generalPersonModel.Custom1,
-                CentreCode = centreCode,
-                CentreName = generalPersonModel.CentreName,
-                EmployeeDesignation = employeeDesignation,
-                DateOfBirth = generalPersonModel.DateOfBirth,
-            };
+            userModel.UserMasterId = userMasterData.UserMasterId;
+            userModel.EntityId = userMasterData.EntityId;
+            userModel.UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1;
+            userModel.EmailId = userMasterData.EmailId;
+            userModel.IsPasswordChange = userMasterData.IsPasswordChange;
+            userModel.IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions;
+            userModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
+            userModel.PersonTitle = generalPersonModel.PersonTitle;
+            userModel.FirstName = generalPersonModel.FirstName;
+            userModel.MiddleName = generalPersonModel.MiddleName;
+            userModel.LastName = generalPersonModel.LastName;
+            userModel.GeneralTrainerMasterId = generalTrainerMasterId;
+            userModel.Custom1 = generalPersonModel.Custom1;
+            userModel.CentreName = generalPersonModel.CentreName;
+            userModel.DateOfBirth = generalPersonModel.DateOfBirth;
+            userModel.DateOfJoining = userMasterData.CreatedDate.HasValue ? userMasterData.CreatedDate.Value : default(DateTime);
             return userModel;
         }
 

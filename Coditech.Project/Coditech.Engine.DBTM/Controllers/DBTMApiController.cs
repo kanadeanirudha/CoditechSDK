@@ -175,5 +175,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMMobileDashboardResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/dbtmapi/gettraineedashboard")]
+        [HttpGet]
+        [Produces(typeof(DBTMMobileTraineeDashboardResponse))]
+        public IActionResult GetTraineeDashboard(long userMasterId)
+        {
+            try
+            {
+                DBTMMobileTraineeDashboardModel model = _dBTMApiService.GetTraineeDashboard(userMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMMobileTraineeDashboardResponse { DBTMMobileTraineeDashboardModel = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMMobileTraineeDashboard", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMMobileTraineeDashboardResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMMobileTraineeDashboard", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMMobileTraineeDashboardResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
