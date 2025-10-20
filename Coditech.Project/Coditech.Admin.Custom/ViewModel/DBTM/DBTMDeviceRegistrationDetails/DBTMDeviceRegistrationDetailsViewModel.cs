@@ -9,6 +9,7 @@ namespace Coditech.Admin.ViewModel
         public long DBTMDeviceMasterId { get; set; }
 
         [MaxLength(100)]
+        [Required]
         [Display(Name = "Device Serial Code")]
         public string DeviceSerialCode { get; set; }
 
