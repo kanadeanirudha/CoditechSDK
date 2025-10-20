@@ -16,4 +16,13 @@
         public short DBTMActivityCategoryId { get; set; }
         public string CategoryName { get; set; }
     }
+
+    public class DBTMMobileTraineeDashboardModel
+    {
+        public decimal Height { get; set; }
+        public decimal Weight { get; set; }
+        public string TrainerNames { get; set; }
+        public string BatchNames { get; set; }
+        public string WeeklyActivityHours { get; set; }
+    }
 }

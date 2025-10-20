@@ -5,8 +5,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using static Coditech.Common.Helper.HelperUtility;
-
 using System.Data;
 namespace Coditech.API.Service
 {

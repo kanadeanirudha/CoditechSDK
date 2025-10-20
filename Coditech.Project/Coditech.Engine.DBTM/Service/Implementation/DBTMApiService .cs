@@ -117,6 +117,9 @@ namespace Coditech.API.Service
                                 ParameterValue = item.ParameterValue,
                                 FromTo = item.FromTo,
                                 Row = item.Row,
+                                Comment1 = item.Comment1,
+                                Comment2 = item.Comment2,
+                                Comment3 = item.Comment3,
                                 CreatedBy = dBTMDeviceDataModel.CreatedBy,
                                 CreatedDate = createdDate
                             };
@@ -285,7 +288,7 @@ namespace Coditech.API.Service
             return dBTMTestApiModel;
         }
 
-        //Get Dashboard Details
+        //Get Trainer Dashboard Details
         public DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId)
         {
             if (userMasterId <= 0)
@@ -307,6 +310,24 @@ namespace Coditech.API.Service
                                                          CategoryName = a.ActivityCategoryName,
                                                          DBTMActivityCategoryId = a.DBTMActivityCategoryId
                                                      }).ToList();
+            return dBTMDashboardModel;
+        }
+
+        //Get Trainee Dashboard Details
+        public DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId)
+        {
+            if (userMasterId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "UserMasterId"));
+
+            DBTMMobileTraineeDashboardModel dBTMDashboardModel = new DBTMMobileTraineeDashboardModel();
+
+            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.GetParameter("@UserId", userMasterId, ParameterDirection.Input, SqlDbType.BigInt);
+            DataSet dataset = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMMobileTraineeDashboard");
+
+            dataset.Tables[0].TableName = "TraineeDetails";
+            ConvertDataTableToList dataTable = new ConvertDataTableToList();
+            dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)

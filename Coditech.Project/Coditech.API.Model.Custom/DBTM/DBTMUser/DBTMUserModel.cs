@@ -32,5 +32,7 @@
         public string CentreName { get; set; }
         public string EmployeeDesignation { get; set; }
         public long GeneralTrainerMasterId { get; set; }
+        public DateTime DateOfJoining { get; set; }
+     
     }
 }
