@@ -130,7 +130,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMTraineeDetailsCreateEditViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new { selectedCentreCode = dBTMTraineeDetailsCreateEditViewModel.SelectedCentreCode });
+                    if (string.Equals(dBTMTraineeDetailsCreateEditViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("UpdateDBTMTraineePersonalDetails", new { dBTMTraineeDetailId = dBTMTraineeDetailsCreateEditViewModel.DBTMTraineeDetailId, personId = dBTMTraineeDetailsCreateEditViewModel.PersonId });
+                    }
+                    else if (string.Equals(dBTMTraineeDetailsCreateEditViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel() { SelectedCentreCode = dBTMTraineeDetailsCreateEditViewModel.SelectedCentreCode });
+                    }
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTraineeDetailsCreateEditViewModel.ErrorMessage));
@@ -154,7 +161,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTraineeDetailsAgent.UpdateDBTMTraineePersonalDetails(dBTMTraineeDetailsCreateEditViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("UpdateDBTMTraineePersonalDetails", new { dBTMTraineeDetailId = dBTMTraineeDetailsCreateEditViewModel.DBTMTraineeDetailId, personId = dBTMTraineeDetailsCreateEditViewModel.PersonId });
+                if (string.Equals(dBTMTraineeDetailsCreateEditViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("UpdateDBTMTraineePersonalDetails", new { dBTMTraineeDetailId = dBTMTraineeDetailsCreateEditViewModel.DBTMTraineeDetailId, personId = dBTMTraineeDetailsCreateEditViewModel.PersonId });
+                }
+                else if (string.Equals(dBTMTraineeDetailsCreateEditViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel() { SelectedCentreCode = dBTMTraineeDetailsCreateEditViewModel.SelectedCentreCode });
+                }
             }
             return View(createEditTraineeDetails, dBTMTraineeDetailsCreateEditViewModel);
         }
@@ -174,7 +188,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTraineeDetailsAgent.UpdateDBTMTraineeOtherDetails(dBTMTraineeDetailsViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("MemberOtherDetails", new { dBTMTraineeDetailId = dBTMTraineeDetailsViewModel.DBTMTraineeDetailId });
+                if (string.Equals(dBTMTraineeDetailsViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("MemberOtherDetails", new { dBTMTraineeDetailId = dBTMTraineeDetailsViewModel.DBTMTraineeDetailId });
+                }
+                else if (string.Equals(dBTMTraineeDetailsViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel() { SelectedCentreCode = dBTMTraineeDetailsViewModel.CentreCode });
+                }
             }
             return View("~/Views/DBTM/DBTMTraineeDetails/UpdateDBTMTraineeOtherDetails.cshtml", dBTMTraineeDetailsViewModel);
         }
@@ -239,11 +260,18 @@ namespace Coditech.Admin.Controllers
                     if (!generalTraineeAssociatedToTrainerViewModel.HasError)
                     {
                         SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                        return RedirectToAction("GetAssociatedTrainerList", new
+                        if (string.Equals(generalTraineeAssociatedToTrainerViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                         {
-                            SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId,
-                            SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId
-                        });
+                            return RedirectToAction("UpdateAssociatedTrainer", new { generalTraineeAssociatedToTrainerId = generalTraineeAssociatedToTrainerViewModel.GeneralTraineeAssociatedToTrainerId, dBTMTraineeDetailId = generalTraineeAssociatedToTrainerViewModel.DBTMTraineeDetailId, personId = generalTraineeAssociatedToTrainerViewModel.PersonId });
+                        }
+                        else if (string.Equals(generalTraineeAssociatedToTrainerViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction("GetAssociatedTrainerList", new
+                            {
+                                SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId,
+                                SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId
+                            });
+                        }
                     }
                 }
                 SetNotificationMessage(GetErrorNotificationMessage(generalTraineeAssociatedToTrainerViewModel.ErrorMessage));
@@ -269,7 +297,18 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTraineeDetailsAgent.UpdateAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("GetAssociatedTrainerList", new { SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId, SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId });
+                if (string.Equals(generalTraineeAssociatedToTrainerViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("UpdateAssociatedTrainer", new { generalTraineeAssociatedToTrainerId = generalTraineeAssociatedToTrainerViewModel.GeneralTraineeAssociatedToTrainerId, dBTMTraineeDetailId = generalTraineeAssociatedToTrainerViewModel.DBTMTraineeDetailId, personId = generalTraineeAssociatedToTrainerViewModel.PersonId });
+                }
+                else if (string.Equals(generalTraineeAssociatedToTrainerViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("GetAssociatedTrainerList", new
+                    {
+                        SelectedParameter1 = generalTraineeAssociatedToTrainerViewModel.EntityId,
+                        SelectedParameter2 = generalTraineeAssociatedToTrainerViewModel.PersonId
+                    });
+                }
             }
             return View(createEditAssociatedTrainer, generalTraineeAssociatedToTrainerViewModel);
         }
@@ -373,7 +412,7 @@ namespace Coditech.Admin.Controllers
 
                 if (!list.HasError)
                 {
-                 var  allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                    var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
                     {
                         DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
                         Parameter = joiningCode

@@ -44,7 +44,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMGraphMasterViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("Edit", new { graphCode = dBTMGraphMasterViewModel.GraphCode });
+                    if (string.Equals(dBTMGraphMasterViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { graphCode = dBTMGraphMasterViewModel.GraphCode });
+                    }
+                    else if (string.Equals(dBTMGraphMasterViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList);
+                    }
                 }
             }
             BindDBTMGraphTestCode(dBTMGraphMasterViewModel);
@@ -69,7 +76,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(dBTMGraphMasterViewModel.HasError
                 ? GetErrorNotificationMessage(dBTMGraphMasterViewModel.ErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { graphCode = dBTMGraphMasterViewModel.GraphCode });
+                if (string.Equals(dBTMGraphMasterViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { graphCode = dBTMGraphMasterViewModel.GraphCode });
+                }
+                else if (string.Equals(dBTMGraphMasterViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList);
+                }
             }
             BindDBTMGraphTestCode(dBTMGraphMasterViewModel);
             return View(createEdit, dBTMGraphMasterViewModel);

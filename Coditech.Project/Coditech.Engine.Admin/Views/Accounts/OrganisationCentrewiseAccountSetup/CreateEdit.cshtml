@@ -5,62 +5,58 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 
     DropdownViewModel centreDropdown = new DropdownViewModel()
-            {
-                DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
-                DropdownName = "CentreCode",
-                DropdownSelectedValue = Model.CentreCode,
-                ChangeEvent = "OrganisationCentrewiseAccountSetup.GetOrganisationCentrewiseAccountSetup('" + Model.OrganisationCentrewiseAccountSetupId + "')"
-            };
+    {
+        DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
+        DropdownName = "CentreCode",
+        DropdownSelectedValue = Model.CentreCode,
+        ChangeEvent = "OrganisationCentrewiseAccountSetup.GetOrganisationCentrewiseAccountSetup('" + Model.OrganisationCentrewiseAccountSetupId + "')"
+    };
 
     DropdownViewModel currencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Currency.ToString(), DropdownName = "GeneralCurrencyMasterId", DropdownSelectedValue = Model.GeneralCurrencyMasterId.ToString() };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        // CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        // CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<!-- Page Content-->
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.OrganisationCentrewiseAccountSetupId > 0)
-                                {
-                                    <h4 class="card-title">Update Organisation Centrewise Account Setup</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Organisation Centrewise Account Setup</h4>
-                                }
-                            </div><!--end col-->
-                        </div><!--end row-->
-                    </div>
-                    <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
-                        {
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                                        @Html.ValidationMessageFor(x => x.CentreCode)
-                                    </div>
-                                </div>
-                                <div id="OrganisationCentrewiseAccountSetupDivId">
-                                    @if (!string.IsNullOrWhiteSpace(Model.CentreCode))
-                                    {
-                                        <div class="col-lg-4">
-                                            <div class="mb-3">
-                                                @Html.LabelFor(x => x.GeneralCurrencyMasterId, new { @class = "form-label required" })
-                                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", currencyDropdown)
-                                                @Html.ValidationMessageFor(x => x.GeneralCurrencyMasterId)
-                                            </div>
-                                        </div>
-                                    }
+                <div class="card-body">
+                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                    {
+                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                    @Html.ValidationMessageFor(x => x.CentreCode)
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/GetAccountSetup" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                        }
-                    </div>
+                            <div id="OrganisationCentrewiseAccountSetupDivId">
+                                @if (!string.IsNullOrWhiteSpace(Model.CentreCode))
+                                {
+                                    <div class="col-lg-4">
+                                        <div class="mb-3">
+                                            @Html.LabelFor(x => x.GeneralCurrencyMasterId, new { @class = "form-label required" })
+                                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", currencyDropdown)
+                                            @Html.ValidationMessageFor(x => x.GeneralCurrencyMasterId)
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        <a href="../@controllerName/GetAccountSetup" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
+                    }
                 </div>
             </div>
         </div>

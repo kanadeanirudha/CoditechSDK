@@ -2,9 +2,7 @@
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMDeviceRegistrationDetailsController : BaseController
@@ -42,7 +40,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMDeviceRegistrationDetailsViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", CreateActionDataTable());
+                    if (string.Equals(dBTMDeviceRegistrationDetailsViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMDeviceRegistrationDetailId = dBTMDeviceRegistrationDetailsViewModel.DBTMDeviceRegistrationDetailId });
+                    }
+                    else if (string.Equals(dBTMDeviceRegistrationDetailsViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList);
+                    }
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMDeviceRegistrationDetailsViewModel.ErrorMessage));
@@ -64,11 +69,17 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMDeviceRegistrationDetailsAgent.UpdateRegistrationDetails(dBTMDeviceRegistrationDetailsViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { dBTMDeviceRegistrationDetailId = dBTMDeviceRegistrationDetailsViewModel.DBTMDeviceRegistrationDetailId });
+                if (string.Equals(dBTMDeviceRegistrationDetailsViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMDeviceRegistrationDetailId = dBTMDeviceRegistrationDetailsViewModel.DBTMDeviceRegistrationDetailId });
+                }
+                else if (string.Equals(dBTMDeviceRegistrationDetailsViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList);
+                }
             }
             return View(createEdit, dBTMDeviceRegistrationDetailsViewModel);
         }
-
         public virtual ActionResult Delete(string dBTMDeviceRegistrationDetailIds)
         {
             string message = string.Empty;

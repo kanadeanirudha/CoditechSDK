@@ -5,34 +5,27 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.PaymentGatewayDetailId >= 0 };
     DropdownViewModel paymentGatewayDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.PaymentGateway.ToString(), DropdownName = "PaymentGatewayId", DropdownSelectedValue = Model.PaymentGatewayId.ToString(), IsDisabled = Model.PaymentGatewayDetailId >= 0 };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = Model.IsLiveMode ? $"{ViewBag.Title} : Live Mode" : $"{ViewBag.Title} : Test Mode",
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = @Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.CentreCode, SelectedParameter1 = @Model.PaymentGatewayId }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.PaymentGatewayDetailId > 0)
-                                {
-                                    <h4 class="card-title">
-                                        Update Payment Gateway Details : @(Model.IsLiveMode ? "Live Mode" : "Test Mode")
-                                    </h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">
-                                        Create Payment Gateway Details : @(Model.IsLiveMode ? "Live Mode" : "Test Mode")
-                                    </h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.PaymentGatewayId)
                             @Html.HiddenFor(m => m.PaymentGatewayDetailId)
                             @Html.HiddenFor(m => m.CentreCode)

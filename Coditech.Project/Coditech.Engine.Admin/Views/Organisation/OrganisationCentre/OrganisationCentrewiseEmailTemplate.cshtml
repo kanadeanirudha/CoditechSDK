@@ -4,9 +4,19 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel emailTemplateCodeDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.EmailTemplate.ToString(), DropdownName = "EmailTemplateCode", DropdownSelectedValue = Model.EmailTemplate, ChangeEvent = $"OrganisationCentre.GetEmailTemplateByCentreCode('{Model.OrganisationCentreMasterId}','email')" };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             @if (Model.OrganisationCentreMasterId > 0)
             {
@@ -15,17 +25,11 @@
                 </div>
             }
             <div class="col-lg-10">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="card-title">Organisation Centrewise Email Template</h4>
-                            </div><!--end col-->
-                        </div><!--end row-->
-                    </div>
+                <div class="card">                  
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.OrganisationCentreMasterId)
                             <div class="row">
                                 <div class="col-lg-6">
@@ -50,8 +54,8 @@
                                 </div>
                                 <div id="emailTemplateId"> </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="@Url.Action("List", controllerName)" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button> *@
+                            @* <a href="@Url.Action("List", controllerName)" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
                         }
                     </div>
                 </div>

@@ -4,36 +4,33 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.GeneralPolicyRulesId > 0 || !string.IsNullOrWhiteSpace(Model.PolicyCode) ? "col-lg-10" : "col-lg-12";
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             @if (!string.IsNullOrWhiteSpace(Model.PolicyCode))
-            { 
+            {
                 <div class="col-lg-2">
                     @Html.Partial("~/Views/GeneralMaster/GeneralPolicyMaster/_GeneralPolicySidePannel.cshtml", Model.PolicyCode)
                 </div>
-             } 
+            }
             <div class="@css">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.GeneralPolicyRulesId > 0)
-                                {
-                                    <h4 class="card-title">Update General Policy Rule</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create General Policy Rule</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.PolicyCode)
                             @Html.HiddenFor(m => m.GeneralPolicyRulesId)
                             @Html.HiddenFor(m => m.GeneralPolicyDetailId)
@@ -108,11 +105,11 @@
                                     </div>
                                 }
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                           @*  <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="@Url.Action("GetGeneralPolicyRulesList", controllerName, new { policyCode = Model.PolicyCode })"
                                class="btn btn-secondary">
                                 <i class="ft-x"></i>@AdminResources.LabelCancel
-                            </a>
+                            </a> *@
                         }
                     </div>
                 </div>

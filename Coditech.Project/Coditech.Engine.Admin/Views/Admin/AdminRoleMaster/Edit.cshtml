@@ -4,24 +4,30 @@
     ViewBag.Title = "Update Admin Role";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = @Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-2">
                 @Html.Partial("~/Views/Admin/AdminRoleMaster/_AdminRoleMasterSidePannel.cshtml", Model.AdminRoleMasterId.ToString())
             </div>
             <div class="col-lg-10">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="col">
-                            <h4 class="card-title"><span>Update Admin Role</span></h4>
-                        </div>
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.AdminRoleMasterId)
                             ;
                             @Html.HiddenFor(m => m.SelectedCentreCode)
@@ -76,57 +82,57 @@
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.DashboardFormEnumId, new { @class = "form-label" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.DashboardFormEnumId.ToString(),
-                                   DropdownName = "DashboardFormEnumId",
-                                   GroupCode = DropdownTypeEnum.DashboardForm.ToString(),
-                                   IsRequired = false
-                               })
-                                        @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
-                                    </div>
+                                        {
+                                            DropdownSelectedValue = Model.DashboardFormEnumId.ToString(),
+                                                                        DropdownName = "DashboardFormEnumId",
+                                                                        GroupCode = DropdownTypeEnum.DashboardForm.ToString(),
+                                                                        IsRequired = false
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
                                 </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.LimitedDataAccessEnumId, new { @class = "form-label" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.LimitedDataAccessEnumId.ToString(),
-                                   DropdownName = "LimitedDataAccessEnumId",
-                                   GroupCode = DropdownTypeEnum.LimitedDataAccess.ToString(),
-                                   IsRequired = true,
-                                   AddSelectItem = false
-                               })
-                                        @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
-                                    </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.LimitedDataAccessEnumId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                        {
+                                            DropdownSelectedValue = Model.LimitedDataAccessEnumId.ToString(),
+                                                                        DropdownName = "LimitedDataAccessEnumId",
+                                                                        GroupCode = DropdownTypeEnum.LimitedDataAccess.ToString(),
+                                                                        IsRequired = true,
+                                                                        AddSelectItem = false
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.DashboardFormEnumId, null)
                                 </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsAttendaceAllowFromOutside, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsAttendaceAllowFromOutside, new { @class = "form-check-input" })
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsLoginAllowFromOutside, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsLoginAllowFromOutside, new { @class = "form-check-input" })
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
-                                        </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.IsAttendaceAllowFromOutside, new { @class = "form-label" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsAttendaceAllowFromOutside, new { @class = "form-check-input" })
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>           
-                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId})" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
-                        }
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.IsLoginAllowFromOutside, new { @class = "form-label" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsLoginAllowFromOutside, new { @class = "form-check-input" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId })" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
+                                                }
                     </div>
                 </div>
             </div>

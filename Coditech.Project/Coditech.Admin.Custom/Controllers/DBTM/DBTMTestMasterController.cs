@@ -5,7 +5,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTestMasterController : BaseController
@@ -47,7 +46,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMTestViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", CreateActionDataTable());
+                    if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
+                    }
+                    else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList);
+                    }
                 }
             }
             BindDBTMTestParameter(dBTMTestViewModel);
@@ -75,7 +81,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTestAgent.UpdateDBTMTest(dBTMTestViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
+                if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
+                }
+                else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList);
+                }
             }
             BindDBTMTestParameter(dBTMTestViewModel);
             BindDBTMTestCalculation(dBTMTestViewModel);
