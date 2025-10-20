@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -29,6 +30,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMActivityCategory> _dBTMActivityCategoryRepository;
+        private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
 
 
         public DBTMApiService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -49,6 +51,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMActivityCategoryRepository = new CoditechRepository<DBTMActivityCategory>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public bool InsertDeviceDataViaFile(IFormFile file)
@@ -79,7 +82,7 @@ namespace Coditech.API.Service
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
                     createdDate = DateTime.Now;
-                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails() ;
+                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails();
                     if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
                         dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
 
@@ -330,6 +333,13 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
+
+        public string GetJoiningCode(string generalTrainerMasterId)
+        {
+            string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId)?.Select(y => y.JoiningCode)?.FirstOrDefault();
+            return !string.IsNullOrEmpty(JoiningCode) ? JoiningCode : string.Empty;
+        }
+
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)
             => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
     }
