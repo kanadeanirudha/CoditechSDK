@@ -3,7 +3,6 @@ using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMBatchActivityController : BaseController
@@ -60,7 +59,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMBatchActivityViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("GetDBTMBatchActivityList", new { SelectedParameter1 = dBTMBatchActivityViewModel.GeneralBatchMasterId });
+                    if (string.Equals(dBTMBatchActivityViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("GetDBTMBatchActivityList", new { SelectedParameter1 = dBTMBatchActivityViewModel.GeneralBatchMasterId });
+                    }
+                    else if (string.Equals(dBTMBatchActivityViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("GetDBTMBatchActivityList", new { SelectedParameter1 = dBTMBatchActivityViewModel.GeneralBatchMasterId });
+                    }
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMBatchActivityViewModel.ErrorMessage));

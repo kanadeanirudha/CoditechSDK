@@ -7,23 +7,28 @@
     ViewBag.Title = "Update Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = $"{ViewBag.Title} : {Model.FirstName} {Model.LastName} - {Model.TestName}",
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = !string.IsNullOrEmpty(Model.Custom4) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, SelectedParameter1 = Model.Custom4 })
+         : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="card-title">Update Trainee Assignment - @Model.FirstName @Model.LastName - @Model.TestName </h4>
-                            </div><!--end col-->
-                        </div> <!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm("GetDBTMTraineeAssignment", controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.DBTMTraineeAssignmentId)
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @Html.HiddenFor(x => x.SelectedCentreCode)
@@ -45,28 +50,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            if (!string.IsNullOrEmpty(Model.Custom4))
-                            {
-                              <a href="@Url.Action("Cancel", controllerName, new { 
-                                        SelectedCentreCode = Model.SelectedCentreCode,
-                                        GeneralTrainerMasterId = Model.GeneralTrainerMasterId,
-                                        SelectedParameter1 = Model.Custom4
-                                     })"
-                                   class="btn btn-secondary">
-                                    <i class="ft-x"></i>@AdminResources.LabelCancel
-                                </a>
-                            }
-                            else
-                            {
-                               <a href="@Url.Action("Cancel", controllerName, new { 
-                                        SelectedCentreCode = Model.SelectedCentreCode,
-                                        GeneralTrainerMasterId = Model.GeneralTrainerMasterId
-                                     })"
-                                   class="btn btn-secondary">
-                                    <i class="ft-x"></i>@AdminResources.LabelCancel
-                                </a>
-                            }
                         }
                     </div>
                 </div>

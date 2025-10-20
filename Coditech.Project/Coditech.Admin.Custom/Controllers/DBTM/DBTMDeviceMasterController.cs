@@ -2,9 +2,7 @@
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMDeviceMasterController : BaseController
@@ -71,7 +69,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMDeviceAgent.UpdateDBTMDevice(dBTMDeviceViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { dBTMDeviceId = dBTMDeviceViewModel.DBTMDeviceMasterId });
+                if (string.Equals(dBTMDeviceViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMDeviceId = dBTMDeviceViewModel.DBTMDeviceMasterId });
+                }
+                else if (string.Equals(dBTMDeviceViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMDeviceViewModel.DBTMParentDeviceMasterId) });
+                }
             }
             return View(createEdit, dBTMDeviceViewModel);
         }

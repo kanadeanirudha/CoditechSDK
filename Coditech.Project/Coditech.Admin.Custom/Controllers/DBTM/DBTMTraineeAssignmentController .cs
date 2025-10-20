@@ -84,7 +84,15 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMTraineeAssignmentViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
+                    if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId});
+                    }
+                    else if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
+
+                    }
                 }
             }
 
@@ -118,7 +126,15 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTraineeAssignmentAgent.UpdateDBTMTraineeAssignment(dBTMTraineeAssignmentViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId });
+                if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId });
+                }
+                else if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
+
+                }
             }
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 
