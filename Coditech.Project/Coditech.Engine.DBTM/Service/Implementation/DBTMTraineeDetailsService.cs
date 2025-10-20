@@ -109,7 +109,6 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.GroupEnumId = dBTMTraineeDetailsModel.GroupEnumId;
             dBTMTraineeDetails.SourceEnumId = dBTMTraineeDetailsModel.SourceEnumId;
             dBTMTraineeDetails.OtherInformation = dBTMTraineeDetailsModel.OtherInformation;
-            dBTMTraineeDetails.IsActive = dBTMTraineeDetailsModel.IsActive;
             dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
             dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
             dBTMTraineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
