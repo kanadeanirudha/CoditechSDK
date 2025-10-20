@@ -336,7 +336,7 @@ namespace Coditech.API.Service
 
         public string GetJoiningCode(string generalTrainerMasterId)
         {
-            string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId)?.Select(y => y.JoiningCode)?.FirstOrDefault();
+            string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired)?.Select(y => y.JoiningCode)?.FirstOrDefault();
             return !string.IsNullOrEmpty(JoiningCode) ? JoiningCode : string.Empty;
         }
 
