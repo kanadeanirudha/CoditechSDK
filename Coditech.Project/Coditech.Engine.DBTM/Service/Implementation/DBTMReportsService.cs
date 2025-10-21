@@ -23,6 +23,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
+        private readonly ICoditechRepository<DBTMTestParameterListviewSequence> _dBTMTestParameterListviewSequenceRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -36,6 +37,7 @@ namespace Coditech.API.Service
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListviewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
         public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
@@ -205,7 +207,7 @@ namespace Coditech.API.Service
                         }
                     }
                 }
-            }        
+            }
             return dBTMReportsListModel;
         }
 
@@ -590,6 +592,143 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
+        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
+        {
+            //DBTMReportsListModel listModel = new DBTMReportsListModel();
+            DataTable dataTable = new DataTable();
+            if (dBTMReportsList?.Count > 0)
+            {
+                List<string> displayColumnList = isMobileRequest
+                 ? new List<string> { "Activity Time", "Person Name" }
+                 : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight", "Height" };
+                foreach (var paramColumn in displayColumnList)
+                {
+                    dataTable.Columns.Add(paramColumn, typeof(String));
+                }
 
+                List<DBTMTestParameterListviewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
+                                           .Where(x => x.DBTMTestMasterId == dBTMTestMasterId)
+                                           .OrderBy(y => y.SequenceNumber)
+                                           .ToList();
+                List<DBTMTestParameterListviewSequence> listviewSequenceColumnsOriginal = new List<DBTMTestParameterListviewSequence>(listviewSequenceColumns);
+                List<string> listviewSequenceColumnList = BindReportColumns(dBTMTestMasterId, isMobileRequest, dataTable, listviewSequenceColumns);
+                DataRow newRow = null;
+                foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
+                {
+                    newRow = dataTable.NewRow();
+
+                    //Bind Activity Person Details
+                    foreach (string displayColumnName in displayColumnList)
+                    {
+                        switch (displayColumnName)
+                        {
+                            case "Activity Name":
+                                newRow["Activity Name"] = group.FirstOrDefault().TestName;
+                                break;
+                            case "Person Name":
+                                newRow["Person Name"] = $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}";
+                                break;
+                            case "Activity Status":
+                                newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
+                                break;
+                            case "Weight":
+                                newRow["Weight"] = $"{group.FirstOrDefault().Weight} {DBTMCustomHelper.Unit("Weight")}";
+                                break;
+                            case "Height":
+                                newRow["Height"] = $"{group.FirstOrDefault().Height} {DBTMCustomHelper.Unit("Height")}";
+                                break;
+                            case "Activity Time":
+                                newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
+                                    ? group.FirstOrDefault().TestPerformedTime.ToString("hh:mm:ss tt")
+                                    : group.FirstOrDefault().TestPerformedTime;
+                                break;
+                        }
+                    }
+                    BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow);
+                    dataTable.Rows.Add(newRow);
+                }
+
+                //foreach (DataColumn col in dataTable.Columns)
+                //{
+                //    col.ColumnName = $"{col.ColumnName} {DBTMCustomHelper.Unit(col.ColumnName)}";
+                //}
+            }
+            return dataTable;
+        }
+        private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListviewSequence> listviewSequenceColumns, DataRow newRow)
+        {
+            foreach (var displayColumn in listviewSequenceColumnList)
+            {
+                string[] spilt = displayColumn.Split('-');
+                DBTMTestParameterListviewSequence dBTMTestParameterListviewSequence = spilt.Length > 1 ? listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == spilt[0]) :
+                                                                                                         listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == displayColumn);
+                if (dBTMTestParameterListviewSequence == null)
+                    newRow[displayColumn] = "NA";
+                else
+                {
+                    if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
+                    {
+                        if (spilt.Length == 1)
+                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group,1);
+                        else
+                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt32(spilt[1]));
+                    }
+                    else
+                    {
+                        if (spilt.Length == 1)
+                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == "1")?.ParameterValue.ToString() ?? "NA";
+                        else
+                        {
+                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == spilt[1])?.ParameterValue.ToString();
+                        }
+                    }
+                }
+            }
+        }
+
+        private List<string> BindReportColumns(int dBTMTestMasterId, bool isMobileRequest, DataTable dataTable, List<DBTMTestParameterListviewSequence> listviewSequenceColumns)
+        {
+
+            List<string> listviewSequenceColumnList = new List<string>();
+            // Create a copy to safely iterate and remove items
+            for (int idx = 0; idx < listviewSequenceColumns.Count; idx++)
+            {
+                var item = listviewSequenceColumns[idx];
+                var consecutiveParameterData = listviewSequenceColumns.FirstOrDefault(x => x.ConsecutiveParameterCode == item.ParameterCode);
+
+                if (consecutiveParameterData != null && !string.IsNullOrEmpty(consecutiveParameterData.ParameterCode))
+                {
+                    for (Int16 i = 1; i <= item.Recursion; i++)
+                    {
+                        listviewSequenceColumnList.Add($"{item.ParameterCode}-{i}");
+                        listviewSequenceColumnList.Add($"{consecutiveParameterData.ParameterCode}-{i}");
+                    }
+                    listviewSequenceColumns.Remove(consecutiveParameterData);
+                    // If the removed item is ahead of the current index, adjust the index
+                    if (idx > listviewSequenceColumns.IndexOf(item))
+                        idx--;
+                }
+                else
+                {
+                    if (item.Recursion == 1)
+                    {
+                        listviewSequenceColumnList.Add(item.ParameterCode);
+                        continue;
+                    }
+                    else
+                    {
+                        for (Int16 i = 1; i <= item.Recursion; i++)
+                        {
+                            listviewSequenceColumnList.Add($"{item.ParameterCode}-{i}");
+                        }
+                    }
+                }
+            }
+            foreach (var paramColumn in listviewSequenceColumnList)
+            {
+                dataTable.Columns.Add(paramColumn, typeof(String));
+            }
+            return listviewSequenceColumnList;
+        }
     }
 }
