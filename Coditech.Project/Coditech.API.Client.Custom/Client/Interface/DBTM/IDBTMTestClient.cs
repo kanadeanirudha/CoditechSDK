@@ -43,5 +43,12 @@ namespace Coditech.API.Client
         DBTMTestParameterListResponse GetDBTMTestParameter();
         DBTMTestCalculationListResponse GetDBTMTestCalculation();
         DBTMGraphMasterListResponse GetDBTMGraph();
+
+        /// <summary>
+        /// Get ActivityListViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMTestResponse.</returns>   
+        DBTMActivityListViewSequenceListResponse GetActivityListViewSequenceList(int dBTMTestMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Coditech.API.Data
 {
-    public partial class DBTMTestParameterListviewSequence
+    public partial class DBTMTestParameterListViewSequence
     {
         [Key]
-        public int DBTMTestParameterListviewSequenceId { get; set; }
+        public int DBTMTestParameterListViewSequenceId { get; set; }
         public int DBTMTestMasterId { get; set; }
         public string ParameterCode { get; set; }
         public bool IsCalculatedParameter { get; set; }

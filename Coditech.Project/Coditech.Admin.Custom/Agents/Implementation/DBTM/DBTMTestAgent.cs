@@ -101,6 +101,20 @@ namespace Coditech.Admin.Agents
             }
         }
 
+        //Get Activity List View Sequence
+        public virtual DBTMActivityListViewSequenceListViewModel GetActivityListViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            DBTMActivityListViewSequenceListResponse response = _dBTMTestClient.GetActivityListViewSequenceList(dBTMTestMasterId, null, null, null, null,  int.MaxValue);
+            DBTMActivityListViewSequenceListModel associatedTrainerList = new DBTMActivityListViewSequenceListModel { DBTMActivityListViewSequenceList = response?.DBTMActivityListViewSequenceList };
+            DBTMActivityListViewSequenceListViewModel listViewModel = new DBTMActivityListViewSequenceListViewModel();
+            listViewModel.DBTMActivityListViewSequenceList = associatedTrainerList?.DBTMActivityListViewSequenceList?.ToViewModel<DBTMActivityListViewSequenceViewModel>().ToList();
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMActivityListViewSequenceList.Count, BindActivityListViewSequenceColumns(), false);
+            listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            return listViewModel;
+        }
+
         //Delete DBTMTest.
         public virtual bool DeleteDBTMTest(string dBTMTestMasterIds, out string errorMessage)
         {
@@ -214,6 +228,48 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Is Active",
                 ColumnCode = "IsActive",
                 IsSortable = true,
+            });
+            return datatableColumnList;
+        }
+
+        protected virtual List<DatatableColumns> BindActivityListViewSequenceColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Parameter Code",
+                ColumnCode = "ParameterCode",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Column Name",
+                ColumnCode = "ColumnName",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Sequence Number",
+                ColumnCode = "SequenceNumber",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Recursion",
+                ColumnCode = "Recursion",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Consecutive Parameter Code",
+                ColumnCode = "ConsecutiveParameterCode",
+            });
+
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Calculated Parameter",
+                ColumnCode = "IsCalculatedParameter",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Calculated Consecutive Parameter Code",
+                ColumnCode = "IsCalculatedConsecutiveParameterCode",
             });
             return datatableColumnList;
         }
