@@ -110,12 +110,14 @@ namespace Coditech.Engine.DBTM.Helpers
                 case "MaxLap":
                 case "MinLap":
                 case "AirTime":
+                case "CumulativeTime":
                     data = "sec";
                     break;
                 case "TotalDistanceCovered":
                 case "Distance":
                     data = "m";
                     break;
+                case "CumulativeVelocity":
                 case "AverageVelocity":
                 case "Velocity":
                     data = "m/s";

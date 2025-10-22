@@ -647,11 +647,35 @@ namespace Coditech.API.Service
                     BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow);
                     dataTable.Rows.Add(newRow);
                 }
+                string updatedColumnName = string.Empty;
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    string[] spilt = col.ColumnName.Split('-');
+                    DBTMTestParameterListviewSequence dBTMTestParameterListviewSequence = spilt.Length > 1 ? listviewSequenceColumnsOriginal.FirstOrDefault(x => x.ParameterCode == spilt[0]) :
+                                                                                                             listviewSequenceColumnsOriginal.FirstOrDefault(x => x.ParameterCode == col.ColumnName);
 
-                //foreach (DataColumn col in dataTable.Columns)
-                //{
-                //    col.ColumnName = $"{col.ColumnName} {DBTMCustomHelper.Unit(col.ColumnName)}";
-                //}
+                    if (dBTMTestParameterListviewSequence != null)
+                    {
+                        updatedColumnName = dBTMTestParameterListviewSequence.ColumnName;
+                        if (spilt.Length > 1)
+                        {
+                            string fromTo = string.Empty;
+                            var dBTMReportsListGroupByData = dBTMReportsList.GroupBy(x => x.CreatedDate).LastOrDefault();
+                            if (!string.IsNullOrEmpty(dBTMTestParameterListviewSequence.ConsecutiveParameterCode) && dBTMTestParameterListviewSequence.IsCalculatedParameter)
+                            {
+                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == dBTMTestParameterListviewSequence.ConsecutiveParameterCode && x.Row == spilt[1])?.FromTo;
+                            }
+                            else
+                            {
+                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == spilt[1])?.FromTo;
+                            }
+                            updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
+                            updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
+                        }
+                        updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
+                        col.ColumnName = updatedColumnName;
+                    }
+                }
             }
             return dataTable;
         }
@@ -669,7 +693,7 @@ namespace Coditech.API.Service
                     if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
                     {
                         if (spilt.Length == 1)
-                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group,1);
+                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, 1);
                         else
                             newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt32(spilt[1]));
                     }
