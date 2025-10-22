@@ -120,6 +120,7 @@ namespace Coditech.API.Service
                                 ParameterValue = item.ParameterValue,
                                 FromTo = item.FromTo,
                                 Row = item.Row,
+                                Unit = item.Unit,
                                 Comment1 = item.Comment1,
                                 Comment2 = item.Comment2,
                                 Comment3 = item.Comment3,
