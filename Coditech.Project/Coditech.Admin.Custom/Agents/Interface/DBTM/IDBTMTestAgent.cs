@@ -40,5 +40,12 @@ namespace Coditech.Admin.Agents
         DBTMTestParameterListViewModel DBTMTestParameter();
         DBTMGraphMasterListViewModel DBTMGraph();
         DBTMTestCalculationListViewModel DBTMTestCalculation();
+
+        /// <summary>
+        /// Get ActivityListViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMDeviceViewModel.</returns>
+        DBTMActivityListViewSequenceListViewModel GetActivityListViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel);
     }
 }

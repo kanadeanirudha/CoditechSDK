@@ -112,6 +112,30 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetActivityListViewSequenceList")]
+        [Produces(typeof(DBTMActivityListViewSequenceListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceListModel list = _dBTMTestMasterService.GetActivityListViewSequenceList(dBTMTestMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMActivityListViewSequenceListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }      
+
         [Route("/DBTMTestMaster/DeleteDBTMTest")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]

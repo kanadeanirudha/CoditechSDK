@@ -16,6 +16,7 @@ namespace Coditech.API.Service
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
+        private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMActivityListViewSequenceMasterRepository;
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
@@ -29,6 +30,7 @@ namespace Coditech.API.Service
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMActivityListViewSequenceMasterRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -295,6 +297,34 @@ namespace Coditech.API.Service
                 dBTMTestModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
             }
             return isdBTMTestUpdated;
+        }
+
+        //Get GetActivityListViewSequence by dBTMTestMasterId.
+        public virtual DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        {
+            List<DBTMTestParameterListViewSequence> activityList = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).OrderBy(x => x.SequenceNumber).ToList();
+
+            // Map the entities to the DBTMActivityListViewSequenceModel list
+            List<DBTMActivityListViewSequenceModel> activityViewSequenceList = activityList.Select(x => new DBTMActivityListViewSequenceModel
+            {
+                DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
+                DBTMTestMasterId = x.DBTMTestMasterId,
+                ParameterCode = x.ParameterCode,
+                IsCalculatedParameter = x.IsCalculatedParameter,
+                Recursion = x.Recursion,
+                SequenceNumber = x.SequenceNumber,
+                ConsecutiveParameterCode = x.ConsecutiveParameterCode,
+                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode,
+                ColumnName = x.ColumnName,
+            }).ToList();
+
+            DBTMActivityListViewSequenceListModel listModel = new DBTMActivityListViewSequenceListModel
+            {
+                DBTMActivityListViewSequenceList = activityViewSequenceList,
+                DBTMTestMasterId = dBTMTestMasterId
+            };
+
+            return listModel;
         }
 
         //Delete DBTMTest.
