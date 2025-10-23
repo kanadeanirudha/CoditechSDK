@@ -114,6 +114,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     data = "sec";
                     break;
                 case "TotalDistanceCovered":
+                case "PersonDetectionRange":
                 case "Distance":
                     data = "m";
                     break;

@@ -494,10 +494,18 @@ namespace Coditech.API.Service
 
         private DataTable BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
         {
-            //DBTMReportsListModel listModel = new DBTMReportsListModel();
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
+                List<DBTMTestParameterListviewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
+                                          .Where(x => x.DBTMTestMasterId == dBTMTestMasterId)
+                                          .OrderBy(y => y.SequenceNumber)
+                                          .ToList();
+                if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
+                {
+                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns);
+                }
+
                 List<string> displayColumn = isMobileRequest
                        ? new List<string> { "Activity Time", "Person Name" }
                        : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight", "Height" };
@@ -592,7 +600,7 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
-        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
+        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate , List<DBTMTestParameterListviewSequence> listviewSequenceColumns)
         {
             //DBTMReportsListModel listModel = new DBTMReportsListModel();
             DataTable dataTable = new DataTable();
@@ -600,16 +608,16 @@ namespace Coditech.API.Service
             {
                 List<string> displayColumnList = isMobileRequest
                  ? new List<string> { "Activity Time", "Person Name" }
-                 : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight", "Height" };
+                 : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight(kg)", "Height(cm)" };
                 foreach (var paramColumn in displayColumnList)
                 {
                     dataTable.Columns.Add(paramColumn, typeof(String));
                 }
 
-                List<DBTMTestParameterListviewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
-                                           .Where(x => x.DBTMTestMasterId == dBTMTestMasterId)
-                                           .OrderBy(y => y.SequenceNumber)
-                                           .ToList();
+                //List<DBTMTestParameterListviewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
+                //                           .Where(x => x.DBTMTestMasterId == dBTMTestMasterId)
+                //                           .OrderBy(y => y.SequenceNumber)
+                //                           .ToList();
                 List<DBTMTestParameterListviewSequence> listviewSequenceColumnsOriginal = new List<DBTMTestParameterListviewSequence>(listviewSequenceColumns);
                 List<string> listviewSequenceColumnList = BindReportColumns(dBTMTestMasterId, isMobileRequest, dataTable, listviewSequenceColumns);
                 DataRow newRow = null;
@@ -631,11 +639,11 @@ namespace Coditech.API.Service
                             case "Activity Status":
                                 newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
                                 break;
-                            case "Weight":
-                                newRow["Weight"] = $"{group.FirstOrDefault().Weight} {DBTMCustomHelper.Unit("Weight")}";
+                            case "Weight(kg)":
+                                newRow["Weight(kg)"] = $"{group.FirstOrDefault().Weight}";
                                 break;
-                            case "Height":
-                                newRow["Height"] = $"{group.FirstOrDefault().Height} {DBTMCustomHelper.Unit("Height")}";
+                            case "Height(cm)":
+                                newRow["Height(cm)"] = $"{group.FirstOrDefault().Height}";
                                 break;
                             case "Activity Time":
                                 newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
@@ -647,6 +655,8 @@ namespace Coditech.API.Service
                     BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow);
                     dataTable.Rows.Add(newRow);
                 }
+
+                //Updated Column Name
                 string updatedColumnName = string.Empty;
                 foreach (DataColumn col in dataTable.Columns)
                 {
@@ -671,9 +681,19 @@ namespace Coditech.API.Service
                             }
                             updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
                             updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
+                            if (updatedColumnName.Contains("{Distance*Row}"))
+                            {
+                                decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Distance").ParameterValue * Convert.ToInt32(spilt[1]);
+                                updatedColumnName = updatedColumnName.Replace("{Distance*Row}", distance.ToString());
+                                updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit("Distance"));
+                            }
+                            updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                         }
                         updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
-                        col.ColumnName = updatedColumnName;
+                        if (!dataTable.Columns.Contains(updatedColumnName))
+                        {
+                            col.ColumnName = updatedColumnName;
+                        }
                     }
                 }
             }
@@ -688,6 +708,10 @@ namespace Coditech.API.Service
                                                                                                          listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == displayColumn);
                 if (dBTMTestParameterListviewSequence == null)
                     newRow[displayColumn] = "NA";
+                else if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
+                {
+                    newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Custom1.ToString() ?? "NA";
+                }
                 else
                 {
                     if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
