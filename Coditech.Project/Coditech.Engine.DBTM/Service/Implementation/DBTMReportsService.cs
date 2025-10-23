@@ -657,48 +657,54 @@ namespace Coditech.API.Service
                 }
 
                 //Updated Column Name
-                string updatedColumnName = string.Empty;
-                foreach (DataColumn col in dataTable.Columns)
-                {
-                    string[] spilt = col.ColumnName.Split('-');
-                    DBTMTestParameterListviewSequence dBTMTestParameterListviewSequence = spilt.Length > 1 ? listviewSequenceColumnsOriginal.FirstOrDefault(x => x.ParameterCode == spilt[0]) :
-                                                                                                             listviewSequenceColumnsOriginal.FirstOrDefault(x => x.ParameterCode == col.ColumnName);
-
-                    if (dBTMTestParameterListviewSequence != null)
-                    {
-                        updatedColumnName = dBTMTestParameterListviewSequence.ColumnName;
-                        if (spilt.Length > 1)
-                        {
-                            string fromTo = string.Empty;
-                            var dBTMReportsListGroupByData = dBTMReportsList.GroupBy(x => x.CreatedDate).LastOrDefault();
-                            if (!string.IsNullOrEmpty(dBTMTestParameterListviewSequence.ConsecutiveParameterCode) && dBTMTestParameterListviewSequence.IsCalculatedParameter)
-                            {
-                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == dBTMTestParameterListviewSequence.ConsecutiveParameterCode && x.Row == spilt[1])?.FromTo;
-                            }
-                            else
-                            {
-                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == spilt[1])?.FromTo;
-                            }
-                            updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
-                            updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
-                            if (updatedColumnName.Contains("{Distance*Row}"))
-                            {
-                                decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Distance").ParameterValue * Convert.ToInt32(spilt[1]);
-                                updatedColumnName = updatedColumnName.Replace("{Distance*Row}", distance.ToString());
-                                updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit("Distance"));
-                            }
-                            updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
-                        }
-                        updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
-                        if (!dataTable.Columns.Contains(updatedColumnName))
-                        {
-                            col.ColumnName = updatedColumnName;
-                        }
-                    }
-                }
+                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal);
             }
             return dataTable;
         }
+
+        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListviewSequence> listviewSequenceColumnsOriginal)
+        {
+            string updatedColumnName = string.Empty;
+            foreach (DataColumn col in dataTable.Columns)
+            {
+                string[] spilt = col.ColumnName.Split('-');
+                DBTMTestParameterListviewSequence dBTMTestParameterListviewSequence = spilt.Length > 1 ? listviewSequenceColumnsOriginal.FirstOrDefault(x => x.ParameterCode == spilt[0]) :
+                                                                                                         listviewSequenceColumnsOriginal.FirstOrDefault(x => x.ParameterCode == col.ColumnName);
+
+                if (dBTMTestParameterListviewSequence != null)
+                {
+                    updatedColumnName = dBTMTestParameterListviewSequence.ColumnName;
+                    if (spilt.Length > 1)
+                    {
+                        string fromTo = string.Empty;
+                        var dBTMReportsListGroupByData = dBTMReportsList.GroupBy(x => x.CreatedDate).LastOrDefault();
+                        if (!string.IsNullOrEmpty(dBTMTestParameterListviewSequence.ConsecutiveParameterCode) && dBTMTestParameterListviewSequence.IsCalculatedParameter)
+                        {
+                            fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == dBTMTestParameterListviewSequence.ConsecutiveParameterCode && x.Row == spilt[1])?.FromTo;
+                        }
+                        else
+                        {
+                            fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == spilt[1])?.FromTo;
+                        }
+                        updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
+                        updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
+                        if (updatedColumnName.Contains("{Distance*Row}"))
+                        {
+                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Distance").ParameterValue * Convert.ToInt32(spilt[1]);
+                            updatedColumnName = updatedColumnName.Replace("{Distance*Row}", distance.ToString());
+                            updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit("Distance"));
+                        }
+                        updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
+                    }
+                    updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
+                    if (!dataTable.Columns.Contains(updatedColumnName))
+                    {
+                        col.ColumnName = updatedColumnName;
+                    }
+                }
+            }
+        }
+
         private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListviewSequence> listviewSequenceColumns, DataRow newRow)
         {
             foreach (var displayColumn in listviewSequenceColumnList)
