@@ -96,6 +96,19 @@ namespace Coditech.Admin.Controllers
             return View(createEdit, dBTMTestViewModel);
         }
 
+        // Get Activity List View Sequence
+        public virtual ActionResult ActivityListViewSequenceList(DataTableViewModel dataTableViewModel)
+        {
+            DBTMActivityListViewSequenceListViewModel list = _dBTMTestAgent.GetActivityListViewSequenceList(Convert.ToInt16(dataTableViewModel.SelectedParameter1), dataTableViewModel);
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/_ActivityListViewSequenceList.cshtml", list);
+            }
+
+            return View($"~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/ActivityListViewSequenceList.cshtml", list);
+        }
+
         public virtual ActionResult Delete(string dBTMTestMasterIds)
         {
             string message = string.Empty;

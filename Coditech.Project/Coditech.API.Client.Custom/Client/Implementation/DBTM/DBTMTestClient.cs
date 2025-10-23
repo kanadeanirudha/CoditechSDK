@@ -222,6 +222,53 @@ namespace Coditech.API.Client
             }
         }
 
+        public virtual DBTMActivityListViewSequenceListResponse GetActivityListViewSequenceList(int dBTMTestMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        {
+            return Task.Run(async () => await ActivityListViewSequenceListAsync(dBTMTestMasterId, expand, filter, sort, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMActivityListViewSequenceListResponse> ActivityListViewSequenceListAsync(int dBTMTestMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.GetActivityListViewSequenceListAsync(dBTMTestMasterId, expand, filter, sort, pageIndex, pageSize);
+            HttpResponseMessage response = null;
+            bool disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                Dictionary<string, IEnumerable<string>> headers = BindHeaders(response);
+                switch ((int)response.StatusCode)
+                {
+                    case 200:
+                        {
+                            ObjectResponseResult<DBTMActivityListViewSequenceListResponse> objectResponseResult = await ReadObjectResponseAsync<DBTMActivityListViewSequenceListResponse>(response, headers, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                            if (objectResponseResult.Object == null)
+                            {
+                                throw new CoditechException(objectResponseResult.Object.ErrorCode, objectResponseResult.Object.ErrorMessage);
+                            }
+
+                            return objectResponseResult.Object;
+                        }
+                    case 204:
+                        return new DBTMActivityListViewSequenceListResponse();
+                    default:
+                        {
+                            string value = ((response.Content != null) ? (await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)) : null);
+                            DBTMActivityListViewSequenceListResponse result = JsonConvert.DeserializeObject<DBTMActivityListViewSequenceListResponse>(value);
+                            UpdateApiStatus(result, status, response);
+                            throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                        }
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                {
+                    response.Dispose();
+                }
+            }
+        }
+
         public virtual TrueFalseResponse DeleteDBTMTest(ParameterModel body)
         {
             return Task.Run(async () => await DeleteDBTMTestAsync(body, CancellationToken.None)).GetAwaiter().GetResult();

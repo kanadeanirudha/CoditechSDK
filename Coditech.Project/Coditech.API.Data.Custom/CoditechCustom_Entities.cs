@@ -33,7 +33,7 @@ namespace Coditech.API.Data
         public DbSet<DBTMGraphMaster> DBTMGraphMaster { get; set; }
         public DbSet<DBTMTestGraph> DBTMTestGraph { get; set; }
         public DbSet<DBTMPerformanceMatrix> DBTMPerformanceMatrix { get; set; }
-        public DbSet<DBTMTestParameterListviewSequence> DBTMTestParameterListviewSequence { get; set; }
+        public DbSet<DBTMTestParameterListViewSequence> DBTMTestParameterListViewSequence { get; set; }
         #endregion
     }
 }
