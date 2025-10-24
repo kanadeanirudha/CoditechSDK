@@ -15,6 +15,7 @@ namespace Coditech.API.Data
         public decimal ParameterValue { get; set; }
         public string FromTo { get; set; }
         public short Row { get; set; }
+        public string Unit { get; set; }
         public string Comment1 { get; set; }
         public string Comment2 { get; set; }
         public string Comment3 { get; set; }

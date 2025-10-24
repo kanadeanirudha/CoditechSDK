@@ -4,229 +4,223 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsRequired = true };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = Model.GeneralLeadGenerationMasterId > 0
+        ? (Model.IsConverted ? "View Lead Generation" : "Update Lead Generation")
+        : "Create Lead Generation",
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName, new { SelectedCentreCode = Model.CentreCode }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = !Model.IsConverted ? actionName : "",
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.GeneralLeadGenerationMasterId > 0 && Model.IsConverted)
-                                {
-                                    <h4 class="card-title">View Lead Generation</h4>
-                                }
-                                else if (Model.GeneralLeadGenerationMasterId > 0)
-                                {
-                                    <h4 class="card-title">Update Lead Generation</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Lead Generation</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
-                    <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
-                        {
-                            @Html.HiddenFor(m => m.GeneralLeadGenerationMasterId)
+                <div class="card-body">
+                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                    {
+                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                        @Html.HiddenFor(m => m.GeneralLeadGenerationMasterId)
 
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                                        @Html.ValidationMessageFor(x => x.CentreCode)
-                                        @if (Model.GeneralLeadGenerationMasterId > 0)
-                                        {
-                                            @Html.HiddenFor(x => x.CentreCode)
-                                        }
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.UserTypeCode, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.UserTypeCode ?? string.Empty,
-                                   DropdownName = "UserTypeCode",
-                                   GroupCode = DropdownTypeEnum.UserType.ToString(),
-                                   IsTextValueSame = true,
-                                   IsRequired = true,
-                                   IsStringProperty = true
-                               })    @Html.ValidationMessageFor(x => x.UserTypeCode)
-                                    </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                    @Html.ValidationMessageFor(x => x.CentreCode)
+                                    @if (Model.GeneralLeadGenerationMasterId > 0)
+                                    {
+                                        @Html.HiddenFor(x => x.CentreCode)
+                                    }
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.PersonTitle, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.PersonTitle ?? string.Empty,
-                                   DropdownName = "PersonTitle",
-                                   GroupCode = DropdownTypeEnum.Title.ToString(),
-                                   IsTextValueSame = true,
-                                   IsRequired = true,
-                                   IsStringProperty = true
-                               })
-                                        @Html.ValidationMessageFor(x => x.PersonTitle)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.FirstName, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.FirstName)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.MiddleName, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.MiddleName, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.MiddleName)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.LastName, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.LastName)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.GenderEnumId.ToString(),
-                                   DropdownName = "GenderEnumId",
-                                   GroupCode = DropdownTypeEnum.Gender.ToString()
-                               })   @Html.ValidationMessageFor(x => x.GenderEnumId)
-                                    </div>
-                                </div>
-                                @* <div class="col-lg-3">
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.UserTypeCode, new { @class = "form-label required" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                    {
+                                        DropdownSelectedValue = Model.UserTypeCode ?? string.Empty,
+                                                                DropdownName = "UserTypeCode",
+                                                                GroupCode = DropdownTypeEnum.UserType.ToString(),
+                                                                IsTextValueSame = true,
+                                                                IsRequired = true,
+                                                                IsStringProperty = true
+                                                                })    @Html.ValidationMessageFor(x => x.UserTypeCode)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.PersonTitle, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                {
+                                        DropdownSelectedValue = Model.PersonTitle ?? string.Empty,
+                                                                DropdownName = "PersonTitle",
+                                                                GroupCode = DropdownTypeEnum.Title.ToString(),
+                                                                IsTextValueSame = true,
+                                                                IsRequired = true,
+                                                                IsStringProperty = true
+                                                                })
+                                @Html.ValidationMessageFor(x => x.PersonTitle)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.FirstName, new { @class = "form-label required" })
+                                @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.FirstName)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.MiddleName, new { @class = "form-label" })
+                                @Html.TextBoxFor(x => x.MiddleName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.MiddleName)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.LastName, new { @class = "form-label required" })
+                                @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.LastName)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                {
+                                        DropdownSelectedValue = Model.GenderEnumId.ToString(),
+                                                                DropdownName = "GenderEnumId",
+                                                                GroupCode = DropdownTypeEnum.Gender.ToString()
+                                                                })   @Html.ValidationMessageFor(x => x.GenderEnumId)
+                            </div>
+                        </div>
+                        @* <div class="col-lg-3">
                             <div class="mb-3">
                             @Html.LabelFor(x => x.DateOfBirth, new { @class = "form-label" })
                             @Html.TextBoxFor(x => x.DateOfBirth, AdminGeneralHelper.DateFormat(),  new { @class = "form-control", @id = "DateOfBirth" })
                             @Html.ValidationMessageFor(x => x.DateOfBirth, null, new { id = "errorDateOfBirth" })
                             </div>
                             </div> *@
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.EmailId, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control", type = "email" })
-                                        @Html.ValidationMessageFor(x => x.EmailId)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.MobileNumber, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.MobileNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
-                                        @Html.ValidationMessageFor(x => x.MobileNumber)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.PhoneNumber, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.PhoneNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
-                                        @Html.ValidationMessageFor(x => x.PhoneNumber)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.LeadGenerationSourceEnumId, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.LeadGenerationSourceEnumId.ToString(),
-                                   DropdownName = "LeadGenerationSourceEnumId",
-                                   GroupCode = DropdownTypeEnum.LeadSource.ToString()
-
-                               })
-                                        @Html.ValidationMessageFor(x => x.LeadGenerationSourceEnumId)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.LeadGenerationStatusEnumId, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.LeadGenerationStatusEnumId.ToString(),
-                                   DropdownName = "LeadGenerationStatusEnumId",
-                                   GroupCode = DropdownTypeEnum.LeadStatus.ToString()
-                               })
-                                        @Html.ValidationMessageFor(x => x.LeadGenerationStatusEnumId)
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.LeadGenerationCategoryEnumIds, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.LeadGenerationCategoryEnumIds,
-                                   DropdownName = "LeadGenerationCategoryEnumIds",
-                                   IsRequired = true,
-                                   IsStringProperty = true,
-                                   GroupCode = DropdownTypeEnum.LeadCategory.ToString()
-
-                               })
-                                        @Html.ValidationMessageFor(x => x.LeadGenerationCategoryEnumIds)
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.Location, new { @class = "form-label" })
-                                        @Html.TextAreaFor(x => x.Location, new { @class = "form-control", type = "tel" })
-                                        @Html.ValidationMessageFor(x => x.Location)
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.Comments, new { @class = "form-label" })
-                                        @Html.TextAreaFor(x => x.Comments, new { @class = "form-control", type = "tel" })
-                                        @Html.ValidationMessageFor(x => x.Comments)
-                                    </div>
-                                </div>
-
-                                @if (Model.GeneralLeadGenerationMasterId > 0 && !Model.IsConverted)
-                                {
-                                    <div class="col-lg-3">
-                                        <div class="mb-3">
-                                            @Html.LabelFor(x => x.IsConverted, new { @class = "form-label" })
-                                            <div class="form-check">
-                                                @Html.CheckBoxFor(x => x.IsConverted, new { @class = "form-check-input" })
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                                @if (Model.GeneralLeadGenerationMasterId > 0 && Model.IsConverted)
-                                {
-                                    <div class="col-lg-3">
-                                        <div class="mb-3">
-                                            <label class="form-label" style="color:forestgreen">Great! Lead Is Converted</label>
-                                        </div>
-                                    </div>
-                                }
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.EmailId, new { @class = "form-label" })
+                                @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control", type = "email" })
+                                @Html.ValidationMessageFor(x => x.EmailId)
                             </div>
-                            @if (!Model.IsConverted)
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.MobileNumber, new { @class = "form-label required" })
+                                @Html.TextBoxFor(x => x.MobileNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
+                                @Html.ValidationMessageFor(x => x.MobileNumber)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.PhoneNumber, new { @class = "form-label" })
+                                @Html.TextBoxFor(x => x.PhoneNumber, new { @class = "form-control", @onkeypress = "return CoditechCommon.ValidNumeric()" })
+                                @Html.ValidationMessageFor(x => x.PhoneNumber)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.LeadGenerationSourceEnumId, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                {
+                                        DropdownSelectedValue = Model.LeadGenerationSourceEnumId.ToString(),
+                                                                DropdownName = "LeadGenerationSourceEnumId",
+                                                                GroupCode = DropdownTypeEnum.LeadSource.ToString()
+
+                                                                })
+                                @Html.ValidationMessageFor(x => x.LeadGenerationSourceEnumId)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.LeadGenerationStatusEnumId, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                {
+                                        DropdownSelectedValue = Model.LeadGenerationStatusEnumId.ToString(),
+                                                                DropdownName = "LeadGenerationStatusEnumId",
+                                                                GroupCode = DropdownTypeEnum.LeadStatus.ToString()
+                                                                })
+                                @Html.ValidationMessageFor(x => x.LeadGenerationStatusEnumId)
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.LeadGenerationCategoryEnumIds, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                {
+                                        DropdownSelectedValue = Model.LeadGenerationCategoryEnumIds,
+                                                                DropdownName = "LeadGenerationCategoryEnumIds",
+                                                                IsRequired = true,
+                                                                IsStringProperty = true,
+                                                                GroupCode = DropdownTypeEnum.LeadCategory.ToString()
+
+                                                                })
+                                @Html.ValidationMessageFor(x => x.LeadGenerationCategoryEnumIds)
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.Location, new { @class = "form-label" })
+                                @Html.TextAreaFor(x => x.Location, new { @class = "form-control", type = "tel" })
+                                @Html.ValidationMessageFor(x => x.Location)
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.Comments, new { @class = "form-label" })
+                                @Html.TextAreaFor(x => x.Comments, new { @class = "form-control", type = "tel" })
+                                @Html.ValidationMessageFor(x => x.Comments)
+                            </div>
+                        </div>
+
+                        @if (Model.GeneralLeadGenerationMasterId > 0 && !Model.IsConverted)
                             {
-                                <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsConverted, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsConverted, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
                             }
-                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.CentreCode })"
-                               class="btn btn-secondary">
-                                <i class="ft-x"></i>@AdminResources.LabelCancel
-                            </a>
+                            @if (Model.GeneralLeadGenerationMasterId > 0 && Model.IsConverted)
+                            {
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        <label class="form-label" style="color:forestgreen">Great! Lead Is Converted</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                       @*  @if (!Model.IsConverted)
+                        {
+                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                         }
-                    </div>
+                        <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.CentreCode })"
+                           class="btn btn-secondary">
+                            <i class="ft-x"></i>@AdminResources.LabelCancel
+                        </a> *@
+                    }
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 @section scripts {

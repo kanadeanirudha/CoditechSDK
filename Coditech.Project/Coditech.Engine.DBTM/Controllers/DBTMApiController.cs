@@ -197,5 +197,29 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMMobileTraineeDashboardResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/dbtmapi/getjoiningcode")]
+        [Produces(typeof(StringResponse))]
+        public virtual IActionResult GetJoiningCode(string generalTrainerMasterId)
+        {
+            try
+            {
+                string apiDomainkey = _dBTMApiService.GetJoiningCode(generalTrainerMasterId);
+                StringResponse response = new StringResponse() { Response = apiDomainkey };
+                string data = ApiHelper.ToJson(response);
+                return !string.IsNullOrEmpty(apiDomainkey) ? CreateOKResponse<StringResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new StringResponse { Response = "", ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

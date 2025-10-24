@@ -69,7 +69,7 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.InvalidData, "Selected Trainee cannot be null.");
             if (IsNull(dBTMTraineeAssignmentModel.GeneralTrainerMasterId))
                 throw new CoditechException(ErrorCodes.InvalidData, "GeneralTrainerMasterId cannot be null.");
-            
+
             DBTMTraineeAssignment dBTMTraineeAssignment = dBTMTraineeAssignmentModel.FromModelToEntity<DBTMTraineeAssignment>();
 
             int dBTMTestStatusEnumId = GetEnumIdByEnumCode("Pending", DropdownCustomTypeEnum.DBTMTestStatus.ToString());
@@ -92,7 +92,12 @@ namespace Coditech.API.Service
             }
 
             if (dBTMTraineeAssignmentToUserData.Any())
-                _dBTMTraineeAssignmentToUserRepository.Insert(dBTMTraineeAssignmentToUserData);
+            {
+                var insertedUsers = _dBTMTraineeAssignmentToUserRepository.Insert(dBTMTraineeAssignmentToUserData);
+                // if repository returns inserted entities, you can set the first one’s ID like:
+                if (insertedUsers != null && insertedUsers.Any())
+                    dBTMTraineeAssignmentModel.DBTMTraineeAssignmentUserId = insertedUsers.First().DBTMTraineeAssignmentUserId;
+            }
 
             return dBTMTraineeAssignmentModel;
         }

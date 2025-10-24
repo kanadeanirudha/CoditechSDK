@@ -6,36 +6,35 @@
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("EmployeeId", Model.EmployeeId.ToString());
     keyValuePairs.Add("PersonId", Model.PersonId.ToString());
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = Model.EmployeeId > 0
+        ? $"{ViewBag.Title} : {Model.FirstName} {Model.LastName}"
+        : ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-2">
                 @Html.Partial("~/Views/EmployeeMaster/_EmployeeDetailsSidePannel.cshtml", keyValuePairs)
             </div>
             <div class="col-lg-10">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.EmployeeId > 0)
-                                {
-                                    <h4 class="card-title"><span>Update Employee Other Details : @Model.FirstName @Model.LastName</span></h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Employee</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm("UpdateEmployeeOtherDetail", controllerName, FormMethod.Post))
+                        @using (Html.BeginForm("UpdateEmployeeOtherDetail", controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.EmployeeId)
                             @Html.HiddenFor(m => m.PersonId)
                             @Html.HiddenFor(m => m.EmployeeDesignationMasterId)
+                            @Html.HiddenFor(m => m.CentreCode)
+                            @Html.HiddenFor(m => m.GeneralDepartmentMasterId)
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
@@ -67,8 +66,8 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.AdharCardNumber, new { @class = "form-label"})
-                                        @Html.TextBoxFor(x => x.AdharCardNumber, new { @class = "form-control",@onkeypress="return CoditechCommom"})
+                                        @Html.LabelFor(x => x.AdharCardNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.AdharCardNumber, new { @class = "form-control", @onkeypress = "return CoditechCommom" })
                                         @Html.ValidationMessageFor(x => x.AdharCardNumber)
                                     </div>
                                 </div>
@@ -100,15 +99,15 @@
                                             @Html.CheckBoxFor(x => x.IsEmployeeSmoker, new { @class = "form-check-input" })
                                         </div>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            @*  <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                             <a href="@Url.Action("List", controllerName,
                                         new { SelectedCentreCode = Model.CentreCode, SelectedDepartmentId = Model.GeneralDepartmentMasterId })"
                            class="btn btn-secondary">
                             <i class="ft-x"></i>@AdminResources.LabelCancel
-                        </a>
-                                                }
+                        </a> *@
+                        }
                     </div>
                 </div>
             </div>

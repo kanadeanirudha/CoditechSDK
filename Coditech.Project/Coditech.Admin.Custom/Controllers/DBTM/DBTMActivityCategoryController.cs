@@ -2,9 +2,7 @@
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMActivityCategoryController : BaseController
@@ -42,7 +40,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMActivityCategoryViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", CreateActionDataTable());
+                    if (string.Equals(dBTMActivityCategoryViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMActivityCategoryId = dBTMActivityCategoryViewModel.DBTMActivityCategoryId });
+                    }
+                    else if (string.Equals(dBTMActivityCategoryViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList);
+                    }
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMActivityCategoryViewModel.ErrorMessage));
@@ -64,7 +69,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMActivityCategoryAgent.UpdateDBTMActivityCategory(dBTMActivityCategoryViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { DBTMActivityCategoryId = dBTMActivityCategoryViewModel.DBTMActivityCategoryId });
+                if (string.Equals(dBTMActivityCategoryViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMActivityCategoryId = dBTMActivityCategoryViewModel.DBTMActivityCategoryId });
+                }
+                else if (string.Equals(dBTMActivityCategoryViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList);
+                }
             }
             return View(createEdit, dBTMActivityCategoryViewModel);
         }

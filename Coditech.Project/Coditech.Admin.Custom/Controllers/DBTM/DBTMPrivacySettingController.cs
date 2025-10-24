@@ -2,9 +2,7 @@
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
-
 using Microsoft.AspNetCore.Mvc;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMPrivacySettingController : BaseController
@@ -48,7 +46,15 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMPrivacySettingViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = dBTMPrivacySettingViewModel.CentreCode });
+                    if(string.Equals(dBTMPrivacySettingViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMPrivacySettingId = dBTMPrivacySettingViewModel.DBTMPrivacySettingId });
+                    }
+                    else if (string.Equals(dBTMPrivacySettingViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMPrivacySettingViewModel.CentreCode });
+
+                    }
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMPrivacySettingViewModel.ErrorMessage));
@@ -69,7 +75,15 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMPrivacySettingAgent.UpdateDBTMPrivacySetting(dBTMPrivacySettingViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { dBTMPrivacySettingId = dBTMPrivacySettingViewModel.DBTMPrivacySettingId });
+                if (string.Equals(dBTMPrivacySettingViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMPrivacySettingId = dBTMPrivacySettingViewModel.DBTMPrivacySettingId });
+                }
+                else if (string.Equals(dBTMPrivacySettingViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMPrivacySettingViewModel.CentreCode });
+
+                }
             }
             return View(createEdit, dBTMPrivacySettingViewModel);
         }

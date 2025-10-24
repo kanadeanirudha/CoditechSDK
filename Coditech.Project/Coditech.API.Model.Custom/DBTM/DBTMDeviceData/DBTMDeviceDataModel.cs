@@ -42,6 +42,8 @@ namespace Coditech.Common.API.Model
         public decimal ParameterValue { get; set; }
         public string FromTo { get; set; }
         public short Row { get; set; }
+        [JsonPropertyName("U")]
+        public string Unit { get; set; }
         [JsonPropertyName("C1")]
         public string Comment1 { get; set; }     
         [JsonPropertyName("C2")]
