@@ -8,7 +8,7 @@
     keyValuePairs.Add("PersonId", Model.PersonId.ToString());
     PageHeaderViewModel headerModel = new PageHeaderViewModel
     {
-        Title = $"{ViewBag.Title} {Model.FirstName} {Model.LastName}",
+        Title = $"{ViewBag.Title} : {Model.FirstName} {Model.LastName}",
         SaveButtonText = GeneralResources.SaveButtonText,
         CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName, new { SelectedCentreCode = Model.CentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId }),
         CancelButtonText = GeneralResources.CancelButtonText,
