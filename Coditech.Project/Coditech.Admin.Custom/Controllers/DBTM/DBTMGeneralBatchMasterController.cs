@@ -23,7 +23,7 @@ namespace Coditech.Admin.Controllers
             _dBTMTestAgent = dBTMTestAgent;
             _dBTMBatchAgent = dBTMBatchAgent;
         }
-        [HttpGet ,HttpPost]
+        [HttpGet, HttpPost]
         public ActionResult List(DataTableViewModel dataTableModel)
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
@@ -117,7 +117,15 @@ namespace Coditech.Admin.Controllers
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                    return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom4 });
+                    if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom4 });
+                    }
+                    else if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode });
+
+                    }
                 }
             }
             else
@@ -166,7 +174,7 @@ namespace Coditech.Admin.Controllers
                     DateTime currentDate = batch.BatchStartDate.Value;
                     DateTime batchEndDate = batch.BatchExpireDate ?? batch.BatchStartDate.Value;
 
-                    var increment = frequencyMap.ContainsKey(batch.BatchFrequency) ? frequencyMap[batch.BatchFrequency]: (d => d.AddDays(1));
+                    var increment = frequencyMap.ContainsKey(batch.BatchFrequency) ? frequencyMap[batch.BatchFrequency] : (d => d.AddDays(1));
 
                     while (currentDate <= batchEndDate)
                     {
@@ -216,7 +224,7 @@ namespace Coditech.Admin.Controllers
             DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
             if (dBTMBatchActivityList?.DBTMTestList != null)
             {
-                foreach (var item in dBTMBatchActivityList.DBTMTestList)
+                foreach (var item in dBTMBatchActivityList.DBTMTestList.Where(x => x.IsActive))
                 {
                     generalBatchViewModel.CustomDropdownList1.Add(new SelectListItem
                     {
@@ -264,9 +272,9 @@ namespace Coditech.Admin.Controllers
             BindDBTMBatchUserList(generalBatchViewModel);
 
         }
-        public virtual ActionResult Cancel(string SelectedCentreCode ,string custom4)
+        public virtual ActionResult Cancel(string SelectedCentreCode, string custom4)
         {
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode , SelectedParameter4=custom4 };
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter4 = custom4 };
             return RedirectToAction("List", dataTableViewModel);
         }
         public virtual ActionResult Delete(string generalBatchMasterIds, string selectedCentreCode, string custom4)
@@ -279,10 +287,10 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(string.IsNullOrEmpty(message) ? GeneralResources.DeleteErrorMessage : message)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4=custom4 });
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4 = custom4 });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4= custom4 });
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4 = custom4 });
         }
         #endregion
     }
