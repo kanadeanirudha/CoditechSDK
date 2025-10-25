@@ -4,14 +4,24 @@
     ViewBag.Title = "Trainee Registration";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
+                    @* <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
                                 <h4 class="card-title">Trainee Registration</h4>
@@ -20,10 +30,11 @@
                         <a class="btn btn-sm btn-soft-secondary float-end" href="/DBTMTraineeDetails/List" role="button">
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
-                    </div>
+                    </div> *@
                     <div class="card-body">
-                        @using (Html.BeginForm("TraineeRegistration", controllerName, FormMethod.Post))
+                        @using (Html.BeginForm("TraineeRegistration", controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             bool trainersLoaded = false;
                             @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                             {
@@ -74,7 +85,7 @@
                                 }
                             </div>
                             @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTraineeRegistration.cshtml", Model)
-                            <div class="form-group row my-3">
+                           @*  <div class="form-group row my-3">
                                 <div class="col-sm-6">
                                     <div class="custom-control custom-switch switch-success">
                                         <div class="col-sm-6 text-end">
@@ -86,7 +97,7 @@
                                     </div>
                                 </div>
 
-                            </div>
+                            </div> *@
                         }
                     </div>
                 </div>

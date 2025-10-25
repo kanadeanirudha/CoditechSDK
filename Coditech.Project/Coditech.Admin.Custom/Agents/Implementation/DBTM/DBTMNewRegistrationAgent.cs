@@ -159,6 +159,8 @@ namespace Coditech.Admin.Agents
                 GeneralPersonResponse response = _userClient.TraineeRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
 
                 GeneralPersonModel dBTMNewRegistrationModel = response?.GeneralPersonModel;
+                dBTMNewRegistrationModel.EntityId = response.GeneralPersonModel.EntityId;
+                dBTMNewRegistrationModel.PersonId = response.GeneralPersonModel.PersonId;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
             }
             catch (CoditechException ex)
