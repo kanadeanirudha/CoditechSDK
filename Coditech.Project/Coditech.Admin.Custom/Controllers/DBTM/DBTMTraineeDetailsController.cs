@@ -456,6 +456,8 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("GeneralRegionMasterId");
             ModelState.Remove("AddressLine1");
             ModelState.Remove("Pincode");
+            ModelState.Remove("ConfirmPassword");
+            ModelState.Remove("Password");
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
@@ -501,7 +503,15 @@ namespace Coditech.Admin.Controllers
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
-                        return RedirectToAction("List", "DBTMTraineeDetails");
+                        //return RedirectToAction("List", "DBTMTraineeDetails");
+                        if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction("UpdateDBTMTraineePersonalDetails", new { dBTMTraineeDetailId = dBTMNewRegistrationViewModel.EntityId, personId = dBTMNewRegistrationViewModel.PersonId });
+                        }
+                        else if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel() { SelectedCentreCode = dBTMNewRegistrationViewModel.CentreCode });
+                        }
                     }
                 }
             }

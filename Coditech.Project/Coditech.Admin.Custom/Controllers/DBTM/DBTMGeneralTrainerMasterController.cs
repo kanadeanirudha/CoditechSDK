@@ -1,4 +1,5 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 namespace Coditech.Admin.Controllers
@@ -41,13 +42,22 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("GeneralRegionMasterId");
                 ModelState.Remove("AddressLine1");
                 ModelState.Remove("Pincode");
+                ModelState.Remove("ConfirmPassword");
+                ModelState.Remove("Password");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
                         SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
-                        return RedirectToAction("List", "GeneralTrainerMaster");
+                        if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction("Edit", "GeneralTrainerMaster", new { generalTrainerId = dBTMNewRegistrationViewModel.GeneralTrainerMasterId});
+                        }
+                        else if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction("List", "GeneralTrainerMaster", new DataTableViewModel() { SelectedCentreCode = dBTMNewRegistrationViewModel.CentreCode, SelectedDepartmentId = Convert.ToInt16(dBTMNewRegistrationViewModel.Custom5) });
+                        }
                     }
                 }
             }
