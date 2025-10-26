@@ -716,7 +716,7 @@ namespace Coditech.API.Service
                     newRow[displayColumn] = "NA";
                 else if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
                 {
-                    newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Custom1.ToString() ?? "NA";
+                    newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Custom1 != null ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Custom1.ToString() : "NA";
                 }
                 else
                 {
