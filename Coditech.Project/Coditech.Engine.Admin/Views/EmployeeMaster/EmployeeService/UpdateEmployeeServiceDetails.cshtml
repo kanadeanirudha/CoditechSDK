@@ -27,20 +27,6 @@
             </div>
             <div class="col-lg-10">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.EmployeeServiceId > 0)
-                                {
-                                    <h4 class="card-title"><span>Update Employee Service : @Model.FirstName @Model.LastName</span></h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Employee Service</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
                     <div class="card-body">
                         @using (Html.BeginForm("UpdateEmployeeService", controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {

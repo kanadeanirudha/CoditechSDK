@@ -21,149 +21,150 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card-body">
-                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
-                    {
-                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)                           
-                        @Html.HiddenFor(m => m.GeneralRunningNumberId)
-                        @if (Model.GeneralRunningNumberId > 0)
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
-                            @Html.HiddenFor(m => m.CentreCode)
-                            @Html.HiddenFor(m => m.KeyFieldEnumId)
-                        }
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.GeneralRunningNumberId)
+                            @if (Model.GeneralRunningNumberId > 0)
+                            {
+                                @Html.HiddenFor(m => m.CentreCode)
+                                @Html.HiddenFor(m => m.KeyFieldEnumId)
+                            }
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.GeneralFinancialYearId, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                        {
+                                            DropdownType = DropdownTypeEnum.FinancialYear.ToString(),
+                                                                        DropdownName = "GeneralFinancialYearId",
+                                                                        DropdownSelectedValue = Model.GeneralFinancialYearId.ToString(),
+                                                                        Parameter = !string.IsNullOrEmpty(Model.CentreCode) ? $"{Model.CentreCode}" : ""
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.KeyFieldEnumId, new { @class = "form-label required" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                        {
+                                            DropdownSelectedValue = Model.KeyFieldEnumId.ToString(),
+                                                                        DropdownName = "KeyFieldEnumId",
+                                                                        GroupCode = DropdownTypeEnum.GeneralRunningNumberFor.ToString(),
+                                                                        IsDisabled = Model.GeneralRunningNumberId > 0
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.KeyFieldEnumId)
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.Prefix, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.Prefix, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Prefix)
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.DisplayFormat, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.DisplayFormat, new { @class = "form-control", @title = "Create running number using <centrecode>,<prefix>,<yyyy>,<yy>,<mm>,<dd>,<hh>,<min>,<sec>,<currentsequence> micros" })
+                                    @Html.ValidationMessageFor(x => x.DisplayFormat)
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.Separator, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.Separator, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Separator)
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.StartSequence, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.StartSequence, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.StartSequence)
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.CurrentSequnce, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.CurrentSequnce, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.CurrentSequnce)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.Description, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Description)
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="mb-3">
-                                    @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                                    @Html.ValidationMessageFor(x => x.CentreCode)
+                                    @Html.LabelFor(x => x.IsSequenceReset, new { @class = "form-label required" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsSequenceReset, new { @class = "form-check-input" })
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="mb-3">
-                                    @Html.LabelFor(x => x.GeneralFinancialYearId, new { @class = "form-label" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                    {
-                                        DropdownType = DropdownTypeEnum.FinancialYear.ToString(),
-                                                                DropdownName = "GeneralFinancialYearId",
-                                                                DropdownSelectedValue = Model.GeneralFinancialYearId.ToString(),
-                                                                Parameter = !string.IsNullOrEmpty(Model.CentreCode) ? $"{Model.CentreCode}" : ""
-                                                                })
-                                @Html.ValidationMessageFor(x => x.GeneralFinancialYearId)
+                                    @Html.LabelFor(x => x.IsBackDated, new { @class = "form-label required" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsBackDated, new { @class = "form-check-input" })
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-2">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.KeyFieldEnumId, new { @class = "form-label required" })
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                                                {
-                                        DropdownSelectedValue = Model.KeyFieldEnumId.ToString(),
-                                                                DropdownName = "KeyFieldEnumId",
-                                                                GroupCode = DropdownTypeEnum.GeneralRunningNumberFor.ToString(),
-                                                                IsDisabled = Model.GeneralRunningNumberId > 0
-                                                                })
-                                @Html.ValidationMessageFor(x => x.KeyFieldEnumId)
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.BackDatedPrefix, new { @class = "form-label" })
+                                    @Html.TextBoxFor(x => x.BackDatedPrefix, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.BackDatedPrefix)
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.Prefix, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.Prefix, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(x => x.Prefix)
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.IsRowLock, new { @class = "form-label required" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsRowLock, new { @class = "form-check-input" })
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-8">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.DisplayFormat, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.DisplayFormat, new { @class = "form-control", @title = "Create running number using <centrecode>,<prefix>,<yyyy>,<yy>,<mm>,<dd>,<hh>,<min>,<sec>,<currentsequence> micros" })
-                                @Html.ValidationMessageFor(x => x.DisplayFormat)
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.Separator, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.Separator, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(x => x.Separator)
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.StartSequence, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.StartSequence, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(x => x.StartSequence)
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.CurrentSequnce, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.CurrentSequnce, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(x => x.CurrentSequnce)
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.Description, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(x => x.Description)
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.IsSequenceReset, new { @class = "form-label required" })
-                                <div class="form-check">
-                                    @Html.CheckBoxFor(x => x.IsSequenceReset, new { @class = "form-check-input" })
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.IsActive, new { @class = "form-label required" })
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.IsBackDated, new { @class = "form-label required" })
-                                <div class="form-check">
-                                    @Html.CheckBoxFor(x => x.IsBackDated, new { @class = "form-check-input" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.BackDatedPrefix, new { @class = "form-label" })
-                                @Html.TextBoxFor(x => x.BackDatedPrefix, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(x => x.BackDatedPrefix)
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.IsRowLock, new { @class = "form-label required" })
-                                <div class="form-check">
-                                    @Html.CheckBoxFor(x => x.IsRowLock, new { @class = "form-check-input" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.IsActive, new { @class = "form-label required" })
-                                <div class="form-check">
-                                    @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                     <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.CentreCode })"
                        class="btn btn-secondary">
                         <i class="ft-x"></i>@AdminResources.LabelCancel
                     </a> *@
-                                        }
+                                                }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 <script src="~/js/coditech/general/generalRunningNumbers.js"></script>

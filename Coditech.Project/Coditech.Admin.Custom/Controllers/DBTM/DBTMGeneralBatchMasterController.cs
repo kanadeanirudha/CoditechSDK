@@ -76,7 +76,15 @@ namespace Coditech.Admin.Controllers
                 if (!generalBatchViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
+                    if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom4 });
+                    }
+                    else if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
+
+                    }
                 }
             }
             BindDropdown(generalBatchViewModel);
@@ -123,7 +131,7 @@ namespace Coditech.Admin.Controllers
                     }
                     else if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode });
+                        return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
 
                     }
                 }
