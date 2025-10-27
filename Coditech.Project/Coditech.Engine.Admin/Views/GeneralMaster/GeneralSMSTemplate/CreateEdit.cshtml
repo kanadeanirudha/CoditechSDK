@@ -20,67 +20,69 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card-body">
-                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
-                    {
-                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)                           
-                        @Html.HiddenFor(m => m.GeneralEmailTemplateId)
-                        @Html.HiddenFor(m => m.IsSmsTemplate)
-                        <div class="row">
-                            <div class="col-lg-5">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.EmailTemplateName, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.EmailTemplateName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.EmailTemplateName)
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.GeneralEmailTemplateId)
+                            @Html.HiddenFor(m => m.IsSmsTemplate)
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmailTemplateName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.EmailTemplateName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.EmailTemplateName)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-5">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.EmailTemplateCode, new { @class = "form-label required" })
-                                    @if (Model.GeneralEmailTemplateId > 0)
-                                    {
-                                        @Html.TextBoxFor(x => x.EmailTemplateCode, new { @class = "form-control", @readonly = "readonly" })
-                                    }
-                                    else
-                                    {
-                                        @Html.TextBoxFor(x => x.EmailTemplateCode, new { @class = "form-control" })
-                                    }
-                                    @Html.ValidationMessageFor(x => x.EmailTemplateCode)
+                                <div class="col-lg-5">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmailTemplateCode, new { @class = "form-label required" })
+                                        @if (Model.GeneralEmailTemplateId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.EmailTemplateCode, new { @class = "form-control", @readonly = "readonly" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.EmailTemplateCode, new { @class = "form-control" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.EmailTemplateCode)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label required" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
-                                    @Html.ValidationMessageFor(x => x.ModuleCode)
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
+                                        @Html.ValidationMessageFor(x => x.ModuleCode)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.Subject, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.Subject, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.Subject)
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Subject, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.Subject, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.Subject)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.EmailTemplate, new { @class = "form-label required" })
-                                    @Html.TextAreaFor(x => x.EmailTemplate, new { @class = "form-control", rows = "10" })
-                                    @Html.ValidationMessageFor(x => x.EmailTemplate)
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.EmailTemplate, new { @class = "form-label required" })
+                                        @Html.TextAreaFor(x => x.EmailTemplate, new { @class = "form-control", rows = "10" })
+                                        @Html.ValidationMessageFor(x => x.EmailTemplate)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-                                    <div class="form-check">
-                                        @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                     @*    <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            @*    <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                         <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
-                    }
+                        }
+                    </div>
                 </div>
             </div>
         </div>

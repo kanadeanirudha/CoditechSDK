@@ -5,30 +5,27 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()", IsDisabled = Model.GeneralTrainerMasterId > 0 };
     DropdownViewModel departmentDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(), DropdownName = "SelectedDepartmentId", DropdownSelectedValue = Convert.ToString(Model.SelectedDepartmentId), Parameter = Model.SelectedCentreCode, ChangeEvent = "GeneralTrainerMaster.GetEmployeeListByCentreCodeAndDepartmentId()", IsDisabled = Model.GeneralTrainerMasterId > 0 };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.GeneralTrainerMasterId > 0)
-                                {
-                                    <h4 class="card-title">Update Trainer Details: @Model.FirstName @Model.LastName</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Trainer</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @if (Model.GeneralTrainerMasterId > 0)
                             {
@@ -58,17 +55,17 @@
                                         <div class="mb-3">
                                             @Html.LabelFor(x => x.EmployeeId, new { @class = "form-label required" })
                                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownType = DropdownTypeEnum.UnAssociatedTrainerEmployeeList.ToString(),
-                                   DropdownName = "EmployeeId",
-                                   DropdownSelectedValue = Model.EmployeeId.ToString(),
-                                   IsRequired = true,
-                                   Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}" : ""
-                               })
-                                            @Html.ValidationMessageFor(x => x.EmployeeId)
-                                        </div>
-                                    </div>
-                                }
+                                            {
+                                                DropdownType = DropdownTypeEnum.UnAssociatedTrainerEmployeeList.ToString(),
+                                                                        DropdownName = "EmployeeId",
+                                                                        DropdownSelectedValue = Model.EmployeeId.ToString(),
+                                                                        IsRequired = true,
+                                                                        Parameter = !string.IsNullOrEmpty(Model.SelectedCentreCode) ? $"{Model.SelectedCentreCode}~{Model.SelectedDepartmentId}" : ""
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.EmployeeId)
+                                </div>
+                            </div>
+                                                        }
                                 else
                                 {
                                     @Html.HiddenFor(x => x.EmployeeId)
@@ -77,17 +74,17 @@
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.TrainerSpecializationEnumId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
-                                   DropdownName = "TrainerSpecializationEnumId",
-                                   IsRequired = true,
-                                   GroupCode = DropdownTypeEnum.TrainerSpecialization.ToString()
-                               })
-                                        @Html.ValidationMessageFor(x => x.TrainerSpecializationEnumId)
-                                    </div>
+                                        {
+                                            DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
+                                                                        DropdownName = "TrainerSpecializationEnumId",
+                                                                        IsRequired = true,
+                                                                        GroupCode = DropdownTypeEnum.TrainerSpecialization.ToString()
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.TrainerSpecializationEnumId)
                                 </div>
+                            </div>
 
-                                @if (Model.GeneralTrainerMasterId > 0)
+                            @if (Model.GeneralTrainerMasterId > 0)
                                 {
                                     <div class="col-lg-6">
                                         <div class="mb-3">
@@ -102,15 +99,7 @@
                                     @Html.HiddenFor(x => x.UniqueCode)
                                 }
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                           <a href="@Url.Action("Cancel", controllerName, new { 
-                                    SelectedCentreCode = Model.SelectedCentreCode, 
-                                    SelectedDepartmentId = Model.SelectedDepartmentId 
-                                })" 
-                               class="btn btn-secondary">
-                                <i class="ft-x"></i>@AdminResources.LabelCancel
-                            </a>
-                                    }
+                        }
                     </div>
                 </div>
             </div>

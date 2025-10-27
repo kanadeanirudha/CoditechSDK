@@ -19,54 +19,57 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card-body">
-                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
-                    {
-                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)                            @Html.HiddenFor(m => m.CoditechApplicationSettingId)
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ApplicationCode, new { @class = "form-label required" })
-                                    @if (Model.CoditechApplicationSettingId > 0)
-                                    {
-                                        @Html.TextBoxFor(x => x.ApplicationCode, new { @class = "form-control", @readonly = "true" })
-                                    }
-                                    else
-                                    {
-                                        @Html.TextBoxFor(x => x.ApplicationCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
-                                    }
-                                    @Html.ValidationMessageFor(x => x.ApplicationCode)
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.CoditechApplicationSettingId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ApplicationCode, new { @class = "form-label required" })
+                                        @if (Model.CoditechApplicationSettingId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.ApplicationCode, new { @class = "form-control", @readonly = "true" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.ApplicationCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        }
+                                        @Html.ValidationMessageFor(x => x.ApplicationCode)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ApplicationValue1, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.ApplicationValue1, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.ApplicationValue1)
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ApplicationValue1, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ApplicationValue1, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ApplicationValue1)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ApplicationValue2, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.ApplicationValue2, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.ApplicationValue2)
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ApplicationValue2, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ApplicationValue2, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ApplicationValue2)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ApplicationValue3, new { @class = "form-label required" })
-                                    @Html.Partial("~/Views/Shared/Control/_HTMLEditor.cshtml", new HTMLEditorViewModel()
-                                    {
-                                        EditorName = "ApplicationValue3",
-                                                                EditorValue = Model.ApplicationValue3
-                                                                })
-                                @Html.ValidationMessageFor(x => x.ApplicationValue3)
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ApplicationValue3, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_HTMLEditor.cshtml", new HTMLEditorViewModel()
+                                        {
+                                            EditorName = "ApplicationValue3",
+                                                                        EditorValue = Model.ApplicationValue3
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.ApplicationValue3)
+                                </div>
                             </div>
                         </div>
-                    </div>
-                  @*   <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        @*   <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                     <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
-                                        }
+                                                }
+                    </div>
                 </div>
             </div>
         </div>
