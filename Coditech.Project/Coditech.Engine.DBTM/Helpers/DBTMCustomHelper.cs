@@ -110,6 +110,29 @@ namespace Coditech.Engine.DBTM.Helpers
                     }
                     result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, 3)}" : "Invalid Data";
                     break;
+                case "AccelerationByRow":
+                    var timeValue = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion)?.ParameterValue ?? 0;
+                    if (recurtion == 1)
+                    {
+                        var velocityValue = Convert.ToDecimal(newRow["VelocityByRow-1"]);
+                        result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, 3)}" : "Invalid Data";
+                    }
+                    else
+                    {
+                        var velocityValueCurrent = Convert.ToDecimal(newRow[$"VelocityByRow-{recurtion}"]);
+                        var velocityValueBefore = Convert.ToDecimal(newRow[$"VelocityByRow-{recurtion - 1}"]);
+                        result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, 3)}" : "Invalid Data";
+                    }
+                    break;
+                case "ForceByRow":
+                    var accelerationByRow = Convert.ToDecimal(newRow[$"AccelerationByRow-{recurtion}"]);
+                    result = weight == 0 ? "N/A" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
+                    break;
+                case "PowerByRow":
+                    var velocityByRow = Convert.ToDecimal(newRow[$"VelocityByRow-{recurtion}"]);
+                    var forceByRow = Convert.ToDecimal(newRow[$"ForceByRow-{recurtion}"]);
+                    result = weight == 0 ? "N/A" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
+                    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }
@@ -141,10 +164,12 @@ namespace Coditech.Engine.DBTM.Helpers
                     data = "m/s";
                     break;
                 case "Power":
-                    data = "watts";
+                case "PowerByRow":
+                    data = "W";
                     break;
                 case "Force":
-                    data = "newtons";
+                case "ForceByRow":
+                    data = "N";
                     break;
                 case "Weight":
                     data = "kg";
@@ -154,6 +179,9 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case "JumpHeight":
                     data = "cm";
+                    break;
+                case "AccelerationByRow":
+                    data = "m/s2";
                     break;
                 default:
                     data = "";

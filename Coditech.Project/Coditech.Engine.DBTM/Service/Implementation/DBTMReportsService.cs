@@ -685,7 +685,10 @@ namespace Coditech.API.Service
                                 if (dBTMTestParameterListviewSequence.ParameterCode == "CumulativeTime" ||
                                     dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocity" ||
                                     dBTMTestParameterListviewSequence.ParameterCode == "VelocityByRow" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocityByRow"
+                                    dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocityByRow" ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == "AccelerationByRow" ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == "ForceByRow" ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == "PowerByRow"
                                     )
                                 {
                                     fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
