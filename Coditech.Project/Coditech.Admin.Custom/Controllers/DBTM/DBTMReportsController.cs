@@ -214,7 +214,7 @@ namespace Coditech.Admin.Controllers
             });
             if (dBTMBatchActivityList?.DBTMTestList != null)
             {
-                foreach (var item in dBTMBatchActivityList.DBTMTestList)
+                foreach (var item in dBTMBatchActivityList.DBTMTestList.Where(x => x.IsActive))
                 {
                     dBTMReportsViewModel.CustomDropdownList1.Add(new SelectListItem
                     {
