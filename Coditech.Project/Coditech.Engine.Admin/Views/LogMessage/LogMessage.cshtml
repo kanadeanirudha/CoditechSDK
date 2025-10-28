@@ -19,65 +19,67 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card-body">
-                    @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="CreatedDate">Created Date</label> <br />
-                                @Html.DisplayFor(x => x.CreatedDate, new { @class = "form-control" })
+                <div class="card">
+                    <div class="card-body">
+                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    <label class="form-label" for="CreatedDate">Created Date</label> <br />
+                                    @Html.DisplayFor(x => x.CreatedDate, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ErrorMessageType, new { @class = "form-label" })<br />
+                                    @Html.DisplayFor(x => x.ErrorMessageType, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ComponentName, new { @class = "form-label" })<br />
+                                    @Html.DisplayFor(x => x.ComponentName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.TraceLevel, new { @class = "form-label" })<br />
+                                    @Html.DisplayFor(x => x.TraceLevel, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ExceptionMessage, new { @class = "form-label" })
+                                    @Html.DisplayFor(x => x.ExceptionMessage, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.MethodName, new { @class = "form-label" })
+                                    @Html.DisplayFor(x => x.MethodName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.FileName, new { @class = "form-label" })
+                                    @Html.DisplayFor(x => x.FileName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.LineNumber, new { @class = "form-label" })
+                                    @Html.DisplayFor(x => x.LineNumber, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.Exception, new { @class = "form-label" })
+                                    @Html.DisplayFor(x => x.Exception, new { @class = "form-control" })
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.ErrorMessageType, new { @class = "form-label" })<br />
-                                @Html.DisplayFor(x => x.ErrorMessageType, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.ComponentName, new { @class = "form-label" })<br />
-                                @Html.DisplayFor(x => x.ComponentName, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.TraceLevel, new { @class = "form-label" })<br />
-                                @Html.DisplayFor(x => x.TraceLevel, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.ExceptionMessage, new { @class = "form-label" })
-                                @Html.DisplayFor(x => x.ExceptionMessage, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.MethodName, new { @class = "form-label" })
-                                @Html.DisplayFor(x => x.MethodName, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.FileName, new { @class = "form-label" })
-                                @Html.DisplayFor(x => x.FileName, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.LineNumber, new { @class = "form-label" })
-                                @Html.DisplayFor(x => x.LineNumber, new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.Exception, new { @class = "form-label" })
-                                @Html.DisplayFor(x => x.Exception, new { @class = "form-control" })
-                            </div>
-                        </div>
+                        @* <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>Back</a> *@
                     </div>
-                    @* <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>Back</a> *@
                 </div>
             </div>
         </div>

@@ -256,7 +256,7 @@ namespace Coditech.Admin.Controllers
 
             if (dBTMTestList?.DBTMTestList != null)
             {
-                foreach (var item in dBTMTestList.DBTMTestList)
+                foreach (var item in dBTMTestList.DBTMTestList.Where(x => x.IsActive))
                 {
                     dBTMTraineeAssignmentViewModel.DBTMTestList.Add(new SelectListItem
                     {

@@ -123,5 +123,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Specialization")]
         [Required]
         public int? SpecializationEnumId { get; set; }
+        public long PersonId { get; set; }
+        public long EntityId { get; set; }
     }
 }

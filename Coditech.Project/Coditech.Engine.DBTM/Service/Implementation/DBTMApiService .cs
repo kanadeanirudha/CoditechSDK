@@ -1,5 +1,4 @@
 ﻿using Coditech.API.Data;
-using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -129,7 +128,16 @@ namespace Coditech.API.Service
                             };
                             dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
                         }
-                        _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
+                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
+                        if (data == null || data.Count() > 0)
+                        {
+                            int statusOutput = 0;
+                            CoditechViewRepository<DBTMDeviceDataModel> objStoredProc = new CoditechViewRepository<DBTMDeviceDataModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+                            objStoredProc.SetParameter("@TestCode", DBTMDeviceDataDetails.TestCode, ParameterDirection.Input, DbType.String);
+                            objStoredProc.SetParameter("@CreatedDate", DBTMDeviceDataDetails.CreatedDate, ParameterDirection.Input, DbType.DateTime);
+                            objStoredProc.SetParameter("@Status", statusOutput, ParameterDirection.Output, DbType.Int32);
+                            objStoredProc.ExecuteStoredProcedureList("Coditech_DBTMUpdateDeviceData @TestCode,@CreatedDate,@Status OUT", 2, out statusOutput);
+                        }
                     }
                 }
 

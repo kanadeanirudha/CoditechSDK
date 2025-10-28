@@ -19,36 +19,38 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card-body">
-                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
-                    {
-                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
-                        @Html.HiddenFor(m => m.DBTMDeviceRegistrationDetailId)
-                        <div class="row">
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.DBTMDeviceRegistrationDetailId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.DBTMDeviceMasterId, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                        {
+                                            DropdownType = DropdownCustomTypeEnum.DBTMDeviceRegistrationDetails.ToString(),
+                                                                        DropdownName = "DBTMDeviceMasterId",
+                                                                        DropdownSelectedValue = Model.DBTMDeviceMasterId.ToString(),
+                                                                        IsCustomDropdown = true
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.DBTMDeviceMasterId, null)
+                                </div>
+                            </div>
+
+
                             <div class="col-lg-4">
                                 <div class="mb-3">
-                                    @Html.LabelFor(x => x.DBTMDeviceMasterId, new { @class = "form-label" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                    {
-                                        DropdownType = DropdownCustomTypeEnum.DBTMDeviceRegistrationDetails.ToString(),
-                                                                DropdownName = "DBTMDeviceMasterId",
-                                                                DropdownSelectedValue = Model.DBTMDeviceMasterId.ToString(),
-                                                                IsCustomDropdown = true
-                                                                })
-                                @Html.ValidationMessageFor(x => x.DBTMDeviceMasterId, null)
+                                    @Html.LabelFor(x => x.PurchaseDate, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.PurchaseDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "true" })
+                                    @Html.ValidationMessageFor(x => x.PurchaseDate)
+                                </div>
                             </div>
                         </div>
-
-
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                @Html.LabelFor(x => x.PurchaseDate, new { @class = "form-label required" })
-                                @Html.TextBoxFor(x => x.PurchaseDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "true" })
-                                @Html.ValidationMessageFor(x => x.PurchaseDate)
-                            </div>
-                        </div>
+                                                }
                     </div>
-                    }
                 </div>
             </div>
         </div>

@@ -6,15 +6,15 @@
     DropdownViewModel smsProviderDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SMSProvider.ToString(), DropdownName = "GeneralSmsProviderId", DropdownSelectedValue = Model.GeneralSmsProviderId.ToString(), ChangeEvent = $"OrganisationCentre.GetSMSSettingByCentreCode('{Model.OrganisationCentreMasterId}')" };
     ModelPopUpViewModel sendTestEmail = new ModelPopUpViewModel() { ModelPopUpId = "SendDetailsPopupId", ModalContentId = "SendDetailsContentId" };
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-            {
-                Title = ViewBag.Title,
-                SaveButtonText = GeneralResources.SaveButtonText,
-                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-                CancelButtonText = GeneralResources.CancelButtonText,
-                ControllerName = controllerName,
-                ActionName = actionName,
-                FormId = AdminConstants.FormId + controllerName,
-            };
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <div class="page-content">
     <div class="container-fluid mt-5">
@@ -26,6 +26,7 @@
                 </div>
             }
             <div class="col-lg-10">
+                <div class="card">
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
@@ -73,7 +74,7 @@
                                                 class="btn btn-gradient-info"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#@sendTestEmail.ModelPopUpId"
-                                            onclick="OrganisationCentre.SendSmsTestModel('@sendTestEmail.ModalContentId', '@Model.CentreCode', '@Model.OrganisationCentreMasterId')"
+                                                onclick="OrganisationCentre.SendSmsTestModel('@sendTestEmail.ModalContentId', '@Model.CentreCode', '@Model.OrganisationCentreMasterId')"
                                                 title="Send Test SMS">
                                             Send Test SMS
                                         </button>

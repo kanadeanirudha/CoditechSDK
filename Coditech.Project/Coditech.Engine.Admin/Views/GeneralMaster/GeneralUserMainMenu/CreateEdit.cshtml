@@ -21,95 +21,97 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
-                <div class="card-body">
-                    @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
-                    {
-                        @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
-                        @Html.HiddenFor(m => m.UserMainMenuMasterId)
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.MenuName, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.MenuName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.MenuName)
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.UserMainMenuMasterId)
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.MenuName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.MenuName)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.MenuCode, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.MenuCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
-                                    @Html.ValidationMessageFor(x => x.MenuCode)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuCode, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.MenuCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.MenuCode)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label required" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
-                                    @Html.ValidationMessageFor(x => x.ModuleCode)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ModuleCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", moduleDropdown)
+                                        @Html.ValidationMessageFor(x => x.ModuleCode)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ParentMenuCode, new { @class = "form-label" })
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", menuDropdown)
-                                    @Html.ValidationMessageFor(x => x.ParentMenuCode)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ParentMenuCode, new { @class = "form-label" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", menuDropdown)
+                                        @Html.ValidationMessageFor(x => x.ParentMenuCode)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.MenuToolTip, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.MenuToolTip, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.MenuToolTip)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuToolTip, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.MenuToolTip, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.MenuToolTip)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.MenuIconName, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.MenuIconName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.MenuIconName)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuIconName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.MenuIconName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.MenuIconName)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ControllerName, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.ControllerName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.ControllerName)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ControllerName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ControllerName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ControllerName)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.ActionName, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.ActionName, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.ActionName)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ActionName, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ActionName, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ActionName)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.MenuDisplaySeqNo, new { @class = "form-label" })
-                                    @Html.TextBoxFor(x => x.MenuDisplaySeqNo, new { @class = "form-control", type = "number" })
-                                    @Html.ValidationMessageFor(x => x.MenuDisplaySeqNo)
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuDisplaySeqNo, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.MenuDisplaySeqNo, new { @class = "form-control", type = "number" })
+                                        @Html.ValidationMessageFor(x => x.MenuDisplaySeqNo)
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.MenuInstalledFlag, new { @class = "form-label" })
-                                    <div class="form-check">
-                                        @Html.CheckBoxFor(x => x.MenuInstalledFlag, new { @class = "form-check-input" })
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.MenuInstalledFlag, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.MenuInstalledFlag, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsEnable, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsEnable, new { @class = "form-check-input" })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.IsEnable, new { @class = "form-label" })
-                                    <div class="form-check">
-                                        @Html.CheckBoxFor(x => x.IsEnable, new { @class = "form-check-input" })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                      @*   <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                            @*   <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                         <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
-                    }
+                        }
+                    </div>
                 </div>
             </div>
         </div>
