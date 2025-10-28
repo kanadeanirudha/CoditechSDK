@@ -456,33 +456,23 @@ namespace Coditech.API.Service
             if (IsNull(dBTMActivityListViewSequenceModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            // Delete all existing sequences for the given TestMasterId
-            var existingSequences = _dBTMActivityListViewSequenceMasterRepository.Table
-                .Where(x => x.DBTMTestMasterId == dBTMActivityListViewSequenceModel.DBTMTestMasterId)
-                .ToList();
+            if (dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList == null ||
+                !dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList.Any())
+                return dBTMActivityListViewSequenceModel;
 
-            if (existingSequences.Any())
-                _dBTMActivityListViewSequenceMasterRepository.Delete(existingSequences);
-
-            // Insert updated sequence list
-            if (dBTMActivityListViewSequenceModel?.DBTMActivityListViewSequenceList?.Count > 0)
+            foreach (var updatedItem in dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList)
             {
-                var newSequences = dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList
-                    .Select(item => new DBTMTestParameterListViewSequence
-                    {
-                        DBTMTestParameterListViewSequenceId = item.DBTMTestParameterListViewSequenceId,
-                        DBTMTestMasterId = dBTMActivityListViewSequenceModel.DBTMTestMasterId,
-                        SequenceNumber = item.SequenceNumber,
-                        ParameterCode = item.ParameterCode,
-                        IsCalculatedParameter = item.IsCalculatedParameter,
-                        IsActive = true,
-                        CreatedDate = DateTime.Now
-                    })
-                    .ToList();
+                var existing = _dBTMActivityListViewSequenceMasterRepository.Table
+                    .FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == updatedItem.DBTMTestParameterListViewSequenceId);
 
-                if (newSequences.Any())
-                    _dBTMActivityListViewSequenceMasterRepository.Insert(newSequences);
+                if (existing != null)
+                {
+                    existing.SequenceNumber = updatedItem.SequenceNumber;
+                    existing.ModifiedDate = DateTime.Now;
+                    _dBTMActivityListViewSequenceMasterRepository.Update(existing);
+                }
             }
+
             return dBTMActivityListViewSequenceModel;
         }
 

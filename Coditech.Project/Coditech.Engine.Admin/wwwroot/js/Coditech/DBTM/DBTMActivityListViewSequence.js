@@ -18,8 +18,6 @@
 
                 var modal = new bootstrap.Modal(document.getElementById('AddSequenceNumberPopupId'));
                 modal.show();
-
-                DBTMActivityListViewSequence.BindSave();
             },
             error: function () {
                 CoditechCommon.HideLodder();
@@ -28,40 +26,47 @@
         });
     },
 
-    BindSave: function () {
-        $("#saveSequenceButton").off("click").on("click", function () {
-            var data = [];
+    SaveData: function () {
+        $("#saveSequenceButton").prop("disabled", true);
 
-            $("#sequenceTable tbody tr").each(function () {
-                var row = $(this);
-                var id = row.find('input[name*="DBTMTestParameterListViewSequenceId"]').val();
-                var seq = row.find('input[name*="SequenceNumber"]').val();
+        var data = [];
 
-                data.push({
-                    DBTMTestParameterListViewSequenceId: parseInt(id),
-                    SequenceNumber: parseInt(seq)
-                });
+        $("#sequenceTable tbody tr").each(function () {
+            var row = $(this);
+            var id = row.find('.DBTMTestParameterListViewSequenceId').val();
+            var seq = row.find('.SequenceNumber').val();
+
+            data.push({
+                DBTMTestParameterListViewSequenceId: parseInt(id),
+                SequenceNumber: parseInt(seq)
             });
+        });
+        var jsonData = JSON.stringify(data);
+        $("#DBTMSequenceData").val(jsonData);
 
-            var jsonData = JSON.stringify(data);
-            $("#DBTMSequenceData").val(jsonData);
-
-            $.ajax({
-                type: "POST",
-                url: "/DBTMTestMaster/UpdateSequenceNumber",
-                data: $("#frmUpdateSequence").serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        CoditechNotification.DisplayNotificationMessage("Sequence Number Saved Successfully.", "success");
-                        location.reload();
-                    } else {
-                        CoditechNotification.DisplayNotificationMessage("Failed to save sequence number.", "error");
-                    }
-                },
-                error: function () {
-                    CoditechNotification.DisplayNotificationMessage("Error while saving sequence number.", "error");
+        $.ajax({
+            type: "POST",
+            url: "/DBTMTestMaster/UpdateSequenceNumber",
+            data: {
+                DBTMTestMasterId: $("#DBTMTestMasterId").val(),
+                DBTMTestParameterListViewSequenceId: $("#DBTMTestParameterListViewSequenceId").val(),
+                DBTMSequenceData: jsonData
+            },
+            success: function (response) {
+                if (response.success) {
+                    CoditechNotification.DisplayNotificationMessage("Sequence number saved successfully.", "success");
+                    $('#AddSequenceNumberPopupId').modal('hide');
+                    location.reload();
+                } else {
+                    CoditechNotification.DisplayNotificationMessage(response.message || "Failed to save sequence number.", "error");
                 }
-            });
+            },
+            error: function (xhr) {
+                CoditechNotification.DisplayNotificationMessage("Error while saving sequence number. " + xhr.statusText, "error");
+            },
+            complete: function () {
+                $("#saveSequenceButton").prop("disabled", false);
+            }
         });
     }
 };

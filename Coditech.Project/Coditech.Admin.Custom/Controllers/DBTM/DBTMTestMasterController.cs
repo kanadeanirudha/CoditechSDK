@@ -277,21 +277,3 @@ namespace Coditech.Admin.Controllers
         #endregion
     }
 }
-
-//[HttpPost]
-//[ValidateAntiForgeryToken]
-//public ActionResult UpdateSequenceNumber(DBTMActivityListViewSequenceListViewModel listViewModel)
-//{
-//    if (ModelState.IsValid)
-//    {
-
-//        listViewModel = _dBTMTestAgent.UpdateSequenceNumber(listViewModel);
-//        if (!listViewModel.HasError)
-//        {
-//            SetNotificationMessage(GetSuccessNotificationMessage("Sequence Number Saved Successfully."));
-//            return Json(new { success = true, dBTMTestParameterListViewSequenceId = listViewModel.DBTMTestParameterListViewSequenceId });
-//        }
-//    }
-//    SetNotificationMessage(GetErrorNotificationMessage("Failed to Save Sequence Number."));
-//    return RedirectToAction("ActivityListViewSequence", new { dBTMTestParameterListViewSequenceId = listViewModel.DBTMTestParameterListViewSequenceId });
-//}
