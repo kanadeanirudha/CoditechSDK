@@ -42,7 +42,7 @@ namespace Coditech.Engine.DBTM.Helpers
             }
         }
 
-        public static string Calculation(string calculationCode, string calculationName, DataRow newRow, IGrouping<string, DBTMReportsModel> group, int recurtion, bool isDisplayUnit = false)
+        public static string Calculation(string calculationCode, string calculationName, DataRow newRow, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false)
         {
             double weight = Convert.ToDouble(group.FirstOrDefault()?.Weight);
             calculationName = string.IsNullOrEmpty(calculationName) ? calculationCode : calculationName;
@@ -59,8 +59,12 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)}" : "Invalid Data";
                     break;
                 case "TotalDistanceCovered":
-                    decimal totalDistanceCovered = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
+                    decimal totalDistanceCovered = group.Where(x => x.ParameterCode == "Distance" || x.ParameterCode == "DistanceMultiplyByRow").Sum(x => x.ParameterValue);
                     result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)}" : "Invalid Data";
+                    break;
+                case "DistanceMultiplyByRow":
+                    decimal distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
+                    result = distance != 0 ? $"{Math.Round(distance * recurtion, 3)}" : "Invalid Data";
                     break;
                 case "MaxLap":
                     result = $"{group.Where(x => x.ParameterCode == "Time").Max(x => x.ParameterValue)}";
@@ -78,21 +82,31 @@ namespace Coditech.Engine.DBTM.Helpers
                     decimal cumulativeTime = 0;
                     for (int i = 1; i <= recurtion; i++)
                     {
-                        cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == i.ToString()).ParameterValue;
+                        cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == i).ParameterValue;
                     }
                     result = $"{cumulativeTime}";
                     break;
                 case "Velocity":
-                    decimal distance = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
-                    decimal time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion.ToString()).ParameterValue;
+                    distance = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
+                    decimal time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
+                    break;
+                case "VelocityByRow":
+                    distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
+                    time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
+                    result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
+                    break;
+                case "CumulativeVelocityByRow":
+                    distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
+                    time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
+                    result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, 3)}" : "Invalid Data";
                     break;
                 case "CumulativeVelocity":
                     distance = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
                     cumulativeTime = 0;
                     for (int i = 1; i <= recurtion; i++)
                     {
-                        cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == i.ToString()).ParameterValue;
+                        cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == i).ParameterValue;
                     }
                     result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, 3)}" : "Invalid Data";
                     break;
@@ -115,11 +129,14 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case "TotalDistanceCovered":
                 case "PersonDetectionRange":
+                case "DistanceMultiplyByRow":
                 case "Distance":
                     data = "m";
                     break;
                 case "CumulativeVelocity":
                 case "AverageVelocity":
+                case "VelocityByRow":
+                case "CumulativeVelocityByRow":
                 case "Velocity":
                     data = "m/s";
                     break;

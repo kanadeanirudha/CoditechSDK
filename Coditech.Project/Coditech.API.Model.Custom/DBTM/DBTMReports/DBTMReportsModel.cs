@@ -5,7 +5,7 @@
         public string ParameterCode { get; set; }
         public decimal ParameterValue { get; set; }
         public string FromTo { get; set; }
-        public string Row { get; set; }
+        public Int16 Row { get; set; }
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
         public int DBTMTestMasterId { get; set; }
@@ -17,5 +17,8 @@
         public DateTime TestPerformedTime { get; set; }
         public int RowCountPerDate { get; set; }
         public int RowOrder { get; set; }
+        public string Comment1 { get; set; }
+        public string Comment2 { get; set; }
+        public string Comment3 { get; set; }
     }
 }

@@ -498,7 +498,7 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
-                                          .Where(x => x.DBTMTestMasterId == dBTMTestMasterId)
+                                          .Where(x => x.DBTMTestMasterId == dBTMTestMasterId && x.IsActive)
                                           .OrderBy(y => y.SequenceNumber)
                                           .ToList();
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
@@ -680,11 +680,23 @@ namespace Coditech.API.Service
                         var dBTMReportsListGroupByData = dBTMReportsList.GroupBy(x => x.CreatedDate).LastOrDefault();
                         if (!string.IsNullOrEmpty(dBTMTestParameterListviewSequence.ConsecutiveParameterCode) && dBTMTestParameterListviewSequence.IsCalculatedParameter)
                         {
-                            fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == dBTMTestParameterListviewSequence.ConsecutiveParameterCode && x.Row == spilt[1])?.FromTo;
+                            if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
+                            {
+                                if (dBTMTestParameterListviewSequence.ParameterCode == "CumulativeTime" ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocity" ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == "VelocityByRow" ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocityByRow"
+                                    )
+                                {
+                                    fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
+                                }
+                            }
+                            else
+                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == dBTMTestParameterListviewSequence.ConsecutiveParameterCode && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
                         }
                         else
                         {
-                            fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == spilt[1])?.FromTo;
+                            fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
                         }
                         updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
@@ -716,7 +728,7 @@ namespace Coditech.API.Service
                     newRow[displayColumn] = "NA";
                 else if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
                 {
-                    newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Custom1 != null ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Custom1.ToString() : "NA";
+                    newRow[displayColumn] = !string.IsNullOrEmpty(group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1) ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1.ToString() : "NA";
                 }
                 else
                 {
@@ -725,15 +737,15 @@ namespace Coditech.API.Service
                         if (spilt.Length == 1)
                             newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, 1);
                         else
-                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt32(spilt[1]));
+                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt16(spilt[1]));
                     }
                     else
                     {
                         if (spilt.Length == 1)
-                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == "1")?.ParameterValue.ToString() ?? "NA";
+                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == 1)?.ParameterValue.ToString() ?? "NA";
                         else
                         {
-                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == spilt[1])?.ParameterValue.ToString();
+                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.ParameterValue.ToString();
                         }
                     }
                 }
@@ -748,19 +760,30 @@ namespace Coditech.API.Service
             for (int idx = 0; idx < listviewSequenceColumns.Count; idx++)
             {
                 var item = listviewSequenceColumns[idx];
-                var consecutiveParameterData = listviewSequenceColumns.FirstOrDefault(x => x.ConsecutiveParameterCode == item.ParameterCode);
+                var consecutiveParameterDataList = listviewSequenceColumns.Where(x => x.ConsecutiveParameterCode == item.ParameterCode && x.Recursion == item.Recursion)?.ToList();
 
-                if (consecutiveParameterData != null && !string.IsNullOrEmpty(consecutiveParameterData.ParameterCode))
+                if (consecutiveParameterDataList != null && consecutiveParameterDataList.Any())
                 {
                     for (Int16 i = 1; i <= item.Recursion; i++)
                     {
-                        listviewSequenceColumnList.Add($"{item.ParameterCode}-{i}");
-                        listviewSequenceColumnList.Add($"{consecutiveParameterData.ParameterCode}-{i}");
+                        int count = 1;
+                        foreach (var consecutiveParameterData in consecutiveParameterDataList.OrderBy(x => x.SequenceNumber))
+                        {
+                            if (!string.IsNullOrEmpty(consecutiveParameterData.ParameterCode))
+                            {
+                                if (count == 1)
+                                    listviewSequenceColumnList.Add($"{item.ParameterCode}-{i}");
+                                listviewSequenceColumnList.Add($"{consecutiveParameterData.ParameterCode}-{i}");
+                            }
+                            listviewSequenceColumns.Remove(consecutiveParameterData);
+                            // If the removed item is ahead of the current index, adjust the index
+                            if (idx > listviewSequenceColumns.IndexOf(item))
+                            {
+                                idx--;
+                            }
+                            count++;
+                        }
                     }
-                    listviewSequenceColumns.Remove(consecutiveParameterData);
-                    // If the removed item is ahead of the current index, adjust the index
-                    if (idx > listviewSequenceColumns.IndexOf(item))
-                        idx--;
                 }
                 else
                 {
