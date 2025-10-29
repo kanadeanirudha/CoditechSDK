@@ -1,4 +1,6 @@
-﻿namespace Coditech.Common.API.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coditech.Common.API.Model
 {
     public class DBTMActivityListViewSequenceModel : BaseModel
     {
@@ -11,5 +13,8 @@
         public string ConsecutiveParameterCode { get; set; }
         public bool IsCalculatedConsecutiveParameterCode { get; set; }
         public string ColumnName { get; set; }
+        public bool IsActive { get; set; }
+        public string DBTMSequenceData { get; set; }
+        public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
     }
 }

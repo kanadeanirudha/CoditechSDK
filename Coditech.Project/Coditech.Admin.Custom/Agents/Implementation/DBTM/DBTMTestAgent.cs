@@ -8,6 +8,7 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Admin.Agents
@@ -101,20 +102,6 @@ namespace Coditech.Admin.Agents
             }
         }
 
-        //Get Activity List View Sequence
-        public virtual DBTMActivityListViewSequenceListViewModel GetActivityListViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel)
-        {
-            FilterCollection filters = new FilterCollection();
-            dataTableModel = dataTableModel ?? new DataTableViewModel();
-            DBTMActivityListViewSequenceListResponse response = _dBTMTestClient.GetActivityListViewSequenceList(dBTMTestMasterId, null, null, null, null,  int.MaxValue);
-            DBTMActivityListViewSequenceListModel associatedTrainerList = new DBTMActivityListViewSequenceListModel { DBTMActivityListViewSequenceList = response?.DBTMActivityListViewSequenceList };
-            DBTMActivityListViewSequenceListViewModel listViewModel = new DBTMActivityListViewSequenceListViewModel();
-            listViewModel.DBTMActivityListViewSequenceList = associatedTrainerList?.DBTMActivityListViewSequenceList?.ToViewModel<DBTMActivityListViewSequenceViewModel>().ToList();
-            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMActivityListViewSequenceList.Count, BindActivityListViewSequenceColumns(), false);
-            listViewModel.DBTMTestMasterId = dBTMTestMasterId;
-            return listViewModel;
-        }
-
         //Delete DBTMTest.
         public virtual bool DeleteDBTMTest(string dBTMTestMasterIds, out string errorMessage)
         {
@@ -173,6 +160,109 @@ namespace Coditech.Admin.Agents
             DBTMGraphMasterListViewModel listViewModel = new DBTMGraphMasterListViewModel();
             listViewModel.DBTMGraphMasterList = dBTMGraphMasterList?.DBTMGraphMasterList?.ToViewModel<DBTMGraphMasterViewModel>().ToList();
             return listViewModel;
+        }
+
+        //Get Activity List View Sequence
+        public virtual DBTMActivityListViewSequenceListViewModel GetActivityListViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            DBTMActivityListViewSequenceListResponse response = _dBTMTestClient.GetActivityListViewSequenceList(dBTMTestMasterId, null, null, null, null, int.MaxValue);
+            DBTMActivityListViewSequenceListModel associatedTrainerList = new DBTMActivityListViewSequenceListModel { DBTMActivityListViewSequenceList = response?.DBTMActivityListViewSequenceList };
+            DBTMActivityListViewSequenceListViewModel listViewModel = new DBTMActivityListViewSequenceListViewModel();
+            listViewModel.DBTMActivityListViewSequenceList = associatedTrainerList?.DBTMActivityListViewSequenceList?.ToViewModel<DBTMActivityListViewSequenceViewModel>().ToList();
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMActivityListViewSequenceList.Count, BindActivityListViewSequenceColumns());
+            listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            return listViewModel;
+        }
+
+        public virtual DBTMActivityListViewSequenceViewModel GetActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            DBTMActivityListViewSequenceResponse response = _dBTMTestClient.GetActivityListViewSequence(dBTMTestParameterListViewSequenceId);
+            return response?.DBTMActivityListViewSequenceModel.ToViewModel<DBTMActivityListViewSequenceViewModel>();
+        }
+
+        //Update Activity List View Sequence
+        public virtual DBTMActivityListViewSequenceViewModel UpdateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMTestViewModel)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTest", TraceLevel.Info);
+                DBTMActivityListViewSequenceResponse response = _dBTMTestClient.UpdateActivityListViewSequence(dBTMTestViewModel.ToModel<DBTMActivityListViewSequenceModel>());
+                DBTMActivityListViewSequenceModel dBTMTestModel = response?.DBTMActivityListViewSequenceModel;
+                _coditechLogging.LogMessage("Agent method execution done.", "DBTMTest", TraceLevel.Info);
+                return IsNotNull(dBTMTestModel) ? dBTMTestModel.ToViewModel<DBTMActivityListViewSequenceViewModel>() : (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(new DBTMActivityListViewSequenceViewModel(), GeneralResources.UpdateErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMTestViewModel, GeneralResources.UpdateErrorMessage);
+            }
+        }
+
+        //Update Sequence Number
+        public virtual DBTMActivityListViewSequenceViewModel UpdateSequenceNumber(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(dBTMActivityListViewSequenceViewModel.DBTMSequenceData))
+                {
+                    List<DBTMActivityListViewSequenceModel> dBTMActivityListViewSequenceList = JsonConvert.DeserializeObject<List<DBTMActivityListViewSequenceModel>>(dBTMActivityListViewSequenceViewModel.DBTMSequenceData);
+                    dBTMActivityListViewSequenceViewModel.DBTMActivityListViewSequenceList = dBTMActivityListViewSequenceList;
+                }
+
+                DBTMActivityListViewSequenceResponse response = _dBTMTestClient.UpdateSequenceNumber(dBTMActivityListViewSequenceViewModel.ToModel<DBTMActivityListViewSequenceModel>());
+                DBTMActivityListViewSequenceModel dBTMActivityListViewSequenceModel = response?.DBTMActivityListViewSequenceModel;
+                return IsNotNull(dBTMActivityListViewSequenceModel) ? dBTMActivityListViewSequenceModel.ToViewModel<DBTMActivityListViewSequenceViewModel>() : new DBTMActivityListViewSequenceViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityListViewSequenceViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityListViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityListViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
+        //Delete ActivityListViewSequence.
+        public virtual bool DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, out string errorMessage)
+        {
+            errorMessage = GeneralResources.ErrorFailedToDelete;
+
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTest", TraceLevel.Info);
+                TrueFalseResponse trueFalseResponse = _dBTMTestClient.DeleteActivityListViewSequence(new ParameterModel { Ids = dBTMTestParameterListViewSequenceIds });
+                return trueFalseResponse.IsSuccess;
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AssociationDeleteError:
+                        errorMessage = AdminResources.ErrorDeleteDBTMTestMaster;
+                        return false;
+                    default:
+                        errorMessage = GeneralResources.ErrorFailedToDelete;
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                errorMessage = GeneralResources.ErrorFailedToDelete;
+                return false;
+            }
         }
 
         #endregion
@@ -270,6 +360,11 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Is Calculated Consecutive Parameter Code",
                 ColumnCode = "IsCalculatedConsecutiveParameterCode",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Active",
+                ColumnCode = "IsActive",
             });
             return datatableColumnList;
         }

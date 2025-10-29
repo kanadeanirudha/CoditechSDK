@@ -1,6 +1,7 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
@@ -96,19 +97,6 @@ namespace Coditech.Admin.Controllers
             return View(createEdit, dBTMTestViewModel);
         }
 
-        // Get Activity List View Sequence
-        public virtual ActionResult ActivityListViewSequenceList(DataTableViewModel dataTableViewModel)
-        {
-            DBTMActivityListViewSequenceListViewModel list = _dBTMTestAgent.GetActivityListViewSequenceList(Convert.ToInt16(dataTableViewModel.SelectedParameter1), dataTableViewModel);
-            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
-            if (AjaxHelper.IsAjaxRequest)
-            {
-                return PartialView("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/_ActivityListViewSequenceList.cshtml", list);
-            }
-
-            return View($"~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/ActivityListViewSequenceList.cshtml", list);
-        }
-
         public virtual ActionResult Delete(string dBTMTestMasterIds)
         {
             string message = string.Empty;
@@ -126,6 +114,101 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction<DBTMTestMasterController>(x => x.List(null));
         }
 
+        // Get Activity List View Sequence
+        public virtual ActionResult ActivityListViewSequenceList(DataTableViewModel dataTableViewModel)
+        {
+            DBTMActivityListViewSequenceListViewModel list = _dBTMTestAgent.GetActivityListViewSequenceList(Convert.ToInt16(dataTableViewModel.SelectedParameter1), dataTableViewModel);
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/_ActivityListViewSequenceList.cshtml", list);
+            }
+
+            return View($"~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/ActivityListViewSequenceList.cshtml", list);
+        }
+
+        [HttpGet]
+        public virtual ActionResult ActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            DBTMActivityListViewSequenceViewModel dBTMTestViewModel = _dBTMTestAgent.GetActivityListViewSequence(dBTMTestParameterListViewSequenceId);
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMTestViewModel);
+        }
+
+        [HttpPost]
+        public virtual ActionResult ActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMTestViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                SetNotificationMessage(_dBTMTestAgent.UpdateActivityListViewSequence(dBTMTestViewModel).HasError
+                    ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                    : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("ActivityListViewSequence", new { dBTMTestParameterListViewSequenceId = dBTMTestViewModel.DBTMTestParameterListViewSequenceId });
+                }
+                else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMTestViewModel.DBTMTestMasterId)});
+                }
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMTestViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult UpdateSequenceNumber(int dBTMTestMasterId)
+        {
+            DBTMActivityListViewSequenceListViewModel listViewModel = _dBTMTestAgent.GetActivityListViewSequenceList(dBTMTestMasterId, new DataTableViewModel());
+
+            var modelList = listViewModel.DBTMActivityListViewSequenceList
+                .Select(x => new DBTMActivityListViewSequenceModel
+                {
+                    DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
+                    DBTMTestMasterId = x.DBTMTestMasterId,
+                    ParameterCode = x.ParameterCode,
+                    IsCalculatedParameter = x.IsCalculatedParameter,
+                    SequenceNumber = x.SequenceNumber
+                })
+                .ToList();
+
+            DBTMActivityListViewSequenceViewModel viewModel = new DBTMActivityListViewSequenceViewModel
+            {
+                DBTMTestMasterId = dBTMTestMasterId,
+                DBTMActivityListViewSequenceList = modelList
+            };
+            return PartialView("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/_AddSequenceNumberPopUp.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateSequenceNumber(DBTMActivityListViewSequenceViewModel listViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                listViewModel = _dBTMTestAgent.UpdateSequenceNumber(listViewModel);
+                if (!listViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage("Sequence Number Saved Successfully."));
+                    return Json(new { success = true });
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage("Failed to Save Sequence Number."));
+            return Json(new { success = false });
+        }
+
+        public virtual ActionResult DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, int dBTMTestMasterId)
+        {
+            string message = string.Empty;
+            bool status = false;
+            if (!string.IsNullOrEmpty(dBTMTestParameterListViewSequenceIds))
+            {
+                status = _dBTMTestAgent.DeleteActivityListViewSequence(dBTMTestParameterListViewSequenceIds, out message);
+                SetNotificationMessage(!status
+                ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
+                : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
+                return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId});
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
+            return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+        }
         #region Protected
         protected virtual void BindDBTMTestParameter(DBTMTestViewModel dBTMTestViewModel)
         {
