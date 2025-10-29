@@ -361,5 +361,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMTestMaster/CreateActivityListViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMActivityListViewSequenceResponse))]
+        public virtual IActionResult CreateActivityListViewSequence([FromBody] DBTMActivityListViewSequenceModel model)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceModel dBTMActivityListViewSequence = _dBTMTestMasterService.CreateActivityListViewSequence(model);
+                return IsNotNull(dBTMActivityListViewSequence) ? CreateCreatedResponse(new DBTMActivityListViewSequenceResponse { DBTMActivityListViewSequenceModel = dBTMActivityListViewSequence }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

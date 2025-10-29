@@ -476,6 +476,31 @@ namespace Coditech.API.Service
             return dBTMActivityListViewSequenceModel;
         }
 
+        //Create Activity List View Sequence.
+        public virtual DBTMActivityListViewSequenceModel CreateActivityListViewSequence(DBTMActivityListViewSequenceModel dBTMActivityListViewSequenceModel)
+        {
+            if (IsNull(dBTMActivityListViewSequenceModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            if (IsParameterCodeAlreadyExist(dBTMActivityListViewSequenceModel.ParameterCode))
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Parameter Code"));
+
+            DBTMTestParameterListViewSequence dBTMTestParameterListViewSequence = dBTMActivityListViewSequenceModel.FromModelToEntity<DBTMTestParameterListViewSequence>();
+
+            //Create new DBTM Activity List View Sequence and return it.
+            DBTMTestParameterListViewSequence dBTMTestParameterListViewSequenceData = _dBTMActivityListViewSequenceMasterRepository.Insert(dBTMTestParameterListViewSequence);
+            if (dBTMTestParameterListViewSequenceData?.DBTMTestParameterListViewSequenceId > 0)
+            {
+                dBTMActivityListViewSequenceModel.DBTMTestParameterListViewSequenceId = dBTMTestParameterListViewSequenceData.DBTMTestParameterListViewSequenceId;
+            }
+            else
+            {
+                dBTMActivityListViewSequenceModel.HasError = true;
+                dBTMActivityListViewSequenceModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return dBTMActivityListViewSequenceModel;
+        }
+
         //Delete DBTMActivityListViewSequence.
         public virtual bool DeleteActivityListViewSequence(ParameterModel parameterModel)
         {
@@ -495,6 +520,11 @@ namespace Coditech.API.Service
         // Check if Test Name is already present or not.
         protected virtual bool IsDBTMTestNameAlreadyExist(string testCode, int dBTMTestMasterId = 0)
             => _dBTMTestMasterRepository.Table.Any(x => x.TestCode == testCode && (x.DBTMTestMasterId != dBTMTestMasterId || dBTMTestMasterId == 0));
+
+        //Check if Parameter Code is already present or not.
+        protected virtual bool IsParameterCodeAlreadyExist(string parameterCode, int dBTMTestParameterListViewSequenceId = 0)
+
+        => _dBTMActivityListViewSequenceMasterRepository.Table.Any(x => x.ParameterCode == parameterCode && (x.DBTMTestParameterListViewSequenceId != dBTMTestParameterListViewSequenceId || dBTMTestParameterListViewSequenceId == 0));
         #endregion
     }
 }

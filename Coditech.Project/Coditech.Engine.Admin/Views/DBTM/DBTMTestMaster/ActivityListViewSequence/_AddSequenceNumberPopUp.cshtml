@@ -89,36 +89,53 @@
             $(this).next(".error-message").hide();
         });
 
-        $("#saveSequenceButton").click(function (e) {
-            e.preventDefault(); 
-            let isValid = true;
-            let sequenceNumbers = [];
+           $("#saveSequenceButton").click(function (e) {
+        e.preventDefault();
+        let isValid = true;
+        let sequenceNumbers = [];
 
+        $(".SequenceNumber").each(function () {
+            let val = $(this).val().trim();
+            if (val === "") {
+                $(this).next(".error-message").text("Sequence Number is required.").show();
+                isValid = false;
+            } else {
+                sequenceNumbers.push(parseInt(val));
+                $(this).next(".error-message").hide();
+            }
+        });
+        // Check duplicates
+        let duplicates = sequenceNumbers.filter((v, i, a) => a.indexOf(v) !== i);
+        if (duplicates.length > 0) {
             $(".SequenceNumber").each(function () {
-                let val = $(this).val().trim();
-                if (val === "") {
-                    $(this).next(".error-message").text("Sequence Number is required.").show();
-                    isValid = false;
-                } else {
-                    sequenceNumbers.push(val);
+                if (duplicates.includes(parseInt($(this).val()))) {
+                    $(this).next(".error-message").text("Duplicate sequence number not allowed.").show();
                 }
             });
-
-            let duplicates = sequenceNumbers.filter((v, i, a) => a.indexOf(v) !== i);
-            if (duplicates.length > 0) {
-                $(".SequenceNumber").each(function () {
-                    if (duplicates.includes($(this).val().trim())) {
-                        $(this).next(".error-message").text("Duplicate sequence number not allowed.").show();
-                    }
-                });
-                isValid = false;
-            }
-
-            if (!isValid) {
-                return false;
-            }
-
-            DBTMActivityListViewSequence.SaveData();
-        });
+            isValid = false;
+        }
+        // Check sequence range
+        let totalCount = $(".SequenceNumber").length;
+        let invalidNumbers = sequenceNumbers.filter(n => n < 1 || n > totalCount);
+        if (invalidNumbers.length > 0) {
+            $(".SequenceNumber").each(function () {
+                let val = parseInt($(this).val());
+                if (invalidNumbers.includes(val)) {
+                    $(this).next(".error-message").text("Sequence number must be between 1 and " + totalCount + ".").show();
+                }
+            });
+            isValid = false;
+        }
+        let expected = Array.from({ length: totalCount }, (_, i) => i + 1);
+        let missing = expected.filter(n => !sequenceNumbers.includes(n));
+        if (missing.length > 0) {
+            CoditechNotification.DisplayNotificationMessage("All sequence numbers from 1 to " + totalCount + " must be used without gaps.");
+            isValid = false;
+        }
+        if (!isValid) {
+            return false;
+        }
+        DBTMActivityListViewSequence.SaveData();
+       });
     });
 </script>
