@@ -443,11 +443,11 @@ namespace Coditech.Admin.Controllers
             }
             return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
+            // Remove unnecessary model validations
             ModelState.Remove("CentreName");
             ModelState.Remove("CentreCode");
             ModelState.Remove("DeviceSerialCode");
@@ -458,66 +458,85 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("Pincode");
             ModelState.Remove("ConfirmPassword");
             ModelState.Remove("Password");
-            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
+
+            // Main validation check
+            if (!dBTMNewRegistrationViewModel.IsTermsAndCondition
+                || !ModelState.IsValid
+                || string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
                 {
-                    //var generalcountrymasterid = dBTMNewRegistrationViewModel.GeneralCountryMasterId;
-                    //var generalcitymasterid = dBTMNewRegistrationViewModel.GeneralCityMasterId;
-                    //var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
                     var isTermsAndCondition = dBTMNewRegistrationViewModel.IsTermsAndCondition;
+                    var joiningCode = dBTMNewRegistrationViewModel.JoiningCode;
 
-                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode);
-                    if (!list.HasError)
+                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
+
+                    // ✅ Stop execution immediately if backend returned an error
+                    if (list.HasError)
                     {
-                        dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
-                        {
-                            JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
-                            AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-                            {
-                                DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                                Parameter = dBTMNewRegistrationViewModel.JoiningCode
-                            }).DropdownList?.Where(x => x.Value != "")?.ToList()
+                        dBTMNewRegistrationViewModel.ErrorMessage = list.ErrorMessage
+                            ?? "An unexpected error occurred while fetching trainer details.";
 
-                        };
+                        SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
+                        return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
                     }
-                    //dBTMNewRegistrationViewModel.GeneralRegionMasterId = regionmasterid;
-                    //dBTMNewRegistrationViewModel.GeneralCountryMasterId = generalcountrymasterid;
-                    //dBTMNewRegistrationViewModel.GeneralCityMasterId = generalcitymasterid;
+
+                    // ✅ Continue only if no error
+                    dBTMNewRegistrationViewModel.AllTrainerList =
+                        CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                        {
+                            DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                            Parameter = joiningCode
+                        }).DropdownList?.Where(x => !string.IsNullOrEmpty(x.Value))?.ToList();
+
                     dBTMNewRegistrationViewModel.IsTermsAndCondition = isTermsAndCondition;
+                    dBTMNewRegistrationViewModel.JoiningCode = joiningCode;
                 }
 
-                if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
+                // Validation messages
+                if (string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
                 {
-                    dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
+                    dBTMNewRegistrationViewModel.ErrorMessage = "Please enter a valid Joining Code.";
                 }
-            }
-            else
-            {
-                ModelState.Remove("CentreName");
-                ModelState.Remove("CentreCode");
-                ModelState.Remove("DeviceSerialCode");
-                if (ModelState.IsValid)
+                else if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
                 {
-                    dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
-                    if (!dBTMNewRegistrationViewModel.HasError)
+                    dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms and Conditions.";
+                }
+
+                SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
+                return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+            }
+
+            // Secondary validation
+            ModelState.Remove("CentreName");
+            ModelState.Remove("CentreCode");
+            ModelState.Remove("DeviceSerialCode");
+
+            if (ModelState.IsValid)
+            {
+                dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
+
+                if (!dBTMNewRegistrationViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
+
+                    if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
-                        SetNotificationMessage(GetSuccessNotificationMessage("You have registered successfully."));
-                        //return RedirectToAction("List", "DBTMTraineeDetails");
-                        if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
-                        {
-                            return RedirectToAction("UpdateDBTMTraineePersonalDetails", new { dBTMTraineeDetailId = dBTMNewRegistrationViewModel.EntityId, personId = dBTMNewRegistrationViewModel.PersonId });
-                        }
-                        else if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
-                        {
-                            return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel() { SelectedCentreCode = dBTMNewRegistrationViewModel.CentreCode });
-                        }
+                        return RedirectToAction("UpdateDBTMTraineePersonalDetails",
+                            new { dBTMTraineeDetailId = dBTMNewRegistrationViewModel.EntityId, personId = dBTMNewRegistrationViewModel.PersonId });
+                    }
+                    else if (string.Equals(dBTMNewRegistrationViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList,
+                            new DataTableViewModel() { SelectedCentreCode = dBTMNewRegistrationViewModel.CentreCode });
                     }
                 }
             }
+
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
+
         #region Profilee
         [HttpGet]
         public virtual ActionResult Profile(long dBTMTraineeDetailId)
