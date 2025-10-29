@@ -44,5 +44,15 @@ namespace Coditech.API.Endpoint
         {
             return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetActivityListViewSequenceList?dBTMTestMasterId={dBTMTestMasterId}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
         }
+        public string DeleteActivityListViewSequenceAsync() =>
+                  $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DeleteActivityListViewSequence";
+
+        public string GetActivityListViewSequenceAsync(int dBTMTestParameterListViewSequenceId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetActivityListViewSequence?dBTMTestParameterListViewSequenceId={dBTMTestParameterListViewSequenceId}";
+
+        public string UpdateActivityListViewSequenceAsync() =>
+               $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateActivityListViewSequence";
+        public string UpdateSequenceNumberAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateSequenceNumber";
     }
 }

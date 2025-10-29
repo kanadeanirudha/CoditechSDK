@@ -298,35 +298,7 @@ namespace Coditech.API.Service
             }
             return isdBTMTestUpdated;
         }
-
-        //Get GetActivityListViewSequence by dBTMTestMasterId.
-        public virtual DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
-        {
-            List<DBTMTestParameterListViewSequence> activityList = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).OrderBy(x => x.SequenceNumber).ToList();
-
-            // Map the entities to the DBTMActivityListViewSequenceModel list
-            List<DBTMActivityListViewSequenceModel> activityViewSequenceList = activityList.Select(x => new DBTMActivityListViewSequenceModel
-            {
-                DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
-                DBTMTestMasterId = x.DBTMTestMasterId,
-                ParameterCode = x.ParameterCode,
-                IsCalculatedParameter = x.IsCalculatedParameter,
-                Recursion = x.Recursion,
-                SequenceNumber = x.SequenceNumber,
-                ConsecutiveParameterCode = x.ConsecutiveParameterCode,
-                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode,
-                ColumnName = x.ColumnName,
-            }).ToList();
-
-            DBTMActivityListViewSequenceListModel listModel = new DBTMActivityListViewSequenceListModel
-            {
-                DBTMActivityListViewSequenceList = activityViewSequenceList,
-                DBTMTestMasterId = dBTMTestMasterId
-            };
-
-            return listModel;
-        }
-
+          
         //Delete DBTMTest.
         public virtual bool DeleteDBTMTest(ParameterModel parameterModel)
         {
@@ -417,6 +389,107 @@ namespace Coditech.API.Service
             return list;
         }
 
+        //Get GetActivityListViewSequence by dBTMTestMasterId.
+        public virtual DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        {
+            List<DBTMTestParameterListViewSequence> activityList = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).OrderBy(x => x.SequenceNumber).ToList();
+
+            // Map the entities to the DBTMActivityListViewSequenceModel list
+            List<DBTMActivityListViewSequenceModel> activityViewSequenceList = activityList.Select(x => new DBTMActivityListViewSequenceModel
+            {
+                DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
+                DBTMTestMasterId = x.DBTMTestMasterId,
+                ParameterCode = x.ParameterCode,
+                IsCalculatedParameter = x.IsCalculatedParameter,
+                Recursion = x.Recursion,
+                SequenceNumber = x.SequenceNumber,
+                ConsecutiveParameterCode = x.ConsecutiveParameterCode,
+                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode,
+                ColumnName = x.ColumnName,
+                IsActive= x.IsActive
+            }).ToList();
+
+            DBTMActivityListViewSequenceListModel listModel = new DBTMActivityListViewSequenceListModel
+            {
+                DBTMActivityListViewSequenceList = activityViewSequenceList,
+                DBTMTestMasterId = dBTMTestMasterId
+            };
+
+            return listModel;
+        }
+
+        public virtual DBTMActivityListViewSequenceModel GetActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            if (dBTMTestParameterListViewSequenceId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterListViewSequenceId"));
+
+            //Get the DBTMTest Details based on id.
+            DBTMTestParameterListViewSequence dBTMTestMaster = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestParameterListViewSequenceId == dBTMTestParameterListViewSequenceId)?.FirstOrDefault();
+            DBTMActivityListViewSequenceModel dBTMTestModel = dBTMTestMaster?.FromEntityToModel<DBTMActivityListViewSequenceModel>();
+            return dBTMTestModel;
+        }
+
+        //Update ActivityListViewSequence
+
+        public virtual bool UpdateActivityListViewSequence(DBTMActivityListViewSequenceModel dBTMTestModel)
+        {
+            if (IsNull(dBTMTestModel))
+                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
+
+            if (dBTMTestModel.DBTMTestParameterListViewSequenceId < 1)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterListViewSequenceId"));
+
+            DBTMTestParameterListViewSequence dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestParameterListViewSequence>();
+
+            //Update DBTMTest
+            bool isdBTMTestUpdated = _dBTMActivityListViewSequenceMasterRepository.Update(dBTMTestMaster);
+            if (!isdBTMTestUpdated)
+            {
+                dBTMTestModel.HasError = true;
+                dBTMTestModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
+            }
+            return isdBTMTestUpdated;
+        }
+
+        public virtual DBTMActivityListViewSequenceModel UpdateSequenceNumber(DBTMActivityListViewSequenceModel dBTMActivityListViewSequenceModel)
+        {
+            if (IsNull(dBTMActivityListViewSequenceModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            if (dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList == null ||
+                !dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList.Any())
+                return dBTMActivityListViewSequenceModel;
+
+            foreach (var updatedItem in dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList)
+            {
+                var existing = _dBTMActivityListViewSequenceMasterRepository.Table
+                    .FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == updatedItem.DBTMTestParameterListViewSequenceId);
+
+                if (existing != null)
+                {
+                    existing.SequenceNumber = updatedItem.SequenceNumber;
+                    existing.ModifiedDate = DateTime.Now;
+                    _dBTMActivityListViewSequenceMasterRepository.Update(existing);
+                }
+            }
+
+            return dBTMActivityListViewSequenceModel;
+        }
+
+        //Delete DBTMActivityListViewSequence.
+        public virtual bool DeleteActivityListViewSequence(ParameterModel parameterModel)
+        {
+            if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterListViewSequenceId"));
+
+            CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("DBTMTestParameterListViewSequenceId", parameterModel.Ids, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+            int status = 0;
+            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMActivityListViewSequence @DBTMTestParameterListViewSequenceId,  @Status OUT", 1, out status);
+
+            return status == 1 ? true : false;
+        }
 
         #region Protected Method
         // Check if Test Name is already present or not.

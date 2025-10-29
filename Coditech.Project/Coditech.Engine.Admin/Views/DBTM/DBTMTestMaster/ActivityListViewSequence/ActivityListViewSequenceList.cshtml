@@ -1,14 +1,14 @@
 ﻿@using Coditech.Admin.Utilities;
 @model DBTMActivityListViewSequenceListViewModel
+
 @{
     ViewBag.Title = "Activity List View Sequence List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string actionName = ViewContext.RouteData.Values["action"].ToString();
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTestMasterId", Model.DBTMTestMasterId.ToString());
-    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+    ModelPopUpViewModel addSequenceNumber = new ModelPopUpViewModel() { ModelPopUpId = "AddSequenceNumberPopupId", ModalContentId = "AddSequenceNumberContentId" };
 }
-<!-- Page Content-->
+
 <div class="page-content mt-5">
     <div class="container-fluid">
         <div class="row">
@@ -18,8 +18,10 @@
             <div class="col-10">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">Activity List View Sequence List </span>
-                        
+                        <span class="card-title">Activity List View Sequence List</span>
+                        <a href="javascript:void(0)" class="btn btn-sm btn-soft-primary float-end" title="Update Sequence Number" onclick="DBTMActivityListViewSequence.UpdateSequenceNumber('@addSequenceNumber.ModalContentId','@Model.DBTMTestMasterId','@Model.SequenceNumber')">
+                            <i class="fas fa-plus me-2"></i>Update Sequence Number
+                        </a>
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
@@ -31,4 +33,16 @@
         </div>
     </div>
 </div>
-<!-- end page content -->
+
+<!-- Modal wrapper -->
+<div class="modal fade" id="@addSequenceNumber.ModelPopUpId" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="@addSequenceNumber.ModalContentId">
+            <!-- AJAX content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/coditech/DBTM/DBTMActivityListViewSequence.js"></script>
+}
