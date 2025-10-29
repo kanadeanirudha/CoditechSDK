@@ -71,6 +71,19 @@ namespace Coditech.API.Client
         /// <param name="ParameterModel">ParameterModel.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteActivityListViewSequence(ParameterModel body);
+
+        /// <summary>
+        /// Update Sequence Number.
+        /// </summary>
+        /// <param name="DBTMActivityListViewSequenceModel">DBTMActivityListViewSequenceModel.</param>
+        /// <returns>Returns DBTMActivityListViewSequenceResponse.</returns>
         DBTMActivityListViewSequenceResponse UpdateSequenceNumber(DBTMActivityListViewSequenceModel body);
+
+        /// <summary>
+        /// Create DBTMActivityListViewSequence.
+        /// </summary>
+        /// <param name="DBTMActivityListViewSequenceModel">DBTMActivityListViewSequenceModel.</param>
+        /// <returns>Returns DBTMActivityListViewSequenceResponse.</returns>
+        DBTMActivityListViewSequenceResponse CreateActivityListViewSequence(DBTMActivityListViewSequenceModel body);
     }
 }

@@ -21,5 +21,6 @@ namespace Coditech.API.Service
         bool UpdateActivityListViewSequence(DBTMActivityListViewSequenceModel model);
         DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMActivityListViewSequenceModel UpdateSequenceNumber(DBTMActivityListViewSequenceModel model);
+        DBTMActivityListViewSequenceModel CreateActivityListViewSequence(DBTMActivityListViewSequenceModel model);
     }
 }

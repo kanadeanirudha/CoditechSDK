@@ -17,11 +17,20 @@
             </div>
             <div class="col-10">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="card-title">Activity List View Sequence List</span>
-                        <a href="javascript:void(0)" class="btn btn-sm btn-soft-primary float-end" title="Update Sequence Number" onclick="DBTMActivityListViewSequence.UpdateSequenceNumber('@addSequenceNumber.ModalContentId','@Model.DBTMTestMasterId','@Model.SequenceNumber')">
-                            <i class="fas fa-plus me-2"></i>Update Sequence Number
-                        </a>
+                        <div class="d-flex gap-2">
+                            <a href="/@controllerName/CreateActivityListViewSequence?dBTMTestMasterId=@Model.DBTMTestMasterId"
+                               class="btn btn-sm btn-soft-primary" role="button">
+                                <i class="fas fa-plus me-2"></i>Create Activity List View Sequence
+                            </a>
+                            <a href="javascript:void(0)"
+                               class="btn btn-sm btn-soft-primary"
+                               title="Update Sequence Number"
+                               onclick="DBTMActivityListViewSequence.UpdateSequenceNumber('@addSequenceNumber.ModalContentId','@Model.DBTMTestMasterId','@Model.SequenceNumber')">
+                                <i class="fas fa-sync me-2"></i>Update Sequence Number
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
