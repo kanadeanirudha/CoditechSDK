@@ -13,7 +13,6 @@
 
 @using (Html.BeginForm("UpdateSequenceNumber", "DBTMTestMaster", FormMethod.Post, new { id = "frmUpdateSequence" }))
 {
-    @* @Html.AntiForgeryToken()  *@
     @Html.HiddenFor(m => m.DBTMTestMasterId)
     @Html.HiddenFor(m => m.DBTMTestParameterListViewSequenceId)
     @Html.HiddenFor(m => m.DBTMSequenceData)
@@ -59,7 +58,7 @@
     </div>
 
     <div class="modal-footer">
-        <button type="button" id="saveSequenceButton" class="btn btn-success" onclick="DBTMActivityListViewSequence.SaveData()">Save</button>
+        <button type="button" id="saveSequenceButton" class="btn btn-success">Save</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     </div>
 }

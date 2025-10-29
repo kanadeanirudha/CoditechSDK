@@ -54,11 +54,11 @@
             },
             success: function (response) {
                 if (response.success) {
-                    CoditechNotification.DisplayNotificationMessage("Sequence number saved successfully.", "success");
+                    CoditechNotification.DisplayNotificationMessage("success");
                     $('#AddSequenceNumberPopupId').modal('hide');
                     location.reload();
                 } else {
-                    CoditechNotification.DisplayNotificationMessage(response.message || "Failed to save sequence number.", "error");
+                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
                 }
             },
             error: function (xhr) {
