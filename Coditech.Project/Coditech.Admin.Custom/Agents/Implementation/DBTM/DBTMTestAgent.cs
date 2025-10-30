@@ -377,17 +377,21 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Consecutive Parameter Code",
                 ColumnCode = "ConsecutiveParameterCode",
             });
-
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Help Text",
+                ColumnCode = "HelpText",
+            });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Is Calculated Parameter",
                 ColumnCode = "IsCalculatedParameter",
             });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Calculated Consecutive Parameter Code",
-                ColumnCode = "IsCalculatedConsecutiveParameterCode",
-            });
+            //datatableColumnList.Add(new DatatableColumns()
+            //{
+            //    ColumnName = "Is Calculated Consecutive Parameter Code",
+            //    ColumnCode = "IsCalculatedConsecutiveParameterCode",
+            //});
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Is Active",

@@ -20,7 +20,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="card-title">Activity List View Sequence List</span>
                         <div class="d-flex gap-2">
-                            <a href="/@controllerName/CreateActivityListViewSequence?dBTMTestMasterId=@Model.DBTMTestMasterId"
+                            <a href="@Url.Action("CreateActivityListViewSequence", controllerName, new {dBTMTestMasterId=@Model.DBTMTestMasterId})"
                                class="btn btn-sm btn-soft-primary" role="button">
                                 <i class="fas fa-plus me-2"></i>Create Activity List View Sequence
                             </a>

@@ -133,6 +133,26 @@ namespace Coditech.Engine.DBTM.Helpers
                     var forceByRow = Convert.ToDecimal(newRow[$"ForceByRow-{recurtion}"]);
                     result = weight == 0 ? "N/A" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
                     break;
+                case "ChangeOfDirection":
+                    var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "B-C")?.ParameterValue);
+                    var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "C-B")?.ParameterValue);
+                    result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, 3)}" : "0";
+                    break;
+                case "AgilityDeficitRatio":
+                    var changeOfDirection = Convert.ToDecimal(newRow[$"ChangeOfDirection"]);
+                    var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "A-B")?.ParameterValue);
+                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / time1, 3)}" : "0";
+                    break;
+                case "ChangeOfDirectionDeficit":
+                    changeOfDirection = Convert.ToDecimal(newRow[$"ChangeOfDirection"]);
+                    time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time-1" && x.FromTo == "A-B")?.ParameterValue);
+                    result = changeOfDirection > 0 ? $"{Math.Round(changeOfDirection - time1, 3)}" : "0";
+                    break;
+                case "ChangeOfDirectionRatio":
+                    time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "B-C")?.ParameterValue);
+                    time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "C-B")?.ParameterValue);
+                    result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, 3)}" : "0";
+                    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }
@@ -148,6 +168,8 @@ namespace Coditech.Engine.DBTM.Helpers
                 case "MinLap":
                 case "AirTime":
                 case "CumulativeTime":
+                case "ChangeOfDirection":
+                case "ChangeOfDirectionDeficit":
                     data = "sec";
                     break;
                 case "TotalDistanceCovered":
