@@ -21,11 +21,9 @@
                             <td>@item.SequenceNumber</td>
                             <td>@item.Recursion</td>
                             <td>@item.ConsecutiveParameterCode</td>
+                            <td>@item.HelpText</td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCalculatedParameter)
-                            </td>
-                            <td>
-                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCalculatedConsecutiveParameterCode)
                             </td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
