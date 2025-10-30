@@ -68,6 +68,19 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMTestViewModel">dBTMTestViewModel.</param>
         /// <returns>Returns updated DBTMTestViewModel</returns>
         DBTMActivityListViewSequenceViewModel UpdateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMTestViewModel);
+
+        /// <summary>
+        /// Update Sequence Number.
+        /// </summary>
+        /// <param name="dBTMActivityListViewSequenceViewModel">dBTMActivityListViewSequenceViewModel.</param>
+        /// <returns>Returns updated DBTMActivityListViewSequenceViewModel</returns>
         DBTMActivityListViewSequenceViewModel UpdateSequenceNumber(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel);
+
+        /// <summary>
+        /// Create ActivityListViewSequence.
+        /// </summary>
+        /// <param name="dBTMActivityListViewSequenceViewModel">DBTM Activity List View Sequence View Model.</param>
+        /// <returns>Returns created model.</returns>
+        DBTMActivityListViewSequenceViewModel CreateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel);
     }
 }

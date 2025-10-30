@@ -697,6 +697,64 @@ namespace Coditech.API.Client
                 }
             }
         }
+
+        public virtual DBTMActivityListViewSequenceResponse CreateActivityListViewSequence(DBTMActivityListViewSequenceModel body)
+        {
+            return Task.Run(async () => await CreateActivityListViewSequenceAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMActivityListViewSequenceResponse> CreateActivityListViewSequenceAsync(DBTMActivityListViewSequenceModel body, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.CreateActivityListViewSequenceAsync();
+            HttpResponseMessage response = null;
+            bool disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                Dictionary<string, IEnumerable<string>> dictionary = BindHeaders(response);
+
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        {
+                            ObjectResponseResult<DBTMActivityListViewSequenceResponse> objectResponseResult2 = await ReadObjectResponseAsync<DBTMActivityListViewSequenceResponse>(response, BindHeaders(response), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                            if (objectResponseResult2.Object == null)
+                            {
+                                throw new CoditechException(objectResponseResult2.Object.ErrorCode, objectResponseResult2.Object.ErrorMessage);
+                            }
+
+                            return objectResponseResult2.Object;
+                        }
+                    case HttpStatusCode.Created:
+                        {
+                            ObjectResponseResult<DBTMActivityListViewSequenceResponse> objectResponseResult = await ReadObjectResponseAsync<DBTMActivityListViewSequenceResponse>(response, dictionary, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                            if (objectResponseResult.Object == null)
+                            {
+                                throw new CoditechException(objectResponseResult.Object.ErrorCode, objectResponseResult.Object.ErrorMessage);
+                            }
+
+                            return objectResponseResult.Object;
+                        }
+                    default:
+                        {
+                            string value = ((response.Content != null) ? (await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)) : null);
+                            DBTMActivityListViewSequenceResponse result = JsonConvert.DeserializeObject<DBTMActivityListViewSequenceResponse>(value);
+                            UpdateApiStatus(result, status, response);
+                            throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                        }
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                {
+                    response.Dispose();
+                }
+            }
+        }
+
+
         public virtual TrueFalseResponse DeleteActivityListViewSequence(ParameterModel body)
         {
             return Task.Run(async () => await DeleteActivityListViewSequenceAsync(body, CancellationToken.None)).GetAwaiter().GetResult();

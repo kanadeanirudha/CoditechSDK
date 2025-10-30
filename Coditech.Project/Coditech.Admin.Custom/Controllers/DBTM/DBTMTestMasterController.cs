@@ -194,6 +194,48 @@ namespace Coditech.Admin.Controllers
             return Json(new { success = false });
         }
 
+        // Create Activity List View Sequence
+        [HttpGet]
+        public virtual ActionResult CreateActivityListViewSequence(int dBTMTestMasterId)
+        {
+            DBTMActivityListViewSequenceListViewModel listViewModel = _dBTMTestAgent.GetActivityListViewSequenceList(dBTMTestMasterId, new DataTableViewModel());
+            int maxSequence = 0;
+            if (listViewModel?.DBTMActivityListViewSequenceList != null && listViewModel.DBTMActivityListViewSequenceList.Count > 0)
+            {
+                maxSequence = listViewModel.DBTMActivityListViewSequenceList.Max(x => x.SequenceNumber);
+            }
+            var newViewModel = new DBTMActivityListViewSequenceViewModel
+            {
+                DBTMTestMasterId = dBTMTestMasterId,
+                SequenceNumber = (short)(maxSequence + 1), 
+            };
+
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", newViewModel);
+        }
+
+        [HttpPost]
+        public virtual ActionResult CreateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                dBTMActivityListViewSequenceViewModel = _dBTMTestAgent.CreateActivityListViewSequence(dBTMActivityListViewSequenceViewModel);
+                if (!dBTMActivityListViewSequenceViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                    if (string.Equals(dBTMActivityListViewSequenceViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("ActivityListViewSequence", new { dBTMTestParameterListViewSequenceId = dBTMActivityListViewSequenceViewModel.DBTMTestParameterListViewSequenceId });
+                    }
+                    else if (string.Equals(dBTMActivityListViewSequenceViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMActivityListViewSequenceViewModel.DBTMTestMasterId) });
+                    }
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(dBTMActivityListViewSequenceViewModel.ErrorMessage));
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMActivityListViewSequenceViewModel);
+        }
+
         public virtual ActionResult DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, int dBTMTestMasterId)
         {
             string message = string.Empty;

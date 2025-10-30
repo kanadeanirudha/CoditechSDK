@@ -54,5 +54,7 @@ namespace Coditech.API.Endpoint
                $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateActivityListViewSequence";
         public string UpdateSequenceNumberAsync() =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateSequenceNumber";
+        public string CreateActivityListViewSequenceAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityListViewSequence";
     }
 }

@@ -54,11 +54,10 @@
             },
             success: function (response) {
                 if (response.success) {
-                    CoditechNotification.DisplayNotificationMessage("success");
                     $('#AddSequenceNumberPopupId').modal('hide');
                     location.reload();
                 } else {
-                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+                    CoditechNotification.DisplayNotificationMessage(response.message);
                 }
             },
             error: function (xhr) {

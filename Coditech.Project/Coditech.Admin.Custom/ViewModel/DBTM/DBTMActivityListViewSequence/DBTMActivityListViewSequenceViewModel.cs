@@ -8,12 +8,14 @@ namespace Coditech.Admin.ViewModel
     {
         public int DBTMTestParameterListViewSequenceId { get; set; }
         public int DBTMTestMasterId { get; set; }
+
         [Display(Name = "Parameter Code")]
         public string ParameterCode { get; set; }
 
         [Display(Name = "Is Calculated Parameter")]
         public bool IsCalculatedParameter { get; set; }
 
+        [Required]
         [Display(Name = "Recursion")]
         public short Recursion { get; set; }
 

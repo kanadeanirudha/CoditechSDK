@@ -233,6 +233,33 @@ namespace Coditech.Admin.Agents
             }
         }
 
+        //Create Activity List View Sequence
+        public virtual DBTMActivityListViewSequenceViewModel CreateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceResponse response = _dBTMTestClient.CreateActivityListViewSequence(dBTMActivityListViewSequenceViewModel.ToModel<DBTMActivityListViewSequenceModel>());
+                DBTMActivityListViewSequenceModel gymWorkoutPlanModel = response?.DBTMActivityListViewSequenceModel;
+                return IsNotNull(gymWorkoutPlanModel) ? gymWorkoutPlanModel.ToViewModel<DBTMActivityListViewSequenceViewModel>() : new DBTMActivityListViewSequenceViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityListViewSequenceViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityListViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMActivityListViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityListViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
         //Delete ActivityListViewSequence.
         public virtual bool DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, out string errorMessage)
         {
