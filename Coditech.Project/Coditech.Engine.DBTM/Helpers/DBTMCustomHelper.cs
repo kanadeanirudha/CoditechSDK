@@ -59,7 +59,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)}" : "Invalid Data";
                     break;
                 case "TotalDistanceCovered":
-                    decimal totalDistanceCovered = group.Where(x => x.ParameterCode == "Distance" || x.ParameterCode == "DistanceMultiplyByRow").Sum(x => x.ParameterValue);
+                    decimal totalDistanceCovered = group.Where(x => (x.ParameterCode == "Distance" || x.ParameterCode == "DistanceMultiplyByRow") && x.Row != 0).Sum(x => x.ParameterValue);
                     result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)}" : "Invalid Data";
                     break;
                 case "DistanceMultiplyByRow":

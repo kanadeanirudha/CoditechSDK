@@ -709,7 +709,14 @@ namespace Coditech.API.Service
                         }
                         else
                         {
-                            fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
+                            if (dBTMTestParameterListviewSequence.ParameterCode == "Velocity")
+                            {
+                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
+                            }
+                            else
+                            {
+                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
+                            }
                         }
                         updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
