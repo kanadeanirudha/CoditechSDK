@@ -667,12 +667,12 @@ namespace Coditech.API.Service
                 }
 
                 //Updated Column Name
-                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal);
+                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal, isMobileRequest);
             }
             return dataTable;
         }
 
-        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal)
+        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal, bool isMobileRequest)
         {
             string updatedColumnName = string.Empty;
             foreach (DataColumn col in dataTable.Columns)
