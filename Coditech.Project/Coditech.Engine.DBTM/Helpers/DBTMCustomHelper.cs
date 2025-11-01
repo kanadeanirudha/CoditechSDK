@@ -145,8 +145,8 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case "ChangeOfDirectionDeficit":
                     changeOfDirection = Convert.ToDecimal(newRow[$"ChangeOfDirection"]);
-                    time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time-1" && x.FromTo == "A-B")?.ParameterValue);
-                    result = changeOfDirection > 0 ? $"{Math.Round(changeOfDirection - time1, 3)}" : "0";
+                    time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "A-B")?.ParameterValue);
+                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - time1, 3)}" : "0";
                     break;
                 case "ChangeOfDirectionRatio":
                     time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "B-C")?.ParameterValue);
