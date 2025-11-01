@@ -230,11 +230,10 @@ namespace Coditech.API.Service
                 {
                     string sheetName = table.Key.Trim();
                     var replacements = new Dictionary<string, string>
-            {
-                { "5-0-5", "FiveZeroFive Agility Test" },
-                { "5-10-5", "FiveTenFive Agility Test" }
-            };
-
+                    {
+                        { "5-0-5", "FiveZeroFive" },
+                        { "5-10-5", "FiveTenFive" }
+                    };
                     foreach (var kv in replacements)
                     {
                         if (sheetName.Contains(kv.Key))
@@ -242,8 +241,7 @@ namespace Coditech.API.Service
                             sheetName = sheetName.Replace(kv.Key, kv.Value);
                         }
                     }
-
-                    if (!sheetName.Contains("FiveZeroFive Agility Test") && !sheetName.Contains("FiveTenFive Agility Test"))
+                    if (!sheetName.Contains("FiveZeroFive") && !sheetName.Contains("FiveTenFive"))
                     {
                         Match match = Regex.Match(sheetName, @"^(\d+)");
                         if (match.Success)
@@ -253,7 +251,6 @@ namespace Coditech.API.Service
                             sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
                         }
                     }
-
                     char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
                         sheetName = sheetName.Replace(c.ToString(), "");
@@ -264,10 +261,8 @@ namespace Coditech.API.Service
                     var worksheet = workbook.Worksheets.Add(sheetName);
                     worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
                 }
-
                 workbook.SaveAs(filePath);
             }
-
             reportData.FilePath = filePath;
             reportData.FileName = fileName;
             return reportData;
