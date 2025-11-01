@@ -8,6 +8,7 @@ using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Newtonsoft.Json;
 using System.Data;
+using System.Text.RegularExpressions;
 namespace Coditech.API.Service
 {
     public class DBTMReportsService : BaseService, IDBTMReportsService
@@ -227,32 +228,46 @@ namespace Coditech.API.Service
             {
                 foreach (var table in reportData.DataTableList)
                 {
+                    string sheetName = table.Key.Trim();
                     var replacements = new Dictionary<string, string>
-                    {
-                        { "300", "Threehundres" },
-                        { "5-0-5 ", "FiveZeroFiveAgilityTest" },
-                        { "5-10-5", "ProAgilityTest" },
-                        { "3", "ThreeGateSprint" }
-                    };
-                    string sheetName = table.Key;
+            {
+                { "5-0-5", "FiveZeroFive Agility Test" },
+                { "5-10-5", "FiveTenFive Agility Test" }
+            };
+
                     foreach (var kv in replacements)
                     {
-                        sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        if (sheetName.Contains(kv.Key))
+                        {
+                            sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        }
                     }
-                    char[] invalidChars = new char[] { ':', '\\', '/', '?', '*', '[', ']' };
-                    foreach (var c in invalidChars)
+
+                    if (!sheetName.Contains("FiveZeroFive Agility Test") && !sheetName.Contains("FiveTenFive Agility Test"))
                     {
-                        sheetName = sheetName.Replace(c.ToString(), "");
+                        Match match = Regex.Match(sheetName, @"^(\d+)");
+                        if (match.Success)
+                        {
+                            int number = int.Parse(match.Value);
+                            string numberInWords = NumberToWords(number);
+                            sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
+                        }
                     }
+
+                    char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
+                    foreach (var c in invalidChars)
+                        sheetName = sheetName.Replace(c.ToString(), "");
+
                     sheetName = sheetName.Trim();
                     if (sheetName.Length > 31)
                         sheetName = sheetName.Substring(0, 31);
                     var worksheet = workbook.Worksheets.Add(sheetName);
                     worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
                 }
-                // Save the workbook
+
                 workbook.SaveAs(filePath);
             }
+
             reportData.FilePath = filePath;
             reportData.FileName = fileName;
             return reportData;
@@ -810,5 +825,57 @@ namespace Coditech.API.Service
             }
             return listviewSequenceColumnList;
         }
+
+        #region Private Methods
+        private static string NumberToWords(int number)
+        {
+            if (number == 0)
+                return "Zero";
+
+            if (number < 0)
+                return "Minus " + NumberToWords(Math.Abs(number));
+
+            string words = "";
+
+            if ((number / 1000000) > 0)
+            {
+                words += NumberToWords(number / 1000000) + " Million ";
+                number %= 1000000;
+            }
+
+            if ((number / 1000) > 0)
+            {
+                words += NumberToWords(number / 1000) + " Thousand ";
+                number %= 1000;
+            }
+
+            if ((number / 100) > 0)
+            {
+                words += NumberToWords(number / 100) + " Hundred ";
+                number %= 100;
+            }
+
+            if (number > 0)
+            {
+                string[] unitsMap = { "Zero", "One", "Two", "Three", "Four", "Five", "Six",
+                              "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
+                              "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+                              "Eighteen", "Nineteen" };
+
+                string[] tensMap = { "Zero", "Ten", "Twenty", "Thirty", "Forty", "Fifty",
+                             "Sixty", "Seventy", "Eighty", "Ninety" };
+
+                if (number < 20)
+                    words += unitsMap[number];
+                else
+                {
+                    words += tensMap[number / 10];
+                    if ((number % 10) > 0)
+                        words += " " + unitsMap[number % 10];
+                }
+            }
+            return words.Trim();
+        }
+        #endregion
     }
 }
