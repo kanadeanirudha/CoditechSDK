@@ -151,21 +151,32 @@ namespace Coditech.API.Service
             {
                 foreach (var table in dBTMReportsListModel.DataTableList)
                 {
+                    string sheetName = table.Key.Trim();
                     var replacements = new Dictionary<string, string>
                     {
-                        { "300", "Threehundres" },
-                        { "5-0-5 ", "FiveZeroFiveAgilityTest" },
-                        { "5-10-5", "ProAgilityTest" },
-                        { "3", "ThreeGateSprint" }
+                        { "5-0-5", "FiveZeroFive" },
+                        { "5-10-5", "FiveTenFive" }
                     };
-                    string sheetName = table.Key;
                     foreach (var kv in replacements)
                     {
-                        sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        if (sheetName.Contains(kv.Key))
+                        {
+                            sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        }
                     }
-                    char[] invalidChars = new char[] { ':', '\\', '/', '?', '*', '[', ']' };
-                    foreach (var c in invalidChars)
+                    if (!sheetName.Contains("FiveZeroFive") && !sheetName.Contains("FiveTenFive"))
                     {
+                        Match match = Regex.Match(sheetName, @"^(\d+)");
+                        if (match.Success)
+                        {
+                            int number = int.Parse(match.Value);
+                            string numberInWords = NumberToWords(number);
+                            sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
+                        }
+                    }
+                    char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
+                    foreach (var c in invalidChars)
+                    { 
                         sheetName = sheetName.Replace(c.ToString(), "");
                     }
                     sheetName = sheetName.Trim();
@@ -253,8 +264,9 @@ namespace Coditech.API.Service
                     }
                     char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
+                    {
                         sheetName = sheetName.Replace(c.ToString(), "");
-
+                    }
                     sheetName = sheetName.Trim();
                     if (sheetName.Length > 31)
                         sheetName = sheetName.Substring(0, 31);
