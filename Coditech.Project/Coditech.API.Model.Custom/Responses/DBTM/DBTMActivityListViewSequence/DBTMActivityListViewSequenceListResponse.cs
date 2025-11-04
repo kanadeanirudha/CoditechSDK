@@ -3,5 +3,6 @@
     public class DBTMActivityListViewSequenceListResponse : BaseListResponse
     {
         public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
+        public string TestName { get; set; }
     }
 }

@@ -151,19 +151,30 @@ namespace Coditech.API.Service
             {
                 foreach (var table in dBTMReportsListModel.DataTableList)
                 {
+                    string sheetName = table.Key.Trim();
                     var replacements = new Dictionary<string, string>
                     {
-                        { "300", "Threehundres" },
-                        { "5-0-5 ", "FiveZeroFiveAgilityTest" },
-                        { "5-10-5", "ProAgilityTest" },
-                        { "3", "ThreeGateSprint" }
+                        { "5-0-5", "FiveZeroFive" },
+                        { "5-10-5", "FiveTenFive" }
                     };
-                    string sheetName = table.Key;
                     foreach (var kv in replacements)
                     {
-                        sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        if (sheetName.Contains(kv.Key))
+                        {
+                            sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        }
                     }
-                    char[] invalidChars = new char[] { ':', '\\', '/', '?', '*', '[', ']' };
+                    if (!sheetName.Contains("FiveZeroFive") && !sheetName.Contains("FiveTenFive"))
+                    {
+                        Match match = Regex.Match(sheetName, @"^(\d+)");
+                        if (match.Success)
+                        {
+                            int number = int.Parse(match.Value);
+                            string numberInWords = NumberToWords(number);
+                            sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
+                        }
+                    }
+                    char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
                     {
                         sheetName = sheetName.Replace(c.ToString(), "");
@@ -253,8 +264,9 @@ namespace Coditech.API.Service
                     }
                     char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
+                    {
                         sheetName = sheetName.Replace(c.ToString(), "");
-
+                    }
                     sheetName = sheetName.Trim();
                     if (sheetName.Length > 31)
                         sheetName = sheetName.Substring(0, 31);
@@ -667,12 +679,12 @@ namespace Coditech.API.Service
                 }
 
                 //Updated Column Name
-                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal);
+                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal, isMobileRequest);
             }
             return dataTable;
         }
 
-        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal)
+        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal, bool isMobileRequest)
         {
             string updatedColumnName = string.Empty;
             foreach (DataColumn col in dataTable.Columns)
@@ -731,7 +743,21 @@ namespace Coditech.API.Service
                     updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
                     if (!dataTable.Columns.Contains(updatedColumnName))
                     {
-                        col.ColumnName = updatedColumnName;
+                        if (!isMobileRequest)
+                        {
+                            if (string.IsNullOrEmpty(dBTMTestParameterListviewSequence.HelpText))
+                            {
+                                col.ColumnName = updatedColumnName;
+                            }
+                            else
+                            {
+                                col.ColumnName = $"{updatedColumnName}~{dBTMTestParameterListviewSequence.HelpText}";
+                            }
+                        }
+                        else
+                        {
+                            col.ColumnName = updatedColumnName;
+                        }
                     }
                 }
             }
