@@ -8,5 +8,6 @@
             DBTMActivityListViewSequenceList = new List<DBTMActivityListViewSequenceModel>();
         }
         public int DBTMTestMasterId { get; set; }
+        public string TestName { get; set; }
     }
 }

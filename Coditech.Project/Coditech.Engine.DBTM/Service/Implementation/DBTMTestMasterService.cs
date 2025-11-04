@@ -399,14 +399,18 @@ namespace Coditech.API.Service
             {
                 DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
                 DBTMTestMasterId = x.DBTMTestMasterId,
-                ParameterCode = x.ParameterCode,
+                ParameterCode = x.ParameterCode ?? string.Empty,
                 IsCalculatedParameter = x.IsCalculatedParameter,
                 Recursion = x.Recursion,
                 SequenceNumber = x.SequenceNumber,
-                ConsecutiveParameterCode = x.ConsecutiveParameterCode,
-                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode,
-                ColumnName = x.ColumnName,
-                IsActive= x.IsActive
+                ConsecutiveParameterCode = x.ConsecutiveParameterCode ?? string.Empty,
+                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode ?? false,
+                ColumnName = x.ColumnName ?? string.Empty,
+                HelpText = x.HelpText ?? string.Empty,
+                IsActive = x.IsActive,
+                DisplayOn = x.DisplayOn ?? string.Empty,
+                ColumnCellColor = x.ColumnCellColor ?? string.Empty,
+                IsColumnCellBold = x.IsColumnCellBold ?? false
             }).ToList();
 
             DBTMActivityListViewSequenceListModel listModel = new DBTMActivityListViewSequenceListModel
@@ -414,7 +418,11 @@ namespace Coditech.API.Service
                 DBTMActivityListViewSequenceList = activityViewSequenceList,
                 DBTMTestMasterId = dBTMTestMasterId
             };
-
+            if (dBTMTestMasterId > 0)
+            {
+                listModel.TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault();
+            }
+            listModel.DBTMTestMasterId = dBTMTestMasterId;
             return listModel;
         }
 

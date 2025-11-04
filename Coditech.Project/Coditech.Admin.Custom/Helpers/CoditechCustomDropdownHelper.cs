@@ -86,6 +86,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMPerformanceMatrix(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DisplayOn.ToString()))
+            {
+                GetDisplayOn(dropdownViewModel, dropdownList);
+            }
 
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
@@ -484,6 +488,29 @@ namespace Coditech.Admin.Helpers
                     });
                 }
             }
+        }
+        private static void GetDisplayOn(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Both",
+                Value = "Both",
+                Selected = "Both" == dropdownViewModel.DropdownSelectedValue
+            });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Only Web",
+                Value = "OnlyWeb",
+                Selected = "OnlyWeb" == dropdownViewModel.DropdownSelectedValue
+            });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Only Mobile App",
+                Value = "OnlyMobileApp",
+                Selected = "OnlyMobileApp" == dropdownViewModel.DropdownSelectedValue
+            });
         }
     }
 }

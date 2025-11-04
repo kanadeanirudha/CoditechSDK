@@ -14,5 +14,9 @@
         public string HelpText { get; set; }
         public bool IsActive { get; set; }
         public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
+        public string DisplayOn { get; set; }
+        public string ColumnCellColor { get; set; }
+        public bool IsColumnCellBold { get; set; }
+        public string TestName { get; set; }
     }
 }

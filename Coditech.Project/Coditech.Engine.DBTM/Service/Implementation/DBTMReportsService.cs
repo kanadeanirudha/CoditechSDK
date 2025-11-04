@@ -176,7 +176,7 @@ namespace Coditech.API.Service
                     }
                     char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
-                    { 
+                    {
                         sheetName = sheetName.Replace(c.ToString(), "");
                     }
                     sheetName = sheetName.Trim();
@@ -743,7 +743,21 @@ namespace Coditech.API.Service
                     updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
                     if (!dataTable.Columns.Contains(updatedColumnName))
                     {
-                        col.ColumnName = updatedColumnName;
+                        if (!isMobileRequest)
+                        {
+                            if (string.IsNullOrEmpty(dBTMTestParameterListviewSequence.HelpText))
+                            {
+                                col.ColumnName = updatedColumnName;
+                            }
+                            else
+                            {
+                                col.ColumnName = $"{updatedColumnName}~{dBTMTestParameterListviewSequence.HelpText}";
+                            }
+                        }
+                        else
+                        {
+                            col.ColumnName = updatedColumnName;
+                        }
                     }
                 }
             }
