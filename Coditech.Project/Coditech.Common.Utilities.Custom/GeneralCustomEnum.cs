@@ -24,6 +24,7 @@
         BatchWiseMultiReports,
         DBTMTrainerCentrewise,
         DisplayOn,
+        GraphMode,
     }
     public enum DashboardFormCustomEnum
     {

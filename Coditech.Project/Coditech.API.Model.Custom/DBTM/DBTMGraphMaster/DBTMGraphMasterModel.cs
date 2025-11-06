@@ -9,6 +9,7 @@
         public string YParameter { get; set; }
         public string TestCode { get; set; }
         public string GraphType { get; set; }
+        public string GraphMode { get; set; }
         public List<string> DBTMSelectedTestCode { get; set; } = new List<string>();
     }
 }

@@ -90,6 +90,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDisplayOn(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphMode.ToString()))
+            {
+                GetGraphMode(dropdownViewModel, dropdownList);
+            }
 
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
@@ -510,6 +514,22 @@ namespace Coditech.Admin.Helpers
                 Text = "Only Mobile App",
                 Value = "OnlyMobileApp",
                 Selected = "OnlyMobileApp" == dropdownViewModel.DropdownSelectedValue
+            });
+        }
+        private static void GetGraphMode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Instantaneous Chart",
+                Value = "InstantaneousChart",
+                Selected = "InstantaneousChart" == dropdownViewModel.DropdownSelectedValue
+            });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Progress Chart",
+                Value = "ProgressChart",
+                Selected = "ProgressChart" == dropdownViewModel.DropdownSelectedValue
             });
         }
     }
