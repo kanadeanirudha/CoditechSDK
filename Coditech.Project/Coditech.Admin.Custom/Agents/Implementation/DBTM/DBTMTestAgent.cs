@@ -173,6 +173,7 @@ namespace Coditech.Admin.Agents
             listViewModel.DBTMActivityListViewSequenceList = associatedTrainerList?.DBTMActivityListViewSequenceList?.ToViewModel<DBTMActivityListViewSequenceViewModel>().ToList();
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMActivityListViewSequenceList.Count, BindActivityListViewSequenceColumns());
             listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            listViewModel.TestName = response.TestName;
             return listViewModel;
         }
 
@@ -364,6 +365,11 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Display On",
+                ColumnCode = "DisplayOn",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Sequence Number",
                 ColumnCode = "SequenceNumber",
             });
@@ -377,17 +383,16 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Consecutive Parameter Code",
                 ColumnCode = "ConsecutiveParameterCode",
             });
-
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Is Calculated Parameter",
                 ColumnCode = "IsCalculatedParameter",
             });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Calculated Consecutive Parameter Code",
-                ColumnCode = "IsCalculatedConsecutiveParameterCode",
-            });
+            //datatableColumnList.Add(new DatatableColumns()
+            //{
+            //    ColumnName = "Is Calculated Consecutive Parameter Code",
+            //    ColumnCode = "IsCalculatedConsecutiveParameterCode",
+            //});
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Is Active",

@@ -35,7 +35,19 @@
                                     <tr>
                                         @foreach (DataColumn col in keyValue.Value.Columns)
                                         {
-                                            <th>@col.ColumnName</th>
+                                            var parts = col.ColumnName.Split('~');
+                                            var displayName = parts[0];
+                                            var helpText = parts.Length > 1 ? parts[1] : string.Empty;
+
+                                            <th>
+                                                @displayName
+                                                @if (!string.IsNullOrEmpty(helpText))
+                                                {
+                                                    <span class="ms-1 text-info" data-bs-toggle="tooltip" data-bs-placement="top" title="@helpText" style="cursor:pointer;">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </span>
+                                                }
+                                            </th>
                                         }
                                     </tr>
                                 </thead>
@@ -74,3 +86,17 @@
         <div class="text-danger fw-bold text-center">No Data Found</div>
     }
 </div>
+@section scripts {
+    <script>
+        function initializeTooltips() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeTooltips();
+        });
+    </script>
+}

@@ -315,7 +315,7 @@ namespace Coditech.API.Service
                 UserType = UserTypeEnum.Employee.ToString(),
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
-                IsPasswordChange = true,
+                IsPasswordChange = string.IsNullOrEmpty(dBTMNewRegistrationModel.Password) ? false : true,
                 Custom1 = dBTMNewRegistrationModel.Custom1
             };
             GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);

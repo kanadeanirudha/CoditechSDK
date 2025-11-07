@@ -15,8 +15,8 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Is Calculated Parameter")]
         public bool IsCalculatedParameter { get; set; }
 
-        [Required]
-        [Display(Name = "Recursion")]
+        [Required(ErrorMessage = "Recursion is required.")]
+        [Range(0, 12, ErrorMessage = "Recursion must be between 0 and 12.")]
         public short Recursion { get; set; }
 
         [Display(Name = "Sequence Number")]
@@ -31,9 +31,22 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Column Name")]
         public string ColumnName { get; set; }
 
+        [Display(Name = "Help Text")]
+        public string HelpText { get; set; }
+
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
         public string DBTMSequenceData { get; set; }
         public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
+
+        [Display(Name = "Display On")]
+        public string DisplayOn { get; set; }
+
+        [Display(Name = "Column Cell Color")]
+        public string ColumnCellColor { get; set; }
+
+        [Display(Name = "Is Column Cell Bold")]
+        public bool IsColumnCellBold { get; set; }
+        public string TestName { get; set; }
     }
 }

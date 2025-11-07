@@ -11,6 +11,7 @@ namespace Coditech.API.Data
         public string YParameter { get; set; }
         public string TestCode { get; set; }
         public string GraphType { get; set; }
+        public string GraphMode { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

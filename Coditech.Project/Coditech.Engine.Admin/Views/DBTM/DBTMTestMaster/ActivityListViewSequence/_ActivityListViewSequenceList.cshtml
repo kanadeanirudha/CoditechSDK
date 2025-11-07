@@ -18,14 +18,12 @@
                         <tr>
                             <td>@item.ParameterCode</td>
                             <td>@item.ColumnName</td>
+                            <td>@System.Text.RegularExpressions.Regex.Replace(item.DisplayOn ?? "", "(\\B[A-Z])", " $1")</td>
                             <td>@item.SequenceNumber</td>
                             <td>@item.Recursion</td>
                             <td>@item.ConsecutiveParameterCode</td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCalculatedParameter)
-                            </td>
-                            <td>
-                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCalculatedConsecutiveParameterCode)
                             </td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
@@ -70,3 +68,15 @@
         </table>
     </div>
 </div>
+@section scripts {
+    <script src="~/js/coditech/DBTM/DBTMActivityListViewSequence.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+}

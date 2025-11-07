@@ -27,5 +27,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Test Name")]
         public List<string> DBTMSelectedTestCode { get; set; } = new List<string>();
         public List<SelectListItem> DBTMTestList { get; set; }
+        [Display(Name = "Graph Mode")]
+        public string GraphMode { get; set; }
     }
 }
