@@ -30,9 +30,9 @@ namespace Coditech.API.Endpoint
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestCalculation";
         public string GetDBTMGraphAsync() =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMGraph";
-        public string GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public string GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DBTMGraphByDBTMTestMasterId?dBTMTestMasterId={dBTMTestMasterId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DBTMGraphByDBTMTestMasterId?dBTMTestMasterId={dBTMTestMasterId}&graphMode={graphMode}";
             return endpoint;
         }
         public string GetDBTMPerformanceMatrixListAsync(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)

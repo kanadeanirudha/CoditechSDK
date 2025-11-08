@@ -14,7 +14,7 @@ namespace Coditech.API.Service
         DBTMTestParameterListModel GetDBTMTestParameter();
         DBTMTestCalculationListModel GetDBTMTestCalculation();
         DBTMGraphMasterListModel GetDBTMGraph();
-        DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId);
+        DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode);
         DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         bool DeleteActivityListViewSequence(ParameterModel parameterModel);
         DBTMActivityListViewSequenceModel GetActivityListViewSequence(int dBTMTestParameterListViewSequenceId);

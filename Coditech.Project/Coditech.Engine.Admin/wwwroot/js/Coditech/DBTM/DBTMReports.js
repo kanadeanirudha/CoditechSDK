@@ -126,6 +126,7 @@
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         var dBTMGraphMasterId = $("#DBTMGraphMasterId").val();
+        var graphMode = $("#GraphMode").val();
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
 
@@ -142,7 +143,8 @@
                     dBTMTraineeDetailId: dBTMTraineeDetailId,
                     fromdate: fromdate,
                     todate: todate,
-                    dBTMGraphMasterId: dBTMGraphMasterId
+                    dBTMGraphMasterId: dBTMGraphMasterId,
+                    graphMode: graphMode
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
@@ -164,6 +166,7 @@
 
     GetGraphListByDBTMTestMasterId: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        var graphMode = $("#GraphMode").val();
 
         if (dBTMTestMasterId !== "") {
             CoditechCommon.ShowLodder();
@@ -172,7 +175,31 @@
                 url: '/DBTMReports/GetGraphListByDBTMTestMasterId',
                 type: 'GET',
                 dataType: 'html',
-                data: { dBTMTestMasterId: dBTMTestMasterId },
+                data: { dBTMTestMasterId: dBTMTestMasterId, graphMode: graphMode },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#DBTMGraphMasterId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Failed to load graph list.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        }
+    },
+    GetGraphListByGraphMode: function () {
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        var graphMode = $("#GraphMode").val();
+
+        if (dBTMTestMasterId !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                url: '/DBTMReports/GetGraphListByDBTMTestMasterId',
+                type: 'GET',
+                dataType: 'html',
+                data: { dBTMTestMasterId: dBTMTestMasterId, graphMode: graphMode },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     $("#DBTMGraphMasterId").html(data);
@@ -302,7 +329,7 @@
                             + "&toDate=" + encodeURIComponent(todate)
                             + "&reportType=" + encodeURIComponent(reportType);
                         CoditechCommon.HideLodder();
-                        $("#hiddenDownloader").attr("src", downloadUrl);                       
+                        $("#hiddenDownloader").attr("src", downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
                         CoditechCommon.HideLodder();

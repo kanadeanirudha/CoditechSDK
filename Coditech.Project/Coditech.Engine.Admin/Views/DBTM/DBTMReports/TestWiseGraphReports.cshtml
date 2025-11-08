@@ -17,6 +17,14 @@
                 ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()",
                 IsCustomDropdown = true
             };
+    DropdownViewModel graphModeDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.GraphMode.ToString(),
+                DropdownName = "GraphMode",
+                DropdownSelectedValue = Model.GraphMode,
+                ChangeEvent = "DBTMReports.GetGraphListByGraphMode()",
+                IsCustomDropdown = true
+            };
     DropdownViewModel graphTypeDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
@@ -49,7 +57,7 @@
                                     <input type="radio" id="radio-list" name="switch-tile-list" value="list" onclick="window.open('@($"{url}/dbtmreports/testwisereports")', '_self');" />
                                     <label for="radio-list">List</label>
                                     <input type="radio" id="radio-tile" name="switch-tile-list" value="tile" checked onclick="window.open('@($"{url}/dbtmreports/TestWiseGraphReports")', '_self');" />
-                                    <label for="radio-tile">Graph</label>                                
+                                    <label for="radio-tile">Graph</label>
                                 </div>
                             </div>
                         </div>
@@ -59,33 +67,39 @@
                             <div class="col-md-1">
                                 <label class="form-label">Activity List</label>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">Graph Mode</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphModeDropdown)
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label">Graph Type</label>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">Trainee List</label>
-                            </div>
-                            <div class="col-md-5">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
-                            </div>
+                            </div>                          
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-1">
+                                <label class="form-label">Trainee List</label>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
+                            </div>
+                            <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
@@ -105,10 +119,10 @@
     </div>
 </div>
 <style>
-        .switch-field {
-            display: flex;
-            overflow: hidden;
-        }
+    .switch-field {
+        display: flex;
+        overflow: hidden;
+    }
 
         .switch-field input {
             position: absolute !important;
@@ -132,10 +146,10 @@
             cursor: pointer;
         }
 
-        .switch-field label:hover {
+            .switch-field label:hover {
                 background-color: rgba(255, 184, 34, 0.6);
                 color: #000;
-        }
+            }
 
         .switch-field input:checked + label {
             background-color: rgb(255, 184, 34);
@@ -195,7 +209,7 @@
                 clearBtn: true,
                 showButtonPanel: true,
                 closeText: 'Clear',
-                maxDate: new Date(), 
+                maxDate: new Date(),
                 onSelect: function () {
                     updateToDate();
                 }
@@ -212,7 +226,7 @@
                 clearBtn: true,
                 showButtonPanel: true,
                 closeText: 'Clear',
-                maxDate: new Date(), 
+                maxDate: new Date(),
                 onSelect: function () {
                     updateToDate();
                 }

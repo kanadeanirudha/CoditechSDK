@@ -70,11 +70,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/TestWiseGraphReports")]
         [Produces(typeof(GraphResponse))]
-        public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId,string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode,string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             try
             {
-                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
                 return IsNotNull(model) ? CreateOKResponse(new GraphResponse { GraphModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
