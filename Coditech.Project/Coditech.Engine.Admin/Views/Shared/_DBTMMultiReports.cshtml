@@ -59,7 +59,17 @@
                                             <tr>
                                                 @foreach (DataColumn col in keyValue.Value.Columns)
                                                 {
-                                                    <td>@row[col]</td>
+                                                    string[] value = row[col].ToString().Split('~');
+                                                    string style = string.Empty;
+                                                    if (value.Length > 1)
+                                                    {
+                                                        style = value[1] == "True" ? "font-weight: bold;" : "";
+                                                        if (!string.IsNullOrEmpty(value[2].ToString()))
+                                                        {
+                                                            style = $"{style} color: #{value[2]};";
+                                                        }
+                                                    }
+                                                    <td style="@style">@value[0]</td>
                                                 }
                                             </tr>
                                         }

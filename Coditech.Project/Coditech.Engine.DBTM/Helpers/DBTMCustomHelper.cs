@@ -203,7 +203,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     data = "cm";
                     break;
                 case "AccelerationByRow":
-                    data = "m/s2";
+                    data = "m/s^2";
                     break;
                 default:
                     data = "";
