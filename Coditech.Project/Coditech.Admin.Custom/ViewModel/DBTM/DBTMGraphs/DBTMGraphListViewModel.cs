@@ -16,5 +16,8 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "To Date")]
         public DateTime ToDate { get; set; }
+
+        [Display(Name = "Graph Mode")]
+        public string GraphMode { get; set; }
     }
 }

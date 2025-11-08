@@ -195,14 +195,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual GraphResponse TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
+        public virtual GraphResponse TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
-            return Task.Run(async () => await TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<GraphResponse> TestWiseGraphReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
+        public virtual async Task<GraphResponse> TestWiseGraphReportsAsync(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, fromDate, toDate, entityId, userType, centreCode);
+            string endpoint = dBTMReportsEndpoint.TestWiseGraphReportsAsync(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, fromDate, toDate, entityId, userType, centreCode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

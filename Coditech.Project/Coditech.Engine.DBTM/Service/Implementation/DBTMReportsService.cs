@@ -151,19 +151,30 @@ namespace Coditech.API.Service
             {
                 foreach (var table in dBTMReportsListModel.DataTableList)
                 {
+                    string sheetName = table.Key.Trim();
                     var replacements = new Dictionary<string, string>
                     {
-                        { "300", "Threehundres" },
-                        { "5-0-5 ", "FiveZeroFiveAgilityTest" },
-                        { "5-10-5", "ProAgilityTest" },
-                        { "3", "ThreeGateSprint" }
+                        { "5-0-5", "FiveZeroFive" },
+                        { "5-10-5", "FiveTenFive" }
                     };
-                    string sheetName = table.Key;
                     foreach (var kv in replacements)
                     {
-                        sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        if (sheetName.Contains(kv.Key))
+                        {
+                            sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        }
                     }
-                    char[] invalidChars = new char[] { ':', '\\', '/', '?', '*', '[', ']' };
+                    if (!sheetName.Contains("FiveZeroFive") && !sheetName.Contains("FiveTenFive"))
+                    {
+                        Match match = Regex.Match(sheetName, @"^(\d+)");
+                        if (match.Success)
+                        {
+                            int number = int.Parse(match.Value);
+                            string numberInWords = NumberToWords(number);
+                            sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
+                        }
+                    }
+                    char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
                     {
                         sheetName = sheetName.Replace(c.ToString(), "");
@@ -253,8 +264,9 @@ namespace Coditech.API.Service
                     }
                     char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
                     foreach (var c in invalidChars)
+                    {
                         sheetName = sheetName.Replace(c.ToString(), "");
-
+                    }
                     sheetName = sheetName.Trim();
                     if (sheetName.Length > 31)
                         sheetName = sheetName.Substring(0, 31);
@@ -323,7 +335,7 @@ namespace Coditech.API.Service
             return dBTMReportsListModel;
         }
 
-        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             GraphModel graphModel = new GraphModel();
             DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
@@ -507,8 +519,9 @@ namespace Coditech.API.Service
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
+                string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
-                                          .Where(x => x.DBTMTestMasterId == dBTMTestMasterId && x.IsActive)
+                                          .Where(x => x.DBTMTestMasterId == dBTMTestMasterId && x.IsActive && (x.DisplayOn.Contains("both") || x.DisplayOn == displayOn))
                                           .OrderBy(y => y.SequenceNumber)
                                           .ToList();
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
@@ -662,17 +675,17 @@ namespace Coditech.API.Service
                                 break;
                         }
                     }
-                    BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow);
+                    BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow, isMobileRequest);
                     dataTable.Rows.Add(newRow);
                 }
 
                 //Updated Column Name
-                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal);
+                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal, isMobileRequest);
             }
             return dataTable;
         }
 
-        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal)
+        private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal, bool isMobileRequest)
         {
             string updatedColumnName = string.Empty;
             foreach (DataColumn col in dataTable.Columns)
@@ -731,13 +744,27 @@ namespace Coditech.API.Service
                     updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
                     if (!dataTable.Columns.Contains(updatedColumnName))
                     {
-                        col.ColumnName = updatedColumnName;
+                        if (!isMobileRequest)
+                        {
+                            if (string.IsNullOrEmpty(dBTMTestParameterListviewSequence.HelpText))
+                            {
+                                col.ColumnName = updatedColumnName;
+                            }
+                            else
+                            {
+                                col.ColumnName = $"{updatedColumnName}~{dBTMTestParameterListviewSequence.HelpText}";
+                            }
+                        }
+                        else
+                        {
+                            col.ColumnName = updatedColumnName;
+                        }
                     }
                 }
             }
         }
 
-        private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow)
+        private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow, bool isMobileRequest)
         {
             foreach (var displayColumn in listviewSequenceColumnList)
             {
@@ -745,30 +772,35 @@ namespace Coditech.API.Service
                 DBTMTestParameterListViewSequence dBTMTestParameterListviewSequence = spilt.Length > 1 ? listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == spilt[0]) :
                                                                                                          listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == displayColumn);
                 if (dBTMTestParameterListviewSequence == null)
-                    newRow[displayColumn] = "NA";
-                else if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
                 {
-                    newRow[displayColumn] = !string.IsNullOrEmpty(group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1) ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1.ToString() : "NA";
+                    newRow[displayColumn] = "NA";
+                    return;
+                }
+                string rowValue = string.Empty;
+                if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
+                {
+                    rowValue = !string.IsNullOrEmpty(group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1) ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1.ToString() : "NA";
                 }
                 else
                 {
                     if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
                     {
                         if (spilt.Length == 1)
-                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, 1);
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, 1);
                         else
-                            newRow[displayColumn] = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt16(spilt[1]));
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt16(spilt[1]));
                     }
                     else
                     {
                         if (spilt.Length == 1)
-                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == 1)?.ParameterValue.ToString() ?? "NA";
+                            rowValue = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == 1)?.ParameterValue.ToString() ?? "NA";
                         else
                         {
-                            newRow[displayColumn] = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.ParameterValue.ToString();
+                            rowValue = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.ParameterValue.ToString();
                         }
                     }
                 }
+                newRow[displayColumn] = isMobileRequest ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
             }
         }
 

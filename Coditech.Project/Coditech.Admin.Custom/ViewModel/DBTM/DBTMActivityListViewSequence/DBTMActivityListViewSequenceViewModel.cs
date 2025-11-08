@@ -38,5 +38,15 @@ namespace Coditech.Admin.ViewModel
         public bool IsActive { get; set; }
         public string DBTMSequenceData { get; set; }
         public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
+
+        [Display(Name = "Display On")]
+        public string DisplayOn { get; set; }
+
+        [Display(Name = "Column Cell Color")]
+        public string ColumnCellColor { get; set; }
+
+        [Display(Name = "Is Column Cell Bold")]
+        public bool IsColumnCellBold { get; set; }
+        public string TestName { get; set; }
     }
 }

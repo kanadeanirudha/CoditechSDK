@@ -505,14 +505,14 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-        public virtual DBTMGraphMasterListResponse DBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public virtual DBTMGraphMasterListResponse DBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
-            return Task.Run(async () => await GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId, graphMode, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMGraphMasterListResponse> GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMGraphMasterListResponse> GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTestEndpoint.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+            string endpoint = dBTMTestEndpoint.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId, graphMode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
 

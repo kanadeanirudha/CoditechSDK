@@ -134,9 +134,9 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId,string graphMode, DateTime FromDate, DateTime ToDate)
         {
-            GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate);
+            GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, FromDate, ToDate);
             if (graphModel.IsRecordFound)
             {
                 if (graphModel.GraphType == "LineChart")
@@ -156,13 +156,13 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId)
+        public ActionResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             DropdownViewModel dBTMGraphByDBTMTestMaster = new DropdownViewModel()
             {
                 DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
                 DropdownName = "DBTMGraphMasterId",
-                Parameter = dBTMTestMasterId.ToString(),
+                Parameter = dBTMTestMasterId + "|" + graphMode, 
                 IsCustomDropdown = true
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);

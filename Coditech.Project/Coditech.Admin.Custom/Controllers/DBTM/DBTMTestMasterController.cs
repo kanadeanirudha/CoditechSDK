@@ -131,6 +131,10 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult ActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
         {
             DBTMActivityListViewSequenceViewModel dBTMTestViewModel = _dBTMTestAgent.GetActivityListViewSequence(dBTMTestParameterListViewSequenceId);
+            if (string.IsNullOrEmpty(dBTMTestViewModel.DisplayOn))
+            {
+                dBTMTestViewModel.DisplayOn = "Both";
+            }
             return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMTestViewModel);
         }
 
@@ -150,6 +154,10 @@ namespace Coditech.Admin.Controllers
                 {
                     return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMTestViewModel.DBTMTestMasterId)});
                 }
+            }
+            if (string.IsNullOrEmpty(dBTMTestViewModel.DisplayOn))
+            {
+                dBTMTestViewModel.DisplayOn = "Both";
             }
             return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMTestViewModel);
         }
@@ -209,7 +217,10 @@ namespace Coditech.Admin.Controllers
                 DBTMTestMasterId = dBTMTestMasterId,
                 SequenceNumber = (short)(maxSequence + 1), 
             };
-
+            if (string.IsNullOrEmpty(newViewModel.DisplayOn))
+            {
+                newViewModel.DisplayOn = "Both";
+            }
             return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", newViewModel);
         }
 
@@ -231,6 +242,10 @@ namespace Coditech.Admin.Controllers
                         return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMActivityListViewSequenceViewModel.DBTMTestMasterId) });
                     }
                 }
+            }
+            if (string.IsNullOrEmpty(dBTMActivityListViewSequenceViewModel.DisplayOn))
+            {
+                dBTMActivityListViewSequenceViewModel.DisplayOn = "Both";
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMActivityListViewSequenceViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMActivityListViewSequenceViewModel);

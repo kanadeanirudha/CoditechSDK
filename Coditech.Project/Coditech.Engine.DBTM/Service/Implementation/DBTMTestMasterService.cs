@@ -355,7 +355,7 @@ namespace Coditech.API.Service
             };
             return list;
         }
-        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             var graphList = (from a in _dBTMTestGraphRepository.Table
                              join b in _dBTMGraphMasterRepository.Table
@@ -365,14 +365,26 @@ namespace Coditech.API.Service
                              {
                                  DBTMGraphMasterId = b.DBTMGraphMasterId,
                                  GraphName = b.GraphName,
-                                 GraphCode = b.GraphCode
+                                 GraphCode = b.GraphCode,
+                                 GraphMode = b.GraphMode,
+                                 GraphType = b.GraphType
                              })
                              .Distinct()
                              .ToList();
 
+            if (!string.IsNullOrEmpty(graphMode))
+            {
+                graphList = graphList.Where(x => x.GraphMode == graphMode).ToList(); 
+            }
+
+            var graphListResult = graphList
+                .Distinct()
+                .OrderBy(x => x.GraphName)
+                .ToList();
+
             return new DBTMGraphMasterListModel
             {
-                DBTMGraphMasterList = graphList
+                DBTMGraphMasterList = graphListResult
             };
         }
         public virtual DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -399,14 +411,18 @@ namespace Coditech.API.Service
             {
                 DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
                 DBTMTestMasterId = x.DBTMTestMasterId,
-                ParameterCode = x.ParameterCode,
+                ParameterCode = x.ParameterCode ?? string.Empty,
                 IsCalculatedParameter = x.IsCalculatedParameter,
                 Recursion = x.Recursion,
                 SequenceNumber = x.SequenceNumber,
-                ConsecutiveParameterCode = x.ConsecutiveParameterCode,
-                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode,
-                ColumnName = x.ColumnName,
-                IsActive= x.IsActive
+                ConsecutiveParameterCode = x.ConsecutiveParameterCode ?? string.Empty,
+                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode ?? false,
+                ColumnName = x.ColumnName ?? string.Empty,
+                HelpText = x.HelpText ?? string.Empty,
+                IsActive = x.IsActive,
+                DisplayOn = x.DisplayOn ?? string.Empty,
+                ColumnCellColor = x.ColumnCellColor ?? string.Empty,
+                IsColumnCellBold = x.IsColumnCellBold ?? false
             }).ToList();
 
             DBTMActivityListViewSequenceListModel listModel = new DBTMActivityListViewSequenceListModel
@@ -414,7 +430,11 @@ namespace Coditech.API.Service
                 DBTMActivityListViewSequenceList = activityViewSequenceList,
                 DBTMTestMasterId = dBTMTestMasterId
             };
-
+            if (dBTMTestMasterId > 0)
+            {
+                listModel.TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault();
+            }
+            listModel.DBTMTestMasterId = dBTMTestMasterId;
             return listModel;
         }
 
