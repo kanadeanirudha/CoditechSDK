@@ -40,6 +40,246 @@ namespace Coditech.API.Service
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
+
+        public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            List<GraphModel> graphModelList = new List<GraphModel>();
+            GraphModel graphModel = new GraphModel();
+            DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, graphMaster.XParameter, graphMaster.YParameter, fromDate, toDate, ref entityId, userType, centreCode);
+            if (dBTMReportsList?.Count > 0)
+            {
+                string dateTimeFormat = "yyyy-MM-dd";
+                int rowCountPerDate = dBTMReportsList.Max(x => x.RowCountPerDate);
+                DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
+                string[] XValuesList = null;
+                List<DateTime> testPerformedDateList = new List<DateTime>();
+                foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
+                {
+                    testPerformedDateList.Add(item.Date);
+                }
+                if (graphMaster.XParameter == "Date")
+                {
+                    List<string> xValues = new List<string>();
+                    foreach (var item in testPerformedDateList)
+                    {
+                        xValues.Add(item.ToString(dateTimeFormat));
+                    }
+                    XValuesList = xValues.ToArray();
+                }
+                else if (graphMaster.XParameter == "Distance")
+                {
+                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
+                        XValuesList = new string[] { "5", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
+                        XValuesList = new string[] { "10", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
+                        XValuesList = new string[] { "10", "30" };
+                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
+                        XValuesList = new string[] { "10", "20", "30", "40" };
+                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    {
+                        List<string> xValues = new List<string>();
+                        short distance = 25;
+                        for (int i = distance; i <= (distance * 12); i = i + distance)
+                        {
+                            xValues.Add(i.ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
+                }
+                else if (graphMaster.XParameter == "Attempt")
+                {
+
+                }
+
+                if (XValuesList != null)
+                {
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = graphMaster.GraphType;
+                    int colorIndex = 0;
+                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.TestPerformedTime.Date);
+                    string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
+                    if (graphModel.GraphType == "LineChart")
+                    {
+                        graphModel.LineChartModel = new LineChartModel()
+                        {
+                            LineChartId = dBTMTestMasterId.ToString(),
+                            XAxisLabel = graphMaster?.XParameter,
+                            XValues = JsonConvert.SerializeObject(XValuesList),
+                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
+                            Datasets = new List<LineGraphsDatasetModel>()
+                        };
+
+                        for (int i = 1; i <= rowCountPerDate; i++)
+                        {
+                            List<decimal> yValuesList = new List<decimal>();
+                            foreach (DateTime date in testPerformedDateList)
+                            {
+                                yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
+                            }
+
+                            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                            {
+                                Color = colorPalette[colorIndex % colorPalette.Length],
+                                Label = $"Number Of Turns: {i}",
+                                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                            });
+                            colorIndex++;
+                        }
+                    }
+                    else if (graphModel.GraphType == "BarChart")
+                    {
+                        graphModel.BarChartModel = new BarChartModel()
+                        {
+                            BarChartId = dBTMTestMasterId.ToString(),
+                            XAxisLabel = graphMaster?.XParameter,
+                            XValues = JsonConvert.SerializeObject(XValuesList),
+                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
+                            Datasets = new List<BarGraphsDatasetModel>()
+                        };
+                        // dataset will create based on rowCountPerDate count and dataset value will will bind based on testPerformedDateList
+                        for (int i = 1; i <= rowCountPerDate; i++)
+                        {
+                            List<decimal> YValuesList = new List<decimal>();
+                            foreach (DateTime date in testPerformedDateList)
+                            {
+                                YValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
+                            }
+
+                            graphModel.BarChartModel.Datasets.Add(new BarGraphsDatasetModel()
+                            {
+                                Color = colorPalette[colorIndex % colorPalette.Length],
+                                Label = $"Number Of Turns: {i}",
+                                Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
+                            });
+                            colorIndex++;
+                        }
+                    }
+                }
+            }
+            return graphModelList;
+        }
+
+        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            GraphModel graphModel = new GraphModel();
+            DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, graphMaster.XParameter, graphMaster.YParameter, fromDate, toDate, ref entityId, userType, centreCode);
+            if (dBTMReportsList?.Count > 0)
+            {
+                string dateTimeFormat = "yyyy-MM-dd";
+                int rowCountPerDate = dBTMReportsList.Max(x => x.RowCountPerDate);
+                DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
+                string[] XValuesList = null;
+                List<DateTime> testPerformedDateList = new List<DateTime>();
+                foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
+                {
+                    testPerformedDateList.Add(item.Date);
+                }
+                if (graphMaster.XParameter == "Date")
+                {
+                    List<string> xValues = new List<string>();
+                    foreach (var item in testPerformedDateList)
+                    {
+                        xValues.Add(item.ToString(dateTimeFormat));
+                    }
+                    XValuesList = xValues.ToArray();
+                }
+                else if (graphMaster.XParameter == "Distance")
+                {
+                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
+                        XValuesList = new string[] { "5", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
+                        XValuesList = new string[] { "10", "15", "20" };
+                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
+                        XValuesList = new string[] { "10", "30" };
+                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
+                        XValuesList = new string[] { "10", "20", "30", "40" };
+                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    {
+                        List<string> xValues = new List<string>();
+                        short distance = 25;
+                        for (int i = distance; i <= (distance * 12); i = i + distance)
+                        {
+                            xValues.Add(i.ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
+                }
+                else if (graphMaster.XParameter == "Attempt")
+                {
+
+                }
+
+                if (XValuesList != null)
+                {
+                    graphModel.IsRecordFound = true;
+                    graphModel.GraphType = graphMaster.GraphType;
+                    int colorIndex = 0;
+                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.TestPerformedTime.Date);
+                    string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
+                    if (graphModel.GraphType == "LineChart")
+                    {
+                        graphModel.LineChartModel = new LineChartModel()
+                        {
+                            LineChartId = dBTMTestMasterId.ToString(),
+                            XAxisLabel = graphMaster?.XParameter,
+                            XValues = JsonConvert.SerializeObject(XValuesList),
+                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
+                            Datasets = new List<LineGraphsDatasetModel>()
+                        };
+
+                        for (int i = 1; i <= rowCountPerDate; i++)
+                        {
+                            List<decimal> yValuesList = new List<decimal>();
+                            foreach (DateTime date in testPerformedDateList)
+                            {
+                                yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
+                            }
+
+                            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                            {
+                                Color = colorPalette[colorIndex % colorPalette.Length],
+                                Label = $"Number Of Turns: {i}",
+                                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                            });
+                            colorIndex++;
+                        }
+                    }
+                    else if (graphModel.GraphType == "BarChart")
+                    {
+                        graphModel.BarChartModel = new BarChartModel()
+                        {
+                            BarChartId = dBTMTestMasterId.ToString(),
+                            XAxisLabel = graphMaster?.XParameter,
+                            XValues = JsonConvert.SerializeObject(XValuesList),
+                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
+                            Datasets = new List<BarGraphsDatasetModel>()
+                        };
+                        // dataset will create based on rowCountPerDate count and dataset value will will bind based on testPerformedDateList
+                        for (int i = 1; i <= rowCountPerDate; i++)
+                        {
+                            List<decimal> YValuesList = new List<decimal>();
+                            foreach (DateTime date in testPerformedDateList)
+                            {
+                                YValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
+                            }
+
+                            graphModel.BarChartModel.Datasets.Add(new BarGraphsDatasetModel()
+                            {
+                                Color = colorPalette[colorIndex % colorPalette.Length],
+                                Label = $"Number Of Turns: {i}",
+                                Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
+                            });
+                            colorIndex++;
+                        }
+                    }
+                }
+            }
+            return graphModel;
+        }
+
         public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
             if (dBTMTestMasterId <= 0)
@@ -281,7 +521,7 @@ namespace Coditech.API.Service
         }
 
         // Delete Report File from Data folder
-        public virtual bool DeleteReportsFile(string fileName)
+        public bool DeleteReportsFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
                 return false;
@@ -335,125 +575,7 @@ namespace Coditech.API.Service
             return dBTMReportsListModel;
         }
 
-        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
-        {
-            GraphModel graphModel = new GraphModel();
-            DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
-            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, graphMaster.XParameter, graphMaster.YParameter, fromDate, toDate, ref entityId, userType, centreCode);
-            if (dBTMReportsList?.Count > 0)
-            {
-                string dateTimeFormat = "yyyy-MM-dd";
-                int rowCountPerDate = dBTMReportsList.Max(x => x.RowCountPerDate);
-                DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
-                string[] XValuesList = null;
-                List<DateTime> testPerformedDateList = new List<DateTime>();
-                foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
-                {
-                    testPerformedDateList.Add(item.Date);
-                }
-                if (graphMaster.XParameter == "Date")
-                {
-                    List<string> xValues = new List<string>();
-                    foreach (var item in testPerformedDateList)
-                    {
-                        xValues.Add(item.ToString(dateTimeFormat));
-                    }
-                    XValuesList = xValues.ToArray();
-                }
-                else if (graphMaster.XParameter == "Distance")
-                {
-                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
-                        XValuesList = new string[] { "5", "15", "20" };
-                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
-                        XValuesList = new string[] { "10", "15", "20" };
-                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
-                        XValuesList = new string[] { "10", "30" };
-                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
-                        XValuesList = new string[] { "10", "20", "30", "40" };
-                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
-                    {
-                        List<string> xValues = new List<string>();
-                        short distance = 25;
-                        for (int i = distance; i <= (distance * 12); i = i + distance)
-                        {
-                            xValues.Add(i.ToString());
-                        }
-                        XValuesList = xValues.ToArray();
-                    }
-                }
-                else if (graphMaster.XParameter == "Attempt")
-                {
-
-                }
-
-                if (XValuesList != null)
-                {
-                    graphModel.IsRecordFound = true;
-                    graphModel.GraphType = graphMaster.GraphType;
-                    int colorIndex = 0;
-                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter).GroupBy(x => x.TestPerformedTime.Date);
-                    string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
-                    if (graphModel.GraphType == "LineChart")
-                    {
-                        graphModel.LineChartModel = new LineChartModel()
-                        {
-                            LineChartId = dBTMTestMasterId.ToString(),
-                            XAxisLabel = graphMaster?.XParameter,
-                            XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
-                            Datasets = new List<LineGraphsDatasetModel>()
-                        };
-
-                        for (int i = 1; i <= rowCountPerDate; i++)
-                        {
-                            List<decimal> yValuesList = new List<decimal>();
-                            foreach (DateTime date in testPerformedDateList)
-                            {
-                                yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
-                            }
-
-                            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
-                            {
-                                Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = $"Number Of Turns: {i}",
-                                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
-                            });
-                            colorIndex++;
-                        }
-                    }
-                    else if (graphModel.GraphType == "BarChart")
-                    {
-                        graphModel.BarChartModel = new BarChartModel()
-                        {
-                            BarChartId = dBTMTestMasterId.ToString(),
-                            XAxisLabel = graphMaster?.XParameter,
-                            XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = $"{graphMaster?.YParameter} {DBTMCustomHelper.Unit(graphMaster?.YParameter)}",
-                            Datasets = new List<BarGraphsDatasetModel>()
-                        };
-                        // dataset will create based on rowCountPerDate count and dataset value will will bind based on testPerformedDateList
-                        for (int i = 1; i <= rowCountPerDate; i++)
-                        {
-                            List<decimal> YValuesList = new List<decimal>();
-                            foreach (DateTime date in testPerformedDateList)
-                            {
-                                YValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == graphMaster.YParameter && x.TestPerformedTime.Date == date && x.RowOrder == i).Select(x => x.ParameterValue).FirstOrDefault()));
-                            }
-
-                            graphModel.BarChartModel.Datasets.Add(new BarGraphsDatasetModel()
-                            {
-                                Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = $"Number Of Turns: {i}",
-                                Data = JsonConvert.SerializeObject(YValuesList.ToArray()),
-                            });
-                            colorIndex++;
-                        }
-                    }
-                }
-            }
-            return graphModel;
-        }
-
+        #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
@@ -623,6 +745,7 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
+
         private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns)
         {
             //DBTMReportsListModel listModel = new DBTMReportsListModel();
@@ -786,9 +909,9 @@ namespace Coditech.API.Service
                     if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
                     {
                         if (spilt.Length == 1)
-                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, 1);
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, 1);
                         else
-                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, newRow, group, Convert.ToInt16(spilt[1]));
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, Convert.ToInt16(spilt[1]));
                     }
                     else
                     {
@@ -860,7 +983,6 @@ namespace Coditech.API.Service
             return listviewSequenceColumnList;
         }
 
-        #region Private Methods
         private static string NumberToWords(int number)
         {
             if (number == 0)

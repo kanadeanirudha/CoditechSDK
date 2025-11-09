@@ -42,7 +42,7 @@ namespace Coditech.Engine.DBTM.Helpers
             }
         }
 
-        public static string Calculation(string calculationCode, string calculationName, DataRow newRow, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false)
+        public static string Calculation(string calculationCode, string calculationName, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false)
         {
             double weight = Convert.ToDouble(group.FirstOrDefault()?.Weight);
             calculationName = string.IsNullOrEmpty(calculationName) ? calculationCode : calculationName;
@@ -92,9 +92,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
                     break;
                 case "VelocityByRow":
-                    distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
-                    time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
+                    result = VelocityByRow(group, recurtion);
                     break;
                 case "CumulativeVelocityByRow":
                     distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
@@ -111,40 +109,27 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, 3)}" : "Invalid Data";
                     break;
                 case "AccelerationByRow":
-                    var timeValue = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion)?.ParameterValue ?? 0;
-                    if (recurtion == 1)
-                    {
-                        var velocityValue = Convert.ToDecimal(newRow["VelocityByRow-1"]);
-                        result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, 3)}" : "Invalid Data";
-                    }
-                    else
-                    {
-                        var velocityValueCurrent = Convert.ToDecimal(newRow[$"VelocityByRow-{recurtion}"]);
-                        var velocityValueBefore = Convert.ToDecimal(newRow[$"VelocityByRow-{recurtion - 1}"]);
-                        result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, 3)}" : "Invalid Data";
-                    }
+                    result = AccelerationByRow(group, recurtion);
                     break;
                 case "ForceByRow":
-                    var accelerationByRow = Convert.ToDecimal(newRow[$"AccelerationByRow-{recurtion}"]);
-                    result = weight == 0 ? "N/A" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
+                    result = ForceByRow(group, recurtion, weight);
                     break;
                 case "PowerByRow":
-                    var velocityByRow = Convert.ToDecimal(newRow[$"VelocityByRow-{recurtion}"]);
-                    var forceByRow = Convert.ToDecimal(newRow[$"ForceByRow-{recurtion}"]);
+                    var velocityByRow = Convert.ToDecimal(VelocityByRow(group, recurtion));
+                    var forceByRow = Convert.ToDecimal(ForceByRow(group, recurtion, weight));
                     result = weight == 0 ? "N/A" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
                     break;
                 case "ChangeOfDirection":
-                    var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "B-C")?.ParameterValue);
-                    var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "C-B")?.ParameterValue);
-                    result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, 3)}" : "0";
+                    decimal time2, time3;
+                    result = ChangeOfDirection(group);
                     break;
                 case "AgilityDeficitRatio":
-                    var changeOfDirection = Convert.ToDecimal(newRow[$"ChangeOfDirection"]);
+                    var changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group));
                     var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "A-B")?.ParameterValue);
                     result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / time1, 3)}" : "0";
                     break;
                 case "ChangeOfDirectionDeficit":
-                    changeOfDirection = Convert.ToDecimal(newRow[$"ChangeOfDirection"]);
+                    changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group));
                     time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "A-B")?.ParameterValue);
                     result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - time1, 3)}" : "0";
                     break;
@@ -155,6 +140,51 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
+        }
+
+        private static string ChangeOfDirection(IGrouping<string, DBTMReportsModel> group)
+        {
+            string result;
+            var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "B-C")?.ParameterValue);
+            var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == "Time" && x.FromTo == "C-B")?.ParameterValue);
+            result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, 3)}" : "0";
+            return result;
+        }
+
+        private static string ForceByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, double weight)
+        {
+            string result;
+            var accelerationByRow = Convert.ToDecimal(AccelerationByRow(group, recurtion));
+            result = weight == 0 ? "N/A" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
+            return result;
+        }
+
+        private static string AccelerationByRow(IGrouping<string, DBTMReportsModel> group, short recurtion)
+        {
+            string result;
+            var timeValue = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion)?.ParameterValue ?? 0;
+            if (recurtion == 1)
+            {
+                var velocityValue = Convert.ToDecimal(VelocityByRow(group, 1));
+                result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, 3)}" : "Invalid Data";
+            }
+            else
+            {
+                var velocityValueCurrent = Convert.ToDecimal(VelocityByRow(group, recurtion));
+                var velocityValueBefore = Convert.ToDecimal(VelocityByRow(group, (short)(recurtion - 1)));
+                result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, 3)}" : "Invalid Data";
+            }
+
+            return result;
+        }
+
+        private static string VelocityByRow(IGrouping<string, DBTMReportsModel> group, short recurtion)
+        {
+            string result = string.Empty;
+            decimal distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
+            decimal time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
+            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
+            return result;
         }
 
         public static string Unit(string parameterCode)
