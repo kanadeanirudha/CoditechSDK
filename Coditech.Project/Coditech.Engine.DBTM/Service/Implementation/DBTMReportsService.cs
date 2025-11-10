@@ -120,9 +120,10 @@ namespace Coditech.API.Service
                             YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
                             Datasets = new List<LineGraphsDatasetModel>()
                         };
+                        short i = 1;
                         foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
                         {
-                            short i = 1, j = 1;
+                            short j = 1;
                             List<decimal> yValuesList = new List<decimal>();
                             if (graphMaster.IsYParameterCalculated)
                             {
@@ -160,9 +161,11 @@ namespace Coditech.API.Service
                             YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
                             Datasets = new List<BarGraphsDatasetModel>()
                         };
+
+                        short i = 1;
                         foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
                         {
-                            short i = 1, j = 1;
+                            short j = 1;
                             List<decimal> yValuesList = new List<decimal>();
                             if (graphMaster.IsYParameterCalculated)
                             {
