@@ -13,7 +13,7 @@ namespace Coditech.API.Service
         bool DeleteDBTMTest(ParameterModel parameterModel);
         DBTMTestParameterListModel GetDBTMTestParameter();
         DBTMTestCalculationListModel GetDBTMTestCalculation();
-        DBTMGraphMasterListModel GetDBTMGraph();
+        DBTMGraphMasterListModel GetDBTMGraph(int dBTMTestMasterId);
         DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode);
         DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         bool DeleteActivityListViewSequence(ParameterModel parameterModel);

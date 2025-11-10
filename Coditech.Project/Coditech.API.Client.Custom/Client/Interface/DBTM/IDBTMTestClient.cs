@@ -42,7 +42,7 @@ namespace Coditech.API.Client
         TrueFalseResponse DeleteDBTMTest(ParameterModel body);
         DBTMTestParameterListResponse GetDBTMTestParameter();
         DBTMTestCalculationListResponse GetDBTMTestCalculation();
-        DBTMGraphMasterListResponse GetDBTMGraph();
+        DBTMGraphMasterListResponse GetDBTMGraph(int dBTMTestMasterId);
 
         /// <summary>
         /// Get ActivityListViewSequence by DBTMTestParameterListViewSequenceId.
