@@ -71,24 +71,24 @@
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label">Trainee List</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
+                            </div>
+                            <div class="col-md-1">
                                 <label class="form-label">Graph Mode</label>
                             </div>
                             <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphModeDropdown)
                             </div>
+                        </div>
+                        <div class="row mt-2">
                             <div class="col-md-1">
                                 <label class="form-label">Graph Type</label>
                             </div>
                             <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
-                            </div>                          
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-md-1">
-                                <label class="form-label">Trainee List</label>
-                            </div>
-                            <div class="col-md-6">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })

@@ -42,11 +42,11 @@ namespace Coditech.Engine.DBTM.Helpers
             }
         }
 
-        public static string Calculation(string calculationCode, string calculationName, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false)
+        public static string Calculation(string calculationCode, string calculationName, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false, bool isGraph = false)
         {
             double weight = Convert.ToDouble(group.FirstOrDefault()?.Weight);
             calculationName = string.IsNullOrEmpty(calculationName) ? calculationCode : calculationName;
-            string result = "NA";
+            string result = isGraph ? "0" : "NA";
             switch (calculationCode)
             {
                 case "CompletionTime":
@@ -56,15 +56,15 @@ namespace Coditech.Engine.DBTM.Helpers
                 case "AverageVelocity":
                     decimal totalDistance = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
                     decimal totalTime = group.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
-                    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)}" : "Invalid Data";
+                    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case "TotalDistanceCovered":
                     decimal totalDistanceCovered = group.Where(x => (x.ParameterCode == "Distance" || x.ParameterCode == "DistanceMultiplyByRow") && x.Row != 0).Sum(x => x.ParameterValue);
-                    result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)}" : "Invalid Data";
+                    result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case "DistanceMultiplyByRow":
                     decimal distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
-                    result = distance != 0 ? $"{Math.Round(distance * recurtion, 3)}" : "Invalid Data";
+                    result = distance != 0 ? $"{Math.Round(distance * recurtion, 3)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case "MaxLap":
                     result = $"{group.Where(x => x.ParameterCode == "Time").Max(x => x.ParameterValue)}";
@@ -89,15 +89,15 @@ namespace Coditech.Engine.DBTM.Helpers
                 case "Velocity":
                     distance = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
                     decimal time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
+                    result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case "VelocityByRow":
-                    result = VelocityByRow(group, recurtion);
+                    result = VelocityByRow(group, recurtion, isGraph);
                     break;
                 case "CumulativeVelocityByRow":
                     distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, 3)}" : "Invalid Data";
+                    result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, 3)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case "CumulativeVelocity":
                     distance = group.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
@@ -106,17 +106,17 @@ namespace Coditech.Engine.DBTM.Helpers
                     {
                         cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == i).ParameterValue;
                     }
-                    result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, 3)}" : "Invalid Data";
+                    result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, 3)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case "AccelerationByRow":
-                    result = AccelerationByRow(group, recurtion);
+                    result = AccelerationByRow(group, recurtion, isGraph);
                     break;
                 case "ForceByRow":
-                    result = ForceByRow(group, recurtion, weight);
+                    result = ForceByRow(group, recurtion, weight, isGraph);
                     break;
                 case "PowerByRow":
-                    var velocityByRow = Convert.ToDecimal(VelocityByRow(group, recurtion));
-                    var forceByRow = Convert.ToDecimal(ForceByRow(group, recurtion, weight));
+                    var velocityByRow = Convert.ToDecimal(VelocityByRow(group, recurtion, isGraph));
+                    var forceByRow = Convert.ToDecimal(ForceByRow(group, recurtion, weight, isGraph));
                     result = weight == 0 ? "N/A" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
                     break;
                 case "ChangeOfDirection":
@@ -151,39 +151,39 @@ namespace Coditech.Engine.DBTM.Helpers
             return result;
         }
 
-        private static string ForceByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, double weight)
+        private static string ForceByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, double weight, bool isGraph)
         {
             string result;
-            var accelerationByRow = Convert.ToDecimal(AccelerationByRow(group, recurtion));
+            var accelerationByRow = Convert.ToDecimal(AccelerationByRow(group, recurtion, isGraph));
             result = weight == 0 ? "N/A" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
             return result;
         }
 
-        private static string AccelerationByRow(IGrouping<string, DBTMReportsModel> group, short recurtion)
+        private static string AccelerationByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
         {
             string result;
             var timeValue = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion)?.ParameterValue ?? 0;
             if (recurtion == 1)
             {
-                var velocityValue = Convert.ToDecimal(VelocityByRow(group, 1));
-                result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, 3)}" : "Invalid Data";
+                var velocityValue = Convert.ToDecimal(VelocityByRow(group, 1, isGraph));
+                result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, 3)}" : isGraph ? "0" : "Invalid Data";
             }
             else
             {
-                var velocityValueCurrent = Convert.ToDecimal(VelocityByRow(group, recurtion));
-                var velocityValueBefore = Convert.ToDecimal(VelocityByRow(group, (short)(recurtion - 1)));
-                result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, 3)}" : "Invalid Data";
+                var velocityValueCurrent = Convert.ToDecimal(VelocityByRow(group, recurtion, isGraph));
+                var velocityValueBefore = Convert.ToDecimal(VelocityByRow(group, (short)(recurtion - 1), isGraph));
+                result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, 3)}" : isGraph ? "0" : "Invalid Data";
             }
 
             return result;
         }
 
-        private static string VelocityByRow(IGrouping<string, DBTMReportsModel> group, short recurtion)
+        private static string VelocityByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
         {
             string result = string.Empty;
             decimal distance = group.FirstOrDefault(x => x.ParameterCode == "DistanceMultiplyByRow" && x.Row == recurtion).ParameterValue;
             decimal time = group.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == recurtion).ParameterValue;
-            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : "Invalid Data";
+            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : isGraph ? "0" : "Invalid Data";
             return result;
         }
 
