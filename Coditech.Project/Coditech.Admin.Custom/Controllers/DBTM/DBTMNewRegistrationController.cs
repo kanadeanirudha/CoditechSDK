@@ -117,7 +117,10 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult IndividualRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-
+            if (string.IsNullOrEmpty(dBTMNewRegistrationViewModel.Custom1))
+            {
+                dBTMNewRegistrationViewModel.ErrorMessage = "Device serial code is required.";
+            }
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
@@ -244,7 +247,7 @@ namespace Coditech.Admin.Controllers
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
-           
+
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }
