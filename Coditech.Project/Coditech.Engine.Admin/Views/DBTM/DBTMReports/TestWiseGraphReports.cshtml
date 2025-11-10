@@ -191,7 +191,8 @@
             if (graphMode === "InstantaneousChart" && fromDate) {
                 $("#ToDate").datepicker("setDate", fromDate);
                 $("#ToDate").prop("readonly", true);
-            } else {
+            }
+            else {
                 $("#ToDate").prop("readonly", false);
                 if (fromDate) {
                     $("#ToDate").datepicker("option", "minDate", fromDate);
@@ -220,9 +221,9 @@
                 onSelect: function () {
                     updateToDate();
                 }
-            });
+            }).on("change", function () { updateToDate(); });
 
-            // ToDate
+             // ToDate
             $("#ToDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
@@ -240,7 +241,7 @@
             });
 
             $("#ToDate").on("mousedown focus click", function (e) {
-            var graphMode = $("#GraphMode").val();
+                var graphMode = $("#GraphMode").val();
                 if (graphMode === "InstantaneousChart") {
                     e.stopImmediatePropagation();
                     e.preventDefault();
