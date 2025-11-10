@@ -18,6 +18,7 @@ namespace Coditech.API.Data
         public string GraphType { get; set; }
         public string GraphMode { get; set; }
         public short OrderBy { get; set; }
+        public string GraphSize { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
