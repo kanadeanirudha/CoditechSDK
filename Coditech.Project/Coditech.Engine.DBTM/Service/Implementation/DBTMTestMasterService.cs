@@ -355,7 +355,7 @@ namespace Coditech.API.Service
             };
             return list;
         }
-        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             var graphList = (from a in _dBTMTestGraphRepository.Table
                              join b in _dBTMGraphMasterRepository.Table
@@ -365,14 +365,26 @@ namespace Coditech.API.Service
                              {
                                  DBTMGraphMasterId = b.DBTMGraphMasterId,
                                  GraphName = b.GraphName,
-                                 GraphCode = b.GraphCode
+                                 GraphCode = b.GraphCode,
+                                 GraphMode = b.GraphMode,
+                                 GraphType = b.GraphType
                              })
                              .Distinct()
                              .ToList();
 
+            if (!string.IsNullOrEmpty(graphMode))
+            {
+                graphList = graphList.Where(x => x.GraphMode == graphMode).ToList(); 
+            }
+
+            var graphListResult = graphList
+                .Distinct()
+                .OrderBy(x => x.GraphName)
+                .ToList();
+
             return new DBTMGraphMasterListModel
             {
-                DBTMGraphMasterList = graphList
+                DBTMGraphMasterList = graphListResult
             };
         }
         public virtual DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)

@@ -208,11 +208,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTestMaster/DBTMGraphByDBTMTestMasterId")]
         [HttpGet]
         [Produces(typeof(DBTMGraphMasterListResponse))]
-        public virtual IActionResult GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public virtual IActionResult GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             try
             {
-                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId, graphMode);
                 return IsNotNull(list) ? CreateOKResponse(new DBTMGraphMasterListResponse { DBTMGraphMasterList = list.DBTMGraphMasterList }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)

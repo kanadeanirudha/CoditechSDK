@@ -141,7 +141,7 @@ namespace Coditech.Admin.Agents
         }
 
         //Graph Reports
-        public virtual GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime FromDate, DateTime ToDate)
         {
             GraphModel graphModel = new GraphModel();
             if (dBTMTestMasterId > 0)
@@ -155,7 +155,7 @@ namespace Coditech.Admin.Agents
                     generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
                     usertype = userModel?.Custom1;
                 }
-                GraphResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                GraphResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
                 graphModel = response.GraphModel;
 
             }

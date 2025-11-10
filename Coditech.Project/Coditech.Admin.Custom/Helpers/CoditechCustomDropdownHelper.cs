@@ -400,15 +400,21 @@ namespace Coditech.Admin.Helpers
 
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
-                int dBTMTestMasterId = Convert.ToInt32(dropdownViewModel.Parameter);
+                var parameters = dropdownViewModel.Parameter.Split('|');
+                int dBTMTestMasterId = Convert.ToInt32(parameters[0]);
+                string graphMode = parameters.Length > 1 ? parameters[1] : string.Empty;
 
-                DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId, graphMode);
                 DBTMGraphMasterListModel list = new DBTMGraphMasterListModel() { DBTMGraphMasterList = response.DBTMGraphMasterList };
-                foreach (var item in list?.DBTMGraphMasterList.OrderBy(x => x.GraphName))
+                var filteredList = string.IsNullOrEmpty(graphMode)
+                    ? list.DBTMGraphMasterList
+                    : list.DBTMGraphMasterList.Where(x => x.GraphMode == graphMode).ToList();
+
+                foreach (var item in filteredList.OrderBy(x => x.GraphName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
-                        Text = $"{item.GraphName}",
+                        Text = item.GraphName,
                         Value = item.DBTMGraphMasterId.ToString(),
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
                     });
