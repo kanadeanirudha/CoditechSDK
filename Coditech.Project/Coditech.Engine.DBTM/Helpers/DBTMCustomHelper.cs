@@ -31,13 +31,13 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case CustomConstants.Power:
                     double jumpHeight = Convert.ToDouble(dBTMReportsList.FirstOrDefault(x => x.ParameterCode == CustomConstants.JumpHeight && x.CreatedDate == createdDate)?.ParameterValue);
-                    newRow[calculationName] = weight == 0 ? "N/A" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, 3)} {Unit(calculationCode)}";
+                    newRow[calculationName] = weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, 3)} {Unit(calculationCode)}";
                     break;
                 case CustomConstants.Force:
-                    newRow[calculationName] = weight == 0 ? "N/A" : $"{Math.Round(4 * weight * 9.81, 3)} {Unit(calculationCode)}";
+                    newRow[calculationName] = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, 3)} {Unit(calculationCode)}";
                     break;
                 default:
-                    newRow[calculationName] = "N/A";
+                    newRow[calculationName] = "NA";
                     break;
             }
         }
@@ -74,9 +74,9 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case CustomConstants.Power:
                     double jumpHeight = Convert.ToDouble(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.JumpHeight)?.ParameterValue);
-                    return weight == 0 ? "N/A" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, 3)}";
+                    return weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, 3)}";
                 case CustomConstants.Force:
-                    result = weight == 0 ? "N/A" : $"{Math.Round(4 * weight * 9.81, 3)}";
+                    result = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, 3)}";
                     break;
                 case CustomConstants.CumulativeTime:
                     decimal cumulativeTime = 0;
@@ -117,7 +117,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.PowerByRow:
                     var velocityByRow = Convert.ToDecimal(VelocityByRow(group, recurtion, isGraph));
                     var forceByRow = Convert.ToDecimal(ForceByRow(group, recurtion, weight, isGraph));
-                    result = weight == 0 ? "N/A" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
+                    result = weight == 0 ? "NA" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
                     break;
                 case CustomConstants.ChangeOfDirection:
                     decimal time2, time3;
@@ -155,7 +155,7 @@ namespace Coditech.Engine.DBTM.Helpers
         {
             string result;
             var accelerationByRow = Convert.ToDecimal(AccelerationByRow(group, recurtion, isGraph));
-            result = weight == 0 ? "N/A" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
+            result = weight == 0 ? "NA" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
             return result;
         }
 
