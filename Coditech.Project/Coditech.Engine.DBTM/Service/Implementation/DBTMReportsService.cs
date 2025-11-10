@@ -80,7 +80,7 @@ namespace Coditech.API.Service
                     }
                     XValuesList = xValues.ToArray();
                 }
-                else if (graphMaster.XParameter == "Distance")
+                else if (graphMaster.XParameter == CustomConstants.Distance)
                 {
                     if (dbtmTestMaster.TestCode == "ProAgilityTest")
                         XValuesList = new string[] { "5", "15", "20" };
@@ -746,16 +746,16 @@ namespace Coditech.API.Service
                         {
                             if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
                             {
-                                if (dBTMTestParameterListviewSequence.ParameterCode == "CumulativeTime" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocity" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "VelocityByRow" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "CumulativeVelocityByRow" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "AccelerationByRow" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "ForceByRow" ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == "PowerByRow"
+                                if (dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeTime ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocity ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.VelocityByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.AccelerationByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.ForceByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.PowerByRow
                                     )
                                 {
-                                    fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
+                                    fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
                                 }
                             }
                             else
@@ -763,9 +763,9 @@ namespace Coditech.API.Service
                         }
                         else
                         {
-                            if (dBTMTestParameterListviewSequence.ParameterCode == "Velocity")
+                            if (dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.Velocity)
                             {
-                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Time" && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
+                                fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
                             }
                             else
                             {
@@ -776,9 +776,9 @@ namespace Coditech.API.Service
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                         if (updatedColumnName.Contains("{Distance*Row}"))
                         {
-                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == "Distance").ParameterValue * Convert.ToInt32(spilt[1]);
+                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance).ParameterValue * Convert.ToInt32(spilt[1]);
                             updatedColumnName = updatedColumnName.Replace("{Distance*Row}", distance.ToString());
-                            updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit("Distance"));
+                            updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit(CustomConstants.Distance));
                         }
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                     }
