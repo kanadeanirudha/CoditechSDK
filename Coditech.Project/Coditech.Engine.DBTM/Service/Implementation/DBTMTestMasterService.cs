@@ -346,7 +346,7 @@ namespace Coditech.API.Service
         {
             string testCode = dBTMTestMasterId.ToString();
             var graphList = (from graph in _dBTMGraphMasterRepository.Table
-                             where graph.TestCode == testCode
+                             where ("," + graph.TestCode + ",").Contains("," + testCode + ",")
                              select new DBTMGraphMasterModel
                              {
                                  DBTMGraphMasterId = graph.DBTMGraphMasterId,
@@ -363,6 +363,7 @@ namespace Coditech.API.Service
                 DBTMGraphMasterList = graphList
             };
         }
+
         public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             var graphList = (from a in _dBTMTestGraphRepository.Table
