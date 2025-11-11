@@ -186,11 +186,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTestMaster/GetDBTMGraph")]
         [Produces(typeof(DBTMGraphMasterListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMGraph()
+        public virtual IActionResult GetDBTMGraph(int dBTMTestMasterId)
         {
             try
             {
-                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraph();
+                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraph(dBTMTestMasterId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMGraphMasterListResponse>(data) : CreateNoContentResponse();
             }

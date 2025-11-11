@@ -186,12 +186,20 @@
             $("#SelectedParameter2").val(type);
         }
         function updateToDate() {
+            var graphMode = $("#GraphMode").val();
             var fromDate = $("#FromDate").datepicker("getDate");
-            if (fromDate) {
-                $("#ToDate").datepicker("option", "minDate", fromDate);
-                var toDate = $("#ToDate").datepicker("getDate");
-                if (toDate && toDate < fromDate) {
-                    $("#ToDate").datepicker("setDate", fromDate);
+            if (graphMode === "InstantaneousChart" && fromDate) {
+                $("#ToDate").datepicker("setDate", fromDate);
+                $("#ToDate").prop("readonly", true);
+            }
+            else {
+                $("#ToDate").prop("readonly", false);
+                if (fromDate) {
+                    $("#ToDate").datepicker("option", "minDate", fromDate);
+                    var toDate = $("#ToDate").datepicker("getDate");
+                    if (toDate && toDate < fromDate) {
+                        $("#ToDate").datepicker("setDate", fromDate);
+                    }
                 }
             }
         }
@@ -213,9 +221,9 @@
                 onSelect: function () {
                     updateToDate();
                 }
-            });
+            }).on("change", function () { updateToDate(); });
 
-            // ToDate
+             // ToDate
             $("#ToDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
@@ -229,6 +237,15 @@
                 maxDate: new Date(),
                 onSelect: function () {
                     updateToDate();
+                }
+            });
+
+            $("#ToDate").on("mousedown focus click", function (e) {
+                var graphMode = $("#GraphMode").val();
+                if (graphMode === "InstantaneousChart") {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    return false;
                 }
             });
             updateToDate();

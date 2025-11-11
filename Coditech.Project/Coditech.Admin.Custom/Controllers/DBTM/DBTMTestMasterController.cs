@@ -304,20 +304,25 @@ namespace Coditech.Admin.Controllers
         protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)
         {
             dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();
-            DBTMGraphMasterListViewModel dBTMGraphMasterList = _dBTMTestAgent.DBTMGraph();
-
-            if (dBTMGraphMasterList?.DBTMGraphMasterList != null)
+            if (dBTMTestViewModel.DBTMTestMasterId > 0)
             {
-                foreach (var item in dBTMGraphMasterList.DBTMGraphMasterList)
+                DBTMGraphMasterListViewModel dBTMGraphMasterList = _dBTMTestAgent.DBTMGraph(dBTMTestViewModel.DBTMTestMasterId);
+                if (dBTMGraphMasterList?.DBTMGraphMasterList != null)
                 {
-                    dBTMTestViewModel.DBTMGraphMasterList.Add(new SelectListItem
+                    foreach (var item in dBTMGraphMasterList.DBTMGraphMasterList)
                     {
-                        Text = item.GraphName,
-                        Value = item.DBTMGraphMasterId.ToString()
-                    });
+                        dBTMTestViewModel.DBTMGraphMasterList.Add(new SelectListItem
+                        {
+                            Text = $"{item.GraphName} ({item.GraphMode})",
+                            Value = item.DBTMGraphMasterId.ToString(),
+                            Selected = dBTMTestViewModel.DBTMSelectedGraph != null &&
+                                       dBTMTestViewModel.DBTMSelectedGraph.Contains(item.DBTMGraphMasterId.ToString())
+                        });
+                    }
                 }
             }
         }
+
         [HttpGet]
         public ActionResult GetDBTMGraphByDBTMTestMaster(int dBTMTestMasterId)
         {

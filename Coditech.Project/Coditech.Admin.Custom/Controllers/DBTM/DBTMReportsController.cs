@@ -136,6 +136,10 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId,string graphMode, DateTime FromDate, DateTime ToDate)
         {
+            if (!string.IsNullOrEmpty(graphMode) && graphMode.Equals("InstantaneousChart", StringComparison.OrdinalIgnoreCase))
+            {
+                ToDate = FromDate;
+            }
             GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, FromDate, ToDate);
             if (graphModel.IsRecordFound)
             {

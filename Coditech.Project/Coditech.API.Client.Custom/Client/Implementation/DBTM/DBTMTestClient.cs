@@ -459,14 +459,14 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-        public virtual DBTMGraphMasterListResponse GetDBTMGraph()
+        public virtual DBTMGraphMasterListResponse GetDBTMGraph(int dBTMTestMasterId)
         {
-            return Task.Run(async () => await GetDBTMGraphAsync(System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetDBTMGraphAsync(dBTMTestMasterId, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMGraphMasterListResponse> GetDBTMGraphAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async Task<DBTMGraphMasterListResponse> GetDBTMGraphAsync(int dBTMTestMasterId, System.Threading.CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTestEndpoint.GetDBTMGraphAsync();
+            string endpoint = dBTMTestEndpoint.GetDBTMGraphAsync(dBTMTestMasterId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
 

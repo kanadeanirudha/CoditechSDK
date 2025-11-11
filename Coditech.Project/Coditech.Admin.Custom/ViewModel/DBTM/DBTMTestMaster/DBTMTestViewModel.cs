@@ -27,7 +27,6 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Parameter")]
         public List<string> DBTMSelectedTestParameter { get; set; }
-        [Required]
         [Display(Name = "Graph")]
         public List<string> DBTMSelectedGraph { get; set; }
         [Required]

@@ -153,9 +153,9 @@ namespace Coditech.Admin.Agents
             listViewModel.DBTMTestCalculationList = dBTMTestCalculationList?.DBTMTestCalculationList?.ToViewModel<DBTMTestCalculationViewModel>().ToList();
             return listViewModel;
         }
-        public virtual DBTMGraphMasterListViewModel DBTMGraph()
+        public virtual DBTMGraphMasterListViewModel DBTMGraph(int dBTMTestMasterId)
         {
-            DBTMGraphMasterListResponse response = _dBTMTestClient.GetDBTMGraph();
+            DBTMGraphMasterListResponse response = _dBTMTestClient.GetDBTMGraph(dBTMTestMasterId);
             DBTMGraphMasterListModel dBTMGraphMasterList = new DBTMGraphMasterListModel { DBTMGraphMasterList = response?.DBTMGraphMasterList };
             DBTMGraphMasterListViewModel listViewModel = new DBTMGraphMasterListViewModel();
             listViewModel.DBTMGraphMasterList = dBTMGraphMasterList?.DBTMGraphMasterList?.ToViewModel<DBTMGraphMasterViewModel>().ToList();

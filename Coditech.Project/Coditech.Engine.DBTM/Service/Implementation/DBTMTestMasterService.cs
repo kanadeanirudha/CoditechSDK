@@ -341,19 +341,27 @@ namespace Coditech.API.Service
             };
             return list;
         }
-        public virtual DBTMGraphMasterListModel GetDBTMGraph()
+
+        public virtual DBTMGraphMasterListModel GetDBTMGraph(int dBTMTestMasterId)
         {
-            DBTMGraphMasterListModel list = new DBTMGraphMasterListModel
+            string testCode = dBTMTestMasterId.ToString();
+            var graphList = (from graph in _dBTMGraphMasterRepository.Table
+                             where graph.TestCode == testCode
+                             select new DBTMGraphMasterModel
+                             {
+                                 DBTMGraphMasterId = graph.DBTMGraphMasterId,
+                                 GraphName = graph.GraphName,
+                                 GraphCode = graph.GraphCode,
+                                 GraphMode = graph.GraphMode,
+                                 GraphType = graph.GraphType
+                             })
+                             .OrderBy(x => x.GraphName)
+                             .ToList();
+
+            return new DBTMGraphMasterListModel
             {
-                DBTMGraphMasterList = (from a in _dBTMGraphMasterRepository.Table
-                                       select new DBTMGraphMasterModel
-                                       {
-                                           DBTMGraphMasterId = a.DBTMGraphMasterId,
-                                           GraphName = a.GraphName,
-                                           GraphCode = a.GraphCode,
-                                       }).ToList()
+                DBTMGraphMasterList = graphList
             };
-            return list;
         }
         public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {

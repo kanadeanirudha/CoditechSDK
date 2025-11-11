@@ -254,7 +254,7 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate,x.Weight }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
@@ -276,7 +276,7 @@ namespace Coditech.API.Service
 
             dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
             dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetailsData.CreatedDate;
-            
+
 
 
             // Use ternary for brevity
@@ -317,23 +317,23 @@ namespace Coditech.API.Service
         {
             switch (calculationCode)
             {
-                case "CompletionTime":
-                    decimal completionTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
+                case CustomConstants.CompletionTime:
+                    decimal completionTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
                     newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
                     break;
-                case "AverageVelocity":
-                    decimal totalDistance = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
-                    decimal totalTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
+                case CustomConstants.AverageVelocity:
+                    decimal totalDistance = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
+                    decimal totalTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
                     newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
                     break;
-                case "MaxLap":
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Max(x => x.ParameterValue)} {Unit(calculationCode)}";
+                case CustomConstants.MaxLap:
+                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
-                case "MinLap":
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
+                case CustomConstants.MinLap:
+                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Min(x => x.ParameterValue)} {Unit(calculationCode)}";
                     break;
-                case "Power":
-                    newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power")?.ParameterValue ?? 0)} {Unit(calculationCode)}";
+                case CustomConstants.Power:
+                    newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == CustomConstants.Power)?.ParameterValue ?? 0)} {Unit(calculationCode)}";
                     break;
                 default:
                     newRow[calculationName] = "N/A";
@@ -345,17 +345,17 @@ namespace Coditech.API.Service
             string data = string.Empty;
             switch (parameterCode)
             {
-                case "CompletionTime":
-                case "Time":
+                case CustomConstants.CompletionTime:
+                case CustomConstants.Time:
                     data = "sec";
                     break;
-                case "Distance":
+                case CustomConstants.Distance:
                     data = "m";
                     break;
-                case "AverageVelocity":
+                case CustomConstants.AverageVelocity:
                     data = "m/s";
                     break;
-                case "Power":
+                case CustomConstants.Power:
                     data = "watt";
                     break;
                 default:
