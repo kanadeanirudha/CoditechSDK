@@ -211,9 +211,15 @@ namespace Coditech.Admin.Helpers
             else
                 dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
             DBTMTestListModel list = new DBTMTestListModel { DBTMTestList = response.DBTMTestList };
+            bool isActive = !string.IsNullOrEmpty(dropdownViewModel.Parameter)
+                                && dropdownViewModel.Parameter.Equals("IsActive", StringComparison.OrdinalIgnoreCase);
+
+            if (isActive)
+                list.DBTMTestList = list.DBTMTestList.Where(x => x.IsActive).ToList();
+
             foreach (var item in list.DBTMTestList.OrderBy(x => x.TestName))
             {
-                if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && Convert.ToInt16(dropdownViewModel.Parameter) > 0 && item.DBTMTestMasterId == Convert.ToInt16(dropdownViewModel.Parameter))
+                if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && short.TryParse(dropdownViewModel.Parameter, out short excludeId) && item.DBTMTestMasterId == excludeId)
                 {
                     continue;
                 }
