@@ -1,34 +1,43 @@
 ﻿@model LineChartModel
 @{
     Layout = null;
+    var chartId = $"{Model.LineChartId}_{Guid.NewGuid().ToString("N")}";
 }
-<canvas id="@Model.LineChartId"></canvas>
+
+<div class="chart-container" style="position:relative; height:400px; width:100%;">
+    <canvas id="@chartId"></canvas>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script>
-    var xValues = @Html.Raw(Model.XValues);
-    var datasets = [];
+    (function () {
+        var ctx = document.getElementById('@chartId').getContext('2d');
+        var xValues = @Html.Raw(Model.XValues);
+        var datasets = [];
 
     @foreach (var dataset in Model.Datasets)
     {
         <text>
-            datasets.push({
-                label: "@dataset.Label",
-                data: @Html.Raw(dataset.Data),
-                fill: false,
-                borderColor: "@dataset.Color",
-                borderWidth: 2,
-                tension: 0.4
-            });
+                    datasets.push({
+                        label: "@dataset.Label",
+                        data: @Html.Raw(dataset.Data),
+                        fill: false,
+                        borderColor: "@dataset.Color",
+                        borderWidth: 2,
+                        tension: 0.4
+                    });
         </text>
     }
 
-        new Chart("@Model.LineChartId", {
+        new Chart(ctx, {
             type: "line",
             data: {
                 labels: xValues,
                 datasets: datasets
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,  
                 title: {
                     display: true,
                     text: '@Model.Title'
@@ -36,19 +45,14 @@
                 scales: {
                     xAxes: [{
                         display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '@Model.XAxisLabel'
-                        }
+                        scaleLabel: { display: true, labelString: '@Model.XAxisLabel' }
                     }],
                     yAxes: [{
                         display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '@Model.YAxisLabel'
-                        }
+                        scaleLabel: { display: true, labelString: '@Model.YAxisLabel' }
                     }]
                 }
             }
         });
+    })();
 </script>

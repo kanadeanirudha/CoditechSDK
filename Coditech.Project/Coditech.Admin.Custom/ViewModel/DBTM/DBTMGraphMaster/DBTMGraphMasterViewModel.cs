@@ -49,5 +49,6 @@ namespace Coditech.Admin.ViewModel
         public short OrderBy { get; set; }
         [Display(Name = "Graph Size")]
         public string GraphSize { get; set; }
+        public List<string> DBTMSelectedGraph { get; set; }
     }
 }

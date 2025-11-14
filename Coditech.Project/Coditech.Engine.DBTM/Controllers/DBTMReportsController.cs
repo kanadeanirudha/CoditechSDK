@@ -90,6 +90,28 @@ namespace Coditech.Engine.DBTM.Controllers
         }
 
         [HttpGet]
+        [Route("/DBTMReports/TestWiseGraphReportsV2")]
+        [Produces(typeof(GraphListResponse))]
+        public virtual IActionResult TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            try
+            {
+                List<GraphModel> model = _dBTMReportsService.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                return IsNotNull(model) ? CreateOKResponse(new GraphListResponse { GraphList = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseGraphReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new GraphListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWiseGraphReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new GraphListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("/DBTMReports/NameWiseReports")]
         [Produces(typeof(DBTMTestWiseReportsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]

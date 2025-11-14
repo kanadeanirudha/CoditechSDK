@@ -105,6 +105,7 @@ namespace Coditech.API.Service
                 {
                     graphModel.IsRecordFound = true;
                     graphModel.GraphType = graphMaster.GraphType;
+                    graphModel.GraphName = graphMaster.GraphName;
                     int colorIndex = 0;
                     var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == yParameter).GroupBy(x => x.TestPerformedTime);
                     string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();

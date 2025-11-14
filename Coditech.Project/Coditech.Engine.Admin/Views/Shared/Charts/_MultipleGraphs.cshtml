@@ -1,0 +1,29 @@
+﻿@model List<GraphModel>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var graph in Model)
+    {
+        <div class="mb-4">
+            <h5 class="text-center font-weight-bold mb-2">
+                @graph.GraphName
+            </h5>
+            @if (graph.GraphType == "LineChart")
+            {
+                @Html.Partial("~/Views/Shared/Charts/_LineChart.cshtml", graph.LineChartModel)
+            }
+            else if (graph.GraphType == "BarChart")
+            {
+                @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", graph.BarChartModel)
+            }
+            else if (graph.GraphType == "PieChart")
+            {
+                @Html.Partial("~/Views/Shared/Charts/_PieChart.cshtml", graph.PieChartModel)
+            }
+        </div>
+    }
+}
+else
+{
+    <p>No graphs found.</p>
+}

@@ -162,6 +162,27 @@ namespace Coditech.Admin.Agents
             return graphModel;
         }
 
+        public virtual List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
+        {
+            List<GraphModel> graphModel = new List<GraphModel>();
+            if (dBTMTestMasterId > 0)
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                GraphListResponse response = _dBTMReportsClient.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                graphModel = response.GraphList;
+
+            }
+            return graphModel;
+        }
+
         //Delete Report .
         public virtual bool DeleteReportsFile(string fileName)
         {

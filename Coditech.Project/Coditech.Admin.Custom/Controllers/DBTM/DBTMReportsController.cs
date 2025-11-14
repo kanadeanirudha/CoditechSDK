@@ -130,46 +130,47 @@ namespace Coditech.Admin.Controllers
             DBTMGraphListViewModel dBTMReportsViewModel = new DBTMGraphListViewModel();
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
+            BindDBTMGraph(dBTMReportsViewModel);
             return View("~/Views/DBTM/DBTMReports/TestWiseGraphReports.cshtml", dBTMReportsViewModel);
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, byte dBTMGraphMasterId,string graphMode, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetTestWiseGraphReports( int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
         {
-            if (!string.IsNullOrEmpty(graphMode) && graphMode.Equals("InstantaneousChart", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(graphMode) &&
+                graphMode.Equals("InstantaneousChart", StringComparison.OrdinalIgnoreCase))
             {
                 ToDate = FromDate;
             }
-            GraphModel graphModel = _dBTMReportsAgent.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, FromDate, ToDate);
-            if (graphModel.IsRecordFound)
+            if (!string.IsNullOrEmpty(dBTMGraphMasterIds))
             {
-                if (graphModel.GraphType == "LineChart")
+                List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2( dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate );
+
+                if (graphModels != null && graphModels.Any(x => x.IsRecordFound))
                 {
-                    return PartialView("~/Views/Shared/Charts/_LineChart.cshtml", graphModel.LineChartModel);
-                }
-                else if (graphModel.GraphType == "BarChart")
-                {
-                    return PartialView("~/Views/Shared/Charts/_BarChart.cshtml", graphModel.BarChartModel);
-                }
-                else if (graphModel.GraphType == "PieChart")
-                {
-                    return PartialView("~/Views/Shared/Charts/_PieChart.cshtml", graphModel.PieChartModel);
+                    return PartialView("~/Views/Shared/Charts/_MultipleGraphs.cshtml", graphModels);
                 }
             }
             return Content("No Record Found.");
         }
 
         [HttpGet]
-        public ActionResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
+        public JsonResult GetGraphListByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
-            DropdownViewModel dBTMGraphByDBTMTestMaster = new DropdownViewModel()
+            var list = new List<SelectListItem>();
+            DBTMGraphMasterListViewModel graphList = _dBTMTestAgent.DBTMGraph(dBTMTestMasterId);
+
+            if (graphList?.DBTMGraphMasterList != null)
             {
-                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
-                DropdownName = "DBTMGraphMasterId",
-                Parameter = dBTMTestMasterId + "|" + graphMode, 
-                IsCustomDropdown = true
-            };
-            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
+                list = graphList.DBTMGraphMasterList
+                                .Where(g => g.GraphMode == graphMode || string.IsNullOrEmpty(graphMode))
+                                .Select(g => new SelectListItem
+                                {
+                                    Text = $"{g.GraphName} ({g.GraphMode})",
+                                    Value = g.DBTMGraphMasterId.ToString()
+                                }).ToList();
+            }
+            return Json(list);
         }
 
         //NameWise Reports
@@ -225,6 +226,28 @@ namespace Coditech.Admin.Controllers
                         Text = item.TestName,
                         Value = item.DBTMTestMasterId.ToString(),
                     });
+                }
+            }
+        }
+
+        protected virtual void BindDBTMGraph(DBTMGraphListViewModel dBTMTestViewModel)
+        {
+            dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();
+            if (dBTMTestViewModel.DBTMTestMasterId > 0)
+            {
+                DBTMGraphMasterListViewModel dBTMGraphMasterList = _dBTMTestAgent.DBTMGraph(dBTMTestViewModel.DBTMTestMasterId);
+                if (dBTMGraphMasterList?.DBTMGraphMasterList != null)
+                {
+                    foreach (var item in dBTMGraphMasterList.DBTMGraphMasterList)
+                    {
+                        dBTMTestViewModel.DBTMGraphMasterList.Add(new SelectListItem
+                        {
+                            Text = $"{item.GraphName} ({item.GraphMode})",
+                            Value = item.DBTMGraphMasterId.ToString(),
+                            Selected = dBTMTestViewModel.DBTMSelectedGraph != null &&
+                                       dBTMTestViewModel.DBTMSelectedGraph.Contains(item.DBTMGraphMasterId.ToString())
+                        });
+                    }
                 }
             }
         }
