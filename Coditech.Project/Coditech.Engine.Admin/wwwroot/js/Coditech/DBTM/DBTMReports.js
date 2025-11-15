@@ -107,6 +107,7 @@
     },
 
     GetGraphListByDBTMTestMasterId: function () {
+        $("#DBTMTestWiseGraphReportsDivId").html("");
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         var graphMode = $("#GraphMode").val();
 
@@ -138,6 +139,8 @@
         }
     },
     GetGraphListByGraphMode: function () {
+        $("#DBTMTestWiseGraphReportsDivId").html(""); 
+        applyGraphModeUI();
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         var graphMode = $("#GraphMode").val();
         if (graphMode === "InstantaneousChart") {
@@ -253,7 +256,7 @@
         }
     },
 
-    GetDBTMNameWiseReports: function () {
+    GetDBTMNameWiseMultiReports: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
 
@@ -261,7 +264,7 @@
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
 
-        $("#DBTMTestWiseReportsDivId").html("");
+        $("#DBTMNameWiseReportsDivId").html("");
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();

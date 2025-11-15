@@ -166,7 +166,7 @@ namespace Coditech.Admin.Controllers
                                 .Where(g => g.GraphMode == graphMode || string.IsNullOrEmpty(graphMode))
                                 .Select(g => new SelectListItem
                                 {
-                                    Text = $"{g.GraphName} ({g.GraphMode})",
+                                    Text = $"{g.GraphName}",
                                     Value = g.DBTMGraphMasterId.ToString()
                                 }).ToList();
             }
@@ -189,6 +189,12 @@ namespace Coditech.Admin.Controllers
         {
             DBTMReportsListViewModel dBTMReportsViewModel = _dBTMReportsAgent.NameWiseReports(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate);
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", dBTMReportsViewModel);
+        }
+
+        public ActionResult GetNameWiseReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string reportType)
+        {
+            DBTMReportsListViewModel datalist = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, reportType);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", datalist);
         }
 
         #region Protected Methods
