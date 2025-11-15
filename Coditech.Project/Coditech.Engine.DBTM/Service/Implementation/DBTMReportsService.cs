@@ -199,7 +199,7 @@ namespace Coditech.API.Service
             return graphModel;
         }
 
-        public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
+        public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest, bool isDownloadReport)
         {
             if (dBTMTestMasterId <= 0)
             {
@@ -215,7 +215,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, FromDate, ToDate);
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
             return dBTMReportsListModel;
         }
 
@@ -237,7 +237,7 @@ namespace Coditech.API.Service
                 {
                     if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest);
+                        DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest, false);
                         if (list?.DataTable?.Rows?.Count > 0)
                         {
                             var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
@@ -267,12 +267,7 @@ namespace Coditech.API.Service
                 {
                     if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        DBTMReportsListModel list = BatchWiseReports(
-                            generalBatchMasterId,
-                            Convert.ToInt32(testId),
-                            fromDate,
-                            toDate,
-                            isMobileRequest);
+                        DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), fromDate, toDate, isMobileRequest, true);
 
                         if (list?.DataTable?.Rows?.Count > 0)
                         {
@@ -353,10 +348,10 @@ namespace Coditech.API.Service
 
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
-            return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+            return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, false);
         }
 
-        public DBTMReportsListModel TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public DBTMReportsListModel TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
             List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
@@ -370,7 +365,7 @@ namespace Coditech.API.Service
                 {
                     if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, isDownloadReport);
                         if (list?.DataTable?.Rows?.Count > 0)
                         {
                             var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
@@ -384,7 +379,7 @@ namespace Coditech.API.Service
 
         public DBTMReportsListModel TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
         {
-            var reportData = TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+            var reportData = TestWiseMultipleReports(dBTMTestMasterIds, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, true);
             if (reportData?.DataTableList == null || reportData.DataTableList.Count == 0)
                 return reportData;
             string currentDir = Directory.GetCurrentDirectory();
@@ -482,7 +477,7 @@ namespace Coditech.API.Service
                 {
                     if (!string.IsNullOrWhiteSpace(testId))
                     {
-                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest);
+                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, false);
                         if (list?.DataTable?.Rows?.Count > 0)
                         {
                             var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
@@ -495,11 +490,11 @@ namespace Coditech.API.Service
         }
 
         #region Private Methods
-        private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate);
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, isDownloadReport);
             return dBTMReportsListModel;
         }
 
@@ -555,7 +550,7 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
-        private DataTable BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
+        private DataTable BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
         {
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
@@ -567,7 +562,7 @@ namespace Coditech.API.Service
                                           .ToList();
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
-                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns);
+                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport);
                 }
 
                 List<string> displayColumn = isMobileRequest
@@ -665,7 +660,7 @@ namespace Coditech.API.Service
             return dataTable;
         }
 
-        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns)
+        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport)
         {
             //DBTMReportsListModel listModel = new DBTMReportsListModel();
             DataTable dataTable = new DataTable();
@@ -717,7 +712,7 @@ namespace Coditech.API.Service
                                 break;
                         }
                     }
-                    BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow, isMobileRequest);
+                    BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow, isMobileRequest, isDownloadReport);
                     dataTable.Rows.Add(newRow);
                 }
 
@@ -806,7 +801,7 @@ namespace Coditech.API.Service
             }
         }
 
-        private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow, bool isMobileRequest)
+        private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow, bool isMobileRequest, bool isDownloadReport)
         {
             foreach (var displayColumn in listviewSequenceColumnList)
             {
@@ -842,7 +837,7 @@ namespace Coditech.API.Service
                         }
                     }
                 }
-                newRow[displayColumn] = isMobileRequest ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
+                newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
             }
         }
 

@@ -62,6 +62,16 @@ namespace Coditech.API.Service
             return model;
         }
 
+        public override ChangePasswordModel ChangePassword(ChangePasswordModel changePasswordModel)
+        {
+            if (IsNull(changePasswordModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+            if (string.IsNullOrEmpty(changePasswordModel.UserType))
+                throw new CoditechException(ErrorCodes.IdLessThanOne, "UserType is null.");
+
+            changePasswordModel.UserType = changePasswordModel.UserType == "DBTMTrainer" ? UserTypeEnum.Employee.ToString() : changePasswordModel.UserType;
+            return base.ChangePassword(changePasswordModel);
+        }
         protected override GeneralPersonModel GetGeneralPersonDetailsByEntityType(long entityId, string entityType)
         {
             long personId = 0;
