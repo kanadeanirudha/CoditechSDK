@@ -4,10 +4,11 @@
 {
     foreach (var graph in Model)
     {
-        <div class="mb-4">
-            <h5 class="text-center font-weight-bold mb-2">
+        <div class="graph-wrapper my-2">
+            <h5 class="text-center font-weight-bold mb-3">
                 @graph.GraphName
             </h5>
+
             @if (graph.GraphType == "LineChart")
             {
                 @Html.Partial("~/Views/Shared/Charts/_LineChart.cshtml", graph.LineChartModel)
@@ -27,3 +28,14 @@ else
 {
     <p>No graphs found.</p>
 }
+<style>
+    .graph-wrapper {
+        padding-top: 20px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .graph-wrapper h5 {
+            margin-bottom: 20px !important;
+        }
+</style>
