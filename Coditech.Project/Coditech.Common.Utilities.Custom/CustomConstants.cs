@@ -32,5 +32,6 @@
         public const string PersonDetectionRange = "PersonDetectionRange";
         public const string Weight = "Weight";
         public const string Height = "Height";
+        public const string AverageSplitTime = "AverageSplitTime";
     }
 }

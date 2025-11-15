@@ -138,6 +138,11 @@ namespace Coditech.Engine.DBTM.Helpers
                     time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
                     result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, 3)}" : "0";
                     break;
+                //case CustomConstants.AverageSplitTime:
+                //     totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
+                //    decimal totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                //    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)}" : isGraph ? "0" : "Invalid Data";
+                //    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }
