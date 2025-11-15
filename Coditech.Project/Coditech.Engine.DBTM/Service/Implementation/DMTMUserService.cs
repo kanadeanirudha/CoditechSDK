@@ -50,7 +50,7 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.ContactAdministrator, null);
 
             DBTMUserModel userModel = new DBTMUserModel();
-            long personId = 0; 
+            long personId = 0;
 
             if (userMasterData.UserType == UserTypeEnum.Trainee.ToString())
             {
@@ -191,6 +191,7 @@ namespace Coditech.API.Service
             else if (dbtmUserModel.UserType == UserTypeEnum.Employee.ToString())
             {
                 personId = _employeeMasterRepository.Table.Where(x => x.EmployeeId == dbtmUserModel.EntityId).Select(x => x.PersonId).FirstOrDefault();
+                status = true;
             }
 
             if (personId <= 0)
@@ -213,7 +214,7 @@ namespace Coditech.API.Service
                     status = _generalPersonRepository.Update(generalPerson);
                     if (status)
                     {
-                        if (IsNotNull(userMasterData))
+                        if (IsNotNull(userMasterData) && userMasterData.EmailId != dbtmUserModel.EmailId)
                         {
                             userMasterData.EmailId = dbtmUserModel.EmailId;
                             userMasterData.ModifiedBy = dbtmUserModel.ModifiedBy;

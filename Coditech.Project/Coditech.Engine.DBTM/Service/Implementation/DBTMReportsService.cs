@@ -66,9 +66,13 @@ namespace Coditech.API.Service
 
                 if (graphMaster.XParameter == "Split")
                 {
-                    if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
+                    }
+                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
+                    {
+                        XValuesList = new string[] { "A-B", "B-C", "C-B" };
                     }
                 }
                 else if (graphMaster.XParameter == "Date")
@@ -76,21 +80,13 @@ namespace Coditech.API.Service
                     List<string> xValues = new List<string>();
                     foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
                     {
-                        xValues.Add(item.ToString("yyyy-MM-dd"));
+                        xValues.Add(item.ToString(CustomConstants.GraphDateFormat));
                     }
                     XValuesList = xValues.ToArray();
                 }
                 else if (graphMaster.XParameter == CustomConstants.Distance)
                 {
-                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
-                        XValuesList = new string[] { "5", "15", "20" };
-                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
-                        XValuesList = new string[] { "10", "15", "20" };
-                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
-                        XValuesList = new string[] { "10", "30" };
-                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
-                        XValuesList = new string[] { "10", "20", "30", "40" };
-                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         List<string> xValues = new List<string>();
                         double distance = 22.86;
@@ -107,9 +103,13 @@ namespace Coditech.API.Service
                     graphModel.GraphType = graphMaster.GraphType;
                     graphModel.GraphName = graphMaster.GraphName;
                     int colorIndex = 0;
-                    var groupedReports = dBTMReportsList.Where(x => x.ParameterCode == yParameter).GroupBy(x => x.TestPerformedTime);
-                    string[] colorPalette = Enumerable.Range(0, groupedReports.Count()).Select(i => $"hsl({i * 360 / groupedReports.Count()}, 70%, 50%)").ToArray();
-
+                    var groupedReports = dBTMReportsList.GroupBy(x => x.CreatedDate);
+                    int groupedReportCount = groupedReports.Count();
+                    if (graphMaster.IsCalculateAvarage && groupedReportCount > 1)
+                    {
+                        groupedReportCount++;
+                    }
+                    string[] colorPalette = Enumerable.Range(0, groupedReportCount).Select(i => $"hsl({i * 360 / groupedReportCount}, 70%, 50%)").ToArray();
 
                     if (graphModel.GraphType == "LineChart")
                     {
@@ -122,7 +122,7 @@ namespace Coditech.API.Service
                             Datasets = new List<LineGraphsDatasetModel>()
                         };
                         short i = 1;
-                        foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
+                        foreach (var group in groupedReports)
                         {
                             short j = 1;
                             List<decimal> yValuesList = new List<decimal>();
@@ -151,49 +151,73 @@ namespace Coditech.API.Service
                             colorIndex++;
                             i++;
                         }
-                    }
-                    else if (graphModel.GraphType == "BarChart")
-                    {
-                        graphModel.BarChartModel = new BarChartModel()
+                        if (graphMaster.IsCalculateAvarage && graphModel.LineChartModel.Datasets.Count() > 1)
                         {
-                            BarChartId = dBTMTestMasterId.ToString(),
-                            XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
-                            XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
-                            Datasets = new List<BarGraphsDatasetModel>()
-                        };
-
-                        short i = 1;
-                        foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
-                        {
-                            short j = 1;
                             List<decimal> yValuesList = new List<decimal>();
-                            if (graphMaster.IsYParameterCalculated)
+                            int datasetsCount = graphModel.LineChartModel.Datasets.Count();
+                            var dataArray1 = JsonConvert.DeserializeObject<decimal[]>(graphModel.LineChartModel.Datasets[0].Data);
+                            int dataCount = dataArray1.Count();
+                            for (int index = 0; index < dataCount; index++)
                             {
-                                foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                                decimal sum = 0;
+                                foreach (var dataset in graphModel.LineChartModel.Datasets)
                                 {
-                                    yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false)));
-                                    j++;
+                                    var dataArray = JsonConvert.DeserializeObject<decimal[]>(dataset.Data);
+                                    sum += dataArray[index];
                                 }
-                            }
-                            else
-                            {
-                                foreach (var item in group.Where(x => x.ParameterCode == yParameter))
-                                {
-                                    yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == yParameter && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
-                                    j++;
-                                }
+                                yValuesList.Add(sum / dataCount);
+
                             }
                             graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
                             {
                                 Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = $"Turn {i} {graphMaster.YAxixLabel}",
+                                Label = $"Avarage {graphMaster.YAxixLabel}",
                                 Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
                             });
-                            colorIndex++;
-                            i++;
                         }
                     }
+                    //else if (graphModel.GraphType == "BarChart") 
+                    //{
+                    //    graphModel.BarChartModel = new BarChartModel()
+                    //    {
+                    //        BarChartId = dBTMTestMasterId.ToString(),
+                    //        XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
+                    //        XValues = JsonConvert.SerializeObject(XValuesList),
+                    //        YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
+                    //        Datasets = new List<BarGraphsDatasetModel>()
+                    //    };
+
+                    //    short i = 1;
+                    //    foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
+                    //    {
+                    //        short j = 1;
+                    //        List<decimal> yValuesList = new List<decimal>();
+                    //        if (graphMaster.IsYParameterCalculated)
+                    //        {
+                    //            foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                    //            {
+                    //                yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false)));
+                    //                j++;
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                    //            {
+                    //                yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == yParameter && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
+                    //                j++;
+                    //            }
+                    //        }
+                    //        graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                    //        {
+                    //            Color = colorPalette[colorIndex % colorPalette.Length],
+                    //            Label = $"Turn {i} {graphMaster.YAxixLabel}",
+                    //            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                    //        });
+                    //        colorIndex++;
+                    //        i++;
+                    //    }
+                    //}
                 }
             }
             return graphModel;
@@ -744,6 +768,7 @@ namespace Coditech.API.Service
                             {
                                 if (dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeTime ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocity ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.Velocity ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.VelocityByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.AccelerationByRow ||

@@ -17,11 +17,11 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.AverageVelocity:
                     decimal totalDistance = dBTMReportsList.Where(x => x.ParameterCode == CustomConstants.Distance && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
                     decimal totalTime = dBTMReportsList.Where(x => x.ParameterCode == CustomConstants.Time && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}" : "Invalid Data";
+                    newRow[calculationName] = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)} {Unit(calculationCode)}" : "Invalid Data";
                     break;
                 case CustomConstants.TotalDistanceCovered:
                     decimal totalDistanceCovered = dBTMReportsList.Where(x => x.ParameterCode == CustomConstants.Distance && x.CreatedDate == createdDate).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)} {Unit(calculationCode)}" : "Invalid Data";
+                    newRow[calculationName] = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, CustomConstants.GraphListRoundUpValue)} {Unit(calculationCode)}" : "Invalid Data";
                     break;
                 case CustomConstants.MaxLap:
                     newRow[calculationName] = $"{dBTMReportsList.Where(x => x.ParameterCode == CustomConstants.Time && x.CreatedDate == createdDate).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
@@ -31,10 +31,10 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case CustomConstants.Power:
                     double jumpHeight = Convert.ToDouble(dBTMReportsList.FirstOrDefault(x => x.ParameterCode == CustomConstants.JumpHeight && x.CreatedDate == createdDate)?.ParameterValue);
-                    newRow[calculationName] = weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, 3)} {Unit(calculationCode)}";
+                    newRow[calculationName] = weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, CustomConstants.GraphListRoundUpValue)} {Unit(calculationCode)}";
                     break;
                 case CustomConstants.Force:
-                    newRow[calculationName] = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, 3)} {Unit(calculationCode)}";
+                    newRow[calculationName] = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, CustomConstants.GraphListRoundUpValue)} {Unit(calculationCode)}";
                     break;
                 default:
                     newRow[calculationName] = "NA";
@@ -51,20 +51,24 @@ namespace Coditech.Engine.DBTM.Helpers
             {
                 case CustomConstants.CompletionTime:
                     decimal completionTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                    result = $"{completionTime}";
+                    result = $"{Math.Round(completionTime / recurtion, CustomConstants.GraphListRoundUpValue)}";
+                    break;
+                case CustomConstants.AverageTotalTime:
+                    completionTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                    result = $"{completionTime / recurtion}";
                     break;
                 case CustomConstants.AverageVelocity:
                     decimal totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
                     decimal totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, 3)}" : isGraph ? "0" : "Invalid Data";
+                    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.TotalDistanceCovered:
                     decimal totalDistanceCovered = group.Where(x => (x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow) && x.Row != 0).Sum(x => x.ParameterValue);
-                    result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, 3)}" : isGraph ? "0" : "Invalid Data";
+                    result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.DistanceMultiplyByRow:
                     decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
-                    result = distance != 0 ? $"{Math.Round(distance * recurtion, 3)}" : isGraph ? "0" : "Invalid Data";
+                    result = distance != 0 ? $"{Math.Round(distance * recurtion, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.MaxLap:
                     result = $"{group.Where(x => x.ParameterCode == CustomConstants.Time).Max(x => x.ParameterValue)}";
@@ -74,9 +78,9 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case CustomConstants.Power:
                     double jumpHeight = Convert.ToDouble(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.JumpHeight)?.ParameterValue);
-                    return weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, 3)}";
+                    return weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, CustomConstants.GraphListRoundUpValue)}";
                 case CustomConstants.Force:
-                    result = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, 3)}";
+                    result = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.CumulativeTime:
                     decimal cumulativeTime = 0;
@@ -89,7 +93,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.Velocity:
                     distance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
                     decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : isGraph ? "0" : "Invalid Data";
+                    result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.VelocityByRow:
                     result = VelocityByRow(group, recurtion, isGraph);
@@ -97,7 +101,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.CumulativeVelocityByRow:
                     distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, 3)}" : isGraph ? "0" : "Invalid Data";
+                    result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.CumulativeVelocity:
                     distance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
@@ -106,7 +110,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     {
                         cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == i).ParameterValue;
                     }
-                    result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, 3)}" : isGraph ? "0" : "Invalid Data";
+                    result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.AccelerationByRow:
                     result = AccelerationByRow(group, recurtion, isGraph);
@@ -117,7 +121,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.PowerByRow:
                     var velocityByRow = Convert.ToDecimal(VelocityByRow(group, recurtion, isGraph));
                     var forceByRow = Convert.ToDecimal(ForceByRow(group, recurtion, weight, isGraph));
-                    result = weight == 0 ? "NA" : $"{Math.Round(forceByRow * velocityByRow, 3)}";
+                    result = weight == 0 ? "NA" : $"{Math.Round(forceByRow * velocityByRow, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.ChangeOfDirection:
                     decimal time2, time3;
@@ -126,18 +130,23 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.AgilityDeficitRatio:
                     var changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group));
                     var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
-                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / time1, 3)}" : "0";
+                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / time1, CustomConstants.GraphListRoundUpValue)}" : "0";
                     break;
                 case CustomConstants.ChangeOfDirectionDeficit:
                     changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group));
                     time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
-                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - time1, 3)}" : "0";
+                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - time1, CustomConstants.GraphListRoundUpValue)}" : "0";
                     break;
                 case CustomConstants.ChangeOfDirectionRatio:
                     time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
                     time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
-                    result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, 3)}" : "0";
+                    result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, CustomConstants.GraphListRoundUpValue)}" : "0";
                     break;
+                    //case CustomConstants.AverageSplitTime:
+                    //     totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
+                    //    decimal totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                    //    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+                    //    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }
@@ -147,7 +156,7 @@ namespace Coditech.Engine.DBTM.Helpers
             string result;
             var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
             var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
-            result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, 3)}" : "0";
+            result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, CustomConstants.GraphListRoundUpValue)}" : "0";
             return result;
         }
 
@@ -155,7 +164,7 @@ namespace Coditech.Engine.DBTM.Helpers
         {
             string result;
             var accelerationByRow = Convert.ToDecimal(AccelerationByRow(group, recurtion, isGraph));
-            result = weight == 0 ? "NA" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, 3)}";
+            result = weight == 0 ? "NA" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, CustomConstants.GraphListRoundUpValue)}";
             return result;
         }
 
@@ -166,13 +175,13 @@ namespace Coditech.Engine.DBTM.Helpers
             if (recurtion == 1)
             {
                 var velocityValue = Convert.ToDecimal(VelocityByRow(group, 1, isGraph));
-                result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, 3)}" : isGraph ? "0" : "Invalid Data";
+                result = timeValue != 0 ? $"{Math.Round(velocityValue / timeValue, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
             }
             else
             {
                 var velocityValueCurrent = Convert.ToDecimal(VelocityByRow(group, recurtion, isGraph));
                 var velocityValueBefore = Convert.ToDecimal(VelocityByRow(group, (short)(recurtion - 1), isGraph));
-                result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, 3)}" : isGraph ? "0" : "Invalid Data";
+                result = timeValue != 0 ? $"{Math.Round((velocityValueCurrent - velocityValueBefore) / timeValue, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
             }
 
             return result;
@@ -183,7 +192,7 @@ namespace Coditech.Engine.DBTM.Helpers
             string result = string.Empty;
             decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
             decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
-            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, 3)}" : isGraph ? "0" : "Invalid Data";
+            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
             return result;
         }
 
