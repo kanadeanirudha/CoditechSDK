@@ -511,8 +511,8 @@ namespace Coditech.API.Service
             if (IsNull(dBTMActivityListViewSequenceModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            if (IsParameterCodeAlreadyExist(dBTMActivityListViewSequenceModel.ParameterCode))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Parameter Code"));
+            //if (IsParameterCodeAlreadyExist(dBTMActivityListViewSequenceModel.ParameterCode))
+            //    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Parameter Code"));
 
             DBTMTestParameterListViewSequence dBTMTestParameterListViewSequence = dBTMActivityListViewSequenceModel.FromModelToEntity<DBTMTestParameterListViewSequence>();
 
@@ -552,7 +552,6 @@ namespace Coditech.API.Service
 
         //Check if Parameter Code is already present or not.
         protected virtual bool IsParameterCodeAlreadyExist(string parameterCode, int dBTMTestParameterListViewSequenceId = 0)
-
         => _dBTMActivityListViewSequenceMasterRepository.Table.Any(x => x.ParameterCode == parameterCode && (x.DBTMTestParameterListViewSequenceId != dBTMTestParameterListViewSequenceId || dBTMTestParameterListViewSequenceId == 0));
         #endregion
     }

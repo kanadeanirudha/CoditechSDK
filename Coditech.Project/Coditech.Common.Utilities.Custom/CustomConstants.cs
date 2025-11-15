@@ -6,6 +6,7 @@
         public const string DBTMCentreOwner = "DBTMCentreOwner";
         public const string LiveResultSession = "LiveResultSession";
         public const string CompletionTime = "CompletionTime";
+        public const string AverageTotalTime = "AverageTotalTime";
         public const string Time = "Time";
         public const string AverageVelocity = "AverageVelocity";
         public const string Distance = "Distance";
@@ -32,6 +33,8 @@
         public const string PersonDetectionRange = "PersonDetectionRange";
         public const string Weight = "Weight";
         public const string Height = "Height";
-        public const string AverageSplitTime = "AverageSplitTime";
+        public const string ThreeHundredYardTest = "ThreeHundredYardTest";
+        public const string GraphDateFormat = "yyyy-MM-dd";
+        public const int GraphListRoundUpValue = 3;
     }
 }

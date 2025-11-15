@@ -66,14 +66,13 @@ namespace Coditech.API.Service
 
                 if (graphMaster.XParameter == "Split")
                 {
-                    if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
                     }
                     else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
                     {
-                        XValuesList = new string[] {
-                        "A-B", "B-C", "C-B"};
+                        XValuesList = new string[] { "A-B", "B-C", "C-B" };
                     }
                 }
                 else if (graphMaster.XParameter == "Date")
@@ -81,21 +80,13 @@ namespace Coditech.API.Service
                     List<string> xValues = new List<string>();
                     foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
                     {
-                        xValues.Add(item.ToString("yyyy-MM-dd"));
+                        xValues.Add(item.ToString(CustomConstants.GraphDateFormat));
                     }
                     XValuesList = xValues.ToArray();
                 }
                 else if (graphMaster.XParameter == CustomConstants.Distance)
                 {
-                    if (dbtmTestMaster.TestCode == "ProAgilityTest")
-                        XValuesList = new string[] { "5", "15", "20" };
-                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
-                        XValuesList = new string[] { "10", "15", "20" };
-                    else if (dbtmTestMaster.TestCode == "3GateSprintTenTwenty")
-                        XValuesList = new string[] { "10", "30" };
-                    else if (dbtmTestMaster.TestCode == "5GateSprintTenTwentyThirtyFourty")
-                        XValuesList = new string[] { "10", "20", "30", "40" };
-                    else if (dbtmTestMaster.TestCode == "ThreeHundredYardTest")
+                    if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         List<string> xValues = new List<string>();
                         double distance = 22.86;
@@ -119,7 +110,6 @@ namespace Coditech.API.Service
                         groupedReportCount++;
                     }
                     string[] colorPalette = Enumerable.Range(0, groupedReportCount).Select(i => $"hsl({i * 360 / groupedReportCount}, 70%, 50%)").ToArray();
-
 
                     if (graphModel.GraphType == "LineChart")
                     {
@@ -178,7 +168,6 @@ namespace Coditech.API.Service
                                 yValuesList.Add(sum / dataCount);
 
                             }
-                            //colorIndex++;
                             graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
                             {
                                 Color = colorPalette[colorIndex % colorPalette.Length],
@@ -779,6 +768,7 @@ namespace Coditech.API.Service
                             {
                                 if (dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeTime ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocity ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.Velocity ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.VelocityByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.AccelerationByRow ||
