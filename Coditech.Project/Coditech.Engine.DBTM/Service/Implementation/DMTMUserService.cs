@@ -162,6 +162,7 @@ namespace Coditech.API.Service
             if (IsNull(dbtmUserModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            dbtmUserModel.UserType = dbtmUserModel.UserType == "DBTMTrainer" ? UserTypeEnum.Employee.ToString() : dbtmUserModel.UserType;
             UserMaster userMasterData = _userMasterRepository.Table.Where(x => x.EntityId == dbtmUserModel.EntityId && x.UserType == dbtmUserModel.UserType)?.FirstOrDefault();
             bool status = false;
             long personId = 0;
