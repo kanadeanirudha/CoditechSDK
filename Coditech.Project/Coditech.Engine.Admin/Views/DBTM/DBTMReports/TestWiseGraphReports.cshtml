@@ -26,14 +26,6 @@
                 ChangeEvent = "DBTMReports.GetGraphListByGraphMode()",
                 IsCustomDropdown = true
             };
-    DropdownViewModel graphTypeDropdown = new DropdownViewModel()
-            {
-                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
-                DropdownName = "DBTMGraphMasterId",
-                DropdownSelectedValue = Model.DBTMGraphMasterId.ToString(),
-                IsCustomDropdown = true,
-                ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()"
-            };
     string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
 }
 <!-- Page Content-->
@@ -89,7 +81,9 @@
                                 <label class="form-label">Graph Type</label>
                             </div>
                             <div class="col-md-3">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
+                                <div class="mb-3 multiselect-dropdown">
+                                    @Html.ListBoxFor( x => x.DBTMSelectedGraph, new SelectList(Model.DBTMGraphMasterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                </div>
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
