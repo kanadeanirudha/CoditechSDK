@@ -104,6 +104,7 @@ namespace Coditech.API.Service
                     graphModel.GraphName = graphMaster.GraphName;
                     int colorIndex = 0;
                     var groupedReports = dBTMReportsList.GroupBy(x => x.CreatedDate);
+                    var groupedReportsByDateFormat = dBTMReportsList.GroupBy(x => x.CreatedDate.ToString(CustomConstants.GraphDateFormat));
                     int groupedReportCount = groupedReports.Count();
                     if (graphMaster.IsCalculateAvarage && groupedReportCount > 1)
                     {
@@ -121,59 +122,14 @@ namespace Coditech.API.Service
                             YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
                             Datasets = new List<LineGraphsDatasetModel>()
                         };
-                        short i = 1;
-                        foreach (var group in groupedReports)
-                        {
-                            short j = 1;
-                            List<decimal> yValuesList = new List<decimal>();
-                            if (graphMaster.IsYParameterCalculated)
-                            {
-                                foreach (var item in group.Where(x => x.ParameterCode == yParameter))
-                                {
-                                    yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
-                                    j++;
-                                }
-                            }
-                            else
-                            {
-                                foreach (var item in group.Where(x => x.ParameterCode == yParameter))
-                                {
-                                    yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == yParameter && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
-                                    j++;
-                                }
-                            }
-                            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
-                            {
-                                Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = $"Turn {i} {graphMaster.YAxixLabel}",
-                                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
-                            });
-                            colorIndex++;
-                            i++;
-                        }
-                        if (graphMaster.IsCalculateAvarage && graphModel.LineChartModel.Datasets.Count() > 1)
-                        {
-                            List<decimal> yValuesList = new List<decimal>();
-                            int datasetsCount = graphModel.LineChartModel.Datasets.Count();
-                            var dataArray1 = JsonConvert.DeserializeObject<decimal[]>(graphModel.LineChartModel.Datasets[0].Data);
-                            int dataCount = dataArray1.Count();
-                            for (int index = 0; index < dataCount; index++)
-                            {
-                                decimal sum = 0;
-                                foreach (var dataset in graphModel.LineChartModel.Datasets)
-                                {
-                                    var dataArray = JsonConvert.DeserializeObject<decimal[]>(dataset.Data);
-                                    sum += dataArray[index];
-                                }
-                                yValuesList.Add(sum / dataCount);
 
-                            }
-                            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
-                            {
-                                Color = colorPalette[colorIndex % colorPalette.Length],
-                                Label = $"Avarage {graphMaster.YAxixLabel}",
-                                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
-                            });
+                        if (graphMaster.GraphMode == "InstantaneousChart")
+                        {
+                            BindInstantaneousChart(graphModel, graphMaster, yParameter, dBTMReportsList, colorIndex, groupedReports, colorPalette);
+                        }
+                        else if (graphMaster.GraphMode == "ProgressChart")
+                        {
+                            BindProgressChart(graphModel, graphMaster, yParameter, dBTMReportsList, colorIndex, groupedReportsByDateFormat, colorPalette);
                         }
                     }
                     //else if (graphModel.GraphType == "BarChart") 
@@ -221,6 +177,85 @@ namespace Coditech.API.Service
                 }
             }
             return graphModel;
+        }
+
+        private void BindInstantaneousChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<DateTime, DBTMReportsModel>> groupedReports, string[] colorPalette)
+        {
+            short i = 1;
+            foreach (var group in groupedReports)
+            {
+                short j = 1;
+                List<decimal> yValuesList = new List<decimal>();
+                if (graphMaster.IsYParameterCalculated)
+                {
+                    foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                    {
+                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
+                        j++;
+                    }
+                }
+                else
+                {
+                    foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                    {
+                        yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == yParameter && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
+                        j++;
+                    }
+                }
+                graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                {
+                    Color = colorPalette[colorIndex % colorPalette.Length],
+                    Label = $"Turn {i} {graphMaster.YAxixLabel}",
+                    Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                });
+                colorIndex++;
+                i++;
+            }
+
+            if (graphMaster.IsCalculateAvarage && graphModel.LineChartModel.Datasets.Count() > 1)
+            {
+                List<decimal> yValuesList = new List<decimal>();
+                int datasetsCount = graphModel.LineChartModel.Datasets.Count();
+                var dataArray1 = JsonConvert.DeserializeObject<decimal[]>(graphModel.LineChartModel.Datasets[0].Data);
+                int dataCount = dataArray1.Count();
+                for (int index = 0; index < dataCount; index++)
+                {
+                    decimal sum = 0;
+                    foreach (var dataset in graphModel.LineChartModel.Datasets)
+                    {
+                        var dataArray = JsonConvert.DeserializeObject<decimal[]>(dataset.Data);
+                        sum += dataArray[index];
+                    }
+                    yValuesList.Add(sum / dataCount);
+
+                }
+                graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                {
+                    Color = colorPalette[colorIndex % colorPalette.Length],
+                    Label = $"Avarage {graphMaster.YAxixLabel}",
+                    Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                });
+            }
+        }
+
+        private void BindProgressChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<string, DBTMReportsModel>> groupedReports, string[] colorPalette)
+        {
+            List<decimal> yValuesList = new List<decimal>();
+            foreach (var group in groupedReports)
+            {
+                if (graphMaster.IsYParameterCalculated)
+                {
+                    short count = Convert.ToInt16(group.Select(x => x.CreatedDate).Distinct().Count());
+                    yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), count, false, true)));
+                }
+            }
+            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+            {
+                Color = colorPalette[colorIndex % colorPalette.Length],
+                Label = $"{graphMaster.YAxixLabel}",
+                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+            });
+            colorIndex++;
         }
 
         public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest, bool isDownloadReport)
@@ -799,10 +834,10 @@ namespace Coditech.API.Service
                         {
                             decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance).ParameterValue * Convert.ToInt32(spilt[1]);
                             updatedColumnName = updatedColumnName.Replace("{Distance*Row}", distance.ToString());
-                            updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit(CustomConstants.Distance));
                         }
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                     }
+                    updatedColumnName = updatedColumnName.Replace("{DistanceUnit}", DBTMCustomHelper.Unit(CustomConstants.Distance));
                     updatedColumnName = updatedColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(dBTMTestParameterListviewSequence.ParameterCode));
                     if (!dataTable.Columns.Contains(updatedColumnName))
                     {

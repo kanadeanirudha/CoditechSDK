@@ -67,6 +67,7 @@ namespace Coditech.API.Service
                             trainer.PhotoMediaPath = GetImagePath(trainer.PhotoMediaId);
                         }
                     }
+                    dBTMDashboardModel.TrainersDetails = GetTrainerProfile(userMasterId);
                 }
                 else if (dashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -77,40 +78,8 @@ namespace Coditech.API.Service
 
                     dataset.Tables[1].TableName = "YearlyTraineeOverview";
                     dBTMDashboardModel.YearlyTraineeOverviewList = new List<DBTMYearlyTraineeOverviewModel>();
-                    dBTMDashboardModel.YearlyTraineeOverviewList = dataTable.ConvertDataTable<DBTMYearlyTraineeOverviewModel>(dataset.Tables["YearlyTraineeOverview"])?.ToList();                                       
-                    UserMaster userMasterData = _userMasterRepository.Table.Where(x => x.UserMasterId == userMasterId)?.FirstOrDefault();
-                    if (userMasterData == null)
-                        return null;
-                    long personId = 0;
-                    if (userMasterData.UserType == UserTypeEnum.Employee.ToString())
-                    {
-                        var data = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.PersonId })?.FirstOrDefault();
-                        if (data != null)
-                        {
-                            personId = data.PersonId;
-                        }
-                        var trainerData = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.GeneralTrainerMasterId, x.TrainerSpecializationEnumId, x.CreatedDate }).FirstOrDefault();
-                        if (trainerData == null)
-                            return null;
-                        DBTMTrainerDetailsModel trainerProfileModel = new DBTMTrainerDetailsModel();
-                        if (trainerProfileModel == null)
-                            return null;
-                        // Get person details 
-                        GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(personId);
-                        if (generalPersonModel != null)
-                        {
-                            trainerProfileModel.FirstName = generalPersonModel.FirstName;
-                            trainerProfileModel.LastName = generalPersonModel.LastName;
-                            trainerProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
-                            trainerProfileModel.MobileNumber = generalPersonModel.MobileNumber;
-                            trainerProfileModel.EmailId = generalPersonModel.EmailId;
-                            trainerProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
-                        }
-                        trainerProfileModel.TrainerSpecialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(trainerData.TrainerSpecializationEnumId));
-                        trainerProfileModel.DateOfJoining = trainerData.CreatedDate.HasValue ? trainerData.CreatedDate.Value : default(DateTime);
-                        dBTMDashboardModel.TrainersDetails = trainerProfileModel;
-                        trainerProfileModel.DurationWithUs = CalculateDuration(trainerProfileModel.DateOfJoining, DateTime.Now);
-                    }
+                    dBTMDashboardModel.YearlyTraineeOverviewList = dataTable.ConvertDataTable<DBTMYearlyTraineeOverviewModel>(dataset.Tables["YearlyTraineeOverview"])?.ToList();
+                    dBTMDashboardModel.TrainersDetails = GetTrainerProfile(userMasterId);
                 }
             }
             return dBTMDashboardModel;
@@ -148,6 +117,51 @@ namespace Coditech.API.Service
             }
             return $"{years} Y {months} M {days} D";
         }
+        private DBTMTrainerDetailsModel GetTrainerProfile(long userMasterId)
+        {
+            UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x => x.UserMasterId == userMasterId);
+
+            if (userMasterData == null || userMasterData.UserType != UserTypeEnum.Employee.ToString())
+                return null;
+
+            var employeeData = _employeeMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.PersonId }).FirstOrDefault();
+
+            if (employeeData == null)
+                return null;
+
+            long personId = employeeData.PersonId;
+
+            // Get Trainer master data
+            var trainerData = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userMasterData.EntityId).Select(x => new { x.TrainerSpecializationEnumId, x.CreatedDate }).FirstOrDefault();
+
+            if (trainerData == null)
+                return null;
+
+            DBTMTrainerDetailsModel trainerProfile = new DBTMTrainerDetailsModel();
+
+            // Fetch person details
+            var person = GetGeneralPersonDetails(personId);
+            if (person != null)
+            {
+                trainerProfile.FirstName = person.FirstName;
+                trainerProfile.LastName = person.LastName;
+                trainerProfile.DateOfBirth = person.DateOfBirth;
+                trainerProfile.MobileNumber = person.MobileNumber;
+                trainerProfile.EmailId = person.EmailId;
+                trainerProfile.PhotoMediaPath = GetImagePath(person.PhotoMediaId);
+            }
+
+            // Assign specialization & joining
+            trainerProfile.TrainerSpecialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(trainerData.TrainerSpecializationEnumId));
+
+            trainerProfile.DateOfJoining = trainerData.CreatedDate ?? default(DateTime);
+
+            // Duration calculation
+            trainerProfile.DurationWithUs = CalculateDuration(trainerProfile.DateOfJoining, DateTime.Now);
+
+            return trainerProfile;
+        }
+
         #endregion
     }
 }

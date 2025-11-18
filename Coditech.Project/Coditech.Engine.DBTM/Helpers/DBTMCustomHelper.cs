@@ -53,13 +53,19 @@ namespace Coditech.Engine.DBTM.Helpers
                     decimal completionTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
                     result = $"{Math.Round(completionTime / recurtion, CustomConstants.GraphListRoundUpValue)}";
                     break;
-                case CustomConstants.AverageTotalTime:
+                case CustomConstants.AverageTotalCompletionTime:
                     completionTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                    result = $"{completionTime / recurtion}";
+                    result = $"{Math.Round(completionTime / recurtion, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.AverageVelocity:
                     decimal totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
                     decimal totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+                    break;
+                case CustomConstants.AverageTotalVelocity:
+                    totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
+                    totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                    totalTime = totalTime != 0 ? (totalTime / recurtion) : totalTime;
                     result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.TotalDistanceCovered:
@@ -142,11 +148,6 @@ namespace Coditech.Engine.DBTM.Helpers
                     time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
                     result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, CustomConstants.GraphListRoundUpValue)}" : "0";
                     break;
-                    //case CustomConstants.AverageSplitTime:
-                    //     totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
-                    //    decimal totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                    //    result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
-                    //    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }

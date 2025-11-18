@@ -1,7 +1,7 @@
 ﻿@using Coditech.Admin.Utilities;
 @model DBTMPrivacySettingViewModel
 @{
-    ViewBag.Title = Model.DBTMPrivacySettingId > 0 ? "Update DBTMPrivacySetting" : "Add DBTMPrivacySetting";
+    ViewBag.Title = Model.DBTMPrivacySettingId > 0 ? "Update Privacy Setting" : "Add Privacy Setting";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "", IsDisabled = Model.DBTMPrivacySettingId > 0 };

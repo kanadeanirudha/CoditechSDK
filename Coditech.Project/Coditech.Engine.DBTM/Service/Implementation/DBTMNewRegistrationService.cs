@@ -175,7 +175,13 @@ namespace Coditech.API.Service
                 {
                     string password = systemGlobleSettingList?.FirstOrDefault((GeneralSystemGlobleSettingModel x) => x.FeatureName.Equals(GeneralSystemGlobleSettingEnum.DefaultPassword.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue;
                     dBTMNewRegistrationModel.Password = password;
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = false;
                 }
+                else
+                {
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = true;
+                }
+
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.TrainerDepartmentId.ToString(), ApiCustomSettings.TrainerDesignationId, out personId);
                 if (employeeId > 0)
                 {
@@ -315,7 +321,7 @@ namespace Coditech.API.Service
                 UserType = UserTypeEnum.Employee.ToString(),
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
-                IsPasswordChange = string.IsNullOrEmpty(dBTMNewRegistrationModel.Password) ? false : true,
+                IsPasswordChange = dBTMNewRegistrationModel.IsPasswordUserGenerated,
                 Custom1 = dBTMNewRegistrationModel.Custom1
             };
             GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);

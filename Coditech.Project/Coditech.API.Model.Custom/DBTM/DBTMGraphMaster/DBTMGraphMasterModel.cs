@@ -17,6 +17,7 @@
         public string GraphMode { get; set; }
         public short OrderBy { get; set; }
         public string GraphSize { get; set; }
+        public bool IsActive { get; set; }
         public List<string> DBTMSelectedTestCode { get; set; } = new List<string>();
     }
 }
