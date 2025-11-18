@@ -163,7 +163,7 @@ namespace Coditech.Admin.Controllers
             if (graphList?.DBTMGraphMasterList != null)
             {
                 list = graphList.DBTMGraphMasterList
-                                .Where(g => g.GraphMode == graphMode || string.IsNullOrEmpty(graphMode))
+                                .Where(g => g.GraphMode == graphMode && g.IsActive )
                                 .Select(g => new SelectListItem
                                 {
                                     Text = $"{g.GraphName}",

@@ -298,7 +298,7 @@ namespace Coditech.API.Service
             }
             return isdBTMTestUpdated;
         }
-          
+
         //Delete DBTMTest.
         public virtual bool DeleteDBTMTest(ParameterModel parameterModel)
         {
@@ -345,18 +345,20 @@ namespace Coditech.API.Service
         public virtual DBTMGraphMasterListModel GetDBTMGraph(int dBTMTestMasterId)
         {
             string testCode = dBTMTestMasterId.ToString();
-            var graphList = (from graph in _dBTMGraphMasterRepository.Table
-                             where ("," + graph.TestCode + ",").Contains("," + testCode + ",")
-                             select new DBTMGraphMasterModel
-                             {
-                                 DBTMGraphMasterId = graph.DBTMGraphMasterId,
-                                 GraphName = graph.GraphName,
-                                 GraphCode = graph.GraphCode,
-                                 GraphMode = graph.GraphMode,
-                                 GraphType = graph.GraphType
-                             })
-                             .OrderBy(x => x.GraphName)
-                             .ToList();
+            var graphList = _dBTMGraphMasterRepository.Table
+                            .Where(g => ("," + g.TestCode + ",").Contains("," + testCode + ","))
+                            .Select(g => new DBTMGraphMasterModel
+                            {
+                                DBTMGraphMasterId = g.DBTMGraphMasterId,
+                                GraphName = g.GraphName,
+                                GraphCode = g.GraphCode,
+                                GraphMode = g.GraphMode,
+                                GraphType = g.GraphType,
+                                IsActive = g.IsActive,
+                                OrderBy = g.OrderBy
+                            })
+                            .OrderBy(g => g.OrderBy)
+                            .ToList();
 
             return new DBTMGraphMasterListModel
             {
@@ -383,7 +385,7 @@ namespace Coditech.API.Service
 
             if (!string.IsNullOrEmpty(graphMode))
             {
-                graphList = graphList.Where(x => x.GraphMode == graphMode).ToList(); 
+                graphList = graphList.Where(x => x.GraphMode == graphMode).ToList();
             }
 
             var graphListResult = graphList

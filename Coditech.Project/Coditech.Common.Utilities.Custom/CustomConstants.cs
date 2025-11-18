@@ -6,9 +6,10 @@
         public const string DBTMCentreOwner = "DBTMCentreOwner";
         public const string LiveResultSession = "LiveResultSession";
         public const string CompletionTime = "CompletionTime";
-        public const string AverageTotalTime = "AverageTotalTime";
+        public const string AverageTotalCompletionTime = "AverageTotalCompletionTime";
         public const string Time = "Time";
         public const string AverageVelocity = "AverageVelocity";
+        public const string AverageTotalVelocity = "AverageTotalVelocity";
         public const string Distance = "Distance";
         public const string TotalDistanceCovered = "TotalDistanceCovered";
         public const string MaxLap = "MaxLap";
