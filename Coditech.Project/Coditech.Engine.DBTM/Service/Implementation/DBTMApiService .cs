@@ -190,7 +190,7 @@ namespace Coditech.API.Service
                                 BatchName = b.BatchName,
                                 BatchStartTime = b.BatchStartTime,
                             })
-                            .ToList();
+                             .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
                     }
                     else
                     {
@@ -208,7 +208,7 @@ namespace Coditech.API.Service
                                        BatchName = u.EntityId == entityId ? $"{b.BatchName}(Self)" : $"{b.BatchName}({u.FirstName} {u.LastName})",
                                        BatchStartTime = b.BatchStartTime,
                                    })
-                                   .ToList();
+                                   .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
                 }
                 else
                 {
