@@ -23,5 +23,6 @@
         public int? SpecializationEnumId { get; set; }
         public int NumberOfActivityPerformed { get; set; }
         public long GeneralTrainerMasterId { get; set; }
+        public string DisplayName { get; set; }
     }
 }
