@@ -427,6 +427,12 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Display Name",
+                ColumnCode = "DisplayName",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Contact",
                 ColumnCode = "MobileNumber",
                 IsSortable = true,

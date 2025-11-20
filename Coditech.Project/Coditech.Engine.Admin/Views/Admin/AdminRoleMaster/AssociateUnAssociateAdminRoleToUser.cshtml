@@ -12,7 +12,7 @@
         CancelUrl = @Url.Action("RoleAllocatedToUserList", controllerName, new { SelectedParameter1 = @Model.AdminRoleMasterId }),
         CancelButtonText = GeneralResources.CancelButtonText,
         ControllerName = controllerName,
-        ActionName = actionName,
+        ActionName = "AssociateUnAssociateAdminRoleToUser",
         FormId = AdminConstants.FormId + controllerName,
     };
 }
@@ -26,7 +26,7 @@
             <div class="col-lg-10">
                 <div class="card">
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        @using (Html.BeginForm("AssociateUnAssociateAdminRoleToUser", controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.AdminRoleMasterId)

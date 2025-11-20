@@ -82,6 +82,8 @@ namespace Coditech.Admin
 
             // Adds EncryptedQueryMiddleware
             app.UseMiddleware<EncryptedQueryMiddleware>();
+            // Adds UseStatusCodePagesWithReExecute
+            app.UseStatusCodePagesWithReExecute("/User/PageNotFoundRequest");
 
             // Adds the static file configurations with custom path.
             app.UseStaticFiles(builder);

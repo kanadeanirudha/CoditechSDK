@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Page Not Found";
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+}
+
+<div class="container login-page-wrapper">
+    <div class="row vh-100 d-flex justify-content-center">
+        <div class="col-12 align-self-center">
+            <div class="row">
+                <div class="col-lg-5 mx-auto">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h4 class="card-title">Oops! Page Not Found</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-0 auth-content">
+                            <div class="tab-content">
+                                <div class="tab-pane active p-3" role="tabpanel">
+
+                                    <div class="ex-page-content text-center">
+                                        <img src="~/assets/images/error.svg" alt="404" height="170" />
+                                        <h1 class="mt-5 mb-4">404!</h1>
+                                        <h5 class="font-16 text-muted mb-5">
+                                            Something went wrong. The page you're looking for doesn't exist.
+                                        </h5>
+                                    </div>
+
+                                    <div class="form-group mb-0 row">
+                                        <div class="col-12">
+                                            <a href="@dashboardUrl" class="btn btn-secondary w-100 waves-effect waves-light mt-2">
+                                                Back to Dashboard
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

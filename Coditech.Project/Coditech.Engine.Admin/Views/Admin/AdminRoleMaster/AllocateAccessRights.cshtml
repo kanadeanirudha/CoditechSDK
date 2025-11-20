@@ -31,6 +31,8 @@
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.AdminRoleMasterId)
                             @Html.HiddenFor(m => m.SelectedMenuList)
+                            @Html.HiddenFor(m => m.SelectedCentreCode)
+                            @Html.HiddenFor(m => m.SelectedDepartmentId)
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="mb-3">
@@ -72,8 +74,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" id="SaveAdminRoleMenuDetailsId" disabled class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId })" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
                         }
                     </div>
                 </div>
@@ -96,7 +96,7 @@
             });
             $('#jstree').on("changed.jstree", function (e, data) {
                 if (data.selected != "" && data.selected != null) {
-                    $("#SaveAdminRoleMenuDetailsId").removeAttr('disabled');
+                    $("SaveAdminRoleMenuDetailsId").removeAttr('disabled');
                 }
                 $('#SelectedMenuList').val(data.selected);
             });
