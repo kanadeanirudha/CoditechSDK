@@ -136,7 +136,22 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        @Html.LabelFor(x => x.IsCalculateAverage, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsCalculateAverage, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         }
                     </div>

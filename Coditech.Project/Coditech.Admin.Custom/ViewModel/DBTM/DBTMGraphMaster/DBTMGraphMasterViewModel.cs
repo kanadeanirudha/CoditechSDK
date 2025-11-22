@@ -50,6 +50,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Graph Size")]
         public string GraphSize { get; set; }
         public List<string> DBTMSelectedGraph { get; set; }
+        [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
+        [Display(Name = "Is Calculate Average")]
+        public bool IsCalculateAverage { get; set; }
     }
 }

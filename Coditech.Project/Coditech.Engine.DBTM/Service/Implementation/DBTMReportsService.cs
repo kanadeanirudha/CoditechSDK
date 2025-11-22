@@ -106,7 +106,7 @@ namespace Coditech.API.Service
                     var groupedReports = dBTMReportsList.GroupBy(x => x.CreatedDate);
                     var groupedReportsByDateFormat = dBTMReportsList.GroupBy(x => x.CreatedDate.ToString(CustomConstants.GraphDateFormat));
                     int groupedReportCount = groupedReports.Count();
-                    if (graphMaster.IsCalculateAvarage && groupedReportCount > 1)
+                    if (graphMaster.IsCalculateAverage && groupedReportCount > 1)
                     {
                         groupedReportCount++;
                     }
@@ -212,7 +212,7 @@ namespace Coditech.API.Service
                 i++;
             }
 
-            if (graphMaster.IsCalculateAvarage && graphModel.LineChartModel.Datasets.Count() > 1)
+            if (graphMaster.IsCalculateAverage && graphModel.LineChartModel.Datasets.Count() > 1)
             {
                 List<decimal> yValuesList = new List<decimal>();
                 int datasetsCount = graphModel.LineChartModel.Datasets.Count();
