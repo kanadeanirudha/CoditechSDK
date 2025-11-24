@@ -64,7 +64,7 @@ namespace Coditech.API.Service
                 });
             }
 
-            _organisationCentrewiseJoiningCodeRepository.Insert(insertList);
+            _organisationCentrewiseJoiningCodeRepository.Insert(insertList, organisationCentrewiseJoiningCodeModel.CreatedBy);
             return organisationCentrewiseJoiningCodeModel;
         }
     }

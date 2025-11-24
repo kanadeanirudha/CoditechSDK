@@ -15,15 +15,15 @@
     DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring", "Weekly" } };
     string cancelUrl = !string.IsNullOrEmpty(Model.Custom4) ? Url.Action("Cancel", "DBTMGeneralBatchMaster", new { SelectedCentreCode = Model.CentreCode, custom4 = Model.Custom4 }) : Url.Action("Cancel", "GeneralBatchMaster", new { SelectedCentreCode = Model.CentreCode });
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = cancelUrl,
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = cancelUrl,
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -105,35 +105,35 @@
                                         @Html.LabelFor(x => x.Duration, new { @class = "form-label required" })
                                         <div class="d-flex gap-3">
                                             @Html.DropDownListFor(x => x.DurationHours,
-                                            new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                            "Value", "Text"),
-                                                                                "HH",
-                                                                                new { @class = "form-select", id = "DurationHours" })
+                                                     new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+                                                     "Value", "Text"),
+                                                     "HH",
+                                                     new { @class = "form-select", id = "DurationHours" })
 
-                                        @Html.DropDownListFor(x => x.DurationMinutes,
-                                                                                new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                                                                "Value", "Text"),
-                                                                                "MM",
-                                                                                new { @class = "form-select", id = "DurationMinutes" })
-                                    </div>
-                                    @Html.ValidationMessageFor(x => x.Duration)
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
-                                    <div class="form-check">
-                                        @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                            @Html.DropDownListFor(x => x.DurationMinutes,
+                                                     new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+                                                     "Value", "Text"),
+                                                     "MM",
+                                                     new { @class = "form-select", id = "DurationMinutes" })
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.Duration)
                                     </div>
                                 </div>
-                            </div>     <div class="col-lg-12">
-                                <div class="mb-3 multiselect-dropdown">
-                                    <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
-                                    @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
-                                    @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
+                                <div class="col-lg-2">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>     <div class="col-lg-12">
+                                    <div class="mb-3 multiselect-dropdown">
+                                        <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
+                                        @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                        @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
+                                    </div>
                                 </div>
-                            </div>
-                            @if (Model.GeneralBatchMasterId == 0)
+                                @if (Model.GeneralBatchMasterId == 0)
                                 {
                                     <div class="col-lg-12">
                                         <div class="mb-3 multiselect-dropdown">
@@ -144,7 +144,7 @@
                                     </div>
                                 }
                             </div>
-                          
+
                         }
                     </div>
                 </div>
@@ -189,13 +189,17 @@
                 updateExpiryDate();
             }
         });
-
-        var startVal = $("#BatchStartDate").val();
-            if (startVal) {
-                $("#BatchStartDate").datepicker("setDate", startVal);
-            }
-             // Expiry Date Datepicker
-             $("#BatchExpireDate").datepicker({
+        if ($("#GeneralBatchMasterId").val() == 0)
+             {
+                var startVal = $("#BatchStartDate").val();
+                if (startVal)
+                {
+                    $("#BatchStartDate").datepicker("setDate", startVal);
+                }
+                updateExpiryDate();
+        }
+        // Expiry Date Datepicker
+        $("#BatchExpireDate").datepicker({
                     changeMonth: true,
                     changeYear: true,
                     dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
@@ -204,8 +208,14 @@
                     yearRange: "2025:2035",
                     minDate: 0,
                     maxDate: new Date(2035, 11, 31)
-             });
-             updateExpiryDate();
+        });
+        if ($("#GeneralBatchMasterId").val() == 0) {
+            var startVal = $("#BatchStartDate").val();
+                if (startVal) {
+                    $("#BatchStartDate").datepicker("setDate", startVal);
+                }
+                updateExpiryDate();
+             }
         });
 
         $('form').submit(function (e) {
