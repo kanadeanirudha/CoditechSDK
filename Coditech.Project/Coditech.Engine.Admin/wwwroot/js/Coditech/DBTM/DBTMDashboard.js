@@ -45,6 +45,22 @@
             }
         });
     },
+
+    OpenTrainerDetail: function (designation, modelPopContentId, numberOfDaysRecord, generalTrainerMasterId, adminRoleMasterId, userMasterId) {
+        if (designation.trim().toLowerCase() !== "trainer") {
+            CoditechNotification.DisplayNotificationMessage("Details available only for Trainers.", "error");
+            return;
+        }
+
+        DBTMDashboard.GetTrainerDashboard(
+            modelPopContentId,
+            numberOfDaysRecord,
+            generalTrainerMasterId,
+            adminRoleMasterId,
+            userMasterId
+        );
+    },
+
     GetTrainerDashboard: function (modelPopContentId, numberOfDaysRecord, generalTrainerMasterId, adminRoleMasterId, userMasterId) {
         CoditechCommon.ShowLodder();
 
