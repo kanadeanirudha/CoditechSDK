@@ -828,12 +828,25 @@ namespace Coditech.API.Service
                                 fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
                             }
                         }
+                        if (updatedColumnName.Contains("{StartFromTo}"))
+                        {
+                            fromTo = $"A-{fromTo.Split('-')[1]}";
+                            updatedColumnName = updatedColumnName.Replace("{StartFromTo}", fromTo);
+                        }
                         updatedColumnName = updatedColumnName.Replace("{FromTo}", fromTo);
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                         if (updatedColumnName.Contains("{Distance*Row}"))
                         {
-                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance).ParameterValue * Convert.ToInt32(spilt[1]);
-                            updatedColumnName = updatedColumnName.Replace("{Distance*Row}", distance.ToString());
+
+                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
+                            bool isWholeNumber = distance == Math.Truncate(distance);
+                            updatedColumnName = updatedColumnName.Replace("{Distance*Row}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
+                        }
+                        else if (updatedColumnName.Contains("{FromToDistance}"))
+                        {
+                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
+                            bool isWholeNumber = distance == Math.Truncate(distance);
+                            updatedColumnName = updatedColumnName.Replace("{FromToDistance}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                     }
