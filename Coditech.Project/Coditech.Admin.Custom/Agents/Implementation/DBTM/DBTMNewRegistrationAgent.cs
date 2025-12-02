@@ -182,13 +182,13 @@ namespace Coditech.Admin.Agents
             }
         }
         //GetGeneralTrainerByJoiningCode
-        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode)
+        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
             DBTMNewRegistrationListViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationListViewModel();
             try
             {
 
-                DBTMNewRegistrationListResponse response = _dBTMNewRegistrationClient.GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListResponse response = _dBTMNewRegistrationClient.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
                 DBTMNewRegistrationListModel dBTMNewRegistrationList = new DBTMNewRegistrationListModel { DBTMNewRegistrationList = response?.DBTMNewRegistrationList };
                 DBTMNewRegistrationListViewModel listViewModel = new DBTMNewRegistrationListViewModel();
                 listViewModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.DBTMNewRegistrationList?.ToViewModel<DBTMNewRegistrationViewModel>().ToList();
