@@ -149,13 +149,13 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult TraineeRegistration(string joiningCode, long generalTrainerMasterId)
+        public virtual ActionResult TraineeRegistration(string joiningCode)
         {
             TempData["FormSizeClass"] = "col-lg-8";
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
+                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
                 if (!list.HasError)
                 {
                     dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
@@ -200,7 +200,7 @@ namespace Coditech.Admin.Controllers
                     //var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
                     //var isTermsAndCondition = dBTMNewRegistrationViewModel.IsTermsAndCondition;
 
-                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode, dBTMNewRegistrationViewModel.GeneralTrainerMasterId);
+                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode);
                     if (!list.HasError)
                     {
                         dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
