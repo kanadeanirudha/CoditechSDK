@@ -382,17 +382,18 @@ namespace Coditech.Admin.Helpers
 
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
-                string joiningCode = (dropdownViewModel.Parameter);
-
-                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode);
+                var parts = dropdownViewModel.Parameter.Split('|');
+                string joiningCode = parts[0];
+                long trainerId = parts.Length > 1 ? Convert.ToInt64(parts[1]) : 0;
+                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode, trainerId);
                 DBTMNewRegistrationListModel list = new DBTMNewRegistrationListModel() { DBTMNewRegistrationList = response.DBTMNewRegistrationList };
                 foreach (var item in list?.DBTMNewRegistrationList.OrderBy(x => x.FirstName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
-                        Text = string.Concat(item.FirstName, " ", item.LastName, ""),
+                        Text = $"{item.FirstName} {item.LastName}",
                         Value = item.GeneralTrainerMasterId.ToString(),
-                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralTrainerMasterId)
+                        Selected = dropdownViewModel.DropdownSelectedValue == item.GeneralTrainerMasterId.ToString()
                     });
                 }
             }

@@ -5,15 +5,15 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
-        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -25,50 +25,47 @@
                         @using (Html.BeginForm("TraineeRegistration", controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
-                            bool trainersLoaded = false;
-                            @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
-                            {
-                                trainersLoaded = true;
-                            }
+                            <input type="hidden" id="GeneralTrainerMasterId" value="@Model.GeneralTrainerMasterId" />
+                            bool trainersLoaded = Model.JoiningCode != null && Model.AllTrainerList != null && Model.AllTrainerList.Any();
                             string buttonText = trainersLoaded ? "Change" : "Join";
                             string clickHandler = trainersLoaded ? "ChangeJoinningCode()" : "GetTrainerDropdownByJoiningCode()";
                             string labelText = trainersLoaded ? "Loaded" : " ";
                             @Html.AntiForgeryToken()
                             <div class="row">
-                                @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
-                                {
-                                    <div class="col-lg-4">
-                                        <div class="mb-3">
-                                            <label class="form-label required" for="JoiningCode">Joining Code</label>
-                                            @Html.TextBoxFor(x => x.JoiningCode, new { id = "JoiningCode", @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()", @readonly = "readonly" })
-                                            @Html.ValidationMessageFor(x => x.JoiningCode)
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="col-lg-4">
-                                        <div class="mb-3">
-                                            <label class="form-label required" for="JoiningCode">Joining Code</label>
-                                            @Html.TextBoxFor(x => x.JoiningCode, new { id = "JoiningCode", @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
-                                            @Html.ValidationMessageFor(x => x.JoiningCode)
-                                        </div>
-                                    </div>
-                                }
+                                <div class="col-lg-4">
+                                    <label class="form-label required">Joining Code</label>
+                                    @if (trainersLoaded)
+                                    {
+                                        @Html.TextBoxFor(x => x.JoiningCode,
+                                                 new { id = "JoiningCode", @class = "form-control", @readonly = "readonly" })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(x => x.JoiningCode,
+                                                 new { id = "JoiningCode", @class = "form-control" })
+                                    }
+                                    @Html.ValidationMessageFor(x => x.JoiningCode)
+                                </div>
                                 <div class="col-lg-2">
                                     <div class="mb-3">
                                         <label class="form-label">&nbsp;</label>
-                                        <div class="form-check" style="padding-left:0px !important; display:block !important">
-                                            <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
+                                        <div>
+                                            <button type="button" class="btn btn-success" onclick="ChangeJoinningCode()">Change</button>
                                         </div>
                                     </div>
                                 </div>
-                                @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
+                                @if (trainersLoaded)
                                 {
                                     <div class="col-lg-6">
                                         <div class="mb-3 multiselect-dropdown">
                                             @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
-                                            @Html.ListBoxFor(m => m.SelectedTrainer, new SelectList(Model.AllTrainerList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+
+                                            @Html.ListBoxFor(
+                                                     m => m.SelectedTrainer,
+                                                     new MultiSelectList(Model.AllTrainerList, "Value", "Text", Model.SelectedTrainer),
+                                                     new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" }
+                                                     )
+
                                             @Html.ValidationMessageFor(x => x.SelectedTrainer)
                                         </div>
                                     </div>
@@ -86,56 +83,42 @@
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
-            $(".view-password").click(function () {
-                $(this).toggleClass("fa fa-eye-slash");
-                var inputAttribute = $('.password-input');
-                if (inputAttribute.attr("type") == "password") {
-                    inputAttribute.attr("type", "text");
-                } else {
-                    inputAttribute.attr("type", "password");
-                }
-            });
-
-            $("#DateOfBirth").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                yearRange: "-100:+0",
-                dateFormat: "yy-mm-dd",
-                autoSize: true,
-                gotoCurrent: true,
-                showButtonPanel: true,
-                closeText: 'Clear',
-                minDate: "-80Y",
-                maxDate: new Date(),
-                onClose: function () {
-                    if ($(document.activeElement).hasClass("ui-datepicker-close")) {
-                        $(this).val('');
+            // Initialize Date of Birth datepicker
+            if ($("#DateOfBirth").length) {
+                $("#DateOfBirth").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "yy-mm-dd",
+                    autoSize: true,
+                    gotoCurrent: true,
+                    showButtonPanel: true,
+                    closeText: 'Clear',
+                    minDate: "-80Y",
+                    maxDate: new Date(),
+                    onClose: function () {
+                        if ($(document.activeElement).hasClass("ui-datepicker-close")) {
+                            $(this).val('');
+                        }
                     }
-                }
-            });
+                });
+            }
         });
         function GetTrainerDropdownByJoiningCode() {
-            debugger;
             const joiningCode = $("#JoiningCode").val();
             if (joiningCode.length >= 5) {
                 CoditechCommon.ShowLodder();
-                const url = `/DBTMTraineeDetails/TraineeRegistration?joiningCode=${encodeURIComponent(joiningCode)}`;
-                window.location.href = url;
-            }
-            else {
+                window.location.href = `/DBTMTraineeDetails/TraineeRegistration?joiningCode=${joiningCode}`;
+            } else {
                 if (joiningCode === '') {
-                    CoditechNotification.DisplayNotificationMessage('Joining code is required.', 'error');
-                }
-                else {
-                    CoditechNotification.DisplayNotificationMessage('Joining code must be at least 5 characters.', 'error');
+                    CoditechNotification.DisplayNotificationMessage("Joining code is required.", "error");
+                } else {
+                    CoditechNotification.DisplayNotificationMessage("Joining code must be at least 5 characters.", "error");
                 }
             }
         }
-                     function ChangeJoinningCode() {
-            if (confirm("Are you sure?")) {
-                alert("Redirecting...");
-                window.location.href = "/DBTMTraineeDetails/TraineeRegistration";
-            }
+        function ChangeJoinningCode() {
+            window.location.href = `/DBTMTraineeDetails/TraineeRegistration`;
         }
     </script>
 }
