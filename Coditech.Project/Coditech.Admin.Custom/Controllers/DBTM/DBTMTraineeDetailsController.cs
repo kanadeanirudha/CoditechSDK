@@ -405,7 +405,7 @@ namespace Coditech.Admin.Controllers
         {
             UserModel user = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             long generalTrainerMasterId = 0;
-            if (user?.Custom1 == CustomConstants.DBTMTrainer || user?.Custom1 == CustomConstants.DBTMCentreOwner)
+            if (user?.Custom1 == CustomConstants.DBTMTrainer)
             {
                 generalTrainerMasterId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(user.Custom3 ?? "")?.GeneralTrainerMasterId ?? 0;
             }
