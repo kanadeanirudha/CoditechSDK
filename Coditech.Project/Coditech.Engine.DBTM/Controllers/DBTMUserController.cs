@@ -105,11 +105,11 @@ namespace Coditech.API.Controllers
         [Route("/DBTMUser/GetGeneralTrainerByJoiningCode")]
         [HttpGet]
         [Produces(typeof(DBTMNewRegistrationListResponse))]
-        public virtual IActionResult GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
+        public virtual IActionResult GetGeneralTrainerByJoiningCode(string joiningCode)
         {
             try
             {
-                DBTMNewRegistrationListModel list = _dbtmUserService.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
+                DBTMNewRegistrationListModel list = _dbtmUserService.GetGeneralTrainerByJoiningCode(joiningCode);
                 return IsNotNull(list) ? CreateOKResponse(new DBTMNewRegistrationListResponse { DBTMNewRegistrationList = list.DBTMNewRegistrationList }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -123,5 +123,6 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMNewRegistrationListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
     }
 }
