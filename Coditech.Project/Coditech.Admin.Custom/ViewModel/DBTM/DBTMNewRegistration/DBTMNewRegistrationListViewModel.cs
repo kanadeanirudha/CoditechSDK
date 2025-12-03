@@ -9,5 +9,6 @@ namespace Coditech.Admin.ViewModel
         {
             DBTMNewRegistrationList = new List<DBTMNewRegistrationViewModel>();
         }
+        public string JoiningCode { get; set; }
     }
 }

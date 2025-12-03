@@ -5,15 +5,15 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
-        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -26,6 +26,12 @@
                         {
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             bool trainersLoaded = false;
+                            bool isTrainer = false;
+                            var user = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                            if (user?.Custom1 == CustomConstants.DBTMTrainer)
+                            {
+                                isTrainer = true;
+                            }
                             @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                             {
                                 trainersLoaded = true;
@@ -59,7 +65,10 @@
                                     <div class="mb-3">
                                         <label class="form-label">&nbsp;</label>
                                         <div class="form-check" style="padding-left:0px !important; display:block !important">
-                                            <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
+                                            @if (!isTrainer)
+                                            {
+                                                <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
+                                            }
                                         </div>
                                     </div>
                                 </div>
