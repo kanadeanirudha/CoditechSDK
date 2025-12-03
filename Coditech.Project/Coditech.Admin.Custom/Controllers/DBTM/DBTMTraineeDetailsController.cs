@@ -352,7 +352,7 @@ namespace Coditech.Admin.Controllers
         #region Trainee Activities List
         public virtual ActionResult TraineeActivitiesList(DataTableViewModel dataTableModel)
         {
-            DBTMActivitiesListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesList(Convert.ToString(dataTableModel.SelectedParameter1), 7, dataTableModel);
+            DBTMActivitiesListViewModel list = _dBTMTraineeDetailsAgent.GetTraineeActivitiesList(Convert.ToString(dataTableModel.SelectedParameter1), 0, dataTableModel);
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMActivities/_List.cshtml", list);
