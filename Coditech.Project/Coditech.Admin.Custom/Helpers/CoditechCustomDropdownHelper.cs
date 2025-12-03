@@ -383,8 +383,9 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string joiningCode = (dropdownViewModel.Parameter);
+                long generalTrainerMasterId = 0;
 
-                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
                 DBTMNewRegistrationListModel list = new DBTMNewRegistrationListModel() { DBTMNewRegistrationList = response.DBTMNewRegistrationList };
                 foreach (var item in list?.DBTMNewRegistrationList.OrderBy(x => x.FirstName))
                 {
