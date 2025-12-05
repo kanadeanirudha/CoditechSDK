@@ -96,4 +96,24 @@
             CoditechDataTable.LoadList("DBTMTraineeDetails", "List");
         }
     },
+
+    GetActivityDetails: function (contentId, deviceDataId, trainerId) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetActivityDetailsPopup",
+            data: { dBTMDeviceDataId: deviceDataId, trainerId: trainerId },
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load Activity details.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
 }

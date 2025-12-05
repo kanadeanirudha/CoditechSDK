@@ -376,6 +376,16 @@ namespace Coditech.Admin.Controllers
             return View($"~/Views/DBTM/DBTMActivities/DBTMActivitiesDetailsList.cshtml", list);
         }
 
+        [HttpGet]
+        public virtual ActionResult GetActivityDetailsPopup(long dBTMDeviceDataId, long trainerId)
+        {
+            DataTableViewModel dataTableModel = new DataTableViewModel();
+            dataTableModel.SelectedParameter1 = dBTMDeviceDataId.ToString();
+            dataTableModel.SelectedParameter2 = trainerId.ToString();         
+            DBTMActivitiesDetailsListViewModel model = _dBTMTraineeDetailsAgent.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, dataTableModel);
+            return PartialView("~/Views/DBTM/DBTMActivities/_ActivityDetailsPopup.cshtml", model);
+        }
+
         public ActionResult GetTrainerByCentreCode(string centreCode)
         {
             DropdownViewModel trainerDropdown = new DropdownViewModel()

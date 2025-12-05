@@ -185,7 +185,7 @@ namespace Coditech.Admin.Agents
         }
         public virtual DBTMActivitiesDetailsListViewModel GetAssignmentResult(long dBTMDeviceDataId, DataTableViewModel dataTableModel)
         {
-            DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, null, null, null, dataTableModel.PageIndex, int.MaxValue);
+            DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, 0,null,null,null, null, null, dataTableModel.PageIndex, int.MaxValue);
 
             DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
             {
