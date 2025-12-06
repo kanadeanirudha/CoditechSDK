@@ -1,0 +1,17 @@
+﻿@model DBTMActivitiesDetailsListViewModel
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">
+        Activities Details List : @Model.FirstName @Model.LastName (@Model.TestName)
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    @Html.Partial("~/Views/DBTM/DBTMActivities/_DBTMActivitiesDetailsList.cshtml", Model)
+</div>
+
+@Html.Partial("_ValidationScriptsPartial")

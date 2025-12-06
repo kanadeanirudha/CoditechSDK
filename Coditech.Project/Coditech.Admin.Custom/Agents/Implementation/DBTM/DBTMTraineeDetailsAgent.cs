@@ -1,4 +1,5 @@
-﻿using Coditech.Admin.ViewModel;
+﻿using Coditech.Admin.Utilities;
+using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
@@ -8,6 +9,7 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
@@ -343,9 +345,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("TestName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("DeviceSerialCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
-
             DBTMActivitiesListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesList(personCode, numberOfDaysRecord, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMActivitiesListModel dBTMActivitiesList = new DBTMActivitiesListModel { ActivitiesList = response?.ActivitiesList };
             DBTMActivitiesListViewModel listViewModel = new DBTMActivitiesListViewModel();
@@ -362,7 +362,6 @@ namespace Coditech.Admin.Agents
         {
             FilterCollection filters = new FilterCollection();
             dataTableModel = dataTableModel ?? new DataTableViewModel();
-
             if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
             {
                 filters.Add("Time", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
@@ -371,16 +370,22 @@ namespace Coditech.Admin.Agents
                 filters.Add("Force", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("Acceleration", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-
             SortCollection sortList = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
-            DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, null, filters, sortList, dataTableModel.PageIndex, int.MaxValue);
-           
+            long generalTrainerMasterId = 0;
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            string usertype = userModel.UserType;
+            if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                generalTrainerMasterId = Convert.ToInt64(dataTableModel.SelectedParameter2);
+                usertype = userModel?.Custom1;
+            }
+            DBTMActivitiesDetailsListResponse response = _dBTMTraineeDetailsClient.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, generalTrainerMasterId, usertype, userModel.SelectedCentreCode, null, filters, sortList, dataTableModel.PageIndex, int.MaxValue);
             DBTMActivitiesDetailsListViewModel listViewModel = new DBTMActivitiesDetailsListViewModel
             {
                 DataTable = response.DataTable
             };
-
             listViewModel.DBTMDeviceDataId = dBTMDeviceDataId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
@@ -397,7 +402,6 @@ namespace Coditech.Admin.Agents
             return dBTMTraineeProfileViewModel;
         }
         #endregion
-
         #region protected
         protected virtual List<DatatableColumns> BindColumns()
         {
@@ -406,13 +410,7 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Image",
                 ColumnCode = "Image",
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Person Code",
-                ColumnCode = "PersonCode",
-                IsSortable = true,
-            });
+            });         
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "First Name",
@@ -429,6 +427,12 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Display Name",
                 ColumnCode = "DisplayName",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Person Code",
+                ColumnCode = "PersonCode",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
@@ -510,13 +514,13 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Date",
+                ColumnName = "Activity Performed Date",
                 ColumnCode = "CreatedDate",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Serial Code",
+                ColumnName = "Device Serial Code",
                 ColumnCode = "DeviceSerialCode",
                 IsSortable = true,
             });

@@ -12,24 +12,62 @@
             {
                 <thead>
                     <tr role="row">
-                        @foreach (DataColumn datatableColumn in Model?.DataTable.Columns)
+                        @foreach (DataColumn col in Model.DataTable.Columns)
                         {
-                            <th>@datatableColumn</th>
+                            var parts = col.ColumnName.Split('~');
+                            var displayName = parts[0];
+                            var helpText = parts.Length > 1 ? parts[1] : string.Empty;
+
+                            <th>
+                                @displayName
+                                @if (!string.IsNullOrEmpty(helpText))
+                                {
+                                    <span class="ms-1 text-info" data-bs-toggle="tooltip" title="@helpText" style="cursor:pointer;">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                }
+                            </th>
                         }
                     </tr>
                 </thead>
+
                 <tbody>
-                    @foreach (DataRow row in Model?.DataTable.Rows)
+                    @foreach (DataRow row in Model.DataTable.Rows)
                     {
                         <tr>
-                            @foreach (DataColumn col in Model?.DataTable.Columns)
+                            @foreach (DataColumn col in Model.DataTable.Columns)
                             {
-                                <td>@row[col]</td>
+                                string[] valueParts = row[col].ToString().Split('~');
+
+                                string displayValue = valueParts.Length > 0 ? valueParts[0] : "";
+                                string isBold = valueParts.Length > 1 ? valueParts[1] : "";
+                                string color = valueParts.Length > 2 ? valueParts[2] : "";
+
+                                string style = "";
+
+                                if (isBold == "True")
+                                    style += "font-weight: bold;";
+
+                                if (!string.IsNullOrEmpty(color))
+                                    style += $"color: #{color};";
+
+                                <td style="@style">@displayValue</td>
                             }
                         </tr>
                     }
                 </tbody>
+
             }
         </table>
     </div>
 </div>
+@section scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+}

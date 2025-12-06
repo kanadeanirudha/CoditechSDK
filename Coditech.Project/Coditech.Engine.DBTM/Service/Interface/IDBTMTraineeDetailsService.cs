@@ -12,7 +12,7 @@ namespace Coditech.API.Service
         bool UpdateDBTMTraineeOtherDetails(DBTMTraineeDetailsModel model);
         bool DeleteDBTMTraineeDetails(ParameterModel parameterModel);
         DBTMActivitiesListModel GetTraineeActivitiesList(string personCode,int numberOfDaysRecord,FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
-        DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId,FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
+        DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId);
 
     }

@@ -27,9 +27,9 @@ namespace Coditech.API.Endpoint
             return endpoint;
         }
 
-        public string GetTraineeActivitiesDetailsListAsync(long dBTMDeviceDataId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public string GetTraineeActivitiesDetailsListAsync(long dBTMDeviceDataId, long entityId, string userType, string centreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetTraineeActivitiesDetailsList?dBTMDeviceDataId={dBTMDeviceDataId}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetTraineeActivitiesDetailsList?dBTMDeviceDataId={dBTMDeviceDataId}&entityId={entityId}&userType={userType}&centreCode={centreCode}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
 

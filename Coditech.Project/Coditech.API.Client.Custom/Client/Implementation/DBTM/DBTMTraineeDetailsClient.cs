@@ -249,14 +249,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMActivitiesDetailsListResponse GetTraineeActivitiesDetailsList(long dBTMDeviceDataId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public virtual DBTMActivitiesDetailsListResponse GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await GetTraineeActivitiesDetailsListAsync(dBTMDeviceDataId,expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetTraineeActivitiesDetailsListAsync(dBTMDeviceDataId, entityId, userType, centreCode, expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMActivitiesDetailsListResponse> GetTraineeActivitiesDetailsListAsync(long dBTMDeviceDataId,IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMActivitiesDetailsListResponse> GetTraineeActivitiesDetailsListAsync(long dBTMDeviceDataId, long entityId, string userType, string centreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTraineeDetailsEndpoint.GetTraineeActivitiesDetailsListAsync(dBTMDeviceDataId,expand, filter, sort, pageIndex, pageSize);
+            string endpoint = dBTMTraineeDetailsEndpoint.GetTraineeActivitiesDetailsListAsync(dBTMDeviceDataId, entityId, userType, centreCode, expand, filter, sort, pageIndex, pageSize);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

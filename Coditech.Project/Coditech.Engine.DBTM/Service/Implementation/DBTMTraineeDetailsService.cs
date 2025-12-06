@@ -16,6 +16,7 @@ namespace Coditech.API.Service
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
+        private readonly IDBTMReportsService _dBTMReportsService;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
@@ -25,10 +26,11 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
 
-        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
+        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
+            _dBTMReportsService = dBTMReportsService;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -175,79 +177,47 @@ namespace Coditech.API.Service
             listModel.PersonCode = personCode;
             return listModel;
         }
-        public DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+
+        public DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
-            //Bind the Filter, sorts & Paging details.
-            PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
-            CoditechViewRepository<DBTMActivitiesDetailsModel> objStoredProc = new CoditechViewRepository<DBTMActivitiesDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@DBTMDeviceDataId", dBTMDeviceDataId, ParameterDirection.Input, DbType.Int64);
-            objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceDataDetailsList @DBTMDeviceDataId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             DBTMActivitiesDetailsListModel listModel = new DBTMActivitiesDetailsListModel();
 
-            listModel.BindPageListModel(pageListModel);
-            if (dBTMActivitiesDetailsList?.Count > 0)
+            DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();         
+            
+            if (IsNull(dBTMDeviceData)) 
+                return listModel;
+            
+            DateTime activityDate = (dBTMDeviceData.CreatedDate ?? dBTMDeviceData.TestPerformedTime);
+            
+            long traineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode).Select(y => y.DBTMTraineeDetailId).FirstOrDefault();
+            
+            if (IsNull(traineeDetailId))
+                return listModel;
+            
+            DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.FirstOrDefault(x => x.TestCode == dBTMDeviceData.TestCode);
+            
+            if (IsNull(dBTMTestMaster))
+                return listModel;
+            
+            GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType(traineeDetailId, UserTypeEnum.Trainee.ToString());
+            
+            if (IsNotNull(generalPersonModel))
             {
-                DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();
-                long? dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode)?.Select(y => y.DBTMTraineeDetailId)?.FirstOrDefault();
-
-                if (dBTMTraineeDetailId > 0)
-                {
-                    GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
-                    if (IsNotNull(generalPersonModel))
-                    {
-                        listModel.FirstName = generalPersonModel.FirstName;
-                        listModel.LastName = generalPersonModel.LastName;
-                        listModel.PersonCode = dBTMDeviceData.PersonCode;
-                    }
-                    DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
-
-                    if (dBTMTestMaster != null)
-                    {
-                        listModel.TestName = dBTMTestMaster.TestName;
-                        var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
-                                              join b in _dBTMTestParameterRepository.Table
-                                              on a.DBTMTestParameterId equals b.DBTMTestParameterId
-                                              where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId && a.IsActive
-                                              select new
-                                              {
-                                                  b.ParameterName,
-                                                  b.ParameterCode
-                                              })?.Distinct()?.ToList();
-
-                        DataRow newRow = listModel.DataTable.NewRow();
-                        foreach (var item in dBTMActivitiesDetailsList)
-                        {
-                            string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
-                            if (!string.IsNullOrEmpty(parameterName))
-                            {
-                                string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
-                                listModel.DataTable.Columns.Add(columnName, typeof(String));
-                                newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
-                            }
-                        }
-
-                        var calculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
-                                                  join b in _dBTMTestCalculationRepository.Table
-                                                  on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
-                                                  where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
-                                                  orderby b.OrderBy ascending
-                                                  select new { b.CalculationName, b.CalculationCode })?.Distinct()?.ToList();
-                        foreach (var item in calculationColumns)
-                        {
-                            listModel.DataTable.Columns.Add(item.CalculationName, typeof(String));
-                            Calculation(item.CalculationCode, item.CalculationName, newRow, dBTMActivitiesDetailsList);
-                        }
-                        listModel.DataTable.Rows.Add(newRow);
-                    }
-                }
+                listModel.FirstName = generalPersonModel.FirstName;
+                listModel.LastName = generalPersonModel.LastName;
+                listModel.PersonCode = generalPersonModel.PersonCode;
             }
+            
+            DBTMReportsListModel report = _dBTMReportsService.TestWiseMultipleReports(dBTMTestMaster.DBTMTestMasterId.ToString(), traineeDetailId, activityDate, activityDate, entityId, userType, centreCode, false, false);
+            
+            listModel.DataTable = report.DataTable;
+            listModel.TestName = dBTMTestMaster.TestName;
+            listModel.PersonCode = dBTMDeviceData.PersonCode;
+            listModel.DataTable = report.DataTableList?.FirstOrDefault().Value;
+
             return listModel;
         }
+
         //Get ProfileDetails
         public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
         {
@@ -276,8 +246,6 @@ namespace Coditech.API.Service
 
             dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
             dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetailsData.CreatedDate;
-
-
 
             // Use ternary for brevity
             dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue

@@ -29,7 +29,7 @@ namespace Coditech.Common.API.Model
         [JsonPropertyName("TFT")]
         public DateTime TestPerformedTime { get; set; }
         [Required]
-        public short NumberOfTurn { get; set; }
+        public byte NumberOfTurn { get; set; }
         public long EntityId { get; set; }
         public List<DBTMDeviceDataDetailModel> DataList { get; set; }
     }
