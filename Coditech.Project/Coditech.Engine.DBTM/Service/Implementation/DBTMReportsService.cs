@@ -8,6 +8,7 @@ using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Newtonsoft.Json;
 using System.Data;
+using System.Linq;
 using System.Text.RegularExpressions;
 namespace Coditech.API.Service
 {
@@ -29,18 +30,19 @@ namespace Coditech.API.Service
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
-            _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
+        #region Graph
         public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             List<GraphModel> graphModelList = new List<GraphModel>();
@@ -257,7 +259,9 @@ namespace Coditech.API.Service
             });
             colorIndex++;
         }
+        #endregion
 
+        #region Batch Wise Reports
         public DBTMReportsListModel BatchWiseReports(int generalBatchMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest, bool isDownloadReport)
         {
             if (dBTMTestMasterId <= 0)
@@ -274,67 +278,62 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchWiseReportsList @GeneralBatchMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            if (dBTMReportsList?.Count > 0)
+            {
+                dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
+            }
             dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
             return dBTMReportsListModel;
         }
 
         public DBTMReportsListModel BatchWiseMultipleReports(string dBTMTestMasterIds, int generalBatchMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
-            if (generalBatchMasterId <= 0)
+            if (generalBatchMasterId <= 0 || string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {
                 return new DBTMReportsListModel();
             }
-            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
-            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
-            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
-            {
-                if (dBTMReportsListModel.DataTableList == null)
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
 
-                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            var testList = GetTestList(dBTMTestMasterIds);
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+            var dataTableList = new List<KeyValuePair<string, DataTable>>();
+            var dataTableTestPerformedList = new List<KeyValuePair<string, DateTime>>();
+            foreach (var test in testList)
+            {
+                DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, test.DBTMTestMasterId, FromDate, ToDate, isMobileRequest, false);
+                if (!string.IsNullOrEmpty(list?.TestPerformedTime.ToString()))
                 {
-                    if (!string.IsNullOrWhiteSpace(testId))
-                    {
-                        DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), FromDate, ToDate, isMobileRequest, false);
-                        if (list?.DataTable?.Rows?.Count > 0)
-                        {
-                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
-                            dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
-                        }
-                    }
+                    dataTableTestPerformedList.Add(new KeyValuePair<string, DateTime>(test.TestName, Convert.ToDateTime(list.TestPerformedTime)));
+                    dataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
                 }
+            }
+            foreach (var test in dataTableTestPerformedList.OrderByDescending(x => x.Value))
+            {
+                var dataTable = dataTableList.Where(x => x.Key == test.Key).FirstOrDefault().Value;
+                dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.Key, dataTable));
             }
             return dBTMReportsListModel;
         }
 
         public DBTMReportsListModel BatchWiseMultipleReportsFile(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
         {
-            if (generalBatchMasterId <= 0)
+            if (generalBatchMasterId <= 0 || string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {
                 return new DBTMReportsListModel();
             }
+
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
-            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName }).ToList();
-            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            List<DBTMTestModel> testList = GetTestList(dBTMTestMasterIds);
+
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+
+            foreach (var test in testList)
             {
-                if (dBTMReportsListModel.DataTableList == null)
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
+                DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, test.DBTMTestMasterId, fromDate, toDate, isMobileRequest, true);
 
-                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+                if (list?.DataTable?.Rows?.Count > 0)
                 {
-                    if (!string.IsNullOrWhiteSpace(testId))
-                    {
-                        DBTMReportsListModel list = BatchWiseReports(generalBatchMasterId, Convert.ToInt32(testId), fromDate, toDate, isMobileRequest, true);
-
-                        if (list?.DataTable?.Rows?.Count > 0)
-                        {
-                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
-                            dBTMReportsListModel.DataTableList.Add(
-                                new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
-                        }
-                    }
+                    dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
                 }
             }
 
@@ -404,7 +403,9 @@ namespace Coditech.API.Service
             dBTMReportsListModel.FileName = fileName;
             return dBTMReportsListModel;
         }
+        #endregion
 
+        #region TestWiseReports
         public DBTMReportsListModel TestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             return GetTestWiseReports(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, false);
@@ -412,26 +413,31 @@ namespace Coditech.API.Service
 
         public DBTMReportsListModel TestWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
-            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
-            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
-            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
             {
-                if (dBTMReportsListModel.DataTableList == null)
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
+                return new DBTMReportsListModel();
+            }
 
-                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+
+            List<DBTMTestModel> testList = GetTestList(dBTMTestMasterIds);
+
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+            var dataTableList = new List<KeyValuePair<string, DataTable>>();
+            var dataTableTestPerformedList = new List<KeyValuePair<string, DateTime>>();
+            foreach (var test in testList)
+            {
+                DBTMReportsListModel list = GetTestWiseReports(test.DBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, isDownloadReport);
+                if (!string.IsNullOrEmpty(list?.TestPerformedTime.ToString()))
                 {
-                    if (!string.IsNullOrWhiteSpace(testId))
-                    {
-                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, isDownloadReport);
-                        if (list?.DataTable?.Rows?.Count > 0)
-                        {
-                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
-                            dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
-                        }
-                    }
+                    dataTableTestPerformedList.Add(new KeyValuePair<string, DateTime>(test.TestName, Convert.ToDateTime(list.TestPerformedTime)));
+                    dataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
                 }
+            }
+            foreach (var test in dataTableTestPerformedList.OrderByDescending(x => x.Value))
+            {
+                var dataTable = dataTableList.Where(x => x.Key == test.Key).FirstOrDefault().Value;
+                dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.Key, dataTable));
             }
             return dBTMReportsListModel;
         }
@@ -492,7 +498,41 @@ namespace Coditech.API.Service
             reportData.FileName = fileName;
             return reportData;
         }
+        #endregion
 
+        #region NameWiseMultipleReports
+        public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            {
+                return new DBTMReportsListModel();
+            }
+
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+
+            List<DBTMTestModel> testList = GetTestList(dBTMTestMasterIds);
+
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+
+            var dataTableList = new List<KeyValuePair<string, DataTable>>();
+            var dataTableTestPerformedList = new List<KeyValuePair<string, DateTime>>();
+            foreach (var test in testList)
+            {
+                DBTMReportsListModel list = GetTestWiseReports(test.DBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, false);
+                if (!string.IsNullOrEmpty(list?.TestPerformedTime.ToString()))
+                {
+                    dataTableTestPerformedList.Add(new KeyValuePair<string, DateTime>(test.TestName, Convert.ToDateTime(list.TestPerformedTime)));
+                    dataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                }
+            }
+            foreach (var test in dataTableTestPerformedList.OrderByDescending(x => x.Value))
+            {
+                var dataTable = dataTableList.Where(x => x.Key == test.Key).FirstOrDefault().Value;
+                dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.Key, dataTable));
+            }
+            return dBTMReportsListModel;
+        }
+        #endregion
         // Delete Report File from Data folder
         public bool DeleteReportsFile(string fileName)
         {
@@ -504,14 +544,14 @@ namespace Coditech.API.Service
                 string currentDir = Directory.GetCurrentDirectory();
                 string activityPath = Path.Combine(currentDir, "data", "ActivityReport", fileName);
                 string batchPath = Path.Combine(currentDir, "data", "BatchReport", fileName);
-                if (System.IO.File.Exists(activityPath))
+                if (File.Exists(activityPath))
                 {
-                    System.IO.File.Delete(activityPath);
+                    File.Delete(activityPath);
                     return true;
                 }
-                if (System.IO.File.Exists(batchPath))
+                if (File.Exists(batchPath))
                 {
-                    System.IO.File.Delete(batchPath);
+                    File.Delete(batchPath);
                     return true;
                 }
                 return false;
@@ -522,37 +562,15 @@ namespace Coditech.API.Service
             }
         }
 
-        public DBTMReportsListModel NameWiseMultipleReports(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
-        {
-            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            List<string> dBTMTestMasterIdList = dBTMTestMasterIds.Split(",").ToList();
-            var testList = _dBTMTestMasterRepository.Table.Where(x => dBTMTestMasterIdList.Contains(x.DBTMTestMasterId.ToString()) && x.IsActive).Select(x => new { x.DBTMTestMasterId, x.TestName });
-            if (!string.IsNullOrWhiteSpace(dBTMTestMasterIds))
-            {
-                if (dBTMReportsListModel.DataTableList == null)
-                    dBTMReportsListModel.DataTableList = new List<KeyValuePair<string, DataTable>>();
-
-                foreach (string testId in dBTMTestMasterIds.Split(',').ToList())
-                {
-                    if (!string.IsNullOrWhiteSpace(testId))
-                    {
-                        DBTMReportsListModel list = GetTestWiseReports(Convert.ToInt32(testId), dBTMTraineeDetailId, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, false);
-                        if (list?.DataTable?.Rows?.Count > 0)
-                        {
-                            var test = testList.FirstOrDefault(x => x.DBTMTestMasterId == Convert.ToInt32(testId));
-                            dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
-                        }
-                    }
-                }
-            }
-            return dBTMReportsListModel;
-        }
-
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            if (dBTMReportsList?.Count > 0)
+            {
+                dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
+            }
             dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, isDownloadReport);
             return dBTMReportsListModel;
         }
@@ -1018,6 +1036,19 @@ namespace Coditech.API.Service
                 }
             }
             return words.Trim();
+        }
+
+        private List<DBTMTestModel> GetTestList(string dBTMTestMasterIds)
+        {
+            List<int> dBTMTestMasterIdList = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
+            List<DBTMTestModel> result = (from a in _dBTMTestMasterRepository.Table
+                                          where dBTMTestMasterIdList.Contains(a.DBTMTestMasterId) && a.IsActive
+                                          select new DBTMTestModel
+                                          {
+                                              DBTMTestMasterId = a.DBTMTestMasterId,
+                                              TestName = a.TestName,
+                                          }).ToList();
+            return result;
         }
         #endregion
     }
