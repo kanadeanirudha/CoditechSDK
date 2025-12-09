@@ -78,6 +78,17 @@ namespace Coditech.API.Service
             string sanctionPostCode = string.Empty;
             try
             {
+                if (string.IsNullOrEmpty(dBTMNewRegistrationModel.Password))
+                {
+                    List<GeneralSystemGlobleSettingModel> systemGlobleSettingList = GetSystemGlobleSettingList();
+                    string password = systemGlobleSettingList?.FirstOrDefault((GeneralSystemGlobleSettingModel x) => x.FeatureName.Equals(GeneralSystemGlobleSettingEnum.DefaultPassword.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue;
+                    dBTMNewRegistrationModel.Password = password;
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = false;
+                }
+                else
+                {
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = true;
+                }
                 DateTime currentDate = DateTime.Now;
                 //Save Centre 
                 organisationCentreMaster = InsertOrganisationCentreMaster(dBTMNewRegistrationModel, currentDate);
@@ -170,9 +181,9 @@ namespace Coditech.API.Service
 
                 dBTMNewRegistrationModel.Custom1 = CustomConstants.DBTMTrainer;
                 //Insert General Person and registor employee
-                List<GeneralSystemGlobleSettingModel> systemGlobleSettingList = GetSystemGlobleSettingList();
                 if (string.IsNullOrEmpty(dBTMNewRegistrationModel.Password))
                 {
+                    List<GeneralSystemGlobleSettingModel> systemGlobleSettingList = GetSystemGlobleSettingList();
                     string password = systemGlobleSettingList?.FirstOrDefault((GeneralSystemGlobleSettingModel x) => x.FeatureName.Equals(GeneralSystemGlobleSettingEnum.DefaultPassword.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue;
                     dBTMNewRegistrationModel.Password = password;
                     dBTMNewRegistrationModel.IsPasswordUserGenerated = false;
