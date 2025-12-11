@@ -1,0 +1,19 @@
+﻿using System.ComponentModel.DataAnnotations;
+namespace Coditech.API.Data
+{
+    public partial class DBTMCampMaster
+    {
+        [Key]
+        public long DBTMCampMasterId { get; set; }
+        public string CentreCode { get; set; }
+        public string CampName { get; set; }
+        public TimeSpan CampTime { get; set; }
+        public DateTime CampStartDate { get; set; }
+        public DateTime CampEndDate { get; set; }
+        public Nullable<long> CreatedBy { get; set; }
+        public Nullable<System.DateTime> CreatedDate { get; set; }
+        public Nullable<long> ModifiedBy { get; set; }
+        public Nullable<System.DateTime> ModifiedDate { get; set; }
+    }
+}
+
