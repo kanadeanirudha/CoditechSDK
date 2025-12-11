@@ -30,6 +30,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMBatchAgent, DBTMBatchAgent>();
             builder.Services.AddScoped<IDBTMGraphAgent, DBTMGraphAgent>();
             builder.Services.AddScoped<IOrganisationCentrewiseJoiningCodeAgent, DBTMOrganisationCentrewiseJoiningCodeAgent>();
+            builder.Services.AddScoped<IDBTMCampAgent, DBTMCampAgent>();
             #endregion
             #endregion Agent
 
@@ -52,6 +53,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<ILiveTestResultDashboardClient, LiveTestResultDashboardClient>();
             builder.Services.AddScoped<IDBTMBatchClient, DBTMBatchClient>();
             builder.Services.AddScoped<IDBTMGraphClient, DBTMGraphClient>();
+            builder.Services.AddScoped<IDBTMCampClient, DBTMCampClient>();
             #endregion 
             #endregion Client
         }
