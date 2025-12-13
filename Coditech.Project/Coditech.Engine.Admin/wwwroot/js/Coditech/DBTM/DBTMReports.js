@@ -54,7 +54,7 @@
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         var graphMode = $("#GraphMode").val();
-        var dBTMGraphMasterId = $("#DBTMSelectedGraph").val(); 
+        var dBTMGraphMasterId = $("#DBTMSelectedGraph").val();
         dBTMGraphMasterId = dBTMGraphMasterId ? dBTMGraphMasterId.join(",") : "";
 
         $("#DBTMTestWiseGraphReportsDivId").html("");
@@ -128,7 +128,7 @@
                             text: item.Text
                         }));
                     });
-                    $ddl.selectpicker('refresh'); 
+                    $ddl.selectpicker('refresh');
                     CoditechCommon.HideLodder();
                 },
                 error: function () {
@@ -139,7 +139,7 @@
         }
     },
     GetGraphListByGraphMode: function () {
-        $("#DBTMTestWiseGraphReportsDivId").html(""); 
+        $("#DBTMTestWiseGraphReportsDivId").html("");
         applyGraphModeUI();
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         var graphMode = $("#GraphMode").val();
@@ -256,6 +256,10 @@
         }
     },
 
+    GetTraineeChangeNameWiseReports: function () {
+        $("#DBTMNameWiseReportsDivId").html("");
+    },
+
     GetDBTMNameWiseMultiReports: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
@@ -265,10 +269,8 @@
         var todate = $("#ToDate").val();
 
         $("#DBTMNameWiseReportsDivId").html("");
-
-        if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+        if (dBTMTraineeDetailId && dBTMTraineeDetailId !== "0" && dBTMTestMasterId !== "") {
             CoditechCommon.ShowLodder();
-
             $.ajax({
                 cache: false,
                 type: "GET",
@@ -285,17 +287,21 @@
                     $("#DBTMNameWiseReportsDivId").html(data);
                     CoditechCommon.HideLodder();
                 },
-                error: function (xhr, ajaxOptions, thrownError) {
+                error: function (xhr) {
                     if (xhr.status == "401" || xhr.status == "403") {
                         location.reload();
                     }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error");
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve activity Reports.", "error"
+                    );
                     CoditechCommon.HideLodder();
                 }
             });
-        } if (dBTMTestMasterId.length > 0 && dBTMTraineeDetailId) {
-        } else {
-            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+        else if (dBTMTestMasterId == "") {
+            CoditechNotification.DisplayNotificationMessage("Please select an activity.", "error");
+        }
+        else {
+            CoditechNotification.DisplayNotificationMessage("Please select trainee and activity.", "error");
         }
     },
 
