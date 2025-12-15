@@ -109,24 +109,23 @@
         </div>
         <!-- TEST PERFORMANCE RECORDS -->
         @{
-            var traineeProfiles = (Model.TraineeProfiles ?? new List<DBTMTraineeProfileModel>())
-            .GroupBy(x => x.PerformanceMatrix)
-            .ToDictionary(g => g.Key, g => g.ToList());
+            var traineeProfilePerformanceList = (Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
+            .GroupBy(x => x.PerformanceMatrix).ToDictionary(g => g.Key, g => g.ToList());
         }
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header text-center">
-                        <h4 class="card-title">Test Performance</h4>
+                        <h4 class="card-title">Activity Performance</h4>
                     </div>
                     <div class="card-body">
-                        @if (traineeProfiles.Any())
+                        @if (traineeProfilePerformanceList.Any())
                         {
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped text-center align-middle">
                                     <thead class="text-center">
                                         <tr>
-                                            @foreach (var matrix in traineeProfiles.Keys)
+                                            @foreach (var matrix in traineeProfilePerformanceList.Keys)
                                             {
                                                 <th colspan="2" class="text-center" style="background-color: #f2f2f2;">
                                                     @matrix
@@ -134,7 +133,7 @@
                                             }
                                         </tr>
                                         <tr>
-                                            @foreach (var matrix in traineeProfiles.Keys)
+                                            @foreach (var matrix in traineeProfilePerformanceList.Keys)
                                             {
                                                 <th class="text-center">Activity/Test</th>
                                                 <th class="text-center">Score</th>
@@ -143,18 +142,25 @@
                                     </thead>
                                     <tbody>
                                         @{
-                                            int maxRows = traineeProfiles.Values.Max(g => g.Count);
+                                            int maxRows = traineeProfilePerformanceList.Values.Max(g => g.Count);
 
                                             for (int i = 0; i < maxRows; i++)
                                             {
                                                 <tr>
-                                                    @foreach (var matrix in traineeProfiles.Keys)
+                                                    @foreach (var matrix in traineeProfilePerformanceList.Keys)
                                                     {
-                                                        var tests = traineeProfiles[matrix];
+                                                        var tests = traineeProfilePerformanceList[matrix];
                                                         if (i < tests.Count)
                                                         {
                                                             <td class="text-center align-middle">@tests[i].TestName</td>
-                                                            <td class="text-center align-middle">@tests[i].Score</td>
+                                                            if (tests[i].IsUp)
+                                                            {
+                                                                <td class="text-center align-middle"><i class="fas fa-arrow-up"></i> @tests[i].Score</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td class="text-center align-middle"><i class="fas fa-arrow-down"></i> @tests[i].Score</td>
+                                                            }
                                                         }
                                                         else
                                                         {

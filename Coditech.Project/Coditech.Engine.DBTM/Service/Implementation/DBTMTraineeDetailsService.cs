@@ -182,34 +182,34 @@ namespace Coditech.API.Service
         {
             DBTMActivitiesDetailsListModel listModel = new DBTMActivitiesDetailsListModel();
 
-            DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();         
-            
-            if (IsNull(dBTMDeviceData)) 
+            DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();
+
+            if (IsNull(dBTMDeviceData))
                 return listModel;
-            
+
             DateTime activityDate = (dBTMDeviceData.CreatedDate ?? dBTMDeviceData.TestPerformedTime);
-            
+
             long traineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode).Select(y => y.DBTMTraineeDetailId).FirstOrDefault();
-            
+
             if (IsNull(traineeDetailId))
                 return listModel;
-            
+
             DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.FirstOrDefault(x => x.TestCode == dBTMDeviceData.TestCode);
-            
+
             if (IsNull(dBTMTestMaster))
                 return listModel;
-            
+
             GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType(traineeDetailId, UserTypeEnum.Trainee.ToString());
-            
+
             if (IsNotNull(generalPersonModel))
             {
                 listModel.FirstName = generalPersonModel.FirstName;
                 listModel.LastName = generalPersonModel.LastName;
                 listModel.PersonCode = generalPersonModel.PersonCode;
             }
-            
+
             DBTMReportsListModel report = _dBTMReportsService.TestWiseMultipleReports(dBTMTestMaster.DBTMTestMasterId.ToString(), traineeDetailId, activityDate, activityDate, entityId, userType, centreCode, false, false);
-            
+
             listModel.DataTable = report.DataTable;
             listModel.TestName = dBTMTestMaster.TestName;
             listModel.PersonCode = dBTMDeviceData.PersonCode;
@@ -252,9 +252,45 @@ namespace Coditech.API.Service
                 ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
                 : "N/A";
 
-            CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<Coditech_Entities>());
+            CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<Coditech_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
-            dBTMTraineeProfileModel.TraineeProfiles = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
+            List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
+            if (traineeProfilePerformanceList != null && traineeProfilePerformanceList.Count > 0)
+            {
+                dBTMTraineeProfileModel.TraineeProfilePerformanceList = null;
+                foreach (var item in traineeProfilePerformanceList.GroupBy(x => x.TestCode))
+                {
+                    if (dBTMTraineeProfileModel.TraineeProfilePerformanceList == null)
+                        dBTMTraineeProfileModel.TraineeProfilePerformanceList = new List<DBTMTraineeProfilePerformanceModel>();
+                    List<DBTMTraineeProfilePerformanceModel> list = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.RowNumber == 1).ToList();
+                    DBTMTraineeProfilePerformanceModel performanceModel = new DBTMTraineeProfilePerformanceModel();
+                    performanceModel.TestCode = item.Key;
+                    performanceModel.TestName = list.FirstOrDefault().TestName;
+                    performanceModel.PerformanceMatrix = list.FirstOrDefault().PerformanceMatrix;
+                    decimal lastRecordSum, previousResordSum;
+                    if (list.Any(x => x.ParameterCode == CustomConstants.Time))
+                    {
+                        lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
+                        previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => x.ParameterValue);
+                        if (lastRecordSum < previousResordSum)
+                        {
+                            performanceModel.IsUp = false;
+                        }
+                    }
+                    if (list.Any(x => x.ParameterCode == CustomConstants.JumpHeight))
+                    {
+                        lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => x.ParameterValue);
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
+                        previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => x.ParameterValue);
+                        if (lastRecordSum < previousResordSum)
+                        {
+                            performanceModel.IsUp = false;
+                        }
+                    }
+                    dBTMTraineeProfileModel.TraineeProfilePerformanceList.Add(performanceModel);
+                }
+            }
             return dBTMTraineeProfileModel;
         }
 
@@ -278,59 +314,6 @@ namespace Coditech.API.Service
             {
                 return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
             }
-        }
-
-
-        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList)
-        {
-            switch (calculationCode)
-            {
-                case CustomConstants.CompletionTime:
-                    decimal completionTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
-                    break;
-                case CustomConstants.AverageVelocity:
-                    decimal totalDistance = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
-                    decimal totalTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
-                    break;
-                case CustomConstants.MaxLap:
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Max(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case CustomConstants.MinLap:
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == CustomConstants.Time).Min(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case CustomConstants.Power:
-                    newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == CustomConstants.Power)?.ParameterValue ?? 0)} {Unit(calculationCode)}";
-                    break;
-                default:
-                    newRow[calculationName] = "N/A";
-                    break;
-            }
-        }
-        private string Unit(string parameterCode)
-        {
-            string data = string.Empty;
-            switch (parameterCode)
-            {
-                case CustomConstants.CompletionTime:
-                case CustomConstants.Time:
-                    data = "sec";
-                    break;
-                case CustomConstants.Distance:
-                    data = "m";
-                    break;
-                case CustomConstants.AverageVelocity:
-                    data = "m/s";
-                    break;
-                case CustomConstants.Power:
-                    data = "watt";
-                    break;
-                default:
-                    data = "";
-                    break;
-            }
-            return data;
         }
 
         private string CalculateDuration(DateTime fromDate, DateTime toDate)
