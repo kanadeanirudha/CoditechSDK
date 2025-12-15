@@ -55,5 +55,6 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Performance Matrix")]
         public byte DBTMPerformanceMatrixId { get; set; }
+        public string PerformanceMatrix { get; set; }
     }
 }

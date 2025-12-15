@@ -217,7 +217,7 @@ namespace Coditech.Admin.Helpers
             if (isActive)
                 list.DBTMTestList = list.DBTMTestList.Where(x => x.IsActive).ToList();
 
-            foreach (var item in list.DBTMTestList.OrderBy(x => x.TestName))
+            foreach (var item in list?.DBTMTestList.OrderBy(x => x.PerformanceMatrix ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
             {
                 if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && short.TryParse(dropdownViewModel.Parameter, out short excludeId) && item.DBTMTestMasterId == excludeId)
                 {
@@ -278,7 +278,7 @@ namespace Coditech.Admin.Helpers
 
                 DBTMBatchActivityListResponse response = new DBTMBatchActivityClient().GetDBTMBatchActivityList(generalBatchMasterId, isAssociated, null, null, null, 1, int.MaxValue);
                 DBTMBatchActivityListModel list = new DBTMBatchActivityListModel() { DBTMBatchActivityList = response.DBTMBatchActivityList };
-                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.TestName))
+                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.PerformanceMatrix ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
