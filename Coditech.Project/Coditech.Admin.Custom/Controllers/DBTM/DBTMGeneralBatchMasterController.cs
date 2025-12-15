@@ -232,7 +232,7 @@ namespace Coditech.Admin.Controllers
             DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
             if (dBTMBatchActivityList?.DBTMTestList != null)
             {
-                foreach (var item in dBTMBatchActivityList.DBTMTestList.Where(x => x.IsActive))
+                foreach (var item in dBTMBatchActivityList.DBTMTestList.Where(x => x.IsActive).OrderBy(x => x.PerformanceMatrix) .ThenBy(x => x.TestName))
                 {
                     generalBatchViewModel.CustomDropdownList1.Add(new SelectListItem
                     {

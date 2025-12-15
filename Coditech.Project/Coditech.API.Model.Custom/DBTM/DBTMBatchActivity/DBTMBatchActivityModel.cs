@@ -8,5 +8,6 @@
         public string TestName { get; set; }
         public bool IsAssociated { get; set; }
         public string BatchName { get; set; }
+        public string PerformanceMatrix { get; set; }
     }
 }
