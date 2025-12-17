@@ -6,19 +6,31 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.IO;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTraineeDetailsController : BaseController
     {
         private readonly IDBTMTraineeDetailsAgent _dBTMTraineeDetailsAgent;
         private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
+        private readonly IRazorViewEngine _viewEngine;
+        private readonly ITempDataProvider _tempDataProvider;
+        private readonly IServiceProvider _serviceProvider;
+
         private const string createEditTraineeDetails = "~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeDetails.cshtml";
         private const string createEditAssociatedTrainer = "~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/CreateEditAssociatedTrainer.cshtml";
-        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent)
+        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             _dBTMTraineeDetailsAgent = dBTMTraineeDetailsAgent;
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
+            _viewEngine = viewEngine;
+            _tempDataProvider = tempDataProvider;
+            _serviceProvider = serviceProvider;
         }
 
         #region DBTMTraineeDetails
@@ -381,7 +393,7 @@ namespace Coditech.Admin.Controllers
         {
             DataTableViewModel dataTableModel = new DataTableViewModel();
             dataTableModel.SelectedParameter1 = dBTMDeviceDataId.ToString();
-            dataTableModel.SelectedParameter2 = trainerId.ToString();         
+            dataTableModel.SelectedParameter2 = trainerId.ToString();
             DBTMActivitiesDetailsListViewModel model = _dBTMTraineeDetailsAgent.GetTraineeActivitiesDetailsList(dBTMDeviceDataId, dataTableModel);
             return PartialView("~/Views/DBTM/DBTMActivities/_ActivityDetailsPopup.cshtml", model);
         }
@@ -579,6 +591,30 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeProfileViewModel dBTMTraineeProfileViewModel = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
             return View("~/Views/DBTM/DBTMTraineeDetails/Profile.cshtml", dBTMTraineeProfileViewModel);
+        }
+
+        [HttpGet]
+        public JsonResult CheckAthleteReportAvailability(long dBTMTraineeDetailId, string remarks)
+        {
+            DBTMTraineeProfileViewModel profile = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
+            if (profile == null)
+            {
+                return Json(new { success = false, message = "Profile not found." });
+            }
+            return Json(new { success = true });
+        }     
+
+        [HttpGet]
+        public ActionResult DownloadAthleteReportPdf(long dBTMTraineeDetailId,string remarks)
+        {
+            DBTMTraineeProfileViewModel profile = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
+            if (profile == null)
+                return Content("Athlete profile not found.");
+            remarks = "Excellent";
+            var report = _dBTMTraineeDetailsAgent.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
+            byte[] bytes = System.IO.File.ReadAllBytes(report.FilePath);
+            System.IO.File.Delete(report.FilePath);
+            return File(bytes, "application/pdf", report.FileName);
         }
         #endregion
     }

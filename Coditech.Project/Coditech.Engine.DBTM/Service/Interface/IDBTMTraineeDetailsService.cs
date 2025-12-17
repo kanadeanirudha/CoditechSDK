@@ -14,6 +14,6 @@ namespace Coditech.API.Service
         DBTMActivitiesListModel GetTraineeActivitiesList(string personCode,int numberOfDaysRecord,FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId);
-
+        DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
     }
 }

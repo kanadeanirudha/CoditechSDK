@@ -7,9 +7,13 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
+using System;
 using System.Collections.Specialized;
 using System.Data;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using static Coditech.Common.Helper.HelperUtility;
+using Twilio.Converters;
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
@@ -25,8 +29,9 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
+        private readonly IConverter _converter;
 
-        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService) : base(serviceProvider)
+        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter, RazorViewToStringRenderer razorRenderer) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
@@ -39,6 +44,7 @@ namespace Coditech.API.Service
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _converter = converter;
         }
 
         public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -228,7 +234,10 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailsData == null)
                 return null;
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel
+            {
+                DBTMTraineeDetailId = dBTMTraineeDetailId
+            };
             if (dBTMTraineeProfileModel == null)
                 return null;
 
@@ -292,6 +301,40 @@ namespace Coditech.API.Service
                 }
             }
             return dBTMTraineeProfileModel;
+        }
+
+        //Download Athelete Report Pdf
+        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            string fileName = $"Athlete_Profile_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string filePath = Path.Combine(folderPath, fileName);
+
+            var pdf = new HtmlToPdfDocument
+            {
+                GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
+                Objects = { new ObjectSettings { HtmlContent = remarks, WebSettings = { DefaultEncoding = "utf-8" }}}
+            };
+            _converter.Convert(pdf);
+            return new DBTMReportsListModel
+            {
+                FileName = fileName,
+                FilePath = filePath
+            };
+        }
+
+        public void DeleteProfilePdf(string fileName)
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "data", "ProfilePdf", fileName);
+            if (File.Exists(path))
+                File.Delete(path);
         }
 
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)

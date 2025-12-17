@@ -22,5 +22,6 @@
         public string TotalDuration { get; set; }
         public DateTime? WeekelyHours { get; set; }
         public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; } = new List<DBTMTraineeProfilePerformanceModel>();
+        public string Remarks { get; set; } 
     }
 }

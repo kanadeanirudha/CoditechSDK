@@ -401,6 +401,34 @@ namespace Coditech.Admin.Agents
             DBTMTraineeProfileViewModel dBTMTraineeProfileViewModel = response?.DBTMTraineeProfileModel.ToViewModel<DBTMTraineeProfileViewModel>();
             return dBTMTraineeProfileViewModel;
         }
+      
+        public DBTMReportsListViewModel GenerateAthletePdfRemark( long dBTMTraineeDetailId, string remarks)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("GenerateAthletePdfFromHtml started.", "DBTMTraineeDetails",TraceLevel.Info);
+
+                DBTMReportsResponse response = _dBTMTraineeDetailsClient.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
+
+                if (response?.DBTMReportsModel == null)
+                {
+                    return new DBTMReportsListViewModel
+                    {
+                        HasError = true,ErrorMessage = "PDF generation failed."
+                    };
+                }
+                return response.DBTMReportsModel.ToViewModel<DBTMReportsListViewModel>();
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Error);
+
+                return new DBTMReportsListViewModel
+                {
+                    HasError = true, ErrorMessage = "Error while generating athlete PDF."
+                };
+            }
+        }
         #endregion
         #region protected
         protected virtual List<DatatableColumns> BindColumns()
@@ -410,7 +438,7 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Image",
                 ColumnCode = "Image",
-            });         
+            });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "First Name",
