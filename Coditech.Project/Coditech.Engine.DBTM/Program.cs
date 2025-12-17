@@ -26,8 +26,7 @@ if (!File.Exists(nativeDllPath))
 var context = new CustomAssemblyLoadContext();
 context.LoadUnmanagedLibrary(nativeDllPath);
 
-/// REGISTER YOUR HELPER HERE
-builder.Services.AddScoped<RazorViewToStringRenderer>();
+/// Register your Helper services here
 builder.Services.AddSingleton<IConverter>(
     new SynchronizedConverter(new PdfTools())
 );

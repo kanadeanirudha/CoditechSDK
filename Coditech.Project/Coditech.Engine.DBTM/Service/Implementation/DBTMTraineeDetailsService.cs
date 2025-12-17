@@ -31,7 +31,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
         private readonly IConverter _converter;
 
-        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter, RazorViewToStringRenderer razorRenderer) : base(serviceProvider)
+        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
@@ -303,11 +303,24 @@ namespace Coditech.API.Service
             return dBTMTraineeProfileModel;
         }
 
-        //Download Athelete Report Pdf
+        //Download Trainee Report Pdf
         public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            GeneralPersonModel person = new GeneralPersonModel
+            {
+                FirstName = "Lisa",
+                LastName = "G",
+                DateOfBirth = new DateTime(2000, 1, 1)
+            };
+
+            // Get template
+            string template = TraineeHtmlTemplate.GetTemplate();
+
+            // Replace tokens
+            string html = ReplaceTraineeTemplate( template, person, remarks);
 
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
 
@@ -320,7 +333,7 @@ namespace Coditech.API.Service
             var pdf = new HtmlToPdfDocument
             {
                 GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
-                Objects = { new ObjectSettings { HtmlContent = remarks, WebSettings = { DefaultEncoding = "utf-8" }}}
+                Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" }}}
             };
             _converter.Convert(pdf);
             return new DBTMReportsListModel
@@ -328,13 +341,6 @@ namespace Coditech.API.Service
                 FileName = fileName,
                 FilePath = filePath
             };
-        }
-
-        public void DeleteProfilePdf(string fileName)
-        {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "data", "ProfilePdf", fileName);
-            if (File.Exists(path))
-                File.Delete(path);
         }
 
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
@@ -378,6 +384,27 @@ namespace Coditech.API.Service
             }
 
             return $"{years} years {months} months {days} days";
+        }
+
+        //Template Html Replacement
+        private string ReplaceTraineeTemplate(string template, GeneralPersonModel person, string remarks)
+        {
+            string html = template;
+
+            html = html.Replace("#FirstName", person?.FirstName ?? "");
+            html = html.Replace("#LastName", person?.LastName ?? "");
+            html = html.Replace("#DOB", person?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "");
+            html = html.Replace("#JoiningDate", DateTime.Now.ToString("dd-MMM-yyyy"));
+
+            html = html.Replace("#TrainerName", "Geeta Jadhav");
+            html = html.Replace("#WeeklyHours", "10");
+            html = html.Replace("#Weight", "56 Kg");
+            html = html.Replace("#Activity", "Cricket");
+            html = html.Replace("#Score505", "XX");
+
+            html = html.Replace("#Remarks", remarks ?? "");
+
+            return html;
         }
     }
 }
