@@ -80,7 +80,9 @@ jobs:
         run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
       - name: Copy Build report folder
         run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
-
+      - name: Copy Build NativePdfDll folder
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Coditech.Engine.DBTM\NativePdfDll\*  -Destination C:\HostingSites\DBTMStage\DBTM\NativePdfDll\ -Recurse -Force
+      
       - name: Start ADMIN IIS Site and App Pool
         run: |
           # Start the IIS site
