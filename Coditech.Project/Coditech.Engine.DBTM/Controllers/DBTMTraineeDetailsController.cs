@@ -204,5 +204,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMReportsResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMTraineeDetails/GetTraineeProfileHtml")]
+        [Produces(typeof(StringResponse))]
+        public virtual IActionResult GetTraineeProfileHtml(long dBTMTraineeDetailId)
+        {
+            try
+            {
+                string html = _dBTMTraineeDetailsService.GetTraineeProfileHtml(dBTMTraineeDetailId, string.Empty);
+                return !string.IsNullOrEmpty(html) ? CreateOKResponse(new StringResponse { Response = html }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetTraineeProfileHtml", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMMobileTraineeDashboardResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetTraineeProfileHtml", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

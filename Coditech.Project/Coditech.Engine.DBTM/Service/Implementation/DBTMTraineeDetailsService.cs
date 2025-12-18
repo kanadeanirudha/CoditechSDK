@@ -230,7 +230,7 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight, x.CentreCode }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
@@ -251,6 +251,7 @@ namespace Coditech.API.Service
                 dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
                 dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
                 dBTMTraineeProfileModel.Weight = dBTMTraineeDetailsData.Weight;
+                dBTMTraineeProfileModel.CentreCode = dBTMTraineeDetailsData.CentreCode;
             }
 
             dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
@@ -306,34 +307,20 @@ namespace Coditech.API.Service
         //Download Trainee Report Pdf
         public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
-            if (dBTMTraineeDetailId <= 0)
-                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+            // GetTraineeProfileHtml
+            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
 
-            GeneralPersonModel person = new GeneralPersonModel
-            {
-                FirstName = "Lisa",
-                LastName = "G",
-                DateOfBirth = new DateTime(2000, 1, 1)
-            };
-
-            // Get template
-            string template = TraineeHtmlTemplate.GetTemplate();
-
-            // Replace tokens
-            string html = ReplaceTraineeTemplate( template, person, remarks);
-
+            // Generate PDF
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
-
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            string fileName = $"Athlete_Profile_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string fileName = $"Athlete_Profile_{dBTMTraineeDetailId}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
             string filePath = Path.Combine(folderPath, fileName);
-
             var pdf = new HtmlToPdfDocument
             {
                 GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
-                Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" }}}
+                Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
             };
             _converter.Convert(pdf);
             return new DBTMReportsListModel
@@ -341,6 +328,31 @@ namespace Coditech.API.Service
                 FileName = fileName,
                 FilePath = filePath
             };
+        }
+
+        //Get trainee profile html
+        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            // Get trainee profile
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
+            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
+            if (profile == null)
+                throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
+
+            string templateCode = EmailTemplateCodeCustomEnum.TraineeReportTemplate.ToString();
+
+            var emailTemplate = GetEmailTemplateByCode(profile.CentreCode, templateCode);
+
+            if (string.IsNullOrWhiteSpace(emailTemplate?.EmailTemplate))
+                throw new CoditechException(ErrorCodes.NullModel, $"Template '{templateCode}' not found for centre '{centreName}'");
+
+            string html = emailTemplate.EmailTemplate;
+
+            html = ReplaceTraineeTemplate(html, profile, remarks, centreName);
+            return html;
         }
 
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
@@ -387,23 +399,17 @@ namespace Coditech.API.Service
         }
 
         //Template Html Replacement
-        private string ReplaceTraineeTemplate(string template, GeneralPersonModel person, string remarks)
+        private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
         {
-            string html = template;
-
-            html = html.Replace("#FirstName", person?.FirstName ?? "");
-            html = html.Replace("#LastName", person?.LastName ?? "");
-            html = html.Replace("#DOB", person?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "");
-            html = html.Replace("#JoiningDate", DateTime.Now.ToString("dd-MMM-yyyy"));
-
-            html = html.Replace("#TrainerName", "Geeta Jadhav");
-            html = html.Replace("#WeeklyHours", "10");
-            html = html.Replace("#Weight", "56 Kg");
-            html = html.Replace("#Activity", "Cricket");
-            html = html.Replace("#Score505", "XX");
-
-            html = html.Replace("#Remarks", remarks ?? "");
-
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight,profile.Weight.ToString(), html);           
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarks, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
             return html;
         }
     }
