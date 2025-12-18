@@ -348,6 +348,12 @@ namespace Coditech.API.Service
             string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired)?.Select(y => y.JoiningCode)?.FirstOrDefault();
             return !string.IsNullOrEmpty(JoiningCode) ? JoiningCode : string.Empty;
         }
+        public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)
+        {
+            string joiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.CentreCode == centreCode && x.JoiningCodeTypeEnumId == joiningCodeTypeEnumId && !x.IsExpired).Select(x => x.JoiningCode).FirstOrDefault();
+
+            return joiningCode ?? string.Empty;
+        }
 
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)
             => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
