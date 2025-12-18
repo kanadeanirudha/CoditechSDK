@@ -18,18 +18,19 @@
         YValuesBarYearlyTraineeTrainedOverview[count1] = Convert.ToInt32(item.TotalTrainee);
         count1++;
     }
-    var traineeDataset = new List<BarGraphsDatasetModel>
+    var traineeDataset = new List<LineBarGraphsDatasetModel>
     {
-        new BarGraphsDatasetModel
+        new LineBarGraphsDatasetModel
         {
             Label = "Trainees",
             Data = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
             Color = JsonConvert.SerializeObject(backgroundColor)
         }
     };
-    BarChartModel trainerviewModel = new BarChartModel()
+    LineBarChartModel trainerviewModel = new LineBarChartModel()
             {
-                BarChartId = "YearlyTraineeTrainedOverviewChart",
+                GraphType= "bar",
+                LineBarChartId = "YearlyTraineeTrainedOverviewChart",
                 XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
                 XAxisLabel = "Months",
                 YAxisLabel = "Trainees Count",
@@ -246,7 +247,7 @@
                     <h4 class="card-title">Trainees Trained Per Month</h4>
                 </div>
                 <div class="card-body p-0 pt-3">
-                    @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", trainerviewModel)
+    @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", trainerviewModel)
                 </div>
             </div>
         </div>

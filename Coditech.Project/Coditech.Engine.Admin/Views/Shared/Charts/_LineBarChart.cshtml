@@ -1,7 +1,7 @@
-﻿@model LineChartModel
+﻿@model LineBarChartModel
 @{
     Layout = null;
-    var chartId = $"{Model.LineChartId}_{Guid.NewGuid().ToString("N")}";
+    var chartId = $"{Model.LineBarChartId}_{Guid.NewGuid().ToString("N")}";
 }
 
 <div class="chart-container" style="position:relative; height:400px; width:100%;">
@@ -30,7 +30,7 @@
     }
 
         new Chart(ctx, {
-            type: "line",
+            type: "@Model.GraphType.ToLower()",
             data: {
                 labels: xValues,
                 datasets: datasets
