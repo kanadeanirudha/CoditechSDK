@@ -9,13 +9,9 @@
                 @graph.GraphName
             </h5>
 
-            @if (graph.GraphType == "LineChart")
+            @if (graph.GraphType == "LineChart" || graph.GraphType == "BarChart")
             {
-                @Html.Partial("~/Views/Shared/Charts/_LineChart.cshtml", graph.LineChartModel)
-            }
-            else if (graph.GraphType == "BarChart")
-            {
-                @Html.Partial("~/Views/Shared/Charts/_BarChart.cshtml", graph.BarChartModel)
+                @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", graph.LineChartModel)
             }
             else if (graph.GraphType == "PieChart")
             {

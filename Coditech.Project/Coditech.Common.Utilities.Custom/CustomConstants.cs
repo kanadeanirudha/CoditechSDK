@@ -16,6 +16,7 @@
         public const string MinLap = "MinLap";
         public const string Power = "Power";
         public const string JumpHeight = "JumpHeight";
+        public const string JumpLength = "JumpLength";
         public const string Force = "Force";
         public const string DistanceMultiplyByRow = "DistanceMultiplyByRow";
         public const string CumulativeTime = "CumulativeTime";
@@ -34,8 +35,10 @@
         public const string PersonDetectionRange = "PersonDetectionRange";
         public const string Weight = "Weight";
         public const string Height = "Height";
+        public const string Date = "Date";
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";
         public const string GraphDateFormat = "yyyy-MM-dd";
+        public const string Turns = "Turns";
         public const int GraphListRoundUpValue = 3;
     }
 }

@@ -182,5 +182,49 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeProfileResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMTraineeDetails/GenerateAthletePdfRemark")]
+        [HttpGet]
+        [Produces(typeof(DBTMReportsResponse))]
+        public virtual IActionResult GenerateAthletePdfRemark(long dBTMTraineeDetailId,string remarks)
+        {
+           try
+            {
+                DBTMReportsListModel dBTMTraineeProfileModel = _dBTMTraineeDetailsService.GenerateAthletePdfRemark(dBTMTraineeDetailId,remarks);
+                return IsNotNull(dBTMTraineeProfileModel) ? CreateOKResponse(new DBTMReportsResponse { DBTMReportsModel = dBTMTraineeProfileModel }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "Profile", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMReportsResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "Profile", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMReportsResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMTraineeDetails/GetTraineeProfileHtml")]
+        [Produces(typeof(StringResponse))]
+        public virtual IActionResult GetTraineeProfileHtml(long dBTMTraineeDetailId)
+        {
+            try
+            {
+                string html = _dBTMTraineeDetailsService.GetTraineeProfileHtml(dBTMTraineeDetailId, string.Empty);
+                return !string.IsNullOrEmpty(html) ? CreateOKResponse(new StringResponse { Response = html }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetTraineeProfileHtml", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMMobileTraineeDashboardResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetTraineeProfileHtml", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

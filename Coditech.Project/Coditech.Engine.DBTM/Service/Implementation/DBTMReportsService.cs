@@ -71,12 +71,12 @@ namespace Coditech.API.Service
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
                     }
-                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest")
+                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest" || dbtmTestMaster.TestCode == "ProAgilityTest")
                     {
                         XValuesList = new string[] { "A-B", "B-C", "C-B" };
                     }
                 }
-                else if (graphMaster.XParameter == "Date")
+                else if (graphMaster.XParameter == CustomConstants.Date)
                 {
                     List<string> xValues = new List<string>();
                     foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
@@ -98,6 +98,15 @@ namespace Coditech.API.Service
                         XValuesList = xValues.ToArray();
                     }
                 }
+                else if (graphMaster.XParameter == CustomConstants.Turns)
+                {
+                    List<string> xValues = new List<string>();
+                    for (int count = 1; count <= dBTMReportsList.Count(); count++)
+                    {
+                        xValues.Add(count.ToString());
+                    }
+                    XValuesList = xValues.ToArray();
+                }
                 if (XValuesList != null)
                 {
                     graphModel.IsRecordFound = true;
@@ -113,15 +122,16 @@ namespace Coditech.API.Service
                     }
                     string[] colorPalette = Enumerable.Range(0, groupedReportCount).Select(i => $"hsl({i * 360 / groupedReportCount}, 70%, 50%)").ToArray();
 
-                    if (graphModel.GraphType == "LineChart")
+                    if (graphModel.GraphType == "LineChart" || graphModel.GraphType == "BarChart")
                     {
-                        graphModel.LineChartModel = new LineChartModel()
+                        graphModel.LineChartModel = new LineBarChartModel()
                         {
-                            LineChartId = dBTMTestMasterId.ToString(),
+                            GraphType = graphModel.GraphType.Replace("Chart", ""),
+                            LineBarChartId = dBTMTestMasterId.ToString(),
                             XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
                             XValues = JsonConvert.SerializeObject(XValuesList),
                             YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
-                            Datasets = new List<LineGraphsDatasetModel>()
+                            Datasets = new List<LineBarGraphsDatasetModel>()
                         };
 
                         if (graphMaster.GraphMode == "InstantaneousChart")
@@ -133,48 +143,6 @@ namespace Coditech.API.Service
                             BindProgressChart(graphModel, graphMaster, yParameter, dBTMReportsList, colorIndex, groupedReportsByDateFormat, colorPalette);
                         }
                     }
-                    //else if (graphModel.GraphType == "BarChart") 
-                    //{
-                    //    graphModel.BarChartModel = new BarChartModel()
-                    //    {
-                    //        BarChartId = dBTMTestMasterId.ToString(),
-                    //        XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
-                    //        XValues = JsonConvert.SerializeObject(XValuesList),
-                    //        YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
-                    //        Datasets = new List<BarGraphsDatasetModel>()
-                    //    };
-
-                    //    short i = 1;
-                    //    foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
-                    //    {
-                    //        short j = 1;
-                    //        List<decimal> yValuesList = new List<decimal>();
-                    //        if (graphMaster.IsYParameterCalculated)
-                    //        {
-                    //            foreach (var item in group.Where(x => x.ParameterCode == yParameter))
-                    //            {
-                    //                yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false)));
-                    //                j++;
-                    //            }
-                    //        }
-                    //        else
-                    //        {
-                    //            foreach (var item in group.Where(x => x.ParameterCode == yParameter))
-                    //            {
-                    //                yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == yParameter && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
-                    //                j++;
-                    //            }
-                    //        }
-                    //        graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
-                    //        {
-                    //            Color = colorPalette[colorIndex % colorPalette.Length],
-                    //            Label = $"Turn {i} {graphMaster.YAxixLabel}",
-                    //            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
-                    //        });
-                    //        colorIndex++;
-                    //        i++;
-                    //    }
-                    //}
                 }
             }
             return graphModel;
@@ -187,7 +155,21 @@ namespace Coditech.API.Service
             {
                 short j = 1;
                 List<decimal> yValuesList = new List<decimal>();
-                if (graphMaster.IsYParameterCalculated)
+                if (graphMaster.XParameter == CustomConstants.Turns && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
+                {
+                    for (int index = 1; index <= groupedReports.Count(); index++)
+                    {
+                        if (index == i)
+                        {
+                            yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
+                        }
+                        else
+                        {
+                            yValuesList.Add(0);
+                        }
+                    }
+                }
+                else if (graphMaster.IsYParameterCalculated)
                 {
                     foreach (var item in group.Where(x => x.ParameterCode == yParameter))
                     {
@@ -203,7 +185,7 @@ namespace Coditech.API.Service
                         j++;
                     }
                 }
-                graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
                     Color = colorPalette[colorIndex % colorPalette.Length],
                     Label = $"Turn {i} {graphMaster.YAxixLabel}",
@@ -230,7 +212,7 @@ namespace Coditech.API.Service
                     yValuesList.Add(sum / dataCount);
 
                 }
-                graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+                graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
                     Color = colorPalette[colorIndex % colorPalette.Length],
                     Label = $"Avarage {graphMaster.YAxixLabel}",
@@ -247,10 +229,17 @@ namespace Coditech.API.Service
                 if (graphMaster.IsYParameterCalculated)
                 {
                     short count = Convert.ToInt16(group.Select(x => x.CreatedDate).Distinct().Count());
-                    yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), count, false, true)));
+                    if (graphMaster.XParameter == CustomConstants.Date && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
+                    {
+                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group, count, false, true)));
+                    }
+                    else
+                    {
+                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), count, false, true)));
+                    }
                 }
             }
-            graphModel.LineChartModel.Datasets.Add(new LineGraphsDatasetModel()
+            graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
             {
                 Color = colorPalette[colorIndex % colorPalette.Length],
                 Label = $"{graphMaster.YAxixLabel}",

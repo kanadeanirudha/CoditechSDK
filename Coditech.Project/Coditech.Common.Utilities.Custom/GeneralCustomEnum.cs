@@ -45,6 +45,7 @@
         DBTMTraineeRegistration,
         SendAssignmentReminder,
         DBTMSendPendingAssignmentReminder,
+        TraineeReportTemplate,
     }
 
     public enum LogComponentCustomEnum

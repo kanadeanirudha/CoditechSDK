@@ -7,9 +7,13 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
+using System;
 using System.Collections.Specialized;
 using System.Data;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using static Coditech.Common.Helper.HelperUtility;
+using Twilio.Converters;
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
@@ -25,8 +29,9 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
+        private readonly IConverter _converter;
 
-        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService) : base(serviceProvider)
+        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
@@ -39,6 +44,7 @@ namespace Coditech.API.Service
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _converter = converter;
         }
 
         public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -224,11 +230,14 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight, x.CentreCode }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel
+            {
+                DBTMTraineeDetailId = dBTMTraineeDetailId
+            };
             if (dBTMTraineeProfileModel == null)
                 return null;
 
@@ -242,6 +251,7 @@ namespace Coditech.API.Service
                 dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
                 dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
                 dBTMTraineeProfileModel.Weight = dBTMTraineeDetailsData.Weight;
+                dBTMTraineeProfileModel.CentreCode = dBTMTraineeDetailsData.CentreCode;
             }
 
             dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
@@ -294,6 +304,57 @@ namespace Coditech.API.Service
             return dBTMTraineeProfileModel;
         }
 
+        //Download Trainee Report Pdf
+        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
+        {
+            // GetTraineeProfileHtml
+            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
+
+            // Generate PDF
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            string fileName = $"Athlete_Profile_{dBTMTraineeDetailId}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string filePath = Path.Combine(folderPath, fileName);
+            var pdf = new HtmlToPdfDocument
+            {
+                GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
+                Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
+            };
+            _converter.Convert(pdf);
+            return new DBTMReportsListModel
+            {
+                FileName = fileName,
+                FilePath = filePath
+            };
+        }
+
+        //Get trainee profile html
+        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            // Get trainee profile
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
+            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
+            if (profile == null)
+                throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
+
+            string templateCode = EmailTemplateCodeCustomEnum.TraineeReportTemplate.ToString();
+
+            var emailTemplate = GetEmailTemplateByCode(profile.CentreCode, templateCode);
+
+            if (string.IsNullOrWhiteSpace(emailTemplate?.EmailTemplate))
+                throw new CoditechException(ErrorCodes.NullModel, $"Template '{templateCode}' not found for centre '{centreName}'");
+
+            string html = emailTemplate.EmailTemplate;
+
+            html = ReplaceTraineeTemplate(html, profile, remarks, centreName);
+            return html;
+        }
+
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
         {
             long personId = 0;
@@ -335,6 +396,21 @@ namespace Coditech.API.Service
             }
 
             return $"{years} years {months} months {days} days";
+        }
+
+        //Template Html Replacement
+        private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
+        {
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight,profile.Weight.ToString(), html);           
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarks, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
+            return html;
         }
     }
 }

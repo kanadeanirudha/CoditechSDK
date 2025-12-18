@@ -221,5 +221,29 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/dbtmapi/getcentrewisejoiningcode")]
+        [Produces(typeof(StringResponse))]
+        public virtual IActionResult GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)
+        {
+            try
+            {
+                string apiDomainkey = _dBTMApiService.GetCentreWiseJoiningCode(centreCode, joiningCodeTypeEnumId);
+                StringResponse response = new StringResponse() { Response = apiDomainkey };
+                string data = ApiHelper.ToJson(response);
+                return !string.IsNullOrEmpty(apiDomainkey) ? CreateOKResponse<StringResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "getcentrewisejoiningcode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new StringResponse { Response = "", ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "getcentrewisejoiningcode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

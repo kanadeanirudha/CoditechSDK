@@ -148,6 +148,14 @@ namespace Coditech.Engine.DBTM.Helpers
                     time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
                     result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, CustomConstants.GraphListRoundUpValue)}" : "0";
                     break;
+                case CustomConstants.JumpHeight:
+                    decimal totalJumpHeight = group.Where(x => x.ParameterCode == CustomConstants.JumpHeight).Sum(x => x.ParameterValue);
+                    result = totalJumpHeight > 0 ? $"{Math.Round(totalJumpHeight / recurtion, CustomConstants.GraphListRoundUpValue)}" : "0";
+                    break;
+                case CustomConstants.JumpLength:
+                    decimal totalJumpLength = group.Where(x => x.ParameterCode == CustomConstants.JumpLength).Sum(x => x.ParameterValue);
+                    result = totalJumpLength > 0 ? $"{Math.Round(totalJumpLength / recurtion, CustomConstants.GraphListRoundUpValue)}" : "0";
+                    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }
@@ -240,6 +248,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     data = "cm";
                     break;
                 case CustomConstants.JumpHeight:
+                case CustomConstants.JumpLength:
                     data = "cm";
                     break;
                 case CustomConstants.AccelerationByRow:
