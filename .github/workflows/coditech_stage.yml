@@ -17,8 +17,8 @@ on:
          type: boolean
        mediamanager_api_deploy:
          description: 'Deploy MediaManager API'
-         required: true
-         default: true
+         required: false
+         default: false
          type: boolean
        organisation_api_deploy:
          description: 'Deploy Organisation API'
@@ -32,8 +32,8 @@ on:
          type: boolean
        payment_api_deploy:
          description: 'Deploy Payment API'
-         required: true
-         default: true
+         required: false
+         default: false
          type: boolean
 
 jobs:
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: Stage
+          ref: DBTMStage
 
       - name: Restore Packages
         run: | 
@@ -73,16 +73,14 @@ jobs:
           Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMStage\Admin\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\bin\Release\net8.0\*  -Destination C:\HostingSites\DBTMStage\Admin\ -Recurse -Force
       - name: Copy Build webroot
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\wwwroot\*  -Destination C:\HostingSites\DBTMStage\Admin\wwwroot\ -Recurse -Force
       - name: Copy Build views
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
-      - name: Copy Build report folder
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Admin\Coditech.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
-      - name: Copy Build NativePdfDll folder
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\Coditech.Engine.DBTM\NativePdfDll\*  -Destination C:\HostingSites\DBTMStage\DBTM\NativePdfDll\ -Recurse -Force
-      
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Views\*  -Destination C:\HostingSites\DBTMStage\Admin\Views\ -Recurse -Force
+      #- name: Copy Build report folder
+      # run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Admin\Reports\*  -Destination C:\HostingSites\DBTMStage\Admin\Reports\ -Recurse -Force
+
       - name: Start ADMIN IIS Site and App Pool
         run: |
           # Start the IIS site
@@ -109,7 +107,7 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\MediaManager\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.MediaManager\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\MediaManager\ -Recurse -Force 
 
       - name: Start MediaManager IIS Site and App Pool
         run: |
@@ -129,13 +127,13 @@ jobs:
            # Stop the IIS site
            Stop-WebSite -Name "dbtm-stage-api-organisation" 
            # Stop the associated app pool
-           Stop-WebAppPool -Name "dbtm-stage-organisation"
+           Stop-WebAppPool -Name "dbtm-stage-api-organisation"
 
            # Wait for a few seconds (optional, if needed)
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\Organisation\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Organisation\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\Organisation\ -Recurse -Force 
 
       - name: Start Organisation IIS Site and App Pool
         run: |
@@ -161,8 +159,10 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\DBTM\ -Recurse -Force 
-
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\DBTM\ -Recurse -Force 
+      - name: Copy Build NativePdfDll folder
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.DBTM\NativePdfDll\*  -Destination C:\HostingSites\DBTMStage\DBTM\NativePdfDll\ -Recurse -Force
+      
       - name: Start dbtm IIS Site and App Pool
         run: |
            # Start the IIS site
@@ -187,7 +187,7 @@ jobs:
            Start-Sleep -Seconds 5
 
       - name: Copy Build file
-        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\Coditech\Coditech.Project\API\Coditech.Engine.Payment\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\payment\ -Recurse -Force 
+        run: Copy-Item -Path C:\GitAction\DBTMStage\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.Payment\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMStage\payment\ -Recurse -Force 
 
       - name: Start payment IIS Site and App Pool
         run: |
