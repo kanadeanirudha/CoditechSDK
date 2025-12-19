@@ -29,6 +29,9 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
+        private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly IConverter _converter;
 
         public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter) : base(serviceProvider)
@@ -44,6 +47,9 @@ namespace Coditech.API.Service
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _converter = converter;
         }
 
@@ -230,7 +236,7 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight,x.Height, x.CentreCode }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight, x.Height, x.CentreCode }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
@@ -262,6 +268,19 @@ namespace Coditech.API.Service
             dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
                 ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
                 : "N/A";
+
+            var trainerName = (from gtat in _generalTraineeAssociatedToTrainerRepository.Table
+                               join gtm in _generalTrainerMasterRepository.Table
+                                   on gtat.GeneralTrainerMasterId equals gtm.GeneralTrainerMasterId
+                               join um in _userMasterRepository.Table
+                                   on gtm.EmployeeId equals um.EntityId
+                               where gtat.EntityId == dBTMTraineeDetailId
+                                     && gtat.UserType == UserTypeEnum.Trainee.ToString()
+                                     && gtat.IsCurrentTrainer
+                                     && um.UserType == UserTypeEnum.Employee.ToString()
+                               select um.FirstName + " " + um.LastName).FirstOrDefault();
+
+            dBTMTraineeProfileModel.TrainerName = string.IsNullOrWhiteSpace(trainerName) ? "N/A" : trainerName;
 
             CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<Coditech_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
@@ -418,7 +437,7 @@ namespace Coditech.API.Service
             else
             {
                 string remarksHtml = $@"<div style=""margin-top:15px;border:1px solid #333;padding:10px;min-height:60px;""><strong>Remarks:</strong><br/>{remarks}</div>";
-                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarksHtml, html );
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarksHtml, html);
             }
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
             if (profile?.TraineeProfilePerformanceList?.Count > 0)
