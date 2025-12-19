@@ -230,7 +230,7 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight, x.CentreCode }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight,x.Height, x.CentreCode }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
@@ -251,6 +251,7 @@ namespace Coditech.API.Service
                 dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
                 dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
                 dBTMTraineeProfileModel.Weight = dBTMTraineeDetailsData.Weight;
+                dBTMTraineeProfileModel.Height = dBTMTraineeDetailsData.Height;
                 dBTMTraineeProfileModel.CentreCode = dBTMTraineeDetailsData.CentreCode;
             }
 
@@ -406,9 +407,19 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight, profile.Weight.ToString(), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Height, profile.Height.ToString(), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
-            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarks, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TrainerName, profile.TrainerName, html);
+            if (string.IsNullOrWhiteSpace(remarks))
+            {
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, html);
+            }
+            else
+            {
+                string remarksHtml = $@"<div style=""margin-top:15px;border:1px solid #333;padding:10px;min-height:60px;""><strong>Remarks:</strong><br/>{remarks}</div>";
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarksHtml, html );
+            }
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
             if (profile?.TraineeProfilePerformanceList?.Count > 0)
             {

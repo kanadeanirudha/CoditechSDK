@@ -8,6 +8,7 @@
         public string LastName { get; set; }
         public string ImagePath { get; set; }
         public decimal Weight { get; set; }
+        public decimal Height { get; set; }
         public int? SpecializationEnumId { get; set; }
         public long PhotoMediaId { get; set; }
         public string PhotoMediaPath { get; set; }
