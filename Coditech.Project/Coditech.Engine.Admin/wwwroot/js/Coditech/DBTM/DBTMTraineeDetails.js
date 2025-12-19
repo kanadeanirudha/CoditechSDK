@@ -168,4 +168,13 @@
             }
         });
     },
+
+    ConfirmDownloadPdf: function (traineeId) {
+        var remarks = $("#RemarksText").val() || "";
+        $("#RemarkPopupId").modal("hide");
+        DBTMTraineeDetails.DownloadAthleteReportPdf(
+            traineeId,
+            remarks
+        );
+    },
 }
