@@ -11,5 +11,6 @@
         public static string WeeklyHours { get; } = "#WeeklyHours#";
         public static string TotalDuration { get; } = "#TotalDuration#";
         public static string Remarks { get; } = "#Remarks#";
+        public static string DataTable { get; } = "#DataTable#";
     }
 }
