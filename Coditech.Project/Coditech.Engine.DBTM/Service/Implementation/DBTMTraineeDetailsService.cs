@@ -405,11 +405,56 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
-            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight,profile.Weight.ToString(), html);           
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight, profile.Weight.ToString(), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarks, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
+            if (profile?.TraineeProfilePerformanceList?.Count > 0)
+            {
+                var traineeProfilePerformanceList = (profile.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
+               .GroupBy(x => x.PerformanceMatrix).ToDictionary(g => g.Key, g => g.ToList());
+                int maxRows = traineeProfilePerformanceList.Values.Max(g => g.Count);
+                string performanceMatrixHtml = "<table style=\"width:100%;min-width:900px;border-collapse:collapse;font-size:14px;\">";
+                //Bind Table Header
+                performanceMatrixHtml += " <thead><tr>";
+                foreach (var matrix in traineeProfilePerformanceList.Keys)
+                {
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#f8c6b8;\">" + matrix + "</th>";
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;\">Score</th>";
+                }
+                performanceMatrixHtml += "</tr></thead>";
+                //End Bind Table Header
+                //Bind Table Rows
+                performanceMatrixHtml += "<tbody>";
+                for (int i = 0; i < maxRows; i++)
+                {
+                    performanceMatrixHtml += "<tr>";
+                    foreach (var matrix in traineeProfilePerformanceList.Keys)
+                    {
+                        var tests = traineeProfilePerformanceList[matrix];
+                        if (i < tests.Count)
+                        {
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">" + tests[i].TestName + "</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">" + tests[i].Score + "</td>";
+                        }
+                        else
+                        {
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">-</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">-</td>";
+                        }
+                    }
+                    performanceMatrixHtml += "</tr>";
+                }
+                performanceMatrixHtml += "</tbody>";
+                //End Bind Table Rows
+                performanceMatrixHtml += "</table>";
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DataTable, performanceMatrixHtml, html);
+            }
+            else
+            {
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DataTable, "No Record Found", html);
+            }
             return html;
         }
     }

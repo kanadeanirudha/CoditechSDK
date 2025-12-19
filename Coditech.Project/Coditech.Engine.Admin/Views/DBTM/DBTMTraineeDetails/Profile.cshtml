@@ -16,9 +16,9 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">User Profile</h4>
 
-                        @* <button type="button" class="btn btn-success" onclick="DBTMTraineeDetails.DownloadAthleteReportPdf(@Model.DBTMTraineeDetailId,'@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))')">
-                            <i class="fa fa-download"></i> Download PDF
-                        </button> *@
+                         <button type="button" class="btn btn-success" onclick="DBTMTraineeDetails.DownloadAthleteReportPdf(@Model.DBTMTraineeDetailId,'@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))')">
+                        <i class="fa fa-download"></i> Download PDF
+                        </button>
                     </div>
 
                     <div class="card-body">
@@ -135,15 +135,7 @@
                                         <tr>
                                             @foreach (var matrix in traineeProfilePerformanceList.Keys)
                                             {
-                                                <th colspan="2" class="text-center" style="background-color: #f2f2f2;">
-                                                    @matrix
-                                                </th>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            @foreach (var matrix in traineeProfilePerformanceList.Keys)
-                                            {
-                                                <th class="text-center">Activity/Test</th>
+                                                <th class="text-center">@matrix</th>
                                                 <th class="text-center">Score</th>
                                             }
                                         </tr>
@@ -151,7 +143,6 @@
                                     <tbody>
                                         @{
                                             int maxRows = traineeProfilePerformanceList.Values.Max(g => g.Count);
-
                                             for (int i = 0; i < maxRows; i++)
                                             {
                                                 <tr>
