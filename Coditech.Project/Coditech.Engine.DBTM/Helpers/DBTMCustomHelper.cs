@@ -156,6 +156,15 @@ namespace Coditech.Engine.DBTM.Helpers
                     decimal totalJumpLength = group.Where(x => x.ParameterCode == CustomConstants.JumpLength).Sum(x => x.ParameterValue);
                     result = totalJumpLength > 0 ? $"{Math.Round(totalJumpLength / recurtion, CustomConstants.GraphListRoundUpValue)}" : "0";
                     break;
+                case CustomConstants.TotalCount:
+                    decimal totalCount = group.Where(x => x.ParameterCode == CustomConstants.Count).Sum(x => x.ParameterValue);
+                    result = $"{Convert.ToInt32(totalCount)}";
+                    break;
+                case CustomConstants.CountByTime:
+                    decimal count = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Count && x.Row == recurtion).ParameterValue;
+                    time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
+                    result = time != 0 && count != 0 ? $"{Math.Round(count/ time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+                    break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }

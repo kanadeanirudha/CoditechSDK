@@ -914,6 +914,11 @@ namespace Coditech.API.Service
                         {
                             rowValue = group.FirstOrDefault(x => x.ParameterCode == spilt[0] && x.Row == Convert.ToInt16(spilt[1]))?.ParameterValue.ToString();
                         }
+
+                        if (!string.IsNullOrEmpty(rowValue) && spilt[0] == CustomConstants.Count)
+                        {
+                            rowValue = Math.Truncate(Convert.ToDecimal(rowValue)).ToString();
+                        }
                     }
                 }
                 newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
