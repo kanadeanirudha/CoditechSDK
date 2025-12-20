@@ -17,6 +17,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
@@ -32,6 +33,7 @@ namespace Coditech.API.Service
             _coditechLogging = coditechLogging;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -224,6 +226,16 @@ namespace Coditech.API.Service
                 {
                     joiningCodeDetails.IsExpired = true;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
+                    if (dBTMCustomNewRegistrationModel.GeneralBatchMasterId > 0)
+                    {
+                        GeneralBatchUser generalBatchUser = new GeneralBatchUser()
+                        {
+                            GeneralBatchMasterId = dBTMCustomNewRegistrationModel.GeneralBatchMasterId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                            EntityId = generalPersonModel.EntityId,
+                        };
+                        _generalBatchUserRepository.Insert(generalBatchUser);
+                    }
                 }
                 else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
