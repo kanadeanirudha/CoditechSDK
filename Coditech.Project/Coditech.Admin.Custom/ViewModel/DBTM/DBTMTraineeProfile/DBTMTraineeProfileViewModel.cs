@@ -25,5 +25,7 @@ namespace Coditech.Admin.ViewModel
         public DateTime? WeekelyHours { get; set; }
         public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; } = new List<DBTMTraineeProfilePerformanceModel>();
         public string Remarks { get; set; }
+        public string SelectedCentreCode { get; set; }
+        public string SelectedParameter1 { get; set; }
     }
 }

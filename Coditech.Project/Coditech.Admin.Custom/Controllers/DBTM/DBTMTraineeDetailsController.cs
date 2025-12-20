@@ -602,7 +602,15 @@ namespace Coditech.Admin.Controllers
                 return Json(new { success = false, message = "Profile not found." });
             }
             return Json(new { success = true });
-        }     
+        }
+
+        [HttpGet]
+        public ActionResult GetRemarksPopup(long dBTMTraineeDetailId, string remarks)
+        {
+            ViewBag.TraineeId = dBTMTraineeDetailId;
+            ViewBag.Remarks = remarks;
+            return PartialView("~/Views/DBTM/DBTMTraineeDetails/_RemarksPopup.cshtml");
+        }
 
         [HttpGet]
         public ActionResult DownloadAthleteReportPdf(long dBTMTraineeDetailId,string remarks)
@@ -610,7 +618,6 @@ namespace Coditech.Admin.Controllers
             DBTMTraineeProfileViewModel profile = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
             if (profile == null)
                 return Content("Athlete profile not found.");
-            remarks = "Excellent";
             var report = _dBTMTraineeDetailsAgent.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
             byte[] bytes = System.IO.File.ReadAllBytes(report.FilePath);
             System.IO.File.Delete(report.FilePath);

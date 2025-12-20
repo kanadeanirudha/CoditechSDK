@@ -148,4 +148,33 @@
             }
         });
     },
+
+    GetRemarks: function (contentId, dBTMTraineeDetailId, remarks) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetRemarksPopup",
+            data: { dBTMTraineeDetailId: dBTMTraineeDetailId, remarks: remarks },
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+
+    ConfirmDownloadPdf: function (traineeId) {
+        var remarks = $("#RemarksText").val() || "";
+        $("#RemarkPopupId").modal("hide");
+        DBTMTraineeDetails.DownloadAthleteReportPdf(
+            traineeId,
+            remarks
+        );
+    },
 }
