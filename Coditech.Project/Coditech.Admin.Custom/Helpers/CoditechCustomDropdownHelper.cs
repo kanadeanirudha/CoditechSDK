@@ -86,6 +86,14 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMPerformanceMatrix(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DisplayOn.ToString()))
+            {
+                GetDisplayOn(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.GraphMode.ToString()))
+            {
+                GetGraphMode(dropdownViewModel, dropdownList);
+            }
 
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
@@ -203,9 +211,15 @@ namespace Coditech.Admin.Helpers
             else
                 dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
             DBTMTestListModel list = new DBTMTestListModel { DBTMTestList = response.DBTMTestList };
-            foreach (var item in list.DBTMTestList.OrderBy(x => x.TestName))
+            bool isActive = !string.IsNullOrEmpty(dropdownViewModel.Parameter)
+                                && dropdownViewModel.Parameter.Equals("IsActive", StringComparison.OrdinalIgnoreCase);
+
+            if (isActive)
+                list.DBTMTestList = list.DBTMTestList.Where(x => x.IsActive).ToList();
+
+            foreach (var item in list?.DBTMTestList.OrderBy(x => x.PerformanceMatrix ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
             {
-                if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && Convert.ToInt16(dropdownViewModel.Parameter) > 0 && item.DBTMTestMasterId == Convert.ToInt16(dropdownViewModel.Parameter))
+                if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && short.TryParse(dropdownViewModel.Parameter, out short excludeId) && item.DBTMTestMasterId == excludeId)
                 {
                     continue;
                 }
@@ -264,7 +278,7 @@ namespace Coditech.Admin.Helpers
 
                 DBTMBatchActivityListResponse response = new DBTMBatchActivityClient().GetDBTMBatchActivityList(generalBatchMasterId, isAssociated, null, null, null, 1, int.MaxValue);
                 DBTMBatchActivityListModel list = new DBTMBatchActivityListModel() { DBTMBatchActivityList = response.DBTMBatchActivityList };
-                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.TestName))
+                foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.PerformanceMatrix ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
@@ -369,8 +383,9 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string joiningCode = (dropdownViewModel.Parameter);
+                long generalTrainerMasterId = 0;
 
-                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
                 DBTMNewRegistrationListModel list = new DBTMNewRegistrationListModel() { DBTMNewRegistrationList = response.DBTMNewRegistrationList };
                 foreach (var item in list?.DBTMNewRegistrationList.OrderBy(x => x.FirstName))
                 {
@@ -392,15 +407,21 @@ namespace Coditech.Admin.Helpers
 
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
-                int dBTMTestMasterId = Convert.ToInt32(dropdownViewModel.Parameter);
+                var parameters = dropdownViewModel.Parameter.Split('|');
+                int dBTMTestMasterId = Convert.ToInt32(parameters[0]);
+                string graphMode = parameters.Length > 1 ? parameters[1] : string.Empty;
 
-                DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                DBTMGraphMasterListResponse response = new DBTMTestClient().DBTMGraphByDBTMTestMasterId(dBTMTestMasterId, graphMode);
                 DBTMGraphMasterListModel list = new DBTMGraphMasterListModel() { DBTMGraphMasterList = response.DBTMGraphMasterList };
-                foreach (var item in list?.DBTMGraphMasterList.OrderBy(x => x.GraphName))
+                var filteredList = string.IsNullOrEmpty(graphMode)
+                    ? list.DBTMGraphMasterList
+                    : list.DBTMGraphMasterList.Where(x => x.GraphMode == graphMode).ToList();
+
+                foreach (var item in filteredList.OrderBy(x => x.GraphName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
-                        Text = $"{item.GraphName}",
+                        Text = item.GraphName,
                         Value = item.DBTMGraphMasterId.ToString(),
                         Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMGraphMasterId)
                     });
@@ -484,6 +505,45 @@ namespace Coditech.Admin.Helpers
                     });
                 }
             }
+        }
+        private static void GetDisplayOn(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Both",
+                Value = "Both",
+                Selected = "Both" == dropdownViewModel.DropdownSelectedValue
+            });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Only Web",
+                Value = "OnlyWeb",
+                Selected = "OnlyWeb" == dropdownViewModel.DropdownSelectedValue
+            });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Only Mobile App",
+                Value = "OnlyMobileApp",
+                Selected = "OnlyMobileApp" == dropdownViewModel.DropdownSelectedValue
+            });
+        }
+        private static void GetGraphMode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Instantaneous Chart",
+                Value = "InstantaneousChart",
+                Selected = "InstantaneousChart" == dropdownViewModel.DropdownSelectedValue
+            });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Progress Chart",
+                Value = "ProgressChart",
+                Selected = "ProgressChart" == dropdownViewModel.DropdownSelectedValue
+            });
         }
     }
 }

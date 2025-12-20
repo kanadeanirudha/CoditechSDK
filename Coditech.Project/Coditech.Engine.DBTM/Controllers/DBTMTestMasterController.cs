@@ -186,11 +186,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTestMaster/GetDBTMGraph")]
         [Produces(typeof(DBTMGraphMasterListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMGraph()
+        public virtual IActionResult GetDBTMGraph(int dBTMTestMasterId)
         {
             try
             {
-                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraph();
+                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraph(dBTMTestMasterId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMGraphMasterListResponse>(data) : CreateNoContentResponse();
             }
@@ -208,11 +208,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTestMaster/DBTMGraphByDBTMTestMasterId")]
         [HttpGet]
         [Produces(typeof(DBTMGraphMasterListResponse))]
-        public virtual IActionResult GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public virtual IActionResult GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             try
             {
-                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId);
+                DBTMGraphMasterListModel list = _dBTMTestMasterService.GetDBTMGraphByDBTMTestMasterId(dBTMTestMasterId, graphMode);
                 return IsNotNull(list) ? CreateOKResponse(new DBTMGraphMasterListResponse { DBTMGraphMasterList = list.DBTMGraphMasterList }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -247,6 +247,140 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMPerformanceMatrix", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMPerformanceMatrixListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetActivityListViewSequenceList")]
+        [Produces(typeof(DBTMActivityListViewSequenceListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceListModel list = _dBTMTestMasterService.GetActivityListViewSequenceList(dBTMTestMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMActivityListViewSequenceListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/GetActivityListViewSequence")]
+        [HttpGet]
+        [Produces(typeof(DBTMActivityListViewSequenceResponse))]
+        public virtual IActionResult GetActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceModel dBTMTestModel = _dBTMTestMasterService.GetActivityListViewSequence(dBTMTestParameterListViewSequenceId);
+                return IsNotNull(dBTMTestModel) ? CreateOKResponse(new DBTMActivityListViewSequenceResponse { DBTMActivityListViewSequenceModel = dBTMTestModel }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/UpdateActivityListViewSequence")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMActivityListViewSequenceResponse))]
+        public virtual IActionResult UpdateActivityListViewSequence([FromBody] DBTMActivityListViewSequenceModel model)
+        {
+            try
+            {
+                bool isUpdated = _dBTMTestMasterService.UpdateActivityListViewSequence(model);
+                return isUpdated ? CreateOKResponse(new DBTMActivityListViewSequenceResponse { DBTMActivityListViewSequenceModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/DeleteActivityListViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult DeleteActivityListViewSequence([FromBody] ParameterModel dBTMTestMasterIds)
+        {
+            try
+            {
+                bool deleted = _dBTMTestMasterService.DeleteActivityListViewSequence(dBTMTestMasterIds);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/UpdateSequenceNumber")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMActivityListViewSequenceResponse))]
+        public virtual IActionResult UpdateSequenceNumber([FromBody] DBTMActivityListViewSequenceModel model)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceModel activityListViewSequence = _dBTMTestMasterService.UpdateSequenceNumber(model);
+                return IsNotNull(activityListViewSequence) ? CreateCreatedResponse(new DBTMActivityListViewSequenceResponse { DBTMActivityListViewSequenceModel = activityListViewSequence }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GymWorkoutPlan", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GymWorkoutPlan", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/CreateActivityListViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMActivityListViewSequenceResponse))]
+        public virtual IActionResult CreateActivityListViewSequence([FromBody] DBTMActivityListViewSequenceModel model)
+        {
+            try
+            {
+                DBTMActivityListViewSequenceModel dBTMActivityListViewSequence = _dBTMTestMasterService.CreateActivityListViewSequence(model);
+                return IsNotNull(dBTMActivityListViewSequence) ? CreateCreatedResponse(new DBTMActivityListViewSequenceResponse { DBTMActivityListViewSequenceModel = dBTMActivityListViewSequence }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

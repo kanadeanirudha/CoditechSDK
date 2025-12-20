@@ -16,6 +16,7 @@ namespace Coditech.API.Service
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
+        private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMActivityListViewSequenceMasterRepository;
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
@@ -29,6 +30,7 @@ namespace Coditech.API.Service
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMActivityListViewSequenceMasterRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -339,21 +341,32 @@ namespace Coditech.API.Service
             };
             return list;
         }
-        public virtual DBTMGraphMasterListModel GetDBTMGraph()
+
+        public virtual DBTMGraphMasterListModel GetDBTMGraph(int dBTMTestMasterId)
         {
-            DBTMGraphMasterListModel list = new DBTMGraphMasterListModel
+            string testCode = dBTMTestMasterId.ToString();
+            var graphList = _dBTMGraphMasterRepository.Table
+                            .Where(g => ("," + g.TestCode + ",").Contains("," + testCode + ","))
+                            .Select(g => new DBTMGraphMasterModel
+                            {
+                                DBTMGraphMasterId = g.DBTMGraphMasterId,
+                                GraphName = g.GraphName,
+                                GraphCode = g.GraphCode,
+                                GraphMode = g.GraphMode,
+                                GraphType = g.GraphType,
+                                IsActive = g.IsActive,
+                                OrderBy = g.OrderBy
+                            })
+                            .OrderBy(g => g.OrderBy)
+                            .ToList();
+
+            return new DBTMGraphMasterListModel
             {
-                DBTMGraphMasterList = (from a in _dBTMGraphMasterRepository.Table
-                                       select new DBTMGraphMasterModel
-                                       {
-                                           DBTMGraphMasterId = a.DBTMGraphMasterId,
-                                           GraphName = a.GraphName,
-                                           GraphCode = a.GraphCode,
-                                       }).ToList()
+                DBTMGraphMasterList = graphList
             };
-            return list;
         }
-        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+
+        public virtual DBTMGraphMasterListModel GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
             var graphList = (from a in _dBTMTestGraphRepository.Table
                              join b in _dBTMGraphMasterRepository.Table
@@ -363,14 +376,26 @@ namespace Coditech.API.Service
                              {
                                  DBTMGraphMasterId = b.DBTMGraphMasterId,
                                  GraphName = b.GraphName,
-                                 GraphCode = b.GraphCode
+                                 GraphCode = b.GraphCode,
+                                 GraphMode = b.GraphMode,
+                                 GraphType = b.GraphType
                              })
                              .Distinct()
                              .ToList();
 
+            if (!string.IsNullOrEmpty(graphMode))
+            {
+                graphList = graphList.Where(x => x.GraphMode == graphMode).ToList();
+            }
+
+            var graphListResult = graphList
+                .Distinct()
+                .OrderBy(x => x.GraphName)
+                .ToList();
+
             return new DBTMGraphMasterListModel
             {
-                DBTMGraphMasterList = graphList
+                DBTMGraphMasterList = graphListResult
             };
         }
         public virtual DBTMPerformanceMatrixListModel GetDBTMPerformanceMatrixList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -387,11 +412,149 @@ namespace Coditech.API.Service
             return list;
         }
 
+        //Get GetActivityListViewSequence by dBTMTestMasterId.
+        public virtual DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        {
+            List<DBTMTestParameterListViewSequence> activityList = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).OrderBy(x => x.SequenceNumber).ToList();
+
+            // Map the entities to the DBTMActivityListViewSequenceModel list
+            List<DBTMActivityListViewSequenceModel> activityViewSequenceList = activityList.Select(x => new DBTMActivityListViewSequenceModel
+            {
+                DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
+                DBTMTestMasterId = x.DBTMTestMasterId,
+                ParameterCode = x.ParameterCode ?? string.Empty,
+                IsCalculatedParameter = x.IsCalculatedParameter,
+                Recursion = x.Recursion,
+                SequenceNumber = x.SequenceNumber,
+                ConsecutiveParameterCode = x.ConsecutiveParameterCode ?? string.Empty,
+                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode ?? false,
+                ColumnName = x.ColumnName ?? string.Empty,
+                HelpText = x.HelpText ?? string.Empty,
+                IsActive = x.IsActive,
+                DisplayOn = x.DisplayOn ?? string.Empty,
+                ColumnCellColor = x.ColumnCellColor ?? string.Empty,
+                IsColumnCellBold = x.IsColumnCellBold ?? false
+            }).ToList();
+
+            DBTMActivityListViewSequenceListModel listModel = new DBTMActivityListViewSequenceListModel
+            {
+                DBTMActivityListViewSequenceList = activityViewSequenceList,
+                DBTMTestMasterId = dBTMTestMasterId
+            };
+            if (dBTMTestMasterId > 0)
+            {
+                listModel.TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault();
+            }
+            listModel.DBTMTestMasterId = dBTMTestMasterId;
+            return listModel;
+        }
+
+        public virtual DBTMActivityListViewSequenceModel GetActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            if (dBTMTestParameterListViewSequenceId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterListViewSequenceId"));
+
+            //Get the DBTMTest Details based on id.
+            DBTMTestParameterListViewSequence dBTMTestMaster = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestParameterListViewSequenceId == dBTMTestParameterListViewSequenceId)?.FirstOrDefault();
+            DBTMActivityListViewSequenceModel dBTMTestModel = dBTMTestMaster?.FromEntityToModel<DBTMActivityListViewSequenceModel>();
+            return dBTMTestModel;
+        }
+
+        //Update ActivityListViewSequence
+
+        public virtual bool UpdateActivityListViewSequence(DBTMActivityListViewSequenceModel dBTMTestModel)
+        {
+            if (IsNull(dBTMTestModel))
+                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
+
+            if (dBTMTestModel.DBTMTestParameterListViewSequenceId < 1)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterListViewSequenceId"));
+
+            DBTMTestParameterListViewSequence dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestParameterListViewSequence>();
+
+            //Update DBTMTest
+            bool isdBTMTestUpdated = _dBTMActivityListViewSequenceMasterRepository.Update(dBTMTestMaster);
+            if (!isdBTMTestUpdated)
+            {
+                dBTMTestModel.HasError = true;
+                dBTMTestModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
+            }
+            return isdBTMTestUpdated;
+        }
+
+        public virtual DBTMActivityListViewSequenceModel UpdateSequenceNumber(DBTMActivityListViewSequenceModel dBTMActivityListViewSequenceModel)
+        {
+            if (IsNull(dBTMActivityListViewSequenceModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            if (dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList == null ||
+                !dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList.Any())
+                return dBTMActivityListViewSequenceModel;
+
+            foreach (var updatedItem in dBTMActivityListViewSequenceModel.DBTMActivityListViewSequenceList)
+            {
+                var existing = _dBTMActivityListViewSequenceMasterRepository.Table
+                    .FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == updatedItem.DBTMTestParameterListViewSequenceId);
+
+                if (existing != null)
+                {
+                    existing.SequenceNumber = updatedItem.SequenceNumber;
+                    existing.ModifiedDate = DateTime.Now;
+                    _dBTMActivityListViewSequenceMasterRepository.Update(existing);
+                }
+            }
+
+            return dBTMActivityListViewSequenceModel;
+        }
+
+        //Create Activity List View Sequence.
+        public virtual DBTMActivityListViewSequenceModel CreateActivityListViewSequence(DBTMActivityListViewSequenceModel dBTMActivityListViewSequenceModel)
+        {
+            if (IsNull(dBTMActivityListViewSequenceModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            //if (IsParameterCodeAlreadyExist(dBTMActivityListViewSequenceModel.ParameterCode))
+            //    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Parameter Code"));
+
+            DBTMTestParameterListViewSequence dBTMTestParameterListViewSequence = dBTMActivityListViewSequenceModel.FromModelToEntity<DBTMTestParameterListViewSequence>();
+
+            //Create new DBTM Activity List View Sequence and return it.
+            DBTMTestParameterListViewSequence dBTMTestParameterListViewSequenceData = _dBTMActivityListViewSequenceMasterRepository.Insert(dBTMTestParameterListViewSequence);
+            if (dBTMTestParameterListViewSequenceData?.DBTMTestParameterListViewSequenceId > 0)
+            {
+                dBTMActivityListViewSequenceModel.DBTMTestParameterListViewSequenceId = dBTMTestParameterListViewSequenceData.DBTMTestParameterListViewSequenceId;
+            }
+            else
+            {
+                dBTMActivityListViewSequenceModel.HasError = true;
+                dBTMActivityListViewSequenceModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return dBTMActivityListViewSequenceModel;
+        }
+
+        //Delete DBTMActivityListViewSequence.
+        public virtual bool DeleteActivityListViewSequence(ParameterModel parameterModel)
+        {
+            if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterListViewSequenceId"));
+
+            CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("DBTMTestParameterListViewSequenceId", parameterModel.Ids, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+            int status = 0;
+            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMActivityListViewSequence @DBTMTestParameterListViewSequenceId,  @Status OUT", 1, out status);
+
+            return status == 1 ? true : false;
+        }
 
         #region Protected Method
         // Check if Test Name is already present or not.
         protected virtual bool IsDBTMTestNameAlreadyExist(string testCode, int dBTMTestMasterId = 0)
             => _dBTMTestMasterRepository.Table.Any(x => x.TestCode == testCode && (x.DBTMTestMasterId != dBTMTestMasterId || dBTMTestMasterId == 0));
+
+        //Check if Parameter Code is already present or not.
+        protected virtual bool IsParameterCodeAlreadyExist(string parameterCode, int dBTMTestParameterListViewSequenceId = 0)
+        => _dBTMActivityListViewSequenceMasterRepository.Table.Any(x => x.ParameterCode == parameterCode && (x.DBTMTestParameterListViewSequenceId != dBTMTestParameterListViewSequenceId || dBTMTestParameterListViewSequenceId == 0));
         #endregion
     }
 }

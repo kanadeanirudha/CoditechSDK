@@ -4,7 +4,8 @@
     // DropdownViewModel countryDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Country.ToString(), DropdownName = "GeneralCountryMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetRegionListByCountryId()" };
     // DropdownViewModel regionDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Region.ToString(), DropdownName = "GeneralRegionMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralRegionMasterId), Parameter = Convert.ToString(Model.GeneralCountryMasterId), ChangeEvent = $"CoditechCommon.GetCityListByRegionId()" };
     // DropdownViewModel cityDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.City.ToString(), DropdownName = "GeneralCityMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralCityMasterId), Parameter = Convert.ToString(Model.GeneralRegionMasterId) };
-    ModelPopUpViewModel termsAndConditionsModel = new ModelPopUpViewModel() { ModelPopUpId = "AddTermsAndConditionsModelPopupId", ModalContentId = "AddTermsAndConditionsContentId" }; 
+    ModelPopUpViewModel termsAndConditionsModel = new ModelPopUpViewModel() { ModelPopUpId = "AddTermsAndConditionsModelPopupId", ModalContentId = "AddTermsAndConditionsContentId" };
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 }
 @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
 {
@@ -94,7 +95,7 @@
         <div class="col-lg-6">
             <div class="mb-3">
                 <label class="form-label required" for="EmailId">Email Address</label>
-                @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control" })
+                @Html.TextBoxFor(x => x.EmailId, new { @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
                 @Html.ValidationMessageFor(x => x.EmailId)
             </div>
         </div>
@@ -166,7 +167,7 @@
                 </div>
             </div>
         </div>
-       @*  <div class="col-lg-6">
+        @*  <div class="col-lg-6">
             <div class="mb-3">
                 @Html.LabelFor(x => x.AddressLine1, new { @class = "form-label required" })
                 @Html.TextAreaFor(x => x.AddressLine1, new { @class = "form-control" })
@@ -208,28 +209,33 @@
                 @Html.ValidationMessageFor(x => x.Pincode)
             </div>
         </div> *@
-        <div class="col-lg-6">
-            <div class="form-group mb-3">
-                @Html.LabelFor(x => x.Password, new { @class = "form-label required" })
-                <div class="input-group password-input-wraper">
-                    @Html.TextBoxFor(x => x.Password, new { @class = "form-control password-input", type = "password", placeholder = "Password" })
-                    <i class="fas fa-eye view-password"></i>
+        @if (userModel == null)  // means new user, no existing data
+        {
+            <div class="col-lg-6">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(x => x.Password, new { @class = "form-label required" })
+                    <div class="input-group password-input-wraper">
+                        @Html.TextBoxFor(x => x.Password, new { @class = "form-control password-input", type = "password", placeholder = "Password" })
+                        <i class="fas fa-eye view-password"></i>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, null)
+                    @Html.ValidationMessageFor(m => m.ErrorMessage, null)
                 </div>
-                @Html.ValidationMessageFor(m => m.Password, null)
-                @Html.ValidationMessageFor(m => m.ErrorMessage, null)
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="form-group mb-3">
-                @Html.LabelFor(x => x.ConfirmPassword, new { @class = "form-label required" })
-                <div class="input-group password-input-wraper">
-                    @Html.TextBoxFor(x => x.ConfirmPassword, new { @class = "form-control password-input", type = "password", placeholder = "Confirm Password" })
-                    <i class="fas fa-eye view-password"></i>
+
+            <div class="col-lg-6">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(x => x.ConfirmPassword, new { @class = "form-label required" })
+                    <div class="input-group password-input-wraper">
+                        @Html.TextBoxFor(x => x.ConfirmPassword, new { @class = "form-control password-input", type = "password", placeholder = "Confirm Password" })
+                        <i class="fas fa-eye view-password"></i>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, null)
+                    @Html.ValidationMessageFor(m => m.ErrorMessage, null)
                 </div>
-                @Html.ValidationMessageFor(m => m.ConfirmPassword, null)
-                @Html.ValidationMessageFor(m => m.ErrorMessage, null)
             </div>
-        </div>
+        }
+
         <div class="col-lg-6">
             <div class="mb-3">
                 <div class="form-check">

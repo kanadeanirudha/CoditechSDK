@@ -29,6 +29,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMActivityCategory> _dBTMActivityCategoryRepository;
+        private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
 
 
         public DBTMApiService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -49,6 +50,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMActivityCategoryRepository = new CoditechRepository<DBTMActivityCategory>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public bool InsertDeviceDataViaFile(IFormFile file)
@@ -79,7 +81,7 @@ namespace Coditech.API.Service
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
                     createdDate = DateTime.Now;
-                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails() ;
+                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails();
                     if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
                         dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
 
@@ -117,12 +119,25 @@ namespace Coditech.API.Service
                                 ParameterValue = item.ParameterValue,
                                 FromTo = item.FromTo,
                                 Row = item.Row,
+                                Unit = item.Unit,
+                                Comment1 = item.Comment1,
+                                Comment2 = item.Comment2,
+                                Comment3 = item.Comment3,
                                 CreatedBy = dBTMDeviceDataModel.CreatedBy,
                                 CreatedDate = createdDate
                             };
                             dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
                         }
-                        _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
+                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
+                        if (data != null || data.Count() > 0)
+                        {
+                            int statusOutput = 0;
+                            CoditechViewRepository<DBTMDeviceDataModel> objStoredProc = new CoditechViewRepository<DBTMDeviceDataModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+                            objStoredProc.SetParameter("@TestCode", DBTMDeviceDataDetails.TestCode, ParameterDirection.Input, DbType.String);
+                            objStoredProc.SetParameter("@DBTMDeviceDataId", DBTMDeviceDataDetails.DBTMDeviceDataId, ParameterDirection.Input, DbType.Int64);
+                            objStoredProc.SetParameter("@Status", statusOutput, ParameterDirection.Output, DbType.Int32);
+                            objStoredProc.ExecuteStoredProcedureList("Coditech_DBTMUpdateDeviceData @TestCode,@DBTMDeviceDataId,@Status OUT", 2, out statusOutput);
+                        }
                     }
                 }
 
@@ -175,7 +190,7 @@ namespace Coditech.API.Service
                                 BatchName = b.BatchName,
                                 BatchStartTime = b.BatchStartTime,
                             })
-                            .ToList();
+                             .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
                     }
                     else
                     {
@@ -193,7 +208,7 @@ namespace Coditech.API.Service
                                        BatchName = u.EntityId == entityId ? $"{b.BatchName}(Self)" : $"{b.BatchName}({u.FirstName} {u.LastName})",
                                        BatchStartTime = b.BatchStartTime,
                                    })
-                                   .ToList();
+                                   .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
                 }
                 else
                 {
@@ -327,6 +342,19 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
+
+        public string GetJoiningCode(string generalTrainerMasterId)
+        {
+            string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired)?.Select(y => y.JoiningCode)?.FirstOrDefault();
+            return !string.IsNullOrEmpty(JoiningCode) ? JoiningCode : string.Empty;
+        }
+        public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)
+        {
+            string joiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.CentreCode == centreCode && x.JoiningCodeTypeEnumId == joiningCodeTypeEnumId && !x.IsExpired).Select(x => x.JoiningCode).FirstOrDefault();
+
+            return joiningCode ?? string.Empty;
+        }
+
         private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)
             => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
     }

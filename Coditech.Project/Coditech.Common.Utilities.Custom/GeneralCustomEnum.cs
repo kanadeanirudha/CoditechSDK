@@ -23,6 +23,8 @@
         DBTMPerformanceMatrix,
         BatchWiseMultiReports,
         DBTMTrainerCentrewise,
+        DisplayOn,
+        GraphMode,
     }
     public enum DashboardFormCustomEnum
     {
@@ -43,6 +45,7 @@
         DBTMTraineeRegistration,
         SendAssignmentReminder,
         DBTMSendPendingAssignmentReminder,
+        TraineeReportTemplate,
     }
 
     public enum LogComponentCustomEnum

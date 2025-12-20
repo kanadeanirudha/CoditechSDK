@@ -1,4 +1,5 @@
-﻿using Coditech.Common.API.Model;
+﻿using Coditech.API.Data;
+using Coditech.Common.API.Model;
 
 namespace Coditech.API.Service
 {
@@ -7,6 +8,6 @@ namespace Coditech.API.Service
         DBTMUserModel Login(UserLoginModel model);
         DBTMUserModel UpdateAdditionalInformation(DBTMUserModel dbtmUserModel);
         DBTMUserModel GetDBTMTraineeDetails(long entityId, string userType);
-        DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode);
+        DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId);
     }
 }

@@ -7,15 +7,20 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
+using System;
 using System.Collections.Specialized;
 using System.Data;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using static Coditech.Common.Helper.HelperUtility;
+using Twilio.Converters;
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
+        private readonly IDBTMReportsService _dBTMReportsService;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
@@ -24,11 +29,16 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
+        private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        private readonly IConverter _converter;
 
-        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
+        public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
+            _dBTMReportsService = dBTMReportsService;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -37,6 +47,10 @@ namespace Coditech.API.Service
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _converter = converter;
         }
 
         public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -109,7 +123,6 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.GroupEnumId = dBTMTraineeDetailsModel.GroupEnumId;
             dBTMTraineeDetails.SourceEnumId = dBTMTraineeDetailsModel.SourceEnumId;
             dBTMTraineeDetails.OtherInformation = dBTMTraineeDetailsModel.OtherInformation;
-            dBTMTraineeDetails.IsActive = dBTMTraineeDetailsModel.IsActive;
             dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
             dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
             dBTMTraineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
@@ -176,90 +189,61 @@ namespace Coditech.API.Service
             listModel.PersonCode = personCode;
             return listModel;
         }
-        public DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+
+        public DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
-            //Bind the Filter, sorts & Paging details.
-            PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
-            CoditechViewRepository<DBTMActivitiesDetailsModel> objStoredProc = new CoditechViewRepository<DBTMActivitiesDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@DBTMDeviceDataId", dBTMDeviceDataId, ParameterDirection.Input, DbType.Int64);
-            objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceDataDetailsList @DBTMDeviceDataId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
             DBTMActivitiesDetailsListModel listModel = new DBTMActivitiesDetailsListModel();
 
-            listModel.BindPageListModel(pageListModel);
-            if (dBTMActivitiesDetailsList?.Count > 0)
+            DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();
+
+            if (IsNull(dBTMDeviceData))
+                return listModel;
+
+            DateTime activityDate = (dBTMDeviceData.CreatedDate ?? dBTMDeviceData.TestPerformedTime);
+
+            long traineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode).Select(y => y.DBTMTraineeDetailId).FirstOrDefault();
+
+            if (IsNull(traineeDetailId))
+                return listModel;
+
+            DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.FirstOrDefault(x => x.TestCode == dBTMDeviceData.TestCode);
+
+            if (IsNull(dBTMTestMaster))
+                return listModel;
+
+            GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType(traineeDetailId, UserTypeEnum.Trainee.ToString());
+
+            if (IsNotNull(generalPersonModel))
             {
-                DBTMDeviceData dBTMDeviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId)?.FirstOrDefault();
-                long? dBTMTraineeDetailId = _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == dBTMDeviceData.PersonCode)?.Select(y => y.DBTMTraineeDetailId)?.FirstOrDefault();
-
-                if (dBTMTraineeDetailId > 0)
-                {
-                    GeneralPersonModel generalPersonModel = GetDBTMGeneralPersonDetailsByEntityType((int)dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString());
-                    if (IsNotNull(generalPersonModel))
-                    {
-                        listModel.FirstName = generalPersonModel.FirstName;
-                        listModel.LastName = generalPersonModel.LastName;
-                        listModel.PersonCode = dBTMDeviceData.PersonCode;
-                    }
-                    DBTMTestMaster dBTMTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == dBTMDeviceData.TestCode).FirstOrDefault();
-
-                    if (dBTMTestMaster != null)
-                    {
-                        listModel.TestName = dBTMTestMaster.TestName;
-                        var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
-                                              join b in _dBTMTestParameterRepository.Table
-                                              on a.DBTMTestParameterId equals b.DBTMTestParameterId
-                                              where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId && a.IsActive
-                                              select new
-                                              {
-                                                  b.ParameterName,
-                                                  b.ParameterCode
-                                              })?.Distinct()?.ToList();
-
-                        DataRow newRow = listModel.DataTable.NewRow();
-                        foreach (var item in dBTMActivitiesDetailsList)
-                        {
-                            string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
-                            if (!string.IsNullOrEmpty(parameterName))
-                            {
-                                string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
-                                listModel.DataTable.Columns.Add(columnName, typeof(String));
-                                newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
-                            }
-                        }
-
-                        var calculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
-                                                  join b in _dBTMTestCalculationRepository.Table
-                                                  on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
-                                                  where a.DBTMTestMasterId == dBTMTestMaster.DBTMTestMasterId
-                                                  orderby b.OrderBy ascending
-                                                  select new { b.CalculationName, b.CalculationCode })?.Distinct()?.ToList();
-                        foreach (var item in calculationColumns)
-                        {
-                            listModel.DataTable.Columns.Add(item.CalculationName, typeof(String));
-                            Calculation(item.CalculationCode, item.CalculationName, newRow, dBTMActivitiesDetailsList);
-                        }
-                        listModel.DataTable.Rows.Add(newRow);
-                    }
-                }
+                listModel.FirstName = generalPersonModel.FirstName;
+                listModel.LastName = generalPersonModel.LastName;
+                listModel.PersonCode = generalPersonModel.PersonCode;
             }
+
+            DBTMReportsListModel report = _dBTMReportsService.TestWiseMultipleReports(dBTMTestMaster.DBTMTestMasterId.ToString(), traineeDetailId, activityDate, activityDate, entityId, userType, centreCode, false, false);
+
+            listModel.DataTable = report.DataTable;
+            listModel.TestName = dBTMTestMaster.TestName;
+            listModel.PersonCode = dBTMDeviceData.PersonCode;
+            listModel.DataTable = report.DataTableList?.FirstOrDefault().Value;
+
             return listModel;
         }
+
         //Get ProfileDetails
         public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
-            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate,x.Weight }).FirstOrDefault();
+            var dBTMTraineeDetailsData = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId).Select(x => new { x.PersonId, x.SpecializationEnumId, x.CreatedDate, x.Weight, x.Height, x.CentreCode }).FirstOrDefault();
             if (dBTMTraineeDetailsData == null)
                 return null;
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = new DBTMTraineeProfileModel
+            {
+                DBTMTraineeDetailId = dBTMTraineeDetailId
+            };
             if (dBTMTraineeProfileModel == null)
                 return null;
 
@@ -273,22 +257,122 @@ namespace Coditech.API.Service
                 dBTMTraineeProfileModel.DateOfBirth = generalPersonModel.DateOfBirth;
                 dBTMTraineeProfileModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
                 dBTMTraineeProfileModel.Weight = dBTMTraineeDetailsData.Weight;
+                dBTMTraineeProfileModel.Height = dBTMTraineeDetailsData.Height;
+                dBTMTraineeProfileModel.CentreCode = dBTMTraineeDetailsData.CentreCode;
             }
 
             dBTMTraineeProfileModel.Specialization = GetEnumDisplayTextByEnumId(Convert.ToInt32(dBTMTraineeDetailsData.SpecializationEnumId));
             dBTMTraineeProfileModel.DateOfJoining = dBTMTraineeDetailsData.CreatedDate;
-            
-
 
             // Use ternary for brevity
             dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
                 ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
                 : "N/A";
 
-            CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<Coditech_Entities>());
+            var trainerName = (from gtat in _generalTraineeAssociatedToTrainerRepository.Table
+                               join gtm in _generalTrainerMasterRepository.Table
+                                   on gtat.GeneralTrainerMasterId equals gtm.GeneralTrainerMasterId
+                               join um in _userMasterRepository.Table
+                                   on gtm.EmployeeId equals um.EntityId
+                               where gtat.EntityId == dBTMTraineeDetailId
+                                     && gtat.UserType == UserTypeEnum.Trainee.ToString()
+                                     && gtat.IsCurrentTrainer
+                                     && um.UserType == UserTypeEnum.Employee.ToString()
+                               select um.FirstName + " " + um.LastName).FirstOrDefault();
+
+            dBTMTraineeProfileModel.TrainerName = string.IsNullOrWhiteSpace(trainerName) ? "N/A" : trainerName;
+
+            CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<Coditech_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
-            dBTMTraineeProfileModel.TraineeProfiles = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
+            List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
+            if (traineeProfilePerformanceList != null && traineeProfilePerformanceList.Count > 0)
+            {
+                dBTMTraineeProfileModel.TraineeProfilePerformanceList = null;
+                foreach (var item in traineeProfilePerformanceList.GroupBy(x => x.TestCode))
+                {
+                    if (dBTMTraineeProfileModel.TraineeProfilePerformanceList == null)
+                        dBTMTraineeProfileModel.TraineeProfilePerformanceList = new List<DBTMTraineeProfilePerformanceModel>();
+                    List<DBTMTraineeProfilePerformanceModel> list = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.RowNumber == 1).ToList();
+                    DBTMTraineeProfilePerformanceModel performanceModel = new DBTMTraineeProfilePerformanceModel();
+                    performanceModel.TestCode = item.Key;
+                    performanceModel.TestName = list.FirstOrDefault().TestName;
+                    performanceModel.PerformanceMatrix = list.FirstOrDefault().PerformanceMatrix;
+                    decimal lastRecordSum, previousResordSum;
+                    if (list.Any(x => x.ParameterCode == CustomConstants.Time))
+                    {
+                        lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
+                        previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => x.ParameterValue);
+                        if (lastRecordSum < previousResordSum)
+                        {
+                            performanceModel.IsUp = false;
+                        }
+                    }
+                    if (list.Any(x => x.ParameterCode == CustomConstants.JumpHeight))
+                    {
+                        lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => x.ParameterValue);
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
+                        previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => x.ParameterValue);
+                        if (lastRecordSum < previousResordSum)
+                        {
+                            performanceModel.IsUp = false;
+                        }
+                    }
+                    dBTMTraineeProfileModel.TraineeProfilePerformanceList.Add(performanceModel);
+                }
+            }
             return dBTMTraineeProfileModel;
+        }
+
+        //Download Trainee Report Pdf
+        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
+        {
+            // GetTraineeProfileHtml
+            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
+
+            // Generate PDF
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            string fileName = $"Athlete_Profile_{dBTMTraineeDetailId}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string filePath = Path.Combine(folderPath, fileName);
+            var pdf = new HtmlToPdfDocument
+            {
+                GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
+                Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
+            };
+            _converter.Convert(pdf);
+            return new DBTMReportsListModel
+            {
+                FileName = fileName,
+                FilePath = filePath
+            };
+        }
+
+        //Get trainee profile html
+        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            // Get trainee profile
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
+            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
+            if (profile == null)
+                throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
+
+            string templateCode = EmailTemplateCodeCustomEnum.TraineeReportTemplate.ToString();
+
+            var emailTemplate = GetEmailTemplateByCode(profile.CentreCode, templateCode);
+
+            if (string.IsNullOrWhiteSpace(emailTemplate?.EmailTemplate))
+                throw new CoditechException(ErrorCodes.NullModel, $"Template '{templateCode}' not found for centre '{centreName}'");
+
+            string html = emailTemplate.EmailTemplate;
+
+            html = ReplaceTraineeTemplate(html, profile, remarks, centreName);
+            return html;
         }
 
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
@@ -313,59 +397,6 @@ namespace Coditech.API.Service
             }
         }
 
-
-        private void Calculation(string calculationCode, string calculationName, DataRow newRow, List<DBTMActivitiesDetailsModel> dBTMActivitiesDetailsList)
-        {
-            switch (calculationCode)
-            {
-                case "CompletionTime":
-                    decimal completionTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $"{completionTime} {Unit(calculationCode)}";
-                    break;
-                case "AverageVelocity":
-                    decimal totalDistance = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Distance").Sum(x => x.ParameterValue);
-                    decimal totalTime = dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Sum(x => x.ParameterValue);
-                    newRow[calculationName] = $" {Math.Round(totalDistance / totalTime, 3)} {Unit(calculationCode)}";
-                    break;
-                case "MaxLap":
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Max(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case "MinLap":
-                    newRow[calculationName] = $"{dBTMActivitiesDetailsList.Where(x => x.ParameterCode == "Time").Min(x => x.ParameterValue)} {Unit(calculationCode)}";
-                    break;
-                case "Power":
-                    newRow[calculationName] = $"{(dBTMActivitiesDetailsList.FirstOrDefault(x => x.ParameterCode == "Power")?.ParameterValue ?? 0)} {Unit(calculationCode)}";
-                    break;
-                default:
-                    newRow[calculationName] = "N/A";
-                    break;
-            }
-        }
-        private string Unit(string parameterCode)
-        {
-            string data = string.Empty;
-            switch (parameterCode)
-            {
-                case "CompletionTime":
-                case "Time":
-                    data = "sec";
-                    break;
-                case "Distance":
-                    data = "m";
-                    break;
-                case "AverageVelocity":
-                    data = "m/s";
-                    break;
-                case "Power":
-                    data = "watt";
-                    break;
-                default:
-                    data = "";
-                    break;
-            }
-            return data;
-        }
-
         private string CalculateDuration(DateTime fromDate, DateTime toDate)
         {
             int years = toDate.Year - fromDate.Year;
@@ -385,6 +416,76 @@ namespace Coditech.API.Service
             }
 
             return $"{years} years {months} months {days} days";
+        }
+
+        //Template Html Replacement
+        private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
+        {
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight, profile.Weight.ToString(), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Height, profile.Height.ToString(), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TrainerName, profile.TrainerName, html);
+            if (string.IsNullOrWhiteSpace(remarks))
+            {
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, html);
+            }
+            else
+            {
+                string remarksHtml = $@"<div style=""margin-top:15px;border:1px solid #333;padding:10px;min-height:60px;""><strong>Remarks:</strong><br/>{remarks}</div>";
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarksHtml, html);
+            }
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
+            if (profile?.TraineeProfilePerformanceList?.Count > 0)
+            {
+                var traineeProfilePerformanceList = (profile.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
+               .GroupBy(x => x.PerformanceMatrix).ToDictionary(g => g.Key, g => g.ToList());
+                int maxRows = traineeProfilePerformanceList.Values.Max(g => g.Count);
+                string performanceMatrixHtml = "<table style=\"width:100%;min-width:900px;border-collapse:collapse;font-size:14px;\">";
+                //Bind Table Header
+                performanceMatrixHtml += " <thead><tr>";
+                foreach (var matrix in traineeProfilePerformanceList.Keys)
+                {
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#f8c6b8;\">" + matrix + "</th>";
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;\">Score</th>";
+                }
+                performanceMatrixHtml += "</tr></thead>";
+                //End Bind Table Header
+                //Bind Table Rows
+                performanceMatrixHtml += "<tbody>";
+                for (int i = 0; i < maxRows; i++)
+                {
+                    performanceMatrixHtml += "<tr>";
+                    foreach (var matrix in traineeProfilePerformanceList.Keys)
+                    {
+                        var tests = traineeProfilePerformanceList[matrix];
+                        if (i < tests.Count)
+                        {
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">" + tests[i].TestName + "</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">" + tests[i].Score + "</td>";
+                        }
+                        else
+                        {
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">-</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">-</td>";
+                        }
+                    }
+                    performanceMatrixHtml += "</tr>";
+                }
+                performanceMatrixHtml += "</tbody>";
+                //End Bind Table Rows
+                performanceMatrixHtml += "</table>";
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DataTable, performanceMatrixHtml, html);
+            }
+            else
+            {
+                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DataTable, "No Record Found", html);
+            }
+            return html;
         }
     }
 }

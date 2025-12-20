@@ -10,7 +10,6 @@
 @Html.HiddenFor(m => m.PhotoMediaFileName, new { id = "PhotoMediaFileName" })
 @Html.HiddenFor(m => m.PhotoMediaPath, new { id = "PhotoMediaPath" })
 @Html.HiddenFor(m => m.Custom1)
-@Html.HiddenFor(m => m.Custom2)
 @Html.HiddenFor(m => m.Custom3)
 @Html.HiddenFor(m => m.Custom4)
 @Html.HiddenFor(m => m.Custom5)
@@ -49,6 +48,13 @@
             @Html.LabelFor(x => x.LastName, new { @class = "form-label required" })
             @Html.TextBoxFor(x => x.LastName, new { @class = "form-control", @onkeypress = "return CoditechCommon.AllowOnlyAlphabetWithouSpacing()" })
             @Html.ValidationMessageFor(x => x.LastName)
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="mb-3">
+            <label class="form-label" for="Custom2">Display Name</label>
+            @Html.TextBoxFor(x => x.Custom2, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.Custom2)
         </div>
     </div>
     <div class="col-lg-3">
@@ -223,7 +229,6 @@
             </div>
         </div>
     </div>
-
     @if (Model.PersonId != 0)
     {
         <div class="row">
@@ -237,7 +242,7 @@
         </div>
     }
 </div>
-<button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+@* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button> *@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript">

@@ -26,7 +26,7 @@
 
                 },
                 contentType: "application/json; charset=utf-8",
-                success: function(data) {
+                success: function (data) {
                     $("#GeneralTrainerMasterId").html(data);
                     CoditechCommon.HideLodder();
                 },
@@ -95,5 +95,86 @@
         } else {
             CoditechDataTable.LoadList("DBTMTraineeDetails", "List");
         }
+    },
+
+    GetActivityDetails: function (contentId, deviceDataId, trainerId) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetActivityDetailsPopup",
+            data: { dBTMDeviceDataId: deviceDataId, trainerId: trainerId },
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load Activity details.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+
+    DownloadAthleteReportPdf: function (traineeId, remarks) {
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            url: "/DBTMTraineeDetails/CheckAthleteReportAvailability",
+            type: "GET",
+            data: {
+                dBTMTraineeDetailId: traineeId,
+                remarks: remarks
+            },
+            success: function (response) {
+                if (response.success) {
+                    var downloadUrl =
+                        "/DBTMTraineeDetails/DownloadAthleteReportPdf"
+                        + "?dBTMTraineeDetailId=" + encodeURIComponent(traineeId)
+                        + "&remarks=" + encodeURIComponent(remarks);
+
+                    CoditechCommon.HideLodder();
+
+                    $("#hiddenDownloader").attr("src", downloadUrl);
+                }
+                else {
+                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+                    CoditechCommon.HideLodder();
+                }
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Error while downloading profile.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+
+    GetRemarks: function (contentId, dBTMTraineeDetailId, remarks) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetRemarksPopup",
+            data: { dBTMTraineeDetailId: dBTMTraineeDetailId, remarks: remarks },
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+
+    ConfirmDownloadPdf: function (traineeId) {
+        var remarks = $("#RemarksText").val() || "";
+        $("#RemarkPopupId").modal("hide");
+        DBTMTraineeDetails.DownloadAthleteReportPdf(
+            traineeId,
+            remarks
+        );
     },
 }

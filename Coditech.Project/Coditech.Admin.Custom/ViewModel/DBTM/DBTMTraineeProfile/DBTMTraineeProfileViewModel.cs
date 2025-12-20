@@ -23,7 +23,9 @@ namespace Coditech.Admin.ViewModel
         public DateTime? DateOfBirth { get; set; }
         public string TotalDuration { get; set; }
         public DateTime? WeekelyHours { get; set; }
-        public List<DBTMTraineeProfileModel> TraineeProfiles { get; set; } = new List<DBTMTraineeProfileModel>();
-
+        public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; } = new List<DBTMTraineeProfilePerformanceModel>();
+        public string Remarks { get; set; }
+        public string SelectedCentreCode { get; set; }
+        public string SelectedParameter1 { get; set; }
     }
 }

@@ -15,6 +15,7 @@ namespace Coditech.API.Service
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
+        private readonly IDBTMApiService _dBTMApiService;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dbtmTraineeDetailsRepository;
         private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
@@ -23,10 +24,11 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<EmployeeDesignationMaster> _employeeDesignationMasterRepository;
 
-        public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
+        public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMApiService dBTMApiService) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
+            _dBTMApiService = dBTMApiService;
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dbtmTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
@@ -50,7 +52,7 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.ContactAdministrator, null);
 
             DBTMUserModel userModel = new DBTMUserModel();
-            long personId = 0; 
+            long personId = 0;
 
             if (userMasterData.UserType == UserTypeEnum.Trainee.ToString())
             {
@@ -162,6 +164,7 @@ namespace Coditech.API.Service
             if (IsNull(dbtmUserModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            dbtmUserModel.UserType = dbtmUserModel.UserType == "DBTMTrainer" ? UserTypeEnum.Employee.ToString() : dbtmUserModel.UserType;
             UserMaster userMasterData = _userMasterRepository.Table.Where(x => x.EntityId == dbtmUserModel.EntityId && x.UserType == dbtmUserModel.UserType)?.FirstOrDefault();
             bool status = false;
             long personId = 0;
@@ -190,6 +193,7 @@ namespace Coditech.API.Service
             else if (dbtmUserModel.UserType == UserTypeEnum.Employee.ToString())
             {
                 personId = _employeeMasterRepository.Table.Where(x => x.EmployeeId == dbtmUserModel.EntityId).Select(x => x.PersonId).FirstOrDefault();
+                status = true;
             }
 
             if (personId <= 0)
@@ -212,7 +216,7 @@ namespace Coditech.API.Service
                     status = _generalPersonRepository.Update(generalPerson);
                     if (status)
                     {
-                        if (IsNotNull(userMasterData))
+                        if (IsNotNull(userMasterData) && userMasterData.EmailId != dbtmUserModel.EmailId)
                         {
                             userMasterData.EmailId = dbtmUserModel.EmailId;
                             userMasterData.ModifiedBy = dbtmUserModel.ModifiedBy;
@@ -229,13 +233,20 @@ namespace Coditech.API.Service
             return dbtmUserModel;
         }
 
-        public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode)
+        public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
+            if (generalTrainerMasterId > 0)
+            {
+                joiningCode = _dBTMApiService.GetJoiningCode(generalTrainerMasterId.ToString());
+
+                if (string.IsNullOrEmpty(joiningCode))
+                    throw new CoditechException(ErrorCodes.InvalidData, "No Joining Code found for this trainer.");
+            }
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
             joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == joiningCode)?.FirstOrDefault();
 
             if (IsNull(joiningCodeDetails))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joning Code."));
+                throw new CoditechException(ErrorCodes.AlreadyExist, "Invalid Joining Code.");
 
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
@@ -244,10 +255,14 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMNewRegistrationModel> dBTMNewRegistrationList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
-            DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel();
-            listModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>();
+            DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel
+            {
+                JoiningCode = joiningCode,    
+                DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>()
+            };
+
             if (listModel.DBTMNewRegistrationList == null || listModel.DBTMNewRegistrationList.Count == 0)
-                throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator ");
+                throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator.");
             return listModel;
         }
     }

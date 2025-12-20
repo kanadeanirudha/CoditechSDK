@@ -28,11 +28,11 @@ namespace Coditech.API.Endpoint
 
         public string GetDBTMTestCalculationAsync() =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestCalculation";
-        public string GetDBTMGraphAsync() =>
-           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMGraph";
-        public string GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId)
+        public string GetDBTMGraphAsync(int dBTMTestMasterId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMGraph?dBTMTestMasterId={dBTMTestMasterId}";
+        public string GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DBTMGraphByDBTMTestMasterId?dBTMTestMasterId={dBTMTestMasterId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DBTMGraphByDBTMTestMasterId?dBTMTestMasterId={dBTMTestMasterId}&graphMode={graphMode}";
             return endpoint;
         }
         public string GetDBTMPerformanceMatrixListAsync(IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
@@ -40,5 +40,21 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMPerformanceMatrixList{BuildEndpointQueryString(expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
+        public string GetActivityListViewSequenceListAsync(int dBTMTestMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetActivityListViewSequenceList?dBTMTestMasterId={dBTMTestMasterId}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
+        }
+        public string DeleteActivityListViewSequenceAsync() =>
+                  $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DeleteActivityListViewSequence";
+
+        public string GetActivityListViewSequenceAsync(int dBTMTestParameterListViewSequenceId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetActivityListViewSequence?dBTMTestParameterListViewSequenceId={dBTMTestParameterListViewSequenceId}";
+
+        public string UpdateActivityListViewSequenceAsync() =>
+               $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateActivityListViewSequence";
+        public string UpdateSequenceNumberAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateSequenceNumber";
+        public string CreateActivityListViewSequenceAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityListViewSequence";
     }
 }

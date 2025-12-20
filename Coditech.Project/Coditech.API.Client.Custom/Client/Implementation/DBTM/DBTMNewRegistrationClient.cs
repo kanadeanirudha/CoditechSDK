@@ -129,14 +129,14 @@ namespace Coditech.API.Client
                 }
             }
         }
-        public virtual DBTMNewRegistrationListResponse GetGeneralTrainerByJoiningCode(string joiningCode)
+        public virtual DBTMNewRegistrationListResponse GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId)
         {
-            return Task.Run(async () => await GetGeneralTrainerByJoiningCode(joiningCode, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMNewRegistrationListResponse> GetGeneralTrainerByJoiningCode(string joiningCode, CancellationToken cancellationToken)
+        public virtual async Task<DBTMNewRegistrationListResponse> GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMNewRegistrationEndpoint.GetGeneralTrainerByJoiningCode(joiningCode);
+            string endpoint = dBTMNewRegistrationEndpoint.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
 

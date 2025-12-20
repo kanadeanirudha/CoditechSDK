@@ -17,6 +17,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         protected readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
@@ -32,6 +33,7 @@ namespace Coditech.API.Service
             _coditechLogging = coditechLogging;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMDeviceMasterRepository = new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -62,6 +64,16 @@ namespace Coditech.API.Service
             return model;
         }
 
+        public override ChangePasswordModel ChangePassword(ChangePasswordModel changePasswordModel)
+        {
+            if (IsNull(changePasswordModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+            if (string.IsNullOrEmpty(changePasswordModel.UserType))
+                throw new CoditechException(ErrorCodes.IdLessThanOne, "UserType is null.");
+
+            changePasswordModel.UserType = changePasswordModel.UserType == "DBTMTrainer" ? UserTypeEnum.Employee.ToString() : changePasswordModel.UserType;
+            return base.ChangePassword(changePasswordModel);
+        }
         protected override GeneralPersonModel GetGeneralPersonDetailsByEntityType(long entityId, string entityType)
         {
             long personId = 0;
@@ -138,7 +150,7 @@ namespace Coditech.API.Service
             if (dBTMTraineeDetails?.DBTMTraineeDetailId > 0 && settingMasterList?.FirstOrDefault(x => x.FeatureName.Equals(GeneralSystemGlobleSettingCustomEnum.IsDBTMTraineeLogin.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue == "1")
             {
                 generalPersonModel.EntityId = dBTMTraineeDetails.DBTMTraineeDetailId;
-                InsertUserMasterDetails(generalPersonModel, dBTMTraineeDetails.DBTMTraineeDetailId, false);
+                InsertUserMasterDetails(generalPersonModel, dBTMTraineeDetails.DBTMTraineeDetailId, true);
                 try
                 {
                     GeneralEmailTemplateModel emailTemplateModel = GetEmailTemplateByCode(generalPersonModel.SelectedCentreCode, EmailTemplateCodeCustomEnum.DBTMTraineeRegistration.ToString());
@@ -214,6 +226,16 @@ namespace Coditech.API.Service
                 {
                     joiningCodeDetails.IsExpired = true;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
+                    if (dBTMCustomNewRegistrationModel.GeneralBatchMasterId > 0)
+                    {
+                        GeneralBatchUser generalBatchUser = new GeneralBatchUser()
+                        {
+                            GeneralBatchMasterId = dBTMCustomNewRegistrationModel.GeneralBatchMasterId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                            EntityId = generalPersonModel.EntityId,
+                        };
+                        _generalBatchUserRepository.Insert(generalBatchUser);
+                    }
                 }
                 else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {

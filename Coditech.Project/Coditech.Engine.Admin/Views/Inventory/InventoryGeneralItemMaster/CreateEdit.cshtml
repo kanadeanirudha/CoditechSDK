@@ -10,31 +10,27 @@
     DropdownViewModel inventoryItemTrackingDimensionGroup = new DropdownViewModel() { DropdownType = DropdownTypeEnum.InventoryItemTrackingDimensionGroup.ToString(), DropdownName = "InventoryTrackingDimentionGroupId", DropdownSelectedValue = Model.InventoryTrackingDimentionGroupId.ToString(), Parameter = Model.InventoryTrackingDimentionGroupId.ToString(), IsRequired = false };
     DropdownViewModel inventoryItemGroup = new DropdownViewModel() { DropdownType = DropdownTypeEnum.InventoryItemGroup.ToString(), DropdownName = "InventoryItemGroupId", DropdownSelectedValue = Model.InventoryItemGroupId.ToString(), Parameter = Model.InventoryItemGroupId.ToString(), IsRequired = false };
     DropdownViewModel inventoryBaseUoMMaster = new DropdownViewModel() { DropdownType = DropdownTypeEnum.InventoryUomMaster.ToString(), DropdownName = "InventoryBaseUoMMasterId", DropdownSelectedValue = Model.InventoryBaseUoMMasterId.ToString(), Parameter = Model.InventoryBaseUoMMasterId.ToString() };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
-
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.InventoryGeneralItemMasterId > 0)
-                                {
-                                    <h4 class="card-title">Update Inventory General Item Master</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Inventory General Item Master</h4>
-                                }
-                            </div><!--end col-->
-                        </div><!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.InventoryGeneralItemMasterId)
                             @if (Model.InventoryGeneralItemMasterId > 0)
                             {
@@ -46,112 +42,112 @@
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.InventoryCategoryId, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownType = DropdownTypeEnum.InventoryCategory.ToString(),
-                                   DropdownName = "InventoryCategoryId",
-                                   DropdownSelectedValue = Model.InventoryCategoryId.ToString()
-                               })
-                                        @Html.ValidationMessageFor(x => x.InventoryCategoryId, null)
-                                    </div>
+                                        {
+                                            DropdownType = DropdownTypeEnum.InventoryCategory.ToString(),
+                                                                        DropdownName = "InventoryCategoryId",
+                                                                        DropdownSelectedValue = Model.InventoryCategoryId.ToString()
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.InventoryCategoryId, null)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.ProductTypeEnumId, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryProductType)
-                                        @Html.ValidationMessageFor(x => x.ProductTypeEnumId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ProductTypeEnumId, new { @class = "form-label required" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryProductType)
+                                    @Html.ValidationMessageFor(x => x.ProductTypeEnumId)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.ProductSubTypeEnumId, new { @class = "form-label required " })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryProductSubType)
-                                        @Html.ValidationMessageFor(x => x.ProductSubTypeEnumId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ProductSubTypeEnumId, new { @class = "form-label required " })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryProductSubType)
+                                    @Html.ValidationMessageFor(x => x.ProductSubTypeEnumId)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.InventoryProductDimentionGroupId, new { @class = "form-label" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryProductDimensionGroup)
-                                        @Html.ValidationMessageFor(x => x.InventoryProductDimentionGroupId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.InventoryProductDimentionGroupId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryProductDimensionGroup)
+                                    @Html.ValidationMessageFor(x => x.InventoryProductDimentionGroupId)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.ItemNumber, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.ItemNumber, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.ItemNumber)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ItemNumber, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.ItemNumber, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.ItemNumber)
                                 </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.ItemName, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.ItemName, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.ItemName)
-                                    </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.ItemName, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.ItemName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.ItemName)
                                 </div>
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.HSNSACCode, new { @class = "form-label required" })
-                                        @Html.TextBoxFor(x => x.HSNSACCode, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.HSNSACCode)
-                                    </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.HSNSACCode, new { @class = "form-label required" })
+                                    @Html.TextBoxFor(x => x.HSNSACCode, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.HSNSACCode)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.GeneralTaxGroupMasterId, new { @class = "form-label required" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownType = DropdownTypeEnum.TaxGroup.ToString(),
-                                   DropdownName = "GeneralTaxGroupMasterId",
-                                   DropdownSelectedValue = Model.GeneralTaxGroupMasterId.ToString()
-                               })
-                                        @Html.ValidationMessageFor(x => x.GeneralTaxGroupMasterId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.GeneralTaxGroupMasterId, new { @class = "form-label required" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                        {
+                                            DropdownType = DropdownTypeEnum.TaxGroup.ToString(),
+                                                                        DropdownName = "GeneralTaxGroupMasterId",
+                                                                        DropdownSelectedValue = Model.GeneralTaxGroupMasterId.ToString()
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.GeneralTaxGroupMasterId)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.InventoryModelEnumId, new { @class = "form-label " })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.InventoryModelEnumId.ToString(),
-                                   DropdownName = "InventoryModelEnumId",
-                                   GroupCode = DropdownTypeEnum.InventoryModel.ToString(),
-                                   IsRequired = false
-                               })
-                                        @Html.ValidationMessageFor(x => x.InventoryModelEnumId, null)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.InventoryModelEnumId, new { @class = "form-label " })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                                                        {
+                                            DropdownSelectedValue = Model.InventoryModelEnumId.ToString(),
+                                                                        DropdownName = "InventoryModelEnumId",
+                                                                        GroupCode = DropdownTypeEnum.InventoryModel.ToString(),
+                                                                        IsRequired = false
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.InventoryModelEnumId, null)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.InventoryItemGroupId, new { @class = "form-label" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryItemGroup)
-                                        @Html.ValidationMessageFor(x => x.InventoryItemGroupId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.InventoryItemGroupId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryItemGroup)
+                                    @Html.ValidationMessageFor(x => x.InventoryItemGroupId)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.InventoryStorageDimentionGroupId, new { @class = "form-label" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryStorageDimensionGroup)
-                                        @Html.ValidationMessageFor(x => x.InventoryStorageDimentionGroupId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.InventoryStorageDimentionGroupId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryStorageDimensionGroup)
+                                    @Html.ValidationMessageFor(x => x.InventoryStorageDimentionGroupId)
                                 </div>
+                            </div>
 
-                                <div class="col-lg-3">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.InventoryTrackingDimentionGroupId, new { @class = "form-label" })
-                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryItemTrackingDimensionGroup)
-                                        @Html.ValidationMessageFor(x => x.InventoryTrackingDimentionGroupId)
-                                    </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    @Html.LabelFor(x => x.InventoryTrackingDimentionGroupId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", inventoryItemTrackingDimensionGroup)
+                                    @Html.ValidationMessageFor(x => x.InventoryTrackingDimentionGroupId)
                                 </div>
-                                @if (Model.InventoryGeneralItemMasterId == 0)
+                            </div>
+                            @if (Model.InventoryGeneralItemMasterId == 0)
                                 {
                                     <div class="col-lg-3">
                                         <div class="mb-3">
@@ -188,8 +184,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            @*  <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
+                        <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
                         }
                     </div>
                 </div>
@@ -197,7 +193,6 @@
         </div>
     </div>
 </div>
-
 @section scripts {
     <script src="~/js/coditech/inventory/inventorygeneralitemmaster.js"></script>
 }

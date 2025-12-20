@@ -159,6 +159,8 @@ namespace Coditech.Admin.Agents
                 GeneralPersonResponse response = _userClient.TraineeRegistration(dBTMNewRegistrationViewModel.ToModel<GeneralPersonModel>());
 
                 GeneralPersonModel dBTMNewRegistrationModel = response?.GeneralPersonModel;
+                dBTMNewRegistrationModel.EntityId = response.GeneralPersonModel.EntityId;
+                dBTMNewRegistrationModel.PersonId = response.GeneralPersonModel.PersonId;
                 return IsNotNull(dBTMNewRegistrationModel) ? dBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>() : new DBTMNewRegistrationViewModel();
             }
             catch (CoditechException ex)
@@ -180,15 +182,15 @@ namespace Coditech.Admin.Agents
             }
         }
         //GetGeneralTrainerByJoiningCode
-        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode)
+        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId)
         {
             DBTMNewRegistrationListViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationListViewModel();
             try
             {
-
-                DBTMNewRegistrationListResponse response = _dBTMNewRegistrationClient.GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListResponse response = _dBTMNewRegistrationClient.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
                 DBTMNewRegistrationListModel dBTMNewRegistrationList = new DBTMNewRegistrationListModel { DBTMNewRegistrationList = response?.DBTMNewRegistrationList };
                 DBTMNewRegistrationListViewModel listViewModel = new DBTMNewRegistrationListViewModel();
+                listViewModel.JoiningCode = response.JoiningCode;
                 listViewModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.DBTMNewRegistrationList?.ToViewModel<DBTMNewRegistrationViewModel>().ToList();
                 return listViewModel;
             }

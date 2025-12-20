@@ -3,33 +3,30 @@
     ViewBag.Title = Model.AdminRoleMediaFolderActionId > 0 ? "Update Media Folder Action" : "Add Media Folder Action";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = @Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId }),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-2">
                 @Html.Partial("~/Views/Admin/AdminRoleMaster/_AdminRoleMasterSidePannel.cshtml", Model.AdminRoleMasterId.ToString())
             </div>
             <div class="col-lg-10">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                @if (Model.AdminRoleMediaFolderActionId > 0)
-                                {
-                                    <h4 class="card-title">Update Folder Action</h4>
-                                }
-                                else
-                                {
-                                    <h4 class="card-title">Create Folder Action</h4>
-                                }
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.AdminRoleMediaFolderActionId)
                             @Html.HiddenFor(m => m.AdminRoleMasterId)
                             <div class="row">
@@ -48,13 +45,13 @@
                                 <div class="col-lg-6">
                                     <div class="mb-3 multiselect-dropdown">
                                         @Html.LabelFor(x => x.SelectedMediaActions, new { @class = "form-label required" })
-                                        @Html.ListBoxFor(x => x.SelectedMediaActions, new SelectList(Model.MediaActionList, "Text", "Value"), new { @class = "selectpicker form-control", multiple = "multiple",data_live_search = "true"})
+                                        @Html.ListBoxFor(x => x.SelectedMediaActions, new SelectList(Model.MediaActionList, "Text", "Value"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
                                         @Html.ValidationMessageFor(x => x.SelectedMediaActions)
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                            <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId})" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>
+                            @* <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button> *@
+                            @* <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = @Model.SelectedCentreCode, SelectedDepartmentId = @Model.SelectedDepartmentId })" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a> *@
                         }
                     </div>
                 </div>

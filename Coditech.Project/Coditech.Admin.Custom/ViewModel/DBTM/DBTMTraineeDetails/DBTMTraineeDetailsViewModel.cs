@@ -47,6 +47,6 @@ namespace Coditech.Admin.ViewModel
          [Required]
         [Display(Name = "Specialization")]
         public int? SpecializationEnumId { get; set; }
-
+        public string DisplayName { get; set; }
     }
 }

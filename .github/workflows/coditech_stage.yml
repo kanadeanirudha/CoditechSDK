@@ -160,7 +160,9 @@ jobs:
 
       - name: Copy Build file
         run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.DBTM\bin\Release\net8.0\* -Destination C:\HostingSites\DBTMProduction\DBTM\ -Recurse -Force 
-
+      - name: Copy Build NativePdfDll folder
+        run: Copy-Item -Path C:\GitAction\DBTM\_work\CoditechSDK\CoditechSDK\Coditech.Project\Coditech.Engine.DBTM\NativePdfDll\*  -Destination C:\HostingSites\DBTMProduction\DBTM\NativePdfDll\ -Recurse -Force
+      
       - name: Start dbtm IIS Site and App Pool
         run: |
            # Start the IIS site

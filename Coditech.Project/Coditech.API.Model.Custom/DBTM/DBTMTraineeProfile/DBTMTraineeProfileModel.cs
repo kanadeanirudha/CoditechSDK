@@ -8,6 +8,7 @@
         public string LastName { get; set; }
         public string ImagePath { get; set; }
         public decimal Weight { get; set; }
+        public decimal Height { get; set; }
         public int? SpecializationEnumId { get; set; }
         public long PhotoMediaId { get; set; }
         public string PhotoMediaPath { get; set; }
@@ -21,7 +22,9 @@
         public DateTime? DateOfBirth { get; set; }
         public string TotalDuration { get; set; }
         public DateTime? WeekelyHours { get; set; }
-        public List<DBTMTraineeProfileModel> TraineeProfiles { get; set; } = new List<DBTMTraineeProfileModel>();
-
+        public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; } = new List<DBTMTraineeProfilePerformanceModel>();
+        public string Remarks { get; set; } 
+        public string CentreCode { get; set; }
+        public string TrainerName { get; set; }
     }
 }

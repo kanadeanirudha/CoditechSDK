@@ -1,0 +1,27 @@
+﻿@using Coditech.Admin.Utilities;
+@model Dictionary<string, string>
+@{
+    Layout = null;
+    long dBTMCampMasterId = Convert.ToInt32(Model?.FirstOrDefault(x => x.Key == "DBTMCampMasterId").Value);
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="card sidebar-card">
+    <div class="card-body">
+        <div class="files-nav">
+            <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
+                <a class="nav-link"
+                   href="@Url.Action("Edit", "DBTMCampMaster", new { dBTMCampMasterId = dBTMCampMasterId })"
+                   aria-selected="true">
+                    <i class="ti-menu"></i><h5 class="m-0 ps-2">Camp Details</h5>
+                </a>
+
+                <a class="nav-link"
+                   href="@Url.Action("GetDBTMCampUserList", "DBTMCampMaster", new { SelectedParameter1 = dBTMCampMasterId })"
+                   aria-selected="true">
+                    <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Camp User</h5>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>

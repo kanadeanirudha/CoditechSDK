@@ -1,11 +1,11 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTestMasterController : BaseController
@@ -47,7 +47,14 @@ namespace Coditech.Admin.Controllers
                 if (!dBTMTestViewModel.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
-                    return RedirectToAction("List", CreateActionDataTable());
+                    if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
+                    }
+                    else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList);
+                    }
                 }
             }
             BindDBTMTestParameter(dBTMTestViewModel);
@@ -75,7 +82,14 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(_dBTMTestAgent.UpdateDBTMTest(dBTMTestViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                return RedirectToAction("Edit", new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
+                if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToEdit, new { dBTMTestMasterId = dBTMTestViewModel.DBTMTestMasterId });
+                }
+                else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(AdminConstants.ActionRedirectToList);
+                }
             }
             BindDBTMTestParameter(dBTMTestViewModel);
             BindDBTMTestCalculation(dBTMTestViewModel);
@@ -100,6 +114,158 @@ namespace Coditech.Admin.Controllers
             return RedirectToAction<DBTMTestMasterController>(x => x.List(null));
         }
 
+        // Get Activity List View Sequence
+        public virtual ActionResult ActivityListViewSequenceList(DataTableViewModel dataTableViewModel)
+        {
+            DBTMActivityListViewSequenceListViewModel list = _dBTMTestAgent.GetActivityListViewSequenceList(Convert.ToInt16(dataTableViewModel.SelectedParameter1), dataTableViewModel);
+            list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/_ActivityListViewSequenceList.cshtml", list);
+            }
+
+            return View($"~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/ActivityListViewSequenceList.cshtml", list);
+        }
+
+        [HttpGet]
+        public virtual ActionResult ActivityListViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            DBTMActivityListViewSequenceViewModel dBTMTestViewModel = _dBTMTestAgent.GetActivityListViewSequence(dBTMTestParameterListViewSequenceId);
+            if (string.IsNullOrEmpty(dBTMTestViewModel.DisplayOn))
+            {
+                dBTMTestViewModel.DisplayOn = "Both";
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMTestViewModel);
+        }
+
+        [HttpPost]
+        public virtual ActionResult ActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMTestViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                SetNotificationMessage(_dBTMTestAgent.UpdateActivityListViewSequence(dBTMTestViewModel).HasError
+                    ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                    : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("ActivityListViewSequence", new { dBTMTestParameterListViewSequenceId = dBTMTestViewModel.DBTMTestParameterListViewSequenceId });
+                }
+                else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMTestViewModel.DBTMTestMasterId)});
+                }
+            }
+            if (string.IsNullOrEmpty(dBTMTestViewModel.DisplayOn))
+            {
+                dBTMTestViewModel.DisplayOn = "Both";
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMTestViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult UpdateSequenceNumber(int dBTMTestMasterId)
+        {
+            DBTMActivityListViewSequenceListViewModel listViewModel = _dBTMTestAgent.GetActivityListViewSequenceList(dBTMTestMasterId, new DataTableViewModel());
+
+            var modelList = listViewModel.DBTMActivityListViewSequenceList
+                .Select(x => new DBTMActivityListViewSequenceModel
+                {
+                    DBTMTestParameterListViewSequenceId = x.DBTMTestParameterListViewSequenceId,
+                    DBTMTestMasterId = x.DBTMTestMasterId,
+                    ParameterCode = x.ParameterCode,
+                    IsCalculatedParameter = x.IsCalculatedParameter,
+                    SequenceNumber = x.SequenceNumber
+                })
+                .ToList();
+
+            DBTMActivityListViewSequenceViewModel viewModel = new DBTMActivityListViewSequenceViewModel
+            {
+                DBTMTestMasterId = dBTMTestMasterId,
+                DBTMActivityListViewSequenceList = modelList
+            };
+            return PartialView("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/_AddSequenceNumberPopUp.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateSequenceNumber(DBTMActivityListViewSequenceViewModel listViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                listViewModel = _dBTMTestAgent.UpdateSequenceNumber(listViewModel);
+                if (!listViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage("Sequence Number Saved Successfully."));
+                    return Json(new { success = true });
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage("Failed to Save Sequence Number."));
+            return Json(new { success = false });
+        }
+
+        // Create Activity List View Sequence
+        [HttpGet]
+        public virtual ActionResult CreateActivityListViewSequence(int dBTMTestMasterId)
+        {
+            DBTMActivityListViewSequenceListViewModel listViewModel = _dBTMTestAgent.GetActivityListViewSequenceList(dBTMTestMasterId, new DataTableViewModel());
+            int maxSequence = 0;
+            if (listViewModel?.DBTMActivityListViewSequenceList != null && listViewModel.DBTMActivityListViewSequenceList.Count > 0)
+            {
+                maxSequence = listViewModel.DBTMActivityListViewSequenceList.Max(x => x.SequenceNumber);
+            }
+            var newViewModel = new DBTMActivityListViewSequenceViewModel
+            {
+                DBTMTestMasterId = dBTMTestMasterId,
+                SequenceNumber = (short)(maxSequence + 1), 
+            };
+            if (string.IsNullOrEmpty(newViewModel.DisplayOn))
+            {
+                newViewModel.DisplayOn = "Both";
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", newViewModel);
+        }
+
+        [HttpPost]
+        public virtual ActionResult CreateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                dBTMActivityListViewSequenceViewModel = _dBTMTestAgent.CreateActivityListViewSequence(dBTMActivityListViewSequenceViewModel);
+                if (!dBTMActivityListViewSequenceViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
+                    if (string.Equals(dBTMActivityListViewSequenceViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("ActivityListViewSequence", new { dBTMTestParameterListViewSequenceId = dBTMActivityListViewSequenceViewModel.DBTMTestParameterListViewSequenceId });
+                    }
+                    else if (string.Equals(dBTMActivityListViewSequenceViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMActivityListViewSequenceViewModel.DBTMTestMasterId) });
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(dBTMActivityListViewSequenceViewModel.DisplayOn))
+            {
+                dBTMActivityListViewSequenceViewModel.DisplayOn = "Both";
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(dBTMActivityListViewSequenceViewModel.ErrorMessage));
+            return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMActivityListViewSequenceViewModel);
+        }
+
+        public virtual ActionResult DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, int dBTMTestMasterId)
+        {
+            string message = string.Empty;
+            bool status = false;
+            if (!string.IsNullOrEmpty(dBTMTestParameterListViewSequenceIds))
+            {
+                status = _dBTMTestAgent.DeleteActivityListViewSequence(dBTMTestParameterListViewSequenceIds, out message);
+                SetNotificationMessage(!status
+                ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
+                : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
+                return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId});
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
+            return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+        }
         #region Protected
         protected virtual void BindDBTMTestParameter(DBTMTestViewModel dBTMTestViewModel)
         {
@@ -138,20 +304,25 @@ namespace Coditech.Admin.Controllers
         protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)
         {
             dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();
-            DBTMGraphMasterListViewModel dBTMGraphMasterList = _dBTMTestAgent.DBTMGraph();
-
-            if (dBTMGraphMasterList?.DBTMGraphMasterList != null)
+            if (dBTMTestViewModel.DBTMTestMasterId > 0)
             {
-                foreach (var item in dBTMGraphMasterList.DBTMGraphMasterList)
+                DBTMGraphMasterListViewModel dBTMGraphMasterList = _dBTMTestAgent.DBTMGraph(dBTMTestViewModel.DBTMTestMasterId);
+                if (dBTMGraphMasterList?.DBTMGraphMasterList != null)
                 {
-                    dBTMTestViewModel.DBTMGraphMasterList.Add(new SelectListItem
+                    foreach (var item in dBTMGraphMasterList.DBTMGraphMasterList)
                     {
-                        Text = item.GraphName,
-                        Value = item.DBTMGraphMasterId.ToString()
-                    });
+                        dBTMTestViewModel.DBTMGraphMasterList.Add(new SelectListItem
+                        {
+                            Text = $"{item.GraphName} ({item.GraphMode})",
+                            Value = item.DBTMGraphMasterId.ToString(),
+                            Selected = dBTMTestViewModel.DBTMSelectedGraph != null &&
+                                       dBTMTestViewModel.DBTMSelectedGraph.Contains(item.DBTMGraphMasterId.ToString())
+                        });
+                    }
                 }
             }
         }
+
         [HttpGet]
         public ActionResult GetDBTMGraphByDBTMTestMaster(int dBTMTestMasterId)
         {

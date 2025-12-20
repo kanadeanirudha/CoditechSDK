@@ -101,5 +101,6 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMTraineeDetailId">dBTMTraineeDetailId</param>
         /// <returns>Returns DBTMTraineeDetailsResponse.</returns>
         DBTMTraineeProfileViewModel GetProfileDetails(long dBTMTraineeDetailId);
+        DBTMReportsListViewModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
     }
 }

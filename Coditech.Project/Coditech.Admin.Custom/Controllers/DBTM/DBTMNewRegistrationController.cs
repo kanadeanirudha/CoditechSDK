@@ -117,7 +117,10 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult IndividualRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-
+            if (string.IsNullOrEmpty(dBTMNewRegistrationViewModel.Custom1))
+            {
+                dBTMNewRegistrationViewModel.ErrorMessage = "Device serial code is required.";
+            }
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition)
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
@@ -146,13 +149,13 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult TraineeRegistration(string joiningCode)
+        public virtual ActionResult TraineeRegistration(string joiningCode, long generalTrainerMasterId)
         {
             TempData["FormSizeClass"] = "col-lg-8";
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode);
+                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
                 if (!list.HasError)
                 {
                     dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
@@ -197,7 +200,7 @@ namespace Coditech.Admin.Controllers
                     //var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
                     //var isTermsAndCondition = dBTMNewRegistrationViewModel.IsTermsAndCondition;
 
-                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode);
+                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode,dBTMNewRegistrationViewModel.GeneralTrainerMasterId);
                     if (!list.HasError)
                     {
                         dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
@@ -244,7 +247,7 @@ namespace Coditech.Admin.Controllers
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
-           
+
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }

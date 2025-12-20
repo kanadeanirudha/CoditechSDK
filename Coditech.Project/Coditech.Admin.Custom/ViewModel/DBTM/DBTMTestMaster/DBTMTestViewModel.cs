@@ -27,7 +27,6 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Parameter")]
         public List<string> DBTMSelectedTestParameter { get; set; }
-        [Required]
         [Display(Name = "Graph")]
         public List<string> DBTMSelectedGraph { get; set; }
         [Required]
@@ -56,5 +55,6 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Performance Matrix")]
         public byte DBTMPerformanceMatrixId { get; set; }
+        public string PerformanceMatrix { get; set; }
     }
 }

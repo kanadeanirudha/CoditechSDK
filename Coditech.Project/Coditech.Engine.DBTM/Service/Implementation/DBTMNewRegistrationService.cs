@@ -23,6 +23,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterMasterRepository;
+        private readonly ICoditechRepository<EmployeeMaster> _employeeMasterMasterRepository;
 
         public DBTMNewRegistrationService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -35,6 +36,7 @@ namespace Coditech.API.Service
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _employeeMasterMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Public
@@ -76,6 +78,17 @@ namespace Coditech.API.Service
             string sanctionPostCode = string.Empty;
             try
             {
+                if (string.IsNullOrEmpty(dBTMNewRegistrationModel.Password))
+                {
+                    List<GeneralSystemGlobleSettingModel> systemGlobleSettingList = GetSystemGlobleSettingList();
+                    string password = systemGlobleSettingList?.FirstOrDefault((GeneralSystemGlobleSettingModel x) => x.FeatureName.Equals(GeneralSystemGlobleSettingEnum.DefaultPassword.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue;
+                    dBTMNewRegistrationModel.Password = password;
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = false;
+                }
+                else
+                {
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = true;
+                }
                 DateTime currentDate = DateTime.Now;
                 //Save Centre 
                 organisationCentreMaster = InsertOrganisationCentreMaster(dBTMNewRegistrationModel, currentDate);
@@ -113,7 +126,7 @@ namespace Coditech.API.Service
                 InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
 
                 //Insert Admin Role
-                sanctionPostCode= sanctionPostCode = InsertAdminRole(currentDate, ApiCustomSettings.DirectorDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.DirectorDesignationId, DashboardFormCustomEnum.DBTMCentreDashboard.ToString(), ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList());
+                sanctionPostCode = sanctionPostCode = InsertAdminRole(currentDate, ApiCustomSettings.DirectorDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.DirectorDesignationId, DashboardFormCustomEnum.DBTMCentreDashboard.ToString(), ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList());
 
                 //DBTM Device Registration Details
                 InsertDBTMDeviceRegistration(dBTMNewRegistrationModel, currentDate, employeeId, dBTMDeviceMaster.DBTMDeviceMasterId);
@@ -168,6 +181,18 @@ namespace Coditech.API.Service
 
                 dBTMNewRegistrationModel.Custom1 = CustomConstants.DBTMTrainer;
                 //Insert General Person and registor employee
+                if (string.IsNullOrEmpty(dBTMNewRegistrationModel.Password))
+                {
+                    List<GeneralSystemGlobleSettingModel> systemGlobleSettingList = GetSystemGlobleSettingList();
+                    string password = systemGlobleSettingList?.FirstOrDefault((GeneralSystemGlobleSettingModel x) => x.FeatureName.Equals(GeneralSystemGlobleSettingEnum.DefaultPassword.ToString(), StringComparison.InvariantCultureIgnoreCase)).FeatureValue;
+                    dBTMNewRegistrationModel.Password = password;
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = false;
+                }
+                else
+                {
+                    dBTMNewRegistrationModel.IsPasswordUserGenerated = true;
+                }
+
                 employeeId = InsertEmployee(dBTMNewRegistrationModel, currentDate, organisationCentreMaster, ApiCustomSettings.TrainerDepartmentId.ToString(), ApiCustomSettings.TrainerDesignationId, out personId);
                 if (employeeId > 0)
                 {
@@ -201,7 +226,10 @@ namespace Coditech.API.Service
                         sanctionPostCode = InsertAdminRole(currentDate, ApiCustomSettings.TrainerDepartmentId, organisationCentreMaster.CentreCode, employeeId, ApiCustomSettings.TrainerDesignationId, DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), ApiCustomSettings.DBTMTrainerMenuCode.Split(",").ToList());
                     }
                     InsertDBTMTrainerRegistration(dBTMNewRegistrationModel, currentDate, employeeId);
-
+                    long generalTrainerMasterId = _generalTrainerMasterMasterRepository.Table.Where(x => x.EmployeeId == employeeId).Select(y => y.GeneralTrainerMasterId).FirstOrDefault();
+                    short generalDepartmentMasterId = _employeeMasterMasterRepository.Table.Where(x => x.EmployeeId == employeeId).Select(y => y.GeneralDepartmentMasterId).FirstOrDefault();
+                    dBTMNewRegistrationModel.GeneralTrainerMasterId = generalTrainerMasterId;
+                    dBTMNewRegistrationModel.Custom5 = generalDepartmentMasterId.ToString();
                     joiningCodeDetails.IsExpired = true;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                 }
@@ -304,7 +332,7 @@ namespace Coditech.API.Service
                 UserType = UserTypeEnum.Employee.ToString(),
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
-                IsPasswordChange = true,
+                IsPasswordChange = dBTMNewRegistrationModel.IsPasswordUserGenerated,
                 Custom1 = dBTMNewRegistrationModel.Custom1
             };
             GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);

@@ -6,13 +6,25 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
 }
-
 <div class="page-content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
                 <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">User Profile</h4>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#RemarkPopupId" onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId', @Model.DBTMTraineeDetailId, '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))' )">
+                                <i class="fa fa-download me-1"></i> Download PDF
+                            </button>
+                            <!-- BACK BUTTON  -->
+                            <a class="btn btn-sm btn-soft-secondary" href="@Url.Action("List", controllerName, new DataTableViewModel { SelectedCentreCode = Model.SelectedCentreCode, SelectedParameter1 = Model.SelectedParameter1 })">
+                                <i class="fas fa-arrow-left me-2"></i> Back
+                            </a>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <div class="dastone-profile">
                             <div class="row">
@@ -71,8 +83,6 @@
                                         </li>
                                     </ul>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
@@ -109,52 +119,49 @@
         </div>
         <!-- TEST PERFORMANCE RECORDS -->
         @{
-            var traineeProfiles = (Model.TraineeProfiles ?? new List<DBTMTraineeProfileModel>())
-            .GroupBy(x => x.PerformanceMatrix)
-            .ToDictionary(g => g.Key, g => g.ToList());
+            var traineeProfilePerformanceList = (Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
+            .GroupBy(x => x.PerformanceMatrix).ToDictionary(g => g.Key, g => g.ToList());
         }
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header text-center">
-                        <h4 class="card-title">Test Performance</h4>
+                        <h4 class="card-title">Activity Performance</h4>
                     </div>
                     <div class="card-body">
-                        @if (traineeProfiles.Any())
+                        @if (traineeProfilePerformanceList.Any())
                         {
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped text-center align-middle">
                                     <thead class="text-center">
                                         <tr>
-                                            @foreach (var matrix in traineeProfiles.Keys)
+                                            @foreach (var matrix in traineeProfilePerformanceList.Keys)
                                             {
-                                                <th colspan="2" class="text-center" style="background-color: #f2f2f2;">
-                                                    @matrix
-                                                </th>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            @foreach (var matrix in traineeProfiles.Keys)
-                                            {
-                                                <th class="text-center">Activity/Test</th>
+                                                <th class="text-center">@matrix</th>
                                                 <th class="text-center">Score</th>
                                             }
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @{
-                                            int maxRows = traineeProfiles.Values.Max(g => g.Count);
-
+                                            int maxRows = traineeProfilePerformanceList.Values.Max(g => g.Count);
                                             for (int i = 0; i < maxRows; i++)
                                             {
                                                 <tr>
-                                                    @foreach (var matrix in traineeProfiles.Keys)
+                                                    @foreach (var matrix in traineeProfilePerformanceList.Keys)
                                                     {
-                                                        var tests = traineeProfiles[matrix];
+                                                        var tests = traineeProfilePerformanceList[matrix];
                                                         if (i < tests.Count)
                                                         {
                                                             <td class="text-center align-middle">@tests[i].TestName</td>
-                                                            <td class="text-center align-middle">@tests[i].Score</td>
+                                                            if (tests[i].IsUp)
+                                                            {
+                                                                <td class="text-center align-middle"><i class="fas fa-arrow-up"></i> @tests[i].Score</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td class="text-center align-middle"><i class="fas fa-arrow-down"></i> @tests[i].Score</td>
+                                                            }
                                                         }
                                                         else
                                                         {
@@ -179,3 +186,9 @@
         </div>
     </div>
 </div>
+<iframe id="hiddenDownloader"
+        style="display:none;"
+        title="pdf-downloader">
+</iframe>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
+<script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>

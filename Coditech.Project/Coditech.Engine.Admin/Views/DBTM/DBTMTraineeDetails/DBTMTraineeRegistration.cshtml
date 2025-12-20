@@ -4,27 +4,34 @@
     ViewBag.Title = "Trainee Registration";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
-<div class="page-content mt-5">
-    <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="card-title">Trainee Registration</h4>
-                            </div><!--end col-->
-                        </div>  <!--end row-->
-                        <a class="btn btn-sm btn-soft-secondary float-end" href="/DBTMTraineeDetails/List" role="button">
-                            <i class="fas fa-arrow-left me-2"></i>Back
-                        </a>
-                    </div>
                     <div class="card-body">
-                        @using (Html.BeginForm("TraineeRegistration", controllerName, FormMethod.Post))
+                        @using (Html.BeginForm("TraineeRegistration", controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             bool trainersLoaded = false;
+                            bool isTrainer = false;
+                            var user = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                            if (user?.Custom1 == CustomConstants.DBTMTrainer)
+                            {
+                                isTrainer = true;
+                            }
                             @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                             {
                                 trainersLoaded = true;
@@ -58,7 +65,10 @@
                                     <div class="mb-3">
                                         <label class="form-label">&nbsp;</label>
                                         <div class="form-check" style="padding-left:0px !important; display:block !important">
-                                            <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
+                                            @if (!isTrainer)
+                                            {
+                                                <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -74,19 +84,6 @@
                                 }
                             </div>
                             @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTraineeRegistration.cshtml", Model)
-                            <div class="form-group row my-3">
-                                <div class="col-sm-6">
-                                    <div class="custom-control custom-switch switch-success">
-                                        <div class="col-sm-6 text-end">
-                                            @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
-                                            {
-                                                <button class="btn btn-success w-100 waves-effect waves-light">Register<i class="fas fa-sign-in-alt ms-1"></i></button>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
                         }
                     </div>
                 </div>

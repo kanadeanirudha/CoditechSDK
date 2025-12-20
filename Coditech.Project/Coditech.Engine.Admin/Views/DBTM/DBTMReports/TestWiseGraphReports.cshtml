@@ -8,6 +8,7 @@
                 DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
                 IsCustomDropdown = true,
                 ChangeEvent = "DBTMReports.GetGraphListByDBTMTestMasterId()",
+                Parameter = "IsActive"
             };
     DropdownViewModel traineeDropdown = new DropdownViewModel()
             {
@@ -17,13 +18,13 @@
                 ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()",
                 IsCustomDropdown = true
             };
-    DropdownViewModel graphTypeDropdown = new DropdownViewModel()
+    DropdownViewModel graphModeDropdown = new DropdownViewModel()
             {
-                DropdownType = DropdownCustomTypeEnum.DBTMGraph.ToString(),
-                DropdownName = "DBTMGraphMasterId",
-                DropdownSelectedValue = Model.DBTMGraphMasterId.ToString(),
-                IsCustomDropdown = true,
-                ChangeEvent = "DBTMReports.GetDBTMTestWiseGraphReports()"
+                DropdownType = DropdownCustomTypeEnum.GraphMode.ToString(),
+                DropdownName = "GraphMode",
+                DropdownSelectedValue = Model.GraphMode,
+                ChangeEvent = "DBTMReports.GetGraphListByGraphMode()",
+                IsCustomDropdown = true
             };
     string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
 }
@@ -49,7 +50,7 @@
                                     <input type="radio" id="radio-list" name="switch-tile-list" value="list" onclick="window.open('@($"{url}/dbtmreports/testwisereports")', '_self');" />
                                     <label for="radio-list">List</label>
                                     <input type="radio" id="radio-tile" name="switch-tile-list" value="tile" checked onclick="window.open('@($"{url}/dbtmreports/TestWiseGraphReports")', '_self');" />
-                                    <label for="radio-tile">Graph</label>                                
+                                    <label for="radio-tile">Graph</label>
                                 </div>
                             </div>
                         </div>
@@ -59,37 +60,47 @@
                             <div class="col-md-1">
                                 <label class="form-label">Activity List</label>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown)
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">Graph Type</label>
-                            </div>
-                            <div class="col-md-2">
-                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphTypeDropdown)
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label">Trainee List</label>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">Graph Mode</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", graphModeDropdown)
                             </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-1">
-                                @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
+                                <label class="form-label">Graph Type</label>
                             </div>
-                            <div class="col-md-2">
-                                @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            <div class="col-md-11">
+                                <div class="mb-3 multiselect-dropdown">
+                                    @Html.ListBoxFor(x => x.DBTMSelectedGraph, new SelectList(Model.DBTMGraphMasterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2 align-items-center" style="margin-top:10px !important;">
+                            <div class="col-md-1">
+                                <label id="FromDateLabel" class="form-label">From Date</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly", id = "FromDate" })
+                            </div>
+                            <div class="col-md-1" id="ToDateLabelWrapper">
+                                <label class="form-label">To Date</label>
+                            </div>
+                            <div class="col-md-3" id="ToDateWrapper">
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly", id = "ToDate" })
                             </div>
                             <div class="col-md-1">
-                                @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
-                            </div>
-                            <div class="col-md-2">
-                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
-                            </div>
-                            <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseGraphReports()" />
+                                <button type="button" class="btn btn-success w-100" onclick="DBTMReports.GetDBTMTestWiseGraphReports()">Show</button>
                             </div>
                         </div>
                         <div class="row  mt-3">
@@ -105,10 +116,10 @@
     </div>
 </div>
 <style>
-        .switch-field {
-            display: flex;
-            overflow: hidden;
-        }
+    .switch-field {
+        display: flex;
+        overflow: hidden;
+    }
 
         .switch-field input {
             position: absolute !important;
@@ -132,10 +143,10 @@
             cursor: pointer;
         }
 
-        .switch-field label:hover {
+            .switch-field label:hover {
                 background-color: rgba(255, 184, 34, 0.6);
                 color: #000;
-        }
+            }
 
         .switch-field input:checked + label {
             background-color: rgb(255, 184, 34);
@@ -158,66 +169,76 @@
             border-radius: 0 4px 4px 0;
         }
 
+    .multiselect-dropdown {
+        margin-bottom: 0 !important;
+    }
 </style>
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <script type="text/javascript">
-        function ShowHideDiv(type) {
-            if (type == "list") {
+        function applyGraphModeUI() {
+             var mode = $("#GraphMode").val();
+             if (mode === "InstantaneousChart") {
+                 $("#ToDateLabelWrapper").hide();
+                 $("#ToDateWrapper").hide();
+                 $("#FromDateLabel").text("Date");
+                 var fromDate = $("#FromDate").datepicker("getDate");
+                 if (fromDate) {
+                     $("#ToDate").datepicker("setDate", fromDate);
+                 }
+                 $("#ToDate").datepicker("disable");
+             }
+             else {
+                 $("#ToDateLabelWrapper").show();
+                 $("#ToDateWrapper").show();
+                 $("#FromDateLabel").text("From Date");
+                 $("#ToDate").datepicker("enable");
+             }
+         }
+         function updateToDate() {
+             var mode = $("#GraphMode").val();
+             var fromDate = $("#FromDate").datepicker("getDate");
 
-            }
-            else {
+             if (mode !== "InstantaneousChart") {
+                 if (fromDate) {
+                     $("#ToDate").datepicker("option", "minDate", fromDate);
+                     var toDate = $("#ToDate").datepicker("getDate");
+                     if (toDate && toDate < fromDate) {
+                         $("#ToDate").datepicker("setDate", fromDate);
+                     }
+                 }
+             }
+         }
+         $(document).ready(function () {
+             var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
 
-            }
-            $("#SelectedParameter2").val(type);
-        }
-        function updateToDate() {
-            var fromDate = $("#FromDate").datepicker("getDate");
-            if (fromDate) {
-                $("#ToDate").datepicker("option", "minDate", fromDate);
-                var toDate = $("#ToDate").datepicker("getDate");
-                if (toDate && toDate < fromDate) {
-                    $("#ToDate").datepicker("setDate", fromDate);
-                }
-            }
-        }
-
-        $(document).ready(function () {
-            var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
-            // FromDate
-            $("#FromDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: dateFormat,
-                language: "en",
-                autoSize: true,
-                gotoCurrent: true,
-                clearBtn: true,
-                showButtonPanel: true,
-                closeText: 'Clear',
-                maxDate: new Date(), 
-                onSelect: function () {
-                    updateToDate();
-                }
-            });
-
-            // ToDate
-            $("#ToDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: dateFormat,
-                language: "en",
-                autoSize: true,
-                gotoCurrent: true,
-                clearBtn: true,
-                showButtonPanel: true,
-                closeText: 'Clear',
-                maxDate: new Date(), 
-                onSelect: function () {
-                    updateToDate();
-                }
-            });
-            updateToDate();
-        });
+             $("#FromDate").datepicker({
+                 changeMonth: true,
+                 changeYear: true,
+                 dateFormat: dateFormat,
+                 maxDate: new Date(),
+                 onSelect: function () {
+                     updateToDate();
+                     applyGraphModeUI();
+                 }
+             });
+             $("#ToDate").datepicker({
+                 changeMonth: true,
+                 changeYear: true,
+                 dateFormat: dateFormat,
+                 maxDate: new Date(),
+                 onSelect: function () {
+                     updateToDate();
+                 }
+             });
+             $("#ToDate").on("mousedown focus click", function (e) {
+                 if ($("#GraphMode").val() === "InstantaneousChart") {
+                     e.preventDefault();
+                     e.stopImmediatePropagation();
+                 }
+             });
+             applyGraphModeUI();
+         });
     </script>
 }
+

@@ -141,7 +141,7 @@ namespace Coditech.Admin.Agents
         }
 
         //Graph Reports
-        public virtual GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, DateTime FromDate, DateTime ToDate)
+        public virtual GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime FromDate, DateTime ToDate)
         {
             GraphModel graphModel = new GraphModel();
             if (dBTMTestMasterId > 0)
@@ -155,8 +155,29 @@ namespace Coditech.Admin.Agents
                     generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
                     usertype = userModel?.Custom1;
                 }
-                GraphResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                GraphResponse response = _dBTMReportsClient.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
                 graphModel = response.GraphModel;
+
+            }
+            return graphModel;
+        }
+
+        public virtual List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
+        {
+            List<GraphModel> graphModel = new List<GraphModel>();
+            if (dBTMTestMasterId > 0)
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                GraphListResponse response = _dBTMReportsClient.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                graphModel = response.GraphList;
 
             }
             return graphModel;

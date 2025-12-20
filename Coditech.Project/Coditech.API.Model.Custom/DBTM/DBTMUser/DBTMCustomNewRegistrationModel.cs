@@ -7,5 +7,6 @@
         public int? SpecializationEnumId { get; set; }
         public List<string> GeneralTraineeAssociatedToTrainerIds { get; set; }
         public string JoiningCode { get; set; }
+        public int GeneralBatchMasterId { get; set; }
     }
 }

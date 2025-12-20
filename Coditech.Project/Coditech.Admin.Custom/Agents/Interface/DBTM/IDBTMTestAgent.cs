@@ -38,7 +38,49 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteDBTMTest(string dBTMTestMasterIds, out string errorMessage);
         DBTMTestParameterListViewModel DBTMTestParameter();
-        DBTMGraphMasterListViewModel DBTMGraph();
+        DBTMGraphMasterListViewModel DBTMGraph(int dBTMTestMasterId);
         DBTMTestCalculationListViewModel DBTMTestCalculation();
+
+        /// <summary>
+        /// Get ActivityListViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMDeviceViewModel.</returns>
+        DBTMActivityListViewSequenceListViewModel GetActivityListViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel);
+
+        /// <summary>
+        /// Delete ActivityListViewSequence.
+        /// </summary>
+        /// <param name="dBTMTestParameterListViewSequenceIds">dBTMTestParameterListViewSequenceIds.</param>
+        /// <returns>Returns true if deleted successfully else return false.</returns>
+        bool DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, out string errorMessage);
+
+        /// <summary>
+        /// Get ActivityListViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMDeviceViewModel.</returns>
+        DBTMActivityListViewSequenceViewModel GetActivityListViewSequence(int dBTMTestParameterListViewSequenceId);
+
+        /// <summary>
+        /// Update ActivityListViewSequence.
+        /// </summary>
+        /// <param name="dBTMTestViewModel">dBTMTestViewModel.</param>
+        /// <returns>Returns updated DBTMTestViewModel</returns>
+        DBTMActivityListViewSequenceViewModel UpdateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMTestViewModel);
+
+        /// <summary>
+        /// Update Sequence Number.
+        /// </summary>
+        /// <param name="dBTMActivityListViewSequenceViewModel">dBTMActivityListViewSequenceViewModel.</param>
+        /// <returns>Returns updated DBTMActivityListViewSequenceViewModel</returns>
+        DBTMActivityListViewSequenceViewModel UpdateSequenceNumber(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel);
+
+        /// <summary>
+        /// Create ActivityListViewSequence.
+        /// </summary>
+        /// <param name="dBTMActivityListViewSequenceViewModel">DBTM Activity List View Sequence View Model.</param>
+        /// <returns>Returns created model.</returns>
+        DBTMActivityListViewSequenceViewModel CreateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel);
     }
 }

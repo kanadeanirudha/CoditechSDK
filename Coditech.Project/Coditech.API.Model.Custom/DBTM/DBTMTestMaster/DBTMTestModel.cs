@@ -33,5 +33,6 @@ namespace Coditech.Common.API.Model
         public string TestMediaFileName { get; set; }
         [Required]
         public List<string> DBTMSelectedGraph { get; set; }
+        public string PerformanceMatrix { get; set; }
     }
 }

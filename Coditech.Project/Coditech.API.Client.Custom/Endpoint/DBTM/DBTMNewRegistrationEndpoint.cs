@@ -11,9 +11,9 @@ namespace Coditech.API.Endpoint
         public string TrainerRegistrationAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/TrainerRegistration/TrainerRegistration";
 
-        public string GetGeneralTrainerByJoiningCode(string joiningCode)
+        public string GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/GetGeneralTrainerByJoiningCode?joiningCode={joiningCode}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/GetGeneralTrainerByJoiningCode?joiningCode={joiningCode}&generalTrainerMasterId={generalTrainerMasterId}";
             return endpoint;
         }
 

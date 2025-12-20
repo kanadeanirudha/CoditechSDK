@@ -37,7 +37,15 @@
                         {
                             <span class="card-title">All Trainee Details List</span>
                         }
-                        <a class=" btn btn-sm btn-soft-primary float-end" href="/DBTMTraineeDetails/TraineeRegistration" role="button"><i class="fas fa-plus me-2"></i>Add Trainee</a>
+                        @if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                        {
+                            <a class="btn btn-soft-primary" href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails", new { trainerId = @Model.SelectedParameter1 })"> Add Trainee </a>
+                        }
+                        else
+                        {
+                            // Centre Owner
+                            <a class="btn btn-soft-primary" href="/DBTMTraineeDetails/TraineeRegistration"> Add Trainee </a>
+                        }
 
                     </div>
                     <div class="card-header">

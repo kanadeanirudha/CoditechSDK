@@ -52,9 +52,7 @@ namespace Coditech.Common.API.Model
         public string MobileNumber { get; set; }
         [Required]
         public string DeviceSerialCode { get; set; }
-        [Required]
         public string Password { get; set; }
-        [Required]
         public string ConfirmPassword { get; set; }
         public bool TermsAndCondition { get; set; }
         [Required]
@@ -66,5 +64,6 @@ namespace Coditech.Common.API.Model
         [Required]
         public int TrainerSpecializationEnumId { get; set; }
         public long GeneralTrainerMasterId { get; set; }
+        public bool IsPasswordUserGenerated { get; set; }
     }
 }
