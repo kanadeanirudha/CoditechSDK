@@ -5,9 +5,12 @@
         public const string DBTMTrainer = "DBTMTrainer";
         public const string DBTMCentreOwner = "DBTMCentreOwner";
         public const string LiveResultSession = "LiveResultSession";
+        public const string TotalCount = "TotalCount";
+        public const string CountByTime = "CountByTime";
         public const string CompletionTime = "CompletionTime";
         public const string AverageTotalCompletionTime = "AverageTotalCompletionTime";
         public const string Time = "Time";
+        public const string Count = "Count";
         public const string AverageVelocity = "AverageVelocity";
         public const string AverageTotalVelocity = "AverageTotalVelocity";
         public const string Distance = "Distance";
