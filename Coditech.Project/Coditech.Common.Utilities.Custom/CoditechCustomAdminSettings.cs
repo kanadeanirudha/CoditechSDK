@@ -12,7 +12,6 @@ namespace Coditech.Admin.Utilities
         /// <returns>The appsettings configuration section.</returns>
         private static IConfigurationSection settings = CoditechDependencyResolver.GetService<IConfiguration>().GetSection("appsettings");
 
-
         public static string CoditechDBTMApiRootUri
         {
             get
