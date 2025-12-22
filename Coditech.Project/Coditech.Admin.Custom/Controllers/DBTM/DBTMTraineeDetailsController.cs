@@ -4,13 +4,14 @@ using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
-using Coditech.Common.Logger;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using System.Diagnostics;
+using System.IO;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTraineeDetailsController : BaseController
@@ -20,19 +21,16 @@ namespace Coditech.Admin.Controllers
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly IServiceProvider _serviceProvider;
-        protected readonly ICoditechLogging _coditechLogging;
 
         private const string createEditTraineeDetails = "~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeDetails.cshtml";
         private const string createEditAssociatedTrainer = "~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/CreateEditAssociatedTrainer.cshtml";
-        public DBTMTraineeDetailsController(ICoditechLogging coditechLogging, IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
+        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             _dBTMTraineeDetailsAgent = dBTMTraineeDetailsAgent;
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
-            _coditechLogging = coditechLogging;
-
         }
 
         #region DBTMTraineeDetails
@@ -626,19 +624,14 @@ namespace Coditech.Admin.Controllers
             try
             {
                 bytes = System.IO.File.ReadAllBytes(report.FilePath);
-                _coditechLogging.LogMessage("FilePath:" + report.FilePath, "DownloadAthleteReportPdf", TraceLevel.Error);
-                _coditechLogging.LogMessage("bytes:" + bytes.Count(), "DownloadAthleteReportPdf", TraceLevel.Error);
-
             }
             finally
             {
                 if (System.IO.File.Exists(report.FilePath))
                 {
-                    System.IO.File.Delete(report.FilePath);
-                    _coditechLogging.LogMessage("file deleted:", "DownloadAthleteReportPdf", TraceLevel.Error);
+            System.IO.File.Delete(report.FilePath);
                 }
             }
-            _coditechLogging.LogMessage("file generated:", "DownloadAthleteReportPdf", TraceLevel.Error);
             return File(bytes, "application/pdf", report.FileName);
         }
         #endregion
