@@ -7,13 +7,12 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
-using System;
-using System.Collections.Specialized;
-using System.Data;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using System.Collections.Specialized;
+using System.Data;
+using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-using Twilio.Converters;
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
@@ -329,6 +328,7 @@ namespace Coditech.API.Service
         {
             // GetTraineeProfileHtml
             string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
+            _coditechLogging.LogMessage(html, "GenerateAthletePdfRemark", TraceLevel.Error);
 
             // Generate PDF
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
@@ -337,12 +337,17 @@ namespace Coditech.API.Service
 
             string fileName = $"Athlete_Profile_{dBTMTraineeDetailId}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
             string filePath = Path.Combine(folderPath, fileName);
+
+            _coditechLogging.LogMessage("File Path:" + filePath, "GenerateAthletePdfRemark", TraceLevel.Error);
             var pdf = new HtmlToPdfDocument
             {
                 GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
                 Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
             };
             _converter.Convert(pdf);
+
+            _coditechLogging.LogMessage("File converted into pdf:" + filePath, "GenerateAthletePdfRemark", TraceLevel.Error);
+
             return new DBTMReportsListModel
             {
                 FileName = fileName,
