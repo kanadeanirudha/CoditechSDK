@@ -613,14 +613,25 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult DownloadAthleteReportPdf(long dBTMTraineeDetailId,string remarks)
+        public ActionResult DownloadAthleteReportPdf(long dBTMTraineeDetailId, string remarks)
         {
-            DBTMTraineeProfileViewModel profile = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
-            if (profile == null)
+            DBTMReportsListViewModel report = _dBTMTraineeDetailsAgent.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
+            if (report == null)
                 return Content("Athlete profile not found.");
-            var report = _dBTMTraineeDetailsAgent.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
-            byte[] bytes = System.IO.File.ReadAllBytes(report.FilePath);
+
+            byte[] bytes;
+
+            try
+            {
+                bytes = System.IO.File.ReadAllBytes(report.FilePath);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(report.FilePath))
+                {
             System.IO.File.Delete(report.FilePath);
+                }
+            }
             return File(bytes, "application/pdf", report.FileName);
         }
         #endregion
