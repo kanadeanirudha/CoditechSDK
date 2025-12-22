@@ -1,7 +1,6 @@
 using Coditech.API.Common;
 using DinkToPdf;
 using DinkToPdf.Contracts;
-using Microsoft.Extensions.FileProviders;
 using System.Reflection;
 using System.Runtime.Loader;
 
@@ -11,9 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 /// Registers common services.
 /// </summary>
 builder.RegisterCommonServices();
-
-
- ///  LOAD wkhtmltopdf DLL
 
 var nativeDllPath = Path.Combine(
     builder.Environment.ContentRootPath,
@@ -33,21 +29,8 @@ context.LoadUnmanagedLibrary(nativeDllPath);
 builder.Services.AddSingleton<IConverter>(
     new SynchronizedConverter(new PdfTools())
 );
-
 var app = builder.Build();
 
-
-app.UseStaticFiles(); 
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "data")),
-    RequestPath = "/data"
-});
-
-app.UseRouting();
- 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -55,26 +38,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
- ///  ROUTING & MVC
-
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
+/// <summary>
+/// Registers application services with the specified builder.
+/// </summary>
 app.RegisterApplicationServices(builder);
 
 app.Run();
 
-
-  /// <summary>
-  /// Custom DLL Loader
-  /// </summary>
-
 class CustomAssemblyLoadContext : AssemblyLoadContext
 {
     public IntPtr LoadUnmanagedLibrary(string absolutePath)
-        => LoadUnmanagedDllFromPath(absolutePath);
+        => LoadUnmanagedDll(absolutePath);
+
+    protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
+        => LoadUnmanagedDllFromPath(unmanagedDllName);
 
     protected override Assembly Load(AssemblyName assemblyName)
         => null!;
