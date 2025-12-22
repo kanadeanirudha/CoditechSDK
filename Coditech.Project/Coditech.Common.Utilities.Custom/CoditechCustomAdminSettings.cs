@@ -17,22 +17,20 @@ namespace Coditech.Admin.Utilities
         {
             get
             {
-#if DEBUG
-                return Convert.ToString(settings["CoditechDBTMApiRootUri"]);
-#else
-                return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-dbtm.{settings["ApiDomainName"]}");
-#endif
+                if (settings["EnvironmentName"] == "dev")
+                    return Convert.ToString(settings["CoditechDBTMApiRootUri"]);
+                else
+                    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-mediamanager.{settings["ApiDomainName"]}");
             }
         }
         public static string CoditechOrganisationApiRootUri
         {
             get
             {
-#if DEBUG
-                return Convert.ToString(settings["CoditechOrganisationApiRootUri"]);
-#else
-                return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-organisation.{settings["ApiDomainName"]}");
-#endif
+                if (settings["EnvironmentName"] == "dev")
+                    return Convert.ToString(settings["CoditechOrganisationApiRootUri"]);
+                else
+                    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-mediamanager.{settings["ApiDomainName"]}");
             }
         }
     }

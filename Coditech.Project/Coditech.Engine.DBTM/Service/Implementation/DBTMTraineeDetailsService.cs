@@ -7,13 +7,12 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
-using System;
-using System.Collections.Specialized;
-using System.Data;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using System.Collections.Specialized;
+using System.Data;
+using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
-using Twilio.Converters;
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
@@ -329,6 +328,7 @@ namespace Coditech.API.Service
         {
             // GetTraineeProfileHtml
             string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
+            _coditechLogging.LogMessage(html, "GenerateAthletePdfRemark", TraceLevel.Error);
 
             // Generate PDF
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
@@ -337,12 +337,17 @@ namespace Coditech.API.Service
 
             string fileName = $"Athlete_Profile_{dBTMTraineeDetailId}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
             string filePath = Path.Combine(folderPath, fileName);
+
+            _coditechLogging.LogMessage("File Path:" + filePath, "GenerateAthletePdfRemark", TraceLevel.Error);
             var pdf = new HtmlToPdfDocument
             {
                 GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
                 Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
             };
             _converter.Convert(pdf);
+
+            _coditechLogging.LogMessage("File converted into pdf:" + filePath, "GenerateAthletePdfRemark", TraceLevel.Error);
+
             return new DBTMReportsListModel
             {
                 FileName = fileName,
@@ -358,10 +363,10 @@ namespace Coditech.API.Service
 
             // Get trainee profile
             DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
-            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
             if (profile == null)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
 
+            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
             string templateCode = EmailTemplateCodeCustomEnum.TraineeReportTemplate.ToString();
 
             var emailTemplate = GetEmailTemplateByCode(profile.CentreCode, templateCode);
@@ -430,6 +435,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TrainerName, profile.TrainerName, html);
+            html = ReplaceTokenWithMessageText("#ReportIssuedDate#", DateTime.Now.ToString("dd-MMM-yyyy"), html);
             if (string.IsNullOrWhiteSpace(remarks))
             {
                 html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, html);
@@ -450,8 +456,8 @@ namespace Coditech.API.Service
                 performanceMatrixHtml += " <thead><tr>";
                 foreach (var matrix in traineeProfilePerformanceList.Keys)
                 {
-                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#f8c6b8;\">" + matrix + "</th>";
-                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;\">Score</th>";
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#ee445d;color:#fff;\">" + matrix + "</th>";
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#182750;color:#fff;\">Score</th>";
                 }
                 performanceMatrixHtml += "</tr></thead>";
                 //End Bind Table Header
