@@ -20,7 +20,7 @@ namespace Coditech.Admin.Utilities
                 if (settings["EnvironmentName"] == "dev")
                     return Convert.ToString(settings["CoditechDBTMApiRootUri"]);
                 else
-                    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-mediamanager.{settings["ApiDomainName"]}");
+                    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-dbtm.{settings["ApiDomainName"]}");
             }
         }
         public static string CoditechOrganisationApiRootUri
@@ -30,7 +30,7 @@ namespace Coditech.Admin.Utilities
                 if (settings["EnvironmentName"] == "dev")
                     return Convert.ToString(settings["CoditechOrganisationApiRootUri"]);
                 else
-                    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-mediamanager.{settings["ApiDomainName"]}");
+                    return Convert.ToString($"{settings["Scheme"]}{settings["ClientName"]}-{settings["EnvironmentName"]}-api-organisation.{settings["ApiDomainName"]}");
             }
         }
     }
