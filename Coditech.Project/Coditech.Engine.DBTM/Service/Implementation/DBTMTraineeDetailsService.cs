@@ -358,10 +358,10 @@ namespace Coditech.API.Service
 
             // Get trainee profile
             DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
-            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
             if (profile == null)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
 
+            string centreName = base.GetOrganisationCentreNameByCentreCode(profile.CentreCode);
             string templateCode = EmailTemplateCodeCustomEnum.TraineeReportTemplate.ToString();
 
             var emailTemplate = GetEmailTemplateByCode(profile.CentreCode, templateCode);
@@ -430,6 +430,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TrainerName, profile.TrainerName, html);
+            html = ReplaceTokenWithMessageText("#ReportIssuedDate#", DateTime.Now.ToString("dd-MMM-yyyy"), html);
             if (string.IsNullOrWhiteSpace(remarks))
             {
                 html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, html);
@@ -450,8 +451,8 @@ namespace Coditech.API.Service
                 performanceMatrixHtml += " <thead><tr>";
                 foreach (var matrix in traineeProfilePerformanceList.Keys)
                 {
-                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#f8c6b8;\">" + matrix + "</th>";
-                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;\">Score</th>";
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#ee445d;color:#fff;\">" + matrix + "</th>";
+                    performanceMatrixHtml += "<th style=\"border:1px solid #333;padding:8px;background:#182750;color:#fff;\">Score</th>";
                 }
                 performanceMatrixHtml += "</tr></thead>";
                 //End Bind Table Header
