@@ -109,6 +109,17 @@ namespace Coditech.API.Service
                     }
                     XValuesList = xValues.ToArray();
                 }
+                else if (graphMaster.XParameter == "Position")
+                {
+                    List<string> xValues = new List<string>();
+                    xValues.AddRange(dBTMReportsList
+                                    .GroupBy(x => x.FromTo)
+                                    .OrderBy(g => g.Min(x => x.Row))
+                                    .Select(g => g.Key)
+                                    );
+
+                    XValuesList = xValues.ToArray();
+                }
                 if (XValuesList != null)
                 {
                     graphModel.IsRecordFound = true;
