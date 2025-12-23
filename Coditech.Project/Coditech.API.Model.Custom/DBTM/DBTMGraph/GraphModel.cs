@@ -7,6 +7,7 @@
         public bool IsRecordFound { get; set; }
         public string GraphType { get; set; }
         public string GraphName { get; set; }
+        public string GraphSize { get; set; }
         public List<string> DBTMSelectedGraph { get; set; }
     }
 }

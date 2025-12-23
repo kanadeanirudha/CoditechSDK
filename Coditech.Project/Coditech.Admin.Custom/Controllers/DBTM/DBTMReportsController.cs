@@ -173,6 +173,18 @@ namespace Coditech.Admin.Controllers
             return Json(list);
         }
 
+        [HttpGet]
+        public IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId )
+        {
+            if (dBTMTestMasterId <= 0 || dBTMTraineeDetailId <= 0)
+                return Json(new List<string>());
+
+            List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+            List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+
+            return Json(result);
+        }
+
         //NameWise Reports
         [HttpGet]
         public ActionResult NameWiseReports()

@@ -253,5 +253,32 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMReports/GetActivityPerformedDates")]
+        [Produces("application/json")]
+        public virtual IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        {
+            try
+            {
+                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+
+                if (dates == null || !dates.Any())
+                    return Ok(new List<string>());
+
+                var result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+                return Ok(result);
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, nameof(GetActivityPerformedDates), TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new{ HasError = true,ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode});
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage( ex,nameof(GetActivityPerformedDates),TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message});
+            }
+        }
     }
 }

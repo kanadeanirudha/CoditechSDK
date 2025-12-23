@@ -7,6 +7,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Coditech.Admin.Agents
 {
@@ -181,6 +182,15 @@ namespace Coditech.Admin.Agents
 
             }
             return graphModel;
+        }
+        public virtual List<DateTime> GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        {
+            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+
+            if (dateStrings == null || !dateStrings.Any())
+                return new List<DateTime>();
+
+            return dateStrings.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
         }
 
         //Delete Report .
