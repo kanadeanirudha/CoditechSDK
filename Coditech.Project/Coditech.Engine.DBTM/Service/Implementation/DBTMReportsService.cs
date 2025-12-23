@@ -25,6 +25,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMTestParameterListviewSequenceRepository;
+        private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -39,6 +40,7 @@ namespace Coditech.API.Service
             _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph
@@ -147,6 +149,23 @@ namespace Coditech.API.Service
                 }
             }
             return graphModel;
+        }
+
+        public List<DateTime> GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        {
+            if (dBTMTestMasterId <= 0 || dBTMTraineeDetailId <= 0)
+                return new List<DateTime>();
+
+            var dates = (from dd in _dBTMDeviceDataRepository.Table
+                         join td in _dBTMTraineeDetailsRepository.Table
+                             on dd.PersonCode equals td.PersonCode
+                         join tm in _dBTMTestMasterRepository.Table
+                             on dd.TestCode equals tm.TestCode
+                         where td.DBTMTraineeDetailId == dBTMTraineeDetailId
+                               && tm.DBTMTestMasterId == dBTMTestMasterId
+                         select (dd.CreatedDate ?? dd.TestPerformedTime).Date).Distinct().OrderBy(d => d).ToList();
+
+            return dates;
         }
 
         private void BindInstantaneousChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<DateTime, DBTMReportsModel>> groupedReports, string[] colorPalette)
