@@ -1,10 +1,10 @@
-﻿var DBTMReports = {
+﻿var activityPerformedDates = [];
+var DBTMReports = {
     Initialize: function () {
         DBTMReports.constructor();
     },
     constructor: function () {
     },
-
     GetDBTMTestWiseMultiReports: function () {
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
@@ -49,6 +49,7 @@
     },
 
     GetDBTMTestWiseGraphReports: function () {
+        DBTMReports.LoadActivityPerformedDates();
         var dBTMTestMasterId = $("#DBTMTestMasterId").val();
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var fromdate = $("#FromDate").val();
@@ -129,6 +130,7 @@
                         }));
                     });
                     $ddl.selectpicker('refresh');
+                    DBTMReports.LoadActivityPerformedDates();
                     CoditechCommon.HideLodder();
                 },
                 error: function () {
@@ -182,6 +184,43 @@
                 }
             });
         }
+    },
+
+    LoadActivityPerformedDates: function () {
+
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        if (!dBTMTestMasterId || !dBTMTraineeDetailId) {
+            activityPerformedDates = [];
+            return;
+        }
+        $.ajax({
+            cache: false,
+            type: "GET",
+            url: "/DBTMReports/GetActivityPerformedDates",
+            dataType: "json",
+            data: {
+                dBTMTestMasterId: dBTMTestMasterId,
+                dBTMTraineeDetailId: dBTMTraineeDetailId
+            },
+            success: function (data) {
+
+                activityPerformedDates = data || [];
+
+                console.log("Activity dates loaded:", activityPerformedDates);
+
+                // Refresh datepickers so highlights apply
+                $("#FromDate").datepicker("refresh");
+                $("#ToDate").datepicker("refresh");
+            },
+            error: function () {
+                activityPerformedDates = [];
+                CoditechNotification.DisplayNotificationMessage(
+                    "Failed to load activity dates.",
+                    "error"
+                );
+            }
+        });
     },
 
     GetDBTMMultiTestListByGeneralBatchMasterId: function () {
