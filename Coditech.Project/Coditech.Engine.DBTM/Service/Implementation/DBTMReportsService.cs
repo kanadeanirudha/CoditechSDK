@@ -112,6 +112,7 @@ namespace Coditech.API.Service
                     graphModel.IsRecordFound = true;
                     graphModel.GraphType = graphMaster.GraphType;
                     graphModel.GraphName = graphMaster.GraphName;
+                    graphModel.GraphSize = graphMaster.GraphSize;
                     int colorIndex = 0;
                     var groupedReports = dBTMReportsList.GroupBy(x => x.CreatedDate);
                     var groupedReportsByDateFormat = dBTMReportsList.GroupBy(x => x.CreatedDate.ToString(CustomConstants.GraphDateFormat));
