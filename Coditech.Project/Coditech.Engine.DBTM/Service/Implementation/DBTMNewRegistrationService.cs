@@ -24,6 +24,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterMasterRepository;
         private readonly ICoditechRepository<EmployeeMaster> _employeeMasterMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
 
         public DBTMNewRegistrationService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -37,6 +38,7 @@ namespace Coditech.API.Service
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _employeeMasterMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Public
@@ -158,7 +160,7 @@ namespace Coditech.API.Service
 
             if (IsEmailIdAlreadyExist(dBTMNewRegistrationModel.EmailId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Email Id"));
-
+            //
             OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMNewRegistrationModel.CentreCode)?.FirstOrDefault();
 
             if (IsNull(joiningCodeDetails))
@@ -230,6 +232,9 @@ namespace Coditech.API.Service
                     short generalDepartmentMasterId = _employeeMasterMasterRepository.Table.Where(x => x.EmployeeId == employeeId).Select(y => y.GeneralDepartmentMasterId).FirstOrDefault();
                     dBTMNewRegistrationModel.GeneralTrainerMasterId = generalTrainerMasterId;
                     dBTMNewRegistrationModel.Custom5 = generalDepartmentMasterId.ToString();
+                    
+                    // Trainer to Batch
+                    CreateTrainerBatch(dBTMNewRegistrationModel, generalTrainerMasterId, currentDate);
                     joiningCodeDetails.IsExpired = true;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                 }
@@ -652,6 +657,68 @@ namespace Coditech.API.Service
             });
         }
 
+        private void CreateTrainerBatch(DBTMNewRegistrationModel model, long generalTrainerMasterId,DateTime currentDate)
+        {
+            if (string.IsNullOrWhiteSpace(model.Custom4))
+                return;
+
+            if (!int.TryParse(model.Custom4, out int traineeCount) || traineeCount <= 0)
+                return;
+
+            string actualCentreCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == model.CentreCode).Select(x => x.CentreCode).FirstOrDefault() ?? model.CentreCode;
+
+            // Get EmployeeId from GeneralTrainerMaster
+            long employeeId = _generalTrainerMasterMasterRepository.Table.Where(x => x.GeneralTrainerMasterId == generalTrainerMasterId).Select(x => x.EmployeeId).FirstOrDefault();
+
+            if (employeeId <= 0)
+                return;
+
+            // Get UserMasterId from UserMaster
+            long userMasterId = _userMasterRepository.Table.Where(x => x.EntityId == employeeId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.UserMasterId).FirstOrDefault();
+
+            if (userMasterId <= 0)
+                return;
+            GeneralBatchMaster batchMaster = new GeneralBatchMaster()
+            {
+                BatchName = $"{model.FirstName}{model.LastName}Batch",
+                BatchFrequency = "Daily",
+                CentreCode = actualCentreCode,
+                BatchStartDate = currentDate.Date,
+                BatchExpireDate = currentDate.Date.AddDays(2),
+                BatchStartTime = TimeSpan.Parse("10:00"),
+                Duration = TimeSpan.Parse("01:30:00"),
+                WeekDays = "",
+                IsActive = true,
+                CreatedBy = userMasterId,
+                CreatedDate = currentDate,
+                ModifiedDate = currentDate
+            };
+
+            batchMaster = _generalBatchMasterRepository.Insert(batchMaster, userMasterId);
+
+            if (batchMaster?.GeneralBatchMasterId <= 0)
+                return;
+
+            // Create trainee joining codes 
+            List<OrganisationCentrewiseJoiningCode> joiningCodeList = new List<OrganisationCentrewiseJoiningCode>();
+
+            for (int i = 1; i <= traineeCount; i++)
+            {
+                joiningCodeList.Add(new OrganisationCentrewiseJoiningCode
+                {
+                    CentreCode = actualCentreCode,
+                    JoiningCode = GenerateAlphaNumericCode(5),
+                    Quantity = 1,
+                    IsExpired = false,
+                    JoiningCodeTypeEnumId = 325,
+                    Custom1 = batchMaster.GeneralBatchMasterId.ToString(),
+                    CreatedBy = userMasterId,
+                    CreatedDate = currentDate,
+                    ModifiedDate = currentDate
+                });
+            }
+            _organisationCentrewiseJoiningCodeRepository.Insert(joiningCodeList, userMasterId);
+        }
         #endregion
     }
 }
