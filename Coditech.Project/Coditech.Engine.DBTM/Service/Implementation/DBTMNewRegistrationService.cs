@@ -694,7 +694,7 @@ namespace Coditech.API.Service
                 ModifiedDate = currentDate
             };
 
-            batchMaster = _generalBatchMasterRepository.Insert(batchMaster);
+            batchMaster = _generalBatchMasterRepository.Insert(batchMaster, userMasterId);
 
             if (batchMaster?.GeneralBatchMasterId <= 0)
                 return;
