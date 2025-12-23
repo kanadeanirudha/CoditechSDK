@@ -15,19 +15,37 @@
         var xValues = @Html.Raw(Model.XValues);
         var datasets = [];
 
-    @foreach (var dataset in Model.Datasets)
+    @if (Model.GraphType == "BarChart")
     {
-        <text>
-                datasets.push({
-                    label: "@dataset.Label",
-                    data: @Html.Raw(dataset.Data),
-                    // fill: false,
-                    backgroundColor: "@dataset.Color",
-                    borderColor: "@dataset.Color",
-                    borderWidth: 2,
-                    tension: 0.4
-                });
-        </text>
+        @foreach (var dataset in Model.Datasets)
+        {
+            <text>
+                    datasets.push({
+                        label: "@dataset.Label",
+                        data: @Html.Raw(dataset.Data),
+                        backgroundColor: "@dataset.Color",
+                        borderColor: "@dataset.Color",
+                        borderWidth: 2,
+                        tension: 0.4
+                    });
+            </text>
+        }
+    }
+    else
+    {
+        @foreach (var dataset in Model.Datasets)
+        {
+            <text>
+                    datasets.push({
+                        label: "@dataset.Label",
+                        data: @Html.Raw(dataset.Data),
+                        fill: false,
+                        borderColor: "@dataset.Color",
+                        borderWidth: 2,
+                        tension: 0.4
+                    });
+            </text>
+        }
     }
 
             new Chart(ctx, {
