@@ -710,8 +710,8 @@ namespace Coditech.API.Service
                     JoiningCode = GenerateAlphaNumericCode(5),
                     Quantity = 1,
                     IsExpired = false,
-                    JoiningCodeTypeEnumId = 325,
-                    Custom1 = batchMaster.GeneralBatchMasterId.ToString(),
+                    JoiningCodeTypeEnumId = 324,
+                    Custom1 = generalTrainerMasterId.ToString(),
                     CreatedBy = userMasterId,
                     CreatedDate = currentDate,
                     ModifiedDate = currentDate
