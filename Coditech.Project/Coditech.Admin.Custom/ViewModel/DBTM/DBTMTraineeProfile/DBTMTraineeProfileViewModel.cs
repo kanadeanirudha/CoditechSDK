@@ -27,5 +27,6 @@ namespace Coditech.Admin.ViewModel
         public string Remarks { get; set; }
         public string SelectedCentreCode { get; set; }
         public string SelectedParameter1 { get; set; }
+        public string TrainerName { get; set; }
     }
 }
