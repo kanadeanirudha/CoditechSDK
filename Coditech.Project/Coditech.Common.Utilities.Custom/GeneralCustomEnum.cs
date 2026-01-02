@@ -25,6 +25,7 @@
         DBTMTrainerCentrewise,
         DisplayOn,
         GraphMode,
+        TypeOfCentre,
     }
     public enum DashboardFormCustomEnum
     {

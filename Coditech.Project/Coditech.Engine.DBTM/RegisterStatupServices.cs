@@ -269,6 +269,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<ILiveTestResultDashboardService, LiveTestResultDashboardService>();
             builder.Services.AddScoped<IDBTMGraphMasterService, DBTMGraphMasterService>();
             builder.Services.AddScoped<IDBTMCampMasterService, DBTMCampMasterService>();
+            builder.Services.AddScoped<IDBTMCentreWiseSettingService, DBTMCentreWiseSettingService>();
         }
         #endregion
     }
