@@ -78,7 +78,7 @@ namespace Coditech.Admin.Controllers
             }
             else if (string.IsNullOrWhiteSpace(dBTMNewRegistrationViewModel.Custom4))
             {
-                dBTMNewRegistrationViewModel.ErrorMessage = "Total Number Of Students is requirred";
+                dBTMNewRegistrationViewModel.ErrorMessage = "Total Number Of Trainee is required";
             }
             else
             {

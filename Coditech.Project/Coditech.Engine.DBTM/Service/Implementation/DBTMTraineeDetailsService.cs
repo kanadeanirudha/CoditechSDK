@@ -297,10 +297,20 @@ namespace Coditech.API.Service
                     performanceModel.TestName = list.FirstOrDefault().TestName;
                     performanceModel.PerformanceMatrix = list.FirstOrDefault().PerformanceMatrix;
                     decimal lastRecordSum, previousResordSum;
-                    if (list.Any(x => x.ParameterCode == CustomConstants.Time))
+                    if (list.Any(x => x.ParameterCode == CustomConstants.Count))
+                    {
+                        lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Count).Sum(x => x.ParameterValue);
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Count)} </br>(Total Count)";
+                        previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Count && x.RowNumber == 2).Sum(x => x.ParameterValue);
+                        if (lastRecordSum < previousResordSum)
+                        {
+                            performanceModel.IsUp = false;
+                        }
+                    }
+                    else if (list.Any(x => x.ParameterCode == CustomConstants.Time))
                     {
                         lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
-                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} </br>(Total Time)";
                         previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => x.ParameterValue);
                         if (lastRecordSum < previousResordSum)
                         {
@@ -310,7 +320,7 @@ namespace Coditech.API.Service
                     if (list.Any(x => x.ParameterCode == CustomConstants.JumpHeight))
                     {
                         lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => x.ParameterValue);
-                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} </br>(Jump Height)";
                         previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => x.ParameterValue);
                         if (lastRecordSum < previousResordSum)
                         {
