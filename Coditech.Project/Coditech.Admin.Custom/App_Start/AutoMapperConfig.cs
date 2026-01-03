@@ -58,6 +58,8 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMCampMasterListModel, DBTMCampListViewModel>().ReverseMap();
             CreateMap<DBTMCampUserModel, DBTMCampUserViewModel>();
             CreateMap<DBTMCampUserViewModel, DBTMCampUserModel>();
+            CreateMap<DBTMCentrewiseTestParameterListViewModel, DBTMCentrewiseTestParameterListViewViewModel>().ReverseMap();
+            CreateMap<DBTMCentrewiseTestParameterListViewListModel, DBTMCentrewiseTestParameterListViewListViewModel>().ReverseMap();
             CreateMap<DBTMCentreWiseSettingModel, DBTMCentreWiseSettingViewModel>();
             CreateMap<DBTMCentreWiseSettingViewModel, DBTMCentreWiseSettingModel>();
             #endregion
