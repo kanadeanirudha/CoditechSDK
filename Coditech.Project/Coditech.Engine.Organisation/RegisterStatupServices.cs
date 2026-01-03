@@ -5,7 +5,9 @@ using Coditech.Common.API;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Hangfire;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 namespace Coditech.API.Common
 {
@@ -56,6 +58,8 @@ namespace Coditech.API.Common
             // Registered custom filters.
             builder.RegisterFilters();
 
+            //HealthChecks
+            builder.AddHealthChecks();
         }
 
         /// <summary>
@@ -108,6 +112,9 @@ namespace Coditech.API.Common
 
             // Adds a CORS middleware to your web application pipeline to allow cross domain requests.
             app.UseCors(corsOrigin);
+
+            // Health Check endpoint
+            app.HealthCheckEndpoint();
         }
 
         #region Common custom methods
@@ -222,9 +229,44 @@ namespace Coditech.API.Common
 			builder.Services.ConfigureServices(builder.Configuration);
 		}
 
-		#endregion
+        #endregion
 
-		public static void RegisterCustomDI(this WebApplicationBuilder builder)
+        #region HealthChecks
+        /// <summary>
+        /// Add Health Checks.
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddHealthChecks(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddHealthChecks().AddCheck("self", () => HealthCheckResult.Healthy("API is running"));
+        }
+
+        public static void HealthCheckEndpoint(this WebApplication app)
+        {
+            app.MapHealthChecks("/health", new HealthCheckOptions
+            {
+                ResponseWriter = async (context, report) =>
+                {
+                    context.Response.ContentType = "application/json";
+
+                    var result = new
+                    {
+                        status = report.Status.ToString(),
+                        checks = report.Entries.Select(e => new
+                        {
+                            name = e.Key,
+                            status = e.Value.Status.ToString(),
+                            description = e.Value.Description
+                        })
+                    };
+
+                    await context.Response.WriteAsJsonAsync(result);
+                }
+            });
+        }
+        #endregion
+
+        public static void RegisterCustomDI(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IUserService, DBTMUserService>();
             builder.Services.AddScoped<IDBTMUserService, DBTMUserService>();
