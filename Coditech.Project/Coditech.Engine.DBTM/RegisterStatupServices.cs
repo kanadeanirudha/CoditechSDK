@@ -1,13 +1,13 @@
-﻿
-using Coditech.API.Data;
+﻿using Coditech.API.Data;
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
-
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 
 namespace Coditech.API.Common
@@ -56,6 +56,8 @@ namespace Coditech.API.Common
             // Registered custom filters.
             builder.RegisterFilters();
 
+            //HealthChecks
+            builder.AddHealthChecks();
         }
 
         /// <summary>
@@ -108,6 +110,9 @@ namespace Coditech.API.Common
 
             // Adds a CORS middleware to your web application pipeline to allow cross domain requests.
             app.UseCors(corsOrigin);
+
+            // Health Check endpoint
+            app.HealthCheckEndpoint();
         }
 
         #region Common custom methods
@@ -242,6 +247,41 @@ namespace Coditech.API.Common
         }
         #endregion
 
+        #region HealthChecks
+        /// <summary>
+        /// Add Health Checks.
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddHealthChecks(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddHealthChecks().AddCheck("self", () => HealthCheckResult.Healthy("API is running"));
+        }
+
+        public static void HealthCheckEndpoint(this WebApplication app)
+        {
+            app.MapHealthChecks("/health", new HealthCheckOptions
+            {
+                ResponseWriter = async (context, report) =>
+                {
+                    context.Response.ContentType = "application/json";
+
+                    var result = new
+                    {
+                        status = report.Status.ToString(),
+                        checks = report.Entries.Select(e => new
+                        {
+                            name = e.Key,
+                            status = e.Value.Status.ToString(),
+                            description = e.Value.Description
+                        })
+                    };
+
+                    await context.Response.WriteAsJsonAsync(result);
+                }
+            });
+        }
+        #endregion
+
         #region register Dependency
         /// <summary>
         /// Register DI with default microsoft container.
@@ -269,6 +309,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<ILiveTestResultDashboardService, LiveTestResultDashboardService>();
             builder.Services.AddScoped<IDBTMGraphMasterService, DBTMGraphMasterService>();
             builder.Services.AddScoped<IDBTMCampMasterService, DBTMCampMasterService>();
+            builder.Services.AddScoped<IDBTMCentreWiseSettingService, DBTMCentreWiseSettingService>();
         }
         #endregion
     }

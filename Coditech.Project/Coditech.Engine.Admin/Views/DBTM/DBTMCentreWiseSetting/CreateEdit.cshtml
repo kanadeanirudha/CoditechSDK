@@ -1,0 +1,66 @@
+﻿@model DBTMCentreWiseSettingViewModel
+@{
+    ViewBag.Title = Model.DBTMCentreWiseSettingId > 0 ? "Update Centre Wise Setting" : "Add Centre Wise Setting";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.OrganisationCentreMasterId > 0 };
+
+}
+<div class="page-content">
+    <div class="container-fluid  mt-5">
+        <div class="row">
+            @if (Model.OrganisationCentreMasterId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/Organisation/OrganisationCentre/_OrganisationCentreSidePannel.cshtml", Model.OrganisationCentreMasterId.ToString())
+                </div>
+            }
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.DBTMCentreWiseSettingId)
+                            @Html.HiddenFor(m => m.OrganisationCentreMasterId)
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.CentreCode, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                                        @Html.ValidationMessageFor(x => x.CentreCode)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TypeOfCentre, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                        {
+                                            DropdownSelectedValue = Model.TypeOfCentre ?? string.Empty,
+                                                                        DropdownName = "TypeOfCentre",
+                                                                        GroupCode = DropdownCustomTypeEnum.TypeOfCentre.ToString(),
+                                                                        IsTextValueSame = true,
+                                                                        IsRequired = true,
+                                                                        IsStringProperty = true
+                                                                        })
+                                    @Html.ValidationMessageFor(x => x.TypeOfCentre)
+                                </div>
+                            </div>
+                        </div>
+                                                }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
