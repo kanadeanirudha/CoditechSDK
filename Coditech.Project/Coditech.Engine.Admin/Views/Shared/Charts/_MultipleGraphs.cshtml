@@ -2,26 +2,27 @@
 
 @if (Model != null && Model.Any())
 {
-    foreach (var graph in Model)
-    {
-        <div class="@graph.GraphSize">
-            <div class="graph-wrapper my-2">
-                <h5 class="text-center font-weight-bold mb-3">
-                    @graph.GraphName
-                </h5>
+    <div class="row">
+        @foreach (var graph in Model)
+        {
+            <div class="@graph.GraphSize">
+                <div class="graph-wrapper my-2">
+                    <h5 class="text-center font-weight-bold mb-3">
+                        @graph.GraphName
+                    </h5>
 
-                @if (graph.GraphType == "LineChart" || graph.GraphType == "BarChart")
-                {
-
-                    @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", graph.LineChartModel)
-                }
-                else if (graph.GraphType == "PieChart")
-                {
-                    @Html.Partial("~/Views/Shared/Charts/_PieChart.cshtml", graph.PieChartModel)
-                }
+                    @if (graph.GraphType == "LineChart" || graph.GraphType == "BarChart")
+                    {
+                        @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", graph.LineChartModel)
+                    }
+                    else if (graph.GraphType == "PieChart")
+                    {
+                        @Html.Partial("~/Views/Shared/Charts/_PieChart.cshtml", graph.PieChartModel)
+                    }
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 }
 else
 {
