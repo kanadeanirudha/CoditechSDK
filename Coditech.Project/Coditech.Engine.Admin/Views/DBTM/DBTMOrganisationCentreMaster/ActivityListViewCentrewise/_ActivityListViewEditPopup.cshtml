@@ -1,0 +1,69 @@
+﻿@model DBTMCentrewiseTestParameterListViewViewModel
+@{
+    Layout = null;
+
+    DropdownViewModel displayOnDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DisplayOn.ToString(),
+                DropdownName = "DisplayOn",
+                DropdownSelectedValue = Model.DisplayOn?.ToString(),
+                IsCustomDropdown = true
+            };
+}
+<div class="modal-header">
+    <h6 class="modal-title m-0">@Model.TestName</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+@using (Html.BeginForm("GetActivityListViewEditPopup", "DBTMOrganisationCentreMaster", FormMethod.Post, new { id = "ActivityListViewEditForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.DBTMTestParameterListViewSequenceId)
+    @Html.HiddenFor(x => x.CentreCode)
+    <div class="modal-body">
+        <div class="mb-3">
+            @Html.LabelFor(x => x.ColumnName, new { @class = "form-label" })
+            @Html.TextBoxFor(x => x.ColumnName,
+                     new { @class = "form-control", @readonly = "readonly" })
+        </div>
+        <div class="row mb-3 align-items-center">
+
+            <!-- Display On -->
+            <div class="col-md-6">
+                @Html.LabelFor(x => x.DisplayOn, new { @class = "form-label required" })
+                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", displayOnDropdown)
+                @Html.ValidationMessageFor(x => x.DisplayOn)
+            </div>
+
+            <!-- Is Column Cell Bold -->
+            <div class="col-md-3">
+                <div class="form-check d-flex align-items-center mt-4">
+                    @Html.CheckBoxFor(x => x.IsColumnCellBold, new { @class = "form-check-input me-2" })
+                    <label class="form-label mb-0">
+                        Is Column Cell Bold
+                    </label>
+                </div>
+            </div>
+
+            <!-- Is Active -->
+            <div class="col-md-3">
+                <div class="form-check d-flex align-items-center mt-4">
+                    @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input me-2" })
+                    <label class="form-label mb-0">
+                        Is Active
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-footer d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancel </button>
+        <button type="button"
+                class="btn btn-success"
+                onclick="DBTMOrganisationCentrewiseListView.ConfirmActivityListViewUpdate();">
+            Update
+        </button>
+    </div>
+}
+@Html.Partial("_ValidationScriptsPartial")

@@ -9,5 +9,6 @@
         }
         public int DBTMTestMasterId { get; set; }
         public string TestName { get; set; }
+        public string CentreCode { get; set; }
     }
 }

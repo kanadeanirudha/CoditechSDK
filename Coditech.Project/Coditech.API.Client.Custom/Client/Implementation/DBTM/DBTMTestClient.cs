@@ -753,8 +753,6 @@ namespace Coditech.API.Client
                 }
             }
         }
-
-
         public virtual TrueFalseResponse DeleteActivityListViewSequence(ParameterModel body)
         {
             return Task.Run(async () => await DeleteActivityListViewSequenceAsync(body, CancellationToken.None)).GetAwaiter().GetResult();

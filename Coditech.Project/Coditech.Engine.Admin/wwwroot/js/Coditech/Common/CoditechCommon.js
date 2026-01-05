@@ -368,5 +368,19 @@
             return true;
         }
         return false;
+    },
+
+    AllowAlphabetWithSpacing: function () {
+        var charCode = event.which || event.keyCode;
+
+        // Allow: A-Z, a-z, 0-9, and space (charCode 32)
+        if (
+            (charCode >= 65 && charCode <= 90) ||  // A-Z
+            (charCode >= 97 && charCode <= 122) || // a-z
+            charCode === 32                        // space
+        ) {
+            return true;
+        }
+        return false;
     }
 }
