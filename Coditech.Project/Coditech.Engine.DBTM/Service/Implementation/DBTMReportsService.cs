@@ -287,6 +287,7 @@ namespace Coditech.API.Service
             {
                 return new DBTMReportsListModel();
             }
+            string centreCode = _generalBatchMasterRepository.Table.Where(x=>x.GeneralBatchMasterId == generalBatchMasterId).Select(y=>y.CentreCode).FirstOrDefault();
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -301,7 +302,7 @@ namespace Coditech.API.Service
             {
                 dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
             }
-            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, null, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, centreCode, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
             return dBTMReportsListModel;
         }
 
@@ -755,7 +756,6 @@ namespace Coditech.API.Service
 
         private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport)
         {
-            //DBTMReportsListModel listModel = new DBTMReportsListModel();
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
@@ -766,11 +766,6 @@ namespace Coditech.API.Service
                 {
                     dataTable.Columns.Add(paramColumn, typeof(String));
                 }
-
-                //List<DBTMTestParameterListviewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
-                //                           .Where(x => x.DBTMTestMasterId == dBTMTestMasterId)
-                //                           .OrderBy(y => y.SequenceNumber)
-                //                           .ToList();
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal = new List<DBTMTestParameterListViewSequence>(listviewSequenceColumns);
                 List<string> listviewSequenceColumnList = BindReportColumns(dBTMTestMasterId, isMobileRequest, dataTable, listviewSequenceColumns);
                 DataRow newRow = null;
