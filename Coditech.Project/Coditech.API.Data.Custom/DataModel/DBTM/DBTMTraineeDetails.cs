@@ -19,6 +19,9 @@ namespace Coditech.API.Data
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
         public int? SpecializationEnumId { get; set; }
+        public string SchoolName { get; set; }
+        public string Standard { get; set; }
+        public string Section { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
