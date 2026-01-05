@@ -16,7 +16,7 @@ namespace Coditech.Admin.ViewModel
         public bool IsCalculatedParameter { get; set; }
 
         [Required(ErrorMessage = "Recursion is required.")]
-        [Range(0, 12, ErrorMessage = "Recursion must be between 0 and 12.")]
+        [Range(1, 999, ErrorMessage = "Recursion must be between 1 and 999.")]
         public short Recursion { get; set; }
 
         [Display(Name = "Sequence Number")]
