@@ -301,7 +301,7 @@ namespace Coditech.API.Service
             {
                 dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
             }
-            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, null, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
             return dBTMReportsListModel;
         }
 
@@ -590,7 +590,7 @@ namespace Coditech.API.Service
             {
                 dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
             }
-            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, isDownloadReport);
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, centreCode, isMobileRequest, dBTMReportsList, fromDate, toDate, isDownloadReport);
             return dBTMReportsListModel;
         }
 
@@ -646,16 +646,13 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
-        private DataTable BindDBTMDataDetails(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
+        private DataTable BindDBTMDataDetails(int dBTMTestMasterId, string centreCode, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
         {
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
-                List<DBTMTestParameterListViewSequence> listviewSequenceColumns = _dBTMTestParameterListviewSequenceRepository.Table
-                                          .Where(x => x.DBTMTestMasterId == dBTMTestMasterId && x.IsActive && (x.DisplayOn.Contains("both") || x.DisplayOn == displayOn))
-                                          .OrderBy(y => y.SequenceNumber)
-                                          .ToList();
+                List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);                 
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
                     return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport);
@@ -1073,6 +1070,16 @@ namespace Coditech.API.Service
                                               TestName = a.TestName,
                                           }).ToList();
             return result;
+        }
+
+        private List<DBTMTestParameterListViewSequence> GetListViewSequenceByCentre(int dBTMTestMasterId, string centreCode, bool isMobileRequest)
+        {
+            string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
+            CoditechViewRepository<DBTMTestParameterListViewSequence> repo = new CoditechViewRepository<DBTMTestParameterListViewSequence>( _serviceProvider.GetService<CoditechCustom_Entities>());
+            repo.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@DisplayOn", displayOn, ParameterDirection.Input, DbType.String);
+            return repo.ExecuteStoredProcedureList("Coditech_GetDBTMTestParameterListViewSequence @DBTMTestMasterId,@CentreCode,@DisplayOn").ToList();
         }
         #endregion
     }
