@@ -19,7 +19,7 @@ namespace Coditech.API.Client
         /// </summary>
         /// <param name="DBTMOrganisationCentreParameterListViewSequenceId">DBTMOrganisationCentreParameterListViewSequenceId</param>
         /// <returns>Returns DBTMCentrewiseTestParameterListViewResponse.</returns>
-        DBTMCentrewiseTestParameterListViewResponse GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId);
+        DBTMCentrewiseTestParameterListViewResponse GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode);
 
         /// <summary>
         /// Update DBTMCentrewiseTestParameterListView.

@@ -15,7 +15,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dBTMOrganisationCentreMasterId">dBTMOrganisationCentreMasterId</param>
         /// <returns>Returns DBTMDeviceViewModel.</returns>
-        DBTMCentrewiseTestParameterListViewViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId);
+        DBTMCentrewiseTestParameterListViewViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode);
 
         /// <summary>
         /// Update DBTMCentrewiseTestParameterListView.

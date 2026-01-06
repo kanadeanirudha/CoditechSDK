@@ -32,9 +32,6 @@
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCalculatedParameter)
                             </td>
-                            <td>
-                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
-                            </td>
                             <td class="text-center">
                                 <a href="@Url.Action("ActivityListViewSequence", controllerName, new { dBTMTestParameterListViewSequenceId = item.DBTMTestParameterListViewSequenceId })"
                                    title="Update"

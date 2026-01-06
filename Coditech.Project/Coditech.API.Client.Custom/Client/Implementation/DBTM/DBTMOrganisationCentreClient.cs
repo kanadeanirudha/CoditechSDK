@@ -61,16 +61,16 @@ namespace Coditech.API.Client
                 }
             }
         }
-        public virtual DBTMCentrewiseTestParameterListViewResponse GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId)
+        public virtual DBTMCentrewiseTestParameterListViewResponse GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode)
         {
-            return Task.Run(async () => await GetDBTMCentrewiseTestParameterListViewAsync(dBTMOrganisationCentreParameterListViewSequenceId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetDBTMCentrewiseTestParameterListViewAsync(dBTMOrganisationCentreParameterListViewSequenceId, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMCentrewiseTestParameterListViewResponse> GetDBTMCentrewiseTestParameterListViewAsync(int dBTMOrganisationCentreParameterListViewSequenceId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMCentrewiseTestParameterListViewResponse> GetDBTMCentrewiseTestParameterListViewAsync(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode, CancellationToken cancellationToken)
         {
             if (dBTMOrganisationCentreParameterListViewSequenceId <= 0)
                 throw new System.ArgumentNullException("DBTMOrganisationCentreParameterListViewSequenceId");
 
-            string endpoint = dBTMOrganisationCentreEndpoint.GetDBTMCentrewiseTestParameterListViewAsync(dBTMOrganisationCentreParameterListViewSequenceId);
+            string endpoint = dBTMOrganisationCentreEndpoint.GetDBTMCentrewiseTestParameterListViewAsync(dBTMOrganisationCentreParameterListViewSequenceId, centreCode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

@@ -528,6 +528,13 @@ namespace Coditech.Admin.Helpers
                 Value = "OnlyMobileApp",
                 Selected = "OnlyMobileApp" == dropdownViewModel.DropdownSelectedValue
             });
+
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "None",
+                Value = "None",
+                Selected = "None" == dropdownViewModel.DropdownSelectedValue
+            });
         }
         private static void GetGraphMode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {

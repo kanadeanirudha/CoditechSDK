@@ -42,9 +42,9 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
-        public virtual DBTMCentrewiseTestParameterListViewViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId)
+        public virtual DBTMCentrewiseTestParameterListViewViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode)
         {
-            DBTMCentrewiseTestParameterListViewResponse response = _dBTMOrganisationCentreClient.GetDBTMCentrewiseTestParameterListView(dBTMOrganisationCentreParameterListViewSequenceId);
+            DBTMCentrewiseTestParameterListViewResponse response = _dBTMOrganisationCentreClient.GetDBTMCentrewiseTestParameterListView(dBTMOrganisationCentreParameterListViewSequenceId, centreCode);
             return response?.DBTMCentrewiseTestParameterListViewModel.ToViewModel<DBTMCentrewiseTestParameterListViewViewModel>();
         }
 
@@ -85,11 +85,6 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Is Column Cell Bold",
                 ColumnCode = "IsColumnCellBold",
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Active",
-                ColumnCode = "IsActive",
             });
             return datatableColumnList;
         }

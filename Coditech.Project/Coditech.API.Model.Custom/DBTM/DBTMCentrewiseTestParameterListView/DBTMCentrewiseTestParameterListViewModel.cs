@@ -8,7 +8,6 @@
         public string ParameterCode { get; set; }
         public short SequenceNumber { get; set; }
         public string ColumnName { get; set; }
-        public bool IsActive { get; set; }
         public List<DBTMCentrewiseTestParameterListViewModel> DBTMCentrewiseTestParameterList { get; set; }
         public string DisplayOn { get; set; }
         public bool IsColumnCellBold { get; set; }

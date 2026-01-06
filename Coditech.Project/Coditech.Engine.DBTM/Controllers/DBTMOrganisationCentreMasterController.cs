@@ -49,11 +49,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMOrganisationCentreMaster/GetDBTMCentrewiseTestParameterListView")]
         [HttpGet]
         [Produces(typeof(DBTMCentrewiseTestParameterListViewResponse))]
-        public virtual IActionResult GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId)
+        public virtual IActionResult GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode)
         {
             try
             {
-                DBTMCentrewiseTestParameterListViewModel dBTMOrganisationCentreModel = _dBTMOrganisationCentreMasterService.GetDBTMCentrewiseTestParameterListView(dBTMOrganisationCentreParameterListViewSequenceId);
+                DBTMCentrewiseTestParameterListViewModel dBTMOrganisationCentreModel = _dBTMOrganisationCentreMasterService.GetDBTMCentrewiseTestParameterListView(dBTMOrganisationCentreParameterListViewSequenceId, centreCode);
                 return IsNotNull(dBTMOrganisationCentreModel) ? CreateOKResponse(new DBTMCentrewiseTestParameterListViewResponse { DBTMCentrewiseTestParameterListViewModel = dBTMOrganisationCentreModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)

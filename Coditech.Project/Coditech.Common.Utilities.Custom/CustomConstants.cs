@@ -43,6 +43,6 @@
         public const string GraphDateFormat = "yyyy-MM-dd";
         public const string Turns = "Turns";
         public const int GraphListRoundUpValue = 3;
-        public const string Schools = "schools";
+        public const string School = "School";
     }
 }

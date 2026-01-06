@@ -10,8 +10,8 @@ namespace Coditech.API.Endpoint
         {
             return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMOrganisationCentreMaster/GetActivityListViewSequenceList?dBTMOrganisationCentreMasterId={dBTMOrganisationCentreMasterId}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
         }
-        public string GetDBTMCentrewiseTestParameterListViewAsync(int dBTMOrganisationCentreParameterListViewSequenceId) =>
-           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMOrganisationCentreMaster/GetDBTMCentrewiseTestParameterListView?dBTMOrganisationCentreParameterListViewSequenceId={dBTMOrganisationCentreParameterListViewSequenceId}";
+        public string GetDBTMCentrewiseTestParameterListViewAsync(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMOrganisationCentreMaster/GetDBTMCentrewiseTestParameterListView?dBTMOrganisationCentreParameterListViewSequenceId={dBTMOrganisationCentreParameterListViewSequenceId}&centreCode={centreCode}";
         public string UpdateDBTMCentrewiseTestParameterListViewAsync() =>
                   $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMOrganisationCentreMaster/UpdateDBTMCentrewiseTestParameterListView";
     }
