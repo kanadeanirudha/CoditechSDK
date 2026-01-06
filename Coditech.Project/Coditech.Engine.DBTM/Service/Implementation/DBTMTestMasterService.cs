@@ -430,7 +430,6 @@ namespace Coditech.API.Service
                 IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode ?? false,
                 ColumnName = x.ColumnName ?? string.Empty,
                 HelpText = x.HelpText ?? string.Empty,
-                IsActive = x.IsActive,
                 DisplayOn = x.DisplayOn ?? string.Empty,
                 ColumnCellColor = x.ColumnCellColor ?? string.Empty,
                 IsColumnCellBold = x.IsColumnCellBold ?? false

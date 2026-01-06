@@ -32,6 +32,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly IConverter _converter;
+        private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
 
         public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter) : base(serviceProvider)
         {
@@ -50,6 +51,7 @@ namespace Coditech.API.Service
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _converter = converter;
+            _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -88,6 +90,7 @@ namespace Coditech.API.Service
 
             DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId);
             DBTMTraineeDetailsModel dBTMTraineeDetailsModel = dBTMTraineeDetails?.FromEntityToModel<DBTMTraineeDetailsModel>();
+            DBTMCentreWiseSetting dBTMCentreWiseSetting = _dBTMCentreWiseSettingRepository.Table.FirstOrDefault(x => x.CentreCode == dBTMTraineeDetails.CentreCode);
             if (IsNotNull(dBTMTraineeDetailsModel))
             {
                 GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(dBTMTraineeDetailsModel.PersonId);
@@ -96,6 +99,7 @@ namespace Coditech.API.Service
                     dBTMTraineeDetailsModel.FirstName = generalPersonModel.FirstName;
                     dBTMTraineeDetailsModel.LastName = generalPersonModel.LastName;
                     dBTMTraineeDetailsModel.IsActive = dBTMTraineeDetails.IsActive;
+                    dBTMTraineeDetailsModel.TypeOfCentre = dBTMCentreWiseSetting?.TypeOfCentre;
                 }
             }
             return dBTMTraineeDetailsModel;
@@ -125,6 +129,9 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
             dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
             dBTMTraineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
+            dBTMTraineeDetails.SchoolName = dBTMTraineeDetailsModel.SchoolName;
+            dBTMTraineeDetails.Section = dBTMTraineeDetailsModel.Section;
+            dBTMTraineeDetails.Standard = dBTMTraineeDetailsModel.Standard;
 
             isUpdated = _dBTMTraineeDetailsRepository.Update(dBTMTraineeDetails);
             if (isUpdated)

@@ -48,5 +48,15 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Specialization")]
         public int? SpecializationEnumId { get; set; }
         public string DisplayName { get; set; }
+        [Required]
+        [Display(Name = "School Name")]
+        public string SchoolName { get; set; }
+        [Required]
+        [Display(Name = "Standard")]
+        public string Standard { get; set; }
+        [Required]
+        [Display(Name = "Section")]
+        public string Section { get; set; }
+        public string TypeOfCentre { get; set; }
     }
 }

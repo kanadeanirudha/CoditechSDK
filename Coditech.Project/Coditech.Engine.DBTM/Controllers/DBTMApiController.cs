@@ -45,6 +45,18 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             return Ok();
         }
+
+        [AllowAnonymous]
+        [Route("/dbtmapi/servertime")]
+        [HttpGet]
+        public IActionResult ServerTime()
+        {
+            return Ok(new
+            {
+                serverTime = DateTime.Now
+            });
+        }
+
         [Route("/DBTMApi/InsertDeviceData")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]

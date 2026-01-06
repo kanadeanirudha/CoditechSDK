@@ -54,7 +54,14 @@
                         <h5 class="m-0 ps-2">DBTM Centre Wise Setting</h5>
                     </a>
                 }
+                @if (!userModel.IsAdminUser)
+                {
+                    <a class="nav-link" href="@Url.Action("ActivityListViewSequenceList", "DBTMOrganisationCentreMaster", new { organisationCentreId = @Model })" aria-selected="true">
+                        <i class="fas fa-id-card-alt"></i>
+                        <h5 class="m-0 ps-2">Activity List View Sequence List</h5>
+                    </a>
+                }
+                </div>
             </div>
         </div>
     </div>
-</div>

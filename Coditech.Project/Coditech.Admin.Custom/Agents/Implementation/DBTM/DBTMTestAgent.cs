@@ -395,16 +395,6 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Is Calculated Parameter",
                 ColumnCode = "IsCalculatedParameter",
             });
-            //datatableColumnList.Add(new DatatableColumns()
-            //{
-            //    ColumnName = "Is Calculated Consecutive Parameter Code",
-            //    ColumnCode = "IsCalculatedConsecutiveParameterCode",
-            //});
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Active",
-                ColumnCode = "IsActive",
-            });
             return datatableColumnList;
         }
         #endregion

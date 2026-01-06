@@ -12,7 +12,6 @@
         public bool IsCalculatedConsecutiveParameterCode { get; set; }
         public string ColumnName { get; set; }
         public string HelpText { get; set; }
-        public bool IsActive { get; set; }
         public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
         public string DisplayOn { get; set; }
         public string ColumnCellColor { get; set; }
