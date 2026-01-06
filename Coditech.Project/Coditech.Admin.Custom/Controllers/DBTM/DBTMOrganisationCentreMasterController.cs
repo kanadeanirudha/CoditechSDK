@@ -31,7 +31,7 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public ActionResult GetActivityListViewEditPopup( int dBTMTestParameterListViewSequenceId, string testName, string centreCode)
         {
-            DBTMCentrewiseTestParameterListViewViewModel model = _dBTMOrganisationCentreAgent.GetDBTMCentrewiseTestParameterListView(dBTMTestParameterListViewSequenceId);
+            DBTMCentrewiseTestParameterListViewViewModel model = _dBTMOrganisationCentreAgent.GetDBTMCentrewiseTestParameterListView(dBTMTestParameterListViewSequenceId, centreCode);
             model.TestName = testName;
             model.CentreCode = centreCode;
             return PartialView("~/Views/DBTM/DBTMOrganisationCentreMaster/ActivityListViewCentrewise/_ActivityListViewEditPopup.cshtml", model);

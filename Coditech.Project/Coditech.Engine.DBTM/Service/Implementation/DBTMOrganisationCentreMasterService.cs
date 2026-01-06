@@ -45,9 +45,9 @@ namespace Coditech.API.Service
             return listModel;
         }
  
-        public virtual DBTMCentrewiseTestParameterListViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId)
-        {         
-            DBTMCentrewiseTestParameterListView centrewiseEntity =_dDBTMCentrewiseTestParameterListViewMasterRepository.Table.FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == dBTMOrganisationCentreParameterListViewSequenceId);
+        public virtual DBTMCentrewiseTestParameterListViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode)
+        {
+            DBTMCentrewiseTestParameterListView centrewiseEntity = _dDBTMCentrewiseTestParameterListViewMasterRepository.Table.Where(x => x.DBTMTestParameterListViewSequenceId == dBTMOrganisationCentreParameterListViewSequenceId && x.CentreCode == centreCode).FirstOrDefault();
             if (centrewiseEntity != null)
             {
                 return centrewiseEntity.FromEntityToModel<DBTMCentrewiseTestParameterListViewModel>();
@@ -71,7 +71,7 @@ namespace Coditech.API.Service
         {
             if (IsNull(model))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-            DBTMCentrewiseTestParameterListView existingEntity = _dDBTMCentrewiseTestParameterListViewMasterRepository.Table.FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == model.DBTMTestParameterListViewSequenceId );
+            DBTMCentrewiseTestParameterListView existingEntity = _dDBTMCentrewiseTestParameterListViewMasterRepository.Table.FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == model.DBTMTestParameterListViewSequenceId && x.CentreCode == model.CentreCode);
             if (existingEntity != null)
             {
                 existingEntity.DisplayOn = model.DisplayOn;
