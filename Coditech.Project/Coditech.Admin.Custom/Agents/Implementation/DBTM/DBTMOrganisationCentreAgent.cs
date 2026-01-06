@@ -86,11 +86,6 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Is Column Cell Bold",
                 ColumnCode = "IsColumnCellBold",
             });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Active",
-                ColumnCode = "IsActive",
-            });
             return datatableColumnList;
         }
         #endregion

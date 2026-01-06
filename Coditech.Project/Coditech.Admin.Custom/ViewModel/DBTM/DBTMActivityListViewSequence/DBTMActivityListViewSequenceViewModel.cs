@@ -33,9 +33,6 @@ namespace Coditech.Admin.ViewModel
 
         [Display(Name = "Help Text")]
         public string HelpText { get; set; }
-
-        [Display(Name = "Is Active")]
-        public bool IsActive { get; set; }
         public string DBTMSequenceData { get; set; }
         public List<DBTMActivityListViewSequenceModel> DBTMActivityListViewSequenceList { get; set; }
 

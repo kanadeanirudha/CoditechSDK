@@ -16,9 +16,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Column Name")]
         public string ColumnName { get; set; }
 
-        [Display(Name = "Is Active")]
-        public bool IsActive { get; set; }
-
         [Display(Name = "Display On")]
         public string DisplayOn { get; set; }
 

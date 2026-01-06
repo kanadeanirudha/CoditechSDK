@@ -30,10 +30,10 @@ namespace Coditech.API.Service
         //Get GetActivityListViewSequence by dBTMOrganisationCentreMasterId.
         public virtual DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMOrganisationCentreMasterId, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
-             centreCode = GetOrganisationCentreCodeByOrganisationCentreMasterId(dBTMOrganisationCentreMasterId);
+            centreCode = GetOrganisationCentreCodeByOrganisationCentreMasterId(dBTMOrganisationCentreMasterId);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
-            CoditechViewRepository<DBTMActivityListViewSequenceModel> objStoredProc =  new CoditechViewRepository<DBTMActivityListViewSequenceModel>( _serviceProvider.GetService<CoditechCustom_Entities>());
+            CoditechViewRepository<DBTMActivityListViewSequenceModel> objStoredProc = new CoditechViewRepository<DBTMActivityListViewSequenceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             List<DBTMActivityListViewSequenceModel> activityList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCentrewiseActivityListViewSequenceList @CentreCode")?.ToList();
             // Bind List Model
@@ -52,15 +52,15 @@ namespace Coditech.API.Service
             {
                 return centrewiseEntity.FromEntityToModel<DBTMCentrewiseTestParameterListViewModel>();
             }
-            DBTMTestParameterListViewSequence sequenceEntity = _dBTMActivityListViewSequenceMasterRepository.Table.FirstOrDefault(x => x.DBTMTestParameterListViewSequenceId == dBTMOrganisationCentreParameterListViewSequenceId);
+            DBTMTestParameterListViewSequence sequenceEntity = _dBTMActivityListViewSequenceMasterRepository.Table.Where(x => x.DBTMTestParameterListViewSequenceId == dBTMOrganisationCentreParameterListViewSequenceId)?.FirstOrDefault();
             if (sequenceEntity == null)
                 return null;
             DBTMCentrewiseTestParameterListViewModel dBTMCentrewiseTestParameterListViewModel = new DBTMCentrewiseTestParameterListViewModel
             {
+                DBTMCentrewiseTestParameterListViewId = dBTMOrganisationCentreParameterListViewSequenceId,
                 DBTMTestParameterListViewSequenceId = sequenceEntity.DBTMTestParameterListViewSequenceId,
                 ColumnName = sequenceEntity.ColumnName,
                 DisplayOn = sequenceEntity.DisplayOn,
-                IsActive = sequenceEntity.IsActive,
                 IsColumnCellBold = sequenceEntity.IsColumnCellBold ?? false
             };
             return dBTMCentrewiseTestParameterListViewModel;
@@ -75,7 +75,6 @@ namespace Coditech.API.Service
             if (existingEntity != null)
             {
                 existingEntity.DisplayOn = model.DisplayOn;
-                existingEntity.IsActive = model.IsActive;
                 existingEntity.IsColumnCellBold = model.IsColumnCellBold;
                 existingEntity.ModifiedDate = DateTime.Now;
                 _dDBTMCentrewiseTestParameterListViewMasterRepository.Update(existingEntity);

@@ -15,7 +15,6 @@ namespace Coditech.API.Data
         public bool? IsCalculatedConsecutiveParameterCode { get; set; }
         public string? ColumnName { get; set; }
         public string HelpText { get; set; }
-        public bool IsActive { get; set; }
         public string DisplayOn { get; set; }
         public string ColumnCellColor { get; set; }
         public bool? IsColumnCellBold { get; set; }
