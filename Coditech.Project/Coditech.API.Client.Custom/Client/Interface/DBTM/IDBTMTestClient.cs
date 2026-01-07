@@ -85,5 +85,47 @@ namespace Coditech.API.Client
         /// <param name="DBTMActivityListViewSequenceModel">DBTMActivityListViewSequenceModel.</param>
         /// <returns>Returns DBTMActivityListViewSequenceResponse.</returns>
         DBTMActivityListViewSequenceResponse CreateActivityListViewSequence(DBTMActivityListViewSequenceModel body);
+
+        /// <summary>
+        /// Get ActivityVerticalViewSequence by DBTMTestParameterListViewSequenceId.
+        /// </summary>
+        /// <param name="DBTMTestParameterVerticalViewSequenceId">DBTMTestParameterVerticalViewSequenceId</param>
+        /// <returns>Returns DBTMActivityVerticalViewSequenceResponse.</returns>
+        DBTMActivityVerticalViewSequenceResponse GetActivityVerticalViewSequence(int dBTMTestParameterVerticalViewSequenceId);
+
+        /// <summary>
+        /// Update ActivityVerticalViewSequence.
+        /// </summary>
+        /// <param name="DBTMActivityVerticalViewSequenceModel">DBTMActivityVerticalViewSequenceModel.</param>
+        /// <returns>Returns updated DBTMActivityVerticalViewSequenceResponse</returns>
+        DBTMActivityVerticalViewSequenceResponse UpdateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel model);
+
+        /// <summary>
+        /// Get ActivityVerticalViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMActivityVerticalViewSequenceListResponse.</returns>   
+        DBTMActivityVerticalViewSequenceListResponse GetActivityVerticalViewSequenceList(int dBTMTestMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+
+        /// <summary>
+        /// Delete DBTMActivityVerticalViewSequence.
+        /// </summary>
+        /// <param name="ParameterModel">ParameterModel.</param>
+        /// <returns>Returns true if deleted successfully else return false.</returns>
+        TrueFalseResponse DeleteActivityVerticalViewSequence(ParameterModel body);
+
+        /// <summary>
+        /// Update Vertical Sequence Number.
+        /// </summary>
+        /// <param name="DBTMActivityVerticalViewSequenceModel">DBTMActivityVerticalViewSequenceModel.</param>
+        /// <returns>Returns DBTMActivityVerticalViewSequenceResponse.</returns>
+        DBTMActivityVerticalViewSequenceResponse UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceModel body);
+
+        /// <summary>
+        /// Create DBTMActivityVerticalViewSequence.
+        /// </summary>
+        /// <param name="DBTMActivityVerticalViewSequenceModel">DBTMActivityVerticalViewSequenceModel.</param>
+        /// <returns>Returns DBTMActivityVerticalViewSequenceResponse.</returns>
+        DBTMActivityVerticalViewSequenceResponse CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel body);
     }
 }

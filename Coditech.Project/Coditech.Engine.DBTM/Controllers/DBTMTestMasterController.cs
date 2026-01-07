@@ -264,12 +264,12 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
@@ -286,12 +286,12 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
@@ -308,12 +308,12 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
@@ -330,12 +330,12 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
@@ -352,12 +352,12 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "GymWorkoutPlan", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "GymWorkoutPlan", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
@@ -374,13 +374,147 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "ActivityListViewSequence", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMActivityListViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetActivityVerticalViewSequenceList")]
+        [Produces(typeof(DBTMActivityVerticalViewSequenceListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetActivityVerticalViewSequenceList(int dBTMTestMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        {
+            try
+            {
+                DBTMActivityVerticalViewSequenceListModel list = _dBTMTestMasterService.GetActivityVerticalViewSequenceList(dBTMTestMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMActivityVerticalViewSequenceListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/GetActivityVerticalViewSequence")]
+        [HttpGet]
+        [Produces(typeof(DBTMActivityVerticalViewSequenceResponse))]
+        public virtual IActionResult GetActivityVerticalViewSequence(int dBTMTestParameterVerticalViewSequenceId)
+        {
+            try
+            {
+                DBTMActivityVerticalViewSequenceModel dBTMTestModel = _dBTMTestMasterService.GetActivityVerticalViewSequence(dBTMTestParameterVerticalViewSequenceId);
+                return IsNotNull(dBTMTestModel) ? CreateOKResponse(new DBTMActivityVerticalViewSequenceResponse { DBTMActivityVerticalViewSequenceModel = dBTMTestModel }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/UpdateActivityVerticalViewSequence")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMActivityVerticalViewSequenceResponse))]
+        public virtual IActionResult UpdateActivityVerticalViewSequence([FromBody] DBTMActivityVerticalViewSequenceModel model)
+        {
+            try
+            {
+                bool isUpdated = _dBTMTestMasterService.UpdateActivityVerticalViewSequence(model);
+                return isUpdated ? CreateOKResponse(new DBTMActivityVerticalViewSequenceResponse { DBTMActivityVerticalViewSequenceModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/DeleteActivityVerticalViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult DeleteActivityVerticalViewSequence([FromBody] ParameterModel dBTMTestMasterIds)
+        {
+            try
+            {
+                bool deleted = _dBTMTestMasterService.DeleteActivityVerticalViewSequence(dBTMTestMasterIds);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/UpdateVerticalSequenceNumber")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMActivityVerticalViewSequenceResponse))]
+        public virtual IActionResult UpdateVerticalSequenceNumber([FromBody] DBTMActivityVerticalViewSequenceModel model)
+        {
+            try
+            {
+                DBTMActivityVerticalViewSequenceModel ActivityVerticalViewSequence = _dBTMTestMasterService.UpdateVerticalSequenceNumber(model);
+                return IsNotNull(ActivityVerticalViewSequence) ? CreateCreatedResponse(new DBTMActivityVerticalViewSequenceResponse { DBTMActivityVerticalViewSequenceModel = ActivityVerticalViewSequence }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/CreateActivityVerticalViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMActivityVerticalViewSequenceResponse))]
+        public virtual IActionResult CreateActivityVerticalViewSequence([FromBody] DBTMActivityVerticalViewSequenceModel model)
+        {
+            try
+            {
+                DBTMActivityVerticalViewSequenceModel dBTMActivityVerticalViewSequence = _dBTMTestMasterService.CreateActivityVerticalViewSequence(model);
+                return IsNotNull(dBTMActivityVerticalViewSequence) ? CreateCreatedResponse(new DBTMActivityVerticalViewSequenceResponse { DBTMActivityVerticalViewSequenceModel = dBTMActivityVerticalViewSequence }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ActivityVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

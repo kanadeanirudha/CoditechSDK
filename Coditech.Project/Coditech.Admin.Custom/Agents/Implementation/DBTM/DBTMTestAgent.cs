@@ -294,6 +294,139 @@ namespace Coditech.Admin.Agents
             }
         }
 
+        #region Activity Vertical View Sequence 
+
+        //Get Activity Vertical View Sequence
+        public virtual DBTMActivityVerticalViewSequenceListViewModel GetActivityVerticalViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            DBTMActivityVerticalViewSequenceListResponse response = _dBTMTestClient.GetActivityVerticalViewSequenceList(dBTMTestMasterId, null, null, null, null, int.MaxValue);
+            DBTMActivityVerticalViewSequenceListModel associatedTrainerList = new DBTMActivityVerticalViewSequenceListModel { DBTMActivityVerticalViewSequenceList = response?.DBTMActivityVerticalViewSequenceList };
+            DBTMActivityVerticalViewSequenceListViewModel listViewModel = new DBTMActivityVerticalViewSequenceListViewModel();
+            listViewModel.DBTMActivityVerticalViewSequenceList = associatedTrainerList?.DBTMActivityVerticalViewSequenceList?.ToViewModel<DBTMActivityVerticalViewSequenceViewModel>().ToList();
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMActivityVerticalViewSequenceList.Count, BindActivityVerticalViewSequenceColumns());
+            listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            listViewModel.TestName = response.TestName;
+            return listViewModel;
+        }
+
+        public virtual DBTMActivityVerticalViewSequenceViewModel GetActivityVerticalViewSequence(int dBTMTestParameterListViewSequenceId)
+        {
+            DBTMActivityVerticalViewSequenceResponse response = _dBTMTestClient.GetActivityVerticalViewSequence(dBTMTestParameterListViewSequenceId);
+            return response?.DBTMActivityVerticalViewSequenceModel.ToViewModel<DBTMActivityVerticalViewSequenceViewModel>();
+        }
+
+        //Update Activity Vertical View Sequence
+        public virtual DBTMActivityVerticalViewSequenceViewModel UpdateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMTestViewModel)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTest", TraceLevel.Info);
+                DBTMActivityVerticalViewSequenceResponse response = _dBTMTestClient.UpdateActivityVerticalViewSequence(dBTMTestViewModel.ToModel<DBTMActivityVerticalViewSequenceModel>());
+                DBTMActivityVerticalViewSequenceModel dBTMTestModel = response?.DBTMActivityVerticalViewSequenceModel;
+                _coditechLogging.LogMessage("Agent method execution done.", "DBTMTest", TraceLevel.Info);
+                return IsNotNull(dBTMTestModel) ? dBTMTestModel.ToViewModel<DBTMActivityVerticalViewSequenceViewModel>() : (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(new DBTMActivityVerticalViewSequenceViewModel(), GeneralResources.UpdateErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMTestViewModel, GeneralResources.UpdateErrorMessage);
+            }
+        }
+
+        //Update Vertical Sequence Number
+        public virtual DBTMActivityVerticalViewSequenceViewModel UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(dBTMActivityVerticalViewSequenceViewModel.DBTMSequenceData))
+                {
+                    List<DBTMActivityVerticalViewSequenceModel> dBTMActivityVerticalViewSequenceList = JsonConvert.DeserializeObject<List<DBTMActivityVerticalViewSequenceModel>>(dBTMActivityVerticalViewSequenceViewModel.DBTMSequenceData);
+                    dBTMActivityVerticalViewSequenceViewModel.DBTMActivityVerticalViewSequenceList = dBTMActivityVerticalViewSequenceList;
+                }
+
+                DBTMActivityVerticalViewSequenceResponse response = _dBTMTestClient.UpdateVerticalSequenceNumber(dBTMActivityVerticalViewSequenceViewModel.ToModel<DBTMActivityVerticalViewSequenceModel>());
+                DBTMActivityVerticalViewSequenceModel dBTMActivityVerticalViewSequenceModel = response?.DBTMActivityVerticalViewSequenceModel;
+                return IsNotNull(dBTMActivityVerticalViewSequenceModel) ? dBTMActivityVerticalViewSequenceModel.ToViewModel<DBTMActivityVerticalViewSequenceViewModel>() : new DBTMActivityVerticalViewSequenceViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityVerticalViewSequenceViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityVerticalViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityVerticalViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
+        //Create Activity Vertical View Sequence
+        public virtual DBTMActivityVerticalViewSequenceViewModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel)
+        {
+            try
+            {
+                DBTMActivityVerticalViewSequenceResponse response = _dBTMTestClient.CreateActivityVerticalViewSequence(dBTMActivityVerticalViewSequenceViewModel.ToModel<DBTMActivityVerticalViewSequenceModel>());
+                DBTMActivityVerticalViewSequenceModel gymWorkoutPlanModel = response?.DBTMActivityVerticalViewSequenceModel;
+                return IsNotNull(gymWorkoutPlanModel) ? gymWorkoutPlanModel.ToViewModel<DBTMActivityVerticalViewSequenceViewModel>() : new DBTMActivityVerticalViewSequenceViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityVerticalViewSequenceViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityVerticalViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMActivityVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(dBTMActivityVerticalViewSequenceViewModel, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
+        //Delete ActivityVerticalViewSequence.
+        public virtual bool DeleteActivityVerticalViewSequence(string dBTMTestParameterVerticalViewSequenceIds, out string errorMessage)
+        {
+            errorMessage = GeneralResources.ErrorFailedToDelete;
+
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTest", TraceLevel.Info);
+                TrueFalseResponse trueFalseResponse = _dBTMTestClient.DeleteActivityVerticalViewSequence(new ParameterModel { Ids = dBTMTestParameterVerticalViewSequenceIds });
+                return trueFalseResponse.IsSuccess;
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AssociationDeleteError:
+                        errorMessage = AdminResources.ErrorDeleteDBTMTestMaster;
+                        return false;
+                    default:
+                        errorMessage = GeneralResources.ErrorFailedToDelete;
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                errorMessage = GeneralResources.ErrorFailedToDelete;
+                return false;
+            }
+        }
+        #endregion
         #endregion
 
         #region protected
@@ -389,6 +522,37 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Consecutive Parameter Code",
                 ColumnCode = "ConsecutiveParameterCode",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Calculated Parameter",
+                ColumnCode = "IsCalculatedParameter",
+            });
+            return datatableColumnList;
+        }
+
+        protected virtual List<DatatableColumns> BindActivityVerticalViewSequenceColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Parameter Code",
+                ColumnCode = "ParameterCode",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Column Name",
+                ColumnCode = "ColumnName",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Sequence Number",
+                ColumnCode = "SequenceNumber",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Recursion",
+                ColumnCode = "Recursion",
             });
             datatableColumnList.Add(new DatatableColumns()
             {

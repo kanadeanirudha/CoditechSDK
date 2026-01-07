@@ -82,5 +82,47 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMActivityListViewSequenceViewModel">DBTM Activity List View Sequence View Model.</param>
         /// <returns>Returns created model.</returns>
         DBTMActivityListViewSequenceViewModel CreateActivityListViewSequence(DBTMActivityListViewSequenceViewModel dBTMActivityListViewSequenceViewModel);
+
+        /// <summary>
+        /// Get ActivityVerticalViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMDeviceViewModel.</returns>
+        DBTMActivityVerticalViewSequenceListViewModel GetActivityVerticalViewSequenceList(int dBTMTestMasterId, DataTableViewModel dataTableModel);
+
+        /// <summary>
+        /// Delete ActivityVerticalViewSequence.
+        /// </summary>
+        /// <param name="dBTMTestParameterVerticalViewSequenceIds">dBTMTestParameterVerticalViewSequenceIds.</param>
+        /// <returns>Returns true if deleted successfully else return false.</returns>
+        bool DeleteActivityVerticalViewSequence(string dBTMTestParameterVerticalViewSequenceIds, out string errorMessage);
+
+        /// <summary>
+        /// Get ActivityVerticalViewSequence by dBTMTestMasterId.
+        /// </summary>
+        /// <param name="dBTMTestMasterId">dBTMTestMasterId</param>
+        /// <returns>Returns DBTMDeviceViewModel.</returns>
+        DBTMActivityVerticalViewSequenceViewModel GetActivityVerticalViewSequence(int dBTMTestParameterVerticalViewSequenceId);
+
+        /// <summary>
+        /// Update ActivityVerticalViewSequence.
+        /// </summary>
+        /// <param name="dBTMActivityVerticalViewSequenceViewModel">dBTMActivityVerticalViewSequenceViewModel.</param>
+        /// <returns>Returns updated DBTMTestViewModel</returns>
+        DBTMActivityVerticalViewSequenceViewModel UpdateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel);
+
+        /// <summary>
+        /// Update Sequence Number.
+        /// </summary>
+        /// <param name="dBTMActivityVerticalViewSequenceViewModel">dBTMActivityVerticalViewSequenceViewModel.</param>
+        /// <returns>Returns updated DBTMActivityVerticalViewSequenceViewModel</returns>
+        DBTMActivityVerticalViewSequenceViewModel UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel);
+
+        /// <summary>
+        /// Create ActivityVerticalViewSequence.
+        /// </summary>
+        /// <param name="dBTMActivityVerticalViewSequenceViewModel">DBTM Activity Vertical View Sequence View Model.</param>
+        /// <returns>Returns created model.</returns>
+        DBTMActivityVerticalViewSequenceViewModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel);
     }
 }

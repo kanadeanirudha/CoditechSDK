@@ -1,0 +1,141 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMActivityVerticalViewSequenceViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+
+<div class="modal-header">
+    <h6 class="modal-title m-0">Update Vertical Sequence Numbers</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+@using (Html.BeginForm("UpdateVerticalSequenceNumber", "DBTMTestMaster", FormMethod.Post, new { id = "frmUpdateVerticalSequence" }))
+{
+    @Html.HiddenFor(m => m.DBTMTestMasterId)
+    @Html.HiddenFor(m => m.DBTMTestParameterVerticalViewSequenceId)
+    @Html.HiddenFor(m => m.DBTMSequenceData)
+    <div class="modal-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm" id="sequenceVerticalTable">
+                <thead>
+                    <tr>
+                        <th>Parameter Code</th>
+                        <th>Is Calculated</th>
+                        <th>Sequence Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.DBTMActivityVerticalViewSequenceList.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(m => m.DBTMActivityVerticalViewSequenceList[i].ParameterCode)
+                                @Html.HiddenFor(m => m.DBTMActivityVerticalViewSequenceList[i].DBTMTestParameterVerticalViewSequenceId,
+                                         new { @class = "DBTMTestParameterVerticalViewSequenceId" })
+                            </td>
+                            <td class="text-center">
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", Model.DBTMActivityVerticalViewSequenceList[i].IsCalculatedParameter)
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.DBTMActivityVerticalViewSequenceList[i].SequenceNumber,
+                                         new
+                                         {
+                                             @class = "form-control text-center sequence-input SequenceNumber",
+                                             type = "number",
+                                             min = "1",
+                                             max = "999",
+                                             maxlength = "3",
+                                             oninput = "if(this.value.length > 3) this.value = this.value.slice(0,3);"
+                                         })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" id="saveVerticalSequenceButton" class="btn btn-success">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+}
+@Html.Partial("_ValidationScriptsPartial")
+@section scripts {
+    <!-- end page content -->
+    <script src="~/js/coditech/DBTM/DBTMActivityListViewSequence.js"></script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".SequenceNumber").each(function () {
+            if ($(this).next(".error-message").length === 0) {
+                $(this).after('<span class="error-message text-danger" style="display:none;">Sequence Number is required.</span>');
+            }
+        });
+
+        $(".SequenceNumber").on("blur", function () {
+            let val = $(this).val().trim();
+            if (val === "") {
+                $(this).next(".error-message").text("Sequence Number is required.").show();
+            } else {
+                $(this).next(".error-message").hide();
+            }
+        });
+
+        $(".SequenceNumber").on("input", function () {
+            $(this).next(".error-message").hide();
+        });
+
+           $("#saveVerticalSequenceButton").click(function (e) {
+        e.preventDefault();
+        let isValid = true;
+        let sequenceNumbers = [];
+
+        $(".SequenceNumber").each(function () {
+            let val = $(this).val().trim();
+            if (val === "") {
+                $(this).next(".error-message").text("Sequence Number is required.").show();
+                isValid = false;
+            } else {
+                sequenceNumbers.push(parseInt(val));
+                $(this).next(".error-message").hide();
+            }
+        });
+        // Check duplicates
+        let duplicates = sequenceNumbers.filter((v, i, a) => a.indexOf(v) !== i);
+        if (duplicates.length > 0) {
+            $(".SequenceNumber").each(function () {
+                if (duplicates.includes(parseInt($(this).val()))) {
+                    $(this).next(".error-message").text("Duplicate sequence number not allowed.").show();
+                }
+            });
+            isValid = false;
+        }
+        // Check sequence range
+        let totalCount = $(".SequenceNumber").length;
+        let invalidNumbers = sequenceNumbers.filter(n => n < 1 || n > totalCount);
+        if (invalidNumbers.length > 0) {
+            $(".SequenceNumber").each(function () {
+                let val = parseInt($(this).val());
+                if (invalidNumbers.includes(val)) {
+                    $(this).next(".error-message").text("Sequence number must be between 1 and " + totalCount + ".").show();
+                }
+            });
+            isValid = false;
+        }
+        let expected = Array.from({ length: totalCount }, (_, i) => i + 1);
+        let missing = expected.filter(n => !sequenceNumbers.includes(n));
+        if (missing.length > 0) {
+            CoditechNotification.DisplayNotificationMessage("All sequence numbers from 1 to " + totalCount + " must be used without gaps.");
+            isValid = false;
+        }
+        if (!isValid) {
+            return false;
+        }
+        DBTMActivityListViewSequence.SaveVerticalData();
+       });
+    });
+</script>

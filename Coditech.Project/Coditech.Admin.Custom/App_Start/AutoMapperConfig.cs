@@ -62,6 +62,8 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMCentrewiseTestParameterListViewListModel, DBTMCentrewiseTestParameterListViewListViewModel>().ReverseMap();
             CreateMap<DBTMCentreWiseSettingModel, DBTMCentreWiseSettingViewModel>();
             CreateMap<DBTMCentreWiseSettingViewModel, DBTMCentreWiseSettingModel>();
+            CreateMap<DBTMActivityVerticalViewSequenceListModel, DBTMActivityVerticalViewSequenceListViewModel>().ReverseMap();
+            CreateMap<DBTMActivityVerticalViewSequenceModel, DBTMActivityVerticalViewSequenceViewModel>().ReverseMap();
             #endregion
         }
     }
