@@ -916,6 +916,7 @@ namespace Coditech.API.Service
                     return;
                 }
                 string rowValue = string.Empty;
+                long dBTMDeviceDataId = group.FirstOrDefault()?.DBTMDeviceDataId ?? 0;
                 if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
                 {
                     rowValue = !string.IsNullOrEmpty(group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1) ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1.ToString() : "NA";
@@ -944,7 +945,7 @@ namespace Coditech.API.Service
                         }
                     }
                 }
-                newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
+                newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{dBTMDeviceDataId}";
             }
         }
 
