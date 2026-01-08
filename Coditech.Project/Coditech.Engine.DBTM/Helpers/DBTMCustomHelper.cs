@@ -73,7 +73,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.DistanceMultiplyByRow:
-                    decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+                    decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
                     result = distance != 0 ? $"{Math.Round(distance * recurtion, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.MaxLap:
@@ -163,7 +163,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.CountByTime:
                     decimal count = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Count && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && count != 0 ? $"{Math.Round(count/ time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+                    result = time != 0 && count != 0 ? $"{Math.Round(count / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
