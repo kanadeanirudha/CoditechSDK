@@ -1086,7 +1086,8 @@ namespace Coditech.API.Service
         {
             DataTable dataTable = new DataTable();
 
-            var listviewSequenceColumns = _dBTMTestParameterVerticalViewSequenceRepository.Table.Where(x => x.DBTMTestMasterId == DBTMTestMasterId)
+            List<DBTMTestParameterListViewSequence> listviewSequenceColumns = _dBTMTestParameterVerticalViewSequenceRepository.Table.Where(x => x.DBTMTestMasterId == DBTMTestMasterId)
+                                                                                                .Select(x => x.FromEntityToModel<DBTMTestParameterListViewSequence>())
                                                                                                 .OrderBy(x => x.SequenceNumber)
                                                                                                 .ToList();
 
@@ -1136,6 +1137,8 @@ namespace Coditech.API.Service
                 }
                 dataTable.Rows.Add(newRow);
             }
+            //Updated Column Name
+            UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumns, true);
             return dataTable;
         }
         #endregion
