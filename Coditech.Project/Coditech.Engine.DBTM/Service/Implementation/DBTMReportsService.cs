@@ -813,7 +813,7 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
-        
+
         private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal, bool isMobileRequest)
         {
             string updatedColumnName = string.Empty;
@@ -1082,15 +1082,16 @@ namespace Coditech.API.Service
             return repo.ExecuteStoredProcedureList("Coditech_GetDBTMTestParameterListViewSequence @DBTMTestMasterId,@CentreCode,@DisplayOn").ToList();
         }
 
-        private DataTable BindDBTMDataVerticalFormat(int DBTMTestMasterId, long DBTMDeviceDataId)
+        private DataTable BindDBTMDataVerticalFormat(int DBTMTestMasterId, long DBTMDeviceDataId, bool isMobileRequest = false)
         {
             DataTable dataTable = new DataTable();
 
-            List<DBTMTestParameterListViewSequence> listviewSequenceColumns = _dBTMTestParameterVerticalViewSequenceRepository.Table.Where(x => x.DBTMTestMasterId == DBTMTestMasterId)
+            string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
+            List<DBTMTestParameterListViewSequence> listviewSequenceColumns = _dBTMTestParameterVerticalViewSequenceRepository.Table
+                                                                                                .Where(x => x.DBTMTestMasterId == DBTMTestMasterId && x.DisplayOn != "None" && (x.DisplayOn.Contains("Both") || x.DisplayOn == displayOn))
                                                                                                 .Select(x => x.FromEntityToModel<DBTMTestParameterListViewSequence>())
                                                                                                 .OrderBy(x => x.SequenceNumber)
                                                                                                 .ToList();
-
             foreach (var col in listviewSequenceColumns)
             {
                 dataTable.Columns.Add(col.ColumnName, typeof(string));
@@ -1138,7 +1139,7 @@ namespace Coditech.API.Service
                 dataTable.Rows.Add(newRow);
             }
             //Updated Column Name
-            UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumns, true);
+            UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumns, isMobileRequest);
             return dataTable;
         }
         #endregion
