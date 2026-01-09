@@ -3,6 +3,7 @@
     ViewBag.Title = "Batchwise Multiple Reports";
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMMultiTestListByGeneralBatchMasterId()", IsCustomDropdown = true };
     DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.GeneralBatchMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMBatchWiseMultiReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
+    ModelPopUpViewModel activityPopup = new ModelPopUpViewModel(){ModelPopUpId = "DBTMActivityDetailPopupId",ModalContentId = "DBTMActivityDetailPopupContentId"};
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -64,6 +65,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<!-- Activity Detail Popup -->
+<div class="modal fade" id="@activityPopup.ModelPopUpId" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-m modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" id="@activityPopup.ModalContentId">
+            <!-- AJAX content loads here -->
         </div>
     </div>
 </div>
