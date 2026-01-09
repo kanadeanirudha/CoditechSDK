@@ -25,6 +25,7 @@
         public const string CumulativeTime = "CumulativeTime";
         public const string Velocity = "Velocity";
         public const string VelocityByRow = "VelocityByRow";
+        public const string VelocityByRowWithFirstDistance = "VelocityByRowWithFirstDistance";
         public const string CumulativeVelocityByRow = "CumulativeVelocityByRow";
         public const string CumulativeVelocity = "CumulativeVelocity";
         public const string AccelerationByRow = "AccelerationByRow";

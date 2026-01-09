@@ -104,8 +104,11 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.VelocityByRow:
                     result = VelocityByRow(group, recurtion, isGraph);
                     break;
+                case CustomConstants.VelocityByRowWithFirstDistance:
+                    result = VelocityByRowWithFirstDistance(group, recurtion, isGraph);
+                    break;
                 case CustomConstants.CumulativeVelocityByRow:
-                    distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+                    distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
@@ -214,6 +217,15 @@ namespace Coditech.Engine.DBTM.Helpers
             return result;
         }
 
+        private static string VelocityByRowWithFirstDistance(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
+        {
+            string result = string.Empty;
+            decimal distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == 1).ParameterValue;
+            decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
+            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+            return result;
+        }
+
         public static string Unit(string parameterCode)
         {
             string data = string.Empty;
@@ -240,6 +252,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.VelocityByRow:
                 case CustomConstants.CumulativeVelocityByRow:
                 case CustomConstants.Velocity:
+                case CustomConstants.VelocityByRowWithFirstDistance:
                     data = "m/s";
                     break;
                 case CustomConstants.Power:
