@@ -1,0 +1,80 @@
+﻿@using System.Data
+@model DBTMReportVerticalDataViewModel
+
+<div class="modal-header">
+    <h6 class="modal-title m-0">Activity View Details</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+
+    <!-- Details Table -->
+    <table class="table table-bordered table-sm mb-3">
+        <tr>
+            <th style="width: 30%;">Athlete Name:</th>
+            <td>@Model.AthleteName</td>
+        </tr>
+        <tr>
+            <th>Activity Name:</th>
+            <td>@Model.TestName</td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>
+                <span class="badge bg-success">
+                    @Model.Status
+                </span>
+            </td>
+        </tr>
+     @*    <tr>
+            <th>Direction:</th>
+            <td>@Model.Direction</td>
+        </tr> *@
+        <tr>
+            <th style="width: 35%; white-space: nowrap;"> Activity Performed On: </th>
+            <td style="white-space: nowrap;"> @Model.TestPerformedTime.ToString("dd/MM/yyyy hh:mm tt")</td>
+        </tr>
+    </table>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+                <tr>
+                    @foreach (DataColumn col in Model.DataTable.Columns)
+                    {
+                        <th>@col.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.DataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in Model.DataTable.Rows)
+                    {
+                        <tr>
+                            @foreach (DataColumn col in Model.DataTable.Columns)
+                            {
+                                <td>@row[col]</td>
+                            }
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="@Model.DataTable.Columns.Count"
+                            class="text-center text-danger fw-bold">
+                            No Data Found
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

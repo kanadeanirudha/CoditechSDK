@@ -1,0 +1,18 @@
+﻿using Coditech.Common.Helper;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+
+namespace Coditech.Admin.ViewModel
+{
+    public class DBTMReportVerticalDataViewModel : BaseViewModel
+    {
+        public DataTable DataTable { get; set; }
+        public long DBTMDeviceDataId { get; set; }
+        public string AthleteName { get; set; }
+        public string TestName { get; set; }
+        public string Status { get; set; } = "Completed";
+        public DateTime TestPerformedTime { get; set; }
+        public string Direction { get; set; }
+        public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
+    }
+}

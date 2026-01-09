@@ -16,5 +16,6 @@ namespace Coditech.Admin.ViewModel
         public int DBTMTestParameterVerticalViewSequenceId { get; set; }
         public string DBTMSequenceData { get; set; }
         public string TestName { get; set; }
+        public string DisplayOn { get; set; }
     }
 }

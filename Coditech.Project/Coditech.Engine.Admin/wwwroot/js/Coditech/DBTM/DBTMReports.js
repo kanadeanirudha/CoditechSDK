@@ -475,5 +475,33 @@ var DBTMReports = {
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
+    },
+    ShowActivityDetailPopup: function (modelPopContentId, deviceDataId) {
+        CoditechCommon.ShowLodder();
+
+        $("#" + modelPopContentId).html("");
+
+        $.ajax({
+            type: "GET",
+            url: "/DBTMReports/ViewActivityDetailPopup",
+            data: { dBTMDeviceDataId: deviceDataId },
+            success: function (result) {
+                $("#" + modelPopContentId).html(result);
+                CoditechCommon.HideLodder();
+
+                var modal = new bootstrap.Modal(
+                    document.getElementById("DBTMActivityDetailPopupId")
+                );
+                modal.show();
+            },
+            error: function () {
+                CoditechCommon.HideLodder();
+                CoditechNotification.DisplayNotificationMessage(
+                    "Failed to load activity details.",
+                    "error"
+                );
+            }
+        });
     }
+
 };

@@ -427,5 +427,61 @@ namespace Coditech.API.Client
                     response?.Dispose();
             }
         }
+
+        public virtual DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            return Task.Run(async () => await GetActivityVerticalDetailsAsync(dBTMDeviceDataId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMReportVerticalDataResponse> GetActivityVerticalDetailsAsync(long dBTMDeviceDataId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.GetActivityVerticalDetailsAsync(dBTMDeviceDataId);
+
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(
+                    endpoint,
+                    status,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMReportVerticalDataResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object ?? new DBTMReportVerticalDataResponse();
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMReportVerticalDataResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null
+                        ? null
+                        : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    UpdateApiStatus(null, status, response);
+
+                    throw new CoditechException(
+                        status.ErrorCode,
+                        status.ErrorMessage,
+                        status.StatusCode
+                    );
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
     }
 }

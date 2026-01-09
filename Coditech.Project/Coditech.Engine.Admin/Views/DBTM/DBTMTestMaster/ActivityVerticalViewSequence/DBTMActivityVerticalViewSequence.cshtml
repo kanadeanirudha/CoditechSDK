@@ -6,6 +6,13 @@
     string css = Model.DBTMTestMasterId > 0 ? "col-lg-10" : "col-lg-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTestMasterId", Model.DBTMTestMasterId.ToString());
+    DropdownViewModel displayOnDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DisplayOn.ToString(),
+                DropdownName = "DisplayOn",
+                DropdownSelectedValue = Model.DisplayOn.ToString(),
+                IsCustomDropdown = true
+            };
     PageHeaderViewModel headerModel = new PageHeaderViewModel
             {
                 Title = ViewBag.Title,
@@ -91,6 +98,13 @@
                                         @Html.LabelFor(x => x.HelpText, new { @class = "form-label" })
                                         @Html.TextBoxFor(x => x.HelpText, new { @class = "form-control" })
                                         @Html.ValidationMessageFor(x => x.HelpText)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.DisplayOn, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", displayOnDropdown)
+                                        @Html.ValidationMessageFor(x => x.DisplayOn)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

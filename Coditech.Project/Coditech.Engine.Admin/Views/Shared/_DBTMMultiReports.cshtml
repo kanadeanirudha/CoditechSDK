@@ -59,7 +59,8 @@
                                             <tr>
                                                 @foreach (DataColumn col in keyValue.Value.Columns)
                                                 {
-                                                    string[] value = row[col].ToString().Split('~');
+                                                    var rawValue = row[col]?.ToString() ?? "";
+                                                    string[] value = rawValue.Split('~');
                                                     string style = string.Empty;
                                                     if (value.Length > 1)
                                                     {
@@ -69,7 +70,21 @@
                                                             style = $"{style} color: #{value[2]};";
                                                         }
                                                     }
-                                                    <td style="@style">@value[0]</td>
+                                                    <td style="@style">
+                                                        @if (col.ColumnName == "View")
+                                                        {
+                                                            <a href="javascript:void(0);"
+                                                               title="View"
+                                                               class="btn btn-sm btn-soft-success btn-circle"
+                                                               onclick="DBTMReports.ShowActivityDetailPopup('DBTMActivityDetailPopupContentId', @value[0])">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @value[0]
+                                                        }
+                                                    </td>
                                                 }
                                             </tr>
                                         }
@@ -96,6 +111,7 @@
         <div class="text-danger fw-bold text-center">No Data Found</div>
     }
 </div>
+
 <style>
     #accordionExample .accordion-item:first-child {
         margin-top: 0 !important;

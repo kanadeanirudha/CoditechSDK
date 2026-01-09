@@ -25,6 +25,7 @@
                                 </a>
                             </td>
                             <td>@item.ColumnName</td>
+                            <td>@System.Text.RegularExpressions.Regex.Replace(item.DisplayOn ?? "", "(\\B[A-Z])", " $1")</td>
                             <td>@item.SequenceNumber</td>
                             <td>@item.Recursion</td>
                             <td>

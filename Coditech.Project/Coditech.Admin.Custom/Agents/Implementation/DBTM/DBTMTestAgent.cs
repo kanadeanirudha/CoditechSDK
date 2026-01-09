@@ -546,6 +546,11 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Display On",
+                ColumnCode = "DisplayOn",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Sequence Number",
                 ColumnCode = "SequenceNumber",
             });

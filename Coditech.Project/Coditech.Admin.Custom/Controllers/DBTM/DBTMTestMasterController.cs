@@ -365,6 +365,10 @@ namespace Coditech.Admin.Controllers
                 DBTMTestMasterId = dBTMTestMasterId,
                 SequenceNumber = (short)(maxSequence + 1),
             };
+            if (string.IsNullOrEmpty(listViewModel.DisplayOn))
+            {
+                newViewModel.DisplayOn = "Both";
+            }
             return View("~/Views/DBTM/DBTMTestMaster/ActivityVerticalViewSequence/DBTMActivityVerticalViewSequence.cshtml", newViewModel);
         }
 
@@ -386,6 +390,10 @@ namespace Coditech.Admin.Controllers
                         return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMActivityVerticalViewSequenceViewModel.DBTMTestMasterId) });
                     }
                 }
+            }
+            if (string.IsNullOrEmpty(dBTMActivityVerticalViewSequenceViewModel.DisplayOn))
+            {
+                dBTMActivityVerticalViewSequenceViewModel.DisplayOn = "Both";
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMActivityVerticalViewSequenceViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMTestMaster/ActivityVerticalViewSequence/DBTMActivityVerticalViewSequence.cshtml", dBTMActivityVerticalViewSequenceViewModel);
