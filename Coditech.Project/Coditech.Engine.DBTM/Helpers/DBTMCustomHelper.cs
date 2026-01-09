@@ -163,7 +163,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.CountByTime:
                     decimal count = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Count && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && count != 0 ? $"{Math.Round(count/ time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+                    result = time != 0 && count != 0 ? $"{Math.Round(count / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
@@ -208,7 +208,7 @@ namespace Coditech.Engine.DBTM.Helpers
         private static string VelocityByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
         {
             string result = string.Empty;
-            decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+            decimal distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == recurtion).ParameterValue;
             decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
             result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
             return result;
@@ -227,6 +227,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.CumulativeTime:
                 case CustomConstants.ChangeOfDirection:
                 case CustomConstants.ChangeOfDirectionDeficit:
+                case CustomConstants.AverageTime:
                     data = "sec";
                     break;
                 case CustomConstants.TotalDistanceCovered:
