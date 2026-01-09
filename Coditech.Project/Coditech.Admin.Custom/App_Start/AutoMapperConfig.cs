@@ -64,6 +64,7 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMCentreWiseSettingViewModel, DBTMCentreWiseSettingModel>();
             CreateMap<DBTMActivityVerticalViewSequenceListModel, DBTMActivityVerticalViewSequenceListViewModel>().ReverseMap();
             CreateMap<DBTMActivityVerticalViewSequenceModel, DBTMActivityVerticalViewSequenceViewModel>().ReverseMap();
+            CreateMap<DBTMReportVerticalDataModel, DBTMReportVerticalDataViewModel>().ReverseMap();
             #endregion
         }
     }

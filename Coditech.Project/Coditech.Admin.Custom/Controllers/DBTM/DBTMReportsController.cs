@@ -88,6 +88,15 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
+        public ActionResult ViewActivityDetailPopup(long dBTMDeviceDataId)
+        {
+            DBTMReportVerticalDataViewModel model = _dBTMReportsAgent.GetActivityVerticalDetails(dBTMDeviceDataId);
+            if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
+                return Content("No activity details found.");
+            return PartialView("~/Views/DBTM/DBTMReports/_DBTMReportVerticalDetailPopup.cshtml", model);
+        }
+
+        [HttpGet]
         public ActionResult GetTestWiseReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string reportType)
         {
             DBTMReportsListViewModel datalist = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, reportType);

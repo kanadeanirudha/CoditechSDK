@@ -95,6 +95,23 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
+        //Vertical Popup Details
+        public virtual DBTMReportVerticalDataViewModel GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            if (dBTMDeviceDataId <= 0)
+                return new DBTMReportVerticalDataViewModel();
+            try
+            {
+                DBTMReportVerticalDataResponse response =  _dBTMReportsClient.GetActivityVerticalDetails(dBTMDeviceDataId);
+                return response?.DBTMReportVerticalDataModel.ToViewModel<DBTMReportVerticalDataViewModel>();
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage( ex, "GetActivityVerticalDetails", TraceLevel.Error);
+                return new DBTMReportVerticalDataViewModel();
+            }
+        }
+
         //Test Wise Reports File
         public virtual DBTMReportsListViewModel TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string ReportType)
         {
