@@ -208,7 +208,7 @@ namespace Coditech.Engine.DBTM.Helpers
         private static string VelocityByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
         {
             string result = string.Empty;
-            decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+            decimal distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == recurtion).ParameterValue;
             decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
             result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
             return result;
