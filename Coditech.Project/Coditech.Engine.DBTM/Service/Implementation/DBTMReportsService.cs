@@ -17,6 +17,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMBatchActivity> _dBTMBatchActivityRepository;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
+        private readonly ICoditechRepository<DBTMDeviceDataDetails> _dBTMDeviceDataDetailsRepository;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
         private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
@@ -25,6 +26,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMTestParameterListviewSequenceRepository;
+        private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMTestParameterVerticalViewSequenceRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -32,6 +34,7 @@ namespace Coditech.API.Service
             _coditechLogging = coditechLogging;
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMDeviceDataDetailsRepository = new CoditechRepository<DBTMDeviceDataDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -41,6 +44,7 @@ namespace Coditech.API.Service
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestParameterVerticalViewSequenceRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph
@@ -65,6 +69,7 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
+                graphMaster.TestCode = dbtmTestMaster.TestCode;
                 string[] XValuesList = null;
 
                 if (graphMaster.XParameter == "Split")
@@ -72,6 +77,14 @@ namespace Coditech.API.Service
                     if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
+                    }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                    {
+                        XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6" };
+                    }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                    {
+                        XValuesList = new string[] { "S1", "S2", "S3", "S4" };
                     }
                     else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest" || dbtmTestMaster.TestCode == "ProAgilityTest")
                     {
@@ -264,19 +277,54 @@ namespace Coditech.API.Service
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group, count, false, true)));
                     }
+                    else if (graphMaster.GraphCode == "AverageTotalTimeVsSplitDatewise")
+                    {
+                        yValuesList = new List<decimal>();
+                        if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        {
+                            for (short index = 1; index <= 12; index++)
+                            {
+                                yValuesList.Add(group.Where(y=>y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x=>x.ParameterValue)/count);
+                            }
+                        }
+                        else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        {
+                            for (int index = 1; index <= 6; index++)
+                            {
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue)/ count);
+                            }
+                        }
+                        else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                        {
+                            for (int index = 1; index <= 4; index++)
+                            {
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue)/count);
+                            }
+                        }
+                        graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+                        {
+                            Color = colorPalette[colorIndex % colorPalette.Length],
+                            Label = $"{group.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
+                            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                        });
+                        colorIndex++;
+                    }
                     else
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), count, false, true)));
                     }
                 }
             }
-            graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+            if (graphMaster.GraphCode != "AverageTotalTimeVsSplitDatewise")
             {
-                Color = colorPalette[colorIndex % colorPalette.Length],
-                Label = $"{graphMaster.YAxixLabel}",
-                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
-            });
-            colorIndex++;
+                graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+                {
+                    Color = colorPalette[colorIndex % colorPalette.Length],
+                    Label = $"{graphMaster.YAxixLabel}",
+                    Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                });
+                colorIndex++;
+            }
         }
         #endregion
 
@@ -287,7 +335,7 @@ namespace Coditech.API.Service
             {
                 return new DBTMReportsListModel();
             }
-            string centreCode = _generalBatchMasterRepository.Table.Where(x=>x.GeneralBatchMasterId == generalBatchMasterId).Select(y=>y.CentreCode).FirstOrDefault();
+            string centreCode = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(y => y.CentreCode).FirstOrDefault();
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -582,6 +630,29 @@ namespace Coditech.API.Service
             }
         }
 
+        public DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            DBTMReportVerticalDataModel model = new DBTMReportVerticalDataModel();
+            DBTMDeviceData device = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
+            if (device == null)
+                return model;
+            DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonCode == device.PersonCode);
+            GeneralPersonModel person = null;
+            if (trainee?.PersonId > 0)
+                person = GetGeneralPersonDetails(trainee.PersonId);
+            model.AthleteName = person != null ? $"{person.FirstName} {person.LastName}" : "N/A";
+            var testData = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == device.TestCode).Select(x => new { x.DBTMTestMasterId, x.TestName }).FirstOrDefault();
+            if (testData == null)
+                return model;
+            model.TestName = testData.TestName;
+            model.Status = "Completed";
+            model.TestPerformedTime = device.CreatedDate.HasValue ? device.CreatedDate.Value : device.TestPerformedTime;
+            //var directionParam = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId && !string.IsNullOrEmpty(x.FromTo)).OrderBy(x => x.Row).Select(x => x.FromTo).FirstOrDefault();
+            //model.Direction = !string.IsNullOrEmpty(directionParam) ? directionParam : "N/A";
+            model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
+            return model;
+        }
+
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
@@ -653,7 +724,7 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
-                List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);                 
+                List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
                     return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport);
@@ -760,8 +831,8 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 List<string> displayColumnList = isMobileRequest
-                 ? new List<string> { "Activity Time", "Person Name" }
-                 : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight(kg)", "Height(cm)" };
+                ? new List<string> { "View", "Activity Time", "Person Name" }
+                : new List<string> { "View", "Activity Time", "Person Name", "Activity Status", "Weight(kg)", "Height(cm)" };
                 foreach (var paramColumn in displayColumnList)
                 {
                     dataTable.Columns.Add(paramColumn, typeof(String));
@@ -797,6 +868,9 @@ namespace Coditech.API.Service
                                 newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
                                     ? group.FirstOrDefault().TestPerformedTime.ToString("hh:mm:ss tt")
                                     : group.FirstOrDefault().TestPerformedTime;
+                                break;
+                            case "View":
+                                newRow["View"] = group.FirstOrDefault().DBTMDeviceDataId.ToString();
                                 break;
                         }
                     }
@@ -907,6 +981,8 @@ namespace Coditech.API.Service
         {
             foreach (var displayColumn in listviewSequenceColumnList)
             {
+                if (displayColumn == "View")
+                    continue;
                 string[] spilt = displayColumn.Split('-');
                 DBTMTestParameterListViewSequence dBTMTestParameterListviewSequence = spilt.Length > 1 ? listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == spilt[0]) :
                                                                                                          listviewSequenceColumns.FirstOrDefault(x => x.ParameterCode == displayColumn);
@@ -916,6 +992,7 @@ namespace Coditech.API.Service
                     return;
                 }
                 string rowValue = string.Empty;
+                long dBTMDeviceDataId = group.FirstOrDefault()?.DBTMDeviceDataId ?? 0;
                 if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
                 {
                     rowValue = !string.IsNullOrEmpty(group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1) ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1.ToString() : "NA";
@@ -944,13 +1021,12 @@ namespace Coditech.API.Service
                         }
                     }
                 }
-                newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
+                newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{dBTMDeviceDataId}";
             }
         }
 
         private List<string> BindReportColumns(int dBTMTestMasterId, bool isMobileRequest, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumns)
         {
-
             List<string> listviewSequenceColumnList = new List<string>();
             // Create a copy to safely iterate and remove items
             for (int idx = 0; idx < listviewSequenceColumns.Count; idx++)
@@ -1070,11 +1146,70 @@ namespace Coditech.API.Service
         private List<DBTMTestParameterListViewSequence> GetListViewSequenceByCentre(int dBTMTestMasterId, string centreCode, bool isMobileRequest)
         {
             string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
-            CoditechViewRepository<DBTMTestParameterListViewSequence> repo = new CoditechViewRepository<DBTMTestParameterListViewSequence>( _serviceProvider.GetService<CoditechCustom_Entities>());
+            CoditechViewRepository<DBTMTestParameterListViewSequence> repo = new CoditechViewRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             repo.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@DisplayOn", displayOn, ParameterDirection.Input, DbType.String);
             return repo.ExecuteStoredProcedureList("Coditech_GetDBTMTestParameterListViewSequence @DBTMTestMasterId,@CentreCode,@DisplayOn").ToList();
+        }
+
+        private DataTable BindDBTMDataVerticalFormat(int DBTMTestMasterId, long DBTMDeviceDataId, bool isMobileRequest = false)
+        {
+            DataTable dataTable = new DataTable();
+            DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.FirstOrDefault(x => x.DBTMDeviceDataId == DBTMDeviceDataId);
+            string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
+            var entities = _dBTMTestParameterVerticalViewSequenceRepository.Table.Where(x => x.DBTMTestMasterId == DBTMTestMasterId && x.DisplayOn != "None" && (x.DisplayOn.Contains("Both") || x.DisplayOn == displayOn)).OrderBy(x => x.SequenceNumber).ToList();
+            var listviewSequenceColumns = entities.Select(x => x.FromEntityToModel<DBTMTestParameterListViewSequence>()).ToList();
+
+            foreach (DBTMTestParameterListViewSequence col in listviewSequenceColumns)
+            {
+                dataTable.Columns.Add(col.ColumnName, typeof(string));
+            }
+
+            var dBTMReportsList = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == DBTMDeviceDataId).Select(x => x.FromEntityToModel<DBTMReportsModel>()).ToList();
+            foreach (var item in dBTMReportsList)
+            {
+                item.Weight = deviceData?.Weight ?? 0;
+                item.Height = deviceData?.Height ?? 0;
+            }
+            var reportsLookup = dBTMReportsList.GroupBy(x => new { x.ParameterCode, x.Row }).ToDictionary(g => g.Key, g => g.First());
+
+            short maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
+
+            for (short i = 1; i <= maxRecursion; i++)
+            {
+                var newRow = dataTable.NewRow();
+
+                foreach (var displayColumn in listviewSequenceColumns)
+                {
+                    if (displayColumn.ParameterCode == "Row")
+                    {
+                        newRow[displayColumn.ColumnName] = i;
+                    }
+                    else if (displayColumn.ParameterCode == "FromTo")
+                    {
+                        var fromTo = dBTMReportsList.FirstOrDefault(x => x.Row == i && !string.IsNullOrEmpty(x.FromTo))?.FromTo;
+                        newRow[displayColumn.ColumnName] = fromTo ?? string.Empty;
+                    }
+                    else if (displayColumn.IsCalculatedParameter)
+                    {
+                        if (displayColumn.ParameterCode == CustomConstants.CompletionTime)
+                            newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
+                        else
+                            newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
+                    }
+                    else
+                    {
+                        var dataDetails = dBTMReportsList.FirstOrDefault(x => x.ParameterCode == displayColumn.ParameterCode && x.Row == i); newRow[displayColumn.ColumnName] = dataDetails.ParameterValue;
+                    }
+                }
+                dataTable.Rows.Add(newRow);
+            }
+            foreach (DataColumn col in dataTable.Columns)
+            {
+                col.ColumnName = col.ColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(listviewSequenceColumns.FirstOrDefault(x => x.ColumnName == col.ColumnName).ParameterCode));
+            }
+            return dataTable;
         }
         #endregion
     }

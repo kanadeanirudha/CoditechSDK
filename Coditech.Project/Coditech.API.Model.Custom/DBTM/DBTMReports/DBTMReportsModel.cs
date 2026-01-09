@@ -2,6 +2,7 @@
 {
     public class DBTMReportsModel : BaseModel
     {
+        public long DBTMDeviceDataId { get; set; }
         public string ParameterCode { get; set; }
         public decimal ParameterValue { get; set; }
         public string FromTo { get; set; }

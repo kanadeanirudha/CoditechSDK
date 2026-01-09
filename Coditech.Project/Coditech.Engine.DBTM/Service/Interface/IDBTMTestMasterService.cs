@@ -22,5 +22,11 @@ namespace Coditech.API.Service
         DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMActivityListViewSequenceModel UpdateSequenceNumber(DBTMActivityListViewSequenceModel model);
         DBTMActivityListViewSequenceModel CreateActivityListViewSequence(DBTMActivityListViewSequenceModel model);
+        bool DeleteActivityVerticalViewSequence(ParameterModel parameterModel);
+        DBTMActivityVerticalViewSequenceModel GetActivityVerticalViewSequence(int dBTMTestParameterVerticalViewSequenceId);
+        bool UpdateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel model);
+        DBTMActivityVerticalViewSequenceListModel GetActivityVerticalViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
+        DBTMActivityVerticalViewSequenceModel UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceModel model);
+        DBTMActivityVerticalViewSequenceModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel model);
     }
 }

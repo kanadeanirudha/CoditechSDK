@@ -25,12 +25,14 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         private readonly ICoditechRepository<DBTMPerformanceMatrix> _dBTMPerformanceMatrixRepository;
+        private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMActivityVerticalViewSequenceMasterRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMActivityListViewSequenceMasterRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMActivityVerticalViewSequenceMasterRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -542,6 +544,136 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
             int status = 0;
             objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMActivityListViewSequence @DBTMTestParameterListViewSequenceId,  @Status OUT", 1, out status);
+
+            return status == 1 ? true : false;
+        }
+
+        //Get GetActivityVerticalViewSequence by dBTMTestMasterId.
+        public virtual DBTMActivityVerticalViewSequenceListModel GetActivityVerticalViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        {
+            List<DBTMTestParameterVerticalViewSequence> ActivityVertical = _dBTMActivityVerticalViewSequenceMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).OrderBy(x => x.SequenceNumber).ToList();
+
+            // Map the entities to the DBTMActivityVerticalViewSequenceModel list
+            List<DBTMActivityVerticalViewSequenceModel> activityViewSequenceList = ActivityVertical.Select(x => new DBTMActivityVerticalViewSequenceModel
+            {
+                DBTMTestParameterVerticalViewSequenceId = x.DBTMTestParameterVerticalViewSequenceId,
+                DBTMTestMasterId = x.DBTMTestMasterId,
+                ParameterCode = x.ParameterCode ?? string.Empty,
+                IsCalculatedParameter = x.IsCalculatedParameter,
+                Recursion = x.Recursion,
+                SequenceNumber = x.SequenceNumber,
+                ConsecutiveParameterCode = x.ConsecutiveParameterCode ?? string.Empty,
+                IsCalculatedConsecutiveParameterCode = x.IsCalculatedConsecutiveParameterCode ?? false,
+                ColumnName = x.ColumnName ?? string.Empty,
+                HelpText = x.HelpText ?? string.Empty,
+                DisplayOn = x.DisplayOn ?? string.Empty,
+                ColumnCellColor = x.ColumnCellColor ?? string.Empty,
+                IsColumnCellBold = x.IsColumnCellBold ?? false
+            }).ToList();
+
+            DBTMActivityVerticalViewSequenceListModel listModel = new DBTMActivityVerticalViewSequenceListModel
+            {
+                DBTMActivityVerticalViewSequenceList = activityViewSequenceList,
+                DBTMTestMasterId = dBTMTestMasterId
+            };
+            if (dBTMTestMasterId > 0)
+            {
+                listModel.TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault();
+            }
+            listModel.DBTMTestMasterId = dBTMTestMasterId;
+            return listModel;
+        }
+
+        public virtual DBTMActivityVerticalViewSequenceModel GetActivityVerticalViewSequence(int dBTMTestParameterVerticalViewSequenceId)
+        {
+            if (dBTMTestParameterVerticalViewSequenceId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterVerticalViewSequenceId"));
+
+            //Get the DBTMTest Details based on id.
+            DBTMTestParameterVerticalViewSequence dBTMTestMaster = _dBTMActivityVerticalViewSequenceMasterRepository.Table.Where(x => x.DBTMTestParameterVerticalViewSequenceId == dBTMTestParameterVerticalViewSequenceId)?.FirstOrDefault();
+            DBTMActivityVerticalViewSequenceModel dBTMTestModel = dBTMTestMaster?.FromEntityToModel<DBTMActivityVerticalViewSequenceModel>();
+            return dBTMTestModel;
+        }
+
+        //Update ActivityVerticalViewSequence
+
+        public virtual bool UpdateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel dBTMTestModel)
+        {
+            if (IsNull(dBTMTestModel))
+                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
+
+            if (dBTMTestModel.DBTMTestParameterVerticalViewSequenceId < 1)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterVerticalViewSequenceId"));
+
+            DBTMTestParameterVerticalViewSequence dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestParameterVerticalViewSequence>();
+
+            //Update DBTMTest
+            bool isdBTMTestUpdated = _dBTMActivityVerticalViewSequenceMasterRepository.Update(dBTMTestMaster);
+            if (!isdBTMTestUpdated)
+            {
+                dBTMTestModel.HasError = true;
+                dBTMTestModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
+            }
+            return isdBTMTestUpdated;
+        }
+
+        public virtual DBTMActivityVerticalViewSequenceModel UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceModel dBTMActivityVerticalViewSequenceModel)
+        {
+            if (IsNull(dBTMActivityVerticalViewSequenceModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            if (dBTMActivityVerticalViewSequenceModel.DBTMActivityVerticalViewSequenceList == null ||
+                !dBTMActivityVerticalViewSequenceModel.DBTMActivityVerticalViewSequenceList.Any())
+                return dBTMActivityVerticalViewSequenceModel;
+
+            foreach (var updatedItem in dBTMActivityVerticalViewSequenceModel.DBTMActivityVerticalViewSequenceList)
+            {
+                var existing = _dBTMActivityVerticalViewSequenceMasterRepository.Table.FirstOrDefault(x => x.DBTMTestParameterVerticalViewSequenceId == updatedItem.DBTMTestParameterVerticalViewSequenceId);
+
+                if (existing != null)
+                {
+                    existing.SequenceNumber = updatedItem.SequenceNumber;
+                    existing.ModifiedDate = DateTime.Now;
+                    _dBTMActivityVerticalViewSequenceMasterRepository.Update(existing);
+                }
+            }
+
+            return dBTMActivityVerticalViewSequenceModel;
+        }
+
+        //Create Activity List View Sequence.
+        public virtual DBTMActivityVerticalViewSequenceModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel dBTMActivityVerticalViewSequenceModel)
+        {
+            if (IsNull(dBTMActivityVerticalViewSequenceModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            DBTMTestParameterVerticalViewSequence dBTMTestParameterVerticalViewSequence = dBTMActivityVerticalViewSequenceModel.FromModelToEntity<DBTMTestParameterVerticalViewSequence>();
+
+            //Create new DBTM Activity Vertical View Sequence and return it.
+            DBTMTestParameterVerticalViewSequence dBTMTestParameterVerticalViewSequenceData = _dBTMActivityVerticalViewSequenceMasterRepository.Insert(dBTMTestParameterVerticalViewSequence);
+            if (dBTMTestParameterVerticalViewSequenceData?.DBTMTestParameterVerticalViewSequenceId > 0)
+            {
+                dBTMActivityVerticalViewSequenceModel.DBTMTestParameterVerticalViewSequenceId = dBTMTestParameterVerticalViewSequenceData.DBTMTestParameterVerticalViewSequenceId;
+            }
+            else
+            {
+                dBTMActivityVerticalViewSequenceModel.HasError = true;
+                dBTMActivityVerticalViewSequenceModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return dBTMActivityVerticalViewSequenceModel;
+        }
+
+        //Delete DBTMActivityVerticalViewSequence.
+        public virtual bool DeleteActivityVerticalViewSequence(ParameterModel parameterModel)
+        {
+            if (IsNull(parameterModel) || string.IsNullOrEmpty(parameterModel.Ids))
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestParameterVerticalViewSequenceId"));
+
+            CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("DBTMTestParameterVerticalViewSequenceId", parameterModel.Ids, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+            int status = 0;
+            objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMActivityVerticalViewSequence @DBTMTestParameterVerticalViewSequenceId,  @Status OUT", 1, out status);
 
             return status == 1 ? true : false;
         }

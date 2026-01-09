@@ -1,6 +1,6 @@
-﻿@model DBTMActivityListViewSequenceViewModel
+﻿@model DBTMActivityVerticalViewSequenceViewModel
 @{
-    ViewBag.Title = Model.DBTMTestParameterListViewSequenceId > 0 ? "Update Activity List View Sequence" : "Add Activity List View Sequence";
+    ViewBag.Title = Model.DBTMTestParameterVerticalViewSequenceId > 0 ? "Update Activity Vertical View Sequence" : "Add Activity Vertical View Sequence";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.DBTMTestMasterId > 0 ? "col-lg-10" : "col-lg-12";
@@ -17,7 +17,7 @@
             {
                 Title = ViewBag.Title,
                 SaveButtonText = GeneralResources.SaveButtonText,
-                CancelUrl = Url.Action("ActivityListViewSequenceList", controllerName, new { SelectedParameter1 = Model.DBTMTestMasterId.ToString() }),
+                CancelUrl = Url.Action("ActivityVerticalViewSequenceList", controllerName, new { SelectedParameter1 = Model.DBTMTestMasterId.ToString() }),
                 CancelButtonText = GeneralResources.CancelButtonText,
                 ControllerName = controllerName,
                 ActionName = actionName,
@@ -41,12 +41,12 @@
                         {
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.DBTMTestMasterId)
-                            @Html.HiddenFor(m => m.DBTMTestParameterListViewSequenceId)
+                            @Html.HiddenFor(m => m.DBTMTestParameterVerticalViewSequenceId)
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.ParameterCode, new { @class = "form-label required" })
-                                        @if (Model.DBTMTestParameterListViewSequenceId > 0)
+                                        @if (Model.DBTMTestParameterVerticalViewSequenceId > 0)
                                         {
                                             @Html.TextBoxFor(x => x.ParameterCode, new { @class = "form-control", @readonly = "readonly" })
                                         }
@@ -84,21 +84,6 @@
                                         @Html.LabelFor(x => x.SequenceNumber, new { @class = "form-label" })
                                         @Html.TextBoxFor(x => x.SequenceNumber, new { @class = "form-control", @readonly = "readonly" })
                                         @Html.ValidationMessageFor(x => x.SequenceNumber)
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.ConsecutiveParameterCode, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.ConsecutiveParameterCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
-                                        @Html.ValidationMessageFor(x => x.ConsecutiveParameterCode)
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsCalculatedConsecutiveParameterCode, new { @class = "form-label" })
-                                        <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsCalculatedConsecutiveParameterCode, new { @class = "form-check-input" })
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

@@ -280,5 +280,29 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message});
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMReports/GetActivityVerticalDetails")]
+        [Produces(typeof(DBTMReportVerticalDataResponse))]
+        public virtual IActionResult GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            try
+            {
+                DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId);
+                if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
+                    return CreateNoContentResponse();
+                return CreateOKResponse( new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, nameof(GetActivityVerticalDetails), TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message,   ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, nameof(GetActivityVerticalDetails), TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
