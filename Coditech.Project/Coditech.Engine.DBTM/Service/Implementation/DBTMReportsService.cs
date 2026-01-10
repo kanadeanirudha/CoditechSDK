@@ -1117,7 +1117,7 @@ namespace Coditech.API.Service
             var entities = _dBTMTestParameterVerticalViewSequenceRepository.Table.Where(x => x.DBTMTestMasterId == DBTMTestMasterId && x.DisplayOn != "None" && (x.DisplayOn.Contains("Both") || x.DisplayOn == displayOn)).OrderBy(x => x.SequenceNumber).ToList();
             var listviewSequenceColumns = entities.Select(x => x.FromEntityToModel<DBTMTestParameterListViewSequence>()).ToList();
 
-            foreach (var col in listviewSequenceColumns)
+            foreach (DBTMTestParameterListViewSequence col in listviewSequenceColumns)
             {
                 dataTable.Columns.Add(col.ColumnName, typeof(string));
             }
@@ -1145,12 +1145,14 @@ namespace Coditech.API.Service
                     else if (displayColumn.ParameterCode == "FromTo")
                     {
                         var fromTo = dBTMReportsList.FirstOrDefault(x => x.Row == i && !string.IsNullOrEmpty(x.FromTo))?.FromTo;
-
                         newRow[displayColumn.ColumnName] = fromTo ?? string.Empty;
                     }
                     else if (displayColumn.IsCalculatedParameter)
                     {
-                        newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
+                        if (displayColumn.ParameterCode == CustomConstants.CompletionTime)
+                            newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
+                        else
+                            newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
                     }
                     else
                     {
@@ -1159,8 +1161,10 @@ namespace Coditech.API.Service
                 }
                 dataTable.Rows.Add(newRow);
             }
-            //Updated Column Name
-            UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumns, isMobileRequest);
+            foreach (DataColumn col in dataTable.Columns)
+            {
+                col.ColumnName = col.ColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(listviewSequenceColumns.FirstOrDefault(x => x.ColumnName == col.ColumnName).ParameterCode));
+            }
             return dataTable;
         }
         #endregion
