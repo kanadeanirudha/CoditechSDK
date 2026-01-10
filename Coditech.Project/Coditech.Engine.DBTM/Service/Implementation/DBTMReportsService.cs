@@ -69,6 +69,7 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
+                graphMaster.TestCode = dbtmTestMaster.TestCode;
                 string[] XValuesList = null;
 
                 if (graphMaster.XParameter == "Split")
@@ -76,6 +77,14 @@ namespace Coditech.API.Service
                     if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
+                    }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                    {
+                        XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6" };
+                    }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                    {
+                        XValuesList = new string[] { "S1", "S2", "S3", "S4" };
                     }
                     else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest" || dbtmTestMaster.TestCode == "ProAgilityTest")
                     {
@@ -268,19 +277,54 @@ namespace Coditech.API.Service
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group, count, false, true)));
                     }
+                    else if (graphMaster.GraphCode == "AverageTotalTimeVsSplitDatewise")
+                    {
+                        yValuesList = new List<decimal>();
+                        if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        {
+                            for (short index = 1; index <= 12; index++)
+                            {
+                                yValuesList.Add(group.Where(y=>y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x=>x.ParameterValue)/count);
+                            }
+                        }
+                        else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        {
+                            for (int index = 1; index <= 6; index++)
+                            {
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue)/ count);
+                            }
+                        }
+                        else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                        {
+                            for (int index = 1; index <= 4; index++)
+                            {
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue)/count);
+                            }
+                        }
+                        graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+                        {
+                            Color = colorPalette[colorIndex % colorPalette.Length],
+                            Label = $"{group.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
+                            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                        });
+                        colorIndex++;
+                    }
                     else
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), count, false, true)));
                     }
                 }
             }
-            graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+            if (graphMaster.GraphCode != "AverageTotalTimeVsSplitDatewise")
             {
-                Color = colorPalette[colorIndex % colorPalette.Length],
-                Label = $"{graphMaster.YAxixLabel}",
-                Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
-            });
-            colorIndex++;
+                graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+                {
+                    Color = colorPalette[colorIndex % colorPalette.Length],
+                    Label = $"{graphMaster.YAxixLabel}",
+                    Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                });
+                colorIndex++;
+            }
         }
         #endregion
 

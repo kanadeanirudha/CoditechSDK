@@ -239,6 +239,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.CumulativeTime:
                 case CustomConstants.ChangeOfDirection:
                 case CustomConstants.ChangeOfDirectionDeficit:
+                case CustomConstants.AverageTime:
                     data = "sec";
                     break;
                 case CustomConstants.TotalDistanceCovered:
