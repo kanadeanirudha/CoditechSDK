@@ -284,21 +284,21 @@ namespace Coditech.API.Service
                         {
                             for (short index = 1; index <= 12; index++)
                             {
-                                yValuesList.Add(group.Where(y=>y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x=>x.ParameterValue)/count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
                         {
                             for (int index = 1; index <= 6; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue)/ count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
                         {
                             for (int index = 1; index <= 4; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue)/count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
                             }
                         }
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
@@ -831,8 +831,13 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 List<string> displayColumnList = isMobileRequest
-                ? new List<string> { "View", "Activity Time", "Person Name" }
-                : new List<string> { "View", "Activity Time", "Person Name", "Activity Status", "Weight(kg)", "Height(cm)" };
+                    ? new List<string> { "View", "Activity Time", "Person Name" }
+                    : new List<string> { "View", "Activity Time", "Person Name", "Activity Status", "Weight(kg)", "Height(cm)" };
+
+                if (isDownloadReport)
+                {
+                    displayColumnList.Remove("View");
+                }
                 foreach (var paramColumn in displayColumnList)
                 {
                     dataTable.Columns.Add(paramColumn, typeof(String));
@@ -870,7 +875,8 @@ namespace Coditech.API.Service
                                     : group.FirstOrDefault().TestPerformedTime;
                                 break;
                             case "View":
-                                newRow["View"] = group.FirstOrDefault().DBTMDeviceDataId.ToString();
+                                if (!isDownloadReport)
+                                    newRow["View"] = group.FirstOrDefault().DBTMDeviceDataId.ToString();
                                 break;
                         }
                     }
