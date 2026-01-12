@@ -435,7 +435,7 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
 
     .topbar .brand.logo-background .logo-large-wrapper .logo-lg {
         display: inline-block !important;
-        width: 88%;
+        width: 100%;
         height: auto;
     }
 

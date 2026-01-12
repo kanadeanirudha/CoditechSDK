@@ -50,6 +50,8 @@
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";
         public const string SixTenShuttleTest = "SixTenShuttleTest";
         public const string FourTenShuttleTest = "FourTenShuttleTest";
+        public const string FiveZeroFiveAgilityTest = "FiveZeroFiveAgilityTest";
+        public const string ProAgilityTest = "ProAgilityTest";
         #endregion
     }
 }
