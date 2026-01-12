@@ -646,7 +646,7 @@ namespace Coditech.API.Service
                 return model;
             model.TestName = testData.TestName;
             model.Status = "Completed";
-            model.TestPerformedTime = device.CreatedDate.HasValue ? device.CreatedDate.Value : device.TestPerformedTime;
+            model.TestPerformedTime = device.TestPerformedTime;
             //var directionParam = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId && !string.IsNullOrEmpty(x.FromTo)).OrderBy(x => x.Row).Select(x => x.FromTo).FirstOrDefault();
             //model.Direction = !string.IsNullOrEmpty(directionParam) ? directionParam : "N/A";
             model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
