@@ -45,9 +45,9 @@
                             <td style="text-align: center;">
                                 @if (item.NumberOfActivityPerformed > 0)
                                 {
-                                   <a href="@Url.Action("TraineeActivitiesList", controllerName, new { 
+                                    <a href="@Url.Action("TraineeActivitiesList", controllerName, new {
                                            SelectedParameter1 = item.PersonCode,
-                                           SelectedParameter2 = Model.SelectedParameter2 
+                                           SelectedParameter2 = Model.SelectedParameter2
                                        })">
                                         <span class="badge badge-soft-info">@item.NumberOfActivityPerformed</span>
                                     </a>
@@ -56,12 +56,12 @@
                                 {
                                     <span class="badge badge-soft-secondary">@item.NumberOfActivityPerformed</span>
                                 }
-                            </td>                            
+                            </td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center data-action">
-                                   <a href="@Url.Action("UpdateDBTMTraineePersonalDetails", controllerName, new { 
+                                <a href="@Url.Action("UpdateDBTMTraineePersonalDetails", controllerName, new {
                                        dBTMTraineeDetailId = item.DBTMTraineeDetailId,
                                        personId = item.PersonId,
                                        SelectedParameter2 = Model.SelectedParameter2
@@ -72,14 +72,23 @@
                                 </a>
                                 <span class="m-2">|</span>
 
-                                <a href="@Url.Action("Profile", controllerName, new { 
+                                <a href="@Url.Action("Profile", controllerName, new {
                                        dBTMTraineeDetailId = item.DBTMTraineeDetailId
                                    })"
                                    title="Profile"
                                    class="btn btn-sm btn-soft-warning btn-circle">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                             </td>
+                                <span class="m-2">|</span>
+                                <a href="javascript:void(0);"
+                                   title="Download Report"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#RemarkPopupId"
+                                   onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId', @item.DBTMTraineeDetailId, '@Html.Raw(HttpUtility.JavaScriptStringEncode(item.Remarks ?? ""))')"
+                                   class="text-primary fs-5">
+                                    <i class="fa fa-download"></i>
+                                </a>
+                            </td>
                         </tr>
                     }
                 }
@@ -87,4 +96,8 @@
         </table>
     </div>
 </div>
+<iframe id="hiddenDownloader"
+        style="display:none;"
+        title="pdf-downloader">
+</iframe>
 @Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)

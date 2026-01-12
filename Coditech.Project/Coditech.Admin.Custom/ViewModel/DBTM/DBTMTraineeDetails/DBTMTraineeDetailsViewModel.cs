@@ -58,5 +58,6 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Section")]
         public string Section { get; set; }
         public string TypeOfCentre { get; set; }
+        public string Remarks { get; set; }
     }
 }
