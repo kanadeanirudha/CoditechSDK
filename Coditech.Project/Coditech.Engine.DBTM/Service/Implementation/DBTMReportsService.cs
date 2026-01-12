@@ -86,7 +86,7 @@ namespace Coditech.API.Service
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4" };
                     }
-                    else if (dbtmTestMaster.TestCode == "FiveZeroFiveAgilityTest" || dbtmTestMaster.TestCode == "ProAgilityTest")
+                    else if (dbtmTestMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || dbtmTestMaster.TestCode == CustomConstants.ProAgilityTest)
                     {
                         XValuesList = new string[] { "A-B", "B-C", "C-B" };
                     }
@@ -297,6 +297,13 @@ namespace Coditech.API.Service
                         else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
                         {
                             for (int index = 1; index <= 4; index++)
+                            {
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                            }
+                        }
+                        else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
+                        {
+                            for (int index = 1; index <= 3; index++)
                             {
                                 yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
                             }
@@ -998,7 +1005,6 @@ namespace Coditech.API.Service
                     return;
                 }
                 string rowValue = string.Empty;
-                long dBTMDeviceDataId = group.FirstOrDefault()?.DBTMDeviceDataId ?? 0;
                 if (displayColumn == "ModeOfStart" || displayColumn == "Direction")
                 {
                     rowValue = !string.IsNullOrEmpty(group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1) ? group.FirstOrDefault(x => x.ParameterCode == displayColumn)?.Comment1.ToString() : "NA";
@@ -1027,7 +1033,7 @@ namespace Coditech.API.Service
                         }
                     }
                 }
-                newRow[displayColumn] = isMobileRequest || isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{dBTMDeviceDataId}";
+                newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
             }
         }
 
@@ -1206,7 +1212,8 @@ namespace Coditech.API.Service
                     }
                     else
                     {
-                        var dataDetails = dBTMReportsList.FirstOrDefault(x => x.ParameterCode == displayColumn.ParameterCode && x.Row == i); newRow[displayColumn.ColumnName] = dataDetails.ParameterValue;
+                        var dataDetails = dBTMReportsList.FirstOrDefault(x => x.ParameterCode == displayColumn.ParameterCode && x.Row == i);
+                        newRow[displayColumn.ColumnName] = dataDetails.ParameterValue;
                     }
                 }
                 dataTable.Rows.Add(newRow);
