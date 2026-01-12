@@ -3,25 +3,29 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
+using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Newtonsoft.Json;
+using System.Diagnostics;
 namespace Coditech.Admin.Agents
 {
-    public class DBTMOrganisationCentrewiseJoiningCodeAgent : OrganisationCentrewiseJoiningCodeAgent
+    public class DBTMOrganisationCentrewiseJoiningCodeAgent : OrganisationCentrewiseJoiningCodeAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent
     {
         #region Private Variable
         protected readonly ICoditechLogging _coditechLogging;
         private readonly IOrganisationCentrewiseJoiningCodeClient _organisationCentrewiseJoiningCodeClient;
+        private readonly IDBTMOrganisationCentrewiseJoiningCodeClient _dBTMOrganisationCentrewiseJoiningCodeClient;
         #endregion
 
         #region Public Constructor
-        public DBTMOrganisationCentrewiseJoiningCodeAgent(ICoditechLogging coditechLogging, IOrganisationCentrewiseJoiningCodeClient organisationCentrewiseJoiningCodeClient, IUserClient userClient)
+        public DBTMOrganisationCentrewiseJoiningCodeAgent(ICoditechLogging coditechLogging, IOrganisationCentrewiseJoiningCodeClient organisationCentrewiseJoiningCodeClient, IDBTMOrganisationCentrewiseJoiningCodeClient dBTMOrganisationCentrewiseJoiningCodeClient, IUserClient userClient)
             : base(coditechLogging, organisationCentrewiseJoiningCodeClient, userClient)
         {
             _coditechLogging = coditechLogging;
             _organisationCentrewiseJoiningCodeClient = GetClient<IOrganisationCentrewiseJoiningCodeClient>(organisationCentrewiseJoiningCodeClient);
+            _dBTMOrganisationCentrewiseJoiningCodeClient = GetClient<IDBTMOrganisationCentrewiseJoiningCodeClient>(dBTMOrganisationCentrewiseJoiningCodeClient);
         }
         #endregion
 
@@ -52,6 +56,32 @@ namespace Coditech.Admin.Agents
 
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.OrganisationCentrewiseJoiningCodeList.Count, BindColumns());
             return listViewModel;
+        }
+
+        //Test Wise Reports File
+        public virtual DBTMOrganisationCentrewiseJoiningCodeViewModel GetTraineeActiveJoiningCode(string CentreCode)
+        {
+            DBTMOrganisationCentrewiseJoiningCodeViewModel listViewModel = new DBTMOrganisationCentrewiseJoiningCodeViewModel();
+            DBTMOrganisationCentrewiseJoiningCodeResponse response = _dBTMOrganisationCentrewiseJoiningCodeClient.GetTraineeActiveJoiningCode(CentreCode);
+            listViewModel.FilePath = response.FilePath;
+            listViewModel.FileName = response.FileName;
+            return listViewModel;
+        }
+
+        //Delete Report .
+        public virtual bool DeleteJoiningCodeFile(string fileName)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Info);
+                TrueFalseResponse response = _dBTMOrganisationCentrewiseJoiningCodeClient.DeleteJoiningCodeFile(new ParameterModel { Ids = fileName });
+                return response?.IsSuccess ?? false;
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return false;
+            }
         }
         #endregion
 

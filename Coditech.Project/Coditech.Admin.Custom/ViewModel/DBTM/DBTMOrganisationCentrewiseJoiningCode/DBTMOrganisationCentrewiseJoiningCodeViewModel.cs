@@ -1,0 +1,12 @@
+﻿using Coditech.Common.API.Model;
+using Coditech.Common.Helper;
+using System.ComponentModel.DataAnnotations;
+
+namespace Coditech.Admin.ViewModel
+{
+    public class DBTMOrganisationCentrewiseJoiningCodeViewModel : BaseViewModel
+    {
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+    }
+}
