@@ -43,8 +43,11 @@
         public const string Date = "Date";
         public const string GraphDateFormat = "yyyy-MM-dd";
         public const string Turns = "Turns";
+        public const string NumberOfTurns = "NumberOfTurns";
+        public const string Position = "Position";
         public const int GraphListRoundUpValue = 3;
         public const string School = "School";
+        public const string StaticValue = "StaticValue";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

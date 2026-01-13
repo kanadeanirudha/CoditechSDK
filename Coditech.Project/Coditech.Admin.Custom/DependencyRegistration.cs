@@ -33,6 +33,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMCampAgent, DBTMCampAgent>();
             builder.Services.AddScoped<IDBTMOrganisationCentreAgent, DBTMOrganisationCentreAgent>();
             builder.Services.AddScoped<IDBTMCentreWiseSettingAgent, DBTMCentreWiseSettingAgent>();
+            builder.Services.AddScoped<IDBTMOrganisationCentrewiseJoiningCodeAgent, DBTMOrganisationCentrewiseJoiningCodeAgent>();
             #endregion
             #endregion Agent
 
@@ -58,6 +59,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMCampClient, DBTMCampClient>();
             builder.Services.AddScoped<IDBTMOrganisationCentreClient, DBTMOrganisationCentreClient>();
             builder.Services.AddScoped<IDBTMCentreWiseSettingClient, DBTMCentreWiseSettingClient>();
+            builder.Services.AddScoped<IDBTMOrganisationCentrewiseJoiningCodeClient, DBTMOrganisationCentrewiseJoiningCodeClient>();
             #endregion 
             #endregion Client
         }
