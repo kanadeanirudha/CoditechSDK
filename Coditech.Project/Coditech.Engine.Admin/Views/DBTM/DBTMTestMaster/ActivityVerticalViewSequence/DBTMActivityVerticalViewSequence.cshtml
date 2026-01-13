@@ -116,6 +116,13 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
+                                        @Html.LabelFor(x => x.StaticValue, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.StaticValue, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.StaticValue)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
                                         @Html.LabelFor(x => x.IsColumnCellBold, new { @class = "form-label" })
                                         <div class="form-check">
                                             @Html.CheckBoxFor(x => x.IsColumnCellBold, new { @class = "form-check-input" })

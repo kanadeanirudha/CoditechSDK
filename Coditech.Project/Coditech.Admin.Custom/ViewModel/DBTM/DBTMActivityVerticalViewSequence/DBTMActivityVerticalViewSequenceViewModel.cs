@@ -45,5 +45,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Is Column Cell Bold")]
         public bool IsColumnCellBold { get; set; }
         public string TestName { get; set; }
+        [Display(Name = "Static Value")]
+        public string StaticValue { get; set; }
     }
 }
