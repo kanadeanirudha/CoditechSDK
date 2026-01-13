@@ -122,7 +122,7 @@ namespace Coditech.API.Service
                     }
                     XValuesList = xValues.ToArray();
                 }
-                else if (graphMaster.XParameter == "Position")
+                else if (graphMaster.XParameter == CustomConstants.Position)
                 {
                     List<string> xValues = new List<string>();
                     xValues.AddRange(dBTMReportsList
@@ -131,6 +131,16 @@ namespace Coditech.API.Service
                                     .Select(g => g.Key)
                                     );
 
+                    XValuesList = xValues.ToArray();
+                }
+                else if (graphMaster.XParameter == CustomConstants.NumberOfTurns)
+                {
+                    int aa = dBTMReportsList.Select(x => x.CreatedDate).Distinct().Count();
+                    List<string> xValues = new List<string>();
+                    for (int count = 1; count <= dBTMReportsList.Select(x => x.CreatedDate).Distinct().Count(); count++)
+                    {
+                        xValues.Add(count.ToString());
+                    }
                     XValuesList = xValues.ToArray();
                 }
                 if (XValuesList != null)
@@ -215,11 +225,18 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.IsYParameterCalculated)
                 {
+                    //if (graphMaster.YParameter == CustomConstants.TotalCount)
+                    //{
+                    //    yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
+                    //}
+                    //else
+                    //{
                     foreach (var item in group.Where(x => x.ParameterCode == yParameter))
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
                         j++;
                     }
+                    //}
                 }
                 else
                 {
@@ -1202,6 +1219,10 @@ namespace Coditech.API.Service
                     {
                         var fromTo = dBTMReportsList.FirstOrDefault(x => x.Row == i && !string.IsNullOrEmpty(x.FromTo))?.FromTo;
                         newRow[displayColumn.ColumnName] = fromTo ?? string.Empty;
+                    }
+                    else if (displayColumn.ParameterCode == CustomConstants.StaticValue)
+                    {
+                        newRow[displayColumn.ColumnName] = displayColumn.StaticValue;
                     }
                     else if (displayColumn.IsCalculatedParameter)
                     {
