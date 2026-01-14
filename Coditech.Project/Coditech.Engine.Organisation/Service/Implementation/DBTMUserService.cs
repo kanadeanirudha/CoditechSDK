@@ -7,6 +7,7 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
+using System.Data;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -277,6 +278,12 @@ namespace Coditech.API.Service
                     }
                 }
                 List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = null;
+
+                if(dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count == 0)
+                {
+                    dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds = new List<string>();
+                    dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds.Add(joiningCodeDetails.Custom1);
+                } 
                 if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count > 0)
                 {
                     generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
@@ -292,9 +299,57 @@ namespace Coditech.API.Service
                     }
                     _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
                 }
-
             }
             return generalPersonModel;
+        }
+
+        public DBTMTraineeUploadResultModel UploadTrainee(DBTMTraineeUploadRowListModel table)
+        {
+            DBTMTraineeUploadResultModel result = new DBTMTraineeUploadResultModel();
+            int success = 0;
+            int failed = 0;
+
+            foreach (var row in table.DBTMTraineeUploadRowList)
+            {
+                try
+                {
+                    var customModel = new DBTMCustomNewRegistrationModel
+                    {
+                        JoiningCode = row.JoiningCode,
+                        height = row.HeightCm,
+                        weight = row.WeightKg,
+                        SpecializationEnumId = row.SpecializationEnumId,
+                        GeneralBatchMasterId = 0,
+                        GeneralTraineeAssociatedToTrainerIds = new List<string>()
+                    };
+                    string title = !string.IsNullOrEmpty(row.PersonTitle) ? row.PersonTitle : (row.Gender?.ToLower() == "male" ? "Mr" : "Ms");
+                    GeneralPersonModel model = new GeneralPersonModel
+                    {
+                        UserType = UserTypeEnum.Trainee.ToString(),
+                        PersonTitle = title,
+                        FirstName = row.FirstName,
+                        LastName = row.LastName,
+                        EmailId = row.EmailAddress,
+                        MobileNumber = row.MobileNumber,
+                        CallingCode = row.CallingCode,
+                        GenderEnumId = row.Gender.ToLower() == "male" ? 1 : 2,
+                        DateOfBirth = row.DateOfBirth,
+                        Custom1 = JsonConvert.SerializeObject(customModel)
+                    };
+
+                    DBTMRegisterTrainee(model);
+                    success++;
+                }
+                catch
+                {
+                    failed++;
+                }
+            }
+
+            result.TotalRecords = table.DBTMTraineeUploadRowList.Count;
+            result.SuccessCount = success;
+            result.FailedCount = failed;
+            return result;
         }
 
         public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)

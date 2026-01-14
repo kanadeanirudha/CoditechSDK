@@ -9,7 +9,11 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Data;
+using System.IO;
+using System.Text;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
@@ -430,6 +434,84 @@ namespace Coditech.Admin.Agents
             }
         }
         #endregion
+
+        public DBTMTraineeUploadResultViewModel UploadTraineeFromFile(IFormFile file)
+        {
+            DBTMTraineeUploadResultViewModel result = new DBTMTraineeUploadResultViewModel();
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    result.HasError = true;
+                    result.ErrorMessage = "Please select a file.";
+                    return result;
+                }
+                DBTMTraineeUploadRowListModel model = CsvToListModel(file);
+                DBTMTraineeUploadResultResponse response = _dBTMTraineeDetailsClient.UploadTrainee(model);
+
+                result.TotalRecords = model.DBTMTraineeUploadRowList.Count;
+                result.SuccessCount = model.DBTMTraineeUploadRowList.Count; // later replace with response values
+                result.FailedCount = 0;
+                result.HasError = false;
+            }
+            catch (Exception ex)
+            {
+                result.HasError = true;
+                result.ErrorMessage = "Upload failed: " + ex.Message;
+            }
+            return result;
+        }
+
+        private DBTMTraineeUploadRowListModel CsvToListModel(IFormFile file)
+        {
+            var result = new DBTMTraineeUploadRowListModel();
+
+            using var reader = new StreamReader(file.OpenReadStream());
+            bool isHeader = true;
+            int lineNo = 0;
+
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                lineNo++;
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+                var values = line.Split(',');
+                if (isHeader)
+                {
+                    isHeader = false;
+                    continue;
+                }
+                if (values.Length != 12)
+                    throw new Exception($"CSV format error at line {lineNo}. Expected 12 columns, got {values.Length}");
+                try
+                {
+                    string gender = values[7].Trim();
+                    string title = gender.Equals("male", StringComparison.OrdinalIgnoreCase) ? "Mr" : "Ms";
+                    var row = new DBTMTraineeUploadRowModel
+                    {
+                        JoiningCode = values[0].Trim(),
+                        PersonTitle = title,
+                        FirstName = values[2].Trim(),
+                        LastName = values[3].Trim(),
+                        EmailAddress = values[4].Trim(),
+                        CallingCode = values[5].Trim(),
+                        MobileNumber = values[6].Trim(),
+                        Gender = values[7].Trim(),
+                        DateOfBirth = DateTime.TryParse(values[8].Trim(), out var dob) ? dob : throw new Exception("Invalid DateOfBirth"),
+                        WeightKg = decimal.TryParse(values[9].Trim(), out var w) ? w : throw new Exception("Invalid WeightKg"),
+                        HeightCm = decimal.TryParse(values[10].Trim(), out var h) ? h : throw new Exception("Invalid HeightCm"),
+                        SpecializationEnumId = int.TryParse(values[11].Trim(), out var s) ? s : throw new Exception("Invalid SpecializationEnumId")
+                    };
+                    result.DBTMTraineeUploadRowList.Add(row);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Data error at line {lineNo}: {ex.Message}");
+                }
+            }
+            return result;
+        }
         #region protected
         protected virtual List<DatatableColumns> BindColumns()
         {

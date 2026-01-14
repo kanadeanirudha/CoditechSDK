@@ -177,4 +177,53 @@
             remarks
         );
     },
+    GetUploadTraineePopup: function (contentId) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetUploadTraineePopup",
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load upload popup.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+    UploadTraineeFile: function () {
+        var fileInput = $("#TraineeFile")[0];
+        if (!fileInput || fileInput.files.length === 0) {
+            CoditechNotification.DisplayNotificationMessage("Please select file.", "error");
+            return;
+        }
+        var file = fileInput.files[0];
+        var formData = new FormData();
+        formData.append("file", file);
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            url: "/DBTMTraineeDetails/UploadTrainee",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                if (res.success) {
+                    CoditechNotification.DisplayNotificationMessage(res.message, "success");
+                    $("#TraineePopupId").modal("hide");
+                } else {
+                    CoditechNotification.DisplayNotificationMessage(res.message, "error");
+                }
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
 }

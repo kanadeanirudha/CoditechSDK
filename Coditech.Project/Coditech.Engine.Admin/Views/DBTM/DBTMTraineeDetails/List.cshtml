@@ -17,6 +17,7 @@
                 SelectedText = "All",
                 SelectedValue = "0"
             };
+    ModelPopUpViewModel traineePopup = new ModelPopUpViewModel() { ModelPopUpId = "TraineePopupId", ModalContentId = "TraineeContentId" };
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
 }
 <!-- Page Content-->
@@ -44,8 +45,17 @@
                         }
                         else
                         {
-                            // Centre Owner
-                            <a class="btn btn-soft-primary" href="/DBTMTraineeDetails/TraineeRegistration"> Add Trainee </a>
+                            <div class="d-flex gap-2">
+                                <a href="javascript:void(0);"
+                                   class="btn btn-sm btn-success"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#TraineePopupId"
+                                   onclick="DBTMTraineeDetails.GetUploadTraineePopup('TraineeContentId')">
+                                    <i class="fas fa-upload me-2"></i> Upload Trainee
+                                </a>
+                                @*Centre Owner *@
+                                <a class="btn btn-soft-primary" href="/DBTMTraineeDetails/TraineeRegistration"> Add Trainee </a>
+                            </div>
                         }
 
                     </div>
@@ -79,5 +89,6 @@
         </div>
     </div>
 </div>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", traineePopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
 <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>

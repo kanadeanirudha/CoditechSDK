@@ -5,6 +5,7 @@ using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Newtonsoft.Json;
+using System.Data;
 namespace Coditech.API.Client
 {
     public class DBTMTraineeDetailsClient : BaseClient, IDBTMTraineeDetailsClient
@@ -380,6 +381,46 @@ namespace Coditech.API.Client
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMReportsResponse typedBody = JsonConvert.DeserializeObject<DBTMReportsResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTraineeUploadResultResponse UploadTrainee(DBTMTraineeUploadRowListModel table)
+        {
+            return Task.Run(async () => await UploadTraineeAsync(table, CancellationToken.None) ).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTraineeUploadResultResponse> UploadTraineeAsync(DBTMTraineeUploadRowListModel table, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.UploadTraineeAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                string json = JsonConvert.SerializeObject(table);
+                response = await PostResourceToEndpointAsync( endpoint, json, status, cancellationToken ).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeUploadResultResponse>( response, headers_, cancellationToken);
+                    if (objectResponse.Object == null)
+                        throw new CoditechException(status.ErrorCode, status.ErrorMessage);
+
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync();
+                    DBTMTraineeUploadResultResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeUploadResultResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
