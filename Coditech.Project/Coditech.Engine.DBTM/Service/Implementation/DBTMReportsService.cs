@@ -51,6 +51,12 @@ namespace Coditech.API.Service
         public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
         {
             List<GraphModel> graphModelList = new List<GraphModel>();
+            if (string.IsNullOrEmpty(dBTMGraphMasterIds))
+            {
+                List<DBTMGraphMaster> graphMasterList = _dBTMGraphMasterRepository.Table.AsEnumerable().Where(x => x.GraphMode == graphMode && x.TestCode.Split(',').Contains(dBTMTestMasterId.ToString()))?.ToList();
+                if (graphMasterList?.Count() > 0)
+                    dBTMGraphMasterIds = string.Join(',', graphMasterList.Select(x => x.DBTMGraphMasterId));
+            }
             foreach (string dBTMGraphMasterId in dBTMGraphMasterIds.Split(','))
             {
                 graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest));
@@ -171,11 +177,11 @@ namespace Coditech.API.Service
                             Datasets = new List<LineBarGraphsDatasetModel>()
                         };
 
-                        if (graphMaster.GraphMode == "InstantaneousChart")
+                        if (graphMaster.GraphMode == CustomConstants.InstantaneousChart)
                         {
                             BindInstantaneousChart(graphModel, graphMaster, yParameter, dBTMReportsList, colorIndex, groupedReports, colorPalette);
                         }
-                        else if (graphMaster.GraphMode == "ProgressChart")
+                        else if (graphMaster.GraphMode == CustomConstants.ProgressChart)
                         {
                             BindProgressChart(graphModel, graphMaster, yParameter, dBTMReportsList, colorIndex, groupedReportsByDateFormat, colorPalette);
                         }
@@ -657,23 +663,22 @@ namespace Coditech.API.Service
         public DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId)
         {
             DBTMReportVerticalDataModel model = new DBTMReportVerticalDataModel();
-            DBTMDeviceData device = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
-            if (device == null)
+            DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
+            if (deviceData == null)
                 return model;
-            DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonCode == device.PersonCode);
+            DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonCode == deviceData.PersonCode);
             GeneralPersonModel person = null;
-            if (trainee?.PersonId > 0)
-                person = GetGeneralPersonDetails(trainee.PersonId);
+            if (traineeDetails?.PersonId > 0)
+                person = GetGeneralPersonDetails(traineeDetails.PersonId);
             model.AthleteName = person != null ? $"{person.FirstName} {person.LastName}" : "N/A";
-            var testData = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == device.TestCode).Select(x => new { x.DBTMTestMasterId, x.TestName }).FirstOrDefault();
+            var testData = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == deviceData.TestCode).Select(x => new { x.DBTMTestMasterId, x.TestName }).FirstOrDefault();
             if (testData == null)
                 return model;
             model.TestName = testData.TestName;
             model.Status = "Completed";
-            model.TestPerformedTime = device.TestPerformedTime;
-            //var directionParam = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId && !string.IsNullOrEmpty(x.FromTo)).OrderBy(x => x.Row).Select(x => x.FromTo).FirstOrDefault();
-            //model.Direction = !string.IsNullOrEmpty(directionParam) ? directionParam : "N/A";
+            model.TestPerformedTime = deviceData.TestPerformedTime;
             model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
+            model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false);
             return model;
         }
 

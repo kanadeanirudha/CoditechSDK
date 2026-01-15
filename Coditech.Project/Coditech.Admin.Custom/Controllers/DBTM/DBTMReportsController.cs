@@ -144,16 +144,16 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports( int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
         {
             if (!string.IsNullOrEmpty(graphMode) &&
-                graphMode.Equals("InstantaneousChart", StringComparison.OrdinalIgnoreCase))
+                graphMode.Equals(CustomConstants.InstantaneousChart, StringComparison.OrdinalIgnoreCase))
             {
                 ToDate = FromDate;
             }
             if (!string.IsNullOrEmpty(dBTMGraphMasterIds))
             {
-                List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2( dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate );
+                List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate);
 
                 if (graphModels != null && graphModels.Any(x => x.IsRecordFound))
                 {
@@ -172,7 +172,7 @@ namespace Coditech.Admin.Controllers
             if (graphList?.DBTMGraphMasterList != null)
             {
                 list = graphList.DBTMGraphMasterList
-                                .Where(g => g.GraphMode == graphMode && g.IsActive )
+                                .Where(g => g.GraphMode == graphMode && g.IsActive)
                                 .Select(g => new SelectListItem
                                 {
                                     Text = $"{g.GraphName}",
@@ -183,7 +183,7 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId )
+        public IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
         {
             if (dBTMTestMasterId <= 0 || dBTMTraineeDetailId <= 0)
                 return Json(new List<string>());
