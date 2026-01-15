@@ -48,6 +48,8 @@
         public const int GraphListRoundUpValue = 3;
         public const string School = "School";
         public const string StaticValue = "StaticValue";
+        public const string InstantaneousChart = "InstantaneousChart";
+        public const string ProgressChart = "ProgressChart";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

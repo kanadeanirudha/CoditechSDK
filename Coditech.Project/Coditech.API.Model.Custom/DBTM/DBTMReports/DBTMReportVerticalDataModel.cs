@@ -15,5 +15,6 @@ namespace Coditech.Common.API.Model
         {
             DataTable = new DataTable();
         }
+        public List<GraphModel> GraphModelList = new List<GraphModel>();
     }
 }
