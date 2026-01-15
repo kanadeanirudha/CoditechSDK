@@ -57,9 +57,12 @@ namespace Coditech.API.Service
                 if (graphMasterList?.Count() > 0)
                     dBTMGraphMasterIds = string.Join(',', graphMasterList.Select(x => x.DBTMGraphMasterId));
             }
-            foreach (string dBTMGraphMasterId in dBTMGraphMasterIds.Split(','))
+            if (!string.IsNullOrEmpty(dBTMGraphMasterIds) && dBTMGraphMasterIds?.Split(',')?.Count() > 0)
             {
-                graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest));
+                foreach (string dBTMGraphMasterId in dBTMGraphMasterIds.Split(','))
+                {
+                    graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest));
+                }
             }
             return graphModelList;
         }
