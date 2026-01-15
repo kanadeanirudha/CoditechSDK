@@ -20,9 +20,14 @@
                         <tr>
                             <td>@item.GraphName</td>
                             <td>@item.GraphCode</td>
+                            <td>@item.GraphMode</td>
                             <td>@item.XParameter</td>
                             <td>@item.YParameter</td>
                             <td>@item.GraphType</td>
+                            <td>@item.GraphSize</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
+                            </td>
                             <td class="text-center">
                                 <a href="@Url.Action("Edit", controllerName, new { graphCode = item.GraphCode })"
                                    title="Update"

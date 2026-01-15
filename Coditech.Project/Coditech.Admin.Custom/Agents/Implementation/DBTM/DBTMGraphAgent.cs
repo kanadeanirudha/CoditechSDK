@@ -177,6 +177,12 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Graph Mode",
+                ColumnCode = "GraphMode",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "X Parameter",
                 ColumnCode = "XParameter",
                 IsSortable = true,
@@ -191,6 +197,18 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Graph Type",
                 ColumnCode = "GraphType",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Graph Size",
+                ColumnCode = "GraphSize",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Active",
+                ColumnCode = "IsActive",
                 IsSortable = true,
             });
             return datatableColumnList;
