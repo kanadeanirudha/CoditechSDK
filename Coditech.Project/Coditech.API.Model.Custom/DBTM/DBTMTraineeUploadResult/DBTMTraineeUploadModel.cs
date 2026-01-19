@@ -1,13 +1,13 @@
 ﻿using System.Data;
-using Coditech.Common.API.Model;
-using Coditech.Common.Helper;
-namespace Coditech.Admin.ViewModel
+using Microsoft.AspNetCore.Http;
+namespace Coditech.Common.API.Model
 {
-    public class DBTMTraineeUploadResultViewModel : BaseViewModel
+    public class DBTMTraineeUploadModel : BaseModel
     {
         public int TotalRecords { get; set; }
         public int SuccessCount { get; set; }
         public int FailedCount { get; set; }
+        public DataTable DataTable { get; set; }
         public List<Dictionary<string, object>> FailedRows { get; set; }
         public List<Dictionary<string, object>> Data { get; set; }
     }

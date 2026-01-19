@@ -195,6 +195,33 @@
             }
         });
     },
+    RenderFailedTable: function (rows) {
+        if (!rows || rows.length === 0) {
+            $("#UploadErrorTableContainer").html("");
+            $("#ErrorHeader").hide();
+            return;
+        }
+        $("#ErrorHeader").show();   
+        var cols = Object.keys(rows[0]);
+        var html = `<hr/><table class="table table-bordered"><thead><tr>`;
+        cols.forEach(function (c) {
+            html += `<th>${c}</th>`;
+        });
+        html += `</tr></thead><tbody>`;
+        rows.forEach(function (r) {
+            html += `<tr>`;
+            cols.forEach(function (c) {
+                var val = r[c] == null ? "" : r[c];
+                if (c.toLowerCase().includes("error"))
+                    html += `<td style="color:red">${val}</td>`;
+                else
+                    html += `<td>${val}</td>`;
+            });
+            html += `</tr>`;
+        });
+        html += `</tbody></table>`;
+        $("#UploadErrorTableContainer").html(html);
+    },
     UploadTraineeFile: function () {
         var fileInput = $("#TraineeFile")[0];
         if (!fileInput || fileInput.files.length === 0) {
@@ -204,6 +231,8 @@
         var file = fileInput.files[0];
         var formData = new FormData();
         formData.append("file", file);
+        $("#UploadErrorTableContainer").html("");
+        $("#ErrorHeader").hide(); 
         CoditechCommon.ShowLodder();
         $.ajax({
             url: "/DBTMTraineeDetails/UploadTrainee",
@@ -216,7 +245,11 @@
                     CoditechNotification.DisplayNotificationMessage(res.message, "success");
                     $("#TraineePopupId").modal("hide");
                 } else {
-                    CoditechNotification.DisplayNotificationMessage(res.message, "error");
+                    if (res.failedRows && res.failedRows.length > 0) {
+                        DBTMTraineeDetails.RenderFailedTable(res.failedRows);
+                    } else {
+                        CoditechNotification.DisplayNotificationMessage(res.message, "error");
+                    }
                 }
                 CoditechCommon.HideLodder();
             },

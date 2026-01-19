@@ -279,11 +279,11 @@ namespace Coditech.API.Service
                 }
                 List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = null;
 
-                if(dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count == 0)
+                if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count == 0)
                 {
                     dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds = new List<string>();
                     dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds.Add(joiningCodeDetails.Custom1);
-                } 
+                }
                 if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count > 0)
                 {
                     generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
@@ -303,53 +303,258 @@ namespace Coditech.API.Service
             return generalPersonModel;
         }
 
-        public DBTMTraineeUploadResultModel UploadTrainee(DBTMTraineeUploadRowListModel table)
+        public DBTMTraineeUploadModel UploadTraineeFromFile(IFormFile file)
         {
-            DBTMTraineeUploadResultModel result = new DBTMTraineeUploadResultModel();
-            int success = 0;
-            int failed = 0;
-
-            foreach (var row in table.DBTMTraineeUploadRowList)
+            if (file == null || file.Length == 0)
+                throw new Exception("File is empty.");
+            DBTMTraineeUploadModel table = CsvToListModel(file);
+            if (table.DataTable == null || table.DataTable.Rows.Count == 0)
+                throw new Exception("File contains no data.");
+            DBTMTraineeUploadModel result = UploadTrainee(table);
+            return new DBTMTraineeUploadModel
             {
-                try
-                {
-                    var customModel = new DBTMCustomNewRegistrationModel
-                    {
-                        JoiningCode = row.JoiningCode,
-                        height = row.HeightCm,
-                        weight = row.WeightKg,
-                        SpecializationEnumId = row.SpecializationEnumId,
-                        GeneralBatchMasterId = 0,
-                        GeneralTraineeAssociatedToTrainerIds = new List<string>()
-                    };
-                    string title = !string.IsNullOrEmpty(row.PersonTitle) ? row.PersonTitle : (row.Gender?.ToLower() == "male" ? "Mr" : "Ms");
-                    GeneralPersonModel model = new GeneralPersonModel
-                    {
-                        UserType = UserTypeEnum.Trainee.ToString(),
-                        PersonTitle = title,
-                        FirstName = row.FirstName,
-                        LastName = row.LastName,
-                        EmailId = row.EmailAddress,
-                        MobileNumber = row.MobileNumber,
-                        CallingCode = row.CallingCode,
-                        GenderEnumId = row.Gender.ToLower() == "male" ? 1 : 2,
-                        DateOfBirth = row.DateOfBirth,
-                        Custom1 = JsonConvert.SerializeObject(customModel)
-                    };
+                TotalRecords = result.TotalRecords,
+                SuccessCount = result.SuccessCount,
+                FailedCount = result.FailedCount,
+                FailedRows = result.FailedRows,
+                DataTable = result.DataTable
+            };
+        }
 
-                    DBTMRegisterTrainee(model);
-                    success++;
-                }
-                catch
+        public DBTMTraineeUploadModel UploadTrainee(DBTMTraineeUploadModel table)
+        {
+            DataTable dt = table.DataTable;
+            if (!dt.Columns.Contains("SrNo"))
+            {
+                dt.Columns.Add("SrNo", typeof(int));
+                dt.Columns["SrNo"].SetOrdinal(0);
+            }
+            if (!dt.Columns.Contains("ErrorMessage"))
+            {
+                dt.Columns.Add("ErrorMessage");
+            }
+            dt.Columns["ErrorMessage"].SetOrdinal(1);
+            List<string> joiningCodes = dt.AsEnumerable().Select(r => r["JoiningCode"]?.ToString()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+            var joiningCodeList = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => joiningCodes.Contains(x.JoiningCode)).ToList();
+
+            // Validation
+            int sr = 2;
+            bool hasAnyError = false;
+            foreach (DataRow row in dt.Rows)
+            {
+                row["SrNo"] = sr++;
+                if (!ValidateRow(row, joiningCodeList, out string error))
                 {
-                    failed++;
+                    row["ErrorMessage"] = error;
+                    hasAnyError = true;
+                }
+                else
+                {
+                    row["ErrorMessage"] = null;
                 }
             }
+            if (hasAnyError)
+            {
+                DataTable failedTable = BuildFailedTable(dt);
+                return new DBTMTraineeUploadModel
+                {
+                    TotalRecords = dt.Rows.Count,
+                    SuccessCount = 0,
+                    FailedCount = failedTable.Rows.Count,
+                    FailedRows = ToList(failedTable)
+                };
+            }
+            // Insert
+            int success = 0;
+            foreach (DataRow row in dt.Rows)
+            {
+                InsertTrainee(row);
+                success++;
+            }
+            DataTable finalFailed = BuildFailedTable(dt);
+            return new DBTMTraineeUploadModel
+            {
+                TotalRecords = dt.Rows.Count,
+                SuccessCount = success,
+                FailedCount = finalFailed.Rows.Count,
+                FailedRows = ToList(finalFailed),
+                Data = ToList(dt)
+            };
+        }
 
-            result.TotalRecords = table.DBTMTraineeUploadRowList.Count;
-            result.SuccessCount = success;
-            result.FailedCount = failed;
+        // Validation 
+        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, out string errorMessage)
+        {
+            List<string> errors = new List<string>();
+
+            string joiningCode = row["JoiningCode"]?.ToString();
+            string title = row["PersonTitle"]?.ToString();
+            string firstName = row["FirstName"]?.ToString();
+            string lastName = row["LastName"]?.ToString();
+            string mobile = row["MobileNumber"]?.ToString();
+            string gender = row["Gender"]?.ToString();
+
+            if (!ValidateJoiningCode(joiningCode, joiningCodeList, out string joiningCodeError))
+                errors.Add(joiningCodeError);
+
+            if (string.IsNullOrWhiteSpace(title))
+                errors.Add("PersonTitle is empty");
+            else if (title != "Mr" && title != "Ms")
+                errors.Add("PersonTitle must be Mr or Ms");
+
+            if (string.IsNullOrWhiteSpace(firstName))
+                errors.Add("FirstName is empty");
+            else if (!firstName.All(char.IsLetter))
+                errors.Add("FirstName must contain only letters");
+
+            if (string.IsNullOrWhiteSpace(lastName))
+                errors.Add("LastName is empty");
+            else if (!lastName.All(char.IsLetter))
+                errors.Add("LastName must contain only letters");
+
+            if (string.IsNullOrWhiteSpace(mobile))
+                errors.Add("MobileNumber is empty");
+            else if (!mobile.All(char.IsDigit))
+                errors.Add("MobileNumber must contain only digits");
+
+            if (!(gender?.Equals("male", StringComparison.OrdinalIgnoreCase) == true ||
+                  gender?.Equals("female", StringComparison.OrdinalIgnoreCase) == true))
+                errors.Add("Gender must be Male or Female");
+
+            if (!string.IsNullOrWhiteSpace(joiningCode))
+            {
+                OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = joiningCodeList.FirstOrDefault(x =>
+                    x.JoiningCode.Equals(joiningCode, StringComparison.OrdinalIgnoreCase));
+
+                if (organisationCentrewiseJoiningCode != null)
+                {
+                    GeneralPersonModel person = new GeneralPersonModel
+                    {
+                        UserType = UserTypeEnum.Trainee.ToString(),
+                        FirstName = firstName,
+                        LastName = lastName,
+                        MobileNumber = mobile,
+                        EmailId = row["EmailAddress"]?.ToString(),
+                        SelectedCentreCode = organisationCentrewiseJoiningCode.CentreCode
+                    };
+                    if (!ValidatedGeneralPersonData(person, out string baseError))
+                        errors.Add(baseError);
+                }
+            }
+            errorMessage = errors.Count > 0 ? string.Join(", ", errors) : null;
+            return errors.Count == 0;
+        }
+
+        //Insert Trainee 
+        private void InsertTrainee(DataRow row)
+        {
+            DBTMCustomNewRegistrationModel customModel = new DBTMCustomNewRegistrationModel
+            {
+                JoiningCode = row["JoiningCode"].ToString(),
+                height = Convert.ToDecimal(row["HeightCm"]),
+                weight = Convert.ToDecimal(row["WeightKg"]),
+                SpecializationEnumId = Convert.ToInt32(row["SpecializationEnumId"]),
+                GeneralBatchMasterId = 0,
+                GeneralTraineeAssociatedToTrainerIds = new List<string>()
+            };
+            GeneralPersonModel model = new GeneralPersonModel
+            {
+                UserType = UserTypeEnum.Trainee.ToString(),
+                PersonTitle = row["PersonTitle"].ToString(),
+                FirstName = row["FirstName"].ToString(),
+                LastName = row["LastName"].ToString(),
+                EmailId = row["EmailAddress"]?.ToString(),
+                MobileNumber = row["MobileNumber"].ToString(),
+                CallingCode = row["CallingCode"]?.ToString(),
+                GenderEnumId = row["Gender"].ToString().ToLower() == "male" ? 1 : 2,
+                DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
+                Custom1 = JsonConvert.SerializeObject(customModel)
+            };
+
+            DBTMRegisterTrainee(model);
+        }
+        private DataTable BuildFailedTable(DataTable source)
+        {
+            DataTable failed = new DataTable();
+            foreach (DataColumn col in source.Columns)
+                failed.Columns.Add(col.ColumnName, col.DataType);
+            foreach (DataRow row in source.Rows)
+            {
+                if (!string.IsNullOrEmpty(row["ErrorMessage"]?.ToString()))
+                {
+                    DataRow newRow = failed.NewRow();
+                    foreach (DataColumn col in source.Columns)
+                        newRow[col.ColumnName] = row[col.ColumnName];
+                    failed.Rows.Add(newRow);
+                }
+            }
+            return failed;
+        }
+        private bool ValidateJoiningCode(string joiningCode, List<OrganisationCentrewiseJoiningCode> validList, out string error)
+        {
+            error = null;
+            if (string.IsNullOrWhiteSpace(joiningCode))
+            {
+                error = "JoiningCode is empty";
+                return false;
+            }
+            OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = validList.FirstOrDefault(x => x.JoiningCode.Equals(joiningCode, StringComparison.OrdinalIgnoreCase));
+            if (organisationCentrewiseJoiningCode == null)
+            {
+                error = "JoiningCode is invalid";
+                return false;
+            }
+            if (organisationCentrewiseJoiningCode.IsExpired)
+            {
+                error = "JoiningCode has expired";
+                return false;
+            }
+            return true;
+        }
+        private DBTMTraineeUploadModel CsvToListModel(IFormFile file)
+        {
+            var result = new DBTMTraineeUploadModel();
+            var table = new DataTable();
+            using var reader = new StreamReader(file.OpenReadStream());
+            bool isHeader = true;
+            string[] headers = null;
+            int lineNo = 0;
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                lineNo++;
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+                var values = line.Split(',');
+                if (isHeader)
+                {
+                    headers = values.Select(x => x.Trim()).ToArray();
+                    foreach (var col in headers)
+                        table.Columns.Add(col);
+                    isHeader = false;
+                    continue;
+                }
+                if (values.Length != headers.Length)
+                    throw new Exception($"CSV format error at line {lineNo}");
+                var dr = table.NewRow();
+                for (int i = 0; i < headers.Length; i++)
+                    dr[i] = values[i].Trim();
+                table.Rows.Add(dr);
+            }
+            result.DataTable = table;
             return result;
+        }
+        private List<Dictionary<string, object>> ToList(DataTable table)
+        {
+            var list = new List<Dictionary<string, object>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var dict = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                    dict[col.ColumnName] = row[col] == DBNull.Value ? null : row[col];
+                list.Add(dict);
+            }
+            return list;
         }
 
         public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)

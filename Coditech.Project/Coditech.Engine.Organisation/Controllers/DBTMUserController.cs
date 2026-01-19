@@ -45,25 +45,21 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new GeneralPersonResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
         [HttpPost]
         [Route("/DBTMUser/UploadTrainee")]
-        [Produces(typeof(DBTMTraineeUploadResultResponse))]
-        public IActionResult UploadTrainee([FromBody] DBTMTraineeUploadRowListModel table)
+        [Produces(typeof(DBTMTraineeUploadResponse))]
+        public IActionResult UploadTrainee([FromForm] IFormFile file)
         {
             try
             {
-                DBTMTraineeUploadResultModel result = _dbtmUserService.UploadTrainee(table);
-
-                return CreateOKResponse<DBTMTraineeUploadResultResponse>(
-                    ApiHelper.ToJson(new DBTMTraineeUploadResultResponse
-                    {
-                        DBTMTraineeUploadResultModel = result
-                    })
+                var result = _dbtmUserService.UploadTraineeFromFile(file);
+                return CreateOKResponse<DBTMTraineeUploadResponse>( ApiHelper.ToJson(new DBTMTraineeUploadResponse { DBTMTraineeUploadModel = result })
                 );
             }
             catch (CoditechException ex)
             {
-                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResultResponse
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse
                 {
                     HasError = true,
                     ErrorMessage = ex.Message,
@@ -72,7 +68,7 @@ namespace Coditech.API.Controllers
             }
             catch (Exception ex)
             {
-                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResultResponse
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse
                 {
                     HasError = true,
                     ErrorMessage = ex.Message

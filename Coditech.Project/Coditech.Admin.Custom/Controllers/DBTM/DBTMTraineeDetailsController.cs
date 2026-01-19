@@ -609,7 +609,7 @@ namespace Coditech.Admin.Controllers
             ViewBag.Remarks = remarks;
             return PartialView("~/Views/DBTM/DBTMTraineeDetails/_RemarksPopup.cshtml");
         }
-         
+
         //Get Upload Trainee Popup
         [HttpGet]
         public ActionResult GetUploadTraineePopup()
@@ -624,11 +624,9 @@ namespace Coditech.Admin.Controllers
                 return Json(new { success = false, message = "File not selected." });
             try
             {
-                var result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
-
+                DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
                 if (result.HasError)
-                    return Json(new { success = false, message = result.ErrorMessage });
-
+                    return Json(new { success = false, message = result.ErrorMessage, failedRows = result.FailedRows });
                 return Json(new { success = true, message = "Trainee uploaded successfully." });
             }
             catch (Exception ex)
@@ -654,7 +652,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (System.IO.File.Exists(report.FilePath))
                 {
-            System.IO.File.Delete(report.FilePath);
+                    System.IO.File.Delete(report.FilePath);
                 }
             }
             return File(bytes, "application/pdf", report.FileName);

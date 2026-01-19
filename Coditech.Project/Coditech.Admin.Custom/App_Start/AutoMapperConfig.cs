@@ -67,8 +67,7 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMReportVerticalDataModel, DBTMReportVerticalDataViewModel>().ReverseMap();
             CreateMap<DBTMOrganisationCentrewiseJoiningCodeListModel, DBTMOrganisationCentrewiseJoiningCodeListViewModel>().ReverseMap();
             CreateMap<DBTMOrganisationCentrewiseJoiningCodeModel, DBTMOrganisationCentrewiseJoiningCodeViewModel>().ReverseMap();
-            CreateMap<DBTMTraineeUploadResultListModel, DBTMTraineeUploadResultListViewModel>().ReverseMap();
-            CreateMap<DBTMTraineeUploadResultModel, DBTMTraineeUploadResultViewModel>().ReverseMap();
+            CreateMap<DBTMTraineeUploadModel, DBTMTraineeUploadResultViewModel>().ReverseMap();
             #endregion
         }
     }

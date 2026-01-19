@@ -6,6 +6,7 @@ namespace Coditech.API.Service
     public interface IDBTMUserService
     {
         GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel);
-        DBTMTraineeUploadResultModel UploadTrainee(DBTMTraineeUploadRowListModel table);
+        DBTMTraineeUploadModel UploadTrainee(DBTMTraineeUploadModel table);
+        DBTMTraineeUploadModel UploadTraineeFromFile(IFormFile file);
     }
 }

@@ -1,20 +1,29 @@
 ﻿@{
     Layout = null;
 }
-
 <div class="modal-header">
     <h5 class="modal-title">Upload Trainee</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
-
 <div class="modal-body">
-    <div class="mb-3">
-        <label class="form-label">Upload File</label>
-        <input type="file" id="TraineeFile" class="form-control" />
+    <div class="row align-items-end mb-3">
+        <div class="col-lg-6">
+            <label class="form-label">Upload File</label>
+            <input type="file" id="TraineeFile" class="form-control" />
+        </div>
+        <div class="col-lg-6 justify-content-end gap-2">
+            <button type="button" class="btn btn-success" onclick="DBTMTraineeDetails.UploadTraineeFile()">
+                Upload
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+            </button>
+        </div>
     </div>
-</div>
-
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-    <button type="button" class="btn btn-success" onclick="DBTMTraineeDetails.UploadTraineeFile()">Upload</button>
+    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+        <h6 id="ErrorHeader" class="text-danger mb-2" style="display:none;">
+            Data Correction Required
+        </h6>
+        <div id="UploadErrorTableContainer"></div>
+    </div>
 </div>

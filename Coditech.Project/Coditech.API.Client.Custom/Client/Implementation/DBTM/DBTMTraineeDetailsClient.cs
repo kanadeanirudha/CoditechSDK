@@ -4,8 +4,11 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Data;
+using System.Net.Http.Headers;
+using System.Net;
 namespace Coditech.API.Client
 {
     public class DBTMTraineeDetailsClient : BaseClient, IDBTMTraineeDetailsClient
@@ -345,7 +348,7 @@ namespace Coditech.API.Client
 
         public virtual DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
-            return Task.Run(async () => await GenerateAthletePdfRemarkAsync(dBTMTraineeDetailId,remarks, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GenerateAthletePdfRemarkAsync(dBTMTraineeDetailId, remarks, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
         public virtual async Task<DBTMReportsResponse> GenerateAthletePdfRemarkAsync(long dBTMTraineeDetailId, string remarks, CancellationToken cancellationToken)
@@ -391,43 +394,35 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-        public virtual DBTMTraineeUploadResultResponse UploadTrainee(DBTMTraineeUploadRowListModel table)
-        {
-            return Task.Run(async () => await UploadTraineeAsync(table, CancellationToken.None) ).GetAwaiter().GetResult();
-        }
-        public virtual async Task<DBTMTraineeUploadResultResponse> UploadTraineeAsync(DBTMTraineeUploadRowListModel table, CancellationToken cancellationToken)
+
+        public virtual DBTMTraineeUploadResponse UploadTrainee(IFormFile file)
         {
             string endpoint = dBTMTraineeDetailsEndpoint.UploadTraineeAsync();
             HttpResponseMessage response = null;
-            var disposeResponse = true;
+            bool disposeResponse = true;
             try
             {
                 ApiStatus status = new ApiStatus();
-                string json = JsonConvert.SerializeObject(table);
-                response = await PostResourceToEndpointAsync( endpoint, json, status, cancellationToken ).ConfigureAwait(false);
-
-                var headers_ = BindHeaders(response);
-                var status_ = (int)response.StatusCode;
-
-                if (status_ == 200)
+                var formData = new MultipartFormDataContent();
+                var fileContent = new StreamContent(file.OpenReadStream())
                 {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeUploadResultResponse>( response, headers_, cancellationToken);
-                    if (objectResponse.Object == null)
-                        throw new CoditechException(status.ErrorCode, status.ErrorMessage);
-
-                    return objectResponse.Object;
-                }
-                else
+                    Headers = { ContentType = new MediaTypeHeaderValue(file.ContentType) }
+                };
+                formData.Add(fileContent, "file", file.FileName);
+                response = PostResourceToEndpoint(endpoint, formData, status, CancellationToken.None);
+                switch (response.StatusCode)
                 {
-                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync();
-                    DBTMTraineeUploadResultResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeUploadResultResponse>(responseData);
-                    UpdateApiStatus(typedBody, status, response);
-                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                    case HttpStatusCode.OK:
+                    case HttpStatusCode.Created:
+                        return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
+
+                    default:
+                        return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
                 }
             }
             finally
             {
-                if (disposeResponse)
+                if (disposeResponse && response != null)
                     response.Dispose();
             }
         }
