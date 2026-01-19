@@ -19,7 +19,10 @@
                 var modal = new bootstrap.Modal(document.getElementById('AddSequenceNumberPopupId'));
                 modal.show();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechCommon.HideLodder();
                 CoditechNotification.DisplayNotificationMessage("Failed to load popup.", "error");
             }
@@ -83,7 +86,10 @@
                 var modal = new bootstrap.Modal(document.getElementById('AddVerticalSequenceNumberPopupId'));
                 modal.show();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechCommon.HideLodder();
                 CoditechNotification.DisplayNotificationMessage("Failed to load popup.", "error");
             }

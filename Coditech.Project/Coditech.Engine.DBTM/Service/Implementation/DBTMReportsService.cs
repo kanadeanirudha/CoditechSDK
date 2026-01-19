@@ -53,7 +53,7 @@ namespace Coditech.API.Service
             List<GraphModel> graphModelList = new List<GraphModel>();
             if (string.IsNullOrEmpty(dBTMGraphMasterIds))
             {
-                List<DBTMGraphMaster> graphMasterList = _dBTMGraphMasterRepository.Table.AsEnumerable().Where(x => x.GraphMode == graphMode && x.TestCode.Split(',').Contains(dBTMTestMasterId.ToString()))?.ToList();
+                List<DBTMGraphMaster> graphMasterList = _dBTMGraphMasterRepository.Table.AsEnumerable().Where(x => x.GraphMode == graphMode && x.IsActive && x.TestCode.Split(',').Contains(dBTMTestMasterId.ToString()))?.ToList();
                 if (graphMasterList?.Count() > 0)
                     dBTMGraphMasterIds = string.Join(',', graphMasterList.Select(x => x.DBTMGraphMasterId));
             }
@@ -234,18 +234,11 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.IsYParameterCalculated)
                 {
-                    //if (graphMaster.YParameter == CustomConstants.TotalCount)
-                    //{
-                    //    yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
-                    //}
-                    //else
-                    //{
                     foreach (var item in group.Where(x => x.ParameterCode == yParameter))
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
                         j++;
                     }
-                    //}
                 }
                 else
                 {
@@ -279,7 +272,7 @@ namespace Coditech.API.Service
                         var dataArray = JsonConvert.DeserializeObject<decimal[]>(dataset.Data);
                         sum += dataArray[index];
                     }
-                    yValuesList.Add(sum / dataCount);
+                    yValuesList.Add(Math.Round(sum / dataCount, CustomConstants.GraphListRoundUpValue));
 
                 }
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
@@ -1058,6 +1051,14 @@ namespace Coditech.API.Service
                         }
                     }
                 }
+                if (!string.IsNullOrWhiteSpace(rowValue))
+                {
+                    if (decimal.TryParse(rowValue, out decimal number))
+                    {
+                        bool isWholeNumber = number == Math.Truncate(number);
+                        rowValue = isWholeNumber ? Math.Truncate(number).ToString() : number.ToString();
+                    }
+                }
                 newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
             }
         }
@@ -1219,31 +1220,42 @@ namespace Coditech.API.Service
 
                 foreach (var displayColumn in listviewSequenceColumns)
                 {
+                    string value = string.Empty;
                     if (displayColumn.ParameterCode == "Row")
                     {
-                        newRow[displayColumn.ColumnName] = i;
+                        value = i.ToString();
                     }
                     else if (displayColumn.ParameterCode == "FromTo")
                     {
                         var fromTo = dBTMReportsList.FirstOrDefault(x => x.Row == i && !string.IsNullOrEmpty(x.FromTo))?.FromTo;
-                        newRow[displayColumn.ColumnName] = fromTo ?? string.Empty;
+                        value = fromTo ?? string.Empty;
                     }
                     else if (displayColumn.ParameterCode == CustomConstants.StaticValue)
                     {
-                        newRow[displayColumn.ColumnName] = displayColumn.StaticValue;
+                        value = displayColumn.StaticValue;
                     }
                     else if (displayColumn.IsCalculatedParameter)
                     {
                         if (displayColumn.ParameterCode == CustomConstants.CompletionTime)
-                            newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
+                            value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
                         else
-                            newRow[displayColumn.ColumnName] = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
+                            value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
                     }
                     else
                     {
                         var dataDetails = dBTMReportsList.FirstOrDefault(x => x.ParameterCode == displayColumn.ParameterCode && x.Row == i);
-                        newRow[displayColumn.ColumnName] = dataDetails.ParameterValue;
+                        if (dataDetails != null)
+                            value = dataDetails.ParameterValue.ToString();
                     }
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        if (decimal.TryParse(value, out decimal number))
+                        {
+                            bool isWholeNumber = number == Math.Truncate(number);
+                            value = isWholeNumber ? Math.Truncate(number).ToString() : number.ToString();
+                        }
+                    }
+                    newRow[displayColumn.ColumnName] = value;
                 }
                 dataTable.Rows.Add(newRow);
             }

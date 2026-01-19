@@ -110,7 +110,10 @@
                 $("#" + contentId).html(result);
                 CoditechCommon.HideLodder();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechNotification.DisplayNotificationMessage("Failed to load Activity details.", "error");
                 CoditechCommon.HideLodder();
             }
@@ -142,7 +145,10 @@
                     CoditechCommon.HideLodder();
                 }
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechNotification.DisplayNotificationMessage("Error while downloading profile.", "error");
                 CoditechCommon.HideLodder();
             }
@@ -162,7 +168,10 @@
                 $("#" + contentId).html(result);
                 CoditechCommon.HideLodder();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechNotification.DisplayNotificationMessage("Failed to load.", "error");
                 CoditechCommon.HideLodder();
             }
@@ -189,7 +198,10 @@
                 $("#" + contentId).html(result);
                 CoditechCommon.HideLodder();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechNotification.DisplayNotificationMessage("Failed to load upload popup.", "error");
                 CoditechCommon.HideLodder();
             }
@@ -201,7 +213,7 @@
             $("#ErrorHeader").hide();
             return;
         }
-        $("#ErrorHeader").show();   
+        $("#ErrorHeader").show();
         var cols = Object.keys(rows[0]);
         var html = `<hr/><table class="table table-bordered"><thead><tr>`;
         cols.forEach(function (c) {
@@ -232,7 +244,7 @@
         var formData = new FormData();
         formData.append("file", file);
         $("#UploadErrorTableContainer").html("");
-        $("#ErrorHeader").hide(); 
+        $("#ErrorHeader").hide();
         CoditechCommon.ShowLodder();
         $.ajax({
             url: "/DBTMTraineeDetails/UploadTrainee",
@@ -253,7 +265,10 @@
                 }
                 CoditechCommon.HideLodder();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
                 CoditechCommon.HideLodder();
             }

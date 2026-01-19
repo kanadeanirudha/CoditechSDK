@@ -14,6 +14,7 @@
         public const string AverageVelocity = "AverageVelocity";
         public const string AverageTotalVelocity = "AverageTotalVelocity";
         public const string Distance = "Distance";
+        public const string CumulativeDistance = "CumulativeDistance";
         public const string TotalDistanceCovered = "TotalDistanceCovered";
         public const string MaxLap = "MaxLap";
         public const string MinLap = "MinLap";

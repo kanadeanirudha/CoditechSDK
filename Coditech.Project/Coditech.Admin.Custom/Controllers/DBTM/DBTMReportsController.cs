@@ -151,14 +151,12 @@ namespace Coditech.Admin.Controllers
             {
                 ToDate = FromDate;
             }
-            if (!string.IsNullOrEmpty(dBTMGraphMasterIds))
-            {
-                List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate);
+            dBTMGraphMasterIds = !string.IsNullOrEmpty(dBTMGraphMasterIds) ? dBTMGraphMasterIds : string.Empty;
+            List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate);
 
-                if (graphModels != null && graphModels.Any(x => x.IsRecordFound))
-                {
-                    return PartialView("~/Views/Shared/Charts/_MultipleGraphs.cshtml", graphModels);
-                }
+            if (graphModels != null && graphModels.Any(x => x.IsRecordFound))
+            {
+                return PartialView("~/Views/Shared/Charts/_MultipleGraphs.cshtml", graphModels);
             }
             return Content("No Record Found.");
         }
