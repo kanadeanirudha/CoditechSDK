@@ -2,6 +2,8 @@
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Helper.Utilities;
+using Microsoft.AspNetCore.Http;
+using System.Data;
 
 namespace Coditech.API.Client
 {
@@ -38,5 +40,6 @@ namespace Coditech.API.Client
         DBTMActivitiesDetailsListResponse GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
         DBTMTraineeProfileResponse GetProfileDetails(long dBTMTraineeDetailId);
         DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
+        DBTMTraineeUploadResponse UploadTrainee(IFormFile file);
     }
 }

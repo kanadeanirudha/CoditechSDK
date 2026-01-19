@@ -4,7 +4,11 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Data;
+using System.Net.Http.Headers;
+using System.Net;
 namespace Coditech.API.Client
 {
     public class DBTMTraineeDetailsClient : BaseClient, IDBTMTraineeDetailsClient
@@ -344,7 +348,7 @@ namespace Coditech.API.Client
 
         public virtual DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
-            return Task.Run(async () => await GenerateAthletePdfRemarkAsync(dBTMTraineeDetailId,remarks, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GenerateAthletePdfRemarkAsync(dBTMTraineeDetailId, remarks, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
         public virtual async Task<DBTMReportsResponse> GenerateAthletePdfRemarkAsync(long dBTMTraineeDetailId, string remarks, CancellationToken cancellationToken)
@@ -387,6 +391,38 @@ namespace Coditech.API.Client
             finally
             {
                 if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+
+        public virtual DBTMTraineeUploadResponse UploadTrainee(IFormFile file)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.UploadTraineeAsync();
+            HttpResponseMessage response = null;
+            bool disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                var formData = new MultipartFormDataContent();
+                var fileContent = new StreamContent(file.OpenReadStream())
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue(file.ContentType) }
+                };
+                formData.Add(fileContent, "file", file.FileName);
+                response = PostResourceToEndpoint(endpoint, formData, status, CancellationToken.None);
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                    case HttpStatusCode.Created:
+                        return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
+
+                    default:
+                        return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
+                }
+            }
+            finally
+            {
+                if (disposeResponse && response != null)
                     response.Dispose();
             }
         }

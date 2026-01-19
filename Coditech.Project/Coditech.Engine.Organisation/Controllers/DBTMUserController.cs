@@ -1,12 +1,14 @@
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
+using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
 namespace Coditech.API.Controllers
 {
@@ -41,6 +43,36 @@ namespace Coditech.API.Controllers
             {
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMRegisterTrainee.ToString(), TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new GeneralPersonResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("/DBTMUser/UploadTrainee")]
+        [Produces(typeof(DBTMTraineeUploadResponse))]
+        public IActionResult UploadTrainee([FromForm] IFormFile file)
+        {
+            try
+            {
+                var result = _dbtmUserService.UploadTraineeFromFile(file);
+                return CreateOKResponse<DBTMTraineeUploadResponse>( ApiHelper.ToJson(new DBTMTraineeUploadResponse { DBTMTraineeUploadModel = result })
+                );
+            }
+            catch (CoditechException ex)
+            {
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                });
+            }
+            catch (Exception ex)
+            {
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message
+                });
             }
         }
     }
