@@ -87,7 +87,7 @@ namespace Coditech.API.Service
         }
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode)
         {
-            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode);
+            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode).OrderBy(x => x.Custom2).ToList(); 
             if (list == null || !list.Any())
                 return new DBTMOrganisationCentrewiseJoiningCodeModel();
             string currentDir = Directory.GetCurrentDirectory();
@@ -100,16 +100,12 @@ namespace Coditech.API.Service
             {
                 var worksheet = workbook.Worksheets.Add("TraineeJoiningCode");
                 worksheet.Cell(1, 1).Value = "Joining Code";
-                worksheet.Cell(1, 2).Value = "Joining Code Type";
-                worksheet.Cell(1, 3).Value = "Trainer";
-                worksheet.Cell(1, 4).Value = "Is Active";
+                worksheet.Cell(1, 2).Value = "Trainer";
                 int row = 2;
                 foreach (var item in list)
                 {
                     worksheet.Cell(row, 1).Value = item.JoiningCode;
-                    worksheet.Cell(row, 2).Value = item.JoiningCodeType;
-                    worksheet.Cell(row, 3).Value = item.Custom2;
-                    worksheet.Cell(row, 4).Value = item.IsExpired ? "No" : "Yes";
+                    worksheet.Cell(row, 2).Value = item.Custom2;
                     row++;
                 }
                 worksheet.Columns().AdjustToContents();
