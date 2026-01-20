@@ -18,7 +18,9 @@
     /*logo color setting*/
     --logoBackgroundColor: #ffffff;
 }
-
+.btn-close {
+    background-color: whitesmoke !important;
+}
 .theme-color {
     color: var( --primaryColor) !important;
 }
