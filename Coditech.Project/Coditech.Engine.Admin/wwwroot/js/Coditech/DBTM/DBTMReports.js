@@ -189,31 +189,27 @@ var DBTMReports = {
     },
 
     LoadActivityPerformedDates: function () {
-
-        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();   
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
-        if (!dBTMTestMasterId || !dBTMTraineeDetailId) {
+
+        if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0) {
             activityPerformedDates = [];
+            $("#FromDate,#ToDate").datepicker("refresh");
             return;
         }
+        if (!Array.isArray(dBTMTestMasterIds)) {
+            dBTMTestMasterIds = [dBTMTestMasterIds];
+        }
         $.ajax({
-            cache: false,
             type: "GET",
             url: "/DBTMReports/GetActivityPerformedDates",
-            dataType: "json",
             data: {
-                dBTMTestMasterId: dBTMTestMasterId,
+                dBTMTestMasterIds: dBTMTestMasterIds.join(","),  
                 dBTMTraineeDetailId: dBTMTraineeDetailId
             },
             success: function (data) {
-
                 activityPerformedDates = data || [];
-
-                console.log("Activity dates loaded:", activityPerformedDates);
-
-                // Refresh datepickers so highlights apply
-                $("#FromDate").datepicker("refresh");
-                $("#ToDate").datepicker("refresh");
+                $("#FromDate,#ToDate").datepicker("refresh");
             },
             error: function (xhr) {
                 if (xhr.status == 401 || xhr.status == 403) {
@@ -519,6 +515,5 @@ var DBTMReports = {
                 );
             }
         });
-    }
-
+    },
 };

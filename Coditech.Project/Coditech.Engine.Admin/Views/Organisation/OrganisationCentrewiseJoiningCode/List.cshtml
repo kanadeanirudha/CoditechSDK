@@ -3,7 +3,7 @@
     ViewBag.Title = "Organisation Centrewise Joining Code List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    bool IsCentre = false;
+    bool IsCentreOrTrainer = false;
 
     DropdownViewModel centreDropdown = new DropdownViewModel()
             {
@@ -18,9 +18,9 @@
                 DropdownType = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
                 DropdownName = "JoiningCodeTypeEnumId",
                 DropdownSelectedValue = string.IsNullOrEmpty(Model.JoiningCodeTypeEnumId.ToString())
-                        || Model.JoiningCodeTypeEnumId == 0
-                        ? "0"
-                        : Model.JoiningCodeTypeEnumId.ToString(),
+                                || Model.JoiningCodeTypeEnumId == 0
+                                ? "0"
+                                : Model.JoiningCodeTypeEnumId.ToString(),
                 GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
                 SelectedText = "All",
                 SelectedValue = "0",
@@ -28,9 +28,9 @@
             };
 
     UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-    if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+    if (userModel.Custom1 == CustomConstants.DBTMCentreOwner || userModel.Custom1 == CustomConstants.DBTMTrainer)
     {
-        IsCentre = true;
+        IsCentreOrTrainer = true;
     }
 }
 <!-- Hidden field to pass user type to JS -->
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">Joining Code List</span>
-                        @if (IsCentre)
+                        @if (IsCentreOrTrainer)
                         {
                             <div class="d-flex gap-2">
                                 <button type="button"
@@ -51,9 +51,13 @@
                                         onclick="DBTMOrganisationCentrewiseJoiningCode.DownloadTraineeJoiningCode()">
                                     <i class="fas fa-download me-2"></i>Download Trainee Joining Code
                                 </button>
-                                <a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
-                                    <i class="fas fa-plus me-2"></i>Create Joining Code
-                                </a>
+
+                                @if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+                                {
+                                    <a class="btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button">
+                                        <i class="fas fa-plus me-2"></i>Create Joining Code
+                                    </a>
+                                }
                             </div>
                         }
                     </div>

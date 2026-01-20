@@ -257,11 +257,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/GetActivityPerformedDates")]
         [Produces("application/json")]
-        public virtual IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public virtual IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
             try
             {
-                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
 
                 if (dates == null || !dates.Any())
                     return Ok(new List<string>());
