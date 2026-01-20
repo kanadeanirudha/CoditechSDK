@@ -57,9 +57,29 @@
         @Html.Partial("~/Views/Shared/_NotificationMessage.cshtml", @messageData)
         <div class="row vh-100 d-flex justify-content-center">
             <div class="col-12 align-self-center">
-                <div class="row">
-                    <div class="@formSizeClass mx-auto">
-                        <div class="card">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <div class="login-text-wrapper">
+                            <div class="login-header">
+                                <h1 class="line-1">
+                                    <span class="text-white">Train</span> <span class="theme-color">Smarter</span>
+                                    <br />
+                                    <span class="text-white">Perform</span> <span class="theme-color">Stronger</span>
+                                </h1>
+                            </div>
+                            <p class="text-white">
+                                A powerful sports technology platform to assess,
+                                analyze, and elevate athlete performance using real data.
+                            </p>
+                            <div class="check-points">
+                                <div>Digital athlete assessments</div>
+                                <div>Performance analytics &amp; reports</div>
+                                <div>Smart training insights</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="@formSizeClass">
+                        <div class="card login-card-wrapper">
                             <div class="card-body p-0 auth-header-box">
                                 <div class="text-center p-3">
                                     <a href="#" class="logo logo-admin">

@@ -1,6 +1,6 @@
-:root {
-    --primaryColor: #4b49ac;
-    --secondaryColor: #ff4747;
+﻿:root {
+    --primaryColor: #ee435d;
+    --secondaryColor: #172650;
     --tertiaryColor: #ffffff;
     --otherColor: #98bdff;
     --black: #000000;
@@ -19,6 +19,9 @@
     --logoBackgroundColor: #ffffff;
 }
 
+.theme-color {
+    color: var( --primaryColor) !important;
+}
 
 .logo-background {
     background-color: var(--logoBackgroundColor) !important;
@@ -29,8 +32,16 @@
     background: var(--primaryColor) !important;
 }
 
-body.dark-topbar .topbar body.dark-sidenav .left-sidenav, .account-body .auth-header-box {
+body.dark-topbar .topbar body.dark-sidenav .left-sidenav {
     background-color: var(--primaryColor) !important;
+}
+
+.account-body .auth-header-box {
+    background-color: var(--white) !important;
+}
+
+.account-body .card-body.auth-content {
+    background-color: var(--white) !important;
 }
 
 .topbar .navigation-menu > li > a, .navigation-menu > li a i, body.dark-topbar .navbar-custom .nav-link, .card .card-header:first-child span, .card grammarly-extension + .card-header span, .card-header .card-title, .modal-content .modal-header .modal-title {
@@ -68,21 +79,21 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
 }
 
 .page-wrapper .page-content .card .card-header:first-child, .card grammarly-extension + .card-header {
-    background-image: linear-gradient(to left, var(--otherColor), var(--primaryColor)) !important;
+    background-image: linear-gradient(to left, var(--primaryColor), var(--secondaryColor)) !important;
 }
 
 .card .card-header:first-child, .card grammarly-extension + .card-header {
-    background-image: linear-gradient(to left, var(--otherColor), var(--primaryColor)) !important;
+    background-image: linear-gradient(to left, var(--primaryColor), var(--secondaryColor)) !important;
 }
 
 .modal-content .modal-header {
-    background-image: linear-gradient(to left, var(--otherColor), var(--primaryColor)) !important;
+    background-image: linear-gradient(to left, var(--primaryColor), var(--secondaryColor)) !important;
 }
 
 #LogIn_Tab button {
     color: var(--primaryButtonTextColor);
-    background-color: var(--primaryButtonBackgroundColor) !important;
-    border-color: var(--primaryButtonBorderColor) !important;
+    background-color: var( --primaryColor) !important;
+    border-color: var( --primaryColor) !important;
 }
 
 .auth-logo {
@@ -111,15 +122,64 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
 }
 
 .avatar-color {
-    background-color: var(--avatarBackgroundColor) !important;
+    background-color: var(--secondaryColor) !important;
     color: var(--avatarTextColor) !important;
 }
 
+.card.login-card-wrapper {
+    border-radius: 16px !important;
+    border-left: 6px solid var( --primaryColor) !important;
+}
+
+.login-header h1 {
+    font-size: 50px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.login-header h1 .text-white {
+    color: #ffffff !important;
+}
+login-text-wrapper .hero-points {
+    margin-top: 30px;
+}
+.login-text-wrapper p {
+    font-size: 18px;
+    line-height: 1.6;
+}
+.check-points {
+    margin-top: 30px !important;
+}
+.check-points div {
+    font-size: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+    .check-points div::before {
+        content: "✔";
+        color: var( --primaryColor) !important;
+        margin-right: 10px;
+    }
+.login-page-wrapper .card-body.auth-header-box {
+    border-radius: 16px;
+}
 
 @media (min-width: 992px) {
-    body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a span {
+    body .dark-topbar .topbar .navbar-custom-menu .has-submenu.active a span {
         background-color: var(--primaryColor) !important;
         color: var(--tertiaryColor) !important;
+    }
+    .login-text-wrapper p {
+        width: 75%;
+    }
+    body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a span {
+        background-color: var(--secondaryColor) !important;
+        color: var(--white) !important;
+    }
+    body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a.dashboard-menu-list span {
+        background-color: transparent !important;
     }
 }
 
@@ -128,13 +188,41 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
     .topbar .navigation-menu > li > a, .navigation-menu > li a i {
         color: var(--black) !important;
     }
+
     .topbar .navigation-menu > li > a {
         border-bottom: 1px solid #d9d9d9;
     }
+
     .topbar .navigation-menu > li .submenu.open {
         padding-left: 0;
     }
+
     body.dark-topbar .navbar-custom-menu .has-submenu:hover.active a span, body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
         background-color: transparent !important;
     }
+
+    html, body {
+        overflow: auto;
+    }
+}
+
+.nav-border .nav-item.show .nav-link, .nav-border .nav-link.active {
+    color: var(--secondaryColor) !important;
+    border-bottom: 2px solid var(--secondaryColor) !important;
+}
+.form-label, .nav-link {
+    color: var(--secondaryColor) !important;
+}
+.nav-tabs li.nav-item {
+    background: var(--white) !important;
+}
+.nav.nav-tabs .nav-item.show:focus, .nav.nav-tabs .nav-item.show.active, .nav.nav-tabs .nav-link:focus, .nav.nav-tabs .nav-link.active {
+    color: var(--white) !important;
+    background-color: var(--primaryColor) !important;
+    border-radius: 0;
+    border-color: transparent transparent var(--secondaryColor) !important;
+}
+.nav-tabs {
+    width: 99%;
+    margin: 0 auto;
 }

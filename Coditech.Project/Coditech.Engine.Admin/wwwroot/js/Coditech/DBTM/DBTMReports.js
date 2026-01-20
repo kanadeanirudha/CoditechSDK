@@ -74,10 +74,6 @@ var DBTMReports = {
             return;
         }
 
-        if (!dBTMGraphMasterId || dBTMGraphMasterId.trim() === "") {
-            CoditechNotification.DisplayNotificationMessage("Please select Graph Type.", "error");
-            return;
-        }
         CoditechCommon.ShowLodder();
         $.ajax({
             cache: false,
@@ -133,7 +129,10 @@ var DBTMReports = {
                     DBTMReports.LoadActivityPerformedDates();
                     CoditechCommon.HideLodder();
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to load graph list.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -178,7 +177,10 @@ var DBTMReports = {
                     }
                     CoditechCommon.HideLodder();
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to load graph list.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -213,7 +215,10 @@ var DBTMReports = {
                 $("#FromDate").datepicker("refresh");
                 $("#ToDate").datepicker("refresh");
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 activityPerformedDates = [];
                 CoditechNotification.DisplayNotificationMessage(
                     "Failed to load activity dates.",
@@ -238,7 +243,10 @@ var DBTMReports = {
 
                     CoditechCommon.HideLodder();
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -423,7 +431,10 @@ var DBTMReports = {
                         CoditechCommon.HideLodder();
                     }
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -467,7 +478,10 @@ var DBTMReports = {
                         CoditechCommon.HideLodder();
                     }
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -494,7 +508,10 @@ var DBTMReports = {
                 );
                 modal.show();
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechCommon.HideLodder();
                 CoditechNotification.DisplayNotificationMessage(
                     "Failed to load activity details.",

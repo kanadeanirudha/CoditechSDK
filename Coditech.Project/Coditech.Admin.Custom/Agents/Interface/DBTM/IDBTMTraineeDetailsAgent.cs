@@ -1,4 +1,5 @@
 ﻿using Coditech.Admin.ViewModel;
+using Microsoft.AspNetCore.Http;
 
 namespace Coditech.Admin.Agents
 {
@@ -102,5 +103,6 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns DBTMTraineeDetailsResponse.</returns>
         DBTMTraineeProfileViewModel GetProfileDetails(long dBTMTraineeDetailId);
         DBTMReportsListViewModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
+        DBTMTraineeUploadResultViewModel UploadTraineeFromFile(IFormFile file);
     }
 }

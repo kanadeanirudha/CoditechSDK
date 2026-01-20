@@ -94,7 +94,15 @@ namespace Coditech.Engine.DBTM.Helpers
                     {
                         cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == i).ParameterValue;
                     }
-                    result = $"{cumulativeTime}";
+                    result = $"{Math.Round(cumulativeTime, CustomConstants.GraphListRoundUpValue)}";
+                    break;
+                case CustomConstants.CumulativeDistance:
+                    decimal cumulativeDistance = 0;
+                    for (int i = 1; i <= recurtion; i++)
+                    {
+                        cumulativeDistance += group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance && x.Row == i).ParameterValue;
+                    }
+                    result = $"{Math.Round(cumulativeDistance, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.Velocity:
                     distance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
@@ -161,7 +169,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case CustomConstants.TotalCount:
                     decimal totalCount = group.Where(x => x.ParameterCode == CustomConstants.Count).Sum(x => x.ParameterValue);
-                    result = $"{Convert.ToInt32(totalCount)}";
+                    result = totalCount > 0 ? totalCount.ToString() : "0";
                     break;
                 case CustomConstants.CountByTime:
                     decimal count = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Count && x.Row == recurtion).ParameterValue;
@@ -246,6 +254,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.PersonDetectionRange:
                 case CustomConstants.DistanceMultiplyByRow:
                 case CustomConstants.Distance:
+                case CustomConstants.CumulativeDistance:
                     data = "m";
                     break;
                 case CustomConstants.CumulativeVelocity:

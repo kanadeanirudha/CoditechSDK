@@ -9,7 +9,11 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Data;
+using System.IO;
+using System.Text;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
@@ -430,6 +434,39 @@ namespace Coditech.Admin.Agents
             }
         }
         #endregion
+
+        public DBTMTraineeUploadResultViewModel UploadTraineeFromFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return new() { HasError = true, ErrorMessage = "Please select a file." };
+                _coditechLogging.LogMessage("Trainee upload started.", "Trainee", TraceLevel.Info);
+                DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.UploadTrainee(file);
+                _coditechLogging.LogMessage("Trainee upload completed.", "Trainee", TraceLevel.Info);
+                if (response == null || response.HasError)
+                {
+                    return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = response?.ErrorMessage ?? "Upload failed." };
+                }
+                DBTMTraineeUploadModel result = response.DBTMTraineeUploadModel;
+                DBTMTraineeUploadResultViewModel dBTMTraineeUploadResultViewModel = new DBTMTraineeUploadResultViewModel
+                {
+                    TotalRecords = result.TotalRecords,
+                    SuccessCount = result.SuccessCount,
+                    FailedCount = result.FailedCount,
+                    FailedRows = result.FailedRows,
+                    Data = result.Data,
+                    HasError = result.FailedCount > 0,
+                    ErrorMessage = result.FailedCount > 0 ? "Some records failed validation." : null
+                };
+                return dBTMTraineeUploadResultViewModel;
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "Trainee", TraceLevel.Error);
+                return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = "Failed to upload trainee file." };
+            }
+        }
         #region protected
         protected virtual List<DatatableColumns> BindColumns()
         {

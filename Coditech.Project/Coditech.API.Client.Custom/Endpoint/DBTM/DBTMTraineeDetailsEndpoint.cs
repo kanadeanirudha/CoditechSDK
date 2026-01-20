@@ -38,6 +38,9 @@ namespace Coditech.API.Endpoint
 
         public string GenerateAthletePdfRemarkAsync(long dBTMTraineeDetailId, string remarks) =>
           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GenerateAthletePdfRemark?dBTMTraineeDetailId={dBTMTraineeDetailId}&remarks={remarks}";
-
+        public string UploadTraineeAsync()
+        {
+            return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/UploadTrainee";
+        }
     }
 }

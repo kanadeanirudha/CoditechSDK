@@ -5,6 +5,7 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -609,6 +610,31 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/DBTM/DBTMTraineeDetails/_RemarksPopup.cshtml");
         }
 
+        //Get Upload Trainee Popup
+        [HttpGet]
+        public ActionResult GetUploadTraineePopup()
+        {
+            return PartialView("~/Views/DBTM/DBTMTraineeDetails/_UploadTraineePopup.cshtml");
+        }
+
+        [HttpPost]
+        public JsonResult UploadTrainee(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return Json(new { success = false, message = "File not selected." });
+            try
+            {
+                DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
+                if (result.HasError)
+                    return Json(new { success = false, message = result.ErrorMessage, failedRows = result.FailedRows });
+                return Json(new { success = true, message = "Trainee uploaded successfully." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         [HttpGet]
         public ActionResult DownloadAthleteReportPdf(long dBTMTraineeDetailId, string remarks)
         {
@@ -626,7 +652,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (System.IO.File.Exists(report.FilePath))
                 {
-            System.IO.File.Delete(report.FilePath);
+                    System.IO.File.Delete(report.FilePath);
                 }
             }
             return File(bytes, "application/pdf", report.FileName);
