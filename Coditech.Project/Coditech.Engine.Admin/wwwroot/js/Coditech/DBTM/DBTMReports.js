@@ -189,7 +189,7 @@ var DBTMReports = {
     },
 
     LoadActivityPerformedDates: function () {
-        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();   
+        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
 
         if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0) {
@@ -204,7 +204,7 @@ var DBTMReports = {
             type: "GET",
             url: "/DBTMReports/GetActivityPerformedDates",
             data: {
-                dBTMTestMasterIds: dBTMTestMasterIds.join(","),  
+                dBTMTestMasterIds: dBTMTestMasterIds.join(","),
                 dBTMTraineeDetailId: dBTMTraineeDetailId
             },
             success: function (data) {
@@ -486,11 +486,15 @@ var DBTMReports = {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },
-    ShowActivityDetailPopup: function (modelPopContentId, deviceDataId) {
+    ShowActivityDetailPopup: function (modelPopContentId, deviceDataId, enableStackBlur) {
+        if (enableStackBlur === true) {
+            var $openModal = $(".modal.show");
+            if ($openModal.length > 0) {
+                $openModal.addClass("stack-blur");
+            }
+        }
         CoditechCommon.ShowLodder();
-
         $("#" + modelPopContentId).html("");
-
         $.ajax({
             type: "GET",
             url: "/DBTMReports/ViewActivityDetailPopup",
@@ -498,11 +502,18 @@ var DBTMReports = {
             success: function (result) {
                 $("#" + modelPopContentId).html(result);
                 CoditechCommon.HideLodder();
-
-                var modal = new bootstrap.Modal(
-                    document.getElementById("DBTMActivityDetailPopupId")
-                );
+                var modalEl = document.getElementById("DBTMActivityDetailPopupId");
+                var modal = new bootstrap.Modal(modalEl);
                 modal.show();
+                if (enableStackBlur === true) {
+                    modalEl.addEventListener("hidden.bs.modal", function () {
+                        $(".stack-blur").removeClass("stack-blur");
+                        $(".modal-backdrop").not(":first").remove();
+                        if ($(".modal.show").length > 0) {
+                            $("body").addClass("modal-open");
+                        }
+                    }, { once: true });
+                }
             },
             error: function (xhr) {
                 if (xhr.status == 401 || xhr.status == 403) {
