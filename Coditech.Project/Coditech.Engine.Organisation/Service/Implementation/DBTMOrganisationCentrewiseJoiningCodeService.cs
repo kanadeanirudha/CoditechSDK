@@ -71,12 +71,12 @@ namespace Coditech.API.Service
         }
 
         //GetTraineeActiveJoiningCodeList
-        private List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode)
+        private List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode,string trainerId)
         {
             CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 324, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@Rows", 100000, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@PageNo", 1, ParameterDirection.Input, DbType.Int32);
@@ -85,9 +85,9 @@ namespace Coditech.API.Service
             List <OrganisationCentrewiseJoiningCodeModel> OrganisationCentrewiseJoiningCodeList = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int total)?.ToList();
             return OrganisationCentrewiseJoiningCodeList;
         }
-        public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode)
+        public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId)
         {
-            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode).OrderBy(x => x.Custom2).ToList(); 
+            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode, trainerId).OrderBy(x => x.Custom2).ToList(); 
             if (list == null || !list.Any())
                 return new DBTMOrganisationCentrewiseJoiningCodeModel();
             string currentDir = Directory.GetCurrentDirectory();

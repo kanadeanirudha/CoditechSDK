@@ -5,7 +5,7 @@ namespace Coditech.API.Service
 {
     public interface IDBTMOrganisationCentrewiseJoiningCodeService
     {
-        DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode);
+        DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId);
         bool DeleteOrganisationCentrewiseJoiningCodeFile(string fileName);
     }
 }

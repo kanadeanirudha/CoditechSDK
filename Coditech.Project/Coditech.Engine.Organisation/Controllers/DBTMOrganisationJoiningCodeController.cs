@@ -26,11 +26,11 @@ namespace Coditech.API.Controllers
         [Route("/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCode")]
         [Produces(typeof(DBTMOrganisationCentrewiseJoiningCodeResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetTraineeActiveJoiningCode(string centreCode)
+        public virtual IActionResult GetTraineeActiveJoiningCode(string centreCode, string trainerId)
         {
             try
             {
-                DBTMOrganisationCentrewiseJoiningCodeModel list = _dBTMOrganisationCentrewiseJoiningCodeService.GetTraineeActiveJoiningCode(centreCode);
+                DBTMOrganisationCentrewiseJoiningCodeModel list = _dBTMOrganisationCentrewiseJoiningCodeService.GetTraineeActiveJoiningCode(centreCode, trainerId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMOrganisationCentrewiseJoiningCodeResponse>(data) : CreateNoContentResponse();
             }
