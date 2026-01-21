@@ -181,12 +181,12 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            if (dBTMTestMasterId <= 0 || dBTMTraineeDetailId <= 0)
+            if(string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return Json(new List<string>());
 
-            List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+            List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
             List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
 
             return Json(result);

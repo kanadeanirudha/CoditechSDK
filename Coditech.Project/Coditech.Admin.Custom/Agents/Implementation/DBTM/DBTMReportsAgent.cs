@@ -200,9 +200,9 @@ namespace Coditech.Admin.Agents
             }
             return graphModel;
         }
-        public virtual List<DateTime> GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public virtual List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
 
             if (dateStrings == null || !dateStrings.Any())
                 return new List<DateTime>();

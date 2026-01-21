@@ -19,6 +19,10 @@
     --logoBackgroundColor: #ffffff;
 }
 
+.btn-close {
+    background-color: whitesmoke !important;
+}
+
 .theme-color {
     color: var( --primaryColor) !important;
 }
@@ -97,7 +101,7 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
 }
 
 .auth-logo {
-    height: 70px;
+    height: 100px;
 }
 
 [data-layout="horizontal"] .topbar .brand .logo .logo-sm {
@@ -138,30 +142,36 @@ body.dark-topbar .navbar-custom-menu .has-submenu:hover a span {
     margin-bottom: 20px;
 }
 
-.login-header h1 .text-white {
-    color: #ffffff !important;
-}
+    .login-header h1 .text-white {
+        color: #ffffff !important;
+    }
+
 login-text-wrapper .hero-points {
     margin-top: 30px;
 }
+
 .login-text-wrapper p {
     font-size: 18px;
     line-height: 1.6;
 }
+
 .check-points {
     margin-top: 30px !important;
 }
-.check-points div {
-    font-size: 16px;
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: #ffffff !important;
-}
-    .check-points div::before {
-        content: "✔";
-        color: var( --primaryColor) !important;
-        margin-right: 10px;
+
+    .check-points div {
+        font-size: 16px;
+        margin-bottom: 12px;
+        font-weight: 600;
+        color: #ffffff !important;
     }
+
+        .check-points div::before {
+            content: "✔";
+            color: var( --primaryColor) !important;
+            margin-right: 10px;
+        }
+
 .login-page-wrapper .card-body.auth-header-box {
     border-radius: 16px;
 }
@@ -171,13 +181,16 @@ login-text-wrapper .hero-points {
         background-color: var(--primaryColor) !important;
         color: var(--tertiaryColor) !important;
     }
+
     .login-text-wrapper p {
         width: 75%;
     }
+
     body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a span {
         background-color: var(--secondaryColor) !important;
         color: var(--white) !important;
     }
+
     body.dark-topbar .topbar .navbar-custom-menu .has-submenu.active a.dashboard-menu-list span {
         background-color: transparent !important;
     }
@@ -210,18 +223,22 @@ login-text-wrapper .hero-points {
     color: var(--secondaryColor) !important;
     border-bottom: 2px solid var(--secondaryColor) !important;
 }
+
 .form-label, .nav-link {
     color: var(--secondaryColor) !important;
 }
+
 .nav-tabs li.nav-item {
     background: var(--white) !important;
 }
+
 .nav.nav-tabs .nav-item.show:focus, .nav.nav-tabs .nav-item.show.active, .nav.nav-tabs .nav-link:focus, .nav.nav-tabs .nav-link.active {
     color: var(--white) !important;
     background-color: var(--primaryColor) !important;
     border-radius: 0;
     border-color: transparent transparent var(--secondaryColor) !important;
 }
+
 .nav-tabs {
     width: 99%;
     margin: 0 auto;

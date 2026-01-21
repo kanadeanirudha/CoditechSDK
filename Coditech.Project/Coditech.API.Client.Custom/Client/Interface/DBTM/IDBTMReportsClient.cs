@@ -13,7 +13,7 @@ namespace Coditech.API.Client
         DBTMTestWiseReportsListResponse TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType);
         DBTMTestWiseReportsListResponse BatchWiseMultipleReportsFile(string dBTMTestMasterIds, int generalBatchMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType);
         TrueFalseResponse DeleteReportsFile(ParameterModel body);
-        List<string> GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId);
+        List<string> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId);
         DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId);
     }
 }

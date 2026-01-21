@@ -372,14 +372,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual List<string> GetActivityPerformedDates( int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public virtual List<string> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            return Task.Run(async () => await GetActivityPerformedDatesAsync(dBTMTestMasterId,dBTMTraineeDetailId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetActivityPerformedDatesAsync(dBTMTestMasterIds,dBTMTraineeDetailId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<List<string>> GetActivityPerformedDatesAsync(int dBTMTestMasterId,long dBTMTraineeDetailId, CancellationToken cancellationToken)
+        public virtual async Task<List<string>> GetActivityPerformedDatesAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.GetActivityPerformedDatesAsync( dBTMTestMasterId, dBTMTraineeDetailId );
+            string endpoint = dBTMReportsEndpoint.GetActivityPerformedDatesAsync( dBTMTestMasterIds, dBTMTraineeDetailId );
 
             HttpResponseMessage response = null;
             var disposeResponse = true;

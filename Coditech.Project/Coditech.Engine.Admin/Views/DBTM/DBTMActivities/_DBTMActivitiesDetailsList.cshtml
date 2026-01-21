@@ -51,7 +51,21 @@
                                 if (!string.IsNullOrEmpty(color))
                                     style += $"color: #{color};";
 
-                                <td style="@style">@displayValue</td>
+                                <td style="@style">
+                                    @if (col.ColumnName == "View")
+                                    {
+                                        <a href="javascript:void(0);"
+                                           title="View"
+                                           class="btn btn-sm btn-soft-success btn-circle"
+                                           onclick="DBTMReports.ShowActivityDetailPopup('DBTMActivityDetailPopupContentId', @displayValue, true)">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        @displayValue
+                                    }
+                                </td>
                             }
                         </tr>
                     }
@@ -61,6 +75,7 @@
         </table>
     </div>
 </div>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {

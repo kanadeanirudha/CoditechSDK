@@ -194,19 +194,30 @@ namespace Coditech.API.Service
             return graphModel;
         }
 
-        public List<DateTime> GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            if (dBTMTestMasterId <= 0 || dBTMTraineeDetailId <= 0)
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return new List<DateTime>();
 
-            var dates = (from dd in _dBTMDeviceDataRepository.Table
-                         join td in _dBTMTraineeDetailsRepository.Table
-                             on dd.PersonCode equals td.PersonCode
-                         join tm in _dBTMTestMasterRepository.Table
-                             on dd.TestCode equals tm.TestCode
-                         where td.DBTMTraineeDetailId == dBTMTraineeDetailId
-                               && tm.DBTMTestMasterId == dBTMTestMasterId
-                         select (dd.CreatedDate ?? dd.TestPerformedTime).Date).Distinct().OrderBy(d => d).ToList();
+            if (dBTMTraineeDetailId <= 0)
+                return new List<DateTime>();   
+
+            List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
+            bool isAllTest = testIds.Contains(0);
+
+            var dates =
+                (from dd in _dBTMDeviceDataRepository.Table
+                 join td in _dBTMTraineeDetailsRepository.Table
+                     on dd.PersonCode equals td.PersonCode
+                 join tm in _dBTMTestMasterRepository.Table
+                     on dd.TestCode equals tm.TestCode
+                 where
+                     td.DBTMTraineeDetailId == dBTMTraineeDetailId
+                     && (isAllTest || testIds.Contains(tm.DBTMTestMasterId))
+                 select (dd.CreatedDate ?? dd.TestPerformedTime).Date)
+                .Distinct()
+                .OrderBy(d => d)
+                .ToList();
 
             return dates;
         }
