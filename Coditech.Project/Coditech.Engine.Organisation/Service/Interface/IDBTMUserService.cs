@@ -8,5 +8,6 @@ namespace Coditech.API.Service
         GeneralPersonModel DBTMRegisterTrainee(GeneralPersonModel generalPersonModel);
         DBTMTraineeUploadModel UploadTrainee(DBTMTraineeUploadModel table);
         DBTMTraineeUploadModel UploadTraineeFromFile(IFormFile file);
+        DBTMTraineeUploadModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count);
     }
 }

@@ -3,9 +3,11 @@ using Coditech.Admin.Helpers;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -620,19 +622,52 @@ namespace Coditech.Admin.Controllers
         [HttpPost]
         public JsonResult UploadTrainee(IFormFile file)
         {
+            TempData.Remove("NotificationMessage");
+            TempData.Remove("NotificationType");
             if (file == null || file.Length == 0)
                 return Json(new { success = false, message = "File not selected." });
-            try
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
             {
-                DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
-                if (result.HasError)
-                    return Json(new { success = false, message = result.ErrorMessage, failedRows = result.FailedRows });
-                return Json(new { success = true, message = "Trainee uploaded successfully." });
+                return Json(new { success = false, message = "Only Excel (.xlsx) file is allowed."});
             }
-            catch (Exception ex)
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
+            if (result.FailedRows != null && result.FailedRows.Count > 0)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new{ success = false, message = "Data correction required.", failedRows = result.FailedRows});
             }
+            return Json(new { success = true, message = "Trainee uploaded successfully."});
+        }
+
+        //Download Trainee Template
+        [HttpGet]
+        public IActionResult GetDownloadTemplatePopup()
+        {
+            return PartialView("~/Views/DBTM/DBTMTraineeDetails/_DownloadTraineeTemplatePopup.cshtml");
+        }
+        [HttpGet]
+        public JsonResult CheckTraineeTemplateAvailability(string centreCode, long trainerId, string userType, int count)
+        {
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count);
+            if (result.HasError)
+                return Json(new { success = false, message = result.ErrorMessage });
+
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public IActionResult DownloadTraineeTemplate(string centreCode, long trainerId, string userType, int count)
+        {
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count);
+            if (result == null || string.IsNullOrEmpty(result.FilePath) || !System.IO.File.Exists(result.FilePath))
+                return Content("File not found.");
+            if (result.HasError || string.IsNullOrEmpty(result.FilePath) || !System.IO.File.Exists(result.FilePath))
+            {
+                return Content(result.ErrorMessage ?? "File not found.");
+            }
+            var bytes = System.IO.File.ReadAllBytes(result.FilePath);
+            var fileName = result.FileName;
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         [HttpGet]
