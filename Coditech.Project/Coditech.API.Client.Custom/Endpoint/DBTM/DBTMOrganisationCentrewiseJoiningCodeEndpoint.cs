@@ -4,9 +4,9 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMOrganisationCentrewiseJoiningCodeEndpoint : BaseEndpoint
     {
-        public string GetTraineeActiveJoiningCodeAsync(string centreCode)
+        public string GetTraineeActiveJoiningCodeAsync(string centreCode, string trainerId)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCode?centreCode={centreCode}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCode?centreCode={centreCode}&trainerId={trainerId}";
             return endpoint;
         }
         public string DeleteJoiningCodeFileAsync() =>

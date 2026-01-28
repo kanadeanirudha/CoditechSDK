@@ -17,6 +17,7 @@ using System.Text;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace Coditech.Admin.Agents
 {
@@ -405,12 +406,12 @@ namespace Coditech.Admin.Agents
             DBTMTraineeProfileViewModel dBTMTraineeProfileViewModel = response?.DBTMTraineeProfileModel.ToViewModel<DBTMTraineeProfileViewModel>();
             return dBTMTraineeProfileViewModel;
         }
-      
-        public DBTMReportsListViewModel GenerateAthletePdfRemark( long dBTMTraineeDetailId, string remarks)
+
+        public DBTMReportsListViewModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
             try
             {
-                _coditechLogging.LogMessage("GenerateAthletePdfFromHtml started.", "DBTMTraineeDetails",TraceLevel.Info);
+                _coditechLogging.LogMessage("GenerateAthletePdfFromHtml started.", "DBTMTraineeDetails", TraceLevel.Info);
 
                 DBTMReportsResponse response = _dBTMTraineeDetailsClient.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
 
@@ -418,7 +419,8 @@ namespace Coditech.Admin.Agents
                 {
                     return new DBTMReportsListViewModel
                     {
-                        HasError = true,ErrorMessage = "PDF generation failed."
+                        HasError = true,
+                        ErrorMessage = "PDF generation failed."
                     };
                 }
                 return response.DBTMReportsModel.ToViewModel<DBTMReportsListViewModel>();
@@ -429,7 +431,8 @@ namespace Coditech.Admin.Agents
 
                 return new DBTMReportsListViewModel
                 {
-                    HasError = true, ErrorMessage = "Error while generating athlete PDF."
+                    HasError = true,
+                    ErrorMessage = "Error while generating athlete PDF."
                 };
             }
         }
@@ -466,6 +469,23 @@ namespace Coditech.Admin.Agents
                 _coditechLogging.LogMessage(ex, "Trainee", TraceLevel.Error);
                 return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = "Failed to upload trainee file." };
             }
+        }
+
+        public virtual DBTMTraineeUploadResultViewModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count)
+        {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            if (userModel?.Custom1?.ToLower() == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+            {
+                trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty) ?.GeneralTrainerMasterId ?? 0;
+            }
+            DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count);
+            return new DBTMTraineeUploadResultViewModel
+            {
+                FilePath = response.FilePath,
+                FileName = response.FileName,
+                HasError = response.HasError,
+                ErrorMessage = response.ErrorMessage
+            };
         }
         #region protected
         protected virtual List<DatatableColumns> BindColumns()

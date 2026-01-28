@@ -46,6 +46,30 @@ namespace Coditech.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/DBTMUser/DownloadTraineeUploadTemplate")]
+        [Produces(typeof(DBTMTraineeUploadResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count)
+        {
+            try
+            {
+                DBTMTraineeUploadModel list = _dbtmUserService.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeUploadResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DownloadTraineeUploadTemplate", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DownloadTraineeUploadTemplate", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Route("/DBTMUser/UploadTrainee")]
         [Produces(typeof(DBTMTraineeUploadResponse))]

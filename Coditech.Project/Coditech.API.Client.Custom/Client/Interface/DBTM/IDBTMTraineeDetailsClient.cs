@@ -35,11 +35,11 @@ namespace Coditech.API.Client
         /// <param name="ParameterModel">ParameterModel.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteDBTMTraineeDetails(ParameterModel body);
-
         DBTMActivitiesListResponse GetTraineeActivitiesList(string personCode,int numberOfDaysRecord, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
         DBTMActivitiesDetailsListResponse GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
         DBTMTraineeProfileResponse GetProfileDetails(long dBTMTraineeDetailId);
         DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
         DBTMTraineeUploadResponse UploadTrainee(IFormFile file);
+        DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count);
     }
 }

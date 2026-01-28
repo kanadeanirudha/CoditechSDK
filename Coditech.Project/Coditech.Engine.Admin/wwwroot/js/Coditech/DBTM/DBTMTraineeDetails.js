@@ -1,9 +1,13 @@
 ﻿var DBTMTraineeDetails = {
     Initialize: function () {
-        DBTMTraineeDetails.constructor();
+        DBTMTraineeDetails.bindEvents();
     },
-
-    constructor: function () {
+    bindEvents: function () {
+        $('#TraineePopupId').on('hidden.bs.modal', function () {
+            $("#TraineeFile").val("");
+            $("#UploadErrorTableContainer").html("");
+            $("#ErrorHeader").hide();
+        });
     },
 
     GetTrainerListByCentreCodeAndDepartmentId: function () {
@@ -270,6 +274,83 @@
                     location.reload();
                 }
                 CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+    DownloadTemplatePopup: function () {
+        $("#DownloadTemplateContentId").html("");
+        CoditechCommon.ShowLodder();
+
+        $.ajax({
+            type: "GET",
+            url: "/DBTMTraineeDetails/GetDownloadTemplatePopup",
+            success: function (html) {
+                $("#DownloadTemplateContentId").html(html);
+                $("#DownloadTemplatePopupId").modal("show");
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage(
+                    "Failed to load download template popup",
+                    "error"
+                );
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+    ConfirmDownloadTemplate: function () {
+        var count = $("#TraineeCount").val();
+        if (!count || count <= 0) {
+            CoditechNotification.DisplayNotificationMessage(
+                "Please enter valid trainee count.",
+                "error"
+            );
+            return;
+        }
+        $("#DownloadTemplatePopupId").modal("hide");
+        DBTMTraineeDetails.CheckAndDownloadTemplate(parseInt(count));
+    },
+    CheckAndDownloadTemplate: function (count) {
+
+        var centreCode = $("#SelectedCentreCode").val();
+        var trainerId = $("#SelectedParameter1").val();
+        var userType = $("#UserType").val(); 
+
+        CoditechCommon.ShowLodder();
+
+        $.ajax({
+            url: "/DBTMTraineeDetails/CheckTraineeTemplateAvailability",
+            type: "GET",
+            data: {
+                centreCode: centreCode,
+                trainerId: trainerId,
+                userType: userType,
+                count: count
+            },
+            success: function (response) {
+                if (response.success) {
+
+                    var downloadUrl =
+                        "/DBTMTraineeDetails/DownloadTraineeTemplate"
+                        + "?centreCode=" + encodeURIComponent(centreCode)
+                        + "&trainerId=" + encodeURIComponent(trainerId)
+                        + "&userType=" + encodeURIComponent(userType || "")
+                        + "&count=" + encodeURIComponent(count);
+
+                    CoditechCommon.HideLodder();
+                    $("#hiddenDownloader").attr("src", downloadUrl);
+                }
+                else {
+                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+                    CoditechCommon.HideLodder();
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Error while downloading template.", "error");
                 CoditechCommon.HideLodder();
             }
         });

@@ -17,13 +17,13 @@ namespace Coditech.API.Client
             dBTMOrganisationCentrewiseJoiningCodeEndpoint = new DBTMOrganisationCentrewiseJoiningCodeEndpoint();
         }
 
-        public virtual DBTMOrganisationCentrewiseJoiningCodeResponse GetTraineeActiveJoiningCode(string centreCode)
+        public virtual DBTMOrganisationCentrewiseJoiningCodeResponse GetTraineeActiveJoiningCode(string centreCode, string trainerId)
         {
-            return Task.Run(async () => await GetTraineeActiveJoiningCodeAsync(centreCode, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetTraineeActiveJoiningCodeAsync(centreCode, trainerId, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMOrganisationCentrewiseJoiningCodeResponse> GetTraineeActiveJoiningCodeAsync(string centreCode, CancellationToken cancellationToken)
+        public virtual async Task<DBTMOrganisationCentrewiseJoiningCodeResponse> GetTraineeActiveJoiningCodeAsync(string centreCode, string trainerId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMOrganisationCentrewiseJoiningCodeEndpoint.GetTraineeActiveJoiningCodeAsync(centreCode);
+            string endpoint = dBTMOrganisationCentrewiseJoiningCodeEndpoint.GetTraineeActiveJoiningCodeAsync(centreCode, trainerId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

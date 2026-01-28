@@ -8,6 +8,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
@@ -71,23 +72,27 @@ namespace Coditech.API.Service
         }
 
         //GetTraineeActiveJoiningCodeList
-        private List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode)
+        public List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode,string trainerId, int rows)
         {
-            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
+
+            FilterCollection filters = new FilterCollection();
+            NameValueCollection sorts = new NameValueCollection {{ "a.JoiningCode", "ASC" }};
+            PageListModel pageListModel = new PageListModel(filters, sorts, 1, rows);
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 324, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
-            repo.SetParameter("@Rows", 100000, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@PageNo", 1, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@Order_BY", "a.JoiningCode ASC", ParameterDirection.Input, DbType.String);
-            repo.SetParameter("@RowsCount", 0, ParameterDirection.Output, DbType.Int32);
-            List <OrganisationCentrewiseJoiningCodeModel> OrganisationCentrewiseJoiningCodeList = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int total)?.ToList();
-            return OrganisationCentrewiseJoiningCodeList;
+            repo.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            return repo.ExecuteStoredProcedureList( "Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
         }
-        public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode)
+
+        public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId, int rows)
         {
-            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode).OrderBy(x => x.Custom2).ToList(); 
+            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows).OrderBy(x => x.Custom2).ToList(); 
             if (list == null || !list.Any())
                 return new DBTMOrganisationCentrewiseJoiningCodeModel();
             string currentDir = Directory.GetCurrentDirectory();

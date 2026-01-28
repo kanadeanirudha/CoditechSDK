@@ -104,5 +104,6 @@ namespace Coditech.Admin.Agents
         DBTMTraineeProfileViewModel GetProfileDetails(long dBTMTraineeDetailId);
         DBTMReportsListViewModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
         DBTMTraineeUploadResultViewModel UploadTraineeFromFile(IFormFile file);
+        DBTMTraineeUploadResultViewModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count);
     }
 }

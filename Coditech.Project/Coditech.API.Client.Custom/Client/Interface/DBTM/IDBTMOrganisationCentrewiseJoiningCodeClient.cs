@@ -11,7 +11,7 @@ namespace Coditech.API.Client
         /// </summary>
         /// <param name="centreCode">centreCode</param>
         /// <returns>Returns DBTMOrganisationCentrewiseJoiningCodeResponse.</returns>
-        DBTMOrganisationCentrewiseJoiningCodeResponse GetTraineeActiveJoiningCode(string centreCode);
+        DBTMOrganisationCentrewiseJoiningCodeResponse GetTraineeActiveJoiningCode(string centreCode, string trainerId);
         TrueFalseResponse DeleteJoiningCodeFile(ParameterModel body);
     }
 }

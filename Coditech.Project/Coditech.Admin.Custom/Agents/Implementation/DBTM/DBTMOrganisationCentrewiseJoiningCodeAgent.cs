@@ -59,13 +59,19 @@ namespace Coditech.Admin.Agents
         }
 
         //Test Wise Reports File
-        public virtual DBTMOrganisationCentrewiseJoiningCodeViewModel GetTraineeActiveJoiningCode(string CentreCode)
+        public virtual DBTMOrganisationCentrewiseJoiningCodeViewModel GetTraineeActiveJoiningCode(string centreCode)
         {
-            DBTMOrganisationCentrewiseJoiningCodeViewModel listViewModel = new DBTMOrganisationCentrewiseJoiningCodeViewModel();
-            DBTMOrganisationCentrewiseJoiningCodeResponse response = _dBTMOrganisationCentrewiseJoiningCodeClient.GetTraineeActiveJoiningCode(CentreCode);
-            listViewModel.FilePath = response.FilePath;
-            listViewModel.FileName = response.FileName;
-            return listViewModel;
+            string trainerId = "";
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            if (userModel?.Custom1?.ToLower() == "dbtmtrainer")
+            {
+                trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "";
+            }
+            DBTMOrganisationCentrewiseJoiningCodeViewModel viewModel =  new DBTMOrganisationCentrewiseJoiningCodeViewModel();
+            DBTMOrganisationCentrewiseJoiningCodeResponse response = _dBTMOrganisationCentrewiseJoiningCodeClient.GetTraineeActiveJoiningCode(centreCode, trainerId);
+            viewModel.FilePath = response.FilePath;
+            viewModel.FileName = response.FileName;
+            return viewModel;
         }
 
         //Delete Report .
