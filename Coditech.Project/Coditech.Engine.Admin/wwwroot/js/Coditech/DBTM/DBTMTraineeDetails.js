@@ -301,21 +301,18 @@
     },
     ConfirmDownloadTemplate: function () {
         var count = $("#TraineeCount").val();
-        if (!count || count <= 0) {
-            CoditechNotification.DisplayNotificationMessage(
-                "Please enter valid trainee count.",
-                "error"
-            );
+        clearFieldError("TraineeCount");
+        if (!count || isNaN(count) || parseInt(count) <= 0) {
+            showFieldError("TraineeCount", "Please enter a valid number of trainees.");
             return;
         }
-        $("#DownloadTemplatePopupId").modal("hide");
         DBTMTraineeDetails.CheckAndDownloadTemplate(parseInt(count));
     },
     CheckAndDownloadTemplate: function (count) {
 
         var centreCode = $("#SelectedCentreCode").val();
         var trainerId = $("#SelectedParameter1").val();
-        var userType = $("#UserType").val(); 
+        var userType = $("#UserType").val();
 
         CoditechCommon.ShowLodder();
 
@@ -329,20 +326,20 @@
                 count: count
             },
             success: function (response) {
+                clearFieldError("TraineeCount");
                 if (response.success) {
-
+                    $("#DownloadTemplatePopupId").modal("hide");
                     var downloadUrl =
                         "/DBTMTraineeDetails/DownloadTraineeTemplate"
                         + "?centreCode=" + encodeURIComponent(centreCode)
                         + "&trainerId=" + encodeURIComponent(trainerId)
                         + "&userType=" + encodeURIComponent(userType || "")
                         + "&count=" + encodeURIComponent(count);
-
                     CoditechCommon.HideLodder();
                     $("#hiddenDownloader").attr("src", downloadUrl);
-                }
-                else {
-                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+
+                } else {
+                    showFieldError("TraineeCount", response.message);
                     CoditechCommon.HideLodder();
                 }
             },
@@ -355,4 +352,19 @@
             }
         });
     },
+};
+function showFieldError(fieldName, message) {
+    const span = $('[data-valmsg-for="' + fieldName + '"]');
+    span
+        .text(message)
+        .removeClass('field-validation-valid')
+        .addClass('field-validation-error');
+}
+
+function clearFieldError(fieldName) {
+    const span = $('[data-valmsg-for="' + fieldName + '"]');
+    span
+        .text('')
+        .removeClass('field-validation-error')
+        .addClass('field-validation-valid');
 }

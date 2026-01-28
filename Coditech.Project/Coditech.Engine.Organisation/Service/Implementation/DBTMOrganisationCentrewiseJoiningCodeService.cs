@@ -74,7 +74,6 @@ namespace Coditech.API.Service
         //GetTraineeActiveJoiningCodeList
         public List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode,string trainerId, int rows)
         {
-
             FilterCollection filters = new FilterCollection();
             NameValueCollection sorts = new NameValueCollection {{ "a.JoiningCode", "ASC" }};
             PageListModel pageListModel = new PageListModel(filters, sorts, 1, rows);
