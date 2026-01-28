@@ -350,7 +350,7 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTestMasterIds", dBTMTestMasterIds, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @DBTMTestMasterIds,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @DBTMTestMasterIds,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
 
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
