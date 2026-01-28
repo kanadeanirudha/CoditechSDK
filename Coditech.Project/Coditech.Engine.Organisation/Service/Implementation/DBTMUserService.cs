@@ -517,9 +517,9 @@ namespace Coditech.API.Service
                 if (!mobile.All(char.IsDigit))
                     errors.Add("MobileNumber must contain only digits");
 
-                if (mobile.Length < 10 || mobile.Length > 15)
-                    errors.Add("MobileNumber length must be between 10 and 15 digits");
-            }          
+                if (mobile.Length != 10)
+                    errors.Add("MobileNumber must be 10 digits");
+            }
             if (string.IsNullOrWhiteSpace(height))
                 errors.Add("HeightCm is empty");
             else if (!decimal.TryParse(height, out _))
@@ -532,7 +532,11 @@ namespace Coditech.API.Service
                 errors.Add("DateOfBirth is empty");
             else if (!DateTime.TryParse(dob, out _))
                 errors.Add("DateOfBirth is invalid");
-            if (!string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                errors.Add("EmailAddress is empty");
+            }
+            else
             {
                 try
                 {
@@ -710,6 +714,20 @@ namespace Coditech.API.Service
             {
                 sheet.Cell(1, col).Value = header.HeaderName;
                 sheet.Cell(1, col).Style.Font.Bold = true;
+                if (header.HeaderName == "DateOfBirth")
+                {
+                    for (int row = 2; row <= joiningCodes.Count + 1; row++)
+                    {
+                        var cell = sheet.Cell(row, col);
+                        cell.Style.DateFormat.Format = "yyyy-MM-dd";
+                        var dv = cell.CreateDataValidation();
+                        dv.IgnoreBlanks = true;
+                        dv.AllowedValues = XLAllowedValues.Date;
+                        dv.Operator = XLOperator.Between;
+                        dv.InputTitle = "Date Format";
+                        dv.InputMessage = "yyyy-MM-dd";
+                    }
+                }
                 if (headerGroupCodeMap.TryGetValue(header.HeaderName, out string groupCode))
                 {
                     var values = enumList.Where(x => x.EnumGroupCode == groupCode).OrderBy(x => x.SequenceNumber).Select(x => x.EnumDisplayText).ToList();
