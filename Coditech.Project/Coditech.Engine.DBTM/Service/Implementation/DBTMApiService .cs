@@ -7,6 +7,7 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
+using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -342,7 +343,19 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
+        public DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds)
+        {
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTestMasterIds", dBTMTestMasterIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @DBTMTestMasterIds,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
 
+            listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
+            return listModel;
+        }
         public string GetJoiningCode(string generalTrainerMasterId)
         {
             string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired)?.Select(y => y.JoiningCode)?.FirstOrDefault();
