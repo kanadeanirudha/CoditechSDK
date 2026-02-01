@@ -3,26 +3,29 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Coditech.Engine.DBTM.Controllers
 {
-    public class DBTMServerController
+    [ApiController]
+    [Route("dbtmserver")]
+    public class DBTMServerController : ControllerBase
     {
         public DBTMServerController()
         {
         }
 
         [AllowAnonymous]
-        [Route("/dbtmserver/healthcheck")]
-        [HttpGet]
+        [HttpGet("healthcheck")]
         public IActionResult HealthCheck()
         {
-            return new OkResult();
+            return Ok(new
+            {
+                status = "Healthy"
+            });
         }
 
         [AllowAnonymous]
-        [Route("/dbtmserver/servertime")]
-        [HttpGet]
+        [HttpGet("servertime")]
         public IActionResult ServerTime()
         {
-            return new OkObjectResult(new
+            return Ok(new
             {
                 serverTime = DateTime.Now
             });
