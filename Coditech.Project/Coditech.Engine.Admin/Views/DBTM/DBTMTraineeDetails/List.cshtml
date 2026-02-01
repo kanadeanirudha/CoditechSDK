@@ -17,6 +17,9 @@
                 SelectedText = "All",
                 SelectedValue = "0"
             };
+    ModelPopUpViewModel traineePopup = new ModelPopUpViewModel() { ModelPopUpId = "TraineePopupId", ModalContentId = "TraineeContentId", PopUpSize = PopUpSizeEnum.Large };
+    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
+    ModelPopUpViewModel downloadTemplatePopup = new ModelPopUpViewModel { ModelPopUpId = "DownloadTemplatePopupId", ModalContentId = "DownloadTemplateContentId"};
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -37,16 +40,24 @@
                         {
                             <span class="card-title">All Trainee Details List</span>
                         }
-                        @if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
-                        {
-                            <a class="btn btn-soft-primary" href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails", new { trainerId = @Model.SelectedParameter1 })"> Add Trainee </a>
-                        }
-                        else
-                        {
-                            // Centre Owner
-                            <a class="btn btn-soft-primary" href="/DBTMTraineeDetails/TraineeRegistration"> Add Trainee </a>
-                        }
-
+                        <div class="d-flex gap-2">
+                            <a href="javascript:void(0);"
+                               class="btn btn-sm btn-success"
+                               data-bs-toggle="modal"
+                               data-bs-target="#TraineePopupId"
+                               onclick="DBTMTraineeDetails.GetUploadTraineePopup('TraineeContentId')">
+                                <i class="fas fa-upload me-2"></i> Upload Trainee
+                            </a>
+                            @if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                            {
+                                <a class="btn btn-soft-primary" href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails",new { trainerId = Model.SelectedParameter1 })">Add Trainee</a>
+                            }
+                            else
+                            {
+                                @*Centre Owner *@
+                                <a class="btn btn-soft-primary" href="/DBTMTraineeDetails/TraineeRegistration">Add Trainee</a>
+                            }
+                        </div>
                     </div>
                     <div class="card-header">
                         <div class="row">
@@ -78,4 +89,7 @@
         </div>
     </div>
 </div>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", traineePopup)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", downloadTemplatePopup)
 <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>

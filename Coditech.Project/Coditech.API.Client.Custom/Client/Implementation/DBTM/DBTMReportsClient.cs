@@ -372,14 +372,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual List<string> GetActivityPerformedDates( int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public virtual List<string> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            return Task.Run(async () => await GetActivityPerformedDatesAsync(dBTMTestMasterId,dBTMTraineeDetailId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetActivityPerformedDatesAsync(dBTMTestMasterIds,dBTMTraineeDetailId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<List<string>> GetActivityPerformedDatesAsync(int dBTMTestMasterId,long dBTMTraineeDetailId, CancellationToken cancellationToken)
+        public virtual async Task<List<string>> GetActivityPerformedDatesAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.GetActivityPerformedDatesAsync( dBTMTestMasterId, dBTMTraineeDetailId );
+            string endpoint = dBTMReportsEndpoint.GetActivityPerformedDatesAsync( dBTMTestMasterIds, dBTMTraineeDetailId );
 
             HttpResponseMessage response = null;
             var disposeResponse = true;
@@ -405,6 +405,62 @@ namespace Coditech.API.Client
                 else if (status_ == 204)
                 {
                     return new List<string>();
+                }
+                else
+                {
+                    string responseData = response.Content == null
+                        ? null
+                        : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    UpdateApiStatus(null, status, response);
+
+                    throw new CoditechException(
+                        status.ErrorCode,
+                        status.ErrorMessage,
+                        status.StatusCode
+                    );
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
+
+        public virtual DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            return Task.Run(async () => await GetActivityVerticalDetailsAsync(dBTMDeviceDataId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMReportVerticalDataResponse> GetActivityVerticalDetailsAsync(long dBTMDeviceDataId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.GetActivityVerticalDetailsAsync(dBTMDeviceDataId);
+
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(
+                    endpoint,
+                    status,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMReportVerticalDataResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object ?? new DBTMReportVerticalDataResponse();
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMReportVerticalDataResponse();
                 }
                 else
                 {

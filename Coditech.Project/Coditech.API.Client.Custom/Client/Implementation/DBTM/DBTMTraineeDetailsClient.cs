@@ -4,7 +4,11 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Data;
+using System.Net.Http.Headers;
+using System.Net;
 namespace Coditech.API.Client
 {
     public class DBTMTraineeDetailsClient : BaseClient, IDBTMTraineeDetailsClient
@@ -344,7 +348,7 @@ namespace Coditech.API.Client
 
         public virtual DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
-            return Task.Run(async () => await GenerateAthletePdfRemarkAsync(dBTMTraineeDetailId,remarks, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GenerateAthletePdfRemarkAsync(dBTMTraineeDetailId, remarks, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
         public virtual async Task<DBTMReportsResponse> GenerateAthletePdfRemarkAsync(long dBTMTraineeDetailId, string remarks, CancellationToken cancellationToken)
@@ -380,6 +384,81 @@ namespace Coditech.API.Client
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMReportsResponse typedBody = JsonConvert.DeserializeObject<DBTMReportsResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+
+        public virtual DBTMTraineeUploadResponse UploadTrainee(IFormFile file)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.UploadTraineeAsync();
+            HttpResponseMessage response = null;
+            bool disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                var formData = new MultipartFormDataContent();
+                var fileContent = new StreamContent(file.OpenReadStream())
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue(file.ContentType) }
+                };
+                formData.Add(fileContent, "file", file.FileName);
+                response = PostResourceToEndpoint(endpoint, formData, status, CancellationToken.None);
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                    case HttpStatusCode.Created:
+                        return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
+
+                    default:
+                        return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
+                }
+            }
+            finally
+            {
+                if (disposeResponse && response != null)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode,long trainerId, string userType, int count)
+        {
+            return Task.Run(async () => await DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTraineeUploadResponse> DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeUploadResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                if (status_ == 204)
+                {
+                    return new DBTMTraineeUploadResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTraineeUploadResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }

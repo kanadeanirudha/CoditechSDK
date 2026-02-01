@@ -17,7 +17,7 @@
                         <h4 class="card-title mb-0">User Profile</h4>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#RemarkPopupId" onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId', @Model.DBTMTraineeDetailId, '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))' )">
-                                <i class="fa fa-download me-1"></i> Download PDF
+                                <i class="fa fa-download me-1"></i> Download Report
                             </button>
                             <!-- BACK BUTTON  -->
                             <a class="btn btn-sm btn-soft-secondary" href="@Url.Action("List", controllerName, new DataTableViewModel { SelectedCentreCode = Model.SelectedCentreCode, SelectedParameter1 = Model.SelectedParameter1 })">

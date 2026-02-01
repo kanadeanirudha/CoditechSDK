@@ -30,7 +30,11 @@ namespace Coditech.API.Service
         //Get GetActivityListViewSequence by dBTMOrganisationCentreMasterId.
         public virtual DBTMActivityListViewSequenceListModel GetActivityListViewSequenceList(int dBTMOrganisationCentreMasterId, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
-            centreCode = GetOrganisationCentreCodeByOrganisationCentreMasterId(dBTMOrganisationCentreMasterId);
+            if (string.IsNullOrWhiteSpace(centreCode) && dBTMOrganisationCentreMasterId > 0)
+            {
+                centreCode = GetOrganisationCentreCodeByOrganisationCentreMasterId(dBTMOrganisationCentreMasterId);
+            }
+
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<DBTMActivityListViewSequenceModel> objStoredProc = new CoditechViewRepository<DBTMActivityListViewSequenceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -44,7 +48,7 @@ namespace Coditech.API.Service
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
- 
+
         public virtual DBTMCentrewiseTestParameterListViewModel GetDBTMCentrewiseTestParameterListView(int dBTMOrganisationCentreParameterListViewSequenceId, string centreCode)
         {
             DBTMCentrewiseTestParameterListView centrewiseEntity = _dDBTMCentrewiseTestParameterListViewMasterRepository.Table.Where(x => x.DBTMTestParameterListViewSequenceId == dBTMOrganisationCentreParameterListViewSequenceId && x.CentreCode == centreCode).FirstOrDefault();

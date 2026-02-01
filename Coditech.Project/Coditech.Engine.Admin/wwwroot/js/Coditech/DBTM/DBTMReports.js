@@ -74,10 +74,6 @@ var DBTMReports = {
             return;
         }
 
-        if (!dBTMGraphMasterId || dBTMGraphMasterId.trim() === "") {
-            CoditechNotification.DisplayNotificationMessage("Please select Graph Type.", "error");
-            return;
-        }
         CoditechCommon.ShowLodder();
         $.ajax({
             cache: false,
@@ -133,7 +129,10 @@ var DBTMReports = {
                     DBTMReports.LoadActivityPerformedDates();
                     CoditechCommon.HideLodder();
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to load graph list.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -178,7 +177,10 @@ var DBTMReports = {
                     }
                     CoditechCommon.HideLodder();
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to load graph list.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -187,33 +189,32 @@ var DBTMReports = {
     },
 
     LoadActivityPerformedDates: function () {
-
-        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
-        if (!dBTMTestMasterId || !dBTMTraineeDetailId) {
+
+        if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0) {
             activityPerformedDates = [];
+            $("#FromDate,#ToDate").datepicker("refresh");
             return;
         }
+        if (!Array.isArray(dBTMTestMasterIds)) {
+            dBTMTestMasterIds = [dBTMTestMasterIds];
+        }
         $.ajax({
-            cache: false,
             type: "GET",
             url: "/DBTMReports/GetActivityPerformedDates",
-            dataType: "json",
             data: {
-                dBTMTestMasterId: dBTMTestMasterId,
+                dBTMTestMasterIds: dBTMTestMasterIds.join(","),
                 dBTMTraineeDetailId: dBTMTraineeDetailId
             },
             success: function (data) {
-
                 activityPerformedDates = data || [];
-
-                console.log("Activity dates loaded:", activityPerformedDates);
-
-                // Refresh datepickers so highlights apply
-                $("#FromDate").datepicker("refresh");
-                $("#ToDate").datepicker("refresh");
+                $("#FromDate,#ToDate").datepicker("refresh");
             },
-            error: function () {
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 activityPerformedDates = [];
                 CoditechNotification.DisplayNotificationMessage(
                     "Failed to load activity dates.",
@@ -238,7 +239,10 @@ var DBTMReports = {
 
                     CoditechCommon.HideLodder();
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to retrieve DBTM Activity.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -423,7 +427,10 @@ var DBTMReports = {
                         CoditechCommon.HideLodder();
                     }
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -467,7 +474,10 @@ var DBTMReports = {
                         CoditechCommon.HideLodder();
                     }
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Error while checking report availability.", "error");
                     CoditechCommon.HideLodder();
                 }
@@ -475,5 +485,46 @@ var DBTMReports = {
         } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
-    }
+    },
+    ShowActivityDetailPopup: function (modelPopContentId, deviceDataId, enableStackBlur) {
+        if (enableStackBlur === true) {
+            var $openModal = $(".modal.show");
+            if ($openModal.length > 0) {
+                $openModal.addClass("stack-blur");
+            }
+        }
+        CoditechCommon.ShowLodder();
+        $("#" + modelPopContentId).html("");
+        $.ajax({
+            type: "GET",
+            url: "/DBTMReports/ViewActivityDetailPopup",
+            data: { dBTMDeviceDataId: deviceDataId },
+            success: function (result) {
+                $("#" + modelPopContentId).html(result);
+                CoditechCommon.HideLodder();
+                var modalEl = document.getElementById("DBTMActivityDetailPopupId");
+                var modal = new bootstrap.Modal(modalEl);
+                modal.show();
+                if (enableStackBlur === true) {
+                    modalEl.addEventListener("hidden.bs.modal", function () {
+                        $(".stack-blur").removeClass("stack-blur");
+                        $(".modal-backdrop").not(":first").remove();
+                        if ($(".modal.show").length > 0) {
+                            $("body").addClass("modal-open");
+                        }
+                    }, { once: true });
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechCommon.HideLodder();
+                CoditechNotification.DisplayNotificationMessage(
+                    "Failed to load activity details.",
+                    "error"
+                );
+            }
+        });
+    },
 };

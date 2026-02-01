@@ -1,5 +1,6 @@
 ﻿using Coditech.Common.API.Model;
-
+using Coditech.Common.Helper.Utilities;
+using System.Collections.Specialized;
 namespace Coditech.API.Service
 {
     public interface IDBTMApiService
@@ -14,5 +15,6 @@ namespace Coditech.API.Service
         string GetJoiningCode(string generalTrainerMasterId);
         string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId);
         bool InsertDeviceDataViaFile(IFormFile file);
+        DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds);
     }
 }

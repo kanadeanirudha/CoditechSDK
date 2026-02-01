@@ -541,15 +541,15 @@ namespace Coditech.Admin.Helpers
             dropdownList.Add(new SelectListItem
             {
                 Text = "Instantaneous Chart",
-                Value = "InstantaneousChart",
-                Selected = "InstantaneousChart" == dropdownViewModel.DropdownSelectedValue
+                Value = CustomConstants.InstantaneousChart,
+                Selected = CustomConstants.InstantaneousChart == dropdownViewModel.DropdownSelectedValue
             });
 
             dropdownList.Add(new SelectListItem
             {
                 Text = "Progress Chart",
-                Value = "ProgressChart",
-                Selected = "ProgressChart" == dropdownViewModel.DropdownSelectedValue
+                Value = CustomConstants.ProgressChart,
+                Selected = CustomConstants.ProgressChart == dropdownViewModel.DropdownSelectedValue
             });
         }
     }

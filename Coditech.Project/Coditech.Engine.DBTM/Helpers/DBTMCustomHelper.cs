@@ -73,7 +73,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = totalDistanceCovered != 0 ? $"{Math.Round(totalDistanceCovered, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.DistanceMultiplyByRow:
-                    decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+                    decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
                     result = distance != 0 ? $"{Math.Round(distance * recurtion, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
                 case CustomConstants.MaxLap:
@@ -94,7 +94,15 @@ namespace Coditech.Engine.DBTM.Helpers
                     {
                         cumulativeTime += group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == i).ParameterValue;
                     }
-                    result = $"{cumulativeTime}";
+                    result = $"{Math.Round(cumulativeTime, CustomConstants.GraphListRoundUpValue)}";
+                    break;
+                case CustomConstants.CumulativeDistance:
+                    decimal cumulativeDistance = 0;
+                    for (int i = 1; i <= recurtion; i++)
+                    {
+                        cumulativeDistance += group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance && x.Row == i).ParameterValue;
+                    }
+                    result = $"{Math.Round(cumulativeDistance, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.Velocity:
                     distance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => x.ParameterValue);
@@ -104,8 +112,11 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.VelocityByRow:
                     result = VelocityByRow(group, recurtion, isGraph);
                     break;
+                case CustomConstants.VelocityByRowWithFirstDistance:
+                    result = VelocityByRowWithFirstDistance(group, recurtion, isGraph);
+                    break;
                 case CustomConstants.CumulativeVelocityByRow:
-                    distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+                    distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
@@ -158,12 +169,12 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
                 case CustomConstants.TotalCount:
                     decimal totalCount = group.Where(x => x.ParameterCode == CustomConstants.Count).Sum(x => x.ParameterValue);
-                    result = $"{Convert.ToInt32(totalCount)}";
+                    result = totalCount > 0 ? totalCount.ToString() : "0";
                     break;
                 case CustomConstants.CountByTime:
                     decimal count = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Count && x.Row == recurtion).ParameterValue;
                     time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
-                    result = time != 0 && count != 0 ? $"{Math.Round(count/ time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+                    result = time != 0 && count != 0 ? $"{Math.Round(count / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
                     break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
@@ -208,7 +219,16 @@ namespace Coditech.Engine.DBTM.Helpers
         private static string VelocityByRow(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
         {
             string result = string.Empty;
-            decimal distance = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow && x.Row == recurtion).ParameterValue;
+            decimal distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == recurtion).ParameterValue;
+            decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
+            result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
+            return result;
+        }
+
+        private static string VelocityByRowWithFirstDistance(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
+        {
+            string result = string.Empty;
+            decimal distance = group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == 1).ParameterValue;
             decimal time = group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue;
             result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : "Invalid Data";
             return result;
@@ -227,12 +247,14 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.CumulativeTime:
                 case CustomConstants.ChangeOfDirection:
                 case CustomConstants.ChangeOfDirectionDeficit:
+                case CustomConstants.AverageTime:
                     data = "sec";
                     break;
                 case CustomConstants.TotalDistanceCovered:
                 case CustomConstants.PersonDetectionRange:
                 case CustomConstants.DistanceMultiplyByRow:
                 case CustomConstants.Distance:
+                case CustomConstants.CumulativeDistance:
                     data = "m";
                     break;
                 case CustomConstants.CumulativeVelocity:
@@ -240,6 +262,7 @@ namespace Coditech.Engine.DBTM.Helpers
                 case CustomConstants.VelocityByRow:
                 case CustomConstants.CumulativeVelocityByRow:
                 case CustomConstants.Velocity:
+                case CustomConstants.VelocityByRowWithFirstDistance:
                     data = "m/s";
                     break;
                 case CustomConstants.Power:

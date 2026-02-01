@@ -7,15 +7,15 @@
     DropdownViewModel graphTypeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.GraphType.ToString(), DropdownName = "GraphType", DropdownSelectedValue = Model.GraphType, IsCustomDropdown = true };
     DropdownViewModel graphModeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.GraphMode.ToString(), DropdownName = "GraphMode", DropdownSelectedValue = Model.GraphMode, IsCustomDropdown = true };
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -116,8 +116,15 @@
                                 </div>
                                 <div class="col-lg-3">
                                     <div class="mb-4">
-                                        @Html.LabelFor(x => x.GraphSize, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.GraphSize, new { @class = "form-control" })
+                                        @Html.LabelFor(x => x.GraphSize, new { @class = "form-label required" })
+                                        @Html.DropDownListFor(x => x.GraphSize, new List<SelectListItem>
+                                    {
+                                    new SelectListItem { Text = "col-lg-3", Value = "col-lg-3" },
+                                    new SelectListItem { Text = "col-lg-4", Value = "col-lg-4" },
+                                    new SelectListItem { Text = "col-lg-6", Value = "col-lg-6" },
+                                    new SelectListItem { Text = "col-lg-12", Value = "col-lg-12" }
+                                    },
+                                                 "--------Select Graph Size--------", new { @class = "form-control" })
                                         @Html.ValidationMessageFor(x => x.GraphSize)
                                     </div>
                                 </div>

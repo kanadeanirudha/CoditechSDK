@@ -88,6 +88,15 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
+        public ActionResult ViewActivityDetailPopup(long dBTMDeviceDataId)
+        {
+            DBTMReportVerticalDataViewModel model = _dBTMReportsAgent.GetActivityVerticalDetails(dBTMDeviceDataId);
+            if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
+                return Content("No activity details found.");
+            return PartialView("~/Views/DBTM/DBTMReports/_DBTMReportVerticalDetailPopup.cshtml", model);
+        }
+
+        [HttpGet]
         public ActionResult GetTestWiseReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string reportType)
         {
             DBTMReportsListViewModel datalist = _dBTMReportsAgent.TestWiseMultipleReportsFile(dBTMTestMasterIds, dBTMTraineeDetailId, FromDate, ToDate, reportType);
@@ -135,21 +144,19 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetTestWiseGraphReports( int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetTestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime FromDate, DateTime ToDate)
         {
             if (!string.IsNullOrEmpty(graphMode) &&
-                graphMode.Equals("InstantaneousChart", StringComparison.OrdinalIgnoreCase))
+                graphMode.Equals(CustomConstants.InstantaneousChart, StringComparison.OrdinalIgnoreCase))
             {
                 ToDate = FromDate;
             }
-            if (!string.IsNullOrEmpty(dBTMGraphMasterIds))
-            {
-                List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2( dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate );
+            dBTMGraphMasterIds = !string.IsNullOrEmpty(dBTMGraphMasterIds) ? dBTMGraphMasterIds : string.Empty;
+            List<GraphModel> graphModels = _dBTMReportsAgent.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, FromDate, ToDate);
 
-                if (graphModels != null && graphModels.Any(x => x.IsRecordFound))
-                {
-                    return PartialView("~/Views/Shared/Charts/_MultipleGraphs.cshtml", graphModels);
-                }
+            if (graphModels != null && graphModels.Any(x => x.IsRecordFound))
+            {
+                return PartialView("~/Views/Shared/Charts/_MultipleGraphs.cshtml", graphModels);
             }
             return Content("No Record Found.");
         }
@@ -163,7 +170,7 @@ namespace Coditech.Admin.Controllers
             if (graphList?.DBTMGraphMasterList != null)
             {
                 list = graphList.DBTMGraphMasterList
-                                .Where(g => g.GraphMode == graphMode && g.IsActive )
+                                .Where(g => g.GraphMode == graphMode && g.IsActive)
                                 .Select(g => new SelectListItem
                                 {
                                     Text = $"{g.GraphName}",
@@ -174,12 +181,12 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId )
+        public IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            if (dBTMTestMasterId <= 0 || dBTMTraineeDetailId <= 0)
+            if(string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return Json(new List<string>());
 
-            List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+            List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
             List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
 
             return Json(result);

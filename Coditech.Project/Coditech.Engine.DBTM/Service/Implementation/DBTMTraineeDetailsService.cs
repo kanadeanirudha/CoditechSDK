@@ -343,6 +343,12 @@ namespace Coditech.API.Service
         //Download Trainee Report Pdf
         public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
+            if (profile == null)
+                throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
+
+            string traineeName = $"{profile.FirstName}_{profile.LastName}".Trim('_');
+            traineeName = string.Concat(traineeName.Split(Path.GetInvalidFileNameChars()));
             // GetTraineeProfileHtml
             string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
 
@@ -351,7 +357,7 @@ namespace Coditech.API.Service
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            string fileName = $"Athlete_Profile_{dBTMTraineeDetailId}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string fileName = $"Athlete_Profile_{traineeName}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
             string filePath = Path.Combine(folderPath, fileName);
 
             var pdf = new HtmlToPdfDocument

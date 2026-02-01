@@ -4,6 +4,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -255,6 +256,29 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "getcentrewisejoiningcode", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("/dbtmapi/Gettraineesbyperformedactivity")]
+        [Produces(typeof(DBTMTraineeDetailsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds)
+        {
+            try
+            {
+                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

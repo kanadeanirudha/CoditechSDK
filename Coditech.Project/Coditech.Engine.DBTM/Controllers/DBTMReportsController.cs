@@ -257,11 +257,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/GetActivityPerformedDates")]
         [Produces("application/json")]
-        public virtual IActionResult GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public virtual IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
             try
             {
-                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
 
                 if (dates == null || !dates.Any())
                     return Ok(new List<string>());
@@ -278,6 +278,30 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage( ex,nameof(GetActivityPerformedDates),TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message});
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMReports/GetActivityVerticalDetails")]
+        [Produces(typeof(DBTMReportVerticalDataResponse))]
+        public virtual IActionResult GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            try
+            {
+                DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId);
+                if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
+                    return CreateNoContentResponse();
+                return CreateOKResponse( new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, nameof(GetActivityVerticalDetails), TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message,   ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, nameof(GetActivityVerticalDetails), TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

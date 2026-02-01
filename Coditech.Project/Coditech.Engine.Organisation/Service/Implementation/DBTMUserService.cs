@@ -1,4 +1,5 @@
-﻿using Coditech.API.Data;
+﻿using ClosedXML.Excel;
+using Coditech.API.Data;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
@@ -6,7 +7,11 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Hangfire.Common;
 using Newtonsoft.Json;
+using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -15,6 +20,7 @@ namespace Coditech.API.Service
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
+        private readonly IGeneralTemplateService _generalTemplateService;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
@@ -25,12 +31,14 @@ namespace Coditech.API.Service
         protected readonly ICoditechRepository<DBTMDeviceRegistrationDetails> _dBTMDeviceRegistrationDetailsRepository;
         protected readonly ICoditechRepository<DBTMSubscriptionPlan> _dBTMSubscriptionPlanRepository;
         protected readonly ICoditechRepository<DBTMSubscriptionPlanAssociatedToUser> _dBTMSubscriptionPlanAssociatedToUserRepository;
+        private readonly IDBTMOrganisationCentrewiseJoiningCodeService _joiningCodeService;
+        private readonly ICoditechRepository<GeneralTemplateHeaderConfiguration> _generalTemplateHeaderConfigurationRepository;
 
-
-        public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
+        public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
+            _generalTemplateService = generalTemplateService;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
@@ -41,6 +49,8 @@ namespace Coditech.API.Service
             _dBTMSubscriptionPlanRepository = new CoditechRepository<DBTMSubscriptionPlan>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMSubscriptionPlanAssociatedToUserRepository = new CoditechRepository<DBTMSubscriptionPlanAssociatedToUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
+            _joiningCodeService = joiningCodeService;
+            _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public override UserModel Login(UserLoginModel userLoginModel)
@@ -95,7 +105,6 @@ namespace Coditech.API.Service
                 return base.GetGeneralPersonDetailsByEntityType(entityId, entityType);
             }
         }
-
         protected override void InsertPersonDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
             if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
@@ -167,7 +176,6 @@ namespace Coditech.API.Service
                 }
             }
         }
-
         private string ReplaceDBTMTraineeEmailTemplate(GeneralPersonModel generalPersonModel, string emailTemplate)
         {
             string messageText = emailTemplate;
@@ -277,6 +285,12 @@ namespace Coditech.API.Service
                     }
                 }
                 List<GeneralTraineeAssociatedToTrainer> generalTraineeAssociatedToTrainerList = null;
+
+                if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count == 0)
+                {
+                    dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds = new List<string>();
+                    dBTMCustomNewRegistrationModel.GeneralTraineeAssociatedToTrainerIds.Add(joiningCodeDetails.Custom1);
+                }
                 if (dBTMCustomNewRegistrationModel?.GeneralTraineeAssociatedToTrainerIds?.Count > 0)
                 {
                     generalTraineeAssociatedToTrainerList = new List<GeneralTraineeAssociatedToTrainer>();
@@ -292,9 +306,469 @@ namespace Coditech.API.Service
                     }
                     _generalTraineeAssociatedToTrainerRepository.Insert(generalTraineeAssociatedToTrainerList);
                 }
-
             }
             return generalPersonModel;
+        }
+
+        private int GetTemplateIdByCode(string templateCode)
+        {
+            return new CoditechRepository<GeneralTemplateMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.TemplateCode == templateCode).Select(x => x.GeneralTemplateMasterId).FirstOrDefault();
+        }
+        public DBTMTraineeUploadModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count)
+        {
+            // Get joining codes
+            string trainerIdStr = trainerId > 0 ? trainerId.ToString() : null;
+            var joiningCodeModels = _joiningCodeService.GetTraineeActiveJoiningCodeList(centreCode, trainerIdStr, count);
+            var joiningCodes = joiningCodeModels.Select(x => x.JoiningCode).Take(count).ToList();
+            if (joiningCodes.Count < count)
+            {
+                return new DBTMTraineeUploadModel
+                {
+                    HasError = true,
+                    ErrorMessage = $"Insufficient joining codes. Available: {joiningCodes.Count}"
+                };
+            }
+            // Get template
+            int templateId = GetTemplateIdByCode("Trainee");
+            if (templateId <= 0)
+            {
+                return new DBTMTraineeUploadModel
+                {
+                    HasError = true,
+                    ErrorMessage = "Trainee template is not configured."
+                };
+            }
+            List<GeneralTemplateHeaderConfiguration> headers = _generalTemplateHeaderConfigurationRepository.Table.Where(x => x.TemplateCode == "Trainee").OrderBy(x => x.OrderBy).ToList();
+            var template = _generalTemplateService.GetTemplate(templateId);
+            template.HeaderConfigurationList = headers.Select(x =>
+                new GeneralTemplateHeaderConfigurationModel
+                {
+                    GeneralTemplateHeaderConfigurationId = x.GeneralTemplateHeaderConfigurationId,
+                    TemplateCode = x.TemplateCode,
+                    HeaderName = x.HeaderName,
+                    HeaderType = x.HeaderType,
+                    CentreCode = x.CentreCode,
+                    OrderBy = x.OrderBy,
+                    DropdownEnumGroupCode = x.DropdownEnumGroupCode
+                }).ToList();
+            string currentDir = Directory.GetCurrentDirectory();
+            string dataFolder = Path.Combine(currentDir, "data", "TraineeUploadTemplate");
+            if (!Directory.Exists(dataFolder))
+                Directory.CreateDirectory(dataFolder);
+            string trainerNameRaw = joiningCodeModels.FirstOrDefault()?.Custom2 ?? "Trainer";
+            string trainerName = trainerNameRaw.Trim().Replace(" ", "_");  
+            string fileName = $"TraineeUploadTemplate_{centreCode}_{trainerName}.xlsx";
+            string filePath = Path.Combine(dataFolder, fileName);
+            GenerateTraineeTemplateExcel(template, joiningCodes, filePath);
+            return new DBTMTraineeUploadModel
+            {
+                FilePath = filePath,
+                FileName = fileName
+            };
+        }
+
+        public DBTMTraineeUploadModel UploadTraineeFromFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new Exception("File is empty.");
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            DBTMTraineeUploadModel table;
+            if (extension == ".xlsx" || extension == ".xls")
+            {
+                table = ExcelToListModel(file);   
+            }
+            else
+            {
+                throw new Exception("Unsupported file format.");
+            }
+            if (table.DataTable == null || table.DataTable.Rows.Count == 0)
+                throw new Exception("File contains no data.");
+            DBTMTraineeUploadModel result = UploadTrainee(table);
+            return new DBTMTraineeUploadModel
+            {
+                TotalRecords = result.TotalRecords,
+                SuccessCount = result.SuccessCount,
+                FailedCount = result.FailedCount,
+                FailedRows = result.FailedRows,
+                DataTable = result.DataTable
+            };
+        }
+        public DBTMTraineeUploadModel UploadTrainee(DBTMTraineeUploadModel table)
+        {
+            DataTable dt = table.DataTable;
+            if (!dt.Columns.Contains("SrNo"))
+            {
+                dt.Columns.Add("SrNo", typeof(int));
+                dt.Columns["SrNo"].SetOrdinal(0);
+            }
+            if (!dt.Columns.Contains("ErrorMessage"))
+            {
+                dt.Columns.Add("ErrorMessage");
+            }
+            dt.Columns["ErrorMessage"].SetOrdinal(1);
+            List<string> joiningCodes = dt.AsEnumerable().Select(r => r["JoiningCode"]?.ToString()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+            var joiningCodeList = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => joiningCodes.Contains(x.JoiningCode)).ToList();
+            // Validation
+            int sr = 2;
+            bool hasAnyError = false;
+            foreach (DataRow row in dt.Rows)
+            {
+                row["SrNo"] = sr++;
+                if (!ValidateRow(row, joiningCodeList, out string error))
+                {
+                    row["ErrorMessage"] = error;
+                    hasAnyError = true;
+                }
+                else
+                {
+                    row["ErrorMessage"] = null;
+                }
+            }
+            if (hasAnyError)
+            {
+                DataTable failedTable = BuildFailedTable(dt);
+                return new DBTMTraineeUploadModel
+                {
+                    TotalRecords = dt.Rows.Count,
+                    SuccessCount = 0,
+                    FailedCount = failedTable.Rows.Count,
+                    FailedRows = ToList(failedTable)
+                };
+            }
+            // Insert
+            int success = 0;
+            foreach (DataRow row in dt.Rows)
+            {
+                InsertTrainee(row);
+                success++;
+            }
+            DataTable finalFailed = BuildFailedTable(dt);
+            return new DBTMTraineeUploadModel
+            {
+                TotalRecords = dt.Rows.Count,
+                SuccessCount = success,
+                FailedCount = finalFailed.Rows.Count,
+                FailedRows = ToList(finalFailed),
+                Data = ToList(dt)
+            };
+        }
+
+        // Validation 
+        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, out string errorMessage)
+        {
+            List<string> errors = new List<string>();
+
+            string joiningCode = row["JoiningCode"]?.ToString();
+            string title = row["TraineeTitle"]?.ToString();
+            string firstName = row["FirstName"]?.ToString();
+            string lastName = row["LastName"]?.ToString();
+            string callingCode = row["CallingCode"]?.ToString();
+            string mobile = row["MobileNumber"]?.ToString();
+            string email = row["EmailAddress"]?.ToString();
+            string gender = row["Gender"]?.ToString();
+            string height = row["HeightCm"]?.ToString();
+            string weight = row["WeightKg"]?.ToString();
+            string dob = row["DateOfBirth"]?.ToString();
+            if (!ValidateJoiningCode(joiningCode, joiningCodeList, out string joiningCodeError))
+                errors.Add(joiningCodeError);
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                errors.Add("TraineeTitle is empty");
+            }
+            else
+            {
+                int titleEnumId = GetEnumIdByEnumCode(
+                    title,
+                    DropdownTypeEnum.Title.ToString()
+                );
+
+                if (titleEnumId <= 0)
+                {
+                    errors.Add("TraineeTitle is invalid");
+                }
+            }
+            if (string.IsNullOrWhiteSpace(firstName))
+                errors.Add("FirstName is empty");
+            else if (!firstName.All(char.IsLetter))
+                errors.Add("FirstName must contain only letters");
+
+            if (string.IsNullOrWhiteSpace(lastName))
+                errors.Add("LastName is empty");
+            else if (!lastName.All(char.IsLetter))
+                errors.Add("LastName must contain only letters");
+            if (string.IsNullOrWhiteSpace(callingCode))
+            {
+                errors.Add("CallingCode is empty");
+            }
+            else
+            {
+                if (!callingCode.All(char.IsDigit))
+                    errors.Add("CallingCode must contain only digits");
+
+                if (callingCode.Length < 1 || callingCode.Length > 4)
+                    errors.Add("CallingCode length must be between 1 and 4 digits");
+            }
+            if (string.IsNullOrWhiteSpace(mobile))
+            {
+                errors.Add("MobileNumber is empty");
+            }
+            else
+            {
+                if (!mobile.All(char.IsDigit))
+                    errors.Add("MobileNumber must contain only digits");
+
+                if (mobile.Length != 10)
+                    errors.Add("MobileNumber must be 10 digits");
+            }
+            if (string.IsNullOrWhiteSpace(height))
+                errors.Add("HeightCm is empty");
+            else if (!decimal.TryParse(height, out _))
+                errors.Add("HeightCm must be numeric");
+            if (string.IsNullOrWhiteSpace(weight))
+                errors.Add("WeightKg is empty");
+            else if (!decimal.TryParse(weight, out _))
+                errors.Add("WeightKg must be numeric");
+            if (string.IsNullOrWhiteSpace(dob))
+                errors.Add("DateOfBirth is empty");
+            else if (!DateTime.TryParse(dob, out _))
+                errors.Add("DateOfBirth is invalid");
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                errors.Add("EmailAddress is empty");
+            }
+            else
+            {
+                try
+                {
+                    var addr = new System.Net.Mail.MailAddress(email);
+                    if (addr.Address != email)
+                        errors.Add("EmailAddress format is invalid");
+                }
+                catch
+                {
+                    errors.Add("EmailAddress format is invalid");
+                }
+            }
+            if (string.IsNullOrWhiteSpace(gender))
+            {
+                errors.Add("Gender is empty");
+            }
+            else
+            {
+                int genderEnumId = GetEnumIdByEnumCode(gender, DropdownTypeEnum.Gender.ToString());
+                if (genderEnumId <= 0)
+                {
+                    errors.Add("Gender is invalid");
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(joiningCode))
+            {
+                OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = joiningCodeList.FirstOrDefault(x =>
+                    x.JoiningCode.Equals(joiningCode, StringComparison.OrdinalIgnoreCase));
+
+                if (organisationCentrewiseJoiningCode != null)
+                {
+                    GeneralPersonModel person = new GeneralPersonModel
+                    {
+                        UserType = UserTypeEnum.Trainee.ToString(),
+                        FirstName = firstName,
+                        LastName = lastName,
+                        MobileNumber = mobile,
+                        EmailId = row["EmailAddress"]?.ToString(),
+                        SelectedCentreCode = organisationCentrewiseJoiningCode.CentreCode
+                    };
+                    if (!ValidatedGeneralPersonData(person, out string baseError))
+                        errors.Add(baseError);
+                }
+            }
+            errorMessage = errors.Count > 0 ? string.Join(", ", errors) : null;
+            return errors.Count == 0;
+        }
+
+        //Insert Trainee 
+        private void InsertTrainee(DataRow row)
+        {
+            var rawCallingCode = row.Table.Columns.Contains("CallingCode") ? row["CallingCode"]?.ToString(): null;
+            DBTMCustomNewRegistrationModel customModel = new DBTMCustomNewRegistrationModel
+            {
+                JoiningCode = row["JoiningCode"].ToString(),
+                height = Convert.ToDecimal(row["HeightCm"]),
+                weight = Convert.ToDecimal(row["WeightKg"]),
+                SpecializationEnumId = GetEnumIdByEnumCode(row["Specialization"]?.ToString(), DropdownCustomTypeEnum.TraineeSpecialization.ToString()),
+                GeneralBatchMasterId = 0,
+                GeneralTraineeAssociatedToTrainerIds = new List<string>()
+            };
+            GeneralPersonModel model = new GeneralPersonModel
+            {
+                UserType = UserTypeEnum.Trainee.ToString(),
+                PersonTitle = row["TraineeTitle"]?.ToString(),
+                FirstName = row["FirstName"].ToString(),
+                LastName = row["LastName"].ToString(),
+                EmailId = row["EmailAddress"]?.ToString(),
+                MobileNumber = row["MobileNumber"].ToString(),
+                CallingCode = !string.IsNullOrWhiteSpace(rawCallingCode) ? "+" + rawCallingCode : null,
+                GenderEnumId = GetEnumIdByEnumCode(row["Gender"]?.ToString(), DropdownTypeEnum.Gender.ToString()),
+                DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
+                Custom1 = JsonConvert.SerializeObject(customModel)
+            };
+            DBTMRegisterTrainee(model);
+        }
+        private DataTable BuildFailedTable(DataTable source)
+        {
+            DataTable failed = new DataTable();
+            foreach (DataColumn col in source.Columns)
+                failed.Columns.Add(col.ColumnName, col.DataType);
+            foreach (DataRow row in source.Rows)
+            {
+                if (!string.IsNullOrEmpty(row["ErrorMessage"]?.ToString()))
+                {
+                    DataRow newRow = failed.NewRow();
+                    foreach (DataColumn col in source.Columns)
+                        newRow[col.ColumnName] = row[col.ColumnName];
+                    failed.Rows.Add(newRow);
+                }
+            }
+            return failed;
+        }
+        private bool ValidateJoiningCode(string joiningCode, List<OrganisationCentrewiseJoiningCode> validList, out string error)
+        {
+            error = null;
+            if (string.IsNullOrWhiteSpace(joiningCode))
+            {
+                error = "JoiningCode is empty";
+                return false;
+            }
+            OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = validList.FirstOrDefault(x => x.JoiningCode.Equals(joiningCode, StringComparison.OrdinalIgnoreCase));
+            if (organisationCentrewiseJoiningCode == null)
+            {
+                error = "JoiningCode is invalid";
+                return false;
+            }
+            if (organisationCentrewiseJoiningCode.IsExpired)
+            {
+                error = "JoiningCode has expired";
+                return false;
+            }
+            return true;
+        }      
+        private DBTMTraineeUploadModel ExcelToListModel(IFormFile file)
+        {
+            var result = new DBTMTraineeUploadModel();
+            var table = new DataTable();
+            using var stream = file.OpenReadStream();
+            using var workbook = new XLWorkbook(stream);
+            var sheet = workbook.Worksheet(1);
+            bool isHeader = true;
+            int excelRowNo = 1;
+            foreach (var row in sheet.RowsUsed())
+            {
+                excelRowNo++;
+                if (isHeader)
+                {
+                    foreach (var cell in row.Cells())
+                    {
+                        var header = cell.GetString().Trim();
+                        if (!string.IsNullOrEmpty(header))
+                            table.Columns.Add(header);
+                    }
+                    isHeader = false;
+                    continue;
+                }
+                var dr = table.NewRow();
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    var cell = row.Cell(i + 1);
+                    dr[i] = cell.IsEmpty() ? null : cell.GetFormattedString().Trim();
+                }
+                table.Rows.Add(dr);
+            }
+            if (!table.Columns.Contains("SrNo"))
+                table.Columns.Add("SrNo", typeof(int));
+            if (!table.Columns.Contains("ErrorMessage"))
+                table.Columns.Add("ErrorMessage");
+            table.Columns["SrNo"].SetOrdinal(0);
+            table.Columns["ErrorMessage"].SetOrdinal(1);
+            result.DataTable = table;
+            return result;
+        }
+
+        //GenerateTraineeTemplateExcel
+        private void GenerateTraineeTemplateExcel(GeneralTemplateModel template, List<string> joiningCodes, string filePath)
+        {
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Trainee Template");
+            var lookupSheet = workbook.Worksheets.Add("Lookups");
+            lookupSheet.Visibility = XLWorksheetVisibility.Hidden;
+            var headerGroupCodeMap = new Dictionary<string, string>();
+            foreach (var header in template.HeaderConfigurationList.Where(x => x.HeaderType == "Dropdown"))
+            {
+                if (!headerGroupCodeMap.ContainsKey(header.HeaderName))
+                {
+                    headerGroupCodeMap[header.HeaderName] = header.DropdownEnumGroupCode;
+                }
+            }
+            List<GeneralEnumaratorModel> enumList = BindEnumarator();
+            int col = 1;
+            int lookupCol = 1;
+            foreach (var header in template.HeaderConfigurationList.OrderBy(x => x.OrderBy))
+            {
+                sheet.Cell(1, col).Value = header.HeaderName;
+                sheet.Cell(1, col).Style.Font.Bold = true;
+                if (header.HeaderName == "DateOfBirth")
+                {
+                    for (int row = 2; row <= joiningCodes.Count + 1; row++)
+                    {
+                        var cell = sheet.Cell(row, col);
+                        cell.Style.DateFormat.Format = "yyyy-MM-dd";
+                        var dv = cell.CreateDataValidation();
+                        dv.IgnoreBlanks = true;
+                        dv.AllowedValues = XLAllowedValues.Date;
+                        dv.Operator = XLOperator.Between;
+                        dv.InputTitle = "Date Format";
+                        dv.InputMessage = "yyyy-MM-dd";
+                    }
+                }
+                if (headerGroupCodeMap.TryGetValue(header.HeaderName, out string groupCode))
+                {
+                    var values = enumList.Where(x => x.EnumGroupCode == groupCode).OrderBy(x => x.SequenceNumber).Select(x => x.EnumDisplayText).ToList();
+                    for (int i = 0; i < values.Count; i++)
+                        lookupSheet.Cell(i + 1, lookupCol).Value = values[i];
+                    for (int row = 2; row <= joiningCodes.Count + 1; row++)
+                    {
+                        var validation = sheet.Cell(row, col).CreateDataValidation();
+                        validation.IgnoreBlanks = true;
+                        validation.InCellDropdown = true;
+                        validation.List(
+                            lookupSheet.Range(
+                                lookupSheet.Cell(1, lookupCol),
+                                lookupSheet.Cell(values.Count, lookupCol)
+                            ),
+                            true
+                        );
+                    }
+                    lookupCol++;
+                }
+                col++;
+            }
+            for (int i = 0; i < joiningCodes.Count; i++)
+            {
+                sheet.Cell(i + 2, 1).Value = joiningCodes[i];
+            }
+            sheet.Columns().AdjustToContents();
+            workbook.SaveAs(filePath);
+        }
+
+        private List<Dictionary<string, object>> ToList(DataTable table)
+        {
+            var list = new List<Dictionary<string, object>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var dict = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                    dict[col.ColumnName] = row[col] == DBNull.Value ? null : row[col];
+                list.Add(dict);
+            }
+            return list;
         }
 
         public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)

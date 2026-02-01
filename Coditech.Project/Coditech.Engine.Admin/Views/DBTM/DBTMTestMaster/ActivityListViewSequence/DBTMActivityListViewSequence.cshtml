@@ -73,7 +73,7 @@
                                                 @class = "form-control",
                                                 @type = "number",
                                                 @min = "0",
-                                                @max = "12",
+                                                @max = "999",
                                                 @onkeypress = "return CoditechCommon.ValidNumeric()"
                                             })
                                         @Html.ValidationMessageFor(x => x.Recursion)
@@ -127,6 +127,13 @@
                                         @Html.LabelFor(x => x.ColumnCellColor, new { @class = "form-label" })
                                         @Html.TextBoxFor(x => x.ColumnCellColor, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
                                         @Html.ValidationMessageFor(x => x.ColumnCellColor)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.StaticValue, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.StaticValue, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.StaticValue)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

@@ -56,5 +56,22 @@ namespace Coditech.API.Endpoint
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateSequenceNumber";
         public string CreateActivityListViewSequenceAsync() =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityListViewSequence";
+
+        public string GetActivityVerticalViewSequenceListAsync(int dBTMTestMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetActivityVerticalViewSequenceList?dBTMTestMasterId={dBTMTestMasterId}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
+        }
+        public string DeleteActivityVerticalViewSequenceAsync() =>
+                  $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DeleteActivityVerticalViewSequence";
+
+        public string GetActivityVerticalViewSequenceAsync(int dBTMTestParameterVerticalViewSequenceId) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetActivityVerticalViewSequence?dBTMTestParameterVerticalViewSequenceId={dBTMTestParameterVerticalViewSequenceId}";
+
+        public string UpdateActivityVerticalViewSequenceAsync() =>
+               $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateActivityVerticalViewSequence";
+        public string UpdateVerticalSequenceNumberAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateVerticalSequenceNumber";
+        public string CreateActivityVerticalViewSequenceAsync() =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityVerticalViewSequence";
     }
 }

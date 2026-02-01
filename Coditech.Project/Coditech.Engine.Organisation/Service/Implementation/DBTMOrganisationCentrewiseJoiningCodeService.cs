@@ -1,4 +1,5 @@
-﻿using Coditech.API.Data;
+﻿using ClosedXML.Excel;
+using Coditech.API.Data;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
@@ -7,12 +8,14 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
-    public class DBTMOrganisationCentrewiseJoiningCodeService : OrganisationCentrewiseJoiningCodeService
+    public class DBTMOrganisationCentrewiseJoiningCodeService : OrganisationCentrewiseJoiningCodeService, IDBTMOrganisationCentrewiseJoiningCodeService
     {
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         public DBTMOrganisationCentrewiseJoiningCodeService(ICoditechLogging coditechLogging, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IServiceProvider serviceProvider) : base(coditechLogging, coditechEmail, coditechSMS, coditechWhatsApp, serviceProvider)
@@ -66,6 +69,81 @@ namespace Coditech.API.Service
 
             _organisationCentrewiseJoiningCodeRepository.Insert(insertList, organisationCentrewiseJoiningCodeModel.CreatedBy);
             return organisationCentrewiseJoiningCodeModel;
+        }
+
+        //GetTraineeActiveJoiningCodeList
+        public List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode,string trainerId, int rows)
+        {
+            FilterCollection filters = new FilterCollection();
+            NameValueCollection sorts = new NameValueCollection {{ "a.JoiningCode", "ASC" }};
+            PageListModel pageListModel = new PageListModel(filters, sorts, 1, rows);
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
+            repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@JoiningCodeTypeEnumId", 324, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            return repo.ExecuteStoredProcedureList( "Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+        }
+
+        public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId, int rows)
+        {
+            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows).OrderBy(x => x.Custom2).ToList(); 
+            if (list == null || !list.Any())
+                return new DBTMOrganisationCentrewiseJoiningCodeModel();
+            string currentDir = Directory.GetCurrentDirectory();
+            string dataFolder = Path.Combine(currentDir, "data", "JoiningCodeForTrainee");
+            if (!Directory.Exists(dataFolder))
+                Directory.CreateDirectory(dataFolder);
+            string fileName = $"Trainee_JoiningCode_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            string filePath = Path.Combine(dataFolder, fileName);
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("TraineeJoiningCode");
+                worksheet.Cell(1, 1).Value = "Joining Code";
+                worksheet.Cell(1, 2).Value = "Trainer";
+                int row = 2;
+                foreach (var item in list)
+                {
+                    worksheet.Cell(row, 1).Value = item.JoiningCode;
+                    worksheet.Cell(row, 2).Value = item.Custom2;
+                    row++;
+                }
+                worksheet.Columns().AdjustToContents();
+                workbook.SaveAs(filePath);
+            }
+
+            DBTMOrganisationCentrewiseJoiningCodeModel model = new DBTMOrganisationCentrewiseJoiningCodeModel
+            {
+                FilePath = filePath,
+                FileName = fileName
+            };
+            return model;
+        }
+
+        // Delete Report File from Data folder
+        public bool DeleteOrganisationCentrewiseJoiningCodeFile(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return false;
+            try
+            {
+                string currentDir = Directory.GetCurrentDirectory();
+                string activityPath = Path.Combine(currentDir, "data", "JoiningCodeForTrainee", fileName);
+                if (File.Exists(activityPath))
+                {
+                    File.Delete(activityPath);
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

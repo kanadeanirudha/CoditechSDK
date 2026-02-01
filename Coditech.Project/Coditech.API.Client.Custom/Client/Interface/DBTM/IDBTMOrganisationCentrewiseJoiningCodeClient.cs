@@ -1,0 +1,17 @@
+﻿using Coditech.Common.API.Model;
+using Coditech.Common.API.Model.Response;
+using Coditech.Common.API.Model.Responses;
+using Coditech.Common.Helper.Utilities;
+namespace Coditech.API.Client
+{
+    public interface IDBTMOrganisationCentrewiseJoiningCodeClient : IBaseClient
+    {
+        /// <summary>
+        /// Get GetTraineeActiveJoiningCode by centreCode.
+        /// </summary>
+        /// <param name="centreCode">centreCode</param>
+        /// <returns>Returns DBTMOrganisationCentrewiseJoiningCodeResponse.</returns>
+        DBTMOrganisationCentrewiseJoiningCodeResponse GetTraineeActiveJoiningCode(string centreCode, string trainerId);
+        TrueFalseResponse DeleteJoiningCodeFile(ParameterModel body);
+    }
+}

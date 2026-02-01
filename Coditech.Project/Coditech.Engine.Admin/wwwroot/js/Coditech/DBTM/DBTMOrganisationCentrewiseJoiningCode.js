@@ -62,7 +62,10 @@
                     CoditechCommon.HideLodder();
                     $(document).trigger("DBTMTrainerListLoaded");
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to retrieve Trainee Details List", "error");
                     CoditechCommon.HideLodder();
                     $(document).trigger("DBTMTrainerListLoaded");
@@ -72,5 +75,19 @@
             $("#Custom1").html("");
             $(document).trigger("DBTMTrainerListLoaded");
         }
-    }
+    },
+    DownloadTraineeJoiningCode: function () {
+        var centreCode = $("#SelectedCentreCode").val();
+        if (!centreCode) {
+            CoditechNotification.DisplayNotificationMessage("Please select Centre.", "error");
+            return;
+        }
+        CoditechCommon.ShowLodder();
+        var downloadUrl = "/DBTMOrganisationCentrewiseJoiningCode/DownloadTraineeJoiningCode"
+            + "?centreCode=" + encodeURIComponent(centreCode);
+        $("#hiddenDownloader").attr("src", downloadUrl);
+        setTimeout(function () {
+            CoditechCommon.HideLodder();
+        }, 1500);
+    },
 };

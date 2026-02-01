@@ -274,6 +274,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<IGeneralBatchMasterService, DBTMGeneralBatchMasterService>();
             builder.Services.AddScoped<IDBTMBatchMasterService, DBTMGeneralBatchMasterService>();
             builder.Services.AddScoped<IOrganisationCentrewiseJoiningCodeService, DBTMOrganisationCentrewiseJoiningCodeService>();
+            builder.Services.AddScoped<IDBTMOrganisationCentrewiseJoiningCodeService, DBTMOrganisationCentrewiseJoiningCodeService>();
         }
     }
 }

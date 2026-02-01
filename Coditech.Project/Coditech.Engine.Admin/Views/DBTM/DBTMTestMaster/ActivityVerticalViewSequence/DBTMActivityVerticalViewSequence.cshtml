@@ -1,0 +1,167 @@
+﻿@model DBTMActivityVerticalViewSequenceViewModel
+@{
+    ViewBag.Title = Model.DBTMTestParameterVerticalViewSequenceId > 0 ? "Update Activity Vertical View Sequence" : "Add Activity Vertical View Sequence";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string css = Model.DBTMTestMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMTestMasterId", Model.DBTMTestMasterId.ToString());
+    DropdownViewModel displayOnDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DisplayOn.ToString(),
+                DropdownName = "DisplayOn",
+                DropdownSelectedValue = Model.DisplayOn.ToString(),
+                IsCustomDropdown = true
+            };
+    PageHeaderViewModel headerModel = new PageHeaderViewModel
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = Url.Action("ActivityVerticalViewSequenceList", controllerName, new { SelectedParameter1 = Model.DBTMTestMasterId.ToString() }),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
+}
+<!-- Page Content-->
+<div class="page-content">
+    <div class="container-fluid mt-5">
+        <div class="row">
+            @if (Model.DBTMTestMasterId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/DBTM/DBTMTestMaster/_DBTMActivityDetailsSidePannel.cshtml", keyValuePairs)
+                </div>
+            }
+            <div class="@css">
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
+                        {
+                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            @Html.HiddenFor(m => m.DBTMTestMasterId)
+                            @Html.HiddenFor(m => m.DBTMTestParameterVerticalViewSequenceId)
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ParameterCode, new { @class = "form-label required" })
+                                        @if (Model.DBTMTestParameterVerticalViewSequenceId > 0)
+                                        {
+                                            @Html.TextBoxFor(x => x.ParameterCode, new { @class = "form-control", @readonly = "readonly" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.ParameterCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        }
+                                        <span id="ParameterCodeError" class="text-danger" style="display:none;">The Parameter Code field is required.</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsCalculatedParameter, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsCalculatedParameter, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.Recursion, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.Recursion, new
+                                            {
+                                                @class = "form-control",
+                                                @type = "number",
+                                                @min = "0",
+                                                @max = "999",
+                                                @onkeypress = "return CoditechCommon.ValidNumeric()"
+                                            })
+                                        @Html.ValidationMessageFor(x => x.Recursion)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.SequenceNumber, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.SequenceNumber, new { @class = "form-control", @readonly = "readonly" })
+                                        @Html.ValidationMessageFor(x => x.SequenceNumber)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ColumnName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ColumnName, new { @class = "form-control" })
+                                        <span id="ColumnNameError" class="text-danger" style="display:none;">The Column Name field is required.</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.HelpText, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.HelpText, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.HelpText)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.DisplayOn, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", displayOnDropdown)
+                                        @Html.ValidationMessageFor(x => x.DisplayOn)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.ColumnCellColor, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.ColumnCellColor, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.ColumnCellColor)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.StaticValue, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.StaticValue, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
+                                        @Html.ValidationMessageFor(x => x.StaticValue)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsColumnCellBold, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsColumnCellBold, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#@headerModel.FormId").on("submit", function (e) {
+            var isValid = true;
+            var parameterCode = $("#ParameterCode").val().trim();
+            var columnName = $("#ColumnName").val().trim();
+
+            if (parameterCode === "") {
+                $("#ParameterCodeError").show();
+                isValid = false;
+            } else {
+                $("#ParameterCodeError").hide();
+            }
+             if (columnName === "") {
+                $("#ColumnNameError").show();
+                isValid = false;
+            } else {
+                $("#ColumnNameError").hide();
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+

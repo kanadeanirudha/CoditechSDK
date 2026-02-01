@@ -16,24 +16,24 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "X Parameter")]
         public string XParameter { get; set; }
         [Required]
-        [Display(Name = "X ParameterBasedOn")]
+        [Display(Name = "X Parameter Based On")]
         public string XParameterBasedOn { get; set; }
         [Required]
-        [Display(Name = "Is YParameterCalculated")]
+        [Display(Name = "Is Y Parameter Calculated")]
         public bool IsYParameterCalculated { get; set; }
         [Required]
         [Display(Name = "Y Parameter")]
         public string YParameter { get; set; }
         [Required]
-        [Display(Name = "Y ParameterBasedOn")]
+        [Display(Name = "Y Parameter Based On")]
         public string YParameterBasedOn { get; set; }
         [Required]
-        [Display(Name = "X AxixLabel")]
+        [Display(Name = "X Axis Label")]
         public string XAxixLabel { get; set; }
         [Required]
-        [Display(Name = "Y AxixLabel")]
+        [Display(Name = "Y Axis Label")]
         public string YAxixLabel { get; set; }
-        [Display(Name = "Test Name")]
+        [Display(Name = "Activity Name")]
         public string TestCode { get; set; }
         [Required]
         [Display(Name = "Graph Type")]
@@ -47,6 +47,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Order By")]
         public short OrderBy { get; set; }
+        [Required(ErrorMessage = "Graph Size is required")]
         [Display(Name = "Graph Size")]
         public string GraphSize { get; set; }
         public List<string> DBTMSelectedGraph { get; set; }

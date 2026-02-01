@@ -44,9 +44,14 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/TestWiseGraphReportsV2?dBTMTestMasterId={dBTMTestMasterId}&dBTMTraineeDetailId={dBTMTraineeDetailId}&dBTMGraphMasterIds={dBTMGraphMasterIds}&graphMode={graphMode}&fromDate={fromDate}&toDate={toDate}&entityId={entityId}&userType={userType}&centreCode={centreCode}";
             return endpoint;
         }
-        public string GetActivityPerformedDatesAsync(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public string GetActivityPerformedDatesAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityPerformedDates?dBTMTestMasterId={dBTMTestMasterId}&dBTMTraineeDetailId={dBTMTraineeDetailId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMTraineeDetailId={dBTMTraineeDetailId}";
+            return endpoint;
+        }
+        public string GetActivityVerticalDetailsAsync(long dBTMDeviceDataId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityVerticalDetails?dBTMDeviceDataId={dBTMDeviceDataId}";
             return endpoint;
         }
     }

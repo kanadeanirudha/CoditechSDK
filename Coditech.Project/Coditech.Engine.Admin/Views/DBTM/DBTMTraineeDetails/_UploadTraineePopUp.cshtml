@@ -1,0 +1,60 @@
+﻿@{
+    Layout = null;
+}
+<div class="modal-header">
+    <h5 class="modal-title">Upload Trainee</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <div id="stepDownload">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <button type="button"
+                        class="btn btn-warning btn-sm warning-bg"
+                        onclick="DBTMTraineeDetails.DownloadTemplatePopup()">
+                    Download Template
+                </button>
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="stepUpload">
+        <div class="row align-items-end mb-3">
+            <div class="col-md-8">
+                <label class="form-label fw-semibold"></label>
+                <input type="file"
+                       id="TraineeFile"
+                       class="form-control"
+                       accept=".csv,.xlsx" />
+            </div>
+
+            <div class="col-md-4">
+                <button type="button"
+                        class="btn btn-success mt-2"
+                        onclick="DBTMTraineeDetails.UploadTraineeFile()">
+                    Upload File
+                </button>
+            </div>
+        </div>
+        <h6 id="ErrorHeader"
+            class="text-danger mb-2"
+            style="display:none;">
+            Data Correction Required
+        </h6>
+        <div id="UploadErrorTableContainer"
+             class="table-responsive"
+             style="max-height:350px;">
+        </div>
+    </div>
+</div>
+<style>
+    .warning-bg {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #fff !important;
+    }
+</style>

@@ -16,7 +16,10 @@
                 success: function (result) {
                     $("#DataTablesDivId").html(result);
                 },
-                error: function () {
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
                     CoditechNotification.DisplayNotificationMessage("Failed to load list.", "error");
                 }
             });

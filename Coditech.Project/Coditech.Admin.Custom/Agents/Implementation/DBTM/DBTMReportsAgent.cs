@@ -95,6 +95,23 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
+        //Vertical Popup Details
+        public virtual DBTMReportVerticalDataViewModel GetActivityVerticalDetails(long dBTMDeviceDataId)
+        {
+            if (dBTMDeviceDataId <= 0)
+                return new DBTMReportVerticalDataViewModel();
+            try
+            {
+                DBTMReportVerticalDataResponse response =  _dBTMReportsClient.GetActivityVerticalDetails(dBTMDeviceDataId);
+                return response?.DBTMReportVerticalDataModel.ToViewModel<DBTMReportVerticalDataViewModel>();
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage( ex, "GetActivityVerticalDetails", TraceLevel.Error);
+                return new DBTMReportVerticalDataViewModel();
+            }
+        }
+
         //Test Wise Reports File
         public virtual DBTMReportsListViewModel TestWiseMultipleReportsFile(string dBTMTestMasterIds, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate, string ReportType)
         {
@@ -183,9 +200,9 @@ namespace Coditech.Admin.Agents
             }
             return graphModel;
         }
-        public virtual List<DateTime> GetActivityPerformedDates(int dBTMTestMasterId, long dBTMTraineeDetailId)
+        public virtual List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterId, dBTMTraineeDetailId);
+            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
 
             if (dateStrings == null || !dateStrings.Any())
                 return new List<DateTime>();
