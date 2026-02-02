@@ -16,5 +16,6 @@ namespace Coditech.API.Service
         string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId);
         bool InsertDeviceDataViaFile(IFormFile file);
         DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds);
+        DBTMTestListModel GetactivitiesBytrainee(long selectedTraineeId);
     }
 }
