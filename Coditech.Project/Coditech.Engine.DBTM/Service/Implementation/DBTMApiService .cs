@@ -360,9 +360,9 @@ namespace Coditech.API.Service
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMTestModel> objStoredProc = new CoditechViewRepository<DBTMTestModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@DBTMTraineeDetailId", selectedTraineeId, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@DBTMTraineeDetailId", selectedTraineeId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTestModel> dBTMTestList = objStoredProc.ExecuteStoredProcedureList("[Coditech_GetActivityListByTraineeDetailId @DBTMTraineeDetailId,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMTestModel> dBTMTestList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetActivityListByTraineeDetailId @DBTMTraineeDetailId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
             DBTMTestListModel listModel = new DBTMTestListModel();
 
             listModel.DBTMTestList = dBTMTestList?.Count > 0 ? dBTMTestList : new List<DBTMTestModel>();
