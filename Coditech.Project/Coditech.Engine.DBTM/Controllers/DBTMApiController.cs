@@ -281,5 +281,29 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/dbtmapi/Getactivitiesbytrainee")]
+        [Produces(typeof(DBTMTestListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetactivitiesBytrainee(long selectedTraineeId)
+        {
+            try
+            {
+                DBTMTestListModel list = _dBTMApiService.GetactivitiesBytrainee(selectedTraineeId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
