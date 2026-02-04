@@ -319,7 +319,7 @@ namespace Coditech.API.Service
                         lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
                         performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
                         previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => x.ParameterValue);
-                        if (lastRecordSum < previousResordSum)
+                        if (lastRecordSum > previousResordSum)
                         {
                             performanceModel.IsUp = false;
                         }
