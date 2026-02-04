@@ -7,7 +7,6 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
-using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -354,6 +353,20 @@ namespace Coditech.API.Service
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
 
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
+            return listModel;
+        }
+        public DBTMTestListModel GetactivitiesBytrainee(long selectedTraineeId)
+        {
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTestModel> objStoredProc = new CoditechViewRepository<DBTMTestModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTraineeDetailId", selectedTraineeId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTestModel> dBTMTestList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetActivityListByTraineeDetailId @DBTMTraineeDetailId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            DBTMTestListModel listModel = new DBTMTestListModel();
+
+            listModel.DBTMTestList = dBTMTestList?.Count > 0 ? dBTMTestList : new List<DBTMTestModel>();
+            listModel.BindPageListModel(pageListModel);
             return listModel;
         }
         public string GetJoiningCode(string generalTrainerMasterId)
