@@ -42,9 +42,9 @@ namespace Coditech.API.Endpoint
         {
             return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/UploadTrainee";
         }
-        public string DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count)
+        public string DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count, long entityId)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/DownloadTraineeUploadTemplate?centreCode={centreCode}&trainerId={trainerId}&userType={userType}&count={count}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/DownloadTraineeUploadTemplate?centreCode={centreCode}&trainerId={trainerId}&userType={userType}&count={count}&entityId={entityId}";
             return endpoint;
         }
     }

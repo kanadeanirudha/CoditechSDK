@@ -426,13 +426,13 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-        public virtual DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode,long trainerId, string userType, int count)
+        public virtual DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode,long trainerId, string userType, int count, long entityId)
         {
-            return Task.Run(async () => await DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count,  entityId, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMTraineeUploadResponse> DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeUploadResponse> DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count, long entityId,CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTraineeDetailsEndpoint.DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count);
+            string endpoint = dBTMTraineeDetailsEndpoint.DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count, entityId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

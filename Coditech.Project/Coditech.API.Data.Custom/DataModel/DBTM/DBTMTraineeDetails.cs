@@ -20,6 +20,7 @@ namespace Coditech.API.Data
         public decimal Height { get; set; }
         public int? SpecializationEnumId { get; set; }
         public string SchoolName { get; set; }
+        public string AgeGroup { get; set; }
         public string Standard { get; set; }
         public string Section { get; set; }
         public Nullable<long> CreatedBy { get; set; }

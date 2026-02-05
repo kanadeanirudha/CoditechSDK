@@ -33,6 +33,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechRepository<DBTMSubscriptionPlanAssociatedToUser> _dBTMSubscriptionPlanAssociatedToUserRepository;
         private readonly IDBTMOrganisationCentrewiseJoiningCodeService _joiningCodeService;
         private readonly ICoditechRepository<GeneralTemplateHeaderConfiguration> _generalTemplateHeaderConfigurationRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -51,6 +52,7 @@ namespace Coditech.API.Service
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _joiningCodeService = joiningCodeService;
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public override UserModel Login(UserLoginModel userLoginModel)
@@ -150,6 +152,8 @@ namespace Coditech.API.Service
                 UserType = generalPersonModel.UserType,
                 Height = dBTMCustomNewRegistrationModel.height,
                 Weight = dBTMCustomNewRegistrationModel.weight,
+                SchoolName = dBTMCustomNewRegistrationModel.SchoolName,
+                AgeGroup = dBTMCustomNewRegistrationModel.AgeGroup,
                 IsActive = true,
                 SpecializationEnumId = dBTMCustomNewRegistrationModel.SpecializationEnumId
             };
@@ -314,12 +318,12 @@ namespace Coditech.API.Service
         {
             return new CoditechRepository<GeneralTemplateMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.TemplateCode == templateCode).Select(x => x.GeneralTemplateMasterId).FirstOrDefault();
         }
-        public DBTMTraineeUploadModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count)
+        public DBTMTraineeUploadModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId)
         {
             // Get joining codes
             string trainerIdStr = trainerId > 0 ? trainerId.ToString() : null;
             var joiningCodeModels = _joiningCodeService.GetTraineeActiveJoiningCodeList(centreCode, trainerIdStr, count);
-            var joiningCodes = joiningCodeModels.Select(x => x.JoiningCode).Take(count).ToList();
+            var joiningCodes = joiningCodeModels.Take(count).ToList();
             if (joiningCodes.Count < count)
             {
                 return new DBTMTraineeUploadModel
@@ -328,6 +332,21 @@ namespace Coditech.API.Service
                     ErrorMessage = $"Insufficient joining codes. Available: {joiningCodes.Count}"
                 };
             }
+            var trainerIds = joiningCodes.Where(x => !string.IsNullOrEmpty(x.Custom1)).Select(x => Convert.ToInt64(x.Custom1)).ToHashSet();
+            var batchList = _generalBatchRepository.Table.Join(_userMasterRepository.Table,
+                gbm => gbm.CreatedBy,
+                um => um.UserMasterId,
+                (gbm, um) => new { gbm, um }).Join(_generalTrainerMasterRepository.Table,
+                temp => temp.um.EntityId,
+                gtm => gtm.EmployeeId,
+                (temp, gtm) => new
+                {
+                    gtm.GeneralTrainerMasterId,
+                    temp.gbm.BatchName,
+                    temp.gbm.GeneralBatchMasterId
+                })
+                .Where(x => trainerIds.Contains(x.GeneralTrainerMasterId) && x.BatchName != null).GroupBy(x => x.GeneralTrainerMasterId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.BatchName).Distinct().ToList());
             // Get template
             int templateId = GetTemplateIdByCode("Trainee");
             if (templateId <= 0)
@@ -355,11 +374,19 @@ namespace Coditech.API.Service
             string dataFolder = Path.Combine(currentDir, "data", "TraineeUploadTemplate");
             if (!Directory.Exists(dataFolder))
                 Directory.CreateDirectory(dataFolder);
-            string trainerNameRaw = joiningCodeModels.FirstOrDefault()?.Custom2 ?? "Trainer";
-            string trainerName = trainerNameRaw.Trim().Replace(" ", "_");  
-            string fileName = $"TraineeUploadTemplate_{centreCode}_{trainerName}.xlsx";
+            string fileUserName = "TraineeTemplate";
+            if (userType == CustomConstants.DBTMCentreOwner)
+            {
+                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
+            }
+            else
+            {
+                fileUserName = joiningCodeModels.FirstOrDefault()?.Custom2 ?? "Trainer";
+            }
+            fileUserName = fileUserName.Replace(" ", "_");
+            string fileName = $"TraineeUploadTemplate_{centreCode}_{fileUserName}.xlsx";
             string filePath = Path.Combine(dataFolder, fileName);
-            GenerateTraineeTemplateExcel(template, joiningCodes, filePath);
+            GenerateTraineeTemplateExcel(template, joiningCodes, batchList, filePath);
             return new DBTMTraineeUploadModel
             {
                 FilePath = filePath,
@@ -375,7 +402,7 @@ namespace Coditech.API.Service
             DBTMTraineeUploadModel table;
             if (extension == ".xlsx" || extension == ".xls")
             {
-                table = ExcelToListModel(file);   
+                table = ExcelToListModel(file);
             }
             else
             {
@@ -408,13 +435,14 @@ namespace Coditech.API.Service
             dt.Columns["ErrorMessage"].SetOrdinal(1);
             List<string> joiningCodes = dt.AsEnumerable().Select(r => r["JoiningCode"]?.ToString()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             var joiningCodeList = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => joiningCodes.Contains(x.JoiningCode)).ToList();
+            var joiningTrainerMap = joiningCodeList.ToDictionary(x => x.JoiningCode, x => Convert.ToInt64(x.Custom1));
             // Validation
             int sr = 2;
             bool hasAnyError = false;
             foreach (DataRow row in dt.Rows)
             {
                 row["SrNo"] = sr++;
-                if (!ValidateRow(row, joiningCodeList, out string error))
+                if (!ValidateRow(row, joiningCodeList, joiningTrainerMap, out string error))
                 {
                     row["ErrorMessage"] = error;
                     hasAnyError = true;
@@ -424,40 +452,48 @@ namespace Coditech.API.Service
                     row["ErrorMessage"] = null;
                 }
             }
+            int success = 0;
             if (hasAnyError)
             {
                 DataTable failedTable = BuildFailedTable(dt);
-                return new DBTMTraineeUploadModel
-                {
-                    TotalRecords = dt.Rows.Count,
-                    SuccessCount = 0,
-                    FailedCount = failedTable.Rows.Count,
-                    FailedRows = ToList(failedTable)
-                };
+                return BuildUploadResult(dt, 0, failedTable);
             }
             // Insert
-            int success = 0;
             foreach (DataRow row in dt.Rows)
             {
-                InsertTrainee(row);
-                success++;
+                if (!InsertTrainee(row, joiningTrainerMap, out string err))
+                {
+                    row["ErrorMessage"] = err;
+                }
+                else
+                {
+                    success++;
+                }
             }
-            DataTable finalFailed = BuildFailedTable(dt);
+            if (success != dt.Rows.Count)
+            {
+                DataTable failedTable = BuildFailedTable(dt);
+                return BuildUploadResult(dt, success, failedTable);
+            }
+            return BuildUploadResult(dt, success);
+        }
+
+        private DBTMTraineeUploadModel BuildUploadResult(DataTable dt, int success, DataTable failedTable = null)
+        {
             return new DBTMTraineeUploadModel
             {
                 TotalRecords = dt.Rows.Count,
                 SuccessCount = success,
-                FailedCount = finalFailed.Rows.Count,
-                FailedRows = ToList(finalFailed),
-                Data = ToList(dt)
+                FailedCount = failedTable?.Rows.Count ?? 0,
+                FailedRows = failedTable != null ? ToList(failedTable) : null,
+                Data = failedTable == null ? ToList(dt) : null
             };
         }
 
         // Validation 
-        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, out string errorMessage)
+        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, out string errorMessage)
         {
             List<string> errors = new List<string>();
-
             string joiningCode = row["JoiningCode"]?.ToString();
             string title = row["TraineeTitle"]?.ToString();
             string firstName = row["FirstName"]?.ToString();
@@ -561,6 +597,11 @@ namespace Coditech.API.Service
                     errors.Add("Gender is invalid");
                 }
             }
+            if (string.IsNullOrWhiteSpace(row["School/College/Club"]?.ToString()))
+                errors.Add("School is empty");
+
+            if (string.IsNullOrWhiteSpace(row["AgeGroup"]?.ToString()))
+                errors.Add("AgeGroup is empty");
             if (!string.IsNullOrWhiteSpace(joiningCode))
             {
                 OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = joiningCodeList.FirstOrDefault(x =>
@@ -586,16 +627,41 @@ namespace Coditech.API.Service
         }
 
         //Insert Trainee 
-        private void InsertTrainee(DataRow row)
+        private bool InsertTrainee(DataRow row, Dictionary<string, long> joiningTrainerMap, out string error)
         {
-            var rawCallingCode = row.Table.Columns.Contains("CallingCode") ? row["CallingCode"]?.ToString(): null;
+            error = null;
+            var rawCallingCode = row.Table.Columns.Contains("CallingCode") ? row["CallingCode"]?.ToString() : null;
+            string schoolName = row.Table.Columns.Contains("School/College/Club") ? row["School/College/Club"]?.ToString() : null;
+            string ageGroup = row.Table.Columns.Contains("AgeGroup") ? row["AgeGroup"]?.ToString() : null;
+            string batchName = row.Table.Columns.Contains("BatchName") ? row["BatchName"]?.ToString() : null;
+            int batchId = 0;
+            if (!string.IsNullOrWhiteSpace(batchName))
+            {
+                string joiningCode = row["JoiningCode"]?.ToString();
+                long trainerMasterId = joiningTrainerMap[joiningCode];
+                batchId = (from gbm in _generalBatchRepository.Table
+                           join um in _userMasterRepository.Table
+                               on gbm.CreatedBy equals um.UserMasterId
+                           join gtm in _generalTrainerMasterRepository.Table
+                               on um.EntityId equals gtm.EmployeeId
+                           where gtm.GeneralTrainerMasterId == trainerMasterId && gbm.BatchName == batchName && gbm.IsActive
+                           select gbm.GeneralBatchMasterId
+                          ).FirstOrDefault();
+                if (batchId == 0)
+                {
+                    error = $"Batch '{batchName}' is not assigned to this trainer.";
+                    return false;
+                }
+            }
             DBTMCustomNewRegistrationModel customModel = new DBTMCustomNewRegistrationModel
             {
                 JoiningCode = row["JoiningCode"].ToString(),
                 height = Convert.ToDecimal(row["HeightCm"]),
                 weight = Convert.ToDecimal(row["WeightKg"]),
                 SpecializationEnumId = GetEnumIdByEnumCode(row["Specialization"]?.ToString(), DropdownCustomTypeEnum.TraineeSpecialization.ToString()),
-                GeneralBatchMasterId = 0,
+                GeneralBatchMasterId = batchId,
+                SchoolName = schoolName,
+                AgeGroup = ageGroup,
                 GeneralTraineeAssociatedToTrainerIds = new List<string>()
             };
             GeneralPersonModel model = new GeneralPersonModel
@@ -612,6 +678,7 @@ namespace Coditech.API.Service
                 Custom1 = JsonConvert.SerializeObject(customModel)
             };
             DBTMRegisterTrainee(model);
+            return true;
         }
         private DataTable BuildFailedTable(DataTable source)
         {
@@ -650,7 +717,7 @@ namespace Coditech.API.Service
                 return false;
             }
             return true;
-        }      
+        }
         private DBTMTraineeUploadModel ExcelToListModel(IFormFile file)
         {
             var result = new DBTMTraineeUploadModel();
@@ -693,14 +760,14 @@ namespace Coditech.API.Service
         }
 
         //GenerateTraineeTemplateExcel
-        private void GenerateTraineeTemplateExcel(GeneralTemplateModel template, List<string> joiningCodes, string filePath)
+        private void GenerateTraineeTemplateExcel(GeneralTemplateModel template, List<OrganisationCentrewiseJoiningCodeModel> joiningCodes, Dictionary<long, List<string>> batchList, string filePath)
         {
             using var workbook = new XLWorkbook();
-            var sheet = workbook.Worksheets.Add("Trainee Template");
+            var sheet = workbook.Worksheets.Add("Upload Trainee");
             var lookupSheet = workbook.Worksheets.Add("Lookups");
             lookupSheet.Visibility = XLWorksheetVisibility.Hidden;
             var headerGroupCodeMap = new Dictionary<string, string>();
-            foreach (var header in template.HeaderConfigurationList.Where(x => x.HeaderType == "Dropdown"))
+            foreach (var header in template.HeaderConfigurationList.Where(x => x.HeaderType == CustomConstants.Dropdown))
             {
                 if (!headerGroupCodeMap.ContainsKey(header.HeaderName))
                 {
@@ -714,6 +781,32 @@ namespace Coditech.API.Service
             {
                 sheet.Cell(1, col).Value = header.HeaderName;
                 sheet.Cell(1, col).Style.Font.Bold = true;
+                if (header.HeaderName == "BatchName" && batchList.Any())
+                {
+                    for (int row = 0; row < joiningCodes.Count; row++)
+                    {
+                        if (string.IsNullOrEmpty(joiningCodes[row].Custom1))
+                            continue;
+                        long trainerId = Convert.ToInt64(joiningCodes[row].Custom1);
+                        if (!batchList.ContainsKey(trainerId))
+                            continue;
+                        var batches = batchList[trainerId];
+                        int startRow = 1;
+                        for (int i = 0; i < batches.Count; i++)
+                        {
+                            lookupSheet.Cell(startRow + i, lookupCol).Value = batches[i];
+                        }
+                        var range = lookupSheet.Range(
+                            lookupSheet.Cell(startRow, lookupCol),
+                            lookupSheet.Cell(startRow + batches.Count - 1, lookupCol)
+                        );
+                        var validation = sheet.Cell(row + 2, col).CreateDataValidation();
+                        validation.IgnoreBlanks = true;
+                        validation.InCellDropdown = true;
+                        validation.List(range, true);
+                        lookupCol++;
+                    }
+                }
                 if (header.HeaderName == "DateOfBirth")
                 {
                     for (int row = 2; row <= joiningCodes.Count + 1; row++)
@@ -750,9 +843,27 @@ namespace Coditech.API.Service
                 }
                 col++;
             }
-            for (int i = 0; i < joiningCodes.Count; i++)
+            var headersOrdered = template.HeaderConfigurationList.OrderBy(x => x.OrderBy).ToList();
+            for (int row = 0; row < joiningCodes.Count; row++)
             {
-                sheet.Cell(i + 2, 1).Value = joiningCodes[i];
+                var code = joiningCodes[row];
+                for (int colIndex = 0; colIndex < headersOrdered.Count; colIndex++)
+                {
+                    var header = headersOrdered[colIndex].HeaderName;
+
+                    var cell = sheet.Cell(row + 2, colIndex + 1);
+
+                    switch (header)
+                    {
+                        case "JoiningCode":
+                            cell.Value = code.JoiningCode;
+                            break;
+
+                        case "TrainerName":
+                            cell.Value = code.Custom2;
+                            break;
+                    }
+                }
             }
             sheet.Columns().AdjustToContents();
             workbook.SaveAs(filePath);

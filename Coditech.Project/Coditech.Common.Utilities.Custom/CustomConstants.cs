@@ -51,6 +51,7 @@
         public const string StaticValue = "StaticValue";
         public const string InstantaneousChart = "InstantaneousChart";
         public const string ProgressChart = "ProgressChart";
+        public const string Dropdown = "Dropdown";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

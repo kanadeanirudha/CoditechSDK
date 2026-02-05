@@ -50,11 +50,11 @@ namespace Coditech.API.Controllers
         [Route("/DBTMUser/DownloadTraineeUploadTemplate")]
         [Produces(typeof(DBTMTraineeUploadResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count)
+        public virtual IActionResult DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId)
         {
             try
             {
-                DBTMTraineeUploadModel list = _dbtmUserService.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count);
+                DBTMTraineeUploadModel list = _dbtmUserService.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count, entityId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeUploadResponse>(data) : CreateNoContentResponse();
             }
