@@ -8,11 +8,8 @@
 <div class="modal-body">
     <div class="mb-3">
         <label class="form-label required">Number of Trainees</label>
-        <input type="number" id="TraineeCount" class="form-control" min="1" max="999" onkeypress="return CoditechCommon.ValidNumeric()" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter number of trainees" />
-        <span class="text-danger field-validation-valid"
-              data-valmsg-for="TraineeCount"
-              data-valmsg-replace="true">
-        </span>
+        <input type="text" id="TraineeCount" class="form-control" maxlength="3" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/\D/g,'').slice(0,3)" placeholder="Enter number of trainees" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="TraineeCount" data-valmsg-replace="true"></span>
     </div>
 </div>
 <div class="modal-footer">

@@ -302,11 +302,12 @@
     ConfirmDownloadTemplate: function () {
         var count = $("#TraineeCount").val();
         clearFieldError("TraineeCount");
-        if (!count || isNaN(count) || parseInt(count) <= 0) {
-            showFieldError("TraineeCount", "Please enter a valid number of trainees.");
+        count = parseInt(count, 10);
+        if (!count || isNaN(count) || count < 1 || count > 999) {
+            showFieldError("TraineeCount", "Please enter a number between 1 and 999.");
             return;
         }
-        DBTMTraineeDetails.CheckAndDownloadTemplate(parseInt(count));
+        DBTMTraineeDetails.CheckAndDownloadTemplate(count);
     },
     CheckAndDownloadTemplate: function (count) {
 
