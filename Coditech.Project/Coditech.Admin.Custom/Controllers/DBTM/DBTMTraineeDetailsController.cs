@@ -638,7 +638,8 @@ namespace Coditech.Admin.Controllers
             {
                 return Json(new{ success = false, message = "Data correction required.", failedRows = result.FailedRows});
             }
-            return Json(new { success = true, message = "Trainee uploaded successfully."});
+            SetNotificationMessage(GetSuccessNotificationMessage("Trainee uploaded successfully."));
+            return Json(new { success = true });
         }
 
         //Download Trainee Template
