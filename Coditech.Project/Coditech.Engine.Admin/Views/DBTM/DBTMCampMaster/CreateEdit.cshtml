@@ -88,13 +88,18 @@
 @section scripts {
     <script type="text/javascript">
         $(document).ready(function () {
-
+        var today = new Date();
+        var maxFutureDate = new Date(
+            today.getFullYear() + 10,
+            today.getMonth(),
+            today.getDate()
+        );
             $("#CampStartDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 minDate: 0,
-                maxDate: new Date(2035, 11, 31),
+                maxDate: maxFutureDate,
                 onSelect: function () {
                     var startDate = $(this).datepicker("getDate");
                     $("#CampEndDate").datepicker("option", "minDate", startDate);
@@ -111,7 +116,7 @@
                 changeYear: true,
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 minDate: 0,
-                maxDate: new Date(2035, 11, 31)
+                maxDate: maxFutureDate
             });
 
             $('form').submit(function (e) {

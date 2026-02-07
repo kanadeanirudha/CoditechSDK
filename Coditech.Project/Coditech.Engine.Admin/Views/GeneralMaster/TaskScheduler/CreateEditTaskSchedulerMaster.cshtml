@@ -150,8 +150,14 @@
             }
         }
 
-                $(document).ready(function () {
-            updateStartDateTimeVisibility(); // Set initial visibility
+        $(document).ready(function () {
+        var today = new Date();
+        var maxFutureDate = new Date(
+            today.getFullYear() + 10,
+            today.getMonth(),
+            today.getDate()
+        );
+            updateStartDateTimeVisibility(); 
 
             $("#SchedulerFrequency").change(function () {
                 updateStartDateTimeVisibility();
@@ -164,9 +170,9 @@
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 language: "en",
                 autoSize: true,
-                yearRange: "2022:2035",
+                yearRange: maxFutureDate,
                 minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31)
+                maxDate: maxFutureDate
             });
 
             $("form").submit(function (event) {
