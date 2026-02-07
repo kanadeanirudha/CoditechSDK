@@ -8,44 +8,24 @@
 <div class="modal-body">
     <div id="stepDownload">
         <div class="row mb-4">
-            <div class="col-md-12">
-                <button type="button"
-                        class="btn btn-warning btn-sm warning-bg"
-                        onclick="DBTMTraineeDetails.DownloadTemplatePopup()">
-                    Download Template
-                </button>
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-                    Cancel
-                </button>
+            <div class="col-md-12 d-flex gap-3">
+                <button type="button" class="btn btn-warning btn-sm warning-bg" onclick="DBTMTraineeDetails.DownloadTemplatePopup()"> Download Template </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancel </button>
             </div>
         </div>
     </div>
     <div id="stepUpload">
-        <div class="row align-items-end mb-3">
+        <div class="row align-items-center">
             <div class="col-md-8">
-                <label class="form-label fw-semibold"></label>
                 <input type="file" id="TraineeFile" class="form-control" accept=".csv,.xlsx" />
-                <div id="UploadFileValidationMsg" class="text-danger mt-1" style="font-size:13px;"></div>
             </div>
             <div class="col-md-4">
-                <button type="button"
-                        class="btn btn-success mt-2"
-                        onclick="DBTMTraineeDetails.UploadTraineeFile()">
-                    Upload File
-                </button>
+                <button type="button" class="btn btn-success" onclick="DBTMTraineeDetails.UploadTraineeFile()"> Upload File </button>
             </div>
         </div>
-        <h6 id="ErrorHeader"
-            class="text-danger mb-2"
-            style="display:none;">
-            Data Correction Required
-        </h6>
-        <div id="UploadErrorTableContainer"
-             class="table-responsive"
-             style="max-height:350px;">
-        </div>
+        <div id="UploadFileValidationMsg" class="text-danger mt-1 mb-3" style="font-size:13px;"></div>
+        <h6 id="ErrorHeader" class="text-danger mb-2" style="display:none;"> Data Correction Required </h6>
+        <div id="UploadErrorTableContainer" class="table-responsive" style="max-height:350px;"></div>
     </div>
 </div>
 <style>
