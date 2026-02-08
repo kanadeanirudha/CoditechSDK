@@ -11,7 +11,6 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using System.Collections.Specialized;
 using System.Data;
-using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -304,7 +303,7 @@ namespace Coditech.API.Service
                     performanceModel.TestName = list.FirstOrDefault().TestName;
                     performanceModel.PerformanceMatrix = list.FirstOrDefault().PerformanceMatrix;
                     decimal lastRecordSum, previousResordSum;
-                    if (list.Any(x => x.ParameterCode == CustomConstants.Count))
+                    if (list.Any(x => x.ParameterCode == CustomConstants.Count && (x.TestCode != CustomConstants.PlateTapTest)))
                     {
                         lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Count).Sum(x => x.ParameterValue);
                         performanceModel.Score = $"{Convert.ToUInt32(lastRecordSum)} {DBTMCustomHelper.Unit(CustomConstants.Count)} (Total Count)";
@@ -329,6 +328,16 @@ namespace Coditech.API.Service
                         lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => x.ParameterValue);
                         performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
                         previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => x.ParameterValue);
+                        if (lastRecordSum < previousResordSum)
+                        {
+                            performanceModel.IsUp = false;
+                        }
+                    }
+                    if (list.Any(x => x.ParameterCode == CustomConstants.JumpLength))
+                    {
+                        lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpLength).Sum(x => x.ParameterValue);
+                        performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpLength)} (Jump Length)";
+                        previousResordSum = traineeProfilePerformanceList.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpLength && x.RowNumber == 2).Sum(x => x.ParameterValue);
                         if (lastRecordSum < previousResordSum)
                         {
                             performanceModel.IsUp = false;
