@@ -19,7 +19,7 @@
             };
     ModelPopUpViewModel traineePopup = new ModelPopUpViewModel() { ModelPopUpId = "TraineePopupId", ModalContentId = "TraineeContentId", PopUpSize = PopUpSizeEnum.Large };
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
-    ModelPopUpViewModel downloadTemplatePopup = new ModelPopUpViewModel { ModelPopUpId = "DownloadTemplatePopupId", ModalContentId = "DownloadTemplateContentId"};
+    ModelPopUpViewModel downloadTemplatePopup = new ModelPopUpViewModel { ModelPopUpId = "DownloadTemplatePopupId", ModalContentId = "DownloadTemplateContentId" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -89,6 +89,22 @@
         </div>
     </div>
 </div>
+<style>
+    .stack-blur {
+        filter: blur(4px);
+        pointer-events: none;
+    }
+    #notificationDivId {
+        position: fixed;
+        z-index: 9999;
+    }
+    .spinner,
+    .coditech-loader,
+    #divLodder {
+        position: fixed !important;
+        z-index: 99999 !important;
+    }
+</style>
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", traineePopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", downloadTemplatePopup)

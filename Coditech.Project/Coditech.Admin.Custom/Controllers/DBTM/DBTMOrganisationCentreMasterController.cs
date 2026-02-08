@@ -8,10 +8,12 @@ namespace Coditech.Admin.Controllers
     public class DBTMOrganisationCentreMasterController : BaseController
     {
         private readonly IDBTMOrganisationCentreAgent _dBTMOrganisationCentreAgent;
+        private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
 
-        public DBTMOrganisationCentreMasterController(IDBTMOrganisationCentreAgent dBTMOrganisationCentreAgent)
+        public DBTMOrganisationCentreMasterController(IDBTMOrganisationCentreAgent dBTMOrganisationCentreAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent)
         {
             _dBTMOrganisationCentreAgent = dBTMOrganisationCentreAgent;
+            _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
         }
         // Get Activity List View Sequence
         public virtual ActionResult ActivityListViewSequenceList(int organisationCentreId, DataTableViewModel dataTableViewModel)
@@ -26,7 +28,7 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetActivityListViewEditPopup( int dBTMTestParameterListViewSequenceId, string testName, string centreCode)
+        public ActionResult GetActivityListViewEditPopup(int dBTMTestParameterListViewSequenceId, string testName, string centreCode)
         {
             DBTMCentrewiseTestParameterListViewViewModel model = _dBTMOrganisationCentreAgent.GetDBTMCentrewiseTestParameterListView(dBTMTestParameterListViewSequenceId, centreCode);
             model.TestName = testName;
@@ -43,13 +45,48 @@ namespace Coditech.Admin.Controllers
                 if (!response.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                    return Json(new { success = true, centreCode = dBTMTestViewModel.CentreCode});
+                    return Json(new { success = true, centreCode = dBTMTestViewModel.CentreCode });
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
-            return Json(new { success = false, centreCode = dBTMTestViewModel.CentreCode});
+            return Json(new { success = false, centreCode = dBTMTestViewModel.CentreCode });
         }
 
+        // Centre Registration
+        [HttpGet]
+        public IActionResult DBTMCentreRegistration()
+        {
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+            {
+                IsAdminMode = true
+            };
+            return View("~/Views/DBTM/DBTMOrganisationCentreMaster/DBTMCentreRegistration.cshtml", dBTMNewRegistrationViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DBTMCentreRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
+        {
+            ModelState.Remove("Password");
+            ModelState.Remove("ConfirmPassword");
+            ModelState.Remove("CentreCode");
+            ModelState.Remove("TrainerSpecializationEnumId");
+            ModelState.Remove("DateOfBirth");
+            ModelState.Remove("SpecializationEnumId");
+            ModelState.Remove("SelectedTrainer");
+            dBTMNewRegistrationViewModel.IsAdminMode = true;
+            if (ModelState.IsValid)
+            {
+                dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.DBTMCentreRegistration(dBTMNewRegistrationViewModel);
+                if (!dBTMNewRegistrationViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage("Centre added successfully."));
+                    return RedirectToAction("List", "OrganisationCentreMaster");
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
+            return View("~/Views/DBTM/DBTMOrganisationCentreMaster/DBTMCentreRegistration.cshtml", dBTMNewRegistrationViewModel);
+        }
         #region Protected
 
         #endregion

@@ -611,7 +611,9 @@ namespace Coditech.Admin.Controllers
             ViewBag.Remarks = remarks;
             return PartialView("~/Views/DBTM/DBTMTraineeDetails/_RemarksPopup.cshtml");
         }
+        #endregion
 
+        #region Upload Trainee
         //Get Upload Trainee Popup
         [HttpGet]
         public ActionResult GetUploadTraineePopup()
@@ -636,7 +638,8 @@ namespace Coditech.Admin.Controllers
             {
                 return Json(new{ success = false, message = "Data correction required.", failedRows = result.FailedRows});
             }
-            return Json(new { success = true, message = "Trainee uploaded successfully."});
+            SetNotificationMessage(GetSuccessNotificationMessage("Trainee uploaded successfully."));
+            return Json(new { success = true });
         }
 
         //Download Trainee Template
@@ -676,9 +679,7 @@ namespace Coditech.Admin.Controllers
             DBTMReportsListViewModel report = _dBTMTraineeDetailsAgent.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
             if (report == null)
                 return Content("Athlete profile not found.");
-
             byte[] bytes;
-
             try
             {
                 bytes = System.IO.File.ReadAllBytes(report.FilePath);

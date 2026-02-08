@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -34,6 +35,7 @@ namespace Coditech.API.Service
         private readonly IDBTMOrganisationCentrewiseJoiningCodeService _joiningCodeService;
         private readonly ICoditechRepository<GeneralTemplateHeaderConfiguration> _generalTemplateHeaderConfigurationRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
+        private readonly ICoditechRepository<GeneralCountryMaster> _generalCountryRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -53,7 +55,7 @@ namespace Coditech.API.Service
             _joiningCodeService = joiningCodeService;
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
-        }
+            _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());}
 
         public override UserModel Login(UserLoginModel userLoginModel)
         {
@@ -386,7 +388,8 @@ namespace Coditech.API.Service
             fileUserName = fileUserName.Replace(" ", "_");
             string fileName = $"TraineeUploadTemplate_{centreCode}_{fileUserName}.xlsx";
             string filePath = Path.Combine(dataFolder, fileName);
-            GenerateTraineeTemplateExcel(template, joiningCodes, batchList, filePath);
+            var callingCodes = GetCallingCodes();
+            GenerateTraineeTemplateExcel(template, joiningCodes, batchList, filePath, callingCodes);
             return new DBTMTraineeUploadModel
             {
                 FilePath = filePath,
@@ -439,10 +442,11 @@ namespace Coditech.API.Service
             // Validation
             int sr = 2;
             bool hasAnyError = false;
+            var callingCodeSet = GetCallingCodeSet();
             foreach (DataRow row in dt.Rows)
             {
                 row["SrNo"] = sr++;
-                if (!ValidateRow(row, joiningCodeList, joiningTrainerMap, out string error))
+                if (!ValidateRow(row, joiningCodeList, joiningTrainerMap, callingCodeSet, out string error))
                 {
                     row["ErrorMessage"] = error;
                     hasAnyError = true;
@@ -491,7 +495,7 @@ namespace Coditech.API.Service
         }
 
         // Validation 
-        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, out string errorMessage)
+        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, HashSet<string> callingCodeSet, out string errorMessage)
         {
             List<string> errors = new List<string>();
             string joiningCode = row["JoiningCode"]?.ToString();
@@ -538,11 +542,10 @@ namespace Coditech.API.Service
             }
             else
             {
-                if (!callingCode.All(char.IsDigit))
-                    errors.Add("CallingCode must contain only digits");
-
-                if (callingCode.Length < 1 || callingCode.Length > 4)
-                    errors.Add("CallingCode length must be between 1 and 4 digits");
+                if (!Regex.IsMatch(callingCode, @"^\+\d{1,4}$") || !callingCodeSet.Contains(callingCode))
+                {
+                    errors.Add("CallingCode is invalid");
+                }
             }
             if (string.IsNullOrWhiteSpace(mobile))
             {
@@ -672,7 +675,7 @@ namespace Coditech.API.Service
                 LastName = row["LastName"].ToString(),
                 EmailId = row["EmailAddress"]?.ToString(),
                 MobileNumber = row["MobileNumber"].ToString(),
-                CallingCode = !string.IsNullOrWhiteSpace(rawCallingCode) ? "+" + rawCallingCode : null,
+                CallingCode = rawCallingCode,
                 GenderEnumId = GetEnumIdByEnumCode(row["Gender"]?.ToString(), DropdownTypeEnum.Gender.ToString()),
                 DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
                 Custom1 = JsonConvert.SerializeObject(customModel)
@@ -760,7 +763,7 @@ namespace Coditech.API.Service
         }
 
         //GenerateTraineeTemplateExcel
-        private void GenerateTraineeTemplateExcel(GeneralTemplateModel template, List<OrganisationCentrewiseJoiningCodeModel> joiningCodes, Dictionary<long, List<string>> batchList, string filePath)
+        private void GenerateTraineeTemplateExcel(GeneralTemplateModel template, List<OrganisationCentrewiseJoiningCodeModel> joiningCodes, Dictionary<long, List<string>> batchList, string filePath, List<string> callingCodes)
         {
             using var workbook = new XLWorkbook();
             var sheet = workbook.Worksheets.Add("Upload Trainee");
@@ -821,6 +824,26 @@ namespace Coditech.API.Service
                         dv.InputMessage = "yyyy-MM-dd";
                     }
                 }
+                if (header.HeaderName == "CallingCode")
+                {
+                    for (int i = 0; i < callingCodes.Count; i++)
+                        lookupSheet.Cell(i + 1, lookupCol).Value = callingCodes[i];
+                    for (int row = 2; row <= joiningCodes.Count + 1; row++)
+                    {
+                        var validation = sheet.Cell(row, col).CreateDataValidation();
+                        validation.IgnoreBlanks = true;
+                        validation.InCellDropdown = true;
+
+                        validation.List(
+                            lookupSheet.Range(
+                                lookupSheet.Cell(1, lookupCol),
+                                lookupSheet.Cell(callingCodes.Count, lookupCol)
+                            ),
+                            true
+                        );
+                    }
+                    lookupCol++;   
+                }
                 if (headerGroupCodeMap.TryGetValue(header.HeaderName, out string groupCode))
                 {
                     var values = enumList.Where(x => x.EnumGroupCode == groupCode).OrderBy(x => x.SequenceNumber).Select(x => x.EnumDisplayText).ToList();
@@ -880,6 +903,15 @@ namespace Coditech.API.Service
                 list.Add(dict);
             }
             return list;
+        }
+
+        private List<string> GetCallingCodes()
+        {
+            return _generalCountryRepository.Table.Where(x => !string.IsNullOrEmpty(x.CallingCode)).Select(x => x.CallingCode).Distinct().OrderBy(x => x).ToList();
+        }
+        private HashSet<string> GetCallingCodeSet()
+        {
+            return _generalCountryRepository.Table.Select(x => x.CallingCode).ToHashSet();
         }
 
         public DBTMDeviceMaster GetDBTMDeviceMasterDetailsByCode(string deviceSerialCode)
