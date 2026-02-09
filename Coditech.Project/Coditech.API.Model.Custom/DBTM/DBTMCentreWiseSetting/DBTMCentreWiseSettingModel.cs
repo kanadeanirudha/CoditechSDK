@@ -6,5 +6,6 @@
         public string CentreCode { get; set; }
         public string TypeOfCentre { get; set; }
         public int OrganisationCentreMasterId { get; set; }
+        public DBTMCentreWiseTestListModel TestListModel { get; set; }
     }
 }

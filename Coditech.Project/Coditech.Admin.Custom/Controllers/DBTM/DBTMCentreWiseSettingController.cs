@@ -40,5 +40,20 @@ namespace Coditech.Admin.Controllers
             }
             return View(createEdit, dBTMCentreWiseSettingViewModel);
         }
+
+        [HttpGet]
+        public ActionResult GetAssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel)
+        {
+            return PartialView("~/Views/DBTM/DBTMCentreWiseSetting/_AssociateUnAssociateCentrewiseTest.cshtml", dBTMCentreWiseTestViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult AssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel)
+        {
+            SetNotificationMessage(_dBTMCentreWiseSettingAgent.AssociateUnAssociateCentreTest(dBTMCentreWiseTestViewModel).HasError
+                ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+            return RedirectToAction("Update", new { organisationCentreId = dBTMCentreWiseTestViewModel.OrganisationCentreMasterId });
+        }
     }
 }

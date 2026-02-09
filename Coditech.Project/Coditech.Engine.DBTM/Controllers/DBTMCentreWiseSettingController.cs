@@ -62,5 +62,26 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMCentreWiseSettingResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMCentreWiseSetting/AssociateUnAssociateCentreTest")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMCentreWiseTestResponse))]
+        public virtual IActionResult AssociateUnAssociateCentreTest([FromBody] DBTMCentreWiseTestModel model)
+        {
+            try
+            {
+                bool isUpdated = _dBTMCentreWiseSettingService.AssociateUnAssociateCentreTest(model);
+                return isUpdated ? CreateOKResponse(new DBTMCentreWiseTestResponse { DBTMCentreWiseTestModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssociateUnAssociateCentreTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssociateUnAssociateCentreTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

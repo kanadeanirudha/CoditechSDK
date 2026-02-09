@@ -5,5 +5,6 @@ namespace Coditech.API.Service
     {
         DBTMCentreWiseSettingModel GetDBTMCentreWiseSetting(int organisationCentreId);
         DBTMCentreWiseSettingModel UpdateDBTMCentreWiseSetting(DBTMCentreWiseSettingModel model);
+        bool AssociateUnAssociateCentreTest(DBTMCentreWiseTestModel dBTMCentreWiseTestModel);
     }
 }

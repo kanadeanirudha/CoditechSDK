@@ -11,7 +11,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Type Of Centre")]
         public string TypeOfCentre { get; set; }
         public int OrganisationCentreMasterId { get; set; }
-
+        public DBTMCentreWiseTestListViewModel TestListViewModel { get; set; }
     }
 }
 

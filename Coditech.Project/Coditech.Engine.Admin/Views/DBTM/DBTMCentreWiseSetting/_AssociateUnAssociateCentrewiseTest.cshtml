@@ -1,0 +1,63 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMCentreWiseTestViewModel
+@{
+    Layout = null;
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+}
+<div class="modal-header">
+    @if (Model.DBTMCentreWiseTestId > 0)
+    {
+        <h6 class="modal-title m-0">
+            UnAssociate Activity From Centre
+        </h6>
+    }
+    else
+    {
+        <h6 class="modal-title m-0">
+            Associate Activity To Centre
+        </h6>
+    }
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+@using (Html.BeginForm("AssociateUnAssociateCentreTest", controllerName, FormMethod.Post, new { id = "frmAssociateUnAssociateCentreTest" }))
+{
+    @Html.AntiForgeryToken();
+    @Html.HiddenFor(x => x.DBTMCentreWiseTestId)
+    @Html.HiddenFor(x => x.DBTMTestMasterId)
+    @Html.HiddenFor(x => x.OrganisationCentreMasterId)
+    @Html.HiddenFor(x => x.CentreCode)
+    @Html.HiddenFor(x => x.TestName)
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    @if (Model.DBTMCentreWiseTestId > 0)
+                    {
+                        <span>
+                            Are you sure that you want to unassociate
+                            <span class="font-15">
+                                @Model.TestName
+                            </span>
+                            from this centre?
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            Are you sure that you want to associate
+                            <span class="font-15">
+                                @Model.TestName
+                            </span>
+                            to this centre?
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="saveDraft" class="btn btn-success" onclick="CentreTest.AssociateUnAssociateCentreTest(); return false;"> @AdminResources.LabelSave</button>
+        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+    </div>
+}
+@Html.Partial("_ValidationScriptsPartial")
