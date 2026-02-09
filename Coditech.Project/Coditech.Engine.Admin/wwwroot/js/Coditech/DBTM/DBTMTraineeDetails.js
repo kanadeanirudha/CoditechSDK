@@ -309,10 +309,10 @@
                 }, { once: true });
             },
             error: function () {
-                CoditechNotification.DisplayNotificationMessage(
-                    "Failed to load download template popup",
-                    "error"
-                );
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup","error");
                 CoditechCommon.HideLodder();
             }
         });
