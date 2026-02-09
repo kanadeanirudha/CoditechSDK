@@ -59,6 +59,7 @@
         public const string FourTenShuttleTest = "FourTenShuttleTest";
         public const string FiveZeroFiveAgilityTest = "FiveZeroFiveAgilityTest";
         public const string ProAgilityTest = "ProAgilityTest";
+        public const string PlateTapTest = "PlateTapTest";
         #endregion
     }
 }
