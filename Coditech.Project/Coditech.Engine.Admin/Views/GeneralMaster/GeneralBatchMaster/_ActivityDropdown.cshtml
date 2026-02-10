@@ -1,0 +1,6 @@
+﻿@model GeneralBatchViewModel
+<div class="mb-3 multiselect-dropdown">
+    <label class="form-label required">Activity</label>
+    @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1 ?? new List<SelectListItem>(), "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+    @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
+</div>

@@ -45,6 +45,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMTestMaster/GetTestsByCentreCode")]
+        [HttpGet]
+        [Produces(typeof(DBTMCentreWiseTestResponse))]
+        public virtual IActionResult GetTestsByCentreCode(string centreCode)
+        {
+            try
+            {
+                DBTMCentreWiseTestListModel list = _dBTMTestMasterService.GetTestsByCentreCode(centreCode);
+                return IsNotNull(list) ? CreateOKResponse(new DBTMCentreWiseTestListResponse { DBTMCentreWiseTestList = list.DBTMCentreWiseTestList }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
 
         [Route("/DBTMTestMaster/CreateDBTMTest")]
         [HttpPost, ValidateModel]

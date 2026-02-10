@@ -73,5 +73,7 @@ namespace Coditech.API.Endpoint
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateVerticalSequenceNumber";
         public string CreateActivityVerticalViewSequenceAsync() =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityVerticalViewSequence";
+        public string GetTestsByCentreCode(string centreCode) =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetTestsByCentreCode?centreCode={centreCode}";
     }
 }

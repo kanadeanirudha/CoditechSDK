@@ -124,5 +124,6 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMActivityVerticalViewSequenceViewModel">DBTM Activity Vertical View Sequence View Model.</param>
         /// <returns>Returns created model.</returns>
         DBTMActivityVerticalViewSequenceViewModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel);
+        DBTMCentreWiseTestListViewModel GetTestsByCentreCode(string centreCode);
     }
 }
