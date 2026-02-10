@@ -9,5 +9,9 @@ namespace Coditech.API.Endpoint
 
         public string UpdateDBTMCentreWiseSettingAsync() =>
                $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/UpdateDBTMCentreWiseSetting";
+        public string AssociateUnAssociateCentreTestAsync()
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/AssociateUnAssociateCentreTest";
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Coditech.Common.API.Model;
-using Coditech.Common.Helper.Utilities;
-using System.Collections.Specialized;
 namespace Coditech.API.Service
 {
     public interface IDBTMApiService
@@ -17,5 +15,6 @@ namespace Coditech.API.Service
         bool InsertDeviceDataViaFile(IFormFile file);
         DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds);
         DBTMTestListModel GetactivitiesBytrainee(long selectedTraineeId);
+        List<DBTMGeneralBatchUserModel> GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId);
     }
 }

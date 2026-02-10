@@ -2,11 +2,13 @@
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Responses;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Diagnostics;
+using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Admin.Agents
 {
     public class DBTMCentreWiseSettingAgent : BaseAgent, IDBTMCentreWiseSettingAgent
@@ -31,7 +33,51 @@ namespace Coditech.Admin.Agents
         public virtual DBTMCentreWiseSettingViewModel GetDBTMCentreWiseSetting(int organisationCentreId)
         {
             DBTMCentreWiseSettingResponse response = _dBTMCentreWiseSettingClient.GetDBTMCentreWiseSetting(organisationCentreId);
-            return response?.DBTMCentreWiseSettingModel.ToViewModel<DBTMCentreWiseSettingViewModel>();
+            DBTMCentreWiseSettingViewModel dBTMCentreWiseSettingViewModel = response?.DBTMCentreWiseSettingModel?.ToViewModel<DBTMCentreWiseSettingViewModel>();
+            if (dBTMCentreWiseSettingViewModel == null)
+                return new DBTMCentreWiseSettingViewModel();
+            if (response?.DBTMCentreWiseSettingModel?.TestListModel != null)
+            {
+                dBTMCentreWiseSettingViewModel.TestListViewModel = response.DBTMCentreWiseSettingModel.TestListModel.ToViewModel<DBTMCentreWiseTestListViewModel>();
+            }
+            else
+            {
+                dBTMCentreWiseSettingViewModel.TestListViewModel = new DBTMCentreWiseTestListViewModel();
+            }
+            return dBTMCentreWiseSettingViewModel;
+        }
+
+        //Update Associate UnAssociate CentrewiseTest.
+        public virtual DBTMCentreWiseTestViewModel AssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel)
+        {
+            try
+            {
+                int organisationCentreMasterId = dBTMCentreWiseTestViewModel.OrganisationCentreMasterId;
+                long dBTMCentreWiseTestId = dBTMCentreWiseTestViewModel.DBTMCentreWiseTestId;
+                DBTMCentreWiseTestResponse response = _dBTMCentreWiseSettingClient.AssociateUnAssociateCentreTest(dBTMCentreWiseTestViewModel.ToModel<DBTMCentreWiseTestModel>());
+                DBTMCentreWiseTestModel dBTMCentreWiseTestModel = response?.DBTMCentreWiseTestModel;
+                dBTMCentreWiseTestViewModel = IsNotNull(dBTMCentreWiseTestModel) ? dBTMCentreWiseTestModel.ToViewModel<DBTMCentreWiseTestViewModel>() : new DBTMCentreWiseTestViewModel();
+                dBTMCentreWiseTestViewModel.OrganisationCentreMasterId = organisationCentreMasterId;
+                dBTMCentreWiseTestViewModel.DBTMCentreWiseTestId = dBTMCentreWiseTestId;
+                return dBTMCentreWiseTestViewModel;
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage( ex, "DBTMCentreWiseSetting", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMCentreWiseTestViewModel)GetViewModelWithErrorMessage(dBTMCentreWiseTestViewModel, ex.ErrorMessage);
+
+                    default:
+                        return (DBTMCentreWiseTestViewModel)GetViewModelWithErrorMessage(dBTMCentreWiseTestViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseSetting", TraceLevel.Error);
+                return (DBTMCentreWiseTestViewModel)GetViewModelWithErrorMessage(dBTMCentreWiseTestViewModel, GeneralResources.ErrorFailedToCreate);
+            }
         }
 
         //Update DBTMCentreWiseSetting .

@@ -17,6 +17,7 @@ namespace Coditech.API.Data
         public string? TestInstructions { get; set; }
         public long? TestMediaId { get; set; }
         public bool IsActive { get; set; }
+        public bool IsStartDirection { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

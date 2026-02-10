@@ -1,4 +1,6 @@
-﻿namespace Coditech.Common.API.Model
+﻿using System.Data;
+
+namespace Coditech.Common.API.Model
 {
     public class DBTMTraineeProfileModel : BaseModel
     {
@@ -26,5 +28,7 @@
         public string Remarks { get; set; } 
         public string CentreCode { get; set; }
         public string TrainerName { get; set; }
+        public RadarChartModel RadarChart { get; set; }
+        public DataTable RankingScoreDataTable { get; set; }
     }
 }

@@ -30,6 +30,9 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
+        private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
+        private readonly ICoditechRepository<DBTMBatchActivity> _dbtmBatchActivityRepository;
         private readonly IConverter _converter;
         private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
 
@@ -37,6 +40,7 @@ namespace Coditech.API.Service
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
+            _converter = converter;
             _dBTMReportsService = dBTMReportsService;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -49,8 +53,10 @@ namespace Coditech.API.Service
             _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
-            _converter = converter;
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dbtmBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -287,7 +293,158 @@ namespace Coditech.API.Service
 
             dBTMTraineeProfileModel.TrainerName = string.IsNullOrWhiteSpace(trainerName) ? "N/A" : trainerName;
 
-            CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<Coditech_Entities>());
+            GetTraineePerformanceDetails(dBTMTraineeDetailId, dBTMTraineeProfileModel);
+            int generalBranchMasterId = (
+                                            from a in _generalBatchMasterRepository.Table
+                                            join b in _generalBatchUserRepository.Table
+                                                on a.GeneralBatchMasterId equals b.GeneralBatchMasterId
+                                            where b.EntityId == dBTMTraineeDetailId
+                                                  && b.UserType == UserTypeEnum.Trainee.ToString()
+                                                  && a.CentreCode == dBTMTraineeProfileModel.CentreCode
+                                            select a.GeneralBatchMasterId
+                                        ).FirstOrDefault();
+
+            DataTable dt = GetTraineePerformanceRankingDetails(generalBranchMasterId);
+            if(dt == null || dt.Rows.Count == 0)
+                return dBTMTraineeProfileModel;
+
+            DataRow dataRow = dt.Rows.Find(dBTMTraineeDetailId);
+            if (dataRow != null)
+            {
+                dBTMTraineeProfileModel.Rank = dataRow["Rank"].ToString();
+                dBTMTraineeProfileModel.RadarChart = new RadarChartModel()
+                {
+                    Title = dataRow["Name"].ToString(),
+                    Labels = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank").Select(c => c.ColumnName)),
+                    Datasets = new List<RadarGraphsDatasetModel>()
+                    {
+                        new RadarGraphsDatasetModel()
+                        {
+                            Label = "Performance",
+                            Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank").Select(c => dataRow[c].ToString())),
+                            Color = "rgba(255, 99, 132, 0.2)"
+                        }
+                    }
+                };
+            }
+            return dBTMTraineeProfileModel;
+        }
+
+        private DataTable GetTraineePerformanceRankingDetails(int generalBranchMasterId)
+        {
+            DataTable dt = new DataTable();
+            generalBranchMasterId = 1272; // Remove this line after testing as it is hardcoded for testing purpose
+            if (generalBranchMasterId <= 0)
+                return dt;
+            //List<string> batchTestList = (from a in _dbtmBatchActivityRepository.Table
+            //                              join b in _dBTMTestMasterRepository.Table on a.DBTMTestMasterId equals b.DBTMTestMasterId
+            //                              where a.GeneralBatchMasterId == generalBranchMasterId
+            //                              select b.TestCode)?.Distinct()?.ToList();
+            //if (batchTestList?.Count == 0)
+            //    return;
+
+            CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralBranchMasterId", generalBranchMasterId, ParameterDirection.Input, DbType.Int64);
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
+            if (traineeProfilePerformanceRankList != null && traineeProfilePerformanceRankList.Count > 0)
+            {
+                List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestCode).Distinct().ToList();
+                var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestCode)
+                                                               .Select(g => new
+                                                               {
+                                                                   TestCode = g.Key,
+                                                                   MinTime = g.Min(x => x.BestTime),
+                                                                   MaxTime = g.Max(x => x.BestTime),
+                                                                   MinLength = g.Min(x => x.BestLength),
+                                                                   MaxLength = g.Max(x => x.BestLength),
+                                                                   MinHeight = g.Min(x => x.BestHeight),
+                                                                   MaxHeight = g.Max(x => x.BestHeight),
+                                                                   MinCount = g.Min(x => x.BestCount),
+                                                                   MaxCount = g.Max(x => x.BestCount),
+                                                               }).ToList();
+                decimal weights = 100 / testList.Count;
+                dt.Columns.Add("DBTMTraineeDetailId", typeof(long));
+                dt.Columns.Add("Name", typeof(string));
+                foreach (var test in testList)
+                    dt.Columns.Add(test, typeof(decimal));
+                dt.Columns.Add("FinalScore", typeof(decimal));
+                dt.Columns.Add("Rank", typeof(int));
+                dt.PrimaryKey = new DataColumn[] { dt.Columns["DBTMTraineeDetailId"] };
+
+                foreach (var item in traineeProfilePerformanceRankList)
+                {
+                    DataRow dr = dt.Rows.Find(item.DBTMTraineeDetailId);
+                    if (dr == null)
+                    {
+                        dr = dt.NewRow();
+                        dr["DBTMTraineeDetailId"] = item.DBTMTraineeDetailId;
+                        dr["Name"] = item.Name;
+                        dt.Rows.Add(dr);
+                    }
+                    if (testList.Contains(item.TestCode))
+                    {
+                        var testResult = result.FirstOrDefault(x => x.TestCode == item.TestCode);
+                        if (testResult != null)
+                        {
+                            decimal score = 0;
+                            if (item.TestResultBasedon == "BestTime" && item.BestTime > 0 && testResult.MaxTime > testResult.MinTime)
+                            {
+                                score = (((decimal)testResult.MaxTime - (decimal)item.BestTime) / ((decimal)testResult.MaxTime - (decimal)testResult.MinTime)) * 100;
+                            }
+                            else if (item.TestResultBasedon == "BestLength" && item.BestLength > 0 && testResult.MaxLength > testResult.MinLength)
+                            {
+                                score = (((decimal)item.BestLength - (decimal)testResult.MinLength) / ((decimal)testResult.MaxLength - (decimal)testResult.MinLength)) * 100;
+                            }
+                            else if (item.TestResultBasedon == "BestHeight" && item.BestHeight > 0 && testResult.MaxHeight > testResult.MinHeight)
+                            {
+                                score = (((decimal)item.BestHeight - (decimal)testResult.MinHeight) / ((decimal)testResult.MaxHeight - (decimal)testResult.MinHeight)) * 100;
+                            }
+                            else if (item.TestResultBasedon == "BestCount" && item.BestCount > 0 && testResult.MaxCount > testResult.MinCount)
+                            {
+                                score = (((decimal)item.BestCount - (decimal)testResult.MinCount) / ((decimal)testResult.MaxCount - (decimal)testResult.MinCount)) * 100;
+                            }
+                            dr[item.TestCode] = Math.Round(score, 2);
+                        }
+                    }
+                }
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    decimal finalScore = 0;
+                    foreach (var test in testList)
+                    {
+                        if (dr[test] != DBNull.Value)
+                        {
+                            finalScore += ((decimal)dr[test] * weights) / 100;
+                        }
+                    }
+                    dr["FinalScore"] = Math.Round(finalScore, 3);
+                }
+                var rankedList = dt.AsEnumerable()
+                                   .OrderByDescending(r => r.Field<decimal>("FinalScore"))
+                                   .Select((r, index) => new
+                                   {
+
+                                       DBTMTraineeDetailId = r.Field<long>("DBTMTraineeDetailId"),
+                                       Name = r.Field<string>("Name"),
+                                       FinalScore = r.Field<decimal>("FinalScore"),
+                                       Rank = index + 1
+                                   }).ToList();
+                foreach (var item in rankedList)
+                {
+                    DataRow dr = dt.Rows.Find(item.DBTMTraineeDetailId);
+                    if (dr != null)
+                    {
+                        dr["Rank"] = item.Rank;
+                    }
+                }
+            }
+
+            return dt;
+        }
+        private void GetTraineePerformanceDetails(long dBTMTraineeDetailId, DBTMTraineeProfileModel dBTMTraineeProfileModel)
+        {
+            CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailId", dBTMTraineeDetailId, ParameterDirection.Input, DbType.Int64);
             List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrix @DBTMTraineeDetailId")?.ToList();
             if (traineeProfilePerformanceList != null && traineeProfilePerformanceList.Count > 0)
@@ -346,7 +503,6 @@ namespace Coditech.API.Service
                     dBTMTraineeProfileModel.TraineeProfilePerformanceList.Add(performanceModel);
                 }
             }
-            return dBTMTraineeProfileModel;
         }
 
         //Download Trainee Report Pdf

@@ -4,7 +4,6 @@ using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
-using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -123,6 +122,27 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [Route("/DBTMApi/GetBatchAndActivityWiseUserDetails")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchUserResponse))]
+        public IActionResult GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId)
+        {
+            try
+            {
+                List<DBTMGeneralBatchUserModel> model = _dBTMApiService.GetBatchAndActivityWiseUserDetails(generalBatchMasterId, dbtmTestMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchUserResponse { DBTMBatchUserList = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
         [Route("/DBTMApi/GetAssignmentList")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiListResponse))]
