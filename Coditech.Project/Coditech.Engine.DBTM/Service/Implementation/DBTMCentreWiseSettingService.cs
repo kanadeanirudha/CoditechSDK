@@ -28,25 +28,15 @@ namespace Coditech.API.Service
         // Get DBTMCentreWiseSetting by OrganisationCentreId
         public virtual DBTMCentreWiseSettingModel GetDBTMCentreWiseSetting(int organisationCentreId)
         {
-            // 1️⃣ Get Organisation Centre
             OrganisationCentreMaster organisationData = _organisationCentreMasterRepository.Table.FirstOrDefault(x => x.OrganisationCentreMasterId == organisationCentreId);
-
-            if (organisationData == null) throw new CoditechException(ErrorCodes.InvalidData, "Invalid OrganisationCentreMasterId");
-
+            if (organisationData == null)
+                throw new CoditechException(ErrorCodes.InvalidData, "Invalid OrganisationCentreMasterId");
             string centreCode = organisationData.CentreCode;
-
             DBTMCentreWiseSetting dBTMCentreWiseSetting = _dBTMCentreWiseSettingRepository.Table.FirstOrDefault(x => x.CentreCode == centreCode);
-            if (IsNull(dBTMCentreWiseSetting))
-            {
-                return new DBTMCentreWiseSettingModel
-                {
-                    CentreCode = centreCode,
-                    OrganisationCentreMasterId = organisationData.OrganisationCentreMasterId
-                };
-            }
-            DBTMCentreWiseSettingModel model = dBTMCentreWiseSetting.FromEntityToModel<DBTMCentreWiseSettingModel>();
+            DBTMCentreWiseSettingModel model = dBTMCentreWiseSetting?.FromEntityToModel<DBTMCentreWiseSettingModel>() ?? new DBTMCentreWiseSettingModel();
+            model.CentreCode = centreCode;
+            model.TestListModel = GetCentreTests(centreCode);
             model.OrganisationCentreMasterId = organisationData.OrganisationCentreMasterId;
-            model.TestListModel = GetCentreTests(model.CentreCode);
             if (model.TestListModel?.DBTMCentreWiseTestList != null)
             {
                 foreach (var test in model.TestListModel.DBTMCentreWiseTestList)
@@ -61,7 +51,7 @@ namespace Coditech.API.Service
         {
             CoditechViewRepository<DBTMCentreWiseTestModel> objStoredProc = new CoditechViewRepository<DBTMCentreWiseTestModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
-            List<DBTMCentreWiseTestModel> testList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCentreWiseTestList @CentreCode" )?.ToList();
+            List<DBTMCentreWiseTestModel> testList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCentreWiseTestList @CentreCode")?.ToList();
             DBTMCentreWiseTestListModel model = new DBTMCentreWiseTestListModel
             {
                 DBTMCentreWiseTestList = testList ?? new List<DBTMCentreWiseTestModel>()
