@@ -20,6 +20,7 @@ namespace Coditech.Common.API.Model
         public bool IsLapDistanceChange { get; set; }
         public bool IsMultiTest { get; set; }
         public bool IsActive { get; set; }
+        public bool IsStartDirection { get; set; }
         [Required]
         public List<string> DBTMSelectedTestParameter { get; set; }
         public int TopActivityCount { get; set; }

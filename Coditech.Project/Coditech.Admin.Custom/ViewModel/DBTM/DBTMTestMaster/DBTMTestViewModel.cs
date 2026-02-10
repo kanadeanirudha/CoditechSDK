@@ -56,5 +56,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Performance Matrix")]
         public byte DBTMPerformanceMatrixId { get; set; }
         public string PerformanceMatrix { get; set; }
+        [Display(Name = " Is Start Direction")]
+        public bool IsStartDirection { get; set; }
     }
 }
