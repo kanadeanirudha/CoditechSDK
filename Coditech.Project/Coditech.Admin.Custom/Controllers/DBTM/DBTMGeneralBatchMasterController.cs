@@ -28,7 +28,6 @@ namespace Coditech.Admin.Controllers
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
-
             {
                 list = _generalBatchAgent.GetBatchList(dataTableModel);
             }
@@ -56,18 +55,9 @@ namespace Coditech.Admin.Controllers
         [HttpPost]
         public ActionResult Create(GeneralBatchViewModel generalBatchViewModel)
         {
-            if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0 &&
-                (generalBatchViewModel?.CustomDropdownSelectedValue2?.Count ?? 0) == 0)
-            {
-                generalBatchViewModel.ErrorMessage = "Please select at least one Activity and one Batch User.";
-            }
-            else if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
+            if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
             {
                 generalBatchViewModel.ErrorMessage = "Please select at least one Activity.";
-            }
-            else if ((generalBatchViewModel?.CustomDropdownSelectedValue2?.Count ?? 0) == 0)
-            {
-                generalBatchViewModel.ErrorMessage = "Please select at least one Batch User.";
             }
             else if (ModelState.IsValid)
             {
@@ -132,7 +122,6 @@ namespace Coditech.Admin.Controllers
                     else if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
                         return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
-
                     }
                 }
             }
@@ -226,13 +215,14 @@ namespace Coditech.Admin.Controllers
             }
         }
         [HttpGet]
-        public ActionResult GetActivityByCentreCode(string centreCode)
+        public ActionResult GetActivityByCentreCode(string centreCode, List<string> selectedActivities)
         {
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
+            generalBatchViewModel.CustomDropdownSelectedValue1 = selectedActivities;
             if (!string.IsNullOrEmpty(centreCode))
             {
                 DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
-                generalBatchViewModel.CustomDropdownList1 = response?.DBTMCentreWiseTestList?.OrderBy(x => x.TestName).Select(x => new SelectListItem{ Text = x.TestName, Value = x.DBTMTestMasterId.ToString()}).ToList();
+                generalBatchViewModel.CustomDropdownList1 = response?.DBTMCentreWiseTestList?.OrderBy(x => x.TestName).Select(x => new SelectListItem { Text = x.TestName, Value = x.DBTMTestMasterId.ToString(), Selected = selectedActivities?.Contains(x.DBTMTestMasterId.ToString()) == true }).ToList();
             }
             return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/_ActivityDropdown.cshtml", generalBatchViewModel);
         }
@@ -245,14 +235,15 @@ namespace Coditech.Admin.Controllers
             DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
             if (!response?.DBTMCentreWiseTestList?.Any() ?? true)
                 return;
-            generalBatchViewModel.CustomDropdownList1.AddRange( response.DBTMCentreWiseTestList
-                    .OrderBy(x => x.TestName)
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.TestName,
-                        Value = x.DBTMTestMasterId.ToString()
-                    })
-            );
+            generalBatchViewModel.CustomDropdownList1 = response.DBTMCentreWiseTestList
+                .OrderBy(x => x.TestName)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.TestName,
+                    Value = x.DBTMTestMasterId.ToString(),
+                    Selected = generalBatchViewModel.CustomDropdownSelectedValue1
+                    ?.Contains(x.DBTMTestMasterId.ToString()) == true
+                }).ToList();
         }
         protected void BindDuration(GeneralBatchViewModel model)
         {
@@ -293,7 +284,6 @@ namespace Coditech.Admin.Controllers
                 BindDBTMBatchActivity(generalBatchViewModel);
             }
             BindDBTMBatchUserList(generalBatchViewModel);
-
         }
         public virtual ActionResult Cancel(string SelectedCentreCode, string custom4)
         {

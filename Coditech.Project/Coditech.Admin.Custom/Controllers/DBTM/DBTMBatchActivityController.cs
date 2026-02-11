@@ -14,7 +14,6 @@ namespace Coditech.Admin.Controllers
         {
             _dBTMBatchActivityAgent = dBTMBatchActivityAgent;
         }
-
         public virtual ActionResult List(DataTableViewModel dataTableModel)
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
