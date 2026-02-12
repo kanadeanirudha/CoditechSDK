@@ -16,5 +16,7 @@ namespace Coditech.API.Service
         DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId);
         DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
         string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks);
+        RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId);
+        DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds);
     }
 }
