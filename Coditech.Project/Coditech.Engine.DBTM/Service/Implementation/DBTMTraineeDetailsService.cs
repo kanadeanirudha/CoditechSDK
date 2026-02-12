@@ -518,11 +518,11 @@ namespace Coditech.API.Service
             List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
             if (traineeProfilePerformanceRankList != null && traineeProfilePerformanceRankList.Count > 0)
             {
-                List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestCode).Distinct().ToList();
-                var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestCode)
+                List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestName).Distinct().ToList();
+                var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestName)
                                                                .Select(g => new
                                                                {
-                                                                   TestCode = g.Key,
+                                                                   TestName = g.Key,
                                                                    MinTime = g.Min(x => x.BestTime),
                                                                    MaxTime = g.Max(x => x.BestTime),
                                                                    MinLength = g.Min(x => x.BestLength),
@@ -551,9 +551,9 @@ namespace Coditech.API.Service
                         dr["Name"] = item.Name;
                         dt.Rows.Add(dr);
                     }
-                    if (testList.Contains(item.TestCode))
+                    if (testList.Contains(item.TestName))
                     {
-                        var testResult = result.FirstOrDefault(x => x.TestCode == item.TestCode);
+                        var testResult = result.FirstOrDefault(x => x.TestName == item.TestName);
                         if (testResult != null)
                         {
                             decimal score = 0;
@@ -573,7 +573,7 @@ namespace Coditech.API.Service
                             {
                                 score = (((decimal)item.BestCount - (decimal)testResult.MinCount) / ((decimal)testResult.MaxCount - (decimal)testResult.MinCount)) * 100;
                             }
-                            dr[item.TestCode] = Math.Round(score, 2);
+                            dr[item.TestName] = Math.Round(score, 2);
                         }
                     }
                 }
