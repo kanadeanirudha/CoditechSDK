@@ -13,6 +13,7 @@ namespace Coditech.Admin.Controllers
         private const string namereports = "~/Views/DBTM/DBTMReports/NameWiseReports.cshtml";
         private const string testwisemultireports = "~/Views/DBTM/DBTMReports/TestWiseMultiReports.cshtml";
         private const string batchwisemultireports = "~/Views/DBTM/DBTMReports/BatchWiseMultiReports.cshtml";
+        private const string profiledetailslist = "~/Views/DBTM/DBTMReports/ProfileDetailsList.cshtml";
         public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
@@ -275,6 +276,32 @@ namespace Coditech.Admin.Controllers
                     }
                 }
             }
+        }
+        [HttpGet]
+        [HttpGet]
+        public ActionResult GetProfileDetailsList()
+        {
+            DBTMTraineeProfileListViewModel model = new DBTMTraineeProfileListViewModel();
+            model.CustomDropdownList1 = new List<SelectListItem>();
+            return View(profiledetailslist, model);
+        }
+
+        public ActionResult GetBatchUserListByBatchId(long generalBatchMasterId)
+        {
+            DropdownViewModel traineeDropdownn = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.BatchWiseUser.ToString(),
+                DropdownName = "DBTMTraineeDetailId",
+                Parameter = generalBatchMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
+        }
+        [HttpGet]
+        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds)
+        {
+            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds);
+            return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
         #endregion
     }

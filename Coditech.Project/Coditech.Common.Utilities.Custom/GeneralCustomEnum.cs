@@ -26,6 +26,7 @@
         DisplayOn,
         GraphMode,
         TypeOfCentre,
+        BatchWiseUser,
     }
     public enum DashboardFormCustomEnum
     {
