@@ -304,5 +304,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("/DBTMReports/GetBatchWiseUser")]
+        [Produces(typeof(DBTMTraineeDetailsListResponse))]
+        public virtual IActionResult GetBatchWiseUser(long generalBatchMasterId)
+        {
+            try
+            {
+                DBTMTraineeDetailsListModel list = _dBTMReportsService.GetBatchWiseUser(generalBatchMasterId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "BatchWiseUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "BatchWiseUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

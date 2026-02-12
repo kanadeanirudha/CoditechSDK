@@ -527,4 +527,101 @@ var DBTMReports = {
             }
         });
     },
+
+    GetBatchUserListByBatchId: function () {
+
+        var selectedItem = $("#GeneralBatchMasterId").val();
+
+        if (selectedItem != "") {
+
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "/DBTMReports/GetBatchUserListByBatchId",
+                data: { generalBatchMasterId: selectedItem },
+                success: function (data) {
+                    $("#DBTMTraineeDetailId").html("").html(data);
+                    $('#DBTMTraineeDetailId').selectpicker('refresh');
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == "401" || xhr.status == "403") {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Trainee Details List", "error")
+                    CoditechCommon.HideLodder();
+                }
+            });
+        }
+        else {
+            $("#DBTMTraineeDetailId").html("");
+            $('#DBTMTraineeDetailId').selectpicker('refresh');
+        }
+
+    },
+
+    GetBatchWiseTraineeProfileDetailsList: function () {
+
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
+
+        if (Array.isArray(dbtmTraineeDetailId)) {
+            dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
+        }
+
+        $("#DBTMBatchWiseTraineeProfileDetailsDivId").html("");
+
+        if (generalBatchMasterId && dbtmTraineeDetailId) {
+
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetBatchWiseTraineeProfileDetailsList",
+                data: {
+                    generalBatchMasterId: generalBatchMasterId,
+                    dbtmTraineeDetailIds: dbtmTraineeDetailId
+                },
+                success: function (data) {
+                    $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
+
+                    CoditechNotification.DisplayNotificationMessage(
+                        "Failed to retrieve Batch trainees.",
+                        "error"
+                    );
+
+                    CoditechCommon.HideLodder();
+                }
+            });
+
+        }
+        else if (!generalBatchMasterId || generalBatchMasterId === "0") {
+
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select a batch.",
+                "error"
+            );
+
+        }
+        else if (!dbtmTraineeDetailId) {
+
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select a trainee.",
+                "error"
+            );
+
+        }
+    },
+
+
 };

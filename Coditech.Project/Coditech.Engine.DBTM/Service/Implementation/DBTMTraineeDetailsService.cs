@@ -261,7 +261,7 @@ namespace Coditech.API.Service
 
             return dBTMTraineeProfileModel;
         }
-        
+
         public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
             DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
