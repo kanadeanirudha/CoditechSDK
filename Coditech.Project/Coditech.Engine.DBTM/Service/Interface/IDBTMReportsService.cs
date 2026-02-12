@@ -1,5 +1,4 @@
 ﻿using Coditech.Common.API.Model;
-using Coditech.Common.API.Model.Response;
 
 namespace Coditech.API.Service
 {
@@ -17,6 +16,6 @@ namespace Coditech.API.Service
         bool DeleteReportsFile(string fileName);
         List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId);
         DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId);
-        DBTMTraineeDetailsListModel GetBatchWiseUser(long generalBatchMasterId);
+        GeneralBatchUserListModel GetBatchWiseUser(long generalBatchMasterId);
     }
 }

@@ -483,12 +483,12 @@ namespace Coditech.API.Client
                     response?.Dispose();
             }
         }
-        public virtual DBTMTraineeDetailsListResponse GetBatchWiseUser(long generalBatchMasterId)
+        public virtual GeneralBatchUserListResponse GetBatchWiseUser(long generalBatchMasterId)
         {
             return Task.Run(async () => await GetBatchWiseUserAsync(generalBatchMasterId, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeDetailsListResponse> GetBatchWiseUserAsync(long generalBatchMasterId, CancellationToken cancellationToken)
+        public virtual async Task<GeneralBatchUserListResponse> GetBatchWiseUserAsync(long generalBatchMasterId, CancellationToken cancellationToken)
         {
             string endpoint = dBTMReportsEndpoint.GetBatchWiseUserAsync(generalBatchMasterId);
 
@@ -510,12 +510,12 @@ namespace Coditech.API.Client
 
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeDetailsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
-                    return objectResponse.Object ?? new DBTMTraineeDetailsListResponse();
+                    var objectResponse = await ReadObjectResponseAsync<GeneralBatchUserListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object ?? new GeneralBatchUserListResponse();
                 }
                 else if (status_ == 204)
                 {
-                    return new DBTMTraineeDetailsListResponse();
+                    return new GeneralBatchUserListResponse();
                 }
                 else
                 {

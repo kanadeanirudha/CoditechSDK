@@ -31,5 +31,6 @@ namespace Coditech.Common.API.Model
         public RadarChartModel RadarChart { get; set; }
         public DataTable RankingScoreDataTable { get; set; }
         public long GeneralBatchMasterId { get; set; }
+        public bool IsListView { get; set; }
     }
 }

@@ -605,15 +605,15 @@ namespace Coditech.Admin.Helpers
             {
                 long generalBatchMasterId = Convert.ToInt64(dropdownViewModel.Parameter);
 
-                DBTMTraineeDetailsListResponse response = new DBTMReportsClient().GetBatchWiseUser(generalBatchMasterId);
-                DBTMTraineeDetailsListModel list = new DBTMTraineeDetailsListModel() { DBTMTraineeDetailsList = response.DBTMTraineeDetailsList };
-                foreach (var item in list?.DBTMTraineeDetailsList.OrderBy(x => x.FirstName))
+                GeneralBatchUserListResponse response = new DBTMReportsClient().GetBatchWiseUser(generalBatchMasterId);
+                GeneralBatchUserListModel list = new GeneralBatchUserListModel() { GeneralBatchUserList = response.GeneralBatchUserList };
+                foreach (var item in list?.GeneralBatchUserList.OrderBy(x => x.FirstName))
                 {
                     dropdownList.Add(new SelectListItem()
                     {
                         Text = $"{item.FirstName} {item.LastName}",
-                        Value = item.DBTMTraineeDetailId.ToString(),
-                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTraineeDetailId)
+                        Value = item.EntityId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.EntityId)
                     });
                 }
             }

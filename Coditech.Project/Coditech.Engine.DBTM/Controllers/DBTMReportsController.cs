@@ -306,24 +306,24 @@ namespace Coditech.Engine.DBTM.Controllers
         }
         [HttpGet]
         [Route("/DBTMReports/GetBatchWiseUser")]
-        [Produces(typeof(DBTMTraineeDetailsListResponse))]
+        [Produces(typeof(GeneralBatchUserListResponse))]
         public virtual IActionResult GetBatchWiseUser(long generalBatchMasterId)
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMReportsService.GetBatchWiseUser(generalBatchMasterId);
+                GeneralBatchUserListModel list = _dBTMReportsService.GetBatchWiseUser(generalBatchMasterId);
                 string data = ApiHelper.ToJson(list);
-                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<GeneralBatchUserListResponse>(data) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "BatchWiseUser", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+                return CreateInternalServerErrorResponse(new GeneralBatchUserListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "BatchWiseUser", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new GeneralBatchUserListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

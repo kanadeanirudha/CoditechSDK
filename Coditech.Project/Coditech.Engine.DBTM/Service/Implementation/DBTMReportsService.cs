@@ -1281,23 +1281,23 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
-        public DBTMTraineeDetailsListModel GetBatchWiseUser(long generalBatchMasterId)
+        public GeneralBatchUserListModel GetBatchWiseUser(long generalBatchMasterId)
         {
-            DBTMTraineeDetailsListModel model = new DBTMTraineeDetailsListModel();
+            GeneralBatchUserListModel model = new GeneralBatchUserListModel();
 
             var result =
                 (from gbu in _generalBatchUserRepository.Table
                  join um in _userMasterRepository.Table
-                     on gbu.EntityId equals um.UserMasterId
+                     on gbu.EntityId equals um.EntityId
                  where gbu.GeneralBatchMasterId == generalBatchMasterId
-                 select new DBTMTraineeDetailsModel
+                 select new GeneralBatchUserModel
                  {
                      FirstName = um.FirstName,
                      LastName = um.LastName,
-                     DBTMTraineeDetailId = um.EntityId
+                     EntityId = um.EntityId
                  }).ToList();
 
-            model.DBTMTraineeDetailsList = result;
+            model.GeneralBatchUserList = result;
 
             return model;
         }

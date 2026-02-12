@@ -363,6 +363,7 @@ namespace Coditech.API.Service
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId);
                 foreach (var dBTMTraineeProfileModel in list)
                 {
+                    dBTMTraineeProfileModel.IsListView = true;
                     dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
                       ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
                       : "N/A";
@@ -616,7 +617,7 @@ namespace Coditech.API.Service
         {
             List<DBTMTraineeProfilePerformanceModel> listModel = new List<DBTMTraineeProfilePerformanceModel>();
             CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
             List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceListData = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrixByTraineeDetailIds @DBTMTraineeDetailIds")?.ToList();
             if (traineeProfilePerformanceListData != null && traineeProfilePerformanceListData.Count > 0)
             {
