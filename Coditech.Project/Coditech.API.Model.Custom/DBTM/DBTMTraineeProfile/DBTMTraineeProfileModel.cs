@@ -29,6 +29,8 @@ namespace Coditech.Common.API.Model
         public string CentreCode { get; set; }
         public string TrainerName { get; set; }
         public RadarChartModel RadarChart { get; set; }
+        public DataTable RankingScoreDataTable { get; set; }
         public long GeneralBatchMasterId { get; set; }
+        public bool IsListView { get; set; }
     }
 }

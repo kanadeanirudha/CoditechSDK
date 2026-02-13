@@ -29,5 +29,6 @@ namespace Coditech.Admin.ViewModel
         public string SelectedParameter1 { get; set; }
         public string TrainerName { get; set; }
         public RadarChartModel RadarChart { get; set; }
+        public bool IsListView { get; set; }
     }
 }

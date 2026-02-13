@@ -28,6 +28,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMTestParameterListviewSequenceRepository;
         private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMTestParameterVerticalViewSequenceRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
+        private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -45,6 +47,8 @@ namespace Coditech.API.Service
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterVerticalViewSequenceRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Graph
@@ -200,7 +204,7 @@ namespace Coditech.API.Service
                 return new List<DateTime>();
 
             if (dBTMTraineeDetailId <= 0)
-                return new List<DateTime>();   
+                return new List<DateTime>();
 
             List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
             bool isAllTest = testIds.Contains(0);
@@ -688,6 +692,7 @@ namespace Coditech.API.Service
             model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false);
             return model;
         }
+
 
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
@@ -1276,6 +1281,26 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
+        public GeneralBatchUserListModel GetBatchWiseUser(long generalBatchMasterId)
+        {
+            GeneralBatchUserListModel model = new GeneralBatchUserListModel();
+
+            var result =
+                (from gbu in _generalBatchUserRepository.Table
+                 join um in _userMasterRepository.Table on gbu.EntityId equals um.EntityId
+                 where gbu.GeneralBatchMasterId == generalBatchMasterId && um.UserType == UserTypeEnum.Trainee.ToString()
+                 select new GeneralBatchUserModel
+                 {
+                     FirstName = um.FirstName,
+                     LastName = um.LastName,
+                     EntityId = um.EntityId
+                 }).ToList();
+
+            model.GeneralBatchUserList = result;
+
+            return model;
+        }
+
         #endregion
     }
 }

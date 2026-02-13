@@ -261,7 +261,7 @@ namespace Coditech.API.Service
 
             return dBTMTraineeProfileModel;
         }
-        
+
         public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
             DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
@@ -363,6 +363,7 @@ namespace Coditech.API.Service
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId);
                 foreach (var dBTMTraineeProfileModel in list)
                 {
+                    dBTMTraineeProfileModel.IsListView = true;
                     dBTMTraineeProfileModel.TotalDuration = dBTMTraineeProfileModel.DateOfJoining.HasValue
                       ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
                       : "N/A";
@@ -517,11 +518,11 @@ namespace Coditech.API.Service
             List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
             if (traineeProfilePerformanceRankList != null && traineeProfilePerformanceRankList.Count > 0)
             {
-                List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestCode).Distinct().ToList();
-                var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestCode)
+                List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestName).Distinct().ToList();
+                var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestName)
                                                                .Select(g => new
                                                                {
-                                                                   TestCode = g.Key,
+                                                                   TestName = g.Key,
                                                                    MinTime = g.Min(x => x.BestTime),
                                                                    MaxTime = g.Max(x => x.BestTime),
                                                                    MinLength = g.Min(x => x.BestLength),
@@ -550,9 +551,9 @@ namespace Coditech.API.Service
                         dr["Name"] = item.Name;
                         dt.Rows.Add(dr);
                     }
-                    if (testList.Contains(item.TestCode))
+                    if (testList.Contains(item.TestName))
                     {
-                        var testResult = result.FirstOrDefault(x => x.TestCode == item.TestCode);
+                        var testResult = result.FirstOrDefault(x => x.TestName == item.TestName);
                         if (testResult != null)
                         {
                             decimal score = 0;
@@ -572,7 +573,7 @@ namespace Coditech.API.Service
                             {
                                 score = (((decimal)item.BestCount - (decimal)testResult.MinCount) / ((decimal)testResult.MaxCount - (decimal)testResult.MinCount)) * 100;
                             }
-                            dr[item.TestCode] = Math.Round(score, 2);
+                            dr[item.TestName] = Math.Round(score, 2);
                         }
                     }
                 }
@@ -616,7 +617,7 @@ namespace Coditech.API.Service
         {
             List<DBTMTraineeProfilePerformanceModel> listModel = new List<DBTMTraineeProfilePerformanceModel>();
             CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
             List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceListData = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrixByTraineeDetailIds @DBTMTraineeDetailIds")?.ToList();
             if (traineeProfilePerformanceListData != null && traineeProfilePerformanceListData.Count > 0)
             {
