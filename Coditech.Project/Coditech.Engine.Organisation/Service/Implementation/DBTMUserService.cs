@@ -7,10 +7,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Hangfire.Common;
 using Newtonsoft.Json;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -55,28 +52,29 @@ namespace Coditech.API.Service
             _joiningCodeService = joiningCodeService;
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
-            _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());}
-
-        public override UserModel Login(UserLoginModel userLoginModel)
-        {
-            UserModel model = base.Login(userLoginModel);
-
-            if (!model.HasError && model.UserType != UserTypeEnum.Admin.ToString())
-            {
-                GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(model.EntityId, model.UserType);
-                if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
-                {
-                    model.Custom1 = generalPersonModel.Custom1;
-                }
-                if (model.Custom1 == CustomConstants.DBTMTrainer || model.Custom1 == CustomConstants.DBTMCentreOwner)
-                {
-                    DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
-                    dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
-                    model.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
-                }
-            }
-            return model;
+            _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
+
+        //public override UserModel Login(UserLoginModel userLoginModel)
+        //{
+        //    UserModel model = base.Login(userLoginModel);
+
+        //    if (!model.HasError && model.UserType != UserTypeEnum.Admin.ToString())
+        //    {
+        //        GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(model.EntityId, model.UserType);
+        //        if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
+        //        {
+        //            model.Custom1 = generalPersonModel.Custom1;
+        //        }
+        //        if (model.Custom1 == CustomConstants.DBTMTrainer || model.Custom1 == CustomConstants.DBTMCentreOwner)
+        //        {
+        //            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
+        //            dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
+        //            model.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
+        //        }
+        //    }
+        //    return model;
+        //}
 
         public override ChangePasswordModel ChangePassword(ChangePasswordModel changePasswordModel)
         {
@@ -141,6 +139,39 @@ namespace Coditech.API.Service
             {
                 return base.ValidateUserwiseGeneralPerson(generalPersonModel, ref errorMessage, ref generalEnumaratorId);
             }
+        }
+        protected override List<string> BindAssociatedMenuToUser(UserModel userModel)
+        {
+            if (userModel.UserType != UserTypeEnum.Admin.ToString())
+            {
+                GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(userModel.EntityId, userModel.UserType);
+                if (IsNull(generalPersonModel) || string.IsNullOrEmpty(generalPersonModel.Custom1))
+                {
+                    return base.BindAssociatedMenuToUser(userModel);
+                }
+
+                if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
+                {
+                    userModel.Custom1 = generalPersonModel.Custom1;
+                }
+                if (userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
+                    dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == userModel.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
+                    userModel.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
+                    if (userModel.Custom1.Equals(CustomConstants.DBTMTrainer, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return ApiCustomSettings.DBTMTrainerMenuCode.Split(",").ToList();
+                    }
+                    else if (userModel.Custom1.Equals(CustomConstants.DBTMCentreOwner, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return ApiCustomSettings.DBTMDirectorMenuCode.Split(",").ToList();
+                    }
+                }
+                else
+                    return base.BindAssociatedMenuToUser(userModel);
+            }
+            return base.BindAssociatedMenuToUser(userModel);
         }
         private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
@@ -842,7 +873,7 @@ namespace Coditech.API.Service
                             true
                         );
                     }
-                    lookupCol++;   
+                    lookupCol++;
                 }
                 if (headerGroupCodeMap.TryGetValue(header.HeaderName, out string groupCode))
                 {
