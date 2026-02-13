@@ -1287,9 +1287,8 @@ namespace Coditech.API.Service
 
             var result =
                 (from gbu in _generalBatchUserRepository.Table
-                 join um in _userMasterRepository.Table
-                     on gbu.EntityId equals um.EntityId
-                 where gbu.GeneralBatchMasterId == generalBatchMasterId
+                 join um in _userMasterRepository.Table on gbu.EntityId equals um.EntityId
+                 where gbu.GeneralBatchMasterId == generalBatchMasterId && um.UserType == UserTypeEnum.Trainee.ToString()
                  select new GeneralBatchUserModel
                  {
                      FirstName = um.FirstName,
