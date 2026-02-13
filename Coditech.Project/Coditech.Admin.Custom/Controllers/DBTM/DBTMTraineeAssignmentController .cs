@@ -13,11 +13,13 @@ namespace Coditech.Admin.Controllers
     public class DBTMTraineeAssignmentController : BaseController
     {
         private readonly IDBTMTraineeAssignmentAgent _dBTMTraineeAssignmentAgent;
+        private readonly IDBTMTestAgent _dBTMTestAgent;
         private const string createEdit = "~/Views/DBTM/DBTMTraineeAssignment/Create.cshtml";
 
-        public DBTMTraineeAssignmentController(IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent)
+        public DBTMTraineeAssignmentController(IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMTraineeAssignmentAgent = dBTMTraineeAssignmentAgent;
+            _dBTMTestAgent = dBTMTestAgent;
         }
 
         public ActionResult List(DataTableViewModel dataTableModel)
@@ -60,7 +62,7 @@ namespace Coditech.Admin.Controllers
             {
                 SelectedCentreCode = userModel.SelectedCentreCode,
                 SelectedTrainee = new List<string>(),
-                Custom4 =custom4,
+                Custom4 = custom4,
                 GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
             };
 
@@ -69,8 +71,7 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
-            BindDBTMTest(dBTMTraineeAssignmentViewModel);
-
+            BindCentrewsieActivity(dBTMTraineeAssignmentViewModel);
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
@@ -86,7 +87,7 @@ namespace Coditech.Admin.Controllers
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
                     if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId});
+                        return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId });
                     }
                     else if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
@@ -101,14 +102,14 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
-            BindDBTMTest(dBTMTraineeAssignmentViewModel);
+            BindCentrewsieActivity(dBTMTraineeAssignmentViewModel);
 
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTraineeAssignmentViewModel.ErrorMessage));
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
         [HttpGet]
-        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId , string custom4)
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId, string custom4)
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
             dBTMTraineeAssignmentViewModel.Custom4 = custom4;
@@ -116,7 +117,7 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel )
+        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
         {
             ModelState.Remove("DBTMTestStatusEnumId");
             ModelState.Remove("SelectedTrainee");
@@ -151,11 +152,11 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                     ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1 ,SelectedParameter4 = custom4 });
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1, SelectedParameter4 = custom4 });
             }
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode , SelectedParameter4 = custom4 });
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4 = custom4 });
         }
 
         public ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId, string custom4)
@@ -173,7 +174,7 @@ namespace Coditech.Admin.Controllers
             {
                 SetNotificationMessage(GetErrorNotificationMessage(model.ErrorMessage));
             }
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId), SelectedParameter4=custom4 });
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId), SelectedParameter4 = custom4 });
         }
 
         public ActionResult GetTrainerByCentreCode(string centreCode)
@@ -202,7 +203,7 @@ namespace Coditech.Admin.Controllers
 
         public virtual ActionResult Cancel(string SelectedCentreCode, string GeneralTrainerMasterId, string custom4)
         {
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId , SelectedParameter4 = custom4 };
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId, SelectedParameter4 = custom4 };
             return RedirectToAction("List", dataTableViewModel);
         }
 
@@ -249,6 +250,28 @@ namespace Coditech.Admin.Controllers
         }
         #endregion
         #region Protected
+        protected virtual void BindCentrewsieActivity(DBTMTraineeAssignmentViewModel model)
+        {
+            model.DBTMTestList ??= new List<SelectListItem>();
+            if (string.IsNullOrEmpty(model.SelectedCentreCode))
+            {
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                model.SelectedCentreCode = userModel?.SelectedCentreCode;
+            }
+            if (string.IsNullOrEmpty(model.SelectedCentreCode))
+                return;
+            DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(model.SelectedCentreCode);
+            if (response?.DBTMCentreWiseTestList == null)
+                return;
+            model.DBTMTestList.AddRange(response.DBTMCentreWiseTestList
+                .OrderBy(x => x.TestName)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.TestName,
+                    Value = x.DBTMTestMasterId.ToString()
+                })
+            );
+        }
         protected virtual void BindDBTMTest(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
         {
             dBTMTraineeAssignmentViewModel.DBTMTestList = dBTMTraineeAssignmentViewModel.DBTMTestList ?? new List<SelectListItem>();
@@ -256,8 +279,8 @@ namespace Coditech.Admin.Controllers
 
             if (dBTMTestList?.DBTMTestList != null)
             {
-                    foreach (var item in dBTMTestList.DBTMTestList.Where(x => x.IsActive).OrderBy(x => x.PerformanceMatrix).ThenBy(x => x.TestName))
-                    {
+                foreach (var item in dBTMTestList.DBTMTestList.Where(x => x.IsActive).OrderBy(x => x.PerformanceMatrix).ThenBy(x => x.TestName))
+                {
                     dBTMTraineeAssignmentViewModel.DBTMTestList.Add(new SelectListItem
                     {
                         Text = item.TestName,
