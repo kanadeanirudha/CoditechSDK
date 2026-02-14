@@ -6,7 +6,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Data;
-using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
     public class DBTMCentreWiseSettingService : IDBTMCentreWiseSettingService
