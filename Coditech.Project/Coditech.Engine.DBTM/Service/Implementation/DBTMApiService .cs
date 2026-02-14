@@ -234,14 +234,12 @@ namespace Coditech.API.Service
 
             if (dbtmTestMasterIds?.Count > 0)
             {
+                string centreCode = _generalBatchRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(y => y.CentreCode).FirstOrDefault();
                 List<DBTMTestMaster> testDetailList = (from test in _dBTMTestMasterRepository.Table
                                                        join centreTest in _dBTMCentreWiseTestRepository.Table
                                                            on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
-                                                       join batch in _generalBatchRepository.Table
-                                                           on centreTest.CentreCode equals batch.CentreCode
-                                                       where batch.GeneralBatchMasterId == generalBatchMasterId
-                                                             && dbtmTestMasterIds.Contains(test.DBTMTestMasterId)
-                                                             && test.IsActive
+                                                       where dbtmTestMasterIds.Contains(test.DBTMTestMasterId)
+                                                             && test.IsActive && centreTest.CentreCode == centreCode
                                                        select test)?.Distinct()?.ToList();
 
                 if (testDetailList?.Count == 0)
