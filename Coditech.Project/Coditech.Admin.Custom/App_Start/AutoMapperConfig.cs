@@ -70,6 +70,8 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMTraineeUploadModel, DBTMTraineeUploadResultViewModel>().ReverseMap();
             CreateMap<DBTMCentreWiseTestModel, DBTMCentreWiseTestViewModel>().ReverseMap();
             CreateMap<DBTMCentreWiseTestListModel, DBTMCentreWiseTestListViewModel>().ReverseMap();
+            CreateMap<DBTMCampActivityListModel, DBTMCampActivityListViewModel>().ReverseMap();
+            CreateMap<DBTMCampActivityModel, DBTMCampActivityViewModel>().ReverseMap();
             #endregion
         }
     }

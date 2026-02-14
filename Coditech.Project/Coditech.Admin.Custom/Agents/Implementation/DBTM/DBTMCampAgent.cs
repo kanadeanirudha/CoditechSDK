@@ -203,8 +203,16 @@ namespace Coditech.Admin.Agents
                 return (DBTMCampUserViewModel)GetViewModelWithErrorMessage(dBTMCampUserViewModel, GeneralResources.ErrorFailedToCreate);
             }
         }
-
         #endregion  
+        #region DBTMCampUserList
+        public virtual DBTMCampUserListViewModel GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long DBTMCampMasterId)
+        {
+            DBTMCampUserListResponse response = _dBTMCampClient.GetCampUserListByCentreCodeAndGeneralTrainerMasterId(selectedCentreCode, generalTrainerMasterId, DBTMCampMasterId);
+            DBTMCampUserListModel DBTMCampUserList = new DBTMCampUserListModel { DBTMCampUserList = response?.DBTMCampUserList };
+            DBTMCampUserListViewModel listViewModel = new DBTMCampUserListViewModel();
+            listViewModel.DBTMCampUserList = DBTMCampUserList?.DBTMCampUserList?.ToViewModel<DBTMCampUserViewModel>().ToList();
+            return listViewModel;
+        }
         #endregion
 
         #region protected
@@ -271,6 +279,7 @@ namespace Coditech.Admin.Agents
             });
             return datatableColumnList;
         }
+        #endregion
         #endregion
     }
 }

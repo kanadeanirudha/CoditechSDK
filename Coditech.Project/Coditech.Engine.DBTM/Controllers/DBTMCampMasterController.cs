@@ -179,5 +179,28 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMCampUserResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("/DBTMCampMaster/GetCamUserListByCentreCodeAndGeneralTrainerMasterId")]
+        [Produces(typeof(DBTMCampUserListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetCamUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
+        {
+            try
+            {
+                DBTMCampUserListModel list = _dBTMCampMasterService.GetCampUserListByCentreCodeAndGeneralTrainerMasterId(selectedCentreCode, generalTrainerMasterId, dBTMCampMasterId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMCampUserListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex,"DBTMCampUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCampUserListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex,"DBTMCampUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCampUserListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
