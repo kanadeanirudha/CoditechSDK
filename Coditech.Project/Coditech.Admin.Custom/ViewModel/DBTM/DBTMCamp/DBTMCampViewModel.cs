@@ -24,5 +24,19 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Camp End Date")]
         public DateTime? CampEndDate { get; set; }
+        [Display(Name = "Frequency")]
+        public string CampFrequency { get; set; }
+        public string WeekDays { get; set; }
+        [Display(Name = "Duration")]
+        public TimeSpan? Duration { get; set; }
+        [Display(Name = "Weekly")]
+        public List<string> SelectedWeekDays { get; set; } = new List<string>();
+        public List<SelectListItem> SchedulerWeekDaysList { get; set; }
+        [Display(Name = "Is Active")]
+        public bool IsActive { get; set; }
+        [Required(ErrorMessage = "Duration Hours is required.")]
+        public string DurationHours { get; set; }
+        [Required(ErrorMessage = "Duration Minutes is required.")]
+        public string DurationMinutes { get; set; }
     }
 }

@@ -53,5 +53,6 @@ namespace Coditech.Admin.Agents
         /// <param name="DBTMCampUserViewModel">DBTMCampUserViewModel.</param>
         /// <returns>Returns updated DBTMCampUserViewModel</returns>
         DBTMCampUserViewModel AssociateUnAssociateCampwiseUser(DBTMCampUserViewModel dBTMCampUserViewModel);
+        DBTMCampUserListViewModel GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long DBTMCampMasterId);
     }
 }

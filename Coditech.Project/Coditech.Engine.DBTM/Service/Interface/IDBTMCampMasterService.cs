@@ -13,5 +13,6 @@ namespace Coditech.API.Service
         bool DeleteDBTMCamp(ParameterModel parameterModel);
         DBTMCampUserListModel GetDBTMCampUserList(long dBTMCampMasterId, string userType, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         bool AssociateUnAssociateCampwiseUser(DBTMCampUserModel model);
+        DBTMCampUserListModel GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId);
     }
 }

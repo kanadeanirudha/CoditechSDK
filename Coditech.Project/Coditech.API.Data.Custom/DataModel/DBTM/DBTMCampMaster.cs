@@ -10,6 +10,10 @@ namespace Coditech.API.Data
         public TimeSpan CampTime { get; set; }
         public DateTime CampStartDate { get; set; }
         public DateTime CampEndDate { get; set; }
+        public string CampFrequency { get; set; }
+        public string WeekDays { get; set; }
+        public Nullable<TimeSpan> Duration { get; set; }
+        public bool IsActive { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

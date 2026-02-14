@@ -30,6 +30,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
         private readonly ICoditechRepository<DBTMActivityCategory> _dBTMActivityCategoryRepository;
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
+        private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
 
 
         public DBTMApiService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -51,6 +52,7 @@ namespace Coditech.API.Service
             _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMActivityCategoryRepository = new CoditechRepository<DBTMActivityCategory>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public bool InsertDeviceDataViaFile(IFormFile file)
@@ -232,7 +234,15 @@ namespace Coditech.API.Service
 
             if (dbtmTestMasterIds?.Count > 0)
             {
-                List<DBTMTestMaster> testDetailList = _dBTMTestMasterRepository.Table.Where(x => dbtmTestMasterIds.Contains(x.DBTMTestMasterId) && x.IsActive)?.ToList();
+                List<DBTMTestMaster> testDetailList = (from test in _dBTMTestMasterRepository.Table
+                                                       join centreTest in _dBTMCentreWiseTestRepository.Table
+                                                           on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                                                       join batch in _generalBatchRepository.Table
+                                                           on centreTest.CentreCode equals batch.CentreCode
+                                                       where batch.GeneralBatchMasterId == generalBatchMasterId
+                                                             && dbtmTestMasterIds.Contains(test.DBTMTestMasterId)
+                                                             && test.IsActive
+                                                       select test)?.Distinct()?.ToList();
 
                 if (testDetailList?.Count == 0)
                 {
