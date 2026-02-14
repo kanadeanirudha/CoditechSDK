@@ -28,5 +28,6 @@ namespace Coditech.API.Service
         DBTMActivityVerticalViewSequenceListModel GetActivityVerticalViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMActivityVerticalViewSequenceModel UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceModel model);
         DBTMActivityVerticalViewSequenceModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel model);
+        DBTMCentreWiseTestListModel GetTestsByCentreCode(string centreCode);
     }
 }

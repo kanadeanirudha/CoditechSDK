@@ -4,6 +4,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Coditech.Admin.Utilities;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMReportsController : BaseController
@@ -75,9 +76,11 @@ namespace Coditech.Admin.Controllers
         public ActionResult TestWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            dBTMReportsViewModel.CentreCode = userModel?.SelectedCentreCode;
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
-            BindDBTMBatchActivity(dBTMReportsViewModel);
+            BindDBTMCentrewiseBatchActivity(dBTMReportsViewModel);
             return View(testwisemultireports, dBTMReportsViewModel);
         }
 
@@ -184,7 +187,7 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            if(string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return Json(new List<string>());
 
             List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
@@ -200,7 +203,7 @@ namespace Coditech.Admin.Controllers
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
-            BindDBTMBatchActivity(dBTMReportsViewModel);
+            BindDBTMCentrewiseBatchActivity(dBTMReportsViewModel);
             return View(namereports, dBTMReportsViewModel);
         }
 
@@ -253,6 +256,35 @@ namespace Coditech.Admin.Controllers
                         Value = item.DBTMTestMasterId.ToString(),
                     });
                 }
+            }
+        }
+        protected void BindDBTMCentrewiseBatchActivity(DBTMReportsListViewModel model)
+        {
+            model.CustomDropdownList1 ??= new List<SelectListItem>();
+            if (string.IsNullOrEmpty(model.CentreCode))
+            {
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                model.CentreCode = userModel?.SelectedCentreCode;
+            }
+            if (string.IsNullOrEmpty(model.CentreCode))
+                return;
+            DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(model.CentreCode);
+            model.CustomDropdownList1.Add(new SelectListItem
+            {
+                Text = "All",
+                Value = "0"
+            });
+            if (response?.DBTMCentreWiseTestList?.Any() == true)
+            {
+                model.CustomDropdownList1.AddRange(response.DBTMCentreWiseTestList
+                    .OrderBy(x => x.TestName)
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.TestName,
+                        Value = x.DBTMTestMasterId.ToString(),
+                        Selected = model.CustomDropdownSelectedValue1?.Contains(x.DBTMTestMasterId.ToString()) == true
+                    })
+                );
             }
         }
 

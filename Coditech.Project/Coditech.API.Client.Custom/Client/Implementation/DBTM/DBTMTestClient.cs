@@ -1097,5 +1097,49 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+        public virtual DBTMCentreWiseTestListResponse GetTestsByCentreCode(string centreCode)
+        {
+            return Task.Run(async () => await GetTestsByCentreCodeAsync(centreCode, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMCentreWiseTestListResponse> GetTestsByCentreCodeAsync(string centreCode, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(centreCode))
+                throw new ArgumentNullException(nameof(centreCode));
+            string endpoint = dBTMTestEndpoint.GetTestsByCentreCode(centreCode);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMCentreWiseTestListResponse> (response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode,objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMCentreWiseTestListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null: await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMCentreWiseTestListResponse typedBody = JsonConvert.DeserializeObject<DBTMCentreWiseTestListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

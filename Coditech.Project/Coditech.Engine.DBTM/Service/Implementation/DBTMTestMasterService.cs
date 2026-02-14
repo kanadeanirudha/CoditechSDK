@@ -26,6 +26,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         private readonly ICoditechRepository<DBTMPerformanceMatrix> _dBTMPerformanceMatrixRepository;
         private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMActivityVerticalViewSequenceMasterRepository;
+        private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -41,6 +42,7 @@ namespace Coditech.API.Service
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMPerformanceMatrixRepository = new CoditechRepository<DBTMPerformanceMatrix>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -59,6 +61,29 @@ namespace Coditech.API.Service
             listModel.DBTMTestList = dBTMTestList?.Count > 0 ? dBTMTestList : new List<DBTMTestModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;
+        }
+
+        //Centrewise Test List
+        public virtual DBTMCentreWiseTestListModel GetTestsByCentreCode(string centreCode)
+        {
+            var testList = (from test in _dBTMTestMasterRepository.Table
+                            join centreTest in _dBTMCentreWiseTestRepository.Table
+                                on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                            where centreTest.CentreCode == centreCode
+                            select new DBTMCentreWiseTestModel
+                            {
+                                DBTMTestMasterId = test.DBTMTestMasterId,
+                                TestName = test.TestName,
+                                CentreCode = centreTest.CentreCode,
+                                DBTMCentreWiseTestId = centreTest.DBTMCentreWiseTestId,
+                                IsAssociated = true
+                            })
+                   .ToList();
+            DBTMCentreWiseTestListModel model = new DBTMCentreWiseTestListModel
+            {
+                DBTMCentreWiseTestList = testList
+            };
+            return model;
         }
 
         //Create DBTMTest.

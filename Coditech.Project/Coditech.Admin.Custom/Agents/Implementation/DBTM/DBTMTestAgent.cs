@@ -427,6 +427,13 @@ namespace Coditech.Admin.Agents
             }
         }
         #endregion
+        public virtual DBTMCentreWiseTestListViewModel GetTestsByCentreCode(string centreCode)
+        {
+            DBTMCentreWiseTestListResponse response = _dBTMTestClient.GetTestsByCentreCode(centreCode);
+            DBTMCentreWiseTestListViewModel listViewModel =  new DBTMCentreWiseTestListViewModel();
+            listViewModel.DBTMCentreWiseTestList = response?.DBTMCentreWiseTestList?.ToViewModel<DBTMCentreWiseTestViewModel>().ToList();
+            return listViewModel;
+        }
         #endregion
 
         #region protected
