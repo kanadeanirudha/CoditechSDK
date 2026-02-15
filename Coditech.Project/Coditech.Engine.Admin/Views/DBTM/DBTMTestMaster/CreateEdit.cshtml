@@ -1,6 +1,6 @@
 ﻿@model DBTMTestViewModel
 @{
-    ViewBag.Title = Model.DBTMTestMasterId > 0 ? "Update DBTM Test" : "Add DBTM Test";
+    ViewBag.Title = Model.DBTMTestMasterId > 0 ? "Update Activity" : "Add Activity";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.DBTMTestMasterId > 0 ? "col-lg-10" : "col-lg-12";
