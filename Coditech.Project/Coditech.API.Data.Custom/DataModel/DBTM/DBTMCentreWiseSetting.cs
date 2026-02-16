@@ -11,6 +11,7 @@ namespace Coditech.API.Data
 
         public string CentreCode { get; set; }
         public string TypeOfCentre { get; set; }
+        public int AllowJoiningCode { get; set; }
         public long? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public long? ModifiedBy { get; set; }
