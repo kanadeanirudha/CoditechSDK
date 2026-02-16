@@ -4,9 +4,11 @@ using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Resources;
 using Newtonsoft.Json;
 using System.Diagnostics;
 namespace Coditech.Admin.Agents
@@ -67,7 +69,7 @@ namespace Coditech.Admin.Agents
             {
                 trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? "";
             }
-            DBTMOrganisationCentrewiseJoiningCodeViewModel viewModel =  new DBTMOrganisationCentrewiseJoiningCodeViewModel();
+            DBTMOrganisationCentrewiseJoiningCodeViewModel viewModel = new DBTMOrganisationCentrewiseJoiningCodeViewModel();
             DBTMOrganisationCentrewiseJoiningCodeResponse response = _dBTMOrganisationCentrewiseJoiningCodeClient.GetTraineeActiveJoiningCode(centreCode, trainerId);
             viewModel.FilePath = response.FilePath;
             viewModel.FileName = response.FileName;
@@ -87,6 +89,26 @@ namespace Coditech.Admin.Agents
             {
                 _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
                 return false;
+            }
+        }
+        public override OrganisationCentrewiseJoiningCodeViewModel CreateOrganisationCentrewiseJoiningCode(OrganisationCentrewiseJoiningCodeViewModel organisationCentrewiseJoiningCodeViewModel)
+        {
+            try
+            {
+                OrganisationCentrewiseJoiningCodeResponse response = _organisationCentrewiseJoiningCodeClient.CreateOrganisationCentrewiseJoiningCode(organisationCentrewiseJoiningCodeViewModel.ToModel<OrganisationCentrewiseJoiningCodeModel>());
+                OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = response?.OrganisationCentrewiseJoiningCodeModel;
+                return HelperUtility.IsNotNull(organisationCentrewiseJoiningCodeModel) ? organisationCentrewiseJoiningCodeModel.ToViewModel<OrganisationCentrewiseJoiningCodeViewModel>() : new OrganisationCentrewiseJoiningCodeViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.OrganisationCentrewiseJoiningCode.ToString(), TraceLevel.Warning);
+
+                return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, ex.ErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.OrganisationCentrewiseJoiningCode.ToString(), TraceLevel.Error);
+                return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, GeneralResources.ErrorFailedToCreate);
             }
         }
         #endregion

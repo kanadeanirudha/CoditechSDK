@@ -52,6 +52,7 @@
         public const string InstantaneousChart = "InstantaneousChart";
         public const string ProgressChart = "ProgressChart";
         public const string Dropdown = "Dropdown";
+        public const string Trainee = "Trainee";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

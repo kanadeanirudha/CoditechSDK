@@ -8,8 +8,6 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
@@ -17,10 +15,18 @@ namespace Coditech.API.Service
 {
     public class DBTMOrganisationCentrewiseJoiningCodeService : OrganisationCentrewiseJoiningCodeService, IDBTMOrganisationCentrewiseJoiningCodeService
     {
+          protected readonly IServiceProvider _serviceProvider;
+        protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
+        private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
+        private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
         public DBTMOrganisationCentrewiseJoiningCodeService(ICoditechLogging coditechLogging, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IServiceProvider serviceProvider) : base(coditechLogging, coditechEmail, coditechSMS, coditechWhatsApp, serviceProvider)
         {
+            _serviceProvider = serviceProvider;
+            _coditechLogging = coditechLogging;
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
         public override OrganisationCentrewiseJoiningCodeListModel GetOrganisationCentrewiseJoiningCodeList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
@@ -53,6 +59,24 @@ namespace Coditech.API.Service
             if (IsNull(organisationCentrewiseJoiningCodeModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            int? allowJoiningCodeCount = _dBTMCentreWiseSettingRepository.Table .Where(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode).Select(x => (int?)x.AllowJoiningCode).FirstOrDefault();
+
+            string traineeEnumCode = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId).Select(x => x.EnumName).FirstOrDefault();
+
+            if (!allowJoiningCodeCount.HasValue)
+                throw new CoditechException(ErrorCodes.NotFound, "Joining code limit not configured for this centre.");
+
+            if (traineeEnumCode == CustomConstants.Trainee)
+            {
+                int existingJoiningCodeCount = _organisationCentrewiseJoiningCodeRepository.Table.Count(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode && x.JoiningCodeTypeEnumId == organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId);
+
+                if ((existingJoiningCodeCount + organisationCentrewiseJoiningCodeModel.Quantity) > allowJoiningCodeCount.Value)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData,$"Joining code limit exceeded. Allowed: {allowJoiningCodeCount.Value}, Existing: {existingJoiningCodeCount}. Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
+
+                }
+            }
+
             List<OrganisationCentrewiseJoiningCode> insertList = new List<OrganisationCentrewiseJoiningCode>();
             for (int i = 1; i <= organisationCentrewiseJoiningCodeModel.Quantity; i++)
             {
@@ -72,12 +96,12 @@ namespace Coditech.API.Service
         }
 
         //GetTraineeActiveJoiningCodeList
-        public List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode,string trainerId, int rows)
+        public List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows)
         {
             FilterCollection filters = new FilterCollection();
-            NameValueCollection sorts = new NameValueCollection {{ "a.JoiningCode", "ASC" }};
+            NameValueCollection sorts = new NameValueCollection { { "a.JoiningCode", "ASC" } };
             PageListModel pageListModel = new PageListModel(filters, sorts, 1, rows);
-            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 324, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
@@ -86,12 +110,12 @@ namespace Coditech.API.Service
             repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            return repo.ExecuteStoredProcedureList( "Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            return repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
         }
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId, int rows)
         {
-            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows).OrderBy(x => x.Custom2).ToList(); 
+            List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows).OrderBy(x => x.Custom2).ToList();
             if (list == null || !list.Any())
                 return new DBTMOrganisationCentrewiseJoiningCodeModel();
             string currentDir = Directory.GetCurrentDirectory();
