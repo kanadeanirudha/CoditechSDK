@@ -282,11 +282,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/dbtmapi/Gettraineesbyperformedactivity")]
         [Produces(typeof(DBTMTraineeDetailsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds)
+        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds , string centreCode)
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds);
+                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds, centreCode);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
             }
