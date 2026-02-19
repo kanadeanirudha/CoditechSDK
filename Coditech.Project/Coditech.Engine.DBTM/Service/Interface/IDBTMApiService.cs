@@ -13,7 +13,7 @@ namespace Coditech.API.Service
         string GetJoiningCode(string generalTrainerMasterId);
         string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId);
         bool InsertDeviceDataViaFile(IFormFile file);
-        DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds);
+        DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode);
         DBTMTestListModel GetactivitiesBytrainee(long selectedTraineeId);
         List<DBTMGeneralBatchUserModel> GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId);
     }
