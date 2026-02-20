@@ -310,7 +310,6 @@ namespace Coditech.Admin.Controllers
             }
         }
         [HttpGet]
-        [HttpGet]
         public ActionResult GetProfileDetailsList()
         {
             DBTMTraineeProfileListViewModel model = new DBTMTraineeProfileListViewModel();
