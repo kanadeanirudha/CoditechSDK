@@ -4,7 +4,7 @@
     {
         public long DBTMDeviceDataId { get; set; }
         public string ParameterCode { get; set; }
-        public decimal ParameterValue { get; set; }
+        public string ParameterValue { get; set ; }
         public string FromTo { get; set; }
         public Int16 Row { get; set; }
         public decimal Weight { get; set; }

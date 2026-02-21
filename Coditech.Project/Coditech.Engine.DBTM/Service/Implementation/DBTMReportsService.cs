@@ -318,28 +318,28 @@ namespace Coditech.API.Service
                         {
                             for (short index = 1; index <= 12; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
                         {
                             for (int index = 1; index <= 6; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
                         {
                             for (int index = 1; index <= 4; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
                         {
                             for (int index = 1; index <= 3; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
@@ -988,13 +988,15 @@ namespace Coditech.API.Service
                         if (updatedColumnName.Contains("{Distance*Row}"))
                         {
 
-                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
+                            //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue ?? "0") * Convert.ToInt32(spilt[1]);
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{Distance*Row}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
                         else if (updatedColumnName.Contains("{FromToDistance}"))
                         {
-                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
+                            //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue ?? "0");
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{FromToDistance}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
