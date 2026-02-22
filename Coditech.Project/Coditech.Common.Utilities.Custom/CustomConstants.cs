@@ -52,6 +52,7 @@
         public const string InstantaneousChart = "InstantaneousChart";
         public const string ProgressChart = "ProgressChart";
         public const string Dropdown = "Dropdown";
+        public const string Trainee = "Trainee";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";
@@ -60,6 +61,32 @@
         public const string FiveZeroFiveAgilityTest = "FiveZeroFiveAgilityTest";
         public const string ProAgilityTest = "ProAgilityTest";
         public const string PlateTapTest = "PlateTapTest";
+        #endregion
+
+        #region Template Header 
+        public static class ExcelTemplateColumns
+        {
+            public const string JoiningCode = "JoiningCode";
+            public const string TraineeTitle = "TraineeTitle";
+            public const string FirstName = "FirstName";
+            public const string MiddleName = "MiddleName";
+            public const string LastName = "LastName";
+            public const string DisplayName = "DisplayName";
+            public const string CallingCode = "CallingCode";
+            public const string MobileNumber = "MobileNumber";
+            public const string EmailAddress = "EmailAddress";
+            public const string Gender = "Gender";
+            public const string HeightCm = "HeightCm";
+            public const string WeightKg = "WeightKg";
+            public const string DateOfBirth = "DateOfBirth";
+            public const string SchoolOrCollegeOrClub = "SchoolOrCollegeOrClub";
+            public const string AgeGroup = "AgeGroup";
+            public const string BatchName = "BatchName";
+            public const string TrainerName = "BatchName";
+            public const string Specialization = "Specialization";
+            public const string SrNo = "SrNo";
+            public const string ErrorMessage = "ErrorMessage";
+        }
         #endregion
     }
 }

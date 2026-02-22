@@ -72,16 +72,16 @@ namespace Coditech.API.Service
             if (IsNull(dBTMDeviceDataModelList))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            if (dBTMDeviceDataModelList.Any(x => x.PersonCode == "DryRun"))
-            {
-                return true;
-            }
 
             if (dBTMDeviceDataModelList.Count > 0)
             {
                 DateTime? createdDate = null;
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
+                    if (dBTMDeviceDataModel.PersonCode == "DryRun")
+                    {
+                        continue;
+                    }
                     createdDate = DateTime.Now;
                     DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails();
                     if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
@@ -107,7 +107,7 @@ namespace Coditech.API.Service
                     };
 
                     DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
-
+                   
                     if (DBTMDeviceDataDetails?.DBTMDeviceDataId > 0)
                     {
                         dBTMDeviceDataModel.DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId;
@@ -118,7 +118,7 @@ namespace Coditech.API.Service
                             {
                                 DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
                                 ParameterCode = item.ParameterCode,
-                                ParameterValue = item.ParameterValue,
+                                ParameterValue = Convert.ToString( item.ParameterValue),
                                 FromTo = item.FromTo,
                                 Row = item.Row,
                                 Unit = item.Unit,
@@ -362,14 +362,15 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
-        public DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds)
+        public DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@DBTMTestMasterIds", dBTMTestMasterIds, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @DBTMTestMasterIds,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @CentreCode,@DBTMTestMasterIds,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
 
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();

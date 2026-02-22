@@ -11,8 +11,8 @@ namespace Coditech.API.Data
 
         public string ParameterCode { get; set; }
 
-        [Column(TypeName = "decimal(10,3)")]
-        public decimal ParameterValue { get; set; }
+        //[Column(TypeName = "decimal(10,3)")]
+        public string ParameterValue { get; set; }
         public string FromTo { get; set; }
         public short Row { get; set; }
         public string Unit { get; set; }

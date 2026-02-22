@@ -5,6 +5,7 @@
         public long DBTMCentreWiseSettingId { get; set; }
         public string CentreCode { get; set; }
         public string TypeOfCentre { get; set; }
+        public int AllowJoiningCode { get; set; }
         public int OrganisationCentreMasterId { get; set; }
         public DBTMCentreWiseTestListModel TestListModel { get; set; }
     }
