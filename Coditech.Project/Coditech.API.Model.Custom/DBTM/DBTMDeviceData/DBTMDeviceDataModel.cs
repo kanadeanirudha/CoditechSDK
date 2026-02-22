@@ -39,7 +39,7 @@ namespace Coditech.Common.API.Model
         [JsonPropertyName("PC")]
         public string ParameterCode { get; set; }
         [JsonPropertyName("PV")]
-        public string ParameterValue { get; set; }
+        public decimal ParameterValue { get; set; }
         public string FromTo { get; set; }
         public short Row { get; set; }
         [JsonPropertyName("U")]
