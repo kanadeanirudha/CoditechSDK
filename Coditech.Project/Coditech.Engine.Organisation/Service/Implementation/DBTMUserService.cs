@@ -442,17 +442,17 @@ namespace Coditech.API.Service
         public DBTMTraineeUploadModel UploadTrainee(DBTMTraineeUploadModel table)
         {
             DataTable dt = table.DataTable;
-            if (!dt.Columns.Contains("SrNo"))
+            if (!dt.Columns.Contains(ExcelTemplateColumns.SrNo))
             {
-                dt.Columns.Add("SrNo", typeof(int));
-                dt.Columns["SrNo"].SetOrdinal(0);
+                dt.Columns.Add(ExcelTemplateColumns.SrNo, typeof(int));
+                dt.Columns[ExcelTemplateColumns.SrNo].SetOrdinal(0);
             }
-            if (!dt.Columns.Contains("ErrorMessage"))
+            if (!dt.Columns.Contains(ExcelTemplateColumns.ErrorMessage))
             {
-                dt.Columns.Add("ErrorMessage");
+                dt.Columns.Add(ExcelTemplateColumns.ErrorMessage);
             }
-            dt.Columns["ErrorMessage"].SetOrdinal(1);
-            List<string> joiningCodes = dt.AsEnumerable().Select(r => r["JoiningCode"]?.ToString()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+            dt.Columns[ExcelTemplateColumns.ErrorMessage].SetOrdinal(1);
+            List<string> joiningCodes = dt.AsEnumerable().Select(r => r[ExcelTemplateColumns.JoiningCode]?.ToString()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             var joiningCodeList = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => joiningCodes.Contains(x.JoiningCode)).ToList();
             var joiningTrainerMap = joiningCodeList.ToDictionary(x => x.JoiningCode, x => Convert.ToInt64(x.Custom1));
             // Validation
@@ -461,15 +461,15 @@ namespace Coditech.API.Service
             var callingCodeSet = GetCallingCodeSet();
             foreach (DataRow row in dt.Rows)
             {
-                row["SrNo"] = sr++;
+                row[ExcelTemplateColumns.SrNo] = sr++;
                 if (!ValidateRow(row, joiningCodeList, joiningTrainerMap, callingCodeSet, out string error))
                 {
-                    row["ErrorMessage"] = error;
+                    row[ExcelTemplateColumns.ErrorMessage] = error;
                     hasAnyError = true;
                 }
                 else
                 {
-                    row["ErrorMessage"] = null;
+                    row[ExcelTemplateColumns.ErrorMessage] = null;
                 }
             }
             int success = 0;
@@ -483,7 +483,7 @@ namespace Coditech.API.Service
             {
                 if (!InsertTrainee(row, joiningTrainerMap, out string err))
                 {
-                    row["ErrorMessage"] = err;
+                    row[ExcelTemplateColumns.ErrorMessage] = err;
                 }
                 else
                 {
@@ -520,7 +520,7 @@ namespace Coditech.API.Service
         private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, HashSet<string> callingCodeSet, out string errorMessage)
         {
             List<string> errors = new List<string>();
-            string joiningCode = row.Table.Columns.Contains("JoiningCode") ? row["JoiningCode"]?.ToString() : null;
+            string joiningCode = row.Table.Columns.Contains(ExcelTemplateColumns.JoiningCode) ? row[ExcelTemplateColumns.JoiningCode]?.ToString() : null;
             string title = GetValue(row, ExcelTemplateColumns.TraineeTitle);
             string firstName = GetValue(row, ExcelTemplateColumns.FirstName);
             string middleName = GetValue(row, ExcelTemplateColumns.MiddleName);

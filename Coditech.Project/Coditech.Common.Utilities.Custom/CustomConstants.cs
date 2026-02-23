@@ -82,7 +82,7 @@
             public const string SchoolOrCollegeOrClub = "SchoolOrCollegeOrClub";
             public const string AgeGroup = "AgeGroup";
             public const string BatchName = "BatchName";
-            public const string TrainerName = "BatchName";
+            public const string TrainerName = "TrainerName";
             public const string Specialization = "Specialization";
             public const string SrNo = "SrNo";
             public const string ErrorMessage = "ErrorMessage";
