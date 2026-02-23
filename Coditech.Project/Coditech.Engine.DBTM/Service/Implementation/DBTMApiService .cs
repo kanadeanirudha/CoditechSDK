@@ -72,16 +72,16 @@ namespace Coditech.API.Service
             if (IsNull(dBTMDeviceDataModelList))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            if (dBTMDeviceDataModelList.Any(x => x.PersonCode == "DryRun"))
-            {
-                return true;
-            }
 
             if (dBTMDeviceDataModelList.Count > 0)
             {
                 DateTime? createdDate = null;
                 foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
                 {
+                    if (dBTMDeviceDataModel.PersonCode == "DryRun")
+                    {
+                        continue;
+                    }
                     createdDate = DateTime.Now;
                     DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails();
                     if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
@@ -107,7 +107,7 @@ namespace Coditech.API.Service
                     };
 
                     DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
-
+                   
                     if (DBTMDeviceDataDetails?.DBTMDeviceDataId > 0)
                     {
                         dBTMDeviceDataModel.DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId;
@@ -118,7 +118,7 @@ namespace Coditech.API.Service
                             {
                                 DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
                                 ParameterCode = item.ParameterCode,
-                                ParameterValue = item.ParameterValue,
+                                ParameterValue = Convert.ToString( item.ParameterValue),
                                 FromTo = item.FromTo,
                                 Row = item.Row,
                                 Unit = item.Unit,
