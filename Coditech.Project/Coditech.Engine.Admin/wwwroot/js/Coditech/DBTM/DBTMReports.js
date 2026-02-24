@@ -594,20 +594,15 @@ var DBTMReports = {
     },
 
     GetBatchWiseTraineeProfileDetailsList: function () {
-
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
-
+        var orderBy = $("#OrderBy").val();
         if (Array.isArray(dbtmTraineeDetailId)) {
             dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
         }
-
         $("#DBTMBatchWiseTraineeProfileDetailsDivId").html("");
-
         if (generalBatchMasterId && dbtmTraineeDetailId) {
-
             CoditechCommon.ShowLodder();
-
             $.ajax({
                 cache: false,
                 type: "GET",
@@ -615,7 +610,8 @@ var DBTMReports = {
                 url: "/DBTMReports/GetBatchWiseTraineeProfileDetailsList",
                 data: {
                     generalBatchMasterId: generalBatchMasterId,
-                    dbtmTraineeDetailIds: dbtmTraineeDetailId
+                    dbtmTraineeDetailIds: dbtmTraineeDetailId,
+                    orderBy: orderBy
                 },
                 success: function (data) {
                     $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
@@ -625,12 +621,10 @@ var DBTMReports = {
                     if (xhr.status == 401 || xhr.status == 403) {
                         location.reload();
                     }
-
                     CoditechNotification.DisplayNotificationMessage(
                         "Failed to retrieve Batch trainees.",
                         "error"
                     );
-
                     CoditechCommon.HideLodder();
                 }
             });
@@ -642,7 +636,6 @@ var DBTMReports = {
                 "Please select a batch.",
                 "error"
             );
-
         }
         else if (!dbtmTraineeDetailId) {
 
@@ -650,9 +643,6 @@ var DBTMReports = {
                 "Please select a trainee.",
                 "error"
             );
-
         }
     },
-
-
 };

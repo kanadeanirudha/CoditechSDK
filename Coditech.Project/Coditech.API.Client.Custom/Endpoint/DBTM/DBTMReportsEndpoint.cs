@@ -64,9 +64,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetBatchWiseUser?generalBatchMasterId={generalBatchMasterId}";
             return endpoint;
         }
-        public string GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds)
+        public string GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}&orderBy={orderBy}";
             return endpoint;
         }
     }

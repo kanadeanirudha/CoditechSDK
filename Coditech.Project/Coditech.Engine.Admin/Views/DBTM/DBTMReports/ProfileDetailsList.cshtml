@@ -3,6 +3,7 @@
     ViewBag.Title = "Trainee Profile Details";
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetBatchUserListByBatchId()", IsCustomDropdown = true };
     DropdownViewModel traineeDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseUser.ToString(), DropdownName = "DBTMTraineeDetailId", DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(), IsCustomDropdown = true, ChangeEvent = "DBTMReports.GetBatchWiseTraineeProfileDetailsList('" + Model.GeneralBatchMasterId + "')" };
+    DropdownViewModel orderByDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.OrderBy.ToString(), DropdownName = "OrderBy", DropdownSelectedValue = Model.OrderBy, IsCustomDropdown = true };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -25,23 +26,28 @@
                             <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
                             </div>
-                    
+
                             <div class="col-md-1">
                                 <label class="form-label required" for="CustomDropdownSelectedValue1">Trainee List</label>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="mb-3 multiselect-dropdown">
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTraineeDetailId", multiple = "multiple", data_live_search = "true" })
                                 </div>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">Order By</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", orderByDropdown)
                             </div>
                             <div class="col-md-1">
                                 <input type="button"
                                        class="btn btn-success"
                                        value="Show"
                                        id="ShowDataId"
-                                       onclick="DBTMReports.GetBatchWiseTraineeProfileDetailsList('@Model.GeneralBatchMasterId')" />
+                                       onclick="DBTMReports.GetBatchWiseTraineeProfileDetailsList()" />
                             </div>
-
                             <div id="DBTMBatchWiseTraineeProfileDetailsDivId" class="mt-3">
                             </div>
                         </div>

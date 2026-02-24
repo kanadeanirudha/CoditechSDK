@@ -10,5 +10,6 @@ namespace Coditech.Admin.ViewModel
         }
         public long DBTMTraineeDetailId { get; set; }
         public long GeneralBatchMasterId { get; set; }
+        public string OrderBy { get; set; }
     }
 }

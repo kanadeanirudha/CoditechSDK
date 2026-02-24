@@ -339,9 +339,9 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
         }
         [HttpGet]
-        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds)
+        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
-            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds);
+            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
         #endregion
