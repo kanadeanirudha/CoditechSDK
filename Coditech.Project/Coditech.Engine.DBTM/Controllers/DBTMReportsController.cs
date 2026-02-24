@@ -262,7 +262,6 @@ namespace Coditech.Engine.DBTM.Controllers
             try
             {
                 List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
-
                 if (dates == null || !dates.Any())
                     return Ok(new List<string>());
 
@@ -271,13 +270,38 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, nameof(GetActivityPerformedDates), TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "GetActivityPerformedDates", TraceLevel.Error);
                 return CreateInternalServerErrorResponse( new{ HasError = true,ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode});
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage( ex,nameof(GetActivityPerformedDates),TraceLevel.Error);
+                _coditechLogging.LogMessage( ex, "GetActivityPerformedDates", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message});
+            }
+        }
+        [HttpGet]
+        [Route("/DBTMReports/GetBatchActivityPerformedDates")]
+        [Produces("application/json")]
+        public virtual IActionResult GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            try
+            {
+                List<DateTime> dates = _dBTMReportsService.GetBatchActivityPerformedDates(dBTMTestMasterIds, generalBatchMasterId);
+                if (dates == null || !dates.Any())
+                    return Ok(new List<string>());
+
+                var result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+                return Ok(result);
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetBatchActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetBatchActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message });
             }
         }
 
@@ -295,12 +319,12 @@ namespace Coditech.Engine.DBTM.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, nameof(GetActivityVerticalDetails), TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "GetActivityVerticalDetails", TraceLevel.Error);
                 return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message,   ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex, nameof(GetActivityVerticalDetails), TraceLevel.Error);
+                _coditechLogging.LogMessage(ex, "GetActivityVerticalDetails", TraceLevel.Error);
                 return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }

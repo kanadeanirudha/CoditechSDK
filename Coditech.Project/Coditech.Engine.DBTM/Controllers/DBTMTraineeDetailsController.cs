@@ -229,11 +229,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMTraineeDetails/GetProfileDetailsList")]
         [Produces(typeof(DBTMTraineeProfileListResponse))]
-        public virtual IActionResult GetBatchWiseUser(long generalBatchMasterId, string dbtmTraineeDetailIds)
+        public virtual IActionResult GetBatchWiseUser(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
             try
             {
-                DBTMTraineeProfileListModel list = _dBTMTraineeDetailsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds);
+                DBTMTraineeProfileListModel list = _dBTMTraineeDetailsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeProfileListResponse>(data) : CreateNoContentResponse();
             }

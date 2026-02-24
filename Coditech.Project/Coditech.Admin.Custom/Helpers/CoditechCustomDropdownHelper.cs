@@ -98,6 +98,10 @@ namespace Coditech.Admin.Helpers
             {
                 BatchWiseUser(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.OrderBy.ToString()))
+            {
+                GetOrderByTraineeProfileList(dropdownViewModel, dropdownList);
+            }
 
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
@@ -617,6 +621,34 @@ namespace Coditech.Admin.Helpers
                     });
                 }
             }
+        }
+        private static void GetOrderByTraineeProfileList( DropdownViewModel dropdownViewModel,List<SelectListItem> dropdownList)
+        {
+            string selectedValue = string.IsNullOrEmpty(dropdownViewModel.DropdownSelectedValue) ? "Rank" : dropdownViewModel.DropdownSelectedValue;
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = GeneralResources.SelectLabel,
+                Value = "",
+                Selected = string.IsNullOrEmpty(selectedValue)
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "First Name",
+                Value = "FirstName",
+                Selected = selectedValue == "FirstName"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Last Name",
+                Value = "LastName",
+                Selected = selectedValue == "LastName"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Rank",
+                Value = "Rank",
+                Selected = selectedValue == "Rank"
+            });
         }
     }
 }
