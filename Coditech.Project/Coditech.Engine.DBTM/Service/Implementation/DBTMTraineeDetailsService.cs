@@ -256,7 +256,7 @@ namespace Coditech.API.Service
                                             select a.GeneralBatchMasterId
                                         ).FirstOrDefault();
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString())?.DBTMTraineeProfileList?.FirstOrDefault();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty)?.DBTMTraineeProfileList?.FirstOrDefault();
             dBTMTraineeProfileModel.GeneralBatchMasterId = generalBatchMasterId;
 
             return dBTMTraineeProfileModel;
@@ -335,7 +335,7 @@ namespace Coditech.API.Service
             return radarChart;
         }
 
-        public DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds)
+        public DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy)
         {
             DBTMTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMTraineeProfileListModel();
             CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -380,6 +380,15 @@ namespace Coditech.API.Service
                         }
                     }
                 }
+            }
+            if (list?.Count > 0)
+            {
+                if (orderBy == "Rank")
+                    list = list.OrderBy(x => Convert.ToInt32(x.Rank)).ToList();
+                else if (orderBy == "FirstName")
+                    list = list.OrderBy(x => x.FirstName).ToList();
+                else if (orderBy == "LastName")
+                    list = list.OrderBy(x => x.LastName).ToList();
             }
             dBTMTraineeProfileListModel.DBTMTraineeProfileList = list;
             return dBTMTraineeProfileListModel;
