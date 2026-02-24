@@ -209,7 +209,13 @@ namespace Coditech.Admin.Agents
 
             return dateStrings.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
         }
-        
+        public virtual List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            List<string> dateStrings = _dBTMReportsClient.GetBatchActivityPerformedDates(dBTMTestMasterIds, generalBatchMasterId);
+            if (dateStrings == null || !dateStrings.Any())
+                return new List<DateTime>();
+            return dateStrings.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
+        }
         //Delete Report .
         public virtual bool DeleteReportsFile(string fileName)
         {

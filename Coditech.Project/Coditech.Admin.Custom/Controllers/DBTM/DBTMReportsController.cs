@@ -196,6 +196,16 @@ namespace Coditech.Admin.Controllers
             return Json(result);
         }
 
+        [HttpGet]
+        public IActionResult GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds) || generalBatchMasterId <= 0)
+                return Json(new List<string>());
+            List<DateTime> dates = _dBTMReportsAgent.GetBatchActivityPerformedDates(dBTMTestMasterIds, generalBatchMasterId);
+            List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+            return Json(result);
+        }
+
         //NameWise Reports
         [HttpGet]
         public ActionResult NameWiseReports()

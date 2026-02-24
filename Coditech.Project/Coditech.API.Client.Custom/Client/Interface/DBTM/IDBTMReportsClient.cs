@@ -15,6 +15,7 @@ namespace Coditech.API.Client
         DBTMTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds);
         TrueFalseResponse DeleteReportsFile(ParameterModel body);
         List<string> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId);
+        List<string> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId);
         DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId);
     }
 }

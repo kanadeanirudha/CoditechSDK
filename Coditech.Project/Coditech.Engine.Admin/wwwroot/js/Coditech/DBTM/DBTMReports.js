@@ -223,6 +223,37 @@ var DBTMReports = {
             }
         });
     },
+    LoadBatchActivityPerformedDates: function () {
+        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0 || !generalBatchMasterId) {
+            activityPerformedDates = [];
+            $("#FromDate,#ToDate").datepicker("refresh");
+            return;
+        }
+        if (!Array.isArray(dBTMTestMasterIds)) {
+            dBTMTestMasterIds = [dBTMTestMasterIds];
+        }
+        $.ajax({
+            type: "GET",
+            url: "/DBTMReports/GetBatchActivityPerformedDates",
+            data: {
+                dBTMTestMasterIds: dBTMTestMasterIds.join(","),
+                generalBatchMasterId: generalBatchMasterId
+            },
+            success: function (data) {
+                activityPerformedDates = data || [];
+                $("#FromDate,#ToDate").datepicker("refresh");
+            },
+            error: function () {
+                activityPerformedDates = [];
+                CoditechNotification.DisplayNotificationMessage(
+                    "Failed to load batch activity dates.",
+                    "error"
+                );
+            }
+        });
+    },
 
     GetDBTMMultiTestListByGeneralBatchMasterId: function () {
         var selectedItem = $("#GeneralBatchMasterId").val();
