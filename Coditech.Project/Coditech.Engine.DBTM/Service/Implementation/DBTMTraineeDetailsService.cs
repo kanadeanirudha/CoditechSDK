@@ -683,6 +683,7 @@ namespace Coditech.API.Service
         {
             return new RadarChartModel()
             {
+                RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
                 Title = "Score",
                 Labels = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank").Select(c => c.ColumnName)),
                 Datasets = new List<RadarGraphsDatasetModel>()
