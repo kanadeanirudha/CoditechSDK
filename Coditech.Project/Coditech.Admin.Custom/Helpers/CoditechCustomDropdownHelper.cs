@@ -624,31 +624,30 @@ namespace Coditech.Admin.Helpers
         }
         private static void GetOrderByTraineeProfileList( DropdownViewModel dropdownViewModel,List<SelectListItem> dropdownList)
         {
+            string selectedValue = string.IsNullOrEmpty(dropdownViewModel.DropdownSelectedValue) ? "Rank" : dropdownViewModel.DropdownSelectedValue;
             dropdownList.Add(new SelectListItem()
             {
                 Text = GeneralResources.SelectLabel,
-                Value = ""
+                Value = "",
+                Selected = string.IsNullOrEmpty(selectedValue)
             });
-
             dropdownList.Add(new SelectListItem()
             {
                 Text = "First Name",
                 Value = "FirstName",
-                Selected = dropdownViewModel.DropdownSelectedValue == "FirstName"
+                Selected = selectedValue == "FirstName"
             });
-
             dropdownList.Add(new SelectListItem()
             {
                 Text = "Last Name",
                 Value = "LastName",
-                Selected = dropdownViewModel.DropdownSelectedValue == "LastName"
+                Selected = selectedValue == "LastName"
             });
-
             dropdownList.Add(new SelectListItem()
             {
                 Text = "Rank",
                 Value = "Rank",
-                Selected = dropdownViewModel.DropdownSelectedValue == "Rank"
+                Selected = selectedValue == "Rank"
             });
         }
     }

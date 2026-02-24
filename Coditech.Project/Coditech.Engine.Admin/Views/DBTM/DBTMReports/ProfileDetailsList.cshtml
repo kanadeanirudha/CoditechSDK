@@ -23,14 +23,14 @@
                             <div class="col-md-1">
                                 <label class="required">Batch List</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
                             </div>
 
                             <div class="col-md-1">
                                 <label class="form-label required" for="CustomDropdownSelectedValue1">Trainee List</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <div class="mb-3 multiselect-dropdown">
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTraineeDetailId", multiple = "multiple", data_live_search = "true" })
                                 </div>

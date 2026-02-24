@@ -384,7 +384,7 @@ namespace Coditech.API.Service
             if (list?.Count > 0)
             {
                 if (orderBy == "Rank")
-                    list = list.OrderBy(x => Convert.ToInt32(x.Rank)).ToList();
+                    list = list.OrderBy(x => Convert.ToInt32(x.Rank) == 0).ThenBy(x => Convert.ToInt32(x.Rank)).ToList();
                 else if (orderBy == "FirstName")
                     list = list.OrderBy(x => x.FirstName).ToList();
                 else if (orderBy == "LastName")
