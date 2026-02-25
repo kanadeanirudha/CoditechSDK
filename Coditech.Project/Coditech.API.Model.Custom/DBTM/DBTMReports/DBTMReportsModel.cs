@@ -21,5 +21,6 @@
         public string Comment1 { get; set; }
         public string Comment2 { get; set; }
         public string Comment3 { get; set; }
+        public bool IsEncrypted { get; set; }
     }
 }
