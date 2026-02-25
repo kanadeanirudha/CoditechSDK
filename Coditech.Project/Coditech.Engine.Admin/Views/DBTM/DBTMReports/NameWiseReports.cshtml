@@ -105,6 +105,11 @@
 </div>
 <iframe id="hiddenDownloader" style="display:none;"></iframe>
 <style>
+    .activity-date a {
+        background-color: #198754 !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
     .switch-field {
         display: flex;
         overflow: hidden;
@@ -179,51 +184,63 @@
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
     <script type="text/javascript">
+        function formatDate(d) {
+            return d.getFullYear() + "-"
+                + String(d.getMonth() + 1).padStart(2, "0") + "-"
+                + String(d.getDate()).padStart(2, "0");
+        }
         function updateToDate() {
             var fromDate = $("#FromDate").datepicker("getDate");
             if (fromDate) {
                 $("#ToDate").datepicker("option", "minDate", fromDate);
-
                 var toDate = $("#ToDate").datepicker("getDate");
                 if (toDate && toDate < fromDate) {
                     $("#ToDate").datepicker("setDate", fromDate);
                 }
             }
         }
-
         $(document).ready(function () {
+            DBTMReports.LoadActivityPerformedDates();
+            $("#DBTMTestMasterId").on("changed.bs.select", function () {
+                DBTMReports.LoadActivityPerformedDates();
+            });
+            $("#DBTMTraineeDetailId").change(function () {
+                DBTMReports.LoadActivityPerformedDates();
+            });
             var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
-            // FromDate
             $("#FromDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
                 dateFormat: dateFormat,
-                language: "en",
-                autoSize: true,
-                gotoCurrent: true,
-                clearBtn: true,
-                showButtonPanel: true,
-                closeText: 'Clear',
                 maxDate: new Date(),
+                beforeShowDay: function (date) {
+                    if (!activityPerformedDates || activityPerformedDates.length === 0)
+                        return [true, "", ""];
+                    var d = formatDate(date);
+                    if (activityPerformedDates.includes(d)) {
+                        return [true, "activity-date", "Activity Performed"];
+                    }
+                    return [false, "", "No activity"];
+                },
                 onSelect: function () {
                     updateToDate();
                 }
             });
-
-            // ToDate
             $("#ToDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
                 dateFormat: dateFormat,
-                language: "en",
-                autoSize: true,
-                gotoCurrent: true,
-                clearBtn: true,
-                showButtonPanel: true,
-                closeText: 'Clear',
                 maxDate: new Date(),
+                beforeShowDay: function (date) {
+                    if (!activityPerformedDates || activityPerformedDates.length === 0)
+                        return [true, "", ""];
+                    var d = formatDate(date);
+                    if (activityPerformedDates.includes(d)) {
+                        return [true, "activity-date", "Activity Performed"];
+                    }
+                    return [false, "", "No activity"];
+                },
                 onSelect: function () {
                     updateToDate();
                 }
