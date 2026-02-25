@@ -342,6 +342,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
             DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
+            list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
         #endregion
