@@ -107,7 +107,7 @@ namespace Coditech.API.Service
                     };
 
                     DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
-                   
+
                     if (DBTMDeviceDataDetails?.DBTMDeviceDataId > 0)
                     {
                         dBTMDeviceDataModel.DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId;
@@ -118,7 +118,8 @@ namespace Coditech.API.Service
                             {
                                 DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
                                 ParameterCode = item.ParameterCode,
-                                ParameterValue = Convert.ToString( item.ParameterValue),
+                                ParameterValue = dBTMTraineeDetails.CentreCode == "OBXPGVZS" ? EncryptionHelper.Encrypt(Convert.ToString(item.ParameterValue)) : Convert.ToString(item.ParameterValue),
+                                IsEncrypted = dBTMTraineeDetails.CentreCode == "OBXPGVZS" ? true : false,
                                 FromTo = item.FromTo,
                                 Row = item.Row,
                                 Unit = item.Unit,
@@ -336,14 +337,14 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileDashboardModel>(dataset.Tables["NumberOfTrainersDetails"])?.FirstOrDefault();
 
             dBTMDashboardModel.ActivityCategories = (from a in _dBTMActivityCategoryRepository.Table
-                                                        join b in _dBTMTestMasterRepository.Table on a.DBTMActivityCategoryId equals b.DBTMActivityCategoryId
-                                                        join c in _dBTMCentreWiseTestRepository.Table on b.DBTMTestMasterId equals c.DBTMTestMasterId
-                                                        where a.IsActive && c.CentreCode == dBTMDashboardModel.CentreCode
-                                                        select new
-                                                        {
-                                                            a.DBTMActivityCategoryId,
-                                                            a.ActivityCategoryName
-                                                        })
+                                                     join b in _dBTMTestMasterRepository.Table on a.DBTMActivityCategoryId equals b.DBTMActivityCategoryId
+                                                     join c in _dBTMCentreWiseTestRepository.Table on b.DBTMTestMasterId equals c.DBTMTestMasterId
+                                                     where a.IsActive && c.CentreCode == dBTMDashboardModel.CentreCode
+                                                     select new
+                                                     {
+                                                         a.DBTMActivityCategoryId,
+                                                         a.ActivityCategoryName
+                                                     })
                                                         .Distinct()
                                                         .Select(x => new DBTMMobileActivityCategoryModel
                                                         {

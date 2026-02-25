@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Coditech.Utilities
+namespace Coditech.Common.Helper.Utilities
 {
     public static class EncryptionHelper
     {
