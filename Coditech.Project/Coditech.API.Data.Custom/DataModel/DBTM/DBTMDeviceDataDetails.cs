@@ -19,6 +19,7 @@ namespace Coditech.API.Data
         public string Comment1 { get; set; }
         public string Comment2 { get; set; }
         public string Comment3 { get; set; }
+        public bool IsEncrypted { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
