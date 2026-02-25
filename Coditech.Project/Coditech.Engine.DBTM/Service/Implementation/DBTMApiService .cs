@@ -336,14 +336,21 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileDashboardModel>(dataset.Tables["NumberOfTrainersDetails"])?.FirstOrDefault();
 
             dBTMDashboardModel.ActivityCategories = (from a in _dBTMActivityCategoryRepository.Table
-                                                     join b in _dBTMTestMasterRepository.Table on a.DBTMActivityCategoryId equals b.DBTMActivityCategoryId
-                                                     join c in _dBTMCentreWiseTestRepository.Table on b.DBTMTestMasterId equals c.DBTMTestMasterId
-                                                     where a.IsActive && c.CentreCode == dBTMDashboardModel.CentreCode
-                                                     select new DBTMMobileActivityCategoryModel()
-                                                     {
-                                                         CategoryName = a.ActivityCategoryName,
-                                                         DBTMActivityCategoryId = a.DBTMActivityCategoryId
-                                                     })?.ToList();
+                                                        join b in _dBTMTestMasterRepository.Table on a.DBTMActivityCategoryId equals b.DBTMActivityCategoryId
+                                                        join c in _dBTMCentreWiseTestRepository.Table on b.DBTMTestMasterId equals c.DBTMTestMasterId
+                                                        where a.IsActive && c.CentreCode == dBTMDashboardModel.CentreCode
+                                                        select new
+                                                        {
+                                                            a.DBTMActivityCategoryId,
+                                                            a.ActivityCategoryName
+                                                        })
+                                                        .Distinct()
+                                                        .Select(x => new DBTMMobileActivityCategoryModel
+                                                        {
+                                                            DBTMActivityCategoryId = x.DBTMActivityCategoryId,
+                                                            CategoryName = x.ActivityCategoryName
+                                                        })
+                                                        .ToList();
             return dBTMDashboardModel;
         }
 
