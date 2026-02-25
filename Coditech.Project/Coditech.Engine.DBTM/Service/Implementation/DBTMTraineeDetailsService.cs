@@ -650,46 +650,50 @@ namespace Coditech.API.Service
                             lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Count).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{Convert.ToUInt32(lastRecordSum)} {DBTMCustomHelper.Unit(CustomConstants.Count)} (Total Count)";
                             previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Count && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-                            if (lastRecordSum < previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         else if (list.Any(x => x.ParameterCode == CustomConstants.Time))
                         {
                             lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
                             previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-                            if (lastRecordSum > previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         if (list.Any(x => x.ParameterCode == CustomConstants.JumpHeight))
                         {
                             lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
                             previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-                            if (lastRecordSum < previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         if (list.Any(x => x.ParameterCode == CustomConstants.JumpLength))
                         {
                             lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpLength).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpLength)} (Jump Length)";
                             previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpLength && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-                            if (lastRecordSum < previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         listModel.Add(performanceModel);
                     }
                 }
             }
             return listModel;
+        }
+
+        private static void UpdateArrowStatus(DBTMTraineeProfilePerformanceModel performanceModel, decimal lastRecordSum, decimal previousResordSum)
+        {
+            if (previousResordSum == 0 || lastRecordSum == previousResordSum)
+            {
+                performanceModel.IsUp = null;
+            }
+            else if (lastRecordSum > previousResordSum)
+            {
+                performanceModel.IsUp = false;
+            }
+            else
+            {
+                performanceModel.IsUp = true;
+            }
         }
 
         private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow)

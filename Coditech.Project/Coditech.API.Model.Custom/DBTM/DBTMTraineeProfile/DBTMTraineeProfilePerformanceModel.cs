@@ -10,7 +10,7 @@
         public string ParameterValue { get; set; }
         public bool IsEncrypted { get; set; }
         public int RowNumber { get; set; }
-        public bool IsUp { get; set; } = true;
+        public bool? IsUp { get; set; }
         public string Score { get; set; }
     }
 }
