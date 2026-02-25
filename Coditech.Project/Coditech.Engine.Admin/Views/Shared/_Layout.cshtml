@@ -40,6 +40,26 @@
     {
         <link href="~/css/layout/theme-@CoditechAdminSettings.ThemeColor" rel="stylesheet" />
     }
+
+    @if (Convert.ToString(ViewBag.IsDashboardPopup) == "true")
+    {
+        <style>
+            .topbar, .footer, .left-sidenav, .page-header {
+                display: none !important;
+            }
+
+            .page-wrapper {
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: auto !important;
+            }
+
+            .page-content {
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+        </style>
+    }
 </head>
 
 <body data-layout="horizontal" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">

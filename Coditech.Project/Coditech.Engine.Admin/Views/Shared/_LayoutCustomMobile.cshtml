@@ -33,7 +33,14 @@
     }
 </head>
 
-<body data-layout="horizontal" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background-color: #ffffff;background-position: center;background-repeat: no-repeat;background-size: cover;">
+@{
+    string bodyClass = "dark-topbar";
+    if (Convert.ToString(ViewBag.IsDashboardPopup) == "true")
+    {
+        bodyClass += " dashboard-content";
+    }
+}
+<body data-layout="horizontal" class="@bodyClass" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background-color: #ffffff;background-position: center;background-repeat: no-repeat;background-size: cover;">
     @Html.Partial("~/Views/Shared/_Loader.cshtml")
 
     @if (userData != null)
