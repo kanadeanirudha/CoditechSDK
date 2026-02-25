@@ -347,6 +347,12 @@
                     value: selectedVal2
                   }));
 
+                  $form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'isIframe',
+                    value: 'true'
+                  }));
+
                   // add antiforgery token if present
                   var $aft = $('input[name="__RequestVerificationToken"]').first();
                   if ($aft.length) $form.append($aft.clone());

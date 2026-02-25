@@ -1,22 +1,25 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
+    bool isPopup = Convert.ToString(ViewBag.IsPopup).ToLower() == "true" || !string.IsNullOrEmpty(Model.Custom4);
+    if (isPopup)
     {
         Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+        ViewBag.IsDashboardPopup = "true";
     }
     ViewBag.Title = "Add Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string css = Model.DBTMTraineeAssignmentId > 0 ? "col-lg-10" : "col-lg-12";
+    string css = Model.DBTMTraineeAssignmentId > 0 ? "col-12 col-lg-10" : "col-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("DBTMTraineeAssignmentId", Model.DBTMTraineeAssignmentId.ToString());
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "GeneralTrainerMasterId", DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), Parameter = Model.SelectedCentreCode, ChangeEvent = $"DBTMTraineeAssignment.GetDBTMTraineeListByCentreCodeAndTrainerMasterId()", IsDisabled = Model.DBTMTraineeAssignmentId > 0, IsCustomDropdown = true };
+    bool isTrainer = Convert.ToString(ViewBag.IsTrainer).ToLower() == "true";
     PageHeaderViewModel headerModel = new PageHeaderViewModel
     {
         Title = ViewBag.Title,
         SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = !string.IsNullOrEmpty(Model.Custom4) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, SelectedParameter1 = Model.Custom4 })
-         : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId }),
+        CancelUrl = (isPopup && !isTrainer) ? "" : ((isPopup || !string.IsNullOrEmpty(Model.Custom4)) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, custom4 = string.IsNullOrEmpty(Model.Custom4) ? "Mobile View" : Model.Custom4 })
+         : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId })),
         CancelButtonText = GeneralResources.CancelButtonText,
         ControllerName = controllerName,
         ActionName = actionName,
@@ -25,13 +28,13 @@
 
 }
 <!-- Page Content-->
-<div class="page-content">
-    <div class="container-fluid mt-5">
+<div class="@(isPopup ? "" : "page-content")">
+    <div class="container-fluid @(isPopup ? "mt-3" : "")">
         <div class="row">
             @* <div class="col-lg-12"> *@
             @if (Model.DBTMTraineeAssignmentId > 0)
             {
-                <div class="col-lg-2">
+                <div class="col-12 col-lg-2">
                     @Html.Partial("~/Views/DBTM/DBTMTraineeAssignment/_DBTMAssignmentSidePannel.cshtml", keyValuePairs)
                 </div>
             }
@@ -45,6 +48,8 @@
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @Html.HiddenFor(x => x.SelectedCentreCode)
                             @Html.HiddenFor(x => x.Custom4)
+                            <input type="hidden" name="ispopup" value="@Convert.ToString(ViewBag.IsPopup)" />
+                            <input type="hidden" name="istrainer" value="@Convert.ToString(ViewBag.IsTrainer)" />
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="mb-12 multiselect-dropdown">

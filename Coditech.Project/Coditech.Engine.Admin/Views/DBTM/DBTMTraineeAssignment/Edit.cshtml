@@ -1,18 +1,21 @@
 ﻿@model DBTMTraineeAssignmentViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
+    bool isPopup = Convert.ToString(ViewBag.IsPopup).ToLower() == "true" || !string.IsNullOrEmpty(Model.Custom4);
+    if (isPopup)
     {
         Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+        ViewBag.IsDashboardPopup = "true";
     }
     ViewBag.Title = "Update Trainee Assignment";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
+    bool isTrainer = Convert.ToString(ViewBag.IsTrainer).ToLower() == "true";
     PageHeaderViewModel headerModel = new PageHeaderViewModel
     {
         Title = $"{ViewBag.Title} : {Model.FirstName} {Model.LastName} - {Model.TestName}",
         SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = !string.IsNullOrEmpty(Model.Custom4) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, SelectedParameter1 = Model.Custom4 })
-         : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId }),
+        CancelUrl = (isPopup && !isTrainer) ? "" : ((isPopup || !string.IsNullOrEmpty(Model.Custom4)) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, custom4 = string.IsNullOrEmpty(Model.Custom4) ? "Mobile View" : Model.Custom4 })
+         : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId })),
         CancelButtonText = GeneralResources.CancelButtonText,
         ControllerName = controllerName,
         ActionName = actionName,
@@ -20,10 +23,10 @@
     };
 }
 <!-- Page Content-->
-<div class="page-content">
-    <div class="container-fluid mt-5">
+<div class="@(isPopup ? "" : "page-content")">
+    <div class="container-fluid @(isPopup ? "mt-3" : "")">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
@@ -34,6 +37,8 @@
                             @Html.HiddenFor(x => x.SelectedCentreCode)
                             @Html.HiddenFor(x => x.DBTMTraineeAssignmentUserId)
                             @Html.HiddenFor(x => x.Custom4)
+                            <input type="hidden" name="ispopup" value="@Convert.ToString(ViewBag.IsPopup)" />
+                            <input type="hidden" name="istrainer" value="@Convert.ToString(ViewBag.IsTrainer)" />
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">

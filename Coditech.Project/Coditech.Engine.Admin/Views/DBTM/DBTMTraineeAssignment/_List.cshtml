@@ -6,7 +6,31 @@
     }
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
+    string isPopUpView = Convert.ToString(ViewBag.IsDashboardPopup);
+    if (string.IsNullOrEmpty(isPopUpView))
+    {
+        isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
+    }
+    if (string.IsNullOrEmpty(isPopUpView) && !string.IsNullOrEmpty(Model.Custom4) && Model.Custom4.Equals("Mobile View", StringComparison.OrdinalIgnoreCase))
+    {
+        isPopUpView = "true";
+    }
+    bool isTrainer = Convert.ToBoolean(ViewBag.IsTrainer);
+    if (!string.IsNullOrEmpty(Model.Custom4))
+    {
+        controllerName = "DBTMTraineeAssignment";
+    }
+}
+@if (!string.IsNullOrEmpty(isPopUpView))
+{
+    @Html.Raw("<div id='DataTablesDivId'><div class='card'><div class='card-header d-flex justify-content-between align-items-center'><h4 class='card-title mb-0'>Assignment List</h4>")
+    <div>
+        @if (isTrainer)
+        {
+            <a href="@Url.Action("Create", "DBTMTraineeAssignment", new { custom4 = (string.IsNullOrEmpty(isPopUpView) ? "" : Model.Custom4), ispopup = string.IsNullOrEmpty(isPopUpView) ? "" : "true", istrainer = isTrainer ? "true" : "" })" class="btn btn-sm btn-primary"><i class="fas fa-plus me-2"></i>Add Assignment</a>
+        }
+    </div>
+    @Html.Raw("</div><div class='card-body'>")
 }
 @if (string.IsNullOrEmpty(isPopUpView))
 {
@@ -22,6 +46,7 @@
         <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0px; width: 100%;" role="grid" aria-describedby="datatable_info">
             @Html.Partial("~/Views/Shared/Datatable/_DatatableColumns.cshtml", Model.PageListViewModel)
             @Html.HiddenFor(x => x.SelectedParameter1)
+            @Html.Hidden("SelectedParameter4", Convert.ToBoolean(ViewBag.IsReadOnlyDashboard) ? "true" : "")
             <tbody>
                 @if (Model?.DBTMTraineeAssignmentList?.Count > 0)
                 {
@@ -37,14 +62,16 @@
                             <td class="text-center">
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableStatusData.cshtml", new DataTableStatusViewModel() { Key = item.TestStatus, Value = item.TestStatus })
                             </td>
-                            @if (string.IsNullOrEmpty(isPopUpView))
+                            @if (string.IsNullOrEmpty(isPopUpView) || isTrainer)
                             {
                                 <td class="text-center">
                                     @if (string.Equals(item.TestStatus, "Pending"))
                                     {
                                        <a href="@Url.Action("GetDBTMTraineeAssignment", controllerName, new { 
                                                 dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId, 
-                                                custom4 = Model.Custom4 
+                                                custom4 = (string.IsNullOrEmpty(isPopUpView) ? "" : Model.Custom4),
+                                                ispopup = string.IsNullOrEmpty(isPopUpView) ? "" : "true",
+                                                istrainer = isTrainer ? "true" : ""
                                              })"
                                            title="Update" 
                                            class="btn btn-sm btn-soft-success btn-circle me-2">
@@ -55,7 +82,7 @@
                                        <a href="@Url.Action("SendAssignmentReminder", controllerName, new { 
                                                 dBTMTraineeAssignmentId = item.DBTMTraineeAssignmentId,
                                                 dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId,
-                                                custom4 = Model.Custom4
+                                                custom4 = string.IsNullOrEmpty(isPopUpView) ? Model.Custom4 : "Mobile View"
                                              })"
                                            title="Send Reminder"
                                            class="btn btn-sm btn-soft-danger btn-circle">
@@ -85,7 +112,7 @@
                                                                 dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId,
                                                                 selectedCentreCode = Model.SelectedCentreCode,
                                                                 selectedParameter1 = Model.SelectedParameter1,
-                                                                custom4 = Model.Custom4
+                                                                custom4 = string.IsNullOrEmpty(isPopUpView) ? Model.Custom4 : "Mobile View"
                                                              })"
                                                            class="btn btn-outline-danger">
                                                             Delete
@@ -101,7 +128,7 @@
                                                     SelectedParameter1 = item.DBTMDeviceDataId,
                                                     SelectedParameter2 = Model.SelectedParameter2,
                                                     SelectedCentreCode = Model.SelectedCentreCode,
-                                                    custom4 = Model.Custom4
+                                                    custom4 = string.IsNullOrEmpty(isPopUpView) ? Model.Custom4 : "Mobile View"
                                                  })"
                                                title="View Assignment Result" 
                                                class="btn btn-sm btn-soft-warning btn-circle">
@@ -119,3 +146,8 @@
     </div>
 </div>
 @Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
+
+@if (!string.IsNullOrEmpty(isPopUpView))
+{
+    @Html.Raw("</div></div></div>")
+}

@@ -81,6 +81,7 @@ namespace Coditech.API.Service
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode);
             if (dBTMReportsList?.Count > 0)
             {
+                ReportsListDecryption(dBTMReportsList);
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
                 graphMaster.TestCode = dbtmTestMaster.TestCode;
                 string[] XValuesList = null;
@@ -232,7 +233,7 @@ namespace Coditech.API.Service
             var traineeDetailIds = _generalBatchUserRepository.Table
                 .Where(a => a.GeneralBatchMasterId == generalBatchMasterId
                             && a.UserType == "Trainee")
-                .Select(a => a.EntityId)  
+                .Select(a => a.EntityId)
                 .ToList();
             if (!traineeDetailIds.Any())
                 return new List<DateTime>();
@@ -792,11 +793,20 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
+        private void ReportsListDecryption(List<DBTMReportsModel> dBTMReportsList)
+        {
+            dBTMReportsList.ForEach(x =>
+            {
+                x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+            });
+        }
+
         private DataTable BindDBTMDataDetails(int dBTMTestMasterId, string centreCode, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
         {
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
+                ReportsListDecryption(dBTMReportsList);
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
@@ -1256,6 +1266,7 @@ namespace Coditech.API.Service
             }
 
             var dBTMReportsList = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == DBTMDeviceDataId).Select(x => x.FromEntityToModel<DBTMReportsModel>()).ToList();
+            ReportsListDecryption(dBTMReportsList);
             foreach (var item in dBTMReportsList)
             {
                 item.Weight = deviceData?.Weight ?? 0;
