@@ -31,7 +31,7 @@
 <!-- Page Content-->
 <div class="@(isPopup ? "" : "page-content")">
     @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
-    <div class="container-fluid @(isPopup ? "mt-3" : "mt-3")">
+    <div class="container-fluid @(isPopup ? "mt-3" : "mt-5")">
         <div class="row">
             @if (Model.GeneralBatchMasterId > 0)
             {
