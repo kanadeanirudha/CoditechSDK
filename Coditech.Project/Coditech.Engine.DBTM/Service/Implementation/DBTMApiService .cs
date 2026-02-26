@@ -118,8 +118,8 @@ namespace Coditech.API.Service
                             {
                                 DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
                                 ParameterCode = item.ParameterCode,
-                                ParameterValue = dBTMTraineeDetails.CentreCode == "OBXPGVZS" ? EncryptionHelper.Encrypt(Convert.ToString(item.ParameterValue)) : Convert.ToString(item.ParameterValue),
-                                IsEncrypted = dBTMTraineeDetails.CentreCode == "OBXPGVZS" ? true : false,
+                                ParameterValue = EncryptionHelper.Encrypt(Convert.ToString(item.ParameterValue)),
+                                IsEncrypted = true,
                                 FromTo = item.FromTo,
                                 Row = item.Row,
                                 Unit = item.Unit,
