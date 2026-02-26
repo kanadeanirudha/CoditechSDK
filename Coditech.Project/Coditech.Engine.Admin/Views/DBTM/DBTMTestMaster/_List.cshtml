@@ -19,7 +19,12 @@
                     {
                         <tr>
                             <td>@item.DBTMTestMasterId</td>
-                            <td>@item.TestName</td>
+                            <td>
+                                <a href="@Url.Action("Edit", controllerName, new { dBTMTestMasterId = item.DBTMTestMasterId })"
+                                   title="Update">
+                                    @item.TestName
+                                </a>
+                            </td>
                             <td>@item.TestCode</td>
                             <td>@item.PerformanceMatrix</td>
                             <td>@item.MinimunPairedDevice</td>

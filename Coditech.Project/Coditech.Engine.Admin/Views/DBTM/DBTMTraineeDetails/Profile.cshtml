@@ -18,7 +18,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">User Profile</h4>
+                        <h4 class="card-title mb-0">Trainee Profile</h4>
                         <div class="d-flex gap-2">
                             <button type="button"
                                     class="btn btn-success"
@@ -178,7 +178,11 @@
                                                         if (i < tests.Count)
                                                         {
                                                             <td class="text-center align-middle">@tests[i].TestName</td>
-                                                            if (tests[i].IsUp)
+                                                            if (tests[i].IsUp == null)
+                                                            {
+                                                                <td class="text-center align-middle"> @tests[i].Score</td>
+                                                            }
+                                                            else if (tests[i].IsUp == true)
                                                             {
                                                                 <td class="text-center align-middle"><i class="fas fa-arrow-up btn-soft-success"></i> @tests[i].Score</td>
                                                             }
