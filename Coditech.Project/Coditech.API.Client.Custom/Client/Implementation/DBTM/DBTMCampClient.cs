@@ -16,14 +16,14 @@ namespace Coditech.API.Client
         {
             dBTMCampEndpoint = new DBTMCampEndpoint();
         }
-        public virtual DBTMCampListResponse List(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public virtual DBTMCampListResponse List(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await ListAsync(selectedCentreCode,expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await ListAsync(selectedCentreCode, userMasterId, expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMCampListResponse> ListAsync(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMCampListResponse> ListAsync(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMCampEndpoint.ListAsync(selectedCentreCode, expand, filter, sort, pageIndex, pageSize);
+            string endpoint = dBTMCampEndpoint.ListAsync(selectedCentreCode, userMasterId, expand, filter, sort, pageIndex, pageSize);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

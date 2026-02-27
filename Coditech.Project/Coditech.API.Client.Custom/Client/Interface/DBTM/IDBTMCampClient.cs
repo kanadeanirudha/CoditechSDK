@@ -11,7 +11,7 @@ namespace Coditech.API.Client
         /// Get list of DBTM Camp.
         /// </summary>
         /// <returns>DBTMCampListResponse</returns>
-        DBTMCampListResponse List(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMCampListResponse List(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
 
         /// <summary>
         /// Create DBTMCampMaster.

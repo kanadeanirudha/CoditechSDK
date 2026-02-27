@@ -3,8 +3,8 @@
     public class DBTMCampUserModel : BaseModel
     {
         public long DBTMCampUserId { get; set; }
-        public long DBTMCampMasterId { get; set; }
-        public long DBTMTraineeDetailId { get; set; }
+        public int DBTMCampMasterId { get; set; }
+        public long EntityId { get; set; }
         public string UserType { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

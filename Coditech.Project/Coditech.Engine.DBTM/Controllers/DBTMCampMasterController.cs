@@ -27,11 +27,11 @@ namespace Coditech.API.Controllers
         [Route("/DBTMCampMaster/GetDBTMCampList")]
         [Produces(typeof(DBTMCampListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMCampList(string selectedCentreCode,FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMCampList(string selectedCentreCode, long userId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
-                DBTMCampMasterListModel list = _dBTMCampMasterService.GetDBTMCampList(selectedCentreCode, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                DBTMCampMasterListModel list = _dBTMCampMasterService.GetDBTMCampList(selectedCentreCode, userId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMCampListResponse>(data) : CreateNoContentResponse();
             }
@@ -72,7 +72,7 @@ namespace Coditech.API.Controllers
         [Route("/DBTMCampMaster/GetDBTMCamp")]
         [HttpGet]
         [Produces(typeof(DBTMCampResponse))]
-        public virtual IActionResult GetDBTMCamp(long dBTMCampMasterId)
+        public virtual IActionResult GetDBTMCamp(int dBTMCampMasterId)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace Coditech.API.Controllers
         [Route("/DBTMCampMaster/GetDBTMCampUserList")]
         [Produces(typeof(DBTMCampUserListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMCampUserList(long dBTMCampMasterId, string userType, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMCampUserList(int dBTMCampMasterId, string userType, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {

@@ -6,7 +6,7 @@ namespace Coditech.Admin.ViewModel
     public class DBTMCampActivityViewModel : BaseViewModel
     {
         public long DBTMCampActivityId { get; set; }
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
         [Required]
         [Display(Name = "Activity")]
         public int DBTMTestMasterId { get; set; }

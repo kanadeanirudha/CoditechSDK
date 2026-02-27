@@ -524,9 +524,103 @@ namespace Coditech.API.Service
 
             CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
-            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
-            if (traineeProfilePerformanceRankList != null && traineeProfilePerformanceRankList.Count > 0)
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking_A @GeneralBranchMasterId")?.ToList();
+            if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
             {
+                List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = traineeProfilePerformanceRankDataList
+                            .GroupBy(x => new
+                            {
+                                x.DBTMTraineeDetailId,
+                                x.Name,
+                                x.TestCode,
+                                x.TestName,
+                                x.CreatedDate
+                            })
+                            .Select(g => new
+                            {
+                                g.Key.DBTMTraineeDetailId,
+                                g.Key.Name,
+                                g.Key.TestCode,
+                                g.Key.TestName,
+
+                                TotalTime = g.Where(x =>
+                                            x.ParameterCode == "Time" &&
+                                            x.TestCode != "ReactionTimeTestThirtySec" &&
+                                            x.TestCode != "ReactionTimeTestThirtySix")
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue)),
+
+                                TotalLength = g.Where(x => x.ParameterCode == "JumpLength")
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue)),
+
+                                TotalHeight = g.Where(x => x.ParameterCode == "JumpHeight")
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue)),
+
+                                TotalCount = g.Where(x =>
+                                            x.ParameterCode == "Time" &&
+                                           (x.TestCode == "ReactionTimeTestThirtySec" ||
+                                            x.TestCode == "ReactionTimeTestThirtySix"))
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue))
+                            })
+                            .GroupBy(x => new
+                            {
+                                x.DBTMTraineeDetailId,
+                                x.Name,
+                                x.TestCode,
+                                x.TestName
+                            })
+                            .Select(g =>
+                            {
+                                var bestTime = g.Where(x => x.TotalTime > 0)
+                                                .Select(x => x.TotalTime)
+                                                .DefaultIfEmpty()
+                                                .Min();
+
+                                var bestLength = g.Where(x => x.TotalLength > 0)
+                                                  .Select(x => x.TotalLength)
+                                                  .DefaultIfEmpty()
+                                                  .Max();
+
+                                var bestHeight = g.Where(x => x.TotalHeight > 0)
+                                                  .Select(x => x.TotalHeight)
+                                                  .DefaultIfEmpty()
+                                                  .Max();
+
+                                var bestCount = g.Where(x => x.TotalCount > 0)
+                                                 .Select(x => x.TotalCount)
+                                                 .DefaultIfEmpty()
+                                                 .Max();
+
+                                string testResultBasedOn =
+                                    bestTime != 0 ? "BestTime" :
+                                    bestLength != 0 ? "BestLength" :
+                                    bestHeight != 0 ? "BestHeight" :
+                                    bestCount != 0 ? "BestCount" :
+                                    null;
+
+                                return new DBTMTraineeProfilePerformanceRankingModel
+                                {
+                                    DBTMTraineeDetailId = g.Key.DBTMTraineeDetailId,
+                                    Name = g.Key.Name,
+                                    TestName = g.Key.TestName,
+                                    TestCode = g.Key.TestCode,
+                                    BestTime = bestTime == 0 ? (decimal?)null : bestTime,
+                                    BestLength = bestLength == 0 ? (decimal?)null : bestLength,
+                                    BestHeight = bestHeight == 0 ? (decimal?)null : bestHeight,
+                                    BestCount = bestCount == 0 ? (decimal?)null : bestCount,
+                                    TestResultBasedon = testResultBasedOn
+                                };
+                            })
+                            .OrderBy(x => x.Name)
+                            .ThenBy(x => x.TestCode)
+                            .ToList();
                 List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestName).Distinct().ToList();
                 var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestName)
                                                                .Select(g => new
@@ -618,7 +712,6 @@ namespace Coditech.API.Service
                     }
                 }
             }
-
             return dt;
         }
 

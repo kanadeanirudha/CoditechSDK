@@ -6,9 +6,9 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMCampEndpoint : BaseEndpoint
     {
-        public string ListAsync(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public string ListAsync(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetDBTMCampList?selectedCentreCode={selectedCentreCode}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetDBTMCampList?selectedCentreCode={selectedCentreCode}&userMasterId={userMasterId}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
         public string CreateDBTMCampAsync() =>
