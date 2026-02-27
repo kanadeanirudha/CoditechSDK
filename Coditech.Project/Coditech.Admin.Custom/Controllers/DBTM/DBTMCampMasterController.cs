@@ -76,7 +76,7 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult Edit(long dBTMCampMasterId)
+        public virtual ActionResult Edit(int dBTMCampMasterId)
         {
             DBTMCampMasterViewModel dBTMCampMasterViewModel = _dBTMCampAgent.GetDBTMCamp(dBTMCampMasterId);
             BindDropdown(dBTMCampMasterViewModel);
@@ -139,7 +139,7 @@ namespace Coditech.Admin.Controllers
 
         public virtual ActionResult GetDBTMCampUserList(DataTableViewModel dataTableViewModel)
         {
-            DBTMCampUserListViewModel list = _dBTMCampAgent.GetDBTMCampUserList(Convert.ToInt64(dataTableViewModel.SelectedParameter1), Convert.ToString(dataTableViewModel.SelectedParameter2), dataTableViewModel);
+            DBTMCampUserListViewModel list = _dBTMCampAgent.GetDBTMCampUserList(Convert.ToInt16(dataTableViewModel.SelectedParameter1), Convert.ToString(dataTableViewModel.SelectedParameter2), dataTableViewModel);
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMCampMaster/DBTMCampUser/_AssociatedCampList.cshtml", list);
@@ -249,7 +249,7 @@ namespace Coditech.Admin.Controllers
                     generalBatchViewModel.CustomDropdownList2.Add(new SelectListItem
                     {
                         Text = $"{item.FirstName} {item.LastName}",
-                        Value = item.DBTMTraineeDetailId.ToString(),
+                        Value = item.EntityId.ToString(),
                     });
                 }
             }

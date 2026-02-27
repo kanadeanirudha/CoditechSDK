@@ -41,11 +41,11 @@
                             <td class="text-center">
                                 @if (item.IsAssociated)
                                 {
-                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMCampMaster.GetAssociateUnAssociateCampwiseUser('@addFollowUpModel.ModalContentId','@item.DBTMCampUserId','@Model.DBTMCampMasterId','@item.CampName','@item.FirstName','@item.LastName','@item.DBTMTraineeDetailId')" title="UnAssociate Camp From User" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMCampMaster.GetAssociateUnAssociateCampwiseUser('@addFollowUpModel.ModalContentId','@item.DBTMCampUserId','@Model.DBTMCampMasterId','@item.CampName','@item.FirstName','@item.LastName','@item.EntityId')" title="UnAssociate Camp From User" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
                                 }
                                 else if (item.IsCampActive)
                                 {
-                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMCampMaster.GetAssociateUnAssociateCampwiseUser('@addFollowUpModel.ModalContentId','@item.DBTMCampUserId','@Model.DBTMCampMasterId','@item.CampName','@item.FirstName','@item.LastName','@item.DBTMTraineeDetailId')" title="Associate Camp To User" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="DBTMCampMaster.GetAssociateUnAssociateCampwiseUser('@addFollowUpModel.ModalContentId','@item.DBTMCampUserId','@Model.DBTMCampMasterId','@item.CampName','@item.FirstName','@item.LastName','@item.EntityId')" title="Associate Camp To User" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
                                 }
                                 else
                                 {

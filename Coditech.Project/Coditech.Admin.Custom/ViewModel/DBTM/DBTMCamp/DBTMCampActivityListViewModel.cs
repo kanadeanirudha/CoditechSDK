@@ -10,6 +10,6 @@ namespace Coditech.Admin.ViewModel
             DBTMCampActivityList = new List<DBTMCampActivityViewModel>();
         }
         public string CampName { get; set; }
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
     }
 }

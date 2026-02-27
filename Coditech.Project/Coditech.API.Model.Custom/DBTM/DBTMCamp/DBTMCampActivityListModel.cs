@@ -7,7 +7,7 @@
         {
             DBTMCampActivityList = new List<DBTMCampActivityModel>();
         }
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
         public string CampName { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Coditech.API.Data
     {
         [Key]
         public long DBTMCampActivityId { get; set; }
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
         public int DBTMTestMasterId { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
