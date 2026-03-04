@@ -537,6 +537,26 @@ namespace Coditech.API.Service
             return campUserList;
         }
         #endregion
+        public virtual bool UpdateValidRecord(DBTMDeviceDataModel model)
+        {
+            if (model.DBTMDeviceDataId < 1)
+                throw new CoditechException(
+                    ErrorCodes.IdLessThanOne,
+                    string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceDataId")
+                );
+
+            DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.FirstOrDefault(x => x.DBTMDeviceDataId == model.DBTMDeviceDataId);
+
+            if (deviceData == null)
+                throw new CoditechException(ErrorCodes.NotFound, "Record not found");
+
+            // Update field
+            deviceData.IsValidRecord = model.IsValidRecord;
+
+            bool isUpdated = _dBTMDeviceDataRepository.Update(deviceData);
+
+            return isUpdated;
+        }
     }
 }
 

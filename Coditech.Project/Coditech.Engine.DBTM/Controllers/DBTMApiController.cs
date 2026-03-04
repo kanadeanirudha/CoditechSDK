@@ -354,7 +354,7 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMBatchModel model = _dBTMApiService.GetBatchDetails(dBTMCampMasterId);
+                DBTMBatchModel model = _dBTMApiService.GetCampDetails(dBTMCampMasterId);
                 return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -387,6 +387,42 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMCampActivity", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [Route("/DBTMApi/UpdateValidRecord")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public IActionResult UpdateValidRecord([FromBody] DBTMDeviceDataModel model)
+        {
+            try
+            {
+                bool status = _dBTMApiService.UpdateValidRecord(model);
+
+                return CreateOKResponse(new TrueFalseResponse
+                {
+                    IsSuccess = status
+                });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ValidRecord", TraceLevel.Warning);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ValidRecord", TraceLevel.Error);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message
+                });
             }
         }
     }

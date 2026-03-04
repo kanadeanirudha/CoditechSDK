@@ -31,6 +31,7 @@ namespace Coditech.Common.API.Model
         [Required]
         public byte NumberOfTurn { get; set; }
         public long EntityId { get; set; }
+        public bool IsValidRecord { get; set; }
         public List<DBTMDeviceDataDetailModel> DataList { get; set; }
     }
 
