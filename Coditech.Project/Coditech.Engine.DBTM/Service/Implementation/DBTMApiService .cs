@@ -31,6 +31,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMActivityCategory> _dBTMActivityCategoryRepository;
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
+        private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
+        private readonly ICoditechRepository<DBTMCampActivity> _dBTMCampActivityRepository;
 
 
         public DBTMApiService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -53,8 +55,10 @@ namespace Coditech.API.Service
             _dBTMActivityCategoryRepository = new CoditechRepository<DBTMActivityCategory>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCampMasterRepository = new CoditechRepository<DBTMCampMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCampActivityRepository = new CoditechRepository<DBTMCampActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
-
+        #region InsertDeviceData
         public bool InsertDeviceDataViaFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -66,6 +70,7 @@ namespace Coditech.API.Service
             return InsertDeviceData(dBTMDeviceDataModelList);
 
         }
+ 
         //Add DBTMDeviceData.
         public bool InsertDeviceData(List<DBTMDeviceDataModel> dBTMDeviceDataModelList)
         {
@@ -160,6 +165,8 @@ namespace Coditech.API.Service
             }
             return true;
         }
+        #endregion
+        #region DBTMBatch
 
         public List<DBTMBatchModel> GetBatchList(long entityId, string userType)
         {
@@ -268,6 +275,7 @@ namespace Coditech.API.Service
             return dBTMBatchModel;
         }
 
+
         public List<DBTMGeneralBatchUserModel> GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId)
         {
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
@@ -279,7 +287,8 @@ namespace Coditech.API.Service
             generalBatchUserList = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
             return generalBatchUserList;
         }
-
+        #endregion
+        #region Assignment
         public List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType)
         {
             long entityIds = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
@@ -320,6 +329,8 @@ namespace Coditech.API.Service
             }
             return dBTMTestApiModel;
         }
+        #endregion
+        #region TrainerDashboard
 
         //Get Trainer Dashboard Details
         public DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId)
@@ -354,7 +365,8 @@ namespace Coditech.API.Service
                                                         .ToList();
             return dBTMDashboardModel;
         }
-
+        #endregion
+        #region TraineeDashboard
         //Get Trainee Dashboard Details
         public DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId)
         {
@@ -372,6 +384,7 @@ namespace Coditech.API.Service
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
             return dBTMDashboardModel;
         }
+        #endregion
         public DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode)
         {
             //Bind the Filter, sorts & Paging details.
@@ -412,8 +425,118 @@ namespace Coditech.API.Service
             return joiningCode ?? string.Empty;
         }
 
-        private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode)
-            => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
+        private DBTMTraineeDetails GetDBTMTraineeDetailsByCode(string personCode) => _dBTMTraineeDetailsRepository.Table.Where(x => x.PersonCode == personCode).FirstOrDefault();
+
+        #region DBTMCamp
+        public List<DBTMBatchModel> GetCampList(long entityId, string userType)
+        {
+            List<DBTMBatchModel> batcheslist = null;
+            var employeeData = _employeeMasterRepository.Table
+                .Where(x => x.EmployeeId == entityId)
+                .Select(x => new { x.PersonId, x.CentreCode })
+                .FirstOrDefault();
+
+            if (employeeData != null)
+            {
+                string custom1 = _generalPersonRepository.Table
+                    .Where(x => x.PersonId == employeeData.PersonId)
+                    .Select(x => x.Custom1)
+                    .FirstOrDefault();
+
+                if (custom1 == CustomConstants.DBTMTrainer)
+                {
+                    var user = _userMasterRepository.Table
+                        .Where(x => x.EntityId == entityId && x.UserType == userType)
+                        .Select(x => new { x.UserMasterId })
+                        .FirstOrDefault();
+
+                    if (user != null)
+                    {
+                        batcheslist = _dBTMCampMasterRepository.Table
+                            .Where(x => x.CreatedBy == user.UserMasterId && x.IsActive)
+                            .Select(b => new DBTMBatchModel
+                            {
+                                DBTMCampMasterId = b.DBTMCampMasterId,
+                                CampName = b.CampName,
+                            })
+                             .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
+                    }
+                    else
+                    {
+                        batcheslist = new List<DBTMBatchModel>();
+                    }
+                }
+                else if (custom1 == CustomConstants.DBTMCentreOwner)
+                {
+                    batcheslist = (from b in _dBTMCampMasterRepository.Table
+                                   join u in _userMasterRepository.Table on b.CreatedBy equals u.UserMasterId
+                                   where b.CentreCode == employeeData.CentreCode && b.IsActive
+                                   select new DBTMBatchModel
+                                   {
+                                       DBTMCampMasterId = b.DBTMCampMasterId,
+                                       CampName = u.EntityId == entityId ? $"{b.CampName}(Self)" : $"{b.CampName}({u.FirstName} {u.LastName})",
+                                   })
+                                   .ToList().OrderBy(b => b.CampName, StringComparer.OrdinalIgnoreCase).ToList();
+                }
+                else
+                {
+                    batcheslist = new List<DBTMBatchModel>();
+                }
+            }
+            else
+            {
+                batcheslist = new List<DBTMBatchModel>();
+            }
+            return batcheslist ?? new List<DBTMBatchModel>();
+        }
+        public DBTMBatchModel GetCampDetails(int dBTMCampMasterId)
+        {
+            List<int> dbtmTestMasterIds = _dBTMCampActivityRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(x => x.DBTMTestMasterId).ToList();
+            DBTMBatchModel dBTMBatchModel = new DBTMBatchModel()
+            {
+                GeneralBatchMasterId = dBTMCampMasterId,
+            };
+
+            if (dbtmTestMasterIds?.Count > 0)
+            {
+                string centreCode = _dBTMCampMasterRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(y => y.CentreCode).FirstOrDefault();
+                List<DBTMTestMaster> testDetailList = (from test in _dBTMTestMasterRepository.Table
+                                                       join centreTest in _dBTMCentreWiseTestRepository.Table
+                                                           on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                                                       where dbtmTestMasterIds.Contains(test.DBTMTestMasterId)
+                                                             && test.IsActive && centreTest.CentreCode == centreCode
+                                                       select test)?.Distinct()?.ToList();
+
+                if (testDetailList?.Count == 0)
+                {
+                    throw new Exception("The test is not active or does not exist.");
+                }
+                else
+                {
+                    dBTMBatchModel.DBTMBatchTestList = new List<DBTMTestApiModel>();
+                    foreach (DBTMTestMaster item in testDetailList)
+                    {
+                        DBTMTestApiModel dbtmTestApiModel = item.FromEntityToModel<DBTMTestApiModel>();
+                        dbtmTestApiModel.ActivityCode = item.DBTMTestMasterId;
+                        dBTMBatchModel.DBTMBatchTestList.Add(dbtmTestApiModel);
+                    }
+                }
+            }
+            return dBTMBatchModel;
+        }
+
+        public List<DBTMGeneralBatchUserModel> GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId)
+        {
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMcampMasterId", dBTMcampMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI_V2 @DBTMcampMasterId,@DBTMTestMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
+            campUserList = campUserList ?? new List<DBTMGeneralBatchUserModel>();
+            return campUserList;
+        }
+        #endregion
     }
 }
 

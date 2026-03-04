@@ -16,5 +16,8 @@ namespace Coditech.API.Service
         DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode);
         DBTMTestListModel GetactivitiesBytrainee(long selectedTraineeId);
         List<DBTMGeneralBatchUserModel> GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId);
+        List<DBTMGeneralBatchUserModel> GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId);
+        List<DBTMBatchModel> GetCampList(long entityId, string userType);
+        DBTMBatchModel GetCampDetails(int dBTMCampMasterId);
     }
 }
