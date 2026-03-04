@@ -9,7 +9,7 @@ namespace Coditech.Admin.ViewModel
         {
             DBTMCampUserList = new List<DBTMCampUserViewModel>();
         }
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
         public string CampName { get; set; }
         public string SelectedParameter1 { get; set; }
         public string SelectedParameter2 { get; set; }

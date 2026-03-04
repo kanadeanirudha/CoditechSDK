@@ -27,6 +27,8 @@
         GraphMode,
         TypeOfCentre,
         BatchWiseUser,
+        AgeGroup,
+        OrderBy
     }
     public enum DashboardFormCustomEnum
     {

@@ -6,7 +6,7 @@ namespace Coditech.Admin.ViewModel
 {
     public class DBTMCampMasterViewModel : BaseViewModel
     {
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
         [Required]
         [MaxLength(15)]
         [Display(Name = "Centre Code")]
@@ -17,7 +17,7 @@ namespace Coditech.Admin.ViewModel
         public string CampName { get; set; }
         [Required]
         [Display(Name = "Camp Time")]
-        public TimeSpan? CampTime { get; set; }
+        public TimeSpan? CampStartTime { get; set; }
         [Required]
         [Display(Name = "Camp Start Date")]
         public DateTime? CampStartDate { get; set; }

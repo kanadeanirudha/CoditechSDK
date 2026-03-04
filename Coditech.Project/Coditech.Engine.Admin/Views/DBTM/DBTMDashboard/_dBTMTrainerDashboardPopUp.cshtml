@@ -287,13 +287,13 @@
             @Html.Hidden("dataTableModel.SelectedParameter2", Model.SelectedParameter2, new { id = "hdnSelectedParameter2" })
             <div class="tab-pane fade show active" id="batchesPane" role="tabpanel">
                 <iframe name="batchesFrame"
-                        src="/DBTMDashboard/LoadBatchesPartial"
+                        src="/DBTMDashboard/LoadBatchesPartial?isReadOnly=true"
                         frameborder="0"
                         onload="resizeIframe(this)"></iframe>
             </div>
             <div class="tab-pane fade" id="assignmentPane" role="tabpanel">
                 <iframe name="assignmentFrame"
-                        src="/DBTMDashboard/LoadAssignmentPartial"
+                        src="/DBTMDashboard/LoadAssignmentPartial?isReadOnly=true"
                         frameborder="0"
                         onload="resizeIframe(this)"></iframe>
             </div>
@@ -378,6 +378,11 @@
             name: 'dataTableModel.SelectedParameter2',
             value: selectedVal2
           }));
+          $form.append($('<input>', {
+            type: 'hidden',
+            name: 'isReadOnly',
+            value: 'true'
+          }));
 
           // add antiforgery token if present
           var $aft = $('input[name="__RequestVerificationToken"]').first();
@@ -389,7 +394,8 @@
           // GET fallback with querystring
           var url = '/DBTMDashboard/' + method + '?' + $.param({
             'dataTableModel.SelectedParameter1': selectedVal1,
-            'dataTableModel.SelectedParameter2': selectedVal2
+            'dataTableModel.SelectedParameter2': selectedVal2,
+            'isReadOnly': true
           });
           $iframe.attr('src', url);
         }

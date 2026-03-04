@@ -40,6 +40,26 @@
     {
         <link href="~/css/layout/theme-@CoditechAdminSettings.ThemeColor" rel="stylesheet" />
     }
+
+    @if (Convert.ToString(ViewBag.IsDashboardPopup) == "true")
+    {
+        <style>
+            .topbar, .footer, .left-sidenav, .page-header {
+                display: none !important;
+            }
+
+            .page-wrapper {
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: auto !important;
+            }
+
+            .page-content {
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+        </style>
+    }
 </head>
 
 <body data-layout="horizontal" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
@@ -161,46 +181,65 @@
     <script src="~/js/coditech/common/coditechdatatable.js"></script>
     <script src="~/js/coditech/common/coditechnotification.js"></script>
     <script src="~/js/coditech/user.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
+        if (performance.navigation.type == 2) {
+            location.reload();
+        }
+
+        window.onbeforeunload = function () {
+            var inputs = document.getElementsByTagName("button");
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type == "button" || inputs[i].type == "submit") {
+                    inputs[i].disabled = true;
+                }
+            }
+        };
+        function initializeSelect2Dropdowns(context) {
+            var $context = context ? $(context) : $(document);
+            var isIOS = $('body').hasClass('is-ios');
+            var selector = isIOS ? 'select.js-select2, select.selectpicker' : 'select.js-select2';
+            $context.find(selector).each(function () {
+                var $select = $(this);
+                if ($select.hasClass('select2-hidden-accessible')) return;
+                if (isIOS && $select.data('selectpicker')) {
+                    $select.selectpicker('destroy');
+                    $select.removeClass('selectpicker');
+                }
+                var dropdownParentElement = $select.closest('.modal').length ? $select.closest('.modal') : null;
+                $select.select2({
+                    allowClear: false,
+                    width: '100%',
+                    dropdownParent: dropdownParentElement,
+                    minimumResultsForSearch: 0
+                }).on('select2:opening', function (e) {
+                    $(this).next('.select2-container').css('width', '100%');
+                });
+            });
+        }
+        $(document).ready(function () {
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                $('body').addClass('is-ios');
+            }
+            initializeSelect2Dropdowns();
+            $(document).on('focus', '.select2-selection--single', function (e) {
+                var $select = $(this).closest('.select2-container').prev('select');
+                if (!$select.prop('disabled')) {
+                    $select.select2('open');
+                }
+            });
+            $(document).on('select2:open', function (e) {
+                if ($('body').hasClass('is-ios')) {
+                    setTimeout(function () {
+                        var searchField = document.querySelector('.select2-search__field');
+                        if (searchField) {
+                            searchField.focus();
+                        }
+                    }, 100); 
+                }
+            });
+        });
+    </script>
 </body>
 @await RenderSectionAsync("Scripts", required: false)
 </html>
-<script>
-    if (performance.navigation.type == 2) {
-        location.reload();
-    }
-
-    window.onbeforeunload = function () {
-        var inputs = document.getElementsByTagName("button");
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].type == "button" || inputs[i].type == "submit") {
-                inputs[i].disabled = true;
-            }
-        }
-    };
-
-    function initializeSelect2Dropdowns() {
-        $('select.js-select2').each(function () {
-            const $sel = $(this);
-            if ($sel.hasClass('select2-hidden-accessible')) {
-                $sel.select2('destroy');
-                $sel.attr('tabindex', 0);
-            }
-            $sel.select2({
-                allowClear: false,
-                width: 'resolve',
-                dropdownParent: $(this).parent()
-            });
-        });
-    }
-
-    $(document).ready(function () {
-        initializeSelect2Dropdowns();
-        $(document).on('focus', '.select2-selection--single', function () {
-            const $select = $(this).closest('.select2-container').prev('select');
-            if (!$select.prop('disabled')) {
-                $select.select2('open');
-            }
-        });
-    });
-</script>

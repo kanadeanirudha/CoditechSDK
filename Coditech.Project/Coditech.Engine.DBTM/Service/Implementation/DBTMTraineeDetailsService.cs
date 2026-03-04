@@ -256,7 +256,7 @@ namespace Coditech.API.Service
                                             select a.GeneralBatchMasterId
                                         ).FirstOrDefault();
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString())?.DBTMTraineeProfileList?.FirstOrDefault();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty)?.DBTMTraineeProfileList?.FirstOrDefault();
             dBTMTraineeProfileModel.GeneralBatchMasterId = generalBatchMasterId;
 
             return dBTMTraineeProfileModel;
@@ -335,7 +335,7 @@ namespace Coditech.API.Service
             return radarChart;
         }
 
-        public DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds)
+        public DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy)
         {
             DBTMTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMTraineeProfileListModel();
             CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -380,6 +380,15 @@ namespace Coditech.API.Service
                         }
                     }
                 }
+            }
+            if (list?.Count > 0)
+            {
+                if (orderBy == "Rank")
+                    list = list.OrderBy(x => Convert.ToInt32(x.Rank) == 0).ThenBy(x => Convert.ToInt32(x.Rank)).ToList();
+                else if (orderBy == "FirstName")
+                    list = list.OrderBy(x => x.FirstName).ToList();
+                else if (orderBy == "LastName")
+                    list = list.OrderBy(x => x.LastName).ToList();
             }
             dBTMTraineeProfileListModel.DBTMTraineeProfileList = list;
             return dBTMTraineeProfileListModel;
@@ -515,9 +524,103 @@ namespace Coditech.API.Service
 
             CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
-            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
-            if (traineeProfilePerformanceRankList != null && traineeProfilePerformanceRankList.Count > 0)
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
+            if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
             {
+                List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = traineeProfilePerformanceRankDataList
+                            .GroupBy(x => new
+                            {
+                                x.DBTMTraineeDetailId,
+                                x.Name,
+                                x.TestCode,
+                                x.TestName,
+                                x.CreatedDate
+                            })
+                            .Select(g => new
+                            {
+                                g.Key.DBTMTraineeDetailId,
+                                g.Key.Name,
+                                g.Key.TestCode,
+                                g.Key.TestName,
+
+                                TotalTime = g.Where(x =>
+                                            x.ParameterCode == "Time" &&
+                                            x.TestCode != "ReactionTimeTestThirtySec" &&
+                                            x.TestCode != "ReactionTimeTestThirtySix")
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue)),
+
+                                TotalLength = g.Where(x => x.ParameterCode == "JumpLength")
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue)),
+
+                                TotalHeight = g.Where(x => x.ParameterCode == "JumpHeight")
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue)),
+
+                                TotalCount = g.Where(x =>
+                                            x.ParameterCode == "Time" &&
+                                           (x.TestCode == "ReactionTimeTestThirtySec" ||
+                                            x.TestCode == "ReactionTimeTestThirtySix"))
+                                        .Sum(x => x.IsEncrypted
+                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
+                                            : Convert.ToDecimal(x.ParameterValue))
+                            })
+                            .GroupBy(x => new
+                            {
+                                x.DBTMTraineeDetailId,
+                                x.Name,
+                                x.TestCode,
+                                x.TestName
+                            })
+                            .Select(g =>
+                            {
+                                var bestTime = g.Where(x => x.TotalTime > 0)
+                                                .Select(x => x.TotalTime)
+                                                .DefaultIfEmpty()
+                                                .Min();
+
+                                var bestLength = g.Where(x => x.TotalLength > 0)
+                                                  .Select(x => x.TotalLength)
+                                                  .DefaultIfEmpty()
+                                                  .Max();
+
+                                var bestHeight = g.Where(x => x.TotalHeight > 0)
+                                                  .Select(x => x.TotalHeight)
+                                                  .DefaultIfEmpty()
+                                                  .Max();
+
+                                var bestCount = g.Where(x => x.TotalCount > 0)
+                                                 .Select(x => x.TotalCount)
+                                                 .DefaultIfEmpty()
+                                                 .Max();
+
+                                string testResultBasedOn =
+                                    bestTime != 0 ? "BestTime" :
+                                    bestLength != 0 ? "BestLength" :
+                                    bestHeight != 0 ? "BestHeight" :
+                                    bestCount != 0 ? "BestCount" :
+                                    null;
+
+                                return new DBTMTraineeProfilePerformanceRankingModel
+                                {
+                                    DBTMTraineeDetailId = g.Key.DBTMTraineeDetailId,
+                                    Name = g.Key.Name,
+                                    TestName = g.Key.TestName,
+                                    TestCode = g.Key.TestCode,
+                                    BestTime = bestTime == 0 ? (decimal?)null : bestTime,
+                                    BestLength = bestLength == 0 ? (decimal?)null : bestLength,
+                                    BestHeight = bestHeight == 0 ? (decimal?)null : bestHeight,
+                                    BestCount = bestCount == 0 ? (decimal?)null : bestCount,
+                                    TestResultBasedon = testResultBasedOn
+                                };
+                            })
+                            .OrderBy(x => x.Name)
+                            .ThenBy(x => x.TestCode)
+                            .ToList();
                 List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestName).Distinct().ToList();
                 var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestName)
                                                                .Select(g => new
@@ -609,7 +712,6 @@ namespace Coditech.API.Service
                     }
                 }
             }
-
             return dt;
         }
 
@@ -621,6 +723,10 @@ namespace Coditech.API.Service
             List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceListData = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrixByTraineeDetailIds @DBTMTraineeDetailIds")?.ToList();
             if (traineeProfilePerformanceListData != null && traineeProfilePerformanceListData.Count > 0)
             {
+                traineeProfilePerformanceListData.ForEach(x =>
+                {
+                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                });
                 foreach (string dBTMTraineeDetailId in dBTMTraineeDetailIds.Split(","))
                 {
                     foreach (var item in traineeProfilePerformanceListData.Where(x => x.DBTMTraineeDetailId.ToString() == dBTMTraineeDetailId).GroupBy(x => x.TestCode))
@@ -634,43 +740,31 @@ namespace Coditech.API.Service
                         decimal lastRecordSum, previousResordSum;
                         if (list.Any(x => x.ParameterCode == CustomConstants.Count && (x.TestCode != CustomConstants.PlateTapTest)))
                         {
-                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Count).Sum(x => x.ParameterValue);
+                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Count).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{Convert.ToUInt32(lastRecordSum)} {DBTMCustomHelper.Unit(CustomConstants.Count)} (Total Count)";
-                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Count && x.RowNumber == 2).Sum(x => x.ParameterValue);
-                            if (lastRecordSum < previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Count && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         else if (list.Any(x => x.ParameterCode == CustomConstants.Time))
                         {
-                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => x.ParameterValue);
+                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
-                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => x.ParameterValue);
-                            if (lastRecordSum > previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         if (list.Any(x => x.ParameterCode == CustomConstants.JumpHeight))
                         {
-                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => x.ParameterValue);
+                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
-                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => x.ParameterValue);
-                            if (lastRecordSum < previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         if (list.Any(x => x.ParameterCode == CustomConstants.JumpLength))
                         {
-                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpLength).Sum(x => x.ParameterValue);
+                            lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpLength).Sum(x => Convert.ToDecimal(x.ParameterValue));
                             performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpLength)} (Jump Length)";
-                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpLength && x.RowNumber == 2).Sum(x => x.ParameterValue);
-                            if (lastRecordSum < previousResordSum)
-                            {
-                                performanceModel.IsUp = false;
-                            }
+                            previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpLength && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                            UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
                         }
                         listModel.Add(performanceModel);
                     }
@@ -679,10 +773,27 @@ namespace Coditech.API.Service
             return listModel;
         }
 
+        private static void UpdateArrowStatus(DBTMTraineeProfilePerformanceModel performanceModel, decimal lastRecordSum, decimal previousResordSum)
+        {
+            if (previousResordSum == 0 || lastRecordSum == previousResordSum)
+            {
+                performanceModel.IsUp = null;
+            }
+            else if (lastRecordSum > previousResordSum)
+            {
+                performanceModel.IsUp = false;
+            }
+            else
+            {
+                performanceModel.IsUp = true;
+            }
+        }
+
         private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow)
         {
             return new RadarChartModel()
             {
+                RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
                 Title = "Score",
                 Labels = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank").Select(c => c.ColumnName)),
                 Datasets = new List<RadarGraphsDatasetModel>()

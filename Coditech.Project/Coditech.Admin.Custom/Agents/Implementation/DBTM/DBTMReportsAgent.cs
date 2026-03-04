@@ -209,7 +209,13 @@ namespace Coditech.Admin.Agents
 
             return dateStrings.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
         }
-        
+        public virtual List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            List<string> dateStrings = _dBTMReportsClient.GetBatchActivityPerformedDates(dBTMTestMasterIds, generalBatchMasterId);
+            if (dateStrings == null || !dateStrings.Any())
+                return new List<DateTime>();
+            return dateStrings.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
+        }
         //Delete Report .
         public virtual bool DeleteReportsFile(string fileName)
         {
@@ -225,9 +231,9 @@ namespace Coditech.Admin.Agents
                 return false;
             }
         }
-        public virtual DBTMTraineeProfileListViewModel GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds)
+        public virtual DBTMTraineeProfileListViewModel GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
-            DBTMTraineeProfileListResponse response = _dBTMReportsClient.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds);
+            DBTMTraineeProfileListResponse response = _dBTMReportsClient.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
             DBTMTraineeProfileListModel dBTMTraineeProfileList = new DBTMTraineeProfileListModel { DBTMTraineeProfileList = response?.DBTMTraineeProfileList };
             DBTMTraineeProfileListViewModel listViewModel = new DBTMTraineeProfileListViewModel();
             listViewModel.DBTMTraineeProfileList = dBTMTraineeProfileList?.DBTMTraineeProfileList?.ToViewModel<DBTMTraineeProfileViewModel>().ToList();

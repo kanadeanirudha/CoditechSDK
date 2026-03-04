@@ -8,6 +8,7 @@
         public DateTime DateOfJoining { get; set; }
         public string DurationWithUs { get; set; }
         public string TopAthlete { get; set; }
+        public string CentreCode { get; set; }
         public List<DBTMMobileActivityCategoryModel> ActivityCategories { get; set; }
     }
 

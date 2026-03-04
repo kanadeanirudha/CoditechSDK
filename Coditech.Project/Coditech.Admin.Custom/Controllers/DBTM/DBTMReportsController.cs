@@ -196,6 +196,16 @@ namespace Coditech.Admin.Controllers
             return Json(result);
         }
 
+        [HttpGet]
+        public IActionResult GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds) || generalBatchMasterId <= 0)
+                return Json(new List<string>());
+            List<DateTime> dates = _dBTMReportsAgent.GetBatchActivityPerformedDates(dBTMTestMasterIds, generalBatchMasterId);
+            List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+            return Json(result);
+        }
+
         //NameWise Reports
         [HttpGet]
         public ActionResult NameWiseReports()
@@ -310,7 +320,6 @@ namespace Coditech.Admin.Controllers
             }
         }
         [HttpGet]
-        [HttpGet]
         public ActionResult GetProfileDetailsList()
         {
             DBTMTraineeProfileListViewModel model = new DBTMTraineeProfileListViewModel();
@@ -330,9 +339,10 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
         }
         [HttpGet]
-        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds)
+        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
-            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds);
+            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
+            list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
         #endregion

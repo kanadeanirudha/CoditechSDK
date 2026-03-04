@@ -6,7 +6,11 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
-    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
+    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
+            {
+                ModelPopUpId = "RemarkPopupId_" + Model.DBTMTraineeDetailId,
+                ModalContentId = "RemarkContentId_" + Model.DBTMTraineeDetailId
+            };
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -14,9 +18,13 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">User Profile</h4>
+                        <h4 class="card-title mb-0">Trainee Profile</h4>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#RemarkPopupId" onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId', @Model.DBTMTraineeDetailId, '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))' )">
+                            <button type="button"
+                                    class="btn btn-success"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
+                                    onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId_@Model.DBTMTraineeDetailId', @Model.DBTMTraineeDetailId,'@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))')">
                                 <i class="fa fa-download me-1"></i> Download Report
                             </button>
                             @if (!Model.IsListView)
@@ -170,7 +178,11 @@
                                                         if (i < tests.Count)
                                                         {
                                                             <td class="text-center align-middle">@tests[i].TestName</td>
-                                                            if (tests[i].IsUp)
+                                                            if (tests[i].IsUp == null)
+                                                            {
+                                                                <td class="text-center align-middle"> @tests[i].Score</td>
+                                                            }
+                                                            else if (tests[i].IsUp == true)
                                                             {
                                                                 <td class="text-center align-middle"><i class="fas fa-arrow-up btn-soft-success"></i> @tests[i].Score</td>
                                                             }
@@ -202,9 +214,12 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
+    <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+}
 <iframe id="hiddenDownloader"
         style="display:none;"
         title="pdf-downloader">
 </iframe>
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
-<script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>

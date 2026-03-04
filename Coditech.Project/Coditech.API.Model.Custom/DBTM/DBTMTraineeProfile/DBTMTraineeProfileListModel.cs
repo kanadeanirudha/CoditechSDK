@@ -7,6 +7,5 @@
         {
             DBTMTraineeProfileList = new List<DBTMTraineeProfileModel>();
         }
-
     }
 }

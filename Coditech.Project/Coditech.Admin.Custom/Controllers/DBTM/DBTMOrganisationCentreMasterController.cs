@@ -9,11 +9,14 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IDBTMOrganisationCentreAgent _dBTMOrganisationCentreAgent;
         private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
+        private readonly IDBTMCentreWiseSettingAgent _dBTMCentreWiseSettingAgent;
+        private const string createEdit = "~/Views/DBTM/DBTMCentreWiseSetting/CreateEdit.cshtml";
 
-        public DBTMOrganisationCentreMasterController(IDBTMOrganisationCentreAgent dBTMOrganisationCentreAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent)
+        public DBTMOrganisationCentreMasterController(IDBTMOrganisationCentreAgent dBTMOrganisationCentreAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMCentreWiseSettingAgent dBTMCentreWiseSettingAgent)
         {
             _dBTMOrganisationCentreAgent = dBTMOrganisationCentreAgent;
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
+            _dBTMCentreWiseSettingAgent = dBTMCentreWiseSettingAgent;
         }
         // Get Activity List View Sequence
         public virtual ActionResult ActivityListViewSequenceList(int organisationCentreId, DataTableViewModel dataTableViewModel)
@@ -86,7 +89,48 @@ namespace Coditech.Admin.Controllers
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMOrganisationCentreMaster/DBTMCentreRegistration.cshtml", dBTMNewRegistrationViewModel);
+        } [HttpGet]
+        public virtual ActionResult Update(int organisationCentreId)
+        {
+            DBTMCentreWiseSettingViewModel dBTMCentreWiseSettingViewModel = _dBTMCentreWiseSettingAgent.GetDBTMCentreWiseSetting(organisationCentreId);
+            return ActionView(createEdit, dBTMCentreWiseSettingViewModel);
         }
+
+        [HttpPost]
+        public virtual ActionResult Update(DBTMCentreWiseSettingViewModel dBTMCentreWiseSettingViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                SetNotificationMessage(_dBTMCentreWiseSettingAgent.UpdateDBTMCentreWiseSetting(dBTMCentreWiseSettingViewModel).HasError
+                ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                if (string.Equals(dBTMCentreWiseSettingViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("Update", new { organisationCentreId = dBTMCentreWiseSettingViewModel.OrganisationCentreMasterId });
+                }
+                else if (string.Equals(dBTMCentreWiseSettingViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("List", "OrganisationCentreMaster");
+                }
+            }
+            return View(createEdit, dBTMCentreWiseSettingViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetAssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel)
+        {
+            return PartialView("~/Views/DBTM/DBTMCentreWiseSetting/_AssociateUnAssociateCentrewiseTest.cshtml", dBTMCentreWiseTestViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult AssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel)
+        {
+            SetNotificationMessage(_dBTMCentreWiseSettingAgent.AssociateUnAssociateCentreTest(dBTMCentreWiseTestViewModel).HasError
+                ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+                : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+            return RedirectToAction("Update", new { organisationCentreId = dBTMCentreWiseTestViewModel.OrganisationCentreMasterId });
+        }
+
         #region Protected
 
         #endregion

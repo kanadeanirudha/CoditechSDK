@@ -17,7 +17,7 @@
             cache: false,
             type: "GET",
             dataType: "html",
-            url: "/DBTMCentreWiseSetting/GetAssociateUnAssociateCentreTest",
+            url: "/DBTMOrganisationCentreMaster/GetAssociateUnAssociateCentreTest",
             data: viewModel,
             success: function (result) {
                 $('#' + modelPopContentId).html(result);

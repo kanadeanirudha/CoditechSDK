@@ -39,7 +39,6 @@ namespace Coditech.Admin.Controllers
                 }
                 else if (dashboardViewModel.DashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    TempData.Remove("IsMobileCustom");
                     DataTableViewModel dataTableModel = new DataTableViewModel();
                     DBTMDashboardViewModel dBTMDashboardViewModel = _dBTMDashboardAgent.GetDBTMDashboardDetails(numberOfDaysRecord);
                     UserProfileViewModel userProfileViewModel = _userAgent.GetUserProfile();
@@ -54,7 +53,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/Dashboard/GeneralDashboard.cshtml");
         }
         [HttpGet, HttpPost]
-        public ActionResult LoadBatchesPartial(DataTableViewModel dataTableModel, bool isIframe = false)
+        public ActionResult LoadBatchesPartial(DataTableViewModel dataTableModel, bool isIframe = false, bool isReadOnly = false)
         {
             // If no model came from GET, create a default one
             if (dataTableModel == null)
@@ -69,22 +68,36 @@ namespace Coditech.Admin.Controllers
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
             dBTMDashboardViewModel.GeneralBatchList ??= new List<GeneralBatchListViewModel>();
             dBTMDashboardViewModel.GeneralBatchList.Add(list);
-            string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
+            ViewBag.IsDashboardPopup = "true";
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            
+            // Check if this is the ReadOnly Dashboard (Modal/Owner)
+            bool isReadOnlyContext = isReadOnly || (ViewBag.IsReadOnlyDashboard != null && Convert.ToString(ViewBag.IsReadOnlyDashboard).ToLower() == "true") || (!string.IsNullOrEmpty(dataTableModel?.SelectedParameter4) && dataTableModel.SelectedParameter4.ToLower() == "true");
+            ViewBag.IsReadOnlyDashboard = isReadOnlyContext.ToString();
+            bool isTrainerRole = userModel?.Custom1 == CustomConstants.DBTMTrainer;
+            bool isOwnerRole = userModel?.Custom1 == CustomConstants.DBTMCentreOwner;
+
+            // Final check: Trainer gets access ONLY if NOT in ReadOnly mode. Owner is always ReadOnly here.
+            bool isTrainer = (isTrainerRole || isOwnerRole || userModel?.Custom1 == "DBTMTrainer" || userModel?.Custom1 == "DBTMCentreOwner") && !isReadOnlyContext;
+            ViewBag.IsTrainer = isTrainer;
+
+            string isPopUpView = Convert.ToString(ViewBag.IsDashboardPopup);
             if (!string.IsNullOrEmpty(isPopUpView))
             {
-                list.PageListViewModel.IsActionColumn = false;
-                list.PageListViewModel.DatatableColumnList.FirstOrDefault().IsSortable = false;
-                TempData.Keep();
+                list.PageListViewModel.IsActionColumn = isTrainer;
             }
-            TempData.Keep("DBTMModel");
-            if (isIframe)
-                return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
+
+            TempData.Keep();
+            // If it's an AJAX request (DataTables refreshing), return the partial fragment.
+            // If it's the initial iframe load (POST or direct), return the full View.
+            if (AjaxHelper.IsAjaxRequest && !isIframe)
+                return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", list);
 
             return View("~/Views/DBTM/DBTMDashboard/_DBTMBatchListView.cshtml", list);
         }
 
         [HttpGet, HttpPost]
-        public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel, bool isIframe = false)
+        public ActionResult LoadAssignmentPartial(DataTableViewModel dataTableModel, bool isIframe = false, bool isReadOnly = false)
         {
             if (dataTableModel == null)
             {
@@ -96,12 +109,32 @@ namespace Coditech.Admin.Controllers
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
             dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
             dBTMDashboardViewModel.DBTMTraineeAssignmentList.Add(assignmentList);
-            TempData.Keep("DBTMModel");
-            if (isIframe)
-                return PartialView("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
+            ViewBag.IsDashboardPopup = "true";
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+            // Check if this is the ReadOnly Dashboard (Modal/Owner)
+            bool isReadOnlyContext = isReadOnly || (ViewBag.IsReadOnlyDashboard != null && Convert.ToString(ViewBag.IsReadOnlyDashboard).ToLower() == "true") || (!string.IsNullOrEmpty(dataTableModel?.SelectedParameter4) && dataTableModel.SelectedParameter4.ToLower() == "true");
+            ViewBag.IsReadOnlyDashboard = isReadOnlyContext.ToString();
+            bool isTrainerRole = userModel?.Custom1 == CustomConstants.DBTMTrainer;
+            bool isOwnerRole = userModel?.Custom1 == CustomConstants.DBTMCentreOwner;
+
+            // Final check: Trainer gets access ONLY if NOT in ReadOnly mode. Owner is always ReadOnly here.
+            bool isTrainer = (isTrainerRole || isOwnerRole || userModel?.Custom1 == "DBTMTrainer" || userModel?.Custom1 == "DBTMCentreOwner") && !isReadOnlyContext;
+            ViewBag.IsTrainer = isTrainer;
+
+            string isPopUpView = Convert.ToString(ViewBag.IsDashboardPopup);
+            if (!string.IsNullOrEmpty(isPopUpView))
+            {
+                assignmentList.PageListViewModel.IsActionColumn = isTrainer;
+            }
+
+            TempData.Keep();
+            // If it's an AJAX request (DataTables refreshing), return the partial fragment.
+            // If it's the initial iframe load (POST or direct), return the full View.
+            if (AjaxHelper.IsAjaxRequest && !isIframe)
+                return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", assignmentList);
 
             return View("~/Views/DBTM/DBTMDashboard/_DBTMAssignmentListView.cshtml", assignmentList);
-
         }
 
         [HttpGet]
@@ -115,6 +148,7 @@ namespace Coditech.Admin.Controllers
             }
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             string isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
+            // Always set Custom4 to "Mobile View" for dashboard lists to get the clean layout (CSS but no topbar) in the iframe.
             list.Custom4 = "Mobile View";
             return list;
         }
@@ -141,10 +175,10 @@ namespace Coditech.Admin.Controllers
             }
 
             // Additional assignments
-            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : dataTableModel.SelectedParameter1;
+            assignmentList.SelectedParameter1 = userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId?.ToString() ?? string.Empty) : dataTableModel.SelectedParameter1;
+            // Always set Custom4 to "Mobile View" for dashboard lists to get the clean layout in the iframe.
             assignmentList.Custom4 = "Mobile View";
             assignmentList.SelectedCentreCode = dataTableModel.SelectedCentreCode;
-
             return assignmentList;
         }
 
@@ -242,13 +276,15 @@ namespace Coditech.Admin.Controllers
             UserProfileViewModel userProfileViewModel = _dBTMDashboardAgent.GetUserProfile(userMasterId);
             dBTMDashboardViewModel.SelectedParameter1 = generalTrainerMasterId.ToString();
             dBTMDashboardViewModel.SelectedParameter2 = userMasterId.ToString();
-            TempData["IsMobileCustom"] = "data";
+            // TempData["IsMobileCustom"] = "data"; // Removing this to allow Add/Edit/Search for Trainers
             TempData.Keep();
             if (IsNotNull(userProfileViewModel))
             {
                 dBTMDashboardViewModel.UserProfileModel = new List<UserProfileViewModel>();
             }
             dBTMDashboardViewModel.UserProfileModel.Add(userProfileViewModel);
+            ViewBag.IsDashboardPopup = "true";
+            ViewBag.IsReadOnlyDashboard = "true";
             if (isIframe)
                 return PartialView("~/Views/DBTM/DBTMDashboard/_dBTMTrainerDashboardPopUp.cshtml", dBTMDashboardViewModel);
 

@@ -54,7 +54,7 @@ namespace Coditech.Admin.Agents
            
             if (!string.IsNullOrEmpty(dataTableModel.SelectedParameter3))
             {
-                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentList.Count, BindColumns(false), false);
+                SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeAssignmentList.Count, BindColumns(true), false);
             }
             else
             {

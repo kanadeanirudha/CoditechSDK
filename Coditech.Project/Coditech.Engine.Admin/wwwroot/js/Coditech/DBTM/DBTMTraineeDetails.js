@@ -181,14 +181,10 @@
             }
         });
     },
-
-    ConfirmDownloadPdf: function (traineeId) {
+    ConfirmDownloadPdf: function (traineeId, modalId) {
         var remarks = $("#RemarksText").val() || "";
-        $("#RemarkPopupId").modal("hide");
-        DBTMTraineeDetails.DownloadAthleteReportPdf(
-            traineeId,
-            remarks
-        );
+        $("#" + modalId).modal("hide");
+        DBTMTraineeDetails.DownloadAthleteReportPdf(traineeId, remarks);
     },
     GetUploadTraineePopup: function (contentId) {
         $("#" + contentId).html("");
