@@ -19,6 +19,6 @@ namespace Coditech.API.Service
         List<DBTMGeneralBatchUserModel> GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId);
         List<DBTMBatchModel> GetCampList(long entityId, string userType);
         DBTMBatchModel GetCampDetails(int dBTMCampMasterId);
-        bool UpdateValidRecord(DBTMDeviceDataModel model);
+        bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord);
     }
 }

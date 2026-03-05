@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
@@ -724,6 +725,15 @@ namespace Coditech.API.Service
             model.TestPerformedTime = deviceData.TestPerformedTime;
             model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
             model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false);
+            int expireMinutes = ApiCustomSettings.IsValidRecordButtonExpireTimeOnMobile;
+
+            DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
+
+            if (DateTime.Now > expireTime)
+                model.IsValidRecordButton = false;
+            else
+                model.IsValidRecordButton = true;
+
             return model;
         }
 

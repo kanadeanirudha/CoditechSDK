@@ -5,6 +5,7 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Logger;
+using DocumentFormat.OpenXml.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -392,11 +393,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/UpdateValidRecord")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
-        public IActionResult UpdateValidRecord([FromBody] DBTMDeviceDataModel model)
+        public IActionResult UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord)
         {
             try
             {
-                bool status = _dBTMApiService.UpdateValidRecord(model);
+                bool status = _dBTMApiService.UpdateValidRecord(dBTMDeviceDataId, isValidRecord);
 
                 return CreateOKResponse(new TrueFalseResponse
                 {
