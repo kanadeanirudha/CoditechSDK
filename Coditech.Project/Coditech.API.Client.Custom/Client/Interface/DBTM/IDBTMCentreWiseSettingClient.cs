@@ -17,7 +17,6 @@ namespace Coditech.API.Client
         /// <param name="DBTMCentreWiseSettingModel">DBTMCentreWiseSettingModel.</param>
         /// <returns>Returns updated DBTMCentreWiseSettingResponse</returns>
         DBTMCentreWiseSettingResponse UpdateDBTMCentreWiseSetting(DBTMCentreWiseSettingModel model);
-
-      
+        DBTMCentreWiseTestResponse AssociateUnAssociateCentreTest(DBTMCentreWiseTestModel model);      
     }
 }

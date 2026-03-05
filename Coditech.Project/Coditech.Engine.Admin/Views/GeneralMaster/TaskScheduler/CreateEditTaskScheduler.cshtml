@@ -110,6 +110,12 @@
         }
 
         $(document).ready(function () {
+        var today = new Date();
+        var maxFutureDate = new Date(
+            today.getFullYear() + 10,
+            today.getMonth(),
+            today.getDate()
+        );
             updateExpiryDate(); // Ensure correct state on page load
 
             $("#SchedulerFrequency").change(function () {
@@ -123,9 +129,9 @@
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 language: "en",
                 autoSize: true,
-                yearRange: "2022:2035",
+                yearRange: maxFutureDate,
                 minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31),
+                maxDate: maxFutureDate,
                 onSelect: function () {
                     updateExpiryDate();
                 }
@@ -138,9 +144,9 @@
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 language: "en",
                 autoSize: true,
-                yearRange: "2022:2035",
+                yearRange: maxFutureDate,
                 minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31)
+                maxDate: maxFutureDate
             });
         });
     </script>

@@ -16,14 +16,14 @@ namespace Coditech.API.Client
         {
             dBTMCampEndpoint = new DBTMCampEndpoint();
         }
-        public virtual DBTMCampListResponse List(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public virtual DBTMCampListResponse List(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await ListAsync(selectedCentreCode,expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await ListAsync(selectedCentreCode, userMasterId, expand, filter, sort, pageIndex, pageSize, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMCampListResponse> ListAsync(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
+        public virtual async Task<DBTMCampListResponse> ListAsync(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMCampEndpoint.ListAsync(selectedCentreCode, expand, filter, sort, pageIndex, pageSize);
+            string endpoint = dBTMCampEndpoint.ListAsync(selectedCentreCode, userMasterId, expand, filter, sort, pageIndex, pageSize);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
@@ -354,5 +354,50 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+        public virtual DBTMCampUserListResponse GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
+        {
+            return Task.Run(async () => await GetCampUserListByCentreCodeAndGeneralTrainerMasterIdAsync(selectedCentreCode, generalTrainerMasterId, dBTMCampMasterId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMCampUserListResponse> GetCampUserListByCentreCodeAndGeneralTrainerMasterIdAsync(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMCampEndpoint.GetCampUserListByCentreCodeAndGeneralTrainerMasterIdAsync(selectedCentreCode, generalTrainerMasterId, dBTMCampMasterId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMCampUserListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMCampUserListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMCampUserListResponse typedBody = JsonConvert.DeserializeObject<DBTMCampUserListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+
     }
 }

@@ -8,6 +8,6 @@
             DBTMCampUserList = new List<DBTMCampUserModel>();
         }
         public string CampName { get; set; }
-        public long DBTMCampMasterId { get; set; }
+        public int DBTMCampMasterId { get; set; }
     }
 }

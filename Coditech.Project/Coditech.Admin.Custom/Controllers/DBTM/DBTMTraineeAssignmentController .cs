@@ -13,11 +13,13 @@ namespace Coditech.Admin.Controllers
     public class DBTMTraineeAssignmentController : BaseController
     {
         private readonly IDBTMTraineeAssignmentAgent _dBTMTraineeAssignmentAgent;
+        private readonly IDBTMTestAgent _dBTMTestAgent;
         private const string createEdit = "~/Views/DBTM/DBTMTraineeAssignment/Create.cshtml";
 
-        public DBTMTraineeAssignmentController(IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent)
+        public DBTMTraineeAssignmentController(IDBTMTraineeAssignmentAgent dBTMTraineeAssignmentAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMTraineeAssignmentAgent = dBTMTraineeAssignmentAgent;
+            _dBTMTestAgent = dBTMTestAgent;
         }
 
         public ActionResult List(DataTableViewModel dataTableModel)
@@ -26,6 +28,7 @@ namespace Coditech.Admin.Controllers
             GetListOnlyIfSingleCentre(dataTableModel);
 
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            ViewBag.IsTrainer = userModel?.Custom1 == CustomConstants.DBTMTrainer || userModel?.Custom1 == CustomConstants.DBTMCentreOwner;
 
             if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
@@ -44,6 +47,11 @@ namespace Coditech.Admin.Controllers
             list.SelectedParameter1 = dataTableModel.SelectedParameter1;
             list.Custom4 = dataTableModel.SelectedParameter4;
 
+            if (dataTableModel.SelectedParameter4 == "Mobile View")
+            {
+                ViewBag.IsDashboardPopup = "true";
+            }
+
             if (AjaxHelper.IsAjaxRequest)
             {
                 return PartialView("~/Views/DBTM/DBTMTraineeAssignment/_List.cshtml", list);
@@ -53,14 +61,14 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create(string custom4)
+        public ActionResult Create(string custom4, string ispopup = "", string istrainer = "")
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel
             {
                 SelectedCentreCode = userModel.SelectedCentreCode,
                 SelectedTrainee = new List<string>(),
-                Custom4 =custom4,
+                Custom4 = custom4,
                 GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
             };
 
@@ -69,14 +77,15 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
-            BindDBTMTest(dBTMTraineeAssignmentViewModel);
-
+            BindCentrewsieActivity(dBTMTraineeAssignmentViewModel);
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
 
         [HttpPost]
-        public ActionResult Create(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
+        public ActionResult Create(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel, string ispopup = "", string istrainer = "")
         {
             if (ModelState.IsValid)
             {
@@ -86,11 +95,20 @@ namespace Coditech.Admin.Controllers
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
                     if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId});
+                        return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId, ispopup = ispopup, istrainer = istrainer });
                     }
                     else if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
+                        if (!string.IsNullOrEmpty(ispopup) && ispopup.ToLower() == "true")
+                        {
+                            return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter4 = "Mobile View" });
+                        }
+                        if (dBTMTraineeAssignmentViewModel.Custom4 == "Mobile View")
+                        {
+                            TempData["IsMobileCustom"] = "true";
+                            return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
+                        }
+                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter4 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
 
                     }
                 }
@@ -101,22 +119,27 @@ namespace Coditech.Admin.Controllers
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
             }).DropdownList?.Where(x => x.Value != "")?.ToList();
-            BindDBTMTest(dBTMTraineeAssignmentViewModel);
+            BindCentrewsieActivity(dBTMTraineeAssignmentViewModel);
+
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
 
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTraineeAssignmentViewModel.ErrorMessage));
             return View(createEdit, dBTMTraineeAssignmentViewModel);
         }
 
         [HttpGet]
-        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId , string custom4)
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId, string custom4, string ispopup = "", string istrainer = "")
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
             dBTMTraineeAssignmentViewModel.Custom4 = custom4;
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
         }
 
         [HttpPost]
-        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel )
+        public ActionResult GetDBTMTraineeAssignment(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel, string ispopup = "", string istrainer = "")
         {
             ModelState.Remove("DBTMTestStatusEnumId");
             ModelState.Remove("SelectedTrainee");
@@ -128,14 +151,25 @@ namespace Coditech.Admin.Controllers
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
                 if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId });
+                    return RedirectToAction("GetDBTMTraineeAssignment", new { dBTMTraineeAssignmentUserId = dBTMTraineeAssignmentViewModel.DBTMTraineeAssignmentUserId, ispopup = ispopup, istrainer = istrainer });
                 }
                 else if (string.Equals(dBTMTraineeAssignmentViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter5 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
+                    if (!string.IsNullOrEmpty(ispopup) && ispopup.ToLower() == "true")
+                    {
+                        return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter4 = "Mobile View" });
+                    }
+                    if (dBTMTraineeAssignmentViewModel.Custom4 == "Mobile View")
+                    {
+                        TempData["IsMobileCustom"] = "true";
+                        return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
+                    }
+                    return RedirectToAction(AdminConstants.ActionRedirectToList, new DataTableViewModel { SelectedCentreCode = dBTMTraineeAssignmentViewModel.SelectedCentreCode, SelectedParameter1 = Convert.ToString(dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId), SelectedParameter4 = Convert.ToString(dBTMTraineeAssignmentViewModel.Custom4) });
 
                 }
             }
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 
         }
@@ -151,11 +185,21 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                     ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1 ,SelectedParameter4 = custom4 });
+                if (custom4 == "Mobile View")
+                {
+                    TempData["IsMobileCustom"] = "true";
+                    return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
+                }
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1, SelectedParameter4 = custom4 });
             }
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode , SelectedParameter4 = custom4 });
+            if (custom4 == "Mobile View")
+            {
+                TempData["IsMobileCustom"] = "true";
+                return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
+            }
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4 = custom4 });
         }
 
         public ActionResult SendAssignmentReminder(long dBTMTraineeAssignmentId, long dBTMTraineeAssignmentUserId, string custom4)
@@ -173,7 +217,12 @@ namespace Coditech.Admin.Controllers
             {
                 SetNotificationMessage(GetErrorNotificationMessage(model.ErrorMessage));
             }
-            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId), SelectedParameter4=custom4 });
+            if (custom4 == "Mobile View")
+            {
+                TempData["IsMobileCustom"] = "true";
+                return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
+            }
+            return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = model.SelectedCentreCode, SelectedParameter1 = Convert.ToString(model.GeneralTrainerMasterId), SelectedParameter4 = custom4 });
         }
 
         public ActionResult GetTrainerByCentreCode(string centreCode)
@@ -202,7 +251,12 @@ namespace Coditech.Admin.Controllers
 
         public virtual ActionResult Cancel(string SelectedCentreCode, string GeneralTrainerMasterId, string custom4)
         {
-            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId , SelectedParameter4 = custom4 };
+            if (custom4 == "Mobile View")
+            {
+                TempData["IsMobileCustom"] = "true";
+                return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
+            }
+            DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter1 = GeneralTrainerMasterId, SelectedParameter4 = custom4 };
             return RedirectToAction("List", dataTableViewModel);
         }
 
@@ -249,6 +303,28 @@ namespace Coditech.Admin.Controllers
         }
         #endregion
         #region Protected
+        protected virtual void BindCentrewsieActivity(DBTMTraineeAssignmentViewModel model)
+        {
+            model.DBTMTestList ??= new List<SelectListItem>();
+            if (string.IsNullOrEmpty(model.SelectedCentreCode))
+            {
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                model.SelectedCentreCode = userModel?.SelectedCentreCode;
+            }
+            if (string.IsNullOrEmpty(model.SelectedCentreCode))
+                return;
+            DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(model.SelectedCentreCode);
+            if (response?.DBTMCentreWiseTestList == null)
+                return;
+            model.DBTMTestList.AddRange(response.DBTMCentreWiseTestList
+                .OrderBy(x => x.TestName)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.TestName,
+                    Value = x.DBTMTestMasterId.ToString()
+                })
+            );
+        }
         protected virtual void BindDBTMTest(DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel)
         {
             dBTMTraineeAssignmentViewModel.DBTMTestList = dBTMTraineeAssignmentViewModel.DBTMTestList ?? new List<SelectListItem>();
@@ -256,8 +332,8 @@ namespace Coditech.Admin.Controllers
 
             if (dBTMTestList?.DBTMTestList != null)
             {
-                    foreach (var item in dBTMTestList.DBTMTestList.Where(x => x.IsActive).OrderBy(x => x.PerformanceMatrix).ThenBy(x => x.TestName))
-                    {
+                foreach (var item in dBTMTestList.DBTMTestList.Where(x => x.IsActive).OrderBy(x => x.PerformanceMatrix).ThenBy(x => x.TestName))
+                {
                     dBTMTraineeAssignmentViewModel.DBTMTestList.Add(new SelectListItem
                     {
                         Text = item.TestName,

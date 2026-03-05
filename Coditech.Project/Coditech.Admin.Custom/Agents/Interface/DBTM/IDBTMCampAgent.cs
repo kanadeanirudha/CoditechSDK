@@ -24,7 +24,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="CampCode">CampCode</param>
         /// <returns>Returns DBTMCampMasterViewModel.</returns>
-        DBTMCampMasterViewModel GetDBTMCamp(long dBTMCampMasterId);
+        DBTMCampMasterViewModel GetDBTMCamp(int dBTMCampMasterId);
 
         /// <summary>
         /// Update DBTM Camp Master.
@@ -45,7 +45,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dataTableModel">DataTable ViewModel.</param>
         /// <returns>DBTMCampUserListViewModel</returns>
-        DBTMCampUserListViewModel GetDBTMCampUserList(long dBTMCampMasterId, string userType, DataTableViewModel dataTableModel);
+        DBTMCampUserListViewModel GetDBTMCampUserList(int dBTMCampMasterId, string userType, DataTableViewModel dataTableModel);
 
         /// <summary>
         /// Update Associate UnAssociate Campwise User.
@@ -53,5 +53,6 @@ namespace Coditech.Admin.Agents
         /// <param name="DBTMCampUserViewModel">DBTMCampUserViewModel.</param>
         /// <returns>Returns updated DBTMCampUserViewModel</returns>
         DBTMCampUserViewModel AssociateUnAssociateCampwiseUser(DBTMCampUserViewModel dBTMCampUserViewModel);
+        DBTMCampUserListViewModel GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long DBTMCampMasterId);
     }
 }

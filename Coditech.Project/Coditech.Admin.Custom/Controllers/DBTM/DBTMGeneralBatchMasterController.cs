@@ -28,12 +28,20 @@ namespace Coditech.Admin.Controllers
         {
             GeneralBatchListViewModel list = new GeneralBatchListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            ViewBag.IsTrainer = userModel?.Custom1 == CustomConstants.DBTMTrainer || userModel?.Custom1 == CustomConstants.DBTMCentreOwner;
+            ViewBag.IsDashboardPopup = string.Empty; // Explicitly empty for direct list
 
             {
                 list = _generalBatchAgent.GetBatchList(dataTableModel);
             }
             list.SelectedCentreCode = dataTableModel.SelectedCentreCode;
             list.Custom4 = dataTableModel.SelectedParameter4;
+
+            if (dataTableModel.SelectedParameter4 == "Mobile View")
+            {
+                ViewBag.IsDashboardPopup = "true";
+            }
 
             if (AjaxHelper.IsAjaxRequest)
             {
@@ -44,30 +52,23 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create(string custom4)
+        public ActionResult Create(string custom4, string ispopup = "", string istrainer = "")
         {
 
             GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
             generalBatchViewModel.Custom4 = custom4;
             BindDropdown(generalBatchViewModel);
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
 
         [HttpPost]
-        public ActionResult Create(GeneralBatchViewModel generalBatchViewModel)
+        public ActionResult Create(GeneralBatchViewModel generalBatchViewModel, string ispopup = "", string istrainer = "")
         {
-            if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0 &&
-                (generalBatchViewModel?.CustomDropdownSelectedValue2?.Count ?? 0) == 0)
-            {
-                generalBatchViewModel.ErrorMessage = "Please select at least one Activity and one Batch User.";
-            }
-            else if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
+            if ((generalBatchViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
             {
                 generalBatchViewModel.ErrorMessage = "Please select at least one Activity.";
-            }
-            else if ((generalBatchViewModel?.CustomDropdownSelectedValue2?.Count ?? 0) == 0)
-            {
-                generalBatchViewModel.ErrorMessage = "Please select at least one Batch User.";
             }
             else if (ModelState.IsValid)
             {
@@ -78,16 +79,26 @@ namespace Coditech.Admin.Controllers
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
                     if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom4 });
+                        return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, custom4 = generalBatchViewModel.Custom4, ispopup = ispopup, istrainer = istrainer });
                     }
                     else if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
+                        if (!string.IsNullOrEmpty(ispopup) && ispopup.ToLower() == "true")
+                        {
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true, isReadOnly = true });
+                        }
+                        if (generalBatchViewModel.Custom4 == "Mobile View")
+                        {
+                            TempData["IsMobileCustom"] = "true";
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true });
+                        }
                         return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
-
                     }
                 }
             }
             BindDropdown(generalBatchViewModel);
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             SetNotificationMessage(GetErrorNotificationMessage(generalBatchViewModel.ErrorMessage));
             return View("~/Views/GeneralMaster/GeneralBatchMaster/CreateEditGeneralBatch.cshtml", generalBatchViewModel);
         }
@@ -106,16 +117,18 @@ namespace Coditech.Admin.Controllers
             return View($"~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/AssociatedBatchList.cshtml", list);
         }
         [HttpGet]
-        public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string custom4)
+        public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string custom4, string ispopup = "", string istrainer = "")
         {
             GeneralBatchViewModel generalBatchViewModel = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
             BindDropdown(generalBatchViewModel);
             generalBatchViewModel.Custom4 = custom4;
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             return ActionView(createEditBatch, generalBatchViewModel);
         }
 
         [HttpPost]
-        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel)
+        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel, string ispopup = "", string istrainer = "")
         {
             if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0)
             {
@@ -127,12 +140,20 @@ namespace Coditech.Admin.Controllers
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
                     if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, generalBatchViewModel.Custom4 });
+                        return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, custom4 = generalBatchViewModel.Custom4, ispopup = ispopup, istrainer = istrainer });
                     }
                     else if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
+                        if (!string.IsNullOrEmpty(ispopup) && ispopup.ToLower() == "true")
+                        {
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true, isReadOnly = true });
+                        }
+                        if (generalBatchViewModel.Custom4 == "Mobile View")
+                        {
+                            TempData["IsMobileCustom"] = "true";
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true });
+                        }
                         return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
-
                     }
                 }
             }
@@ -141,6 +162,8 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(GetErrorNotificationMessage("Please Select Activity."));
             }
             BindDropdown(generalBatchViewModel);
+            ViewBag.IsPopup = ispopup;
+            ViewBag.IsTrainer = istrainer;
             return View(createEditBatch, generalBatchViewModel);
         }
 
@@ -225,22 +248,36 @@ namespace Coditech.Admin.Controllers
                 generalBatchViewModel.BatchFrequency = SchedulerFrequencyEnum.Daily.ToString();
             }
         }
+        [HttpGet]
+        public ActionResult GetActivityByCentreCode(string centreCode, List<string> selectedActivities)
+        {
+            GeneralBatchViewModel generalBatchViewModel = new GeneralBatchViewModel();
+            generalBatchViewModel.CustomDropdownSelectedValue1 = selectedActivities;
+            if (!string.IsNullOrEmpty(centreCode))
+            {
+                DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
+                generalBatchViewModel.CustomDropdownList1 = response?.DBTMCentreWiseTestList?.OrderBy(x => x.TestName).Select(x => new SelectListItem { Text = x.TestName, Value = x.DBTMTestMasterId.ToString(), Selected = selectedActivities?.Contains(x.DBTMTestMasterId.ToString()) == true }).ToList();
+            }
+            return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/_ActivityDropdown.cshtml", generalBatchViewModel);
+        }
         protected void BindDBTMBatchActivity(GeneralBatchViewModel generalBatchViewModel)
         {
             generalBatchViewModel.CustomDropdownList1 = generalBatchViewModel.CustomDropdownList1 ?? new List<SelectListItem>();
-            DataTableViewModel dataTableModel = new DataTableViewModel() { PageSize = int.MaxValue };
-            DBTMTestListViewModel dBTMBatchActivityList = _dBTMTestAgent.GetDBTMTestList(dataTableModel);
-            if (dBTMBatchActivityList?.DBTMTestList != null)
-            {
-                foreach (var item in dBTMBatchActivityList.DBTMTestList.Where(x => x.IsActive).OrderBy(x => x.PerformanceMatrix) .ThenBy(x => x.TestName))
+            string centreCode = generalBatchViewModel?.CentreCode;
+            if (string.IsNullOrEmpty(centreCode))
+                return;
+            DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
+            if (!response?.DBTMCentreWiseTestList?.Any() ?? true)
+                return;
+            generalBatchViewModel.CustomDropdownList1 = response.DBTMCentreWiseTestList
+                .OrderBy(x => x.TestName)
+                .Select(x => new SelectListItem
                 {
-                    generalBatchViewModel.CustomDropdownList1.Add(new SelectListItem
-                    {
-                        Text = item.TestName,
-                        Value = item.DBTMTestMasterId.ToString(),
-                    });
-                }
-            }
+                    Text = x.TestName,
+                    Value = x.DBTMTestMasterId.ToString(),
+                    Selected = generalBatchViewModel.CustomDropdownSelectedValue1
+                    ?.Contains(x.DBTMTestMasterId.ToString()) == true
+                }).ToList();
         }
         protected void BindDuration(GeneralBatchViewModel model)
         {
@@ -276,12 +313,19 @@ namespace Coditech.Admin.Controllers
         protected void BindDropdown(GeneralBatchViewModel generalBatchViewModel)
         {
             BindFrequency(generalBatchViewModel);
-            BindDBTMBatchActivity(generalBatchViewModel);
+            if (!string.IsNullOrEmpty(generalBatchViewModel.CentreCode))
+            {
+                BindDBTMBatchActivity(generalBatchViewModel);
+            }
             BindDBTMBatchUserList(generalBatchViewModel);
-
         }
         public virtual ActionResult Cancel(string SelectedCentreCode, string custom4)
         {
+            if (custom4 == "Mobile View")
+            {
+                TempData["IsMobileCustom"] = "true";
+                return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true });
+            }
             DataTableViewModel dataTableViewModel = new DataTableViewModel() { SelectedCentreCode = SelectedCentreCode, SelectedParameter4 = custom4 };
             return RedirectToAction("List", dataTableViewModel);
         }
@@ -295,9 +339,19 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(string.IsNullOrEmpty(message) ? GeneralResources.DeleteErrorMessage : message)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
+                if (custom4 == "Mobile View")
+                {
+                    TempData["IsMobileCustom"] = "true";
+                    return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true });
+                }
                 return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4 = custom4 });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
+            if (custom4 == "Mobile View")
+            {
+                TempData["IsMobileCustom"] = "true";
+                return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true });
+            }
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter4 = custom4 });
         }
         #endregion

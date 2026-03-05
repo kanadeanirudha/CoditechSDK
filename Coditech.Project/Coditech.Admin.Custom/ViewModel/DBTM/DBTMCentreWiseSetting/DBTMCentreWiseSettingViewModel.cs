@@ -10,8 +10,11 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Type Of Centre")]
         public string TypeOfCentre { get; set; }
+        [Display(Name = "Allow Joining Code Quantity")]
+        [Required]
+        public int AllowJoiningCode { get; set; }
         public int OrganisationCentreMasterId { get; set; }
-
+        public DBTMCentreWiseTestListViewModel TestListViewModel { get; set; }
     }
 }
 

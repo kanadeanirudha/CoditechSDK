@@ -71,5 +71,19 @@ namespace Coditech.Common.API
                 return Convert.ToString(settings["RunningNumberList"]);
             }
         }
+        public static string EncryptionKey
+        {
+            get
+            {
+                return Convert.ToString(settings["EncryptionKey"]);
+            }
+        }
+        public static string EncryptionIV
+        {
+            get
+            {
+                return Convert.ToString(settings["EncryptionIV"]);
+            }
+        }
     }
 }

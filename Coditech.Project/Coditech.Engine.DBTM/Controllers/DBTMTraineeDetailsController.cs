@@ -226,5 +226,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("/DBTMTraineeDetails/GetProfileDetailsList")]
+        [Produces(typeof(DBTMTraineeProfileListResponse))]
+        public virtual IActionResult GetBatchWiseUser(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
+        {
+            try
+            {
+                DBTMTraineeProfileListModel list = _dBTMTraineeDetailsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeProfileListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ProfileDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeProfileListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ProfileDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeProfileListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

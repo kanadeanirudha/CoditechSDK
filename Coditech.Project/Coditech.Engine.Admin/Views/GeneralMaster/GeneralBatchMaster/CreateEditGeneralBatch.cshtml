@@ -1,19 +1,22 @@
 ﻿@model GeneralBatchViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
+    bool isPopup = Convert.ToString(ViewBag.IsPopup).ToLower() == "true" || !string.IsNullOrEmpty(Model.Custom4);
+    if (isPopup)
     {
         Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+        ViewBag.IsDashboardPopup = "true";
     }
     ViewBag.Title = Model.GeneralBatchMasterId > 0 ? "Update Batch Details" : "Add Batch";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
-    string css = Model.GeneralBatchMasterId > 0 && string.IsNullOrEmpty(Model.Custom4) ? "col-lg-10" : "col-lg-12";
+    string css = Model.GeneralBatchMasterId > 0 ? "col-12 col-md-10" : "col-12";
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
     keyValuePairs.Add("Custom4", Model.Custom4?.ToString() ?? string.Empty);
-    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.GeneralBatchMasterId > 0 };
+    DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "DBTMBatch.OnCentreChange()", IsDisabled = Model.GeneralBatchMasterId > 0 };
     DropdownViewModel frequencyDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.SchedulerFrequency.ToString(), DropdownName = "BatchFrequency", DropdownSelectedValue = Model.BatchFrequency, ExcludedValues = new string[] { "Recurring", "Weekly" } };
-    string cancelUrl = !string.IsNullOrEmpty(Model.Custom4) ? Url.Action("Cancel", "DBTMGeneralBatchMaster", new { SelectedCentreCode = Model.CentreCode, custom4 = Model.Custom4 }) : Url.Action("Cancel", "GeneralBatchMaster", new { SelectedCentreCode = Model.CentreCode });
+    bool isTrainer = Convert.ToString(ViewBag.IsTrainer).ToLower() == "true";
+    string cancelUrl = (isPopup && !isTrainer) ? "" : ((isPopup || !string.IsNullOrEmpty(Model.Custom4)) ? Url.Action("Cancel", "DBTMGeneralBatchMaster", new { SelectedCentreCode = Model.CentreCode, custom4 = string.IsNullOrEmpty(Model.Custom4) ? "Mobile View" : Model.Custom4 }) : Url.Action("Cancel", "DBTMGeneralBatchMaster", new { SelectedCentreCode = Model.CentreCode }));
     PageHeaderViewModel headerModel = new PageHeaderViewModel
             {
                 Title = ViewBag.Title,
@@ -26,12 +29,13 @@
             };
 }
 <!-- Page Content-->
-<div class="page-content">
-    <div class="container-fluid mt-5">
+<div class="@(isPopup ? "" : "page-content")">
+    @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+    <div class="container-fluid @(isPopup ? "pt-5 mt-5" : "mt-5")">
         <div class="row">
             @if (Model.GeneralBatchMasterId > 0)
             {
-                <div class="col-lg-2">
+                <div class="col-12 col-md-2">
                     @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
                 </div>
             }
@@ -40,10 +44,11 @@
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
-                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.GeneralBatchMasterId)
                             @Html.HiddenFor(x => x.WeekDays)
                             @Html.HiddenFor(x => x.Custom4)
+                            <input type="hidden" name="ispopup" value="@Convert.ToString(ViewBag.IsPopup)" />
+                            <input type="hidden" name="istrainer" value="@Convert.ToString(ViewBag.IsTrainer)" />
                             @if (Model.GeneralBatchMasterId > 0)
                             {
                                 @Html.HiddenFor(x => x.CentreCode)
@@ -126,18 +131,15 @@
                                             @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
                                         </div>
                                     </div>
-                                </div>     <div class="col-lg-12">
-                                    <div class="mb-3 multiselect-dropdown">
-                                        <label class="form-label required" for="CustomDropdownSelectedValue1">Activity</label>
-                                        @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
-                                        @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue1)
-                                    </div>
+                                </div>
+                                <div class="col-lg-12" id="ActivityDropdownDiv">
+                                    @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_ActivityDropdown.cshtml", Model)
                                 </div>
                                 @if (Model.GeneralBatchMasterId == 0)
                                 {
                                     <div class="col-lg-12">
                                         <div class="mb-3 multiselect-dropdown">
-                                            <label class="form-label required" for="CustomDropdownSelectedValue2">Batch User</label>
+                                            <label class="form-label" for="CustomDropdownSelectedValue2">Batch User</label>
                                             @Html.ListBoxFor(x => x.CustomDropdownSelectedValue2, new SelectList(Model.CustomDropdownList2, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
                                             @Html.ValidationMessageFor(x => x.CustomDropdownSelectedValue2)
                                         </div>
@@ -154,7 +156,7 @@
 </div>
 @section scripts {
     <script src="~/js/coditech/Common/CoditechCommon.js"></script>
-
+    <script src="~/js/coditech/DBTM/DBTMBatch.js"></script>
     <script type="text/javascript">
         function updateExpiryDate() {
             var selectedFrequency = $("#BatchFrequency").val();
@@ -164,16 +166,28 @@
             } else {
                 $("#weeklyDiv").hide();
             }
-            if (selectedFrequency === "OneTime" && startDate) {
-                $("#BatchExpireDate").datepicker("setDate", startDate);
-                $("#BatchExpireDate").prop("readonly", true);
-                $("#BatchExpireDate").datepicker("option", "beforeShow", function () { return false; });
+            if (!startDate) return;
+            $("#BatchExpireDate").datepicker("option", "minDate", startDate);
+            if (selectedFrequency === "OneTime") {
+                $("#BatchExpireDate").datepicker("setDate", startDate).datepicker("disable");
             } else {
-                $("#BatchExpireDate").prop("readonly", false);
-                $("#BatchExpireDate").datepicker("option", "beforeShow", null);
+                $("#BatchExpireDate").datepicker("enable");
+                if (!$("#BatchExpireDate").val()) {
+                    $("#BatchExpireDate").datepicker("setDate", startDate);
+                }
             }
         }
         $(document).ready(function () {
+            $("#BatchFrequency").change(function () {
+                updateExpiryDate();
+            });
+            DBTMBatch.Initialize();
+            var today = new Date();
+            var maxFutureDate = new Date(
+            today.getFullYear() + 10,
+            today.getMonth(),
+            today.getDate()
+        );
             // Start Date Datepicker
            $("#BatchStartDate").datepicker({
             changeMonth: true,
@@ -182,22 +196,13 @@
             language: "en",
             autoSize: true,
             minDate: 0,
-            maxDate: new Date(2035, 11, 31),
+            maxDate: maxFutureDate,
             onSelect: function (dateText) {
                 var startDate = $(this).datepicker("getDate");
                 $("#BatchExpireDate").datepicker("option", "minDate", startDate);
                 updateExpiryDate();
             }
         });
-        if ($("#GeneralBatchMasterId").val() == 0)
-             {
-                var startVal = $("#BatchStartDate").val();
-                if (startVal)
-                {
-                    $("#BatchStartDate").datepicker("setDate", startVal);
-                }
-                updateExpiryDate();
-        }
         // Expiry Date Datepicker
         $("#BatchExpireDate").datepicker({
                     changeMonth: true,
@@ -205,9 +210,9 @@
                     dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                     language: "en",
                     autoSize: true,
-                    yearRange: "2025:2035",
+                    yearRange: "c-0:c+10",
                     minDate: 0,
-                    maxDate: new Date(2035, 11, 31)
+                    maxDate: maxFutureDate
         });
         if ($("#GeneralBatchMasterId").val() == 0) {
             var startVal = $("#BatchStartDate").val();

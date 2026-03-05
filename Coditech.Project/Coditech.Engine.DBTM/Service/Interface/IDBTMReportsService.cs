@@ -16,5 +16,7 @@ namespace Coditech.API.Service
         bool DeleteReportsFile(string fileName);
         List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId);
         DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId);
+        GeneralBatchUserListModel GetBatchWiseUser(long generalBatchMasterId);
+        List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId);
     }
 }

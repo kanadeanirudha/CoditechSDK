@@ -94,6 +94,14 @@ namespace Coditech.Admin.Helpers
             {
                 GetGraphMode(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.BatchWiseUser.ToString()))
+            {
+                BatchWiseUser(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.OrderBy.ToString()))
+            {
+                GetOrderByTraineeProfileList(dropdownViewModel, dropdownList);
+            }
 
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
@@ -550,6 +558,96 @@ namespace Coditech.Admin.Helpers
                 Text = "Progress Chart",
                 Value = CustomConstants.ProgressChart,
                 Selected = CustomConstants.ProgressChart == dropdownViewModel.DropdownSelectedValue
+            });
+        }
+
+
+        //private static void GetDBTMMultiBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        //{
+        //    if (dropdownViewModel.DropdownType == DropdownCustomTypeEnum.BatchWiseMultiReports.ToString())
+        //        if (dropdownViewModel.IsRequired)
+        //        {
+        //            dropdownList.Add(new SelectListItem { Value = "0", Text = "All" });
+        //        }
+        //        else
+        //        {
+        //            dropdownList.Add(new SelectListItem { Value = "0", Text = GeneralResources.SelectLabel });
+        //        }
+
+        //    if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) &&
+        //    dropdownViewModel.Parameter.ToLower() != "0~false")
+        //    {
+        //        int generalBatchMasterId = Convert.ToInt32(dropdownViewModel.Parameter.Split("~")[0]);
+        //        bool isAssociated = Convert.ToBoolean(dropdownViewModel.Parameter.Split("~")[1]);
+
+        //        DBTMBatchActivityListResponse response = new DBTMBatchActivityClient().GetDBTMBatchActivityList(generalBatchMasterId, isAssociated, null, null, null, 1, int.MaxValue);
+        //        DBTMBatchActivityListModel list = new DBTMBatchActivityListModel() { DBTMBatchActivityList = response.DBTMBatchActivityList };
+        //        foreach (var item in list?.DBTMBatchActivityList.OrderBy(x => x.PerformanceMatrix ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
+        //        {
+        //            dropdownList.Add(new SelectListItem()
+        //            {
+        //                Text = $"{item.TestName}",
+        //                Value = item.DBTMTestMasterId.ToString(),
+        //                Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestMasterId)
+        //            });
+        //        }
+        //    }
+        //}
+        private static void BatchWiseUser(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.DropdownType == DropdownCustomTypeEnum.BatchWiseUser.ToString())
+                if (dropdownViewModel.IsRequired)
+                {
+                    dropdownList.Add(new SelectListItem { Value = "0", Text = "All" });
+                }
+                else
+                {
+                    dropdownList.Add(new SelectListItem { Value = "0", Text = GeneralResources.SelectLabel });
+                }
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && dropdownViewModel.Parameter != "0")
+            {
+                long generalBatchMasterId = Convert.ToInt64(dropdownViewModel.Parameter);
+
+                GeneralBatchUserListResponse response = new DBTMReportsClient().GetBatchWiseUser(generalBatchMasterId);
+                GeneralBatchUserListModel list = new GeneralBatchUserListModel() { GeneralBatchUserList = response.GeneralBatchUserList };
+                foreach (var item in list?.GeneralBatchUserList.OrderBy(x => x.FirstName))
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = $"{item.FirstName} {item.LastName}",
+                        Value = item.EntityId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.EntityId)
+                    });
+                }
+            }
+        }
+        private static void GetOrderByTraineeProfileList( DropdownViewModel dropdownViewModel,List<SelectListItem> dropdownList)
+        {
+            string selectedValue = string.IsNullOrEmpty(dropdownViewModel.DropdownSelectedValue) ? "Rank" : dropdownViewModel.DropdownSelectedValue;
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = GeneralResources.SelectLabel,
+                Value = "",
+                Selected = string.IsNullOrEmpty(selectedValue)
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "First Name",
+                Value = "FirstName",
+                Selected = selectedValue == "FirstName"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Last Name",
+                Value = "LastName",
+                Selected = selectedValue == "LastName"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Rank",
+                Value = "Rank",
+                Selected = selectedValue == "Rank"
             });
         }
     }

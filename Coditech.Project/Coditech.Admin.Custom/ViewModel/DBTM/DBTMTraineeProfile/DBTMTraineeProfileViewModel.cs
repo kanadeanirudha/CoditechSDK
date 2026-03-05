@@ -23,10 +23,12 @@ namespace Coditech.Admin.ViewModel
         public DateTime? DateOfBirth { get; set; }
         public string TotalDuration { get; set; }
         public DateTime? WeekelyHours { get; set; }
-        public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; } = new List<DBTMTraineeProfilePerformanceModel>();
+        public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; }
         public string Remarks { get; set; }
         public string SelectedCentreCode { get; set; }
         public string SelectedParameter1 { get; set; }
         public string TrainerName { get; set; }
+        public RadarChartModel RadarChart { get; set; }
+        public bool IsListView { get; set; }
     }
 }

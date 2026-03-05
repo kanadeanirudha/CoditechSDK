@@ -4,7 +4,6 @@ using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
-using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -123,6 +122,27 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [Route("/DBTMApi/GetBatchAndActivityWiseUserDetails")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchUserResponse))]
+        public IActionResult GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId)
+        {
+            try
+            {
+                List<DBTMGeneralBatchUserModel> model = _dBTMApiService.GetBatchAndActivityWiseUserDetails(generalBatchMasterId, dbtmTestMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchUserResponse { DBTMBatchUserList = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
         [Route("/DBTMApi/GetAssignmentList")]
         [HttpGet]
         [Produces(typeof(DBTMTestApiListResponse))]
@@ -262,11 +282,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/dbtmapi/Gettraineesbyperformedactivity")]
         [Produces(typeof(DBTMTraineeDetailsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds)
+        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds , string centreCode)
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds);
+                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds, centreCode);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
             }
@@ -303,6 +323,70 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMTestListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+      
+        [Route("/DBTMApi/GetCampList")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchListResponse))]
+        public IActionResult GetCampList(long entityId, string userType)
+        {
+            try
+            {
+                List<DBTMBatchModel> list = _dBTMApiService.GetCampList(entityId, userType);
+                return IsNotNull(list) ? CreateOKResponse(new DBTMBatchListResponse { DBTMBatchList = list }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCamp", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCamp", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [Route("/DBTMApi/GetCampDetails")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchResponse))]
+        public IActionResult GetCampDetails(int dBTMCampMasterId)
+        {
+            try
+            {
+                DBTMBatchModel model = _dBTMApiService.GetBatchDetails(dBTMCampMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCampActivity", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCampActivity", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [Route("/DBTMApi/GetCampAndActivityWiseUserDetails")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchUserResponse))]
+        public IActionResult GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId)
+        {
+            try
+            {
+                List<DBTMGeneralBatchUserModel> model = _dBTMApiService.GetCampAndActivityWiseUserDetails(dBTMcampMasterId, dbtmTestMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchUserResponse { DBTMBatchUserList = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCampActivity", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCampActivity", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

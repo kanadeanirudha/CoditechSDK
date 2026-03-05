@@ -8,5 +8,8 @@ namespace Coditech.Admin.ViewModel
         {
             DBTMTraineeProfileList = new List<DBTMTraineeProfileViewModel>();
         }
+        public long DBTMTraineeDetailId { get; set; }
+        public long GeneralBatchMasterId { get; set; }
+        public string OrderBy { get; set; }
     }
 }

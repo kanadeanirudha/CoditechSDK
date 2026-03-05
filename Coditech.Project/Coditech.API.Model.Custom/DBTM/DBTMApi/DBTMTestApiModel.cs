@@ -15,6 +15,7 @@
         public bool IsActive { get; set; }
         public string TestInstructions { get; set; }
         public int ActivityCode { get; set; }
+        public bool IsStartDirection { get; set; }
         public List<DBTMTraineeAssignmentToUserApiModel> DBTMTraineeAssignmentToUserApiModel { get; set; }
     }
 }

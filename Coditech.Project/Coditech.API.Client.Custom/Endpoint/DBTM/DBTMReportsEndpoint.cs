@@ -49,9 +49,24 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMTraineeDetailId={dBTMTraineeDetailId}";
             return endpoint;
         }
+        public string GetBatchActivityPerformedDatesAsync(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetBatchActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&generalBatchMasterId={generalBatchMasterId}";
+            return endpoint;
+        }
         public string GetActivityVerticalDetailsAsync(long dBTMDeviceDataId)
         {
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityVerticalDetails?dBTMDeviceDataId={dBTMDeviceDataId}";
+            return endpoint;
+        }
+        public string GetBatchWiseUserAsync(long generalBatchMasterId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetBatchWiseUser?generalBatchMasterId={generalBatchMasterId}";
+            return endpoint;
+        }
+        public string GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}&orderBy={orderBy}";
             return endpoint;
         }
     }

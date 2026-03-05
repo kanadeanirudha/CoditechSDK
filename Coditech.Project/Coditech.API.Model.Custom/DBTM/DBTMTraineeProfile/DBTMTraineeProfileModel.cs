@@ -1,4 +1,6 @@
-﻿namespace Coditech.Common.API.Model
+﻿using System.Data;
+
+namespace Coditech.Common.API.Model
 {
     public class DBTMTraineeProfileModel : BaseModel
     {
@@ -22,9 +24,13 @@
         public DateTime? DateOfBirth { get; set; }
         public string TotalDuration { get; set; }
         public DateTime? WeekelyHours { get; set; }
-        public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; } = new List<DBTMTraineeProfilePerformanceModel>();
-        public string Remarks { get; set; } 
+        public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; }
+        public string Remarks { get; set; }
         public string CentreCode { get; set; }
         public string TrainerName { get; set; }
+        public RadarChartModel RadarChart { get; set; }
+        public DataTable RankingScoreDataTable { get; set; }
+        public long GeneralBatchMasterId { get; set; }
+        public bool IsListView { get; set; }
     }
 }

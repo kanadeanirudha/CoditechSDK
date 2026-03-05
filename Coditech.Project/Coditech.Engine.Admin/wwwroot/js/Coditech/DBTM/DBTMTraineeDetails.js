@@ -181,14 +181,10 @@
             }
         });
     },
-
-    ConfirmDownloadPdf: function (traineeId) {
+    ConfirmDownloadPdf: function (traineeId, modalId) {
         var remarks = $("#RemarksText").val() || "";
-        $("#RemarkPopupId").modal("hide");
-        DBTMTraineeDetails.DownloadAthleteReportPdf(
-            traineeId,
-            remarks
-        );
+        $("#" + modalId).modal("hide");
+        DBTMTraineeDetails.DownloadAthleteReportPdf(traineeId, remarks);
     },
     GetUploadTraineePopup: function (contentId) {
         $("#" + contentId).html("");
@@ -239,9 +235,10 @@
         $("#UploadErrorTableContainer").html(html);
     },
     UploadTraineeFile: function () {
+        $("#UploadFileValidationMsg").text("");
         var fileInput = $("#TraineeFile")[0];
         if (!fileInput || fileInput.files.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Please select file.", "error");
+            $("#UploadFileValidationMsg").text("Please select file.");
             return;
         }
         var file = fileInput.files[0];
@@ -249,52 +246,69 @@
         formData.append("file", file);
         $("#UploadErrorTableContainer").html("");
         $("#ErrorHeader").hide();
-        CoditechCommon.ShowLodder();
         $.ajax({
             url: "/DBTMTraineeDetails/UploadTrainee",
             type: "POST",
             data: formData,
             processData: false,
             contentType: false,
+            beforeSend: function () {
+                CoditechCommon.ShowLodder();
+            },
             success: function (res) {
                 if (res.success) {
-                    CoditechNotification.DisplayNotificationMessage(res.message, "success");
-                    $("#TraineePopupId").modal("hide");
-                } else {
-                    if (res.failedRows && res.failedRows.length > 0) {
-                        DBTMTraineeDetails.RenderFailedTable(res.failedRows);
-                    } else {
-                        CoditechNotification.DisplayNotificationMessage(res.message, "error");
-                    }
+                    location.reload();
+                    return;
                 }
                 CoditechCommon.HideLodder();
+                if (res.failedRows && res.failedRows.length > 0) {
+                    DBTMTraineeDetails.RenderFailedTable(res.failedRows);
+                }
+                else {
+                    CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
+                }
             },
             error: function (xhr) {
+                CoditechCommon.HideLodder();
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
+                    return;
                 }
                 CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
-                CoditechCommon.HideLodder();
             }
         });
     },
     DownloadTemplatePopup: function () {
-        $("#DownloadTemplateContentId").html("");
+        var $openModal = $(".modal.show").first();
+        if ($openModal.length > 0) {
+            $openModal.addClass("stack-blur"); 
+        }
         CoditechCommon.ShowLodder();
-
         $.ajax({
             type: "GET",
             url: "/DBTMTraineeDetails/GetDownloadTemplatePopup",
             success: function (html) {
                 $("#DownloadTemplateContentId").html(html);
-                $("#DownloadTemplatePopupId").modal("show");
+                var modalEl = document.getElementById("DownloadTemplatePopupId");
+                var modal = new bootstrap.Modal(modalEl);
+                modal.show();
                 CoditechCommon.HideLodder();
+                modalEl.addEventListener("hidden.bs.modal", function () {
+                    $(".stack-blur").removeClass("stack-blur");
+                    if ($(".modal.show").length > 0) {
+                        $(".modal-backdrop").slice(1).remove();
+                        $("body").addClass("modal-open");
+                    } else {
+                        $(".modal-backdrop").remove();
+                        $("body").removeClass("modal-open");
+                    }
+                }, { once: true });
             },
             error: function () {
-                CoditechNotification.DisplayNotificationMessage(
-                    "Failed to load download template popup",
-                    "error"
-                );
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup","error");
                 CoditechCommon.HideLodder();
             }
         });
@@ -302,20 +316,19 @@
     ConfirmDownloadTemplate: function () {
         var count = $("#TraineeCount").val();
         clearFieldError("TraineeCount");
-        if (!count || isNaN(count) || parseInt(count) <= 0) {
-            showFieldError("TraineeCount", "Please enter a valid number of trainees.");
+        count = parseInt(count, 10);
+        if (!count || isNaN(count) || count < 1 || count > 999) {
+            showFieldError("TraineeCount", "Please enter a number between 1 and 999.");
             return;
         }
-        DBTMTraineeDetails.CheckAndDownloadTemplate(parseInt(count));
+        DBTMTraineeDetails.CheckAndDownloadTemplate(count);
     },
     CheckAndDownloadTemplate: function (count) {
 
         var centreCode = $("#SelectedCentreCode").val();
         var trainerId = $("#SelectedParameter1").val();
         var userType = $("#UserType").val();
-
         CoditechCommon.ShowLodder();
-
         $.ajax({
             url: "/DBTMTraineeDetails/CheckTraineeTemplateAvailability",
             type: "GET",
@@ -360,7 +373,6 @@ function showFieldError(fieldName, message) {
         .removeClass('field-validation-valid')
         .addClass('field-validation-error');
 }
-
 function clearFieldError(fieldName) {
     const span = $('[data-valmsg-for="' + fieldName + '"]');
     span

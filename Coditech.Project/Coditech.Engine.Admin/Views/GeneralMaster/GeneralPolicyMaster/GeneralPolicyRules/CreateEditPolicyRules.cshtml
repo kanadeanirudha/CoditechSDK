@@ -120,6 +120,12 @@
 @section scripts {
     <script type="text/javascript">
         $(document).ready(function () {
+        var today = new Date();
+        var maxFutureDate = new Date(
+            today.getFullYear() + 10,
+            today.getMonth(),
+            today.getDate()
+        );
             $("#ApplicableFromDate").datepicker({
                 changeMonth: true,
                 changeYear: true,
@@ -128,10 +134,10 @@
                 language: "en",
                 autoSize: true,
                 showButtonPanel: true,
-                yearRange: "2024:2027",
+                yearRange: maxFutureDate,
                 closeText: "Clear",
                 minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31),
+                maxDate: maxFutureDate,
                 onSelect: function (selectedDate) {
                     var fromDate = $(this).datepicker("getDate");
                     $("#ApplicableUptoDate").datepicker("option", "minDate", fromDate);
@@ -143,9 +149,9 @@
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 language: "en",
                 autoSize: true,
-                yearRange: "2025:2027",
+                yearRange: maxFutureDate,
                 minDate: new Date(2022, 0, 1),
-                maxDate: new Date(2035, 11, 31)
+                maxDate: maxFutureDate
             });
         });
     </script>

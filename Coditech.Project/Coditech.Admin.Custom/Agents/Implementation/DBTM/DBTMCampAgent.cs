@@ -1,4 +1,5 @@
-﻿using Coditech.Admin.ViewModel;
+﻿using Coditech.Admin.Utilities;
+using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
@@ -41,9 +42,9 @@ namespace Coditech.Admin.Agents
                 filters.Add("CampStartDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("CampEndDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
+            long userMasterId = SessionHelper.GetDataFromSession<UserModel>("UserData").UserMasterId;
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "CampName" : dataTableModel.SortByColumn, dataTableModel.SortBy);
-
-            DBTMCampListResponse response = _dBTMCampClient.List(dataTableModel.SelectedCentreCode,null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            DBTMCampListResponse response = _dBTMCampClient.List(dataTableModel.SelectedCentreCode, userMasterId,null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMCampMasterListModel dBTMCampMasterList = new DBTMCampMasterListModel { DBTMCampMasterList = response?.DBTMCampMasterList };
             DBTMCampListViewModel listViewModel = new DBTMCampListViewModel();
             listViewModel.DBTMCampMasterList = dBTMCampMasterList?.DBTMCampMasterList?.ToViewModel<DBTMCampMasterViewModel>().ToList();
@@ -80,7 +81,7 @@ namespace Coditech.Admin.Agents
         }
 
         //Get DBTM Camp by DBTM Camp master id.
-        public virtual DBTMCampMasterViewModel GetDBTMCamp(long dBTMCampMasterId)
+        public virtual DBTMCampMasterViewModel GetDBTMCamp(int dBTMCampMasterId)
         {
             DBTMCampResponse response = _dBTMCampClient.GetDBTMCamp(dBTMCampMasterId);
             return response?.DBTMCampModel.ToViewModel<DBTMCampMasterViewModel>();
@@ -148,7 +149,7 @@ namespace Coditech.Admin.Agents
         }
 
         #region DBTMCampUser
-        public virtual DBTMCampUserListViewModel GetDBTMCampUserList(long dBTMCampMasterId, string userType, DataTableViewModel dataTableModel)
+        public virtual DBTMCampUserListViewModel GetDBTMCampUserList(int dBTMCampMasterId, string userType, DataTableViewModel dataTableModel)
         {
             FilterCollection filters = new FilterCollection();
             dataTableModel = dataTableModel ?? new DataTableViewModel();
@@ -176,7 +177,7 @@ namespace Coditech.Admin.Agents
         {
             try
             {
-                long dBTMCampMasterId = dBTMCampUserViewModel.DBTMCampMasterId;
+                int dBTMCampMasterId = dBTMCampUserViewModel.DBTMCampMasterId;
                 long dBTMCampUserId = dBTMCampUserViewModel.DBTMCampUserId;
                 dBTMCampUserViewModel.UserType = UserTypeEnum.Trainee.ToString();
                 DBTMCampUserResponse response = _dBTMCampClient.AssociateUnAssociateCampwiseUser(dBTMCampUserViewModel.ToModel<DBTMCampUserModel>());
@@ -203,8 +204,16 @@ namespace Coditech.Admin.Agents
                 return (DBTMCampUserViewModel)GetViewModelWithErrorMessage(dBTMCampUserViewModel, GeneralResources.ErrorFailedToCreate);
             }
         }
-
         #endregion  
+        #region DBTMCampUserList
+        public virtual DBTMCampUserListViewModel GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long DBTMCampMasterId)
+        {
+            DBTMCampUserListResponse response = _dBTMCampClient.GetCampUserListByCentreCodeAndGeneralTrainerMasterId(selectedCentreCode, generalTrainerMasterId, DBTMCampMasterId);
+            DBTMCampUserListModel DBTMCampUserList = new DBTMCampUserListModel { DBTMCampUserList = response?.DBTMCampUserList };
+            DBTMCampUserListViewModel listViewModel = new DBTMCampUserListViewModel();
+            listViewModel.DBTMCampUserList = DBTMCampUserList?.DBTMCampUserList?.ToViewModel<DBTMCampUserViewModel>().ToList();
+            return listViewModel;
+        }
         #endregion
 
         #region protected
@@ -220,7 +229,7 @@ namespace Coditech.Admin.Agents
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Camp Time",
-                ColumnCode = "CampTime",
+                ColumnCode = "CampStartTime",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
@@ -271,6 +280,7 @@ namespace Coditech.Admin.Agents
             });
             return datatableColumnList;
         }
+        #endregion
         #endregion
     }
 }

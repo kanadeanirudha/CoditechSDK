@@ -17,6 +17,7 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMCentreWiseSettingViewModel">dBTMCentreWiseSettingViewModel.</param>
         /// <returns>Returns updated DBTMCentreWiseSettingViewModel</returns>
         DBTMCentreWiseSettingViewModel UpdateDBTMCentreWiseSetting(DBTMCentreWiseSettingViewModel dBTMCentreWiseSettingViewModel);
+        DBTMCentreWiseTestViewModel AssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel);
     }
 }
 

@@ -26,5 +26,6 @@ namespace Coditech.Admin.ViewModel
         public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
         public string FilePath { get; set; }   
         public string FileName { get; set; }
+        public string CentreCode { get; set; }
     }
 }

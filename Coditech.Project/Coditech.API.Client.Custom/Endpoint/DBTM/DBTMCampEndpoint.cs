@@ -6,9 +6,9 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMCampEndpoint : BaseEndpoint
     {
-        public string ListAsync(string selectedCentreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        public string ListAsync(string selectedCentreCode, long userMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetDBTMCampList?selectedCentreCode={selectedCentreCode}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetDBTMCampList?selectedCentreCode={selectedCentreCode}&userMasterId={userMasterId}{BuildEndpointQueryString(true,expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
         public string CreateDBTMCampAsync() =>
@@ -28,8 +28,12 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetDBTMCampUserList?dBTMCampMasterId={dBTMCampMasterId}&userType={userType}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
             return endpoint;
         }
-
         public string AssociateUnAssociateCampwiseUserAsync() =>
        $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/AssociateUnAssociateCampwiseUser";
+        public string GetCampUserListByCentreCodeAndGeneralTrainerMasterIdAsync(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMCampMaster/GetCampUserListByCentreCodeAndGeneralTrainerMasterId?selectedCentreCode={selectedCentreCode}&generalTrainerMasterId={generalTrainerMasterId}&dBTMCampMasterId={dBTMCampMasterId}{BuildEndpointQueryString(true)}";
+            return endpoint;
+        }
     }
 }

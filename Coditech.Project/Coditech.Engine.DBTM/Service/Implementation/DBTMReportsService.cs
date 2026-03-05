@@ -28,6 +28,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMTestParameterListviewSequenceRepository;
         private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMTestParameterVerticalViewSequenceRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
+        private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -45,6 +47,8 @@ namespace Coditech.API.Service
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterVerticalViewSequenceRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Graph
@@ -77,6 +81,7 @@ namespace Coditech.API.Service
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode);
             if (dBTMReportsList?.Count > 0)
             {
+                ReportsListDecryption(dBTMReportsList);
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
                 graphMaster.TestCode = dbtmTestMaster.TestCode;
                 string[] XValuesList = null;
@@ -198,13 +203,10 @@ namespace Coditech.API.Service
         {
             if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return new List<DateTime>();
-
             if (dBTMTraineeDetailId <= 0)
-                return new List<DateTime>();   
-
+                return new List<DateTime>();
             List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
             bool isAllTest = testIds.Contains(0);
-
             var dates =
                 (from dd in _dBTMDeviceDataRepository.Table
                  join td in _dBTMTraineeDetailsRepository.Table
@@ -218,10 +220,46 @@ namespace Coditech.API.Service
                 .Distinct()
                 .OrderBy(d => d)
                 .ToList();
-
             return dates;
         }
-
+        public List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+                return new List<DateTime>();
+            if (generalBatchMasterId <= 0)
+                return new List<DateTime>();
+            List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
+            bool isAllTest = testIds.Contains(0);
+            var traineeDetailIds = _generalBatchUserRepository.Table
+                .Where(a => a.GeneralBatchMasterId == generalBatchMasterId
+                            && a.UserType == "Trainee")
+                .Select(a => a.EntityId)
+                .ToList();
+            if (!traineeDetailIds.Any())
+                return new List<DateTime>();
+            var personCodes = _dBTMTraineeDetailsRepository.Table
+                .Where(t => traineeDetailIds.Contains(t.DBTMTraineeDetailId))
+                .Select(t => t.PersonCode)
+                .ToList();
+            if (!personCodes.Any())
+                return new List<DateTime>();
+            var testCodes = _dBTMTestMasterRepository.Table
+                .Where(x => isAllTest || testIds.Contains(x.DBTMTestMasterId))
+                .Select(x => x.TestCode)
+                .ToList();
+            if (!testCodes.Any())
+                return new List<DateTime>();
+            var dates = _dBTMDeviceDataRepository.Table
+                .Where(f => personCodes.Contains(f.PersonCode)
+                            && f.TypeOfRecord == "Batch"
+                            && f.TablePrimaryColumnId == generalBatchMasterId
+                            && testCodes.Contains(f.TestCode))
+                .Select(f => (f.CreatedDate ?? f.TestPerformedTime).Date)
+                .Distinct()
+                .OrderBy(d => d)
+                .ToList();
+            return dates;
+        }
         private void BindInstantaneousChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<DateTime, DBTMReportsModel>> groupedReports, string[] colorPalette)
         {
             short i = 1;
@@ -314,28 +352,28 @@ namespace Coditech.API.Service
                         {
                             for (short index = 1; index <= 12; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
                         {
                             for (int index = 1; index <= 6; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
                         {
                             for (int index = 1; index <= 4; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
                         {
                             for (int index = 1; index <= 3; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => x.ParameterValue) / count);
+                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
@@ -689,6 +727,7 @@ namespace Coditech.API.Service
             return model;
         }
 
+
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
@@ -754,11 +793,20 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
+        private void ReportsListDecryption(List<DBTMReportsModel> dBTMReportsList)
+        {
+            dBTMReportsList.ForEach(x =>
+            {
+                x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+            });
+        }
+
         private DataTable BindDBTMDataDetails(int dBTMTestMasterId, string centreCode, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
         {
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Count > 0)
             {
+                ReportsListDecryption(dBTMReportsList);
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
@@ -983,13 +1031,15 @@ namespace Coditech.API.Service
                         if (updatedColumnName.Contains("{Distance*Row}"))
                         {
 
-                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
+                            //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue ?? "0") * Convert.ToInt32(spilt[1]);
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{Distance*Row}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
                         else if (updatedColumnName.Contains("{FromToDistance}"))
                         {
-                            decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
+                            //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue ?? "0");
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{FromToDistance}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
@@ -1216,6 +1266,7 @@ namespace Coditech.API.Service
             }
 
             var dBTMReportsList = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == DBTMDeviceDataId).Select(x => x.FromEntityToModel<DBTMReportsModel>()).ToList();
+            ReportsListDecryption(dBTMReportsList);
             foreach (var item in dBTMReportsList)
             {
                 item.Weight = deviceData?.Weight ?? 0;
@@ -1276,6 +1327,26 @@ namespace Coditech.API.Service
             }
             return dataTable;
         }
+        public GeneralBatchUserListModel GetBatchWiseUser(long generalBatchMasterId)
+        {
+            GeneralBatchUserListModel model = new GeneralBatchUserListModel();
+
+            var result =
+                (from gbu in _generalBatchUserRepository.Table
+                 join um in _userMasterRepository.Table on gbu.EntityId equals um.EntityId
+                 where gbu.GeneralBatchMasterId == generalBatchMasterId && um.UserType == UserTypeEnum.Trainee.ToString()
+                 select new GeneralBatchUserModel
+                 {
+                     FirstName = um.FirstName,
+                     LastName = um.LastName,
+                     EntityId = um.EntityId
+                 }).ToList();
+
+            model.GeneralBatchUserList = result;
+
+            return model;
+        }
+
         #endregion
     }
 }

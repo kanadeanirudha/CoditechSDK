@@ -27,11 +27,11 @@ namespace Coditech.API.Controllers
         [Route("/DBTMCampMaster/GetDBTMCampList")]
         [Produces(typeof(DBTMCampListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMCampList(string selectedCentreCode,FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMCampList(string selectedCentreCode, long userId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
-                DBTMCampMasterListModel list = _dBTMCampMasterService.GetDBTMCampList(selectedCentreCode, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                DBTMCampMasterListModel list = _dBTMCampMasterService.GetDBTMCampList(selectedCentreCode, userId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMCampListResponse>(data) : CreateNoContentResponse();
             }
@@ -72,7 +72,7 @@ namespace Coditech.API.Controllers
         [Route("/DBTMCampMaster/GetDBTMCamp")]
         [HttpGet]
         [Produces(typeof(DBTMCampResponse))]
-        public virtual IActionResult GetDBTMCamp(long dBTMCampMasterId)
+        public virtual IActionResult GetDBTMCamp(int dBTMCampMasterId)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace Coditech.API.Controllers
         [Route("/DBTMCampMaster/GetDBTMCampUserList")]
         [Produces(typeof(DBTMCampUserListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMCampUserList(long dBTMCampMasterId, string userType, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMCampUserList(int dBTMCampMasterId, string userType, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
@@ -177,6 +177,29 @@ namespace Coditech.API.Controllers
             {
                 _coditechLogging.LogMessage(ex, "AssociateUnAssociateCampwiseUser", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMCampUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("/DBTMCampMaster/GetCamUserListByCentreCodeAndGeneralTrainerMasterId")]
+        [Produces(typeof(DBTMCampUserListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetCamUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
+        {
+            try
+            {
+                DBTMCampUserListModel list = _dBTMCampMasterService.GetCampUserListByCentreCodeAndGeneralTrainerMasterId(selectedCentreCode, generalTrainerMasterId, dBTMCampMasterId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMCampUserListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex,"DBTMCampUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCampUserListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex,"DBTMCampUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCampUserListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

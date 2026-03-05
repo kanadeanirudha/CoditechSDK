@@ -39,6 +39,8 @@ namespace Coditech.API.Data
         public DbSet<DBTMCentrewiseTestParameterListView> DBTMCentrewiseTestParameterListView { get; set; }
         public DbSet<DBTMCentreWiseSetting> DBTMCentreWiseSetting { get; set; }
         public DbSet<DBTMTestParameterVerticalViewSequence> DBTMTestParameterVerticalViewSequence { get; set; }
+        public DbSet<DBTMCentreWiseTest> DBTMCentreWiseTest { get; set; }
+        public DbSet<DBTMCampActivity> DBTMCampActivity { get; set; }
         #endregion
     }
 }

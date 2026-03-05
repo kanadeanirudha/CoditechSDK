@@ -474,11 +474,13 @@ namespace Coditech.Admin.Agents
         public virtual DBTMTraineeUploadResultViewModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count)
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-            if (userModel?.Custom1?.ToLower() == CustomConstants.DBTMTrainer)
+            userType = userModel?.Custom1;
+            long entityId = userModel?.EntityId ?? 0;
+            if (userModel?.Custom1?.Equals(CustomConstants.DBTMTrainer, StringComparison.OrdinalIgnoreCase) == true)
             {
-                trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0;
+                trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty) ?.GeneralTrainerMasterId ?? 0;
             }
-            DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count);
+            DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count, entityId);
             return new DBTMTraineeUploadResultViewModel
             {
                 FilePath = response.FilePath,

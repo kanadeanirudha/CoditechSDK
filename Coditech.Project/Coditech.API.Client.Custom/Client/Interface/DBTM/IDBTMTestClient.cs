@@ -127,5 +127,6 @@ namespace Coditech.API.Client
         /// <param name="DBTMActivityVerticalViewSequenceModel">DBTMActivityVerticalViewSequenceModel.</param>
         /// <returns>Returns DBTMActivityVerticalViewSequenceResponse.</returns>
         DBTMActivityVerticalViewSequenceResponse CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel body);
+        DBTMCentreWiseTestListResponse GetTestsByCentreCode(string centreCode);
     }
 }

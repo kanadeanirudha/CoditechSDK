@@ -4,6 +4,7 @@ using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Coditech.Admin.Utilities;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMReportsController : BaseController
@@ -13,6 +14,7 @@ namespace Coditech.Admin.Controllers
         private const string namereports = "~/Views/DBTM/DBTMReports/NameWiseReports.cshtml";
         private const string testwisemultireports = "~/Views/DBTM/DBTMReports/TestWiseMultiReports.cshtml";
         private const string batchwisemultireports = "~/Views/DBTM/DBTMReports/BatchWiseMultiReports.cshtml";
+        private const string profiledetailslist = "~/Views/DBTM/DBTMReports/ProfileDetailsList.cshtml";
         public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
@@ -74,9 +76,11 @@ namespace Coditech.Admin.Controllers
         public ActionResult TestWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            dBTMReportsViewModel.CentreCode = userModel?.SelectedCentreCode;
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
-            BindDBTMBatchActivity(dBTMReportsViewModel);
+            BindDBTMCentrewiseBatchActivity(dBTMReportsViewModel);
             return View(testwisemultireports, dBTMReportsViewModel);
         }
 
@@ -183,12 +187,22 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            if(string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return Json(new List<string>());
 
             List<DateTime> dates = _dBTMReportsAgent.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
             List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
 
+            return Json(result);
+        }
+
+        [HttpGet]
+        public IActionResult GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds) || generalBatchMasterId <= 0)
+                return Json(new List<string>());
+            List<DateTime> dates = _dBTMReportsAgent.GetBatchActivityPerformedDates(dBTMTestMasterIds, generalBatchMasterId);
+            List<string> result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
             return Json(result);
         }
 
@@ -199,7 +213,7 @@ namespace Coditech.Admin.Controllers
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
-            BindDBTMBatchActivity(dBTMReportsViewModel);
+            BindDBTMCentrewiseBatchActivity(dBTMReportsViewModel);
             return View(namereports, dBTMReportsViewModel);
         }
 
@@ -254,6 +268,35 @@ namespace Coditech.Admin.Controllers
                 }
             }
         }
+        protected void BindDBTMCentrewiseBatchActivity(DBTMReportsListViewModel model)
+        {
+            model.CustomDropdownList1 ??= new List<SelectListItem>();
+            if (string.IsNullOrEmpty(model.CentreCode))
+            {
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                model.CentreCode = userModel?.SelectedCentreCode;
+            }
+            if (string.IsNullOrEmpty(model.CentreCode))
+                return;
+            DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(model.CentreCode);
+            model.CustomDropdownList1.Add(new SelectListItem
+            {
+                Text = "All",
+                Value = "0"
+            });
+            if (response?.DBTMCentreWiseTestList?.Any() == true)
+            {
+                model.CustomDropdownList1.AddRange(response.DBTMCentreWiseTestList
+                    .OrderBy(x => x.TestName)
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.TestName,
+                        Value = x.DBTMTestMasterId.ToString(),
+                        Selected = model.CustomDropdownSelectedValue1?.Contains(x.DBTMTestMasterId.ToString()) == true
+                    })
+                );
+            }
+        }
 
         protected virtual void BindDBTMGraph(DBTMGraphListViewModel dBTMTestViewModel)
         {
@@ -275,6 +318,32 @@ namespace Coditech.Admin.Controllers
                     }
                 }
             }
+        }
+        [HttpGet]
+        public ActionResult GetProfileDetailsList()
+        {
+            DBTMTraineeProfileListViewModel model = new DBTMTraineeProfileListViewModel();
+            model.CustomDropdownList1 = new List<SelectListItem>();
+            return View(profiledetailslist, model);
+        }
+
+        public ActionResult GetBatchUserListByBatchId(long generalBatchMasterId)
+        {
+            DropdownViewModel traineeDropdownn = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.BatchWiseUser.ToString(),
+                DropdownName = "DBTMTraineeDetailId",
+                Parameter = generalBatchMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
+        }
+        [HttpGet]
+        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
+        {
+            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
+            list.OrderBy = orderBy;
+            return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
         #endregion
     }
