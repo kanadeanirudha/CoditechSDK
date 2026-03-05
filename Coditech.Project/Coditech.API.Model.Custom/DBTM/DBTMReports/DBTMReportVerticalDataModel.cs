@@ -11,6 +11,7 @@ namespace Coditech.Common.API.Model
         public string Status { get; set; } = "Completed";
         public DateTime TestPerformedTime { get; set; }
         public DataTable DataTable { get; set; }
+        public bool IsValidRecordButton { get; set; }
         public DBTMReportVerticalDataModel()
         {
             DataTable = new DataTable();

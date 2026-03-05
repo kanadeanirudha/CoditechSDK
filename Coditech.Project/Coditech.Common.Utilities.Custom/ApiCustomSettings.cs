@@ -85,5 +85,12 @@ namespace Coditech.Common.API
                 return Convert.ToString(settings["EncryptionIV"]);
             }
         }
+        public static int IsValidRecordButtonExpireTimeOnMobile
+        {
+            get
+            {
+                return Convert.ToInt16(settings["IsValidRecordButtonExpireTimeOnMobile"]);
+            }
+        }
     }
 }
