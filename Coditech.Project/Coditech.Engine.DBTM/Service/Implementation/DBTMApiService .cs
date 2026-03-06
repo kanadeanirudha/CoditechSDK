@@ -108,7 +108,8 @@ namespace Coditech.API.Service
                         TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
                         NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
                         CreatedBy = dBTMDeviceDataModel.CreatedBy,
-                        CreatedDate = createdDate
+                        CreatedDate = createdDate,
+                        IsValidRecord = true
                     };
 
                     DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
@@ -545,8 +546,7 @@ namespace Coditech.API.Service
                     string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMDeviceDataId")
                 );
 
-            DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.FirstOrDefault(x => x.DBTMDeviceDataId == dBTMDeviceDataId);
-
+            DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
             if (deviceData == null)
                 throw new CoditechException(ErrorCodes.NotFound, "Record not found");
 
