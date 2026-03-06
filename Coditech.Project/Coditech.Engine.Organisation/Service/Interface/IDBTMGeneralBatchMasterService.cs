@@ -7,5 +7,6 @@ namespace Coditech.API.Service
     {
         GeneralBatchUserListModel GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId);
         GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate);
+        bool ConvertCampUserToBatchUser(long dBTMTraineeDetailId);
     }
 }

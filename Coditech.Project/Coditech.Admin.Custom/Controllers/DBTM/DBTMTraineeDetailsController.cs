@@ -559,7 +559,6 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("CentreName");
             ModelState.Remove("CentreCode");
             ModelState.Remove("DeviceSerialCode");
-
             if (ModelState.IsValid)
             {
                 dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
@@ -584,7 +583,18 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
-
+        [HttpPost]
+        public JsonResult ConvertCampUserToBatchUser(long dBTMTraineeDetailId)
+        {
+            bool status = _dBTMNewRegistrationAgent.ConvertCampUserToBatchUser(dBTMTraineeDetailId, out string message);
+            return Json(new { success = status, message = message });
+        }
+        [HttpGet]
+        public ActionResult GetConvertCampPopup(long dBTMTraineeDetailId)
+        {
+            ViewBag.TraineeId = dBTMTraineeDetailId;
+            return PartialView("~/Views/DBTM/DBTMTraineeDetails/_ConvertCampPopup.cshtml");
+        }
         #region Profilee
         [HttpGet]
         public virtual ActionResult Profile(long dBTMTraineeDetailId)

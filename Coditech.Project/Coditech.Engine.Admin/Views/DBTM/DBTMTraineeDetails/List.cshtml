@@ -20,6 +20,7 @@
     ModelPopUpViewModel traineePopup = new ModelPopUpViewModel() { ModelPopUpId = "TraineePopupId", ModalContentId = "TraineeContentId", PopUpSize = PopUpSizeEnum.Large };
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
     ModelPopUpViewModel downloadTemplatePopup = new ModelPopUpViewModel { ModelPopUpId = "DownloadTemplatePopupId", ModalContentId = "DownloadTemplateContentId" };
+    ModelPopUpViewModel convertPopup = new ModelPopUpViewModel() { ModelPopUpId = "ConvertCampPopupId", ModalContentId = "ConvertCampContentId" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -108,4 +109,5 @@
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", traineePopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", downloadTemplatePopup)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", convertPopup)
 <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>

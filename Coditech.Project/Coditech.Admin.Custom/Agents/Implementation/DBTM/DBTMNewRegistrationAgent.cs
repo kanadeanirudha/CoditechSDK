@@ -151,7 +151,8 @@ namespace Coditech.Admin.Agents
                     height = dBTMNewRegistrationViewModel.Height,
                     GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer,
                     JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
-                    SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId
+                    SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId,
+                    RegistrationType = dBTMNewRegistrationViewModel.RegistrationType
                 };
 
                 dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);
@@ -179,6 +180,36 @@ namespace Coditech.Admin.Agents
             {
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TraineeRegistration.ToString(), TraceLevel.Error);
                 return (DBTMNewRegistrationViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, GeneralResources.UpdateErrorMessage);
+            }
+        }
+        public bool ConvertCampUserToBatchUser(long dBTMTraineeDetailId, out string message)
+        {
+            message = string.Empty;
+            try
+            {
+                TrueFalseResponse response = _dBTMNewRegistrationClient.ConvertCampUserToBatchUser(dBTMTraineeDetailId);
+                if (response.IsSuccess)
+                {
+                    message = "Camp user converted to batch user successfully.";
+                    return true;
+                }
+                else
+                {
+                    message = GeneralResources.UpdateErrorMessage;
+                    return false;
+                }
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ConvertCampUserToBatchUser", TraceLevel.Warning);
+                message = ex.Message;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ConvertCampUserToBatchUser", TraceLevel.Error);
+                message = GeneralResources.UpdateErrorMessage;
+                return false;
             }
         }
         //GetGeneralTrainerByJoiningCode
