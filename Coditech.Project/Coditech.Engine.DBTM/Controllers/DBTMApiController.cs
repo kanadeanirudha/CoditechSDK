@@ -5,6 +5,7 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Logger;
+using DocumentFormat.OpenXml.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -354,7 +355,7 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMBatchModel model = _dBTMApiService.GetBatchDetails(dBTMCampMasterId);
+                DBTMBatchModel model = _dBTMApiService.GetCampDetails(dBTMCampMasterId);
                 return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -387,6 +388,42 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMCampActivity", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [Route("/DBTMApi/UpdateValidRecord")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public IActionResult UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord)
+        {
+            try
+            {
+                bool status = _dBTMApiService.UpdateValidRecord(dBTMDeviceDataId, isValidRecord);
+
+                return CreateOKResponse(new TrueFalseResponse
+                {
+                    IsSuccess = status
+                });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ValidRecord", TraceLevel.Warning);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ValidRecord", TraceLevel.Error);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message
+                });
             }
         }
     }
