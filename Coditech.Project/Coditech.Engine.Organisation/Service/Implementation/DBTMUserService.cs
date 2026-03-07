@@ -34,6 +34,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralTemplateHeaderConfiguration> _generalTemplateHeaderConfigurationRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
         private readonly ICoditechRepository<GeneralCountryMaster> _generalCountryRepository;
+        protected readonly ICoditechRepository<DBTMCampUser> _dbtmCampUserRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -54,6 +55,7 @@ namespace Coditech.API.Service
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dbtmCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         //public override UserModel Login(UserLoginModel userLoginModel)
@@ -270,6 +272,16 @@ namespace Coditech.API.Service
                             EntityId = generalPersonModel.EntityId,
                         };
                         _generalBatchUserRepository.Insert(generalBatchUser);
+                    }
+                    if (dBTMCustomNewRegistrationModel.DBTMCampMasterId > 0)
+                    {
+                        DBTMCampUser dbtmCampUser = new DBTMCampUser()
+                        {
+                            DBTMCampMasterId = dBTMCustomNewRegistrationModel.DBTMCampMasterId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                            EntityId = generalPersonModel.EntityId,
+                        };
+                        _dbtmCampUserRepository.Insert(dbtmCampUser);
                     }
                 }
                 else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
