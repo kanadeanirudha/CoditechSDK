@@ -172,7 +172,6 @@ namespace Coditech.API.Service
             listModel.DBTMCampUserList = CampList?.Count > 0 ? CampList : new List<DBTMCampUserModel>();
             listModel.BindPageListModel(pageListModel);
 
-
             if (dBTMCampMasterId > 0)
             {
                 DBTMCampMasterModel model = GetDBTMCamp(dBTMCampMasterId);
@@ -188,7 +187,6 @@ namespace Coditech.API.Service
         public virtual bool AssociateUnAssociateCampwiseUser(DBTMCampUserModel dBTMCampUserModel)
         {
             bool isAssociateUnAssociateCampwiseUser = false;
-
             DBTMCampUser dBTMCampUser = new DBTMCampUser();
             if (dBTMCampUserModel.DBTMCampUserId > 0)
             {
@@ -197,12 +195,16 @@ namespace Coditech.API.Service
             }
             else
             {
-                dBTMCampUser = dBTMCampUserModel.FromModelToEntity<DBTMCampUser>();
-                //dBTMCampUser.DBTMCampUserId = 0;
+                dBTMCampUser = new DBTMCampUser
+                {
+                    DBTMCampMasterId = dBTMCampUserModel.DBTMCampMasterId,
+                    EntityId = dBTMCampUserModel.EntityId,
+                    UserType = UserTypeEnum.Trainee.ToString(),
+                    ActivityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus")
+                };
                 dBTMCampUser = _dBTMCampUserRepository.Insert(dBTMCampUser);
                 isAssociateUnAssociateCampwiseUser = dBTMCampUser.DBTMCampUserId > 0;
             }
-
             if (!isAssociateUnAssociateCampwiseUser)
             {
                 dBTMCampUserModel.HasError = true;

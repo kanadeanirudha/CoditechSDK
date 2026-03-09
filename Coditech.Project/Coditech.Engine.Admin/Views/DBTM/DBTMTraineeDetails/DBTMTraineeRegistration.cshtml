@@ -5,15 +5,15 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
-        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = !string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any() ? GeneralResources.SaveButtonText : string.Empty,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -27,7 +27,8 @@
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             bool trainersLoaded = false;
                             bool isTrainer = false;
-                            var user = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                            var user = SessionHelper.GetDataFromSession<UserModel>
+                            (AdminConstants.UserDataSession);
                             if (user?.Custom1 == CustomConstants.DBTMTrainer)
                             {
                                 isTrainer = true;
@@ -43,7 +44,7 @@
                             <div class="row">
                                 @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                                 {
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <div class="mb-3">
                                             <label class="form-label required" for="JoiningCode">Joining Code</label>
                                             @Html.TextBoxFor(x => x.JoiningCode, new { id = "JoiningCode", @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()", @readonly = "readonly" })
@@ -53,7 +54,7 @@
                                 }
                                 else
                                 {
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <div class="mb-3">
                                             <label class="form-label required" for="JoiningCode">Joining Code</label>
                                             @Html.TextBoxFor(x => x.JoiningCode, new { id = "JoiningCode", @class = "form-control", onkeypress = "return CoditechCommon.AvoidSpacing()" })
@@ -61,8 +62,8 @@
                                         </div>
                                     </div>
                                 }
-                                <div class="col-lg-2">
-                                    <div class="mb-3">
+                                <div class="col-lg-1">
+                                    <div class="mb-1">
                                         <label class="form-label">&nbsp;</label>
                                         <div class="form-check" style="padding-left:0px !important; display:block !important">
                                             @if (!isTrainer)
@@ -74,11 +75,35 @@
                                 </div>
                                 @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                                 {
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-3">
                                         <div class="mb-3 multiselect-dropdown">
                                             @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
-                                            @Html.ListBoxFor(m => m.SelectedTrainer, new SelectList(Model.AllTrainerList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                            @Html.ListBoxFor(m => m.SelectedTrainer,
+                                                     new SelectList(Model.AllTrainerList, "Value", "Text"),
+                                                     new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
                                             @Html.ValidationMessageFor(x => x.SelectedTrainer)
+                                        </div>
+                                    </div>
+                                    <!-- Radio Buttons Section -->
+                                    <div class="col-lg-4">
+                                        <div class="mb-3">
+                                            <label class="form-label required d-block">User Type</label>
+                                            <div class="d-flex align-items-center gap-4">
+                                                <div class="form-check">
+                                                    @Html.RadioButtonFor(m => m.RegistrationType, "Batch",
+                                                             new { @class = "form-check-input", id = "BatchUser" })
+                                                    <label class="form-check-label ms-1" for="BatchUser">
+                                                        Batch User
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    @Html.RadioButtonFor(m => m.RegistrationType, "Camp",
+                                                             new { @class = "form-check-input", id = "CampUser" })
+                                                    <label class="form-check-label ms-1" for="CampUser">
+                                                        Camp User
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 }

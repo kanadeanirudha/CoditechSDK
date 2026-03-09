@@ -23,6 +23,8 @@ namespace Coditech.API.Data
         public string AgeGroup { get; set; }
         public string Standard { get; set; }
         public string Section { get; set; }
+        public bool IsBatchUser { get; set; }
+        public bool IsCampUser { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

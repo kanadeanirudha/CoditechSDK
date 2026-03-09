@@ -26,7 +26,7 @@ namespace Coditech.Admin.Agents
         DBTMNewRegistrationViewModel IndividualRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel);
         DBTMNewRegistrationViewModel TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel);
         DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId);
-
+        bool ConvertCampUserToBatchUser(long dBTMTraineeDetailId, out string message);
 
     }
 }

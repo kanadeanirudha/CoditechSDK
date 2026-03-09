@@ -541,6 +541,18 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Is Batch User",
+                ColumnCode = "IsBatchUser",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Camp User",
+                ColumnCode = "IsCampUser",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Is Active",
                 ColumnCode = "IsActive",
                 IsSortable = true,
