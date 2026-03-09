@@ -274,6 +274,12 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "User Type",
+                ColumnCode = "IsAssociated",
+                IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Is Associated",
                 ColumnCode = "DBTMCampUserId",
                 IsSortable = true,

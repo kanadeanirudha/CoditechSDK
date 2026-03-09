@@ -13,5 +13,7 @@
         public bool IsAssociated { get; set; }
         public string BatchName { get; set; }
         public bool IsCampActive { get; set; }
+        public bool IsBatchUser { get; set; }
+        public bool IsCampUser { get; set; }
     }
 }
