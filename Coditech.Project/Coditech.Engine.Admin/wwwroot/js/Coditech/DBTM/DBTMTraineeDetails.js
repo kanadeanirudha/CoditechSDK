@@ -365,6 +365,48 @@
             }
         });
     },
+    OpenConvertPopup: function (contentId, traineeId) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            type: "GET",
+            url: "/DBTMTraineeDetails/GetConvertCampPopup",
+            data: { dBTMTraineeDetailId: traineeId },
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+                CoditechNotification.DisplayNotificationMessage("Failed to load popup.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+    ConfirmConvert: function (traineeId) {
+        $("#ConvertCampPopupId").modal("hide");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            url: "/DBTMTraineeDetails/ConvertCampUserToBatchUser",
+            type: "POST",
+            data: { dBTMTraineeDetailId: traineeId },
+            success: function (response) {
+                if (response.success) {
+                    CoditechNotification.DisplayNotificationMessage(response.message, "success");
+                    CoditechDataTable.LoadList("DBTMTraineeDetails", "List");
+                }
+                else {
+
+                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+                }
+                CoditechCommon.HideLodder();
+            },
+            error: function () {
+
+                CoditechNotification.DisplayNotificationMessage("Something went wrong.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
 };
 function showFieldError(fieldName, message) {
     const span = $('[data-valmsg-for="' + fieldName + '"]');

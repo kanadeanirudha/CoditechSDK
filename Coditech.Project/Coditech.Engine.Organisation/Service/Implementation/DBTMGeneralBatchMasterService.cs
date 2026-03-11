@@ -18,6 +18,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMBatchActivity> _dBTMBatchActivityRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
+        private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
+        private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         public DBTMGeneralBatchMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -27,11 +29,12 @@ namespace Coditech.API.Service
             _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate)
-        {
-        
+        {       
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<GeneralBatchModel> objStoredProc = new CoditechViewRepository<GeneralBatchModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
@@ -231,12 +234,10 @@ namespace Coditech.API.Service
             const string batch = "Batch";
             int generalBatchMasterId = Convert.ToInt32(parameterModel.Ids);
             bool isReferenced = _dBTMDeviceDataRepository.Table.Any(d => d.TablePrimaryColumnId == generalBatchMasterId && d.TypeOfRecord == batch);
-
             if (isReferenced)
             {
                 throw new CoditechException(ErrorCodes.AssociationDeleteError, "The batch is in use deleteion not allowed.");
             }
-
             return base.DeleteGeneralBatch(parameterModel);
         }
 
@@ -252,6 +253,34 @@ namespace Coditech.API.Service
             GeneralBatchUserListModel listModel = new GeneralBatchUserListModel();
             listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList : new List<GeneralBatchUserModel>();
             return listModel;
+        }
+        public bool ConvertCampUserToBatchUser(long dBTMTraineeDetailId)
+        {
+            if (dBTMTraineeDetailId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+            DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId);
+            if (IsNull(trainee))
+                throw new CoditechException(ErrorCodes.NullModel, "Trainee not found.");
+            DBTMCampUser campUser = _dBTMCampUserRepository.Table.FirstOrDefault(x => x.EntityId == dBTMTraineeDetailId);
+            if (IsNull(campUser))
+                throw new CoditechException(ErrorCodes.NullModel, "Camp user not found.");
+            GeneralBatchUser existingBatchUser = _generalBatchUserRepository.Table.FirstOrDefault(x => x.EntityId == dBTMTraineeDetailId);
+            if (existingBatchUser != null)
+                throw new CoditechException(ErrorCodes.AlreadyExist, "User already converted to batch.");
+            campUser.ActivityStatusEnumId = GetEnumIdByEnumCode("Converted", "DBTMTestStatus");
+            campUser.ModifiedDate = DateTime.Now;
+            _dBTMCampUserRepository.Update(campUser);
+            GeneralBatchUser batchUser = new GeneralBatchUser
+            {
+                EntityId = dBTMTraineeDetailId,
+                UserType = UserTypeEnum.Trainee.ToString(),
+                ActivityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus"),
+                CreatedDate = DateTime.Now
+            };
+            _generalBatchUserRepository.Insert(batchUser);
+            trainee.IsBatchUser = true;
+            _dBTMTraineeDetailsRepository.Update(trainee);
+            return true;
         }
         #endregion
     }

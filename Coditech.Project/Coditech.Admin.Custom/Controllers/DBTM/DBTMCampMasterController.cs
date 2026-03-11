@@ -150,9 +150,18 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult GetAssociateUnAssociateCampwiseUser(DBTMCampUserViewModel dBTMCampUserViewModel)
+        public virtual ActionResult GetAssociateUnAssociateCampwiseUser( long DBTMCampUserId, int DBTMCampMasterId, string CampName, string FirstName, string LastName, long EntityId)
         {
-            return PartialView("~/Views/DBTM/DBTMCampMaster/DBTMCampUser/_AssociateUnAssociateCampwiseUser.cshtml", dBTMCampUserViewModel);
+            DBTMCampUserViewModel model = new DBTMCampUserViewModel
+            {
+                DBTMCampUserId = DBTMCampUserId,
+                DBTMCampMasterId = DBTMCampMasterId,
+                CampName = CampName,
+                FirstName = FirstName,
+                LastName = LastName,
+                EntityId = EntityId
+            };
+            return PartialView("~/Views/DBTM/DBTMCampMaster/DBTMCampUser/_AssociateUnAssociateCampwiseUser.cshtml", model);
         }
 
         [HttpPost]
@@ -189,6 +198,7 @@ namespace Coditech.Admin.Controllers
             {
                 BindDBTMCampActivity(generalBatchViewModel);
             }
+            BindDBTMCampUserList(generalBatchViewModel);
         }
         protected void BindDuration(DBTMCampMasterViewModel model)
         {

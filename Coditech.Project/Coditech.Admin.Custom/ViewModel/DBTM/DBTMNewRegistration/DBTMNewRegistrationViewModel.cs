@@ -126,5 +126,9 @@ namespace Coditech.Admin.ViewModel
         public long PersonId { get; set; }
         public long EntityId { get; set; }
         public bool IsAdminMode { get; set; }
+        public bool IsBatchUser { get; set; }
+        public bool IsCampUser { get; set; }
+        [Required(ErrorMessage = "Please select user type.")]
+        public string RegistrationType { get; set; }
     }
 }

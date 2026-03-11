@@ -29,5 +29,7 @@
         public string Standard { get; set; }
         public string Section { get; set; }
         public string TypeOfCentre { get; set; }
+        public bool IsBatchUser { get; set; }
+        public bool IsCampUser { get; set; }
     }
 }

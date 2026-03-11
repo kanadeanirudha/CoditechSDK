@@ -37,6 +37,24 @@
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
                             <td>@item.MobileNumber</td>
+                            <td>
+                                @if (item.IsBatchUser && item.IsCampUser)
+                                {
+                                    <span class="badge bg-primary">Batch + Camp</span>
+                                }
+                                else if (item.IsBatchUser)
+                                {
+                                    <span class="badge bg-warning">Batch</span>
+                                }
+                                else if (item.IsCampUser)
+                                {
+                                    <span class="badge bg-info">Camp</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">None</span>
+                                }
+                            </td>
                             <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsAssociated)</td>
                             <td class="text-center">
                                 @if (item.IsAssociated)

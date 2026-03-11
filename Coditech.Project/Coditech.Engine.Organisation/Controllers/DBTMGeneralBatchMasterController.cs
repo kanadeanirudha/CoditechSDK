@@ -69,5 +69,30 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new GeneralBatchListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpPost]
+        [Route("/DBTMGeneralBatchMaster/ConvertCampUserToBatchUser")]
+        [Produces(typeof(TrueFalseResponse))]
+        public IActionResult ConvertCampUserToBatchUser([FromBody] ParameterModel parameterModel)
+        {
+            try
+            {
+                long traineeId = Convert.ToInt64(parameterModel.Ids);
+
+                bool result = _dbtmGeneralBatchMasterService.ConvertCampUserToBatchUser(traineeId);
+
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = result });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ConvertCampUser", TraceLevel.Warning);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                });
+            }
+        }
     }
 }

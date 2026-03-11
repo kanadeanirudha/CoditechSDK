@@ -33,7 +33,9 @@ namespace Coditech.API.Service
         private readonly IDBTMOrganisationCentrewiseJoiningCodeService _joiningCodeService;
         private readonly ICoditechRepository<GeneralTemplateHeaderConfiguration> _generalTemplateHeaderConfigurationRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
+        private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
         private readonly ICoditechRepository<GeneralCountryMaster> _generalCountryRepository;
+        protected readonly ICoditechRepository<DBTMCampUser> _dbtmCampUserRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -53,7 +55,9 @@ namespace Coditech.API.Service
             _joiningCodeService = joiningCodeService;
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dbtmCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         //public override UserModel Login(UserLoginModel userLoginModel)
@@ -261,7 +265,8 @@ namespace Coditech.API.Service
                 {
                     joiningCodeDetails.IsExpired = true;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
-                    if (dBTMCustomNewRegistrationModel.GeneralBatchMasterId > 0)
+                    string registrationType = dBTMCustomNewRegistrationModel?.RegistrationType;
+                    if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))
                     {
                         GeneralBatchUser generalBatchUser = new GeneralBatchUser()
                         {
@@ -270,6 +275,41 @@ namespace Coditech.API.Service
                             EntityId = generalPersonModel.EntityId,
                         };
                         _generalBatchUserRepository.Insert(generalBatchUser);
+                        DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == generalPersonModel.EntityId);
+                        if (trainee != null)
+                        {
+                            trainee.IsBatchUser = true;
+                            trainee.IsCampUser = false;
+                            _dBTMTraineeDetailsRepository.Update(trainee);
+                        }
+                    }
+                    else if (registrationType.Equals("Camp", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        DBTMCampUser campUser = new DBTMCampUser()
+                        {
+                            DBTMCampMasterId = dBTMCustomNewRegistrationModel.DBTMCampMasterId,
+                            EntityId = generalPersonModel.EntityId,
+                            ActivityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus"),
+                            UserType = UserTypeEnum.Trainee.ToString()
+                        };
+                        _dBTMCampUserRepository.Insert(campUser);
+                        DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == generalPersonModel.EntityId);
+                        if (trainee != null)
+                        {
+                            trainee.IsCampUser = true;
+                            trainee.IsBatchUser = false;
+                            _dBTMTraineeDetailsRepository.Update(trainee);
+                        }
+                    }
+                    if (dBTMCustomNewRegistrationModel.DBTMCampMasterId > 0)
+                    {
+                        DBTMCampUser dbtmCampUser = new DBTMCampUser()
+                        {
+                            DBTMCampMasterId = dBTMCustomNewRegistrationModel.DBTMCampMasterId,
+                            UserType = UserTypeEnum.Trainee.ToString(),
+                            EntityId = generalPersonModel.EntityId,
+                        };
+                        _dbtmCampUserRepository.Insert(dbtmCampUser);
                     }
                 }
                 else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))

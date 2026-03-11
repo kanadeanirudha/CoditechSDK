@@ -5,7 +5,7 @@
     constructor: function () {
     },
 
-    GetAssociateUnAssociateCampwiseUser: function (modelPopContentId, dBTMCampUserId, dBTMCampMasterId, campName, firstName, lastName, dBTMTraineeDetailId) {
+    GetAssociateUnAssociateCampwiseUser: function (modelPopContentId, dBTMCampUserId, dBTMCampMasterId, campName, firstName, lastName, entityId) {
 
         let DBTMCampUserViewModel = {
             DBTMCampUserId: dBTMCampUserId,
@@ -13,7 +13,7 @@
             CampName: campName,
             FirstName: firstName,
             LastName:lastName,
-            DBTMTraineeDetailId: dBTMTraineeDetailId
+            EntityId: entityId
             
         };
         CoditechCommon.ShowLodder();

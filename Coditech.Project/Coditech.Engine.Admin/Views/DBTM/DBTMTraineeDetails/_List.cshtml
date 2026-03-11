@@ -58,6 +58,12 @@
                                 }
                             </td>
                             <td>
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsBatchUser)
+                            </td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCampUser)
+                            </td>
+                            <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsActive)
                             </td>
                             <td class="text-center data-action">
@@ -88,6 +94,18 @@
                                    class="text-primary fs-5">
                                     <i class="fa fa-download"></i>
                                 </a>
+                                @if (item.IsCampUser && !item.IsBatchUser)
+                                {
+                                    <span class="m-2">|</span>
+                                    <a href="javascript:void(0);"
+                                       title="Convert To Batch User"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#ConvertCampPopupId"
+                                       onclick="DBTMTraineeDetails.OpenConvertPopup('ConvertCampContentId', @item.DBTMTraineeDetailId)"
+                                       class="btn btn-sm btn-soft-primary btn-circle">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }
