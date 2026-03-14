@@ -3,6 +3,7 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
+using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 
@@ -45,6 +46,10 @@ namespace Coditech.Admin.Helpers
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTest.ToString()))
             {
                 GetDBTMTestList(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMCentreWiseTest.ToString()))
+            {
+                GetDBTMCentreWiseTestList(dropdownViewModel, dropdownList);
             }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMBatchActivity.ToString()))
             {
@@ -226,6 +231,36 @@ namespace Coditech.Admin.Helpers
                 list.DBTMTestList = list.DBTMTestList.Where(x => x.IsActive).ToList();
 
             foreach (var item in list?.DBTMTestList.OrderBy(x => x.PerformanceMatrix ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
+            {
+                if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && short.TryParse(dropdownViewModel.Parameter, out short excludeId) && item.DBTMTestMasterId == excludeId)
+                {
+                    continue;
+                }
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = $"{item.TestName}",
+                    Value = Convert.ToString(item.DBTMTestMasterId),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestMasterId)
+                });
+            }
+        }
+        private static void GetDBTMCentreWiseTestList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            string centreCode = userModel.SelectedCentreCode;
+            DBTMCentreWiseTestListResponse response = new DBTMTestClient().GetTestsByCentreCode(centreCode);
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel }); 
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+            DBTMCentreWiseTestListModel list = new DBTMCentreWiseTestListModel { DBTMCentreWiseTestList = response.DBTMCentreWiseTestList };
+            bool isActive = !string.IsNullOrEmpty(dropdownViewModel.Parameter)
+                                && dropdownViewModel.Parameter.Equals("IsActive", StringComparison.OrdinalIgnoreCase);
+
+            //if (isActive)
+            //    list.DBTMCentreWiseTestList = list.DBTMCentreWiseTestList.Where(x => x.IsActive).ToList();
+
+            foreach (var item in list?.DBTMCentreWiseTestList.OrderBy(x => x.TestName ?? string.Empty).ThenBy(x => x.TestName ?? string.Empty))
             {
                 if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && short.TryParse(dropdownViewModel.Parameter, out short excludeId) && item.DBTMTestMasterId == excludeId)
                 {

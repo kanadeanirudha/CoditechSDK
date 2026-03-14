@@ -77,6 +77,7 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("DateOfBirth");
             ModelState.Remove("SpecializationEnumId");
             ModelState.Remove("SelectedTrainer");
+            ModelState.Remove("RegistrationType");
             dBTMNewRegistrationViewModel.IsAdminMode = true;
             if (ModelState.IsValid)
             {
