@@ -35,5 +35,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetCampUserListByCentreCodeAndGeneralTrainerMasterId?selectedCentreCode={selectedCentreCode}&generalTrainerMasterId={generalTrainerMasterId}&dBTMCampMasterId={dBTMCampMasterId}{BuildEndpointQueryString(true)}";
             return endpoint;
         }
+        public string GetCampListAsync(long entityId, string userType)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetCampList?entityId={entityId}&userType={userType}";
+        }
     }
 }

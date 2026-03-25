@@ -1,7 +1,7 @@
 ﻿var DBTMCamp = {
     OnCentreChange: function () {
         var centreCode = $("#CentreCode").val();
-        var selectedActivities = $("#CustomDropdownSelectedValue1").val();
+        var selectedActivities = $("#CustomDropdownSelectedValue1").val() || [];
         if (!centreCode) {
             $("#ActivityDropdownDiv").html("");
             return;
@@ -10,7 +10,8 @@
             cache: false,
             type: "GET",
             dataType: "html",
-            url: "/DBTMCampMaster/GetActivityByCentreCode", 
+            url: "/DBTMCampMaster/GetActivityByCentreCode",
+            traditional: true,   
             data: {
                 centreCode: centreCode,
                 selectedActivities: selectedActivities
@@ -24,9 +25,12 @@
         });
     }
 };
+
 $(document).ready(function () {
-    DBTMCamp.Initialize();
     if ($("#DBTMCampMasterId").val() == 0) {
         DBTMCamp.OnCentreChange();
     }
+    $("#CentreCode").change(function () {
+        DBTMCamp.OnCentreChange();
+    });
 });

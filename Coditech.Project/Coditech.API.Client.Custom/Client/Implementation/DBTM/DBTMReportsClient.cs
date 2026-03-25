@@ -598,7 +598,7 @@ namespace Coditech.API.Client
             return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy,CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, CancellationToken cancellationToken)
         {
             string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
 
@@ -646,6 +646,91 @@ namespace Coditech.API.Client
             {
                 if (disposeResponse)
                     response?.Dispose();
+            }
+        }
+
+        public virtual DBTMTestWiseReportsListResponse CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
+        {
+            return Task.Run(async () => await CampWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestWiseReportsListResponse> CampWiseMultipleReportsAsync(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.CampWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWiseReportsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTestWiseReportsListResponse();
+                }
+                else
+                {
+                    string responseData = await response.Content.ReadAsStringAsync();
+                    var typedBody = JsonConvert.DeserializeObject<DBTMTestWiseReportsListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTestWiseReportsListResponse CampWiseMultipleReportsFile(string dBTMTestMasterIds,int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType)
+        {
+            return Task.Run(async () => await CampWiseMultipleReportsFileAsync( dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode, reportType, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestWiseReportsListResponse> CampWiseMultipleReportsFileAsync(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.CampWiseMultipleReportsFileAsync(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode, reportType);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWiseReportsListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTestWiseReportsListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTestWiseReportsListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWiseReportsListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
             }
         }
     }

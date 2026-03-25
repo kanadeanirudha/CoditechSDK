@@ -30,6 +30,8 @@
         AgeGroup,
         OrderBy,
         DBTMCentreWiseTest,
+        CampWiseReports,
+        CampWiseMultiReports,
     }
     public enum DashboardFormCustomEnum
     {

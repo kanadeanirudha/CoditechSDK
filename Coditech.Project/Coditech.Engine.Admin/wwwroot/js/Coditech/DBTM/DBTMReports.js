@@ -645,4 +645,135 @@ var DBTMReports = {
             );
         }
     },
+    GetDBTMMultiTestListByDBTMCampMasterId: function () {
+        var campId = $("#DBTMCampMasterId").val();
+        if (campId != "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "/DBTMReports/GetMultiTestByCampMasterId", 
+                data: { dBTMCampMasterId: campId },
+                success: function (data) {
+                    $("#DBTMTestMasterId").html(data);
+                    $('#DBTMTestMasterId').selectpicker('refresh');
+                    CoditechCommon.HideLodder();
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Failed to load activity.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+
+            $("#DBTMTestMasterId").html("");
+            $('#DBTMTestMasterId').selectpicker('refresh');
+        }
+    },
+    GetDBTMCampWiseMultiReports: function () {
+        var campId = $("#DBTMCampMasterId").val();
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        $("#DBTMCampWiseMultiReportsDivId").html("");
+        if (campId != "" && dBTMTestMasterId != "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetCampWiseReports",
+                data: {
+                    dBTMCampMasterId: campId,
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    FromDate: fromdate,
+                    ToDate: todate
+                },
+                success: function (data) {
+                    $("#DBTMCampWiseMultiReportsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Camp Reports.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+
+        } else if (campId == "" || campId == "0") {
+            CoditechNotification.DisplayNotificationMessage("Please select a camp.", "error");
+        } else if (dBTMTestMasterId == "") {
+            CoditechNotification.DisplayNotificationMessage("Please select an activity.", "error");
+        }
+    },
+    DownloadCampExcelReport: function () {
+        var campId = $("#DBTMCampMasterId").val();
+        var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+        dBTMTestMasterId = dBTMTestMasterId ? dBTMTestMasterId.join(",") : "";
+        var fromdate = $("#FromDate").val();
+        var todate = $("#ToDate").val();
+        var reportType = $("#ReportType").val() || "excel";
+        if (dBTMTestMasterId !== "" && campId && campId.trim() !== "") {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                url: "/DBTMReports/CheckCampReportAvailability",
+                type: "GET",
+                data: {
+                    dBTMTestMasterIds: dBTMTestMasterId,
+                    dBTMCampMasterId: campId,
+                    fromDate: fromdate,
+                    toDate: todate
+                },
+                success: function (response) {
+                    if (response.success) {
+                        var downloadUrl = "/DBTMReports/DownloadCampReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&dBTMCampMasterId=" + encodeURIComponent(campId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.HideLodder();
+                        $("#hiddenDownloader").attr("src", downloadUrl);
+
+                    } else {
+                        CoditechNotification.DisplayNotificationMessage(response.message || "No data available.", "error");
+                        CoditechCommon.HideLodder();
+                    }
+                },
+                error: function () {
+                    CoditechNotification.DisplayNotificationMessage("Error while downloading report.", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+        } else {
+            CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
+        }
+    },
+    LoadCampActivityPerformedDates: function () {
+        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
+        var campId = $("#DBTMCampMasterId").val();
+        if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0 || !campId) {
+            activityPerformedDates = [];
+            $("#FromDate,#ToDate").datepicker("refresh");
+            return;
+        }
+        if (!Array.isArray(dBTMTestMasterIds)) {
+            dBTMTestMasterIds = [dBTMTestMasterIds];
+        }
+        $.ajax({
+            type: "GET",
+            url: "/DBTMReports/GetBatchActivityPerformedDates", 
+            data: {
+                dBTMTestMasterIds: dBTMTestMasterIds.join(","),
+                generalBatchMasterId: campId   
+            },
+            success: function (data) {
+                activityPerformedDates = data || [];
+                $("#FromDate,#ToDate").datepicker("refresh");
+            },
+            error: function () {
+                activityPerformedDates = [];
+            }
+        });
+    }
 };

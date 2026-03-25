@@ -27,5 +27,6 @@ namespace Coditech.Admin.ViewModel
         public string FilePath { get; set; }   
         public string FileName { get; set; }
         public string CentreCode { get; set; }
+        public int DBTMCampMasterId { get; set; }
     }
 }

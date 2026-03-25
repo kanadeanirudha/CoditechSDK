@@ -107,7 +107,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetOrderByTraineeProfileList(dropdownViewModel, dropdownList);
             }
-
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.CampWiseReports.ToString()))
+            {
+                GetCampWiseReportsList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -684,6 +687,22 @@ namespace Coditech.Admin.Helpers
                 Value = "Rank",
                 Selected = selectedValue == "Rank"
             });
+        }
+        private static void GetCampWiseReportsList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-------Select Camp-------", Value = "0" });
+            long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
+            string userType = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserType;
+            DBTMBatchListResponse response = new DBTMCampClient().GetCampList(entityId, userType);
+            foreach (var item in response?.DBTMBatchList?.OrderBy(x => x.CampName))
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = item.CampName,
+                    Value = item.DBTMCampMasterId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == item.DBTMCampMasterId.ToString()
+                });
+            }
         }
     }
 }
