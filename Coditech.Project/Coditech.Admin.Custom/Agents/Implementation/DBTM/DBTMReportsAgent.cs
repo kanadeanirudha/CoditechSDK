@@ -281,6 +281,13 @@ namespace Coditech.Admin.Agents
             }
             return listViewModel;
         }
+        public virtual List<DateTime> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            List<string> dates = _dBTMReportsClient.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
+            if (dates == null || !dates.Any())
+                return new List<DateTime>();
+            return dates.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
+        }
         #endregion
     }
 }

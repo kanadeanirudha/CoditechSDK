@@ -403,6 +403,12 @@ namespace Coditech.Admin.Controllers
             list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
+        [HttpGet]
+        public IActionResult GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            List<DateTime> dates = _dBTMReportsAgent.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
+            return Json(dates);
+        }
         #endregion
     }
 }

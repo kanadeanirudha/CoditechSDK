@@ -399,5 +399,29 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new GeneralBatchUserListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("/DBTMReports/GetCampActivityPerformedDates")]
+        [Produces("application/json")]
+        public virtual IActionResult GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            try
+            {
+                List<DateTime> dates = _dBTMReportsService.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
+                if (dates == null || !dates.Any())
+                    return Ok(new List<string>());
+                var result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+                return Ok(result);
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetCampActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetCampActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

@@ -657,6 +657,7 @@ var DBTMReports = {
                 success: function (data) {
                     $("#DBTMTestMasterId").html(data);
                     $('#DBTMTestMasterId').selectpicker('refresh');
+                    DBTMReports.LoadCampActivityPerformedDates();
                     CoditechCommon.HideLodder();
                 },
                 error: function () {
@@ -762,13 +763,15 @@ var DBTMReports = {
         }
         $.ajax({
             type: "GET",
-            url: "/DBTMReports/GetBatchActivityPerformedDates", 
+            url: "/DBTMReports/GetCampActivityPerformedDates",
             data: {
                 dBTMTestMasterIds: dBTMTestMasterIds.join(","),
-                generalBatchMasterId: campId   
+                dBTMCampMasterId: campId
             },
             success: function (data) {
-                activityPerformedDates = data || [];
+                activityPerformedDates = (data || []).map(function (d) {
+                    return d.split('T')[0];
+                });
                 $("#FromDate,#ToDate").datepicker("refresh");
             },
             error: function () {
