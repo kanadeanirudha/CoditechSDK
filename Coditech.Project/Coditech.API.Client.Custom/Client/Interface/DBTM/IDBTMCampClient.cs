@@ -54,5 +54,6 @@ namespace Coditech.API.Client
         /// <returns>Returns updated DBTMCampUserResponse</returns>
         DBTMCampUserResponse AssociateUnAssociateCampwiseUser(DBTMCampUserModel body);
         DBTMCampUserListResponse GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId);
+        DBTMBatchListResponse GetCampList(long entityId, string userType);
     }
 }

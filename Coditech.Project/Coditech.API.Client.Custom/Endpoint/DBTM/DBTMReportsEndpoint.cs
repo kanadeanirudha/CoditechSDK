@@ -69,5 +69,21 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}&orderBy={orderBy}";
             return endpoint;
         }
+        public string CampWiseMultipleReportsAsync(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/CampWiseMultipleReports?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMCampMasterId={dBTMCampMasterId}&fromDate={fromDate}&toDate={toDate}&entityId={entityId}&userType={userType}&centreCode={centreCode}";
+            return endpoint;
+        }
+        public string CampWiseMultipleReportsFileAsync(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType)
+        {
+            string endpoint =
+                $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/CampWiseMultipleReportsFile?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMCampMasterId={dBTMCampMasterId}&fromDate={fromDate}&toDate={toDate}&entityId={entityId}&userType={userType}&centreCode={centreCode}&reportType={reportType}";
+            return endpoint;
+        }
+        public string GetCampActivityPerformedDatesAsync(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetCampActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMCampMasterId={dBTMCampMasterId}";
+            return endpoint;
+        }
     }
 }

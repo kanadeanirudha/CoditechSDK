@@ -44,6 +44,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("Pincode");
                 ModelState.Remove("ConfirmPassword");
                 ModelState.Remove("Password");
+                ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);

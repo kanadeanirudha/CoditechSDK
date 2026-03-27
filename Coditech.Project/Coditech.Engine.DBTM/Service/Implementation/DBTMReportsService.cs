@@ -32,6 +32,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
+        private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -52,6 +53,7 @@ namespace Coditech.API.Service
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCampMasterRepository = new CoditechRepository<DBTMCampMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph
@@ -746,7 +748,7 @@ namespace Coditech.API.Service
             return dBTMReportsListModel;
         }
 
-         #endregion
+        #endregion
         // Delete Report File from Data folder
         public bool DeleteReportsFile(string fileName)
         {
@@ -807,7 +809,28 @@ namespace Coditech.API.Service
             return model;
         }
 
-
+        public List<DateTime> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+                return new List<DateTime>();
+            if (dBTMCampMasterId <= 0)
+                return new List<DateTime>();
+            List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
+            bool isAllTest = testIds.Contains(0);
+            var traineeDetailIds = _dBTMCampUserRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId && x.UserType == "Trainee").Select(x => x.EntityId).ToList();
+            if (!traineeDetailIds.Any())
+                return new List<DateTime>();
+            var personCodes = _dBTMTraineeDetailsRepository.Table.Where(t => traineeDetailIds.Contains(t.DBTMTraineeDetailId)).Select(t => t.PersonCode).ToList();
+            if (!personCodes.Any())
+                return new List<DateTime>();
+            var testCodes = _dBTMTestMasterRepository.Table.Where(x => isAllTest || testIds.Contains(x.DBTMTestMasterId)).Select(x => x.TestCode).ToList();
+            if (!testCodes.Any())
+                return new List<DateTime>();
+            var dates = _dBTMDeviceDataRepository.Table.Where(f => personCodes.Contains(f.PersonCode)
+                            && f.TypeOfRecord == "Camp" && f.TablePrimaryColumnId == dBTMCampMasterId
+                            && testCodes.Contains(f.TestCode)).Select(f => (f.CreatedDate ?? f.TestPerformedTime).Date).Distinct().OrderBy(d => d).ToList();
+            return dates;
+        }
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {

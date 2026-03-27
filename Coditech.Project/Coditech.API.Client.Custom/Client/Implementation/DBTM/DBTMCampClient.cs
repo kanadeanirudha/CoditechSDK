@@ -398,6 +398,46 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+        public virtual DBTMBatchListResponse GetCampList(long entityId, string userType)
+        {
+            return Task.Run(async () => await GetCampListAsync(entityId, userType, CancellationToken.None)).GetAwaiter().GetResult();
+        }
 
+        public virtual async Task<DBTMBatchListResponse> GetCampListAsync(long entityId, string userType, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMCampEndpoint.GetCampListAsync(entityId, userType);
+
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMBatchListResponse>(response, headers_, cancellationToken);
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMBatchListResponse();
+                }
+                else
+                {
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

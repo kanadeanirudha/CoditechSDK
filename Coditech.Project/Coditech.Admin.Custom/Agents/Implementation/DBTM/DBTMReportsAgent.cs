@@ -237,8 +237,56 @@ namespace Coditech.Admin.Agents
             DBTMTraineeProfileListModel dBTMTraineeProfileList = new DBTMTraineeProfileListModel { DBTMTraineeProfileList = response?.DBTMTraineeProfileList };
             DBTMTraineeProfileListViewModel listViewModel = new DBTMTraineeProfileListViewModel();
             listViewModel.DBTMTraineeProfileList = dBTMTraineeProfileList?.DBTMTraineeProfileList?.ToViewModel<DBTMTraineeProfileViewModel>().ToList();
-
             return listViewModel;
+        }
+        public virtual DBTMReportsListViewModel CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (!string.IsNullOrEmpty(dBTMTestMasterIds))
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.CampWiseMultipleReports(dBTMTestMasterIds, dBTMCampMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode);
+                listViewModel.DataTable = response.DataTable;
+                listViewModel.DataTableList = response.DataTableList;
+            }
+            return listViewModel;
+        }
+        public virtual DBTMReportsListViewModel CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate, string ReportType)
+        {
+            DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();
+            if (!string.IsNullOrEmpty(dBTMTestMasterIds))
+            {
+                long generalTrainerMasterId = 0;
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                string usertype = userModel.UserType;
+                if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
+                {
+                    DBTMCustomUserModel dBTMCustomUserModel = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3);
+                    generalTrainerMasterId = Convert.ToInt64(dBTMCustomUserModel.GeneralTrainerMasterId);
+                    usertype = userModel?.Custom1;
+                }
+                DBTMTestWiseReportsListResponse response = _dBTMReportsClient.CampWiseMultipleReportsFile(dBTMTestMasterIds, dBTMCampMasterId, FromDate, ToDate, generalTrainerMasterId, usertype, userModel.SelectedCentreCode,  ReportType );
+                listViewModel.DataTable = response.DataTable;
+                listViewModel.DataTableList = response.DataTableList;
+                listViewModel.FilePath = response.FilePath;
+                listViewModel.FileName = response.FileName;
+            }
+            return listViewModel;
+        }
+        public virtual List<DateTime> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            List<string> dates = _dBTMReportsClient.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
+            if (dates == null || !dates.Any())
+                return new List<DateTime>();
+            return dates.Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture)).ToList();
         }
         #endregion
     }

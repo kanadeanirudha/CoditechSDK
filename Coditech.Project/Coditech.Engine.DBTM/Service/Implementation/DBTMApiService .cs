@@ -469,15 +469,18 @@ namespace Coditech.API.Service
                 }
                 else if (custom1 == CustomConstants.DBTMCentreOwner)
                 {
-                    batcheslist = (from b in _dBTMCampMasterRepository.Table
-                                   join u in _userMasterRepository.Table on b.CreatedBy equals u.UserMasterId
-                                   where b.CentreCode == employeeData.CentreCode && b.IsActive
+                    var camps = _dBTMCampMasterRepository.Table.Where(b => b.CentreCode == employeeData.CentreCode && b.IsActive).ToList();
+                    var users = _userMasterRepository.Table.ToList();
+                    batcheslist = (from b in camps
+                                   join u in users on b.CreatedBy equals u.UserMasterId
                                    select new DBTMBatchModel
                                    {
                                        DBTMCampMasterId = b.DBTMCampMasterId,
-                                       CampName = u.EntityId == entityId ? $"{b.CampName}(Self)" : $"{b.CampName}({u.FirstName} {u.LastName})",
+                                       CampName = u.EntityId == entityId
+                                           ? $"{b.CampName}"
+                                           : $"{b.CampName}({u.FirstName} {u.LastName})",
                                    })
-                                   .ToList().OrderBy(b => b.CampName, StringComparer.OrdinalIgnoreCase).ToList();
+                                   .OrderBy(b => b.CampName, StringComparer.OrdinalIgnoreCase).ToList();
                 }
                 else
                 {

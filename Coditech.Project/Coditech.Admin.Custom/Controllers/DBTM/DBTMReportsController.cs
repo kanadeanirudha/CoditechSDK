@@ -15,6 +15,7 @@ namespace Coditech.Admin.Controllers
         private const string testwisemultireports = "~/Views/DBTM/DBTMReports/TestWiseMultiReports.cshtml";
         private const string batchwisemultireports = "~/Views/DBTM/DBTMReports/BatchWiseMultiReports.cshtml";
         private const string profiledetailslist = "~/Views/DBTM/DBTMReports/ProfileDetailsList.cshtml";
+        private const string campwisemultireports = "~/Views/DBTM/DBTMReports/CampWiseMultiReports.cshtml";
         public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
@@ -230,6 +231,63 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", datalist);
         }
 
+        //CampWiseReports
+        [HttpGet]
+        public ActionResult CampWiseReports()
+        {
+            DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            dBTMReportsViewModel.FromDate = DateTime.Today;
+            dBTMReportsViewModel.ToDate = DateTime.Today;
+            dBTMReportsViewModel.CustomDropdownList1 = new List<SelectListItem>();
+            return View(campwisemultireports, dBTMReportsViewModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetCampWiseReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportsListViewModel model = _dBTMReportsAgent.CampWiseMultipleReports(dBTMTestMasterIds, dBTMCampMasterId, FromDate, ToDate);
+            return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", model);
+        }
+
+        [HttpGet]
+        public ActionResult DownloadCampReport(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, string reportType)
+        {
+            var reportData = _dBTMReportsAgent.CampWiseMultipleReportsFile(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, reportType);
+            if (reportData == null || string.IsNullOrEmpty(reportData.FilePath) || !System.IO.File.Exists(reportData.FilePath))
+            {
+                return Content("Report not found.");
+            }
+            byte[] fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
+            string fileName = reportData.FileName;
+            _dBTMReportsAgent.DeleteReportsFile(fileName);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        [HttpGet]
+        public JsonResult CheckCampReportAvailability(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate)
+        {
+            var reportData = _dBTMReportsAgent.CampWiseMultipleReports(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate);
+            if (reportData == null || reportData.DataTableList == null || reportData.DataTableList.Count == 0)
+            {
+                return Json(new { success = false, message = "No data available for download." });
+            }
+            return Json(new { success = true });
+        }
+        public ActionResult GetMultiTestByCampMasterId(int dBTMCampMasterId)
+        {
+            DBTMReportsListViewModel model = new DBTMReportsListViewModel();
+            BindDBTMCentrewiseBatchActivity(model);
+            DropdownViewModel testDropdown = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.CampWiseMultiReports.ToString(),
+                DropdownName = "DBTMTestMasterId",
+                Parameter = $"{dBTMCampMasterId}~true",
+                IsCustomDropdown = true,
+                DropdownList = model.CustomDropdownList1
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown);
+        }
+
         #region Protected Methods
         public ActionResult GetMultiTestByGeneralBatchMasterId(int generalBatchMasterId)
         {
@@ -245,6 +303,7 @@ namespace Coditech.Admin.Controllers
             ViewBag.CustomDropdownList1 = batchreports.CustomDropdownList1;
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown);
         }
+
 
         protected void BindDBTMBatchActivity(DBTMReportsListViewModel dBTMReportsViewModel)
         {
@@ -286,8 +345,7 @@ namespace Coditech.Admin.Controllers
             });
             if (response?.DBTMCentreWiseTestList?.Any() == true)
             {
-                model.CustomDropdownList1.AddRange(response.DBTMCentreWiseTestList
-                    .OrderBy(x => x.TestName)
+                model.CustomDropdownList1.AddRange(response.DBTMCentreWiseTestList.OrderBy(x => x.TestName)
                     .Select(x => new SelectListItem
                     {
                         Text = x.TestName,
@@ -339,11 +397,17 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
         }
         [HttpGet]
-        public ActionResult GetBatchWiseTraineeProfileDetailsList( long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
+        public ActionResult GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
         {
             DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
             list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
+        }
+        [HttpGet]
+        public IActionResult GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            List<DateTime> dates = _dBTMReportsAgent.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
+            return Json(dates);
         }
         #endregion
     }
