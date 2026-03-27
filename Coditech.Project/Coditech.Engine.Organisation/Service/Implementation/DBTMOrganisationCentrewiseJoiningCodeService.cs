@@ -59,7 +59,7 @@ namespace Coditech.API.Service
             if (IsNull(organisationCentrewiseJoiningCodeModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            int? allowJoiningCodeCount = _dBTMCentreWiseSettingRepository.Table .Where(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode).Select(x => (int?)x.AllowJoiningCode).FirstOrDefault();
+            int? allowJoiningCodeCount = _dBTMCentreWiseSettingRepository.Table .Where(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode).Select(x => (int?)x.AllowBatchUser).FirstOrDefault();
 
             string traineeEnumCode = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId).Select(x => x.EnumName).FirstOrDefault();
 

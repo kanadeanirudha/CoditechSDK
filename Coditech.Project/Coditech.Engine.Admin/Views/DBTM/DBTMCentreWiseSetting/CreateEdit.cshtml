@@ -14,7 +14,7 @@
                 FormId = AdminConstants.FormId + controllerName,
             };
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, IsDisabled = Model.OrganisationCentreMasterId > 0 };
-    ModelPopUpViewModel addTestModel = new ModelPopUpViewModel() { ModelPopUpId = "AssociateTestPopup",  ModalContentId = "AssociateTestPopupContent" };
+    ModelPopUpViewModel addTestModel = new ModelPopUpViewModel() { ModelPopUpId = "AssociateTestPopup", ModalContentId = "AssociateTestPopupContent" };
 }
 <div class="page-content">
     <div class="container-fluid  mt-5">
@@ -42,7 +42,7 @@
                                         @Html.ValidationMessageFor(x => x.CentreCode)
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-6">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.TypeOfCentre, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
@@ -57,13 +57,22 @@
                                         @Html.ValidationMessageFor(x => x.TypeOfCentre)
                                     </div>
                                 </div>
-                            <div class="col-lg-3">
-                                <div class="mb-3">
-                                    @Html.LabelFor(x => x.AllowJoiningCode, new { @class = "form-label required" })
-                                    @Html.TextBoxFor(x => x.AllowJoiningCode, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()", maxlength = "99999", min = "1" })
-                                    @Html.ValidationMessageFor(x => x.AllowJoiningCode)
-                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AllowBatchUser, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.AllowBatchUser, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()", maxlength = "99999", min = "1" })
+                                        @Html.ValidationMessageFor(x => x.AllowBatchUser)
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.AllowCampUser, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.AllowCampUser, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()", maxlength = "99999", min = "1" })
+                                        @Html.ValidationMessageFor(x => x.AllowCampUser)
+                                    </div>
+                                </div>
                             </div>
                         }
                         <div class="accordion mt-4 compact-accordion" id="centreTestAccordion">
@@ -97,9 +106,11 @@
         padding-top: 6px !important;
         padding-bottom: 6px !important;
     }
+
     .compact-accordion .accordion-header {
         margin: 0;
     }
+
     .compact-accordion .accordion-item {
         border: 0;
     }
