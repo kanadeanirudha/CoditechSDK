@@ -15,7 +15,7 @@ namespace Coditech.API.Service
 {
     public class DBTMOrganisationCentrewiseJoiningCodeService : OrganisationCentrewiseJoiningCodeService, IDBTMOrganisationCentrewiseJoiningCodeService
     {
-          protected readonly IServiceProvider _serviceProvider;
+        protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
@@ -58,29 +58,25 @@ namespace Coditech.API.Service
         {
             if (IsNull(organisationCentrewiseJoiningCodeModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+            DBTMCentreWiseSetting centreSetting = _dBTMCentreWiseSettingRepository.Table.FirstOrDefault(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode);
+            if (IsNull(centreSetting) || centreSetting.AllowBatchUser <= 0)
+                throw new CoditechException(ErrorCodes.InvalidData, "Centre settings Or Batch user limit not configured for this centre.");
 
-            int? allowJoiningCodeCount = _dBTMCentreWiseSettingRepository.Table .Where(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode).Select(x => (int?)x.AllowBatchUser).FirstOrDefault();
-
+            int? allowJoiningCodeCount = centreSetting.AllowBatchUser + centreSetting.AllowCampUser;
             string traineeEnumCode = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId).Select(x => x.EnumName).FirstOrDefault();
-
             if (!allowJoiningCodeCount.HasValue)
                 throw new CoditechException(ErrorCodes.NotFound, "Joining code limit not configured for this centre.");
-
             if (traineeEnumCode == CustomConstants.Trainee)
             {
                 int existingJoiningCodeCount = _organisationCentrewiseJoiningCodeRepository.Table.Count(x => x.CentreCode == organisationCentrewiseJoiningCodeModel.CentreCode && x.JoiningCodeTypeEnumId == organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId);
-
                 if ((existingJoiningCodeCount + organisationCentrewiseJoiningCodeModel.Quantity) > allowJoiningCodeCount.Value)
                 {
-                    throw new CoditechException(ErrorCodes.InvalidData,$"Joining code limit exceeded. Allowed: {allowJoiningCodeCount.Value}, Existing: {existingJoiningCodeCount}. Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
-
+                    throw new CoditechException(ErrorCodes.InvalidData, $"Joining code limit exceeded. Allowed: {allowJoiningCodeCount.Value}, Existing: {existingJoiningCodeCount}. Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
                 }
             }
-
             List<OrganisationCentrewiseJoiningCode> insertList = new List<OrganisationCentrewiseJoiningCode>();
             for (int i = 1; i <= organisationCentrewiseJoiningCodeModel.Quantity; i++)
             {
-
                 insertList.Add(new OrganisationCentrewiseJoiningCode
                 {
                     JoiningCode = GenerateAlphaNumericCode(ApiSettings.JoiningCodeLength),
@@ -90,7 +86,6 @@ namespace Coditech.API.Service
                     Custom1 = organisationCentrewiseJoiningCodeModel.Custom1
                 });
             }
-
             _organisationCentrewiseJoiningCodeRepository.Insert(insertList, organisationCentrewiseJoiningCodeModel.CreatedBy);
             return organisationCentrewiseJoiningCodeModel;
         }
