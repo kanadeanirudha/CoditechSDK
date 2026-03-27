@@ -36,6 +36,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
         private readonly ICoditechRepository<GeneralCountryMaster> _generalCountryRepository;
         protected readonly ICoditechRepository<DBTMCampUser> _dbtmCampUserRepository;
+        protected readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -58,6 +59,7 @@ namespace Coditech.API.Service
             _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dbtmCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         //public override UserModel Login(UserLoginModel userLoginModel)
@@ -235,6 +237,7 @@ namespace Coditech.API.Service
             string customerData = generalPersonModel.Custom1;
             DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customerData);
             generalPersonModel.Custom1 = null;
+
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode)?.FirstOrDefault();
@@ -242,7 +245,10 @@ namespace Coditech.API.Service
                     throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joining Code."));
                 if (joiningCodeDetails.IsExpired)
                     throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+                ValidateCentreUserLimit(joiningCodeDetails.CentreCode, dBTMCustomNewRegistrationModel?.RegistrationType);
+
                 generalPersonModel.SelectedCentreCode = joiningCodeDetails.CentreCode;
+
             }
             else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
@@ -263,9 +269,10 @@ namespace Coditech.API.Service
             {
                 if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    joiningCodeDetails.IsExpired = true;
-                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                     string registrationType = dBTMCustomNewRegistrationModel?.RegistrationType;
+                    joiningCodeDetails.IsExpired = true;
+                    joiningCodeDetails.Custom2 = registrationType;
+                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                     if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))
                     {
                         GeneralBatchUser generalBatchUser = new GeneralBatchUser()
@@ -583,7 +590,7 @@ namespace Coditech.API.Service
             }
             else
             {
-                int titleEnumId = GetEnumIdByEnumCode(title,DropdownTypeEnum.Title.ToString());
+                int titleEnumId = GetEnumIdByEnumCode(title, DropdownTypeEnum.Title.ToString());
                 if (titleEnumId <= 0)
                 {
                     errors.Add("Trainee Title is invalid");
@@ -1004,6 +1011,49 @@ namespace Coditech.API.Service
             List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
             List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
             return generalRunningNumbersList;
+        }
+        private void ValidateCentreUserLimit(string centreCode, string registrationType)
+        {
+            // Get centre settings
+            DBTMCentreWiseSetting centreSetting = _dBTMCentreWiseSettingRepository.Table
+                .FirstOrDefault(x => x.CentreCode == centreCode);
+
+            if (centreSetting == null)
+                throw new CoditechException(ErrorCodes.InvalidData, "Centre setting not found.");
+
+            // Count based on type 
+            int usedCount = 0;
+
+            if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))
+            {
+                usedCount = _organisationCentrewiseJoiningCodeRepository.Table
+                    .Count(x => x.CentreCode == centreCode
+                             && x.IsExpired
+                             && x.Custom2 == "Batch");
+
+                if (usedCount >= centreSetting.AllowBatchUser)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData,
+                        "Batch limit exceeded, Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
+                }
+            }
+            else if (registrationType.Equals("Camp", StringComparison.InvariantCultureIgnoreCase))
+            {
+                usedCount = _organisationCentrewiseJoiningCodeRepository.Table
+                    .Count(x => x.CentreCode == centreCode
+                             && x.IsExpired
+                             && x.Custom2 == "Camp");
+
+                if (usedCount >= centreSetting.AllowCampUser)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData,
+                        "Camp limit exceeded, Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
+                }
+            }
+            else
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Invalid registration type.");
+            }
         }
         #endregion
 
