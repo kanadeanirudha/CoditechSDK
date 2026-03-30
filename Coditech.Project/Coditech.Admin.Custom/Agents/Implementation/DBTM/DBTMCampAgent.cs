@@ -38,7 +38,7 @@ namespace Coditech.Admin.Agents
             {
                 filters = new FilterCollection();
                 filters.Add("CampName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
-                filters.Add("CampTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("CampStartTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("CampStartDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("CampEndDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
