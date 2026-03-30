@@ -157,21 +157,16 @@ namespace Coditech.API.Service
         {
             if (IsNull(dBTMNewRegistrationModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
             if (IsEmailIdAlreadyExist(dBTMNewRegistrationModel.EmailId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Email Id"));
-            //
-            OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMNewRegistrationModel.CentreCode)?.FirstOrDefault();
-
+            int trainerEnumId = GetEnumIdByEnumCode("Trainer", "OrganisationJoiningCodeType");
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == dBTMNewRegistrationModel.CentreCode && x.JoiningCodeTypeEnumId == trainerEnumId);
             if (IsNull(joiningCodeDetails))
-                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joining Code."));
-
+                throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Trainer Joining Code."));
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
-
             if (!_organisationCentreMasterRepository.Table.Any(x => x.CentreCode == joiningCodeDetails.CentreCode))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Centre Code."));
-
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster() { CentreCode = joiningCodeDetails.CentreCode };
             long personId = 0;
             long employeeId = 0;
@@ -180,7 +175,6 @@ namespace Coditech.API.Service
             try
             {
                 DateTime currentDate = DateTime.Now;
-
                 dBTMNewRegistrationModel.Custom1 = CustomConstants.DBTMTrainer;
                 //Insert General Person and registor employee
                 if (string.IsNullOrEmpty(dBTMNewRegistrationModel.Password))
@@ -200,7 +194,6 @@ namespace Coditech.API.Service
                 {
                     //Insert Employee Address
                     //InsertEmployeeAddress(dBTMNewRegistrationModel, currentDate, personId);
-
 
                     int adminSanctionPostId = _adminSanctionPostRepository.Table.Where(x => x.CentreCode == dBTMNewRegistrationModel.CentreCode && x.DepartmentId == ApiCustomSettings.TrainerDepartmentId && x.DesignationId == ApiCustomSettings.TrainerDesignationId).Select(y => y.AdminSanctionPostId).FirstOrDefault();
                     if (adminSanctionPostId > 0)
