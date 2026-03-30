@@ -276,7 +276,6 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "User Type",
                 ColumnCode = "IsAssociated",
-                IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
