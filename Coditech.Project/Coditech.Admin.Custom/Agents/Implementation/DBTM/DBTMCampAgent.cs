@@ -244,6 +244,12 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "CampEndDate",
                 IsSortable = true,
             });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Active",
+                ColumnCode = "IsActive",
+                IsSortable = true
+            });
             return datatableColumnList;
         }
         protected virtual List<DatatableColumns> BindAssociatedBatchColumns()
