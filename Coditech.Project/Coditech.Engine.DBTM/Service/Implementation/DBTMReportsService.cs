@@ -57,7 +57,7 @@ namespace Coditech.API.Service
         }
 
         #region Graph
-        public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord)
         {
             List<GraphModel> graphModelList = new List<GraphModel>();
             if (string.IsNullOrEmpty(dBTMGraphMasterIds))
@@ -70,20 +70,20 @@ namespace Coditech.API.Service
             {
                 foreach (string dBTMGraphMasterId in dBTMGraphMasterIds.Split(','))
                 {
-                    graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest));
+                    graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, typeOfRecord));
                 }
             }
             return graphModelList;
         }
 
-        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord)
         {
             GraphModel graphModel = new GraphModel();
             DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
             string xParameter = string.IsNullOrEmpty(graphMaster.XParameterBasedOn) ? graphMaster.XParameter : graphMaster.XParameterBasedOn;
             string yParameter = string.IsNullOrEmpty(graphMaster.YParameterBasedOn) ? graphMaster.YParameter : graphMaster.YParameterBasedOn;
 
-            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode);
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode, typeOfRecord);
             if (dBTMReportsList?.Count > 0)
             {
                 ReportsListDecryption(dBTMReportsList);
@@ -778,7 +778,7 @@ namespace Coditech.API.Service
             }
         }
 
-        public DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId)
+        public DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord)
         {
             DBTMReportVerticalDataModel model = new DBTMReportVerticalDataModel();
             DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
@@ -796,7 +796,7 @@ namespace Coditech.API.Service
             model.Status = "Completed";
             model.TestPerformedTime = deviceData.TestPerformedTime;
             model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
-            model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false);
+            model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false, typeOfRecord);
             int expireMinutes = ApiCustomSettings.IsValidRecordButtonExpireTimeOnMobile;
 
             DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
@@ -869,7 +869,7 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
-        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, string xParameter, string yParameter, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
+        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, string xParameter, string yParameter, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode, string typeOfRecord)
         {
             if (dBTMTestMasterId <= 0)
             {
@@ -891,8 +891,9 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@ToDate", toDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@TypeOfRecord", typeOfRecord, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@XParameter,@YParameter,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
+            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@XParameter,@YParameter,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@TypeOfRecord,@RowsCount OUT", 9, out pageListModel.TotalRowCount)?.ToList();
             return dBTMReportsList;
         }
 

@@ -28,7 +28,7 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), isMobileRequest,false);
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), isMobileRequest, false);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
@@ -71,11 +71,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/TestWiseGraphReports")]
         [Produces(typeof(GraphResponse))]
-        public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode,string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord = "Batch")
         {
             try
             {
-                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest, typeOfRecord);
                 return IsNotNull(model) ? CreateOKResponse(new GraphResponse { GraphModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -93,11 +93,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/TestWiseGraphReportsV2")]
         [Produces(typeof(GraphListResponse))]
-        public virtual IActionResult TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public virtual IActionResult TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord = "Batch")
         {
             try
             {
-                List<GraphModel> model = _dBTMReportsService.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                List<GraphModel> model = _dBTMReportsService.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest, typeOfRecord);
                 return IsNotNull(model) ? CreateOKResponse(new GraphListResponse { GraphList = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -320,12 +320,12 @@ namespace Coditech.Engine.DBTM.Controllers
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "GetActivityPerformedDates", TraceLevel.Error);
-                return CreateInternalServerErrorResponse( new{ HasError = true,ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode});
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage( ex, "GetActivityPerformedDates", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message});
+                _coditechLogging.LogMessage(ex, "GetActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message });
             }
         }
         [HttpGet]
@@ -357,24 +357,24 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/GetActivityVerticalDetails")]
         [Produces(typeof(DBTMReportVerticalDataResponse))]
-        public virtual IActionResult GetActivityVerticalDetails(long dBTMDeviceDataId)
+        public virtual IActionResult GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord = "Batch")
         {
             try
             {
-                DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId);
+                DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId, typeOfRecord);
                 if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
                     return CreateNoContentResponse();
-                return CreateOKResponse( new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
+                return CreateOKResponse(new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "GetActivityVerticalDetails", TraceLevel.Error);
-                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message,   ErrorCode = ex.ErrorCode });
+                return CreateInternalServerErrorResponse(new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "GetActivityVerticalDetails", TraceLevel.Error);
-                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
         [HttpGet]
