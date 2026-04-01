@@ -257,7 +257,6 @@ namespace Coditech.Admin.Controllers
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
-
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }
