@@ -150,9 +150,18 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult GetAssociateUnAssociateCampwiseUser(DBTMCampUserViewModel dBTMCampUserViewModel)
+        public virtual ActionResult GetAssociateUnAssociateCampwiseUser( long DBTMCampUserId, int DBTMCampMasterId, string CampName, string FirstName, string LastName, long EntityId)
         {
-            return PartialView("~/Views/DBTM/DBTMCampMaster/DBTMCampUser/_AssociateUnAssociateCampwiseUser.cshtml", dBTMCampUserViewModel);
+            DBTMCampUserViewModel model = new DBTMCampUserViewModel
+            {
+                DBTMCampUserId = DBTMCampUserId,
+                DBTMCampMasterId = DBTMCampMasterId,
+                CampName = CampName,
+                FirstName = FirstName,
+                LastName = LastName,
+                EntityId = EntityId
+            };
+            return PartialView("~/Views/DBTM/DBTMCampMaster/DBTMCampUser/_AssociateUnAssociateCampwiseUser.cshtml", model);
         }
 
         [HttpPost]
@@ -189,6 +198,7 @@ namespace Coditech.Admin.Controllers
             {
                 BindDBTMCampActivity(generalBatchViewModel);
             }
+            BindDBTMCampUserList(generalBatchViewModel);
         }
         protected void BindDuration(DBTMCampMasterViewModel model)
         {
@@ -214,24 +224,45 @@ namespace Coditech.Admin.Controllers
                 generalBatchViewModel.CampFrequency = SchedulerFrequencyEnum.Daily.ToString();
             }
         }
-
         protected void BindDBTMCampActivity(DBTMCampMasterViewModel model)
         {
-            model.CustomDropdownList1 = model.CustomDropdownList1 ?? new List<SelectListItem>();
-            string centreCode = model?.CentreCode;
+            model.CustomDropdownList1 ??= new List<SelectListItem>();
+
+            string centreCode = model.CentreCode;
+
             if (string.IsNullOrEmpty(centreCode))
                 return;
-            DBTMCentreWiseTestListViewModel response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
-            if (!response?.DBTMCentreWiseTestList?.Any() ?? true)
-                return;
-            model.CustomDropdownList1 = response.DBTMCentreWiseTestList
+
+            var response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
+
+            model.CustomDropdownList1 = response?.DBTMCentreWiseTestList?
                 .OrderBy(x => x.TestName)
                 .Select(x => new SelectListItem
                 {
                     Text = x.TestName,
                     Value = x.DBTMTestMasterId.ToString(),
-                    Selected = model.CustomDropdownSelectedValue1
-                    ?.Contains(x.DBTMTestMasterId.ToString()) == true
+                    Selected = model.CustomDropdownSelectedValue1?.Contains(x.DBTMTestMasterId.ToString()) == true
+                }).ToList();
+        }
+        protected void BindDBTMCampActivity(DBTMReportsListViewModel model)
+        {
+            model.CustomDropdownList1 ??= new List<SelectListItem>();
+
+            string centreCode = SessionHelper
+                .GetDataFromSession<UserModel>(AdminConstants.UserDataSession)
+                ?.SelectedCentreCode;
+
+            if (string.IsNullOrEmpty(centreCode))
+                return;
+
+            var response = _dBTMTestAgent.GetTestsByCentreCode(centreCode);
+
+            model.CustomDropdownList1 = response?.DBTMCentreWiseTestList?
+                .OrderBy(x => x.TestName)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.TestName,
+                    Value = x.DBTMTestMasterId.ToString()
                 }).ToList();
         }
         protected void BindDBTMCampUserList(DBTMCampMasterViewModel generalBatchViewModel)

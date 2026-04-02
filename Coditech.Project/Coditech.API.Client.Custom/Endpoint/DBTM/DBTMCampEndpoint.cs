@@ -32,8 +32,12 @@ namespace Coditech.API.Endpoint
        $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/AssociateUnAssociateCampwiseUser";
         public string GetCampUserListByCentreCodeAndGeneralTrainerMasterIdAsync(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMCampMaster/GetCampUserListByCentreCodeAndGeneralTrainerMasterId?selectedCentreCode={selectedCentreCode}&generalTrainerMasterId={generalTrainerMasterId}&dBTMCampMasterId={dBTMCampMasterId}{BuildEndpointQueryString(true)}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCampMaster/GetCampUserListByCentreCodeAndGeneralTrainerMasterId?selectedCentreCode={selectedCentreCode}&generalTrainerMasterId={generalTrainerMasterId}&dBTMCampMasterId={dBTMCampMasterId}{BuildEndpointQueryString(true)}";
             return endpoint;
+        }
+        public string GetCampListAsync(long entityId, string userType)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetCampList?entityId={entityId}&userType={userType}";
         }
     }
 }

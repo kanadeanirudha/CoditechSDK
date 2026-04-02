@@ -43,6 +43,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("DateOfBirth");
                 ModelState.Remove("SpecializationEnumId");
                 ModelState.Remove("SelectedTrainer");
+                ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.DBTMCentreRegistration(dBTMNewRegistrationViewModel);
@@ -93,6 +94,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("GeneralRegionMasterId");
                 ModelState.Remove("AddressLine1");
                 ModelState.Remove("Pincode");
+                ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
@@ -136,6 +138,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("CentreCode");
                 ModelState.Remove("JoiningCode");
                 ModelState.Remove("SelectedTrainer");
+                ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.IndividualRegistration(dBTMNewRegistrationViewModel);
@@ -195,6 +198,7 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("GeneralRegionMasterId");
             ModelState.Remove("AddressLine1");
             ModelState.Remove("Pincode");
+            ModelState.Remove("RegistrationType");
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition || !ModelState.IsValid)
             {
                 if (!string.IsNullOrEmpty(dBTMNewRegistrationViewModel.JoiningCode))
@@ -238,9 +242,11 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("GeneralCountryMasterId");
                 ModelState.Remove("GeneralRegionMasterId");
                 ModelState.Remove("AddressLine1");
-                ModelState.Remove("Pincode");
+                ModelState.Remove("Pincode"); 
+                ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
+                    dBTMNewRegistrationViewModel.RegistrationType = "Batch";
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TraineeRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
@@ -251,7 +257,6 @@ namespace Coditech.Admin.Controllers
                 }
             }
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
-
             return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
     }

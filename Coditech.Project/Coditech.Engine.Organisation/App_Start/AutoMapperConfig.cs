@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Coditech.API.Data;
+using Coditech.Common.API.Model;
 
 namespace Coditech.API.Mapper
 {
@@ -6,6 +8,9 @@ namespace Coditech.API.Mapper
     {
         public AutoMapperConfig()
         {
+            CreateMap<GeneralBatchMaster, DBTMBatchModel>().ReverseMap();
+            CreateMap<DBTMCampMaster, DBTMCampMasterModel>().ReverseMap();
+            CreateMap<DBTMCampUserModel, DBTMCampUser>().ReverseMap();
         }
     }
 }

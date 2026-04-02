@@ -31,6 +31,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
+        private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -50,10 +52,12 @@ namespace Coditech.API.Service
             _dBTMTestParameterVerticalViewSequenceRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMCampMasterRepository = new CoditechRepository<DBTMCampMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph
-        public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public List<GraphModel> TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord)
         {
             List<GraphModel> graphModelList = new List<GraphModel>();
             if (string.IsNullOrEmpty(dBTMGraphMasterIds))
@@ -66,20 +70,20 @@ namespace Coditech.API.Service
             {
                 foreach (string dBTMGraphMasterId in dBTMGraphMasterIds.Split(','))
                 {
-                    graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest));
+                    graphModelList.Add(TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, Convert.ToInt32(dBTMGraphMasterId), graphMode, fromDate, toDate, entityId, userType, centreCode, isMobileRequest, typeOfRecord));
                 }
             }
             return graphModelList;
         }
 
-        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public GraphModel TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord)
         {
             GraphModel graphModel = new GraphModel();
             DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
             string xParameter = string.IsNullOrEmpty(graphMaster.XParameterBasedOn) ? graphMaster.XParameter : graphMaster.XParameterBasedOn;
             string yParameter = string.IsNullOrEmpty(graphMaster.YParameterBasedOn) ? graphMaster.YParameter : graphMaster.YParameterBasedOn;
 
-            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode);
+            List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode, typeOfRecord);
             if (dBTMReportsList?.Count > 0)
             {
                 ReportsListDecryption(dBTMReportsList);
@@ -503,46 +507,7 @@ namespace Coditech.API.Service
             string filePath = Path.Combine(dataFolder, fileName);
 
             // Create Excel workbook
-            using (var workbook = new XLWorkbook())
-            {
-                foreach (var table in dBTMReportsListModel.DataTableList)
-                {
-                    string sheetName = table.Key.Trim();
-                    var replacements = new Dictionary<string, string>
-                    {
-                        { "5-0-5", "FiveZeroFive" },
-                        { "5-10-5", "FiveTenFive" }
-                    };
-                    foreach (var kv in replacements)
-                    {
-                        if (sheetName.Contains(kv.Key))
-                        {
-                            sheetName = sheetName.Replace(kv.Key, kv.Value);
-                        }
-                    }
-                    if (!sheetName.Contains("FiveZeroFive") && !sheetName.Contains("FiveTenFive"))
-                    {
-                        Match match = Regex.Match(sheetName, @"^(\d+)");
-                        if (match.Success)
-                        {
-                            int number = int.Parse(match.Value);
-                            string numberInWords = NumberToWords(number);
-                            sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
-                        }
-                    }
-                    char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
-                    foreach (var c in invalidChars)
-                    {
-                        sheetName = sheetName.Replace(c.ToString(), "");
-                    }
-                    sheetName = sheetName.Trim();
-                    if (sheetName.Length > 31)
-                        sheetName = sheetName.Substring(0, 31);
-                    var worksheet = workbook.Worksheets.Add(sheetName);
-                    worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
-                }
-                workbook.SaveAs(filePath);
-            }
+            CreateExcelWorkbook(dBTMReportsListModel, filePath);
             dBTMReportsListModel.FilePath = filePath;
             dBTMReportsListModel.FileName = fileName;
             return dBTMReportsListModel;
@@ -677,6 +642,113 @@ namespace Coditech.API.Service
             return dBTMReportsListModel;
         }
         #endregion
+
+        #region Camp Wise Reports
+        private DBTMReportsListModel CampWiseReports(int dBTMCampMasterId, int dBTMTestMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest, bool isDownloadReport)
+        {
+            if (dBTMTestMasterId <= 0)
+            {
+                return new DBTMReportsListModel();
+            }
+            string centreCode = _dBTMCampMasterRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(y => y.CentreCode).FirstOrDefault();
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMCampMasterId", dBTMCampMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampWiseReportsList @DBTMCampMasterId,@DBTMTestMasterId,@FromDate,@ToDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            if (dBTMReportsList?.Count > 0)
+            {
+                dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
+            }
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, centreCode, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
+            return dBTMReportsListModel;
+        }
+
+        public DBTMReportsListModel CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
+        {
+            if (dBTMCampMasterId <= 0 || string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            {
+                return new DBTMReportsListModel();
+            }
+
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            var testList = GetTestList(dBTMTestMasterIds);
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+            var dataTableList = new List<KeyValuePair<string, DataTable>>();
+            var dataTableTestPerformedList = new List<KeyValuePair<string, DateTime>>();
+            foreach (var test in testList)
+            {
+                DBTMReportsListModel list = CampWiseReports(dBTMCampMasterId, test.DBTMTestMasterId, FromDate, ToDate, isMobileRequest, false);
+                if (!string.IsNullOrEmpty(list?.TestPerformedTime.ToString()))
+                {
+                    dataTableTestPerformedList.Add(new KeyValuePair<string, DateTime>(test.TestName, Convert.ToDateTime(list.TestPerformedTime)));
+                    dataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                }
+            }
+            foreach (var test in dataTableTestPerformedList.OrderByDescending(x => x.Value))
+            {
+                var dataTable = dataTableList.Where(x => x.Key == test.Key).FirstOrDefault().Value;
+                dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.Key, dataTable));
+            }
+            return dBTMReportsListModel;
+        }
+
+        public DBTMReportsListModel CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
+        {
+            if (dBTMCampMasterId <= 0 || string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+            {
+                return new DBTMReportsListModel();
+            }
+
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            List<DBTMTestModel> testList = GetTestList(dBTMTestMasterIds);
+
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+
+            foreach (var test in testList)
+            {
+                DBTMReportsListModel list = CampWiseReports(dBTMCampMasterId, test.DBTMTestMasterId, fromDate, toDate, isMobileRequest, true);
+
+                if (list?.DataTable?.Rows?.Count > 0)
+                {
+                    dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                }
+            }
+
+            if (dBTMReportsListModel?.DataTableList == null || dBTMReportsListModel.DataTableList.Count == 0)
+            {
+                return dBTMReportsListModel;
+            }
+
+            DBTMCampMaster camp = _dBTMCampMasterRepository.Table.FirstOrDefault(b => b.DBTMCampMasterId == dBTMCampMasterId);
+            string campName = camp != null ? camp.CampName : "";
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                campName = campName.Replace(c.ToString(), "");
+            }
+            string currentDir = Directory.GetCurrentDirectory();
+            string dataFolder = Path.Combine(currentDir, "data", "BatchReport");
+            if (!Directory.Exists(dataFolder))
+            {
+                Directory.CreateDirectory(dataFolder);
+            }
+
+            string fileName = $"Camp_Report_{campName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            string filePath = Path.Combine(dataFolder, fileName);
+
+            // Create Excel workbook
+            CreateExcelWorkbook(dBTMReportsListModel, filePath);
+            dBTMReportsListModel.FilePath = filePath;
+            dBTMReportsListModel.FileName = fileName;
+            return dBTMReportsListModel;
+        }
+
+        #endregion
         // Delete Report File from Data folder
         public bool DeleteReportsFile(string fileName)
         {
@@ -706,7 +778,7 @@ namespace Coditech.API.Service
             }
         }
 
-        public DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId)
+        public DBTMReportVerticalDataModel GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord)
         {
             DBTMReportVerticalDataModel model = new DBTMReportVerticalDataModel();
             DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
@@ -724,7 +796,7 @@ namespace Coditech.API.Service
             model.Status = "Completed";
             model.TestPerformedTime = deviceData.TestPerformedTime;
             model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
-            model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false);
+            model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false, typeOfRecord);
             int expireMinutes = ApiCustomSettings.IsValidRecordButtonExpireTimeOnMobile;
 
             DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
@@ -737,7 +809,28 @@ namespace Coditech.API.Service
             return model;
         }
 
-
+        public List<DateTime> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
+                return new List<DateTime>();
+            if (dBTMCampMasterId <= 0)
+                return new List<DateTime>();
+            List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
+            bool isAllTest = testIds.Contains(0);
+            var traineeDetailIds = _dBTMCampUserRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId && x.UserType == "Trainee").Select(x => x.EntityId).ToList();
+            if (!traineeDetailIds.Any())
+                return new List<DateTime>();
+            var personCodes = _dBTMTraineeDetailsRepository.Table.Where(t => traineeDetailIds.Contains(t.DBTMTraineeDetailId)).Select(t => t.PersonCode).ToList();
+            if (!personCodes.Any())
+                return new List<DateTime>();
+            var testCodes = _dBTMTestMasterRepository.Table.Where(x => isAllTest || testIds.Contains(x.DBTMTestMasterId)).Select(x => x.TestCode).ToList();
+            if (!testCodes.Any())
+                return new List<DateTime>();
+            var dates = _dBTMDeviceDataRepository.Table.Where(f => personCodes.Contains(f.PersonCode)
+                            && f.TypeOfRecord == "Camp" && f.TablePrimaryColumnId == dBTMCampMasterId
+                            && testCodes.Contains(f.TestCode)).Select(f => (f.CreatedDate ?? f.TestPerformedTime).Date).Distinct().OrderBy(d => d).ToList();
+            return dates;
+        }
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
@@ -776,7 +869,7 @@ namespace Coditech.API.Service
             return dBTMReportsList;
         }
 
-        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, string xParameter, string yParameter, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode)
+        private List<DBTMReportsModel> GetTestWiseGraphReportFromDB(int dBTMTestMasterId, long dBTMTraineeDetailId, string xParameter, string yParameter, DateTime fromDate, DateTime toDate, ref long entityId, string userType, string centreCode, string typeOfRecord)
         {
             if (dBTMTestMasterId <= 0)
             {
@@ -798,8 +891,9 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@ToDate", toDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", entityId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@TypeOfRecord", typeOfRecord, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@XParameter,@YParameter,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
+            dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseGraphReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@XParameter,@YParameter,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@TypeOfRecord,@RowsCount OUT", 9, out pageListModel.TotalRowCount)?.ToList();
             return dBTMReportsList;
         }
 
@@ -1355,6 +1449,50 @@ namespace Coditech.API.Service
             model.GeneralBatchUserList = result;
 
             return model;
+        }
+
+        private void CreateExcelWorkbook(DBTMReportsListModel dBTMReportsListModel, string filePath)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                foreach (var table in dBTMReportsListModel.DataTableList)
+                {
+                    string sheetName = table.Key.Trim();
+                    var replacements = new Dictionary<string, string>
+                    {
+                        { "5-0-5", "FiveZeroFive" },
+                        { "5-10-5", "FiveTenFive" }
+                    };
+                    foreach (var kv in replacements)
+                    {
+                        if (sheetName.Contains(kv.Key))
+                        {
+                            sheetName = sheetName.Replace(kv.Key, kv.Value);
+                        }
+                    }
+                    if (!sheetName.Contains("FiveZeroFive") && !sheetName.Contains("FiveTenFive"))
+                    {
+                        Match match = Regex.Match(sheetName, @"^(\d+)");
+                        if (match.Success)
+                        {
+                            int number = int.Parse(match.Value);
+                            string numberInWords = NumberToWords(number);
+                            sheetName = Regex.Replace(sheetName, @"^(\d+)", numberInWords);
+                        }
+                    }
+                    char[] invalidChars = { ':', '\\', '/', '?', '*', '[', ']' };
+                    foreach (var c in invalidChars)
+                    {
+                        sheetName = sheetName.Replace(c.ToString(), "");
+                    }
+                    sheetName = sheetName.Trim();
+                    if (sheetName.Length > 31)
+                        sheetName = sheetName.Substring(0, 31);
+                    var worksheet = workbook.Worksheets.Add(sheetName);
+                    worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
+                }
+                workbook.SaveAs(filePath);
+            }
         }
 
         #endregion

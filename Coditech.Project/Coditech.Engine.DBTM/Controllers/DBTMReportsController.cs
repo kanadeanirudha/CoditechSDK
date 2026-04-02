@@ -1,3 +1,4 @@
+using Coditech.API.Data;
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
@@ -27,7 +28,7 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), isMobileRequest,false);
+                DBTMReportsListModel list = _dBTMReportsService.BatchWiseReports(generalBatchMasterId, dBTMTestMasterId, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), isMobileRequest, false);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchWiseReportsListResponse>(data) : CreateNoContentResponse();
             }
@@ -70,11 +71,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/TestWiseGraphReports")]
         [Produces(typeof(GraphResponse))]
-        public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode,string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public virtual IActionResult TestWiseGraphReports(int dBTMTestMasterId, long dBTMTraineeDetailId, int dBTMGraphMasterId, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord = "Batch")
         {
             try
             {
-                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                GraphModel model = _dBTMReportsService.TestWiseGraphReports(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterId, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest, typeOfRecord);
                 return IsNotNull(model) ? CreateOKResponse(new GraphResponse { GraphModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -92,11 +93,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/TestWiseGraphReportsV2")]
         [Produces(typeof(GraphListResponse))]
-        public virtual IActionResult TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest)
+        public virtual IActionResult TestWiseGraphReportsV2(int dBTMTestMasterId, long dBTMTraineeDetailId, string dBTMGraphMasterIds, string graphMode, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string typeOfRecord = "Batch")
         {
             try
             {
-                List<GraphModel> model = _dBTMReportsService.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest);
+                List<GraphModel> model = _dBTMReportsService.TestWiseGraphReportsV2(dBTMTestMasterId, dBTMTraineeDetailId, dBTMGraphMasterIds, graphMode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest, typeOfRecord);
                 return IsNotNull(model) ? CreateOKResponse(new GraphListResponse { GraphList = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -231,6 +232,54 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/DBTMReports/CampWiseMultipleReports")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, string fromDate, string toDate, bool isMobileRequest)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.CampWiseMultipleReports(dBTMTestMasterIds, dBTMCampMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), isMobileRequest);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "CampWiseMultipleReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "CampWiseMultipleReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMReports/CampWiseMultipleReportsFile")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, string fromDate, string toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.CampWiseMultipleReportsFile(dBTMTestMasterIds, dBTMCampMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), entityId, userType, centreCode, isMobileRequest, reportType);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "CampWiseMultipleReportsFile", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "CampWiseMultipleReportsFile", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [Route("/DBTMReports/DeleteReportsFile")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
@@ -271,12 +320,12 @@ namespace Coditech.Engine.DBTM.Controllers
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "GetActivityPerformedDates", TraceLevel.Error);
-                return CreateInternalServerErrorResponse( new{ HasError = true,ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode});
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage( ex, "GetActivityPerformedDates", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message});
+                _coditechLogging.LogMessage(ex, "GetActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message });
             }
         }
         [HttpGet]
@@ -308,24 +357,24 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/GetActivityVerticalDetails")]
         [Produces(typeof(DBTMReportVerticalDataResponse))]
-        public virtual IActionResult GetActivityVerticalDetails(long dBTMDeviceDataId)
+        public virtual IActionResult GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord = "Batch")
         {
             try
             {
-                DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId);
+                DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId, typeOfRecord);
                 if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
                     return CreateNoContentResponse();
-                return CreateOKResponse( new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
+                return CreateOKResponse(new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "GetActivityVerticalDetails", TraceLevel.Error);
-                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message,   ErrorCode = ex.ErrorCode });
+                return CreateInternalServerErrorResponse(new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "GetActivityVerticalDetails", TraceLevel.Error);
-                return CreateInternalServerErrorResponse( new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new DBTMReportVerticalDataResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
         [HttpGet]
@@ -348,6 +397,30 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "BatchWiseUser", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new GeneralBatchUserListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("/DBTMReports/GetCampActivityPerformedDates")]
+        [Produces("application/json")]
+        public virtual IActionResult GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
+        {
+            try
+            {
+                List<DateTime> dates = _dBTMReportsService.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
+                if (dates == null || !dates.Any())
+                    return Ok(new List<string>());
+                var result = dates.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+                return Ok(result);
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetCampActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GetCampActivityPerformedDates", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

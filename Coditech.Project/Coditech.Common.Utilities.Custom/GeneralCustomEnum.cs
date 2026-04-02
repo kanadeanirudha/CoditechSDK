@@ -28,7 +28,10 @@
         TypeOfCentre,
         BatchWiseUser,
         AgeGroup,
-        OrderBy
+        OrderBy,
+        DBTMCentreWiseTest,
+        CampWiseReports,
+        CampWiseMultiReports,
     }
     public enum DashboardFormCustomEnum
     {

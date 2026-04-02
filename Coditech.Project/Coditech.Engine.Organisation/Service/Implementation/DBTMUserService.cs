@@ -33,8 +33,10 @@ namespace Coditech.API.Service
         private readonly IDBTMOrganisationCentrewiseJoiningCodeService _joiningCodeService;
         private readonly ICoditechRepository<GeneralTemplateHeaderConfiguration> _generalTemplateHeaderConfigurationRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
+        private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
         private readonly ICoditechRepository<GeneralCountryMaster> _generalCountryRepository;
         protected readonly ICoditechRepository<DBTMCampUser> _dbtmCampUserRepository;
+        protected readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -54,8 +56,10 @@ namespace Coditech.API.Service
             _joiningCodeService = joiningCodeService;
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dbtmCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         //public override UserModel Login(UserLoginModel userLoginModel)
@@ -233,14 +237,18 @@ namespace Coditech.API.Service
             string customerData = generalPersonModel.Custom1;
             DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customerData);
             generalPersonModel.Custom1 = null;
+
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode)?.FirstOrDefault();
+                int traineeEnumId = GetEnumIdByEnumCode("Trainee", "OrganisationJoiningCodeType");
+                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode && x.JoiningCodeTypeEnumId == traineeEnumId );
                 if (IsNull(joiningCodeDetails))
-                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Joining Code."));
+                    throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Trainee Joining Code."));
                 if (joiningCodeDetails.IsExpired)
                     throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+                ValidateCentreUserLimit(joiningCodeDetails.CentreCode, dBTMCustomNewRegistrationModel?.RegistrationType);
                 generalPersonModel.SelectedCentreCode = joiningCodeDetails.CentreCode;
+
             }
             else if (userType.Equals(UserTypeCustomEnum.DBTMIndividualRegister.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
@@ -261,9 +269,11 @@ namespace Coditech.API.Service
             {
                 if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
+                    string registrationType = dBTMCustomNewRegistrationModel?.RegistrationType;
                     joiningCodeDetails.IsExpired = true;
+                    joiningCodeDetails.Custom2 = registrationType;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
-                    if (dBTMCustomNewRegistrationModel.GeneralBatchMasterId > 0)
+                    if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))
                     {
                         GeneralBatchUser generalBatchUser = new GeneralBatchUser()
                         {
@@ -272,6 +282,31 @@ namespace Coditech.API.Service
                             EntityId = generalPersonModel.EntityId,
                         };
                         _generalBatchUserRepository.Insert(generalBatchUser);
+                        DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == generalPersonModel.EntityId);
+                        if (trainee != null)
+                        {
+                            trainee.IsBatchUser = true;
+                            trainee.IsCampUser = false;
+                            _dBTMTraineeDetailsRepository.Update(trainee);
+                        }
+                    }
+                    else if (registrationType.Equals("Camp", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        DBTMCampUser campUser = new DBTMCampUser()
+                        {
+                            DBTMCampMasterId = dBTMCustomNewRegistrationModel.DBTMCampMasterId,
+                            EntityId = generalPersonModel.EntityId,
+                            ActivityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus"),
+                            UserType = UserTypeEnum.Trainee.ToString()
+                        };
+                        _dBTMCampUserRepository.Insert(campUser);
+                        DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == generalPersonModel.EntityId);
+                        if (trainee != null)
+                        {
+                            trainee.IsCampUser = true;
+                            trainee.IsBatchUser = false;
+                            _dBTMTraineeDetailsRepository.Update(trainee);
+                        }
                     }
                     if (dBTMCustomNewRegistrationModel.DBTMCampMasterId > 0)
                     {
@@ -555,7 +590,7 @@ namespace Coditech.API.Service
             }
             else
             {
-                int titleEnumId = GetEnumIdByEnumCode(title,DropdownTypeEnum.Title.ToString());
+                int titleEnumId = GetEnumIdByEnumCode(title, DropdownTypeEnum.Title.ToString());
                 if (titleEnumId <= 0)
                 {
                     errors.Add("Trainee Title is invalid");
@@ -976,6 +1011,49 @@ namespace Coditech.API.Service
             List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
             List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
             return generalRunningNumbersList;
+        }
+        private void ValidateCentreUserLimit(string centreCode, string registrationType)
+        {
+            // Get centre settings
+            DBTMCentreWiseSetting centreSetting = _dBTMCentreWiseSettingRepository.Table
+                .FirstOrDefault(x => x.CentreCode == centreCode);
+
+            if (centreSetting == null)
+                throw new CoditechException(ErrorCodes.InvalidData, "Centre setting not found.");
+
+            // Count based on type 
+            int usedCount = 0;
+
+            if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))
+            {
+                usedCount = _organisationCentrewiseJoiningCodeRepository.Table
+                    .Count(x => x.CentreCode == centreCode
+                             && x.IsExpired
+                             && x.Custom2 == "Batch");
+
+                if (usedCount >= centreSetting.AllowBatchUser)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData,
+                        "Batch limit exceeded, Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
+                }
+            }
+            else if (registrationType.Equals("Camp", StringComparison.InvariantCultureIgnoreCase))
+            {
+                usedCount = _organisationCentrewiseJoiningCodeRepository.Table
+                    .Count(x => x.CentreCode == centreCode
+                             && x.IsExpired
+                             && x.Custom2 == "Camp");
+
+                if (usedCount >= centreSetting.AllowCampUser)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData,
+                        "Camp limit exceeded, Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
+                }
+            }
+            else
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Invalid registration type.");
+            }
         }
         #endregion
 

@@ -180,10 +180,10 @@ namespace Coditech.API.Controllers
             }
         }
         [HttpGet]
-        [Route("/DBTMCampMaster/GetCamUserListByCentreCodeAndGeneralTrainerMasterId")]
+        [Route("/DBTMCampMaster/GetCampUserListByCentreCodeAndGeneralTrainerMasterId")]
         [Produces(typeof(DBTMCampUserListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetCamUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
+        public virtual IActionResult GetCampUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, long dBTMCampMasterId)
         {
             try
             {

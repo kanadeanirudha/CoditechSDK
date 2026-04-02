@@ -38,7 +38,7 @@ namespace Coditech.Admin.Agents
             {
                 filters = new FilterCollection();
                 filters.Add("CampName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
-                filters.Add("CampTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("CampStartTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("CampStartDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("CampEndDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
@@ -244,6 +244,12 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "CampEndDate",
                 IsSortable = true,
             });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Active",
+                ColumnCode = "IsActive",
+                IsSortable = true
+            });
             return datatableColumnList;
         }
         protected virtual List<DatatableColumns> BindAssociatedBatchColumns()
@@ -271,6 +277,11 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Contact",
                 ColumnCode = "MobileNumber",
                 IsSortable = true,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "User Type",
+                ColumnCode = "IsAssociated",
             });
             datatableColumnList.Add(new DatatableColumns()
             {
