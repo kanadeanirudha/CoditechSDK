@@ -7,6 +7,9 @@
     OnCentreChange: function () {
         var centreCode = $("#CentreCode").val();
         var selectedActivities = $("#CustomDropdownSelectedValue1").val();
+        if (selectedActivities && selectedActivities.length > 0) {
+            return;
+        }
         if (!centreCode) {
             $("#ActivityDropdownDiv").html("");
             return;
