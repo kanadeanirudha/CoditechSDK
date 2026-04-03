@@ -644,6 +644,10 @@ namespace Coditech.Admin.Controllers
                 return Json(new { success = false, message = "Only Excel (.xlsx) file is allowed."});
             }
             DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
+            if (result.HasError)
+            {
+                return Json(new { success = false, message = result.ErrorMessage });
+            }
             if (result.FailedRows != null && result.FailedRows.Count > 0)
             {
                 return Json(new{ success = false, message = "Data correction required.", failedRows = result.FailedRows});
