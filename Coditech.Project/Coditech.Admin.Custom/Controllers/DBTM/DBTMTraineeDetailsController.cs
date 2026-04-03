@@ -325,7 +325,7 @@ namespace Coditech.Admin.Controllers
             return View(createEditAssociatedTrainer, generalTraineeAssociatedToTrainerViewModel);
         }
 
-        public virtual ActionResult DeleteAssociatedTrainer(string generalTraineeAssociatedToTrainerIds, string selectedCentreCode, short selectedDepartmentId)
+        public virtual ActionResult DeleteAssociatedTrainer(string generalTraineeAssociatedToTrainerIds, long dBTMTraineeDetailId, long personId)
         {
             string message = string.Empty;
             bool status = false;
@@ -335,11 +335,11 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("GetAssociatedTrainerList", new { SelectedParameter1 = selectedCentreCode, SelectedParameter2 = selectedDepartmentId });
+                return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel { SelectedParameter1 = dBTMTraineeDetailId.ToString() ,SelectedParameter2 = personId.ToString() });
             }
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("GetAssociatedTrainerList", new { SelectedParameter1 = selectedCentreCode, SelectedParameter2 = selectedDepartmentId });
+            return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel { SelectedParameter1 = dBTMTraineeDetailId.ToString(), SelectedParameter2 = personId.ToString() });
         }
 
         public virtual ActionResult GetTrainerList(string selectedCentreCode, string selectedDepartmentId, long entityId)
