@@ -582,6 +582,7 @@ namespace Coditech.API.Service
             string dob = GetValue(row, ExcelTemplateColumns.DateOfBirth);
             string school = GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub);
             string ageGroup = GetValue(row, ExcelTemplateColumns.AgeGroup);
+            string batchName = GetValue(row, ExcelTemplateColumns.BatchName);
             if (!ValidateJoiningCode(joiningCode, joiningCodeList, out string joiningCodeError))
                 errors.Add(joiningCodeError);
             if (string.IsNullOrWhiteSpace(title))
@@ -674,6 +675,10 @@ namespace Coditech.API.Service
             }
             if (string.IsNullOrWhiteSpace(GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub)))
                 errors.Add("School Or College Or Club  is empty");
+            if (string.IsNullOrWhiteSpace(batchName))
+            {
+                errors.Add("Batch is required");
+            }
             if (!string.IsNullOrWhiteSpace(ageGroup))
             {
                 ageGroup = ageGroup.Trim();
@@ -744,6 +749,7 @@ namespace Coditech.API.Service
                 GeneralBatchMasterId = batchId,
                 SchoolName = schoolName,
                 AgeGroup = ageGroup,
+                RegistrationType = "Batch",
                 GeneralTraineeAssociatedToTrainerIds = new List<string>()
             };
             GeneralPersonModel model = new GeneralPersonModel
@@ -1024,7 +1030,7 @@ namespace Coditech.API.Service
             // Count based on type 
             int usedCount = 0;
 
-            if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals(registrationType, "Batch", StringComparison.InvariantCultureIgnoreCase))
             {
                 usedCount = _organisationCentrewiseJoiningCodeRepository.Table
                     .Count(x => x.CentreCode == centreCode
@@ -1037,7 +1043,7 @@ namespace Coditech.API.Service
                         "Batch limit exceeded, Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
                 }
             }
-            else if (registrationType.Equals("Camp", StringComparison.InvariantCultureIgnoreCase))
+            else if (string.Equals(registrationType, "Camp", StringComparison.InvariantCultureIgnoreCase))
             {
                 usedCount = _organisationCentrewiseJoiningCodeRepository.Table
                     .Count(x => x.CentreCode == centreCode
