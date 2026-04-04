@@ -459,8 +459,8 @@ namespace Coditech.Admin.Agents
                     FailedCount = result.FailedCount,
                     FailedRows = result.FailedRows,
                     Data = result.Data,
-                    HasError = result.FailedCount > 0,
-                    ErrorMessage = result.FailedCount > 0 ? "Some records failed validation." : null
+                    HasError = false,
+                    ErrorMessage = null
                 };
                 return dBTMTraineeUploadResultViewModel;
             }
