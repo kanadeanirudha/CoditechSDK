@@ -90,9 +90,9 @@ namespace Coditech.Admin.Controllers
                         if (generalBatchViewModel.Custom4 == "Mobile View")
                         {
                             TempData["IsMobileCustom"] = "true";
-                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true });
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = "Mobile View" });
                         }
-                        return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = Convert.ToString(generalBatchViewModel.Custom4) });
+                        return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = generalBatchViewModel.CentreCode, SelectedParameter4 = generalBatchViewModel.Custom4 });
                     }
                 }
             }
