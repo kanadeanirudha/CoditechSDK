@@ -13,9 +13,9 @@
             @if (!string.IsNullOrEmpty(@Model.ActionName))
             {
                 <div class="btn-group">
-                    <button type="submit"
+                    <button type="button"
                             form="@Model.FormId"
-                            data-actionmode=@AdminConstants.ActionModeSaveAndClose
+                            data-actionmode="@AdminConstants.ActionModeSaveAndClose"
                             class="btn btn-success me-0 header-action-btn">
                         @GeneralResources.SaveAndCloseButtonText
                     </button>
@@ -29,9 +29,9 @@
                     </button>
 
                     <div class="dropdown-menu">
-                        <button type="submit"
+                        <button type="button"
                                 form="@Model.FormId"
-                                data-actionmode=@AdminConstants.ActionModeSave
+                                data-actionmode="@AdminConstants.ActionModeSave"
                                 class="dropdown-item header-action-btn">
                             @GeneralResources.SaveButtonText
                         </button>
@@ -43,7 +43,7 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-       $(document).ready(function () {
+    $(document).ready(function () {
         var formId = '@Model.FormId';
         var $form = $('#' + formId);
 
@@ -51,10 +51,10 @@
             e.preventDefault();
             var actionValue = $(this).data('actionmode');
             if ($form.length > 0) {
-                var $actionMode = $form.find('input[name="ActionMode"]');
-                    $actionMode.val(actionValue);
-                    console.log("ActionMode value set to:", $actionMode.val());
-                    $form.submit();
+                var $actionMode = $('input[name="ActionMode"][form="' + formId + '"]');
+                $actionMode.val(actionValue);
+                console.log("ActionMode value set to:", $actionMode.val());
+                $form.submit();
             }
         });
     });

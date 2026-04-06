@@ -53,7 +53,11 @@ namespace Coditech.Admin.Controllers
         [HttpPost]
         public virtual ActionResult Create(DBTMCampMasterViewModel dBTMCampMasterViewModel)
         {
-            if (ModelState.IsValid)
+            if ((dBTMCampMasterViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
+            {
+                dBTMCampMasterViewModel.ErrorMessage = "Please select at least one Activity.";
+            }
+            else if (ModelState.IsValid)
             {
                 BindDuration(dBTMCampMasterViewModel);
                 dBTMCampMasterViewModel = _dBTMCampAgent.CreateDBTMCamp(dBTMCampMasterViewModel);
@@ -94,7 +98,11 @@ namespace Coditech.Admin.Controllers
         [HttpPost]
         public virtual ActionResult Edit(DBTMCampMasterViewModel dBTMCampMasterViewModel)
         {
-            if (ModelState.IsValid)
+            if ((dBTMCampMasterViewModel?.CustomDropdownSelectedValue1?.Count ?? 0) == 0)
+            {
+                SetNotificationMessage(GetErrorNotificationMessage("Please select at least one Activity."));
+            }
+            else if (ModelState.IsValid)
             {
                 BindDuration(dBTMCampMasterViewModel);
                 dBTMCampMasterViewModel = _dBTMCampAgent.UpdateDBTMCamp(dBTMCampMasterViewModel);
