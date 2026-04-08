@@ -173,7 +173,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTraineeAssignment/Edit.cshtml", dBTMTraineeAssignmentViewModel);
 
         }
-        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode, string selectedParameter1, string custom4)
+        public ActionResult Delete(string dBTMTraineeAssignmentUserId, string selectedCentreCode, string SelectedParameter1, string custom4)
         {
             string message = string.Empty;
             bool status = false;
@@ -190,7 +190,7 @@ namespace Coditech.Admin.Controllers
                     TempData["IsMobileCustom"] = "true";
                     return RedirectToAction("LoadAssignmentPartial", "DBTMDashboard", new { isIframe = true });
                 }
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = selectedParameter1, SelectedParameter4 = custom4 });
+                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode, SelectedParameter1 = SelectedParameter1, SelectedParameter4 = custom4 });
             }
 
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
