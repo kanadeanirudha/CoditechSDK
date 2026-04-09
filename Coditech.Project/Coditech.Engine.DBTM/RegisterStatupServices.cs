@@ -58,6 +58,8 @@ namespace Coditech.API.Common
 
             //HealthChecks
             builder.AddHealthChecks();
+
+            builder.IISServerOptions();
         }
 
         /// <summary>
@@ -278,6 +280,16 @@ namespace Coditech.API.Common
 
                     await context.Response.WriteAsJsonAsync(result);
                 }
+            });
+        }
+        #endregion
+
+        #region IISServerOptions
+        public static void IISServerOptions(this WebApplicationBuilder builder)
+        {
+            builder.Services.Configure<IISServerOptions>(options =>
+            {
+                options.MaxRequestBodySize = 52428800;
             });
         }
         #endregion
