@@ -84,6 +84,9 @@ namespace Coditech.API.Common
             // Adds a <see cref="EndpointRoutingMiddleware"/> middleware to the specified <see cref="IApplicationBuilder"/>.
             app.UseRouting();
 
+            // Configure HangfireDashboard with custom code.
+            app.ConfigureHangfireDashboard();
+
             // Adds middleware for redirecting HTTP Requests to HTTPS.
             app.UseHttpsRedirection();
 
