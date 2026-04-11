@@ -29,6 +29,7 @@
                     @using (Html.BeginForm(actionName, controllerName, FormMethod.Post))
                     {
                         @Html.HiddenFor(m => m.TaskSchedulerMasterId)
+                        @Html.HiddenFor(x => x.ConfiguratorId)
                         @Html.HiddenFor(m => m.SchedulerCallFor)
                         @Html.HiddenFor(m => m.HangfireJobId)
                         @Html.HiddenFor(x => x.WeekDays)
@@ -71,7 +72,7 @@
                                     </p>
                                     <strong>Commonly Used Cron Expressions</strong>
                                     <pre class="p-2 ">
-                                Every minute                                             * * * *             Every 5th minute                         */5 * * * *
+                                Every minute                                             * * * * *           Every 5th minute                         */5 * * * *
                                 Every 15th minute                                        */15 * * * *        Every hour, on the hour                  0 * * * *
                                 Every 8 hours                                            0 */8 * * *         Every day at 1:00 AM                     0 1 * * *
                                 Every 15 minutes between 1:00 AM and 3:00 AM every day   */15 1-3 * * *      Every Saturday at 2:30 AM                3 0 2 * * 6
@@ -150,14 +151,8 @@
             }
         }
 
-        $(document).ready(function () {
-        var today = new Date();
-        var maxFutureDate = new Date(
-            today.getFullYear() + 10,
-            today.getMonth(),
-            today.getDate()
-        );
-            updateStartDateTimeVisibility(); 
+                $(document).ready(function () {
+            updateStartDateTimeVisibility(); // Set initial visibility
 
             $("#SchedulerFrequency").change(function () {
                 updateStartDateTimeVisibility();
@@ -170,9 +165,9 @@
                 dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
                 language: "en",
                 autoSize: true,
-                yearRange: maxFutureDate,
+                yearRange: "2022:2035",
                 minDate: new Date(2022, 0, 1),
-                maxDate: maxFutureDate
+                maxDate: new Date(2035, 11, 31)
             });
 
             $("form").submit(function (event) {
