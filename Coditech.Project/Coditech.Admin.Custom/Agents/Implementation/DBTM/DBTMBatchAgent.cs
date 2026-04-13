@@ -53,6 +53,37 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
         #region GeneralBatchUserList
+        public override GeneralBatchUserListViewModel GetGeneralBatchUserList( int generalBatchMasterId, string userType, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
+            {
+                filters.Add("FirstName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("LastName", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("EmailId", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("MobileNumber", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+            }
+            SortCollection sortlist = SortingData( dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy );
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession); 
+            if (userModel.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                userType = CustomConstants.DBTMTrainer; 
+            }
+            else if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+            {
+                userType = CustomConstants.DBTMCentreOwner; 
+            }
+
+            GeneralBatchUserListResponse response = _generalBatchClient.GetGeneralBatchUserList( generalBatchMasterId, userType, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            GeneralBatchUserListModel generalBatchUserList = new GeneralBatchUserListModel{ GeneralBatchUserList = response?.GeneralBatchUserList };
+            GeneralBatchUserListViewModel listViewModel = new GeneralBatchUserListViewModel();
+            listViewModel.GeneralBatchUserList = generalBatchUserList?.GeneralBatchUserList?.ToViewModel<GeneralBatchUserViewModel>().ToList();
+            SetListPagingData( listViewModel.PageListViewModel, response, dataTableModel, listViewModel.GeneralBatchUserList.Count, BindAssociatedBatchColumns());
+            listViewModel.GeneralBatchMasterId = generalBatchMasterId;
+            listViewModel.BatchName = response.BatchName;
+            return listViewModel;
+        }
         public virtual GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId)
         {
             GeneralBatchUserListResponse response = _dBTMBatchClient.GetDBTMBatchUserList(selectedCentreCode, generalTrainerMasterId, generalBatchMasterId);
