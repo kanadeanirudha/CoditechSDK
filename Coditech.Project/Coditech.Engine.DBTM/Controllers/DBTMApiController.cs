@@ -372,11 +372,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetCampAndActivityWiseUserDetails")]
         [HttpGet]
         [Produces(typeof(DBTMBatchUserResponse))]
-        public IActionResult GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId)
+        public IActionResult GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId, string userType)
         {
             try
             {
-                List<DBTMGeneralBatchUserModel> model = _dBTMApiService.GetCampAndActivityWiseUserDetails(dBTMcampMasterId, dbtmTestMasterId);
+                List<DBTMGeneralBatchUserModel> model = _dBTMApiService.GetCampAndActivityWiseUserDetails(dBTMcampMasterId, dbtmTestMasterId, userType);
                 return IsNotNull(model) ? CreateOKResponse(new DBTMBatchUserResponse { DBTMBatchUserList = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
