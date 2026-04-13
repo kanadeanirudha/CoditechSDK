@@ -85,7 +85,7 @@ namespace Coditech.API.Common
             app.UseRouting();
 
             // Configure HangfireDashboard with custom code.
-          //  app.ConfigureHangfireDashboard();
+            app.ConfigureHangfireDashboard();
 
             // Adds middleware for redirecting HTTP Requests to HTTPS.
             app.UseHttpsRedirection();
