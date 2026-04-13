@@ -529,14 +529,15 @@ namespace Coditech.API.Service
             return dBTMBatchModel;
         }
 
-        public List<DBTMGeneralBatchUserModel> GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId)
+        public List<DBTMGeneralBatchUserModel> GetCampAndActivityWiseUserDetails(int dBTMcampMasterId, int dbtmTestMasterId, string userType)
         {
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMcampMasterId", dBTMcampMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI @DBTMcampMasterId,@DBTMTestMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI_A @DBTMcampMasterId,@DBTMTestMasterId,@UserType,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             campUserList = campUserList ?? new List<DBTMGeneralBatchUserModel>();
             return campUserList;
         }
