@@ -70,7 +70,7 @@ namespace Coditech.API.Service
             return InsertDeviceData(dBTMDeviceDataModelList);
 
         }
- 
+
         //Add DBTMDeviceData.
         public bool InsertDeviceData(List<DBTMDeviceDataModel> dBTMDeviceDataModelList)
         {
@@ -386,15 +386,16 @@ namespace Coditech.API.Service
             return dBTMDashboardModel;
         }
         #endregion
-        public DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode)
+        public DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode, long generalTrainerMasterId)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@DBTMTestMasterIds", dBTMTestMasterIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @CentreCode,@DBTMTestMasterIds,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @CentreCode,@DBTMTestMasterIds,@GeneralTrainerMasterId,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
 
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
@@ -537,7 +538,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI_A @DBTMcampMasterId,@DBTMTestMasterId,@UserType,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI @DBTMcampMasterId,@DBTMTestMasterId,@UserType,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             campUserList = campUserList ?? new List<DBTMGeneralBatchUserModel>();
             return campUserList;
         }

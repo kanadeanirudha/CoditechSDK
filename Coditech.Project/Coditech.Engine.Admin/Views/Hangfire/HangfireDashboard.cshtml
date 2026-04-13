@@ -1,0 +1,33 @@
+﻿@using Coditech.Admin.Utilities
+@{
+    ViewBag.Title = "Hangfire Dashboard";
+    string hangfireDashboardUrl = $"{CoditechAdminSettings.CoditechOrganisationApiRootUri}/hangfire";
+}
+<div class="page-content">
+    <div class="container-fluid">
+        <!-- Page Title -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <!-- Header -->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title mb-0">Hangfire Dashboard</span>
+                        <a href="@hangfireDashboardUrl" target="_blank"
+                           class="btn btn-sm btn-soft-primary">
+                            <i class="fas fa-external-link-alt me-2"></i> Launch Dashboard
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            <b>Warning:</b> Hangfire Dashboard is only available for visibility purposes, it is recommended to avoid making any modifications. In case the dashboard is not visible or if the features are not working as expected, then the Hangfire configurations should be checked.
+                        </p>
+                        <p>
+                            <b>Important Note:</b> Schedulers created in accordance with Coditech Display Timezone are saved in UTC. Hangfire displays the execution time for these Scheduled Jobs in accordance with the Browser's Timezone.
+                        </p>
+                        <iframe src="@hangfireDashboardUrl" style="width:100%; height:650px; border:0;" id="hangfireFrame"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
