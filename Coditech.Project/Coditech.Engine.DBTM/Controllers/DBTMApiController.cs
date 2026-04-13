@@ -283,11 +283,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/dbtmapi/Gettraineesbyperformedactivity")]
         [Produces(typeof(DBTMTraineeDetailsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds , string centreCode)
+        public virtual IActionResult GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode, long generalTrainerMasterId)
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds, centreCode);
+                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineesByPerformedActivity(dBTMTestMasterIds, centreCode, generalTrainerMasterId);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
             }
@@ -326,7 +326,7 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
-      
+
         [Route("/DBTMApi/GetCampList")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
