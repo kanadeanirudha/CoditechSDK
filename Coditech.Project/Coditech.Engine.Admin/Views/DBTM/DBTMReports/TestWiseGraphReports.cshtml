@@ -3,7 +3,7 @@
     ViewBag.Title = "Activity Reports";
     DropdownViewModel testDropdown = new DropdownViewModel()
             {
-        DropdownType = DropdownCustomTypeEnum.DBTMCentreWiseTest.ToString(),
+                DropdownType = DropdownCustomTypeEnum.DBTMCentreWiseTest.ToString(),
                 DropdownName = "DBTMTestMasterId",
                 DropdownSelectedValue = Model.DBTMTestMasterId.ToString(),
                 IsCustomDropdown = true,
@@ -98,6 +98,7 @@
                             </div>
                             <div class="col-md-3" id="ToDateWrapper">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly", id = "ToDate" })
+                                <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>
                             <div class="col-md-1">
                                 <button type="button" class="btn btn-success w-100" onclick="DBTMReports.GetDBTMTestWiseGraphReports()">Show</button>
@@ -105,8 +106,8 @@
                         </div>
                         <div class="row  mt-3">
                             @* <div class="col-lg-12 h-100"> *@
-                                <div id="DBTMTestWiseGraphReportsDivId">
-                                </div>
+                            <div id="DBTMTestWiseGraphReportsDivId">
+                            </div>
                             @* </div> *@
                         </div>
                     </div>
@@ -183,6 +184,7 @@
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <script type="text/javascript">
+        var isFromDateSelected = false;
         var activityPerformedDates = [];
         function applyGraphModeUI() {
             var mode = $("#GraphMode").val();
@@ -241,8 +243,11 @@
                 },
 
                 onSelect: function () {
-                    updateToDate();
-                    applyGraphModeUI();
+                     isFromDateSelected = true;
+                        updateToDate();
+                        $("#toDateError").hide();
+                        updateToDate();
+                     applyGraphModeUI();
                 }
             });
 
@@ -270,6 +275,14 @@
                     e.preventDefault();
                     e.stopImmediatePropagation();
                 }
+            });
+            $("#ToDate").on("mousedown", function (e) {
+            if (!isFromDateSelected) {
+                $("#toDateError").show();
+                e.preventDefault();
+            } else {
+                $("#toDateError").hide();
+            }
             });
             applyGraphModeUI();
         });
