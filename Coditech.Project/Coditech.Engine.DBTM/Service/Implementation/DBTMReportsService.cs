@@ -1020,7 +1020,7 @@ namespace Coditech.API.Service
             {
                 List<string> displayColumnList = isMobileRequest
                     ? new List<string> { "View", "Activity Time", "Person Name" }
-                    : new List<string> { "View", "Activity Time", "Person Name", "Activity Status", "Weight(kg)", "Height(cm)" };
+                    : new List<string> { "View", "Activity Time", "Person Name", "Weight(kg)", "Height(cm)" };
 
                 if (isDownloadReport)
                 {
@@ -1048,9 +1048,9 @@ namespace Coditech.API.Service
                             case "Person Name":
                                 newRow["Person Name"] = $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}";
                                 break;
-                            case "Activity Status":
-                                newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
-                                break;
+                            //case "Activity Status":
+                            //    newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
+                            //    break;
                             case "Weight(kg)":
                                 newRow["Weight(kg)"] = $"{group.FirstOrDefault().Weight}";
                                 break;
