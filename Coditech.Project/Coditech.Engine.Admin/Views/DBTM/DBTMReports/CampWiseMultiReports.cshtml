@@ -3,7 +3,7 @@
     ViewBag.Title = "Campwise Multiple Reports";
     DropdownViewModel CampDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CampWiseReports.ToString(), DropdownName = "DBTMCampMasterId", DropdownSelectedValue = Model.DBTMCampMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMMultiTestListByDBTMCampMasterId()", IsCustomDropdown = true };
     DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CampWiseMultiReports.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.DBTMCampMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMCampWiseMultiReports('" + Model.DBTMCampMasterId + "')", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
-    ModelPopUpViewModel activityPopup = new ModelPopUpViewModel(){ModelPopUpId = "DBTMActivityDetailPopupId",ModalContentId = "DBTMActivityDetailPopupContentId"};
+    ModelPopUpViewModel activityPopup = new ModelPopUpViewModel() { ModelPopUpId = "DBTMActivityDetailPopupId", ModalContentId = "DBTMActivityDetailPopupContentId" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -45,6 +45,7 @@
                             </div>
                             <div class="col-md-1">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>
                             <div class="col-md-1">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMCampWiseMultiReports()" />
@@ -106,17 +107,18 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-    $(document).ready(function () {
-        DBTMReports.LoadCampActivityPerformedDates();
-        $("#DBTMTestMasterId").on("changed.bs.select", function () {
+        $(document).ready(function () {
             DBTMReports.LoadCampActivityPerformedDates();
+            $("#DBTMTestMasterId").on("changed.bs.select", function () {
+                DBTMReports.LoadCampActivityPerformedDates();
+            });
+            $("#DBTMCampMasterId").change(function () {
+                DBTMReports.LoadCampActivityPerformedDates();
+            });
         });
-        $("#DBTMCampMasterId").change(function () {
-            DBTMReports.LoadCampActivityPerformedDates();
-        });
-    });
     </script>
     <script type="text/javascript">
+        var isFromDateSelected = false;
         function formatDate(d) {
             return d.getFullYear() + "-"
                 + String(d.getMonth() + 1).padStart(2, "0") + "-"
@@ -159,7 +161,9 @@
                 return [false, "", "No activity"];
             },
                 onSelect: function () {
-                    updateToDate();
+                        isFromDateSelected = true;
+                            updateToDate();
+                                $("#toDateError").hide();
                 }
             });
 
@@ -189,24 +193,32 @@
                     updateToDate();
                 }
             });
+            $("#ToDate").on("mousedown", function (e) {
+            if (!isFromDateSelected) {
+                $("#toDateError").show();
+                e.preventDefault();
+            } else {
+                $("#toDateError").hide();
+            }
+            });
             updateToDate();
         });
     </script>
     <script>
-            $.fn.dataTable.ext.errMode = 'none';
-               $(document).on('ajaxComplete', function () {
-                 $("table[id^='datatable-']").each(function () {
-                    if ($.fn.DataTable.isDataTable(this)) {
-                        $(this).DataTable().destroy();
-                    }
-                    $(this).DataTable({
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        responsive: true
-                    });
+        $.fn.dataTable.ext.errMode = 'none';
+           $(document).on('ajaxComplete', function () {
+             $("table[id^='datatable-']").each(function () {
+                if ($.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable().destroy();
+                }
+                $(this).DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true
                 });
             });
+        });
     </script>
     <script>
         $(document).ready(function () {

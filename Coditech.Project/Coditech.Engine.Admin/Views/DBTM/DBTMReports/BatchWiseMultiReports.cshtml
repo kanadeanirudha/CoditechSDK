@@ -3,7 +3,7 @@
     ViewBag.Title = "Batchwise Multiple Reports";
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMMultiTestListByGeneralBatchMasterId()", IsCustomDropdown = true };
     DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.GeneralBatchMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMBatchWiseMultiReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
-    ModelPopUpViewModel activityPopup = new ModelPopUpViewModel(){ModelPopUpId = "DBTMActivityDetailPopupId",ModalContentId = "DBTMActivityDetailPopupContentId"};
+    ModelPopUpViewModel activityPopup = new ModelPopUpViewModel() { ModelPopUpId = "DBTMActivityDetailPopupId", ModalContentId = "DBTMActivityDetailPopupContentId" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -44,7 +44,8 @@
                                 @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
                             </div>
                             <div class="col-md-1">
-                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
+                                <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>
                             <div class="col-md-1">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMBatchWiseMultiReports()" />
@@ -106,17 +107,18 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-    $(document).ready(function () {
-        DBTMReports.LoadBatchActivityPerformedDates();
-        $("#DBTMTestMasterId").on("changed.bs.select", function () {
+        $(document).ready(function () {
             DBTMReports.LoadBatchActivityPerformedDates();
+            $("#DBTMTestMasterId").on("changed.bs.select", function () {
+                DBTMReports.LoadBatchActivityPerformedDates();
+            });
+            $("#GeneralBatchMasterId").change(function () {
+                DBTMReports.LoadBatchActivityPerformedDates();
+            });
         });
-        $("#GeneralBatchMasterId").change(function () {
-            DBTMReports.LoadBatchActivityPerformedDates();
-        });
-    });
     </script>
     <script type="text/javascript">
+        var isFromDateSelected = false;
         function formatDate(d) {
             return d.getFullYear() + "-"
                 + String(d.getMonth() + 1).padStart(2, "0") + "-"
@@ -133,7 +135,6 @@
                 }
             }
         }
-
         $(document).ready(function () {
             var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
             // FromDate
@@ -159,23 +160,19 @@
                 return [false, "", "No activity"];
             },
                 onSelect: function () {
+                    isFromDateSelected = true;  
                     updateToDate();
-                }
+                $("#toDateError").hide();   
+            }
             });
 
             // ToDate
             $("#ToDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: dateFormat,
-                language: "en",
-                autoSize: true,
-                gotoCurrent: true,
-                clearBtn: true,
-                showButtonPanel: true,
-                closeText: 'Clear',
-                maxDate: new Date(),
-                beforeShowDay: function (date) {
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: dateFormat,
+            maxDate: new Date(),
+            beforeShowDay: function (date) {
                 if (!activityPerformedDates || activityPerformedDates.length === 0) {
                     return [true, "", ""];
                 }
@@ -185,28 +182,36 @@
                 }
                 return [false, "", "No activity"];
             },
-                onSelect: function () {
-                    updateToDate();
-                }
-            });
+            onSelect: function () {
+                updateToDate();
+            }
+        }); 
+        $("#ToDate").on("mousedown", function (e) {
+            if (!isFromDateSelected) {
+                $("#toDateError").show();
+                e.preventDefault();
+            } else {
+                $("#toDateError").hide();
+            }
+        });
             updateToDate();
         });
     </script>
     <script>
-            $.fn.dataTable.ext.errMode = 'none';
-               $(document).on('ajaxComplete', function () {
-                 $("table[id^='datatable-']").each(function () {
-                    if ($.fn.DataTable.isDataTable(this)) {
-                        $(this).DataTable().destroy();
-                    }
-                    $(this).DataTable({
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        responsive: true
-                    });
+        $.fn.dataTable.ext.errMode = 'none';
+           $(document).on('ajaxComplete', function () {
+             $("table[id^='datatable-']").each(function () {
+                if ($.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable().destroy();
+                }
+                $(this).DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true
                 });
             });
+        });
     </script>
     <script>
         $(document).ready(function () {
