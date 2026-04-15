@@ -77,6 +77,7 @@
                             </div>
                             <div class="col-md-1">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                                <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>
                             <div class="col-md-1">
                                 <input type="button" class="btn btn-success me-3" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMNameWiseMultiReports()" />
@@ -185,6 +186,7 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
+        var isFromDateSelected = false;
         function formatDate(d) {
             return d.getFullYear() + "-"
                 + String(d.getMonth() + 1).padStart(2, "0") + "-"
@@ -224,7 +226,9 @@
                     return [false, "", "No activity"];
                 },
                 onSelect: function () {
-                    updateToDate();
+                        isFromDateSelected = true;
+                            updateToDate();
+                                $("#toDateError").hide();
                 }
             });
             $("#ToDate").datepicker({
@@ -244,6 +248,14 @@
                 onSelect: function () {
                     updateToDate();
                 }
+            });
+            $("#ToDate").on("mousedown", function (e) {
+            if (!isFromDateSelected) {
+                $("#toDateError").show();
+                e.preventDefault();
+            } else {
+                $("#toDateError").hide();
+            }
             });
             updateToDate();
         });
