@@ -47,5 +47,7 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/DownloadTraineeUploadTemplate?centreCode={centreCode}&trainerId={trainerId}&userType={userType}&count={count}&entityId={entityId}";
             return endpoint;
         }
+        public string AssociateUnAssociateTrainerAsync() =>
+          $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralTrainerMaster/AssociateUnAssociateTrainer";
     }
 }

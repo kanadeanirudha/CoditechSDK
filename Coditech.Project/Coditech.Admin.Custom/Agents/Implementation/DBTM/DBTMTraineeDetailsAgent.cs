@@ -337,6 +337,42 @@ namespace Coditech.Admin.Agents
                 return false;
             }
         }
+
+        //AssociateUnAssociateTrainer
+        public virtual GeneralTraineeAssociatedToTrainerViewModel AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerViewModel model)
+        {
+            try
+            {
+                long personId = model.PersonId;
+                long entityId = model.EntityId;
+                long associationId = model.GeneralTraineeAssociatedToTrainerId;
+                model.UserType = UserTypeEnum.Trainee.ToString();
+                GeneralTraineeAssociatedToTrainerResponse response = _dBTMTraineeDetailsClient.AssociateUnAssociateTrainer(model.ToModel<GeneralTraineeAssociatedToTrainerModel>());
+                GeneralTraineeAssociatedToTrainerModel result = response?.GeneralTraineeAssociatedToTrainerModel;
+                model = IsNotNull(result) ? result.ToViewModel<GeneralTraineeAssociatedToTrainerViewModel>() : new GeneralTraineeAssociatedToTrainerViewModel();
+                model.PersonId = personId;
+                model.EntityId = entityId;
+                model.GeneralTraineeAssociatedToTrainerId = associationId;
+                return model;
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssociatedTrainer", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (GeneralTraineeAssociatedToTrainerViewModel)GetViewModelWithErrorMessage(model, ex.ErrorMessage);
+
+                    default:
+                        return (GeneralTraineeAssociatedToTrainerViewModel)GetViewModelWithErrorMessage(model, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssociatedTrainer", TraceLevel.Error);
+                return (GeneralTraineeAssociatedToTrainerViewModel)GetViewModelWithErrorMessage(model, GeneralResources.ErrorFailedToCreate);
+            }
+        }
         #endregion
 
         #region DBTMTraineeActivities
@@ -594,7 +630,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Current Trainer",
+                ColumnName = "Is Associated",
                 ColumnCode = "IsCurrentTrainer",
                 IsSortable = true,
             });
