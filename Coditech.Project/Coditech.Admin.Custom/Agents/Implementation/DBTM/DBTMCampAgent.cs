@@ -162,7 +162,17 @@ namespace Coditech.Admin.Agents
             }
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
-            DBTMCampUserListResponse response = _dBTMCampClient.GetDBTMCampUserList(dBTMCampMasterId, UserTypeEnum.Trainee.ToString(), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            if (userModel.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                userType = CustomConstants.DBTMTrainer;
+            }
+            else if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+            {
+                userType = CustomConstants.DBTMCentreOwner;
+            }
+            DBTMCampUserListResponse response = _dBTMCampClient.GetDBTMCampUserList(dBTMCampMasterId, userType, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMCampUserListModel DBTMCampUserList = new DBTMCampUserListModel { DBTMCampUserList = response?.DBTMCampUserList };
             DBTMCampUserListViewModel listViewModel = new DBTMCampUserListViewModel();
             listViewModel.DBTMCampUserList = DBTMCampUserList?.DBTMCampUserList?.ToViewModel<DBTMCampUserViewModel>().ToList();

@@ -469,5 +469,53 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+
+        public virtual GeneralTraineeAssociatedToTrainerResponse AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerModel body)
+        {
+            return Task.Run(async () => await AssociateUnAssociateTrainerAsync(body, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<GeneralTraineeAssociatedToTrainerResponse> AssociateUnAssociateTrainerAsync( GeneralTraineeAssociatedToTrainerModel body, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.AssociateUnAssociateTrainerAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await PutResourceToEndpointAsync( endpoint, JsonConvert.SerializeObject(body), status, cancellationToken ).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<GeneralTraineeAssociatedToTrainerResponse>( response, headers_, cancellationToken ).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 201)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<GeneralTraineeAssociatedToTrainerResponse>( response, headers_, cancellationToken ).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    GeneralTraineeAssociatedToTrainerResponse typedBody = JsonConvert.DeserializeObject<GeneralTraineeAssociatedToTrainerResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

@@ -41,5 +41,6 @@ namespace Coditech.API.Client
         DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
         DBTMTraineeUploadResponse UploadTrainee(IFormFile file);
         DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId);
+        GeneralTraineeAssociatedToTrainerResponse AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerModel body);
     }
 }

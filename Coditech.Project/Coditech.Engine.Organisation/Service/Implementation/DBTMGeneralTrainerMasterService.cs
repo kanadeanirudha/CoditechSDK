@@ -3,17 +3,19 @@ using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Resources;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
-    public class DBTMGeneralTrainerMasterService : GeneralTrainerMasterService
+    public class DBTMGeneralTrainerMasterService : GeneralTrainerMasterService, IDBTMGeneralTrainerMasterService
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<AdminSanctionPost> _adminSanctionPostRepository;
         private readonly ICoditechRepository<AdminRoleMaster> _adminRoleMasterRepository;
         private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
+        private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         public DBTMGeneralTrainerMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -21,6 +23,7 @@ namespace Coditech.API.Service
             _adminSanctionPostRepository = new CoditechRepository<AdminSanctionPost>(_serviceProvider.GetService<Coditech_Entities>());
             _adminRoleMasterRepository = new CoditechRepository<AdminRoleMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         protected override GeneralPersonModel GetGeneralPersonDetailsByEntityType(long entityId, string entityType)
@@ -173,5 +176,47 @@ namespace Coditech.API.Service
             }
         }
 
+        public virtual bool AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerModel model)
+        {
+            bool status = false;
+
+            if (model.GeneralTraineeAssociatedToTrainerId > 0)
+            {
+                GeneralTraineeAssociatedToTrainer entity = _generalTraineeAssociatedToTrainerRepository.Table.FirstOrDefault(x => x.GeneralTraineeAssociatedToTrainerId == model.GeneralTraineeAssociatedToTrainerId);
+                if (entity != null)
+                {
+                    entity.IsCurrentTrainer = false; 
+                    _generalTraineeAssociatedToTrainerRepository.Update(entity);
+                    status = true;
+                }
+            }
+            else
+            {
+                GeneralTraineeAssociatedToTrainer existing = _generalTraineeAssociatedToTrainerRepository.Table.FirstOrDefault(x => x.EntityId == model.EntityId && x.GeneralTrainerMasterId == model.GeneralTrainerMasterId);
+                if (existing != null)
+                {              
+                    existing.IsCurrentTrainer = true;
+                    _generalTraineeAssociatedToTrainerRepository.Update(existing);
+                    status = true;
+                }
+                else
+                {
+                    var alreadyExists = _generalTraineeAssociatedToTrainerRepository.Table.Any(x => x.EntityId == model.EntityId && x.GeneralTrainerMasterId == model.GeneralTrainerMasterId);
+                    if (!alreadyExists)
+                    {
+                        GeneralTraineeAssociatedToTrainer entity = model.FromModelToEntity<GeneralTraineeAssociatedToTrainer>();
+                        entity.IsCurrentTrainer = true;
+                        _generalTraineeAssociatedToTrainerRepository.Insert(entity);
+                        status = true;
+                    }
+                }
+            }
+            if (!status)
+            {
+                model.HasError = true;
+                model.ErrorMessage = GeneralResources.UpdateErrorMessage;
+            }
+            return status;
+        }
     }
 }

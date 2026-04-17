@@ -325,6 +325,22 @@ namespace Coditech.Admin.Controllers
             return View(createEditAssociatedTrainer, generalTraineeAssociatedToTrainerViewModel);
         }
 
+        [HttpGet]
+        public ActionResult GetAssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerViewModel model)
+        {
+            model.EntityId = model.DBTMTraineeDetailId > 0  ? model.DBTMTraineeDetailId : model.EntityId;
+            return PartialView("~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/_AssociateUnAssociateTrainer.cshtml", model);
+        }
+
+        [HttpPost]
+        public ActionResult AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerViewModel model)
+        {
+            SetNotificationMessage(_dBTMTraineeDetailsAgent.AssociateUnAssociateTrainer(model).HasError
+               ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
+               : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+            return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel{ SelectedParameter1 = model.DBTMTraineeDetailId.ToString(), SelectedParameter2 = model.PersonId.ToString()});
+        }
+
         public virtual ActionResult DeleteAssociatedTrainer(string generalTraineeAssociatedToTrainerIds, string SelectedParameter1, string SelectedParameter2)
         {
             string message = string.Empty;
@@ -337,7 +353,6 @@ namespace Coditech.Admin.Controllers
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
                 return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1, SelectedParameter2 = SelectedParameter2 });
             }
-
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1, SelectedParameter2 = SelectedParameter2 });
         }
