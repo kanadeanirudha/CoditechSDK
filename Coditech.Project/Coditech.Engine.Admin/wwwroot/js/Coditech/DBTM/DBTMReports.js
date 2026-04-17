@@ -209,6 +209,9 @@ var DBTMReports = {
             },
             success: function (data) {
                 activityPerformedDates = data || [];
+                if (!activityPerformedDates || activityPerformedDates.length === 0) {
+                    CoditechNotification.DisplayNotificationMessage( "Activity has never been tested.", "error" );
+                }
                 $("#FromDate,#ToDate").datepicker("refresh");
             },
             error: function (xhr) {
@@ -216,10 +219,7 @@ var DBTMReports = {
                     location.reload();
                 }
                 activityPerformedDates = [];
-                CoditechNotification.DisplayNotificationMessage(
-                    "Failed to load activity dates.",
-                    "error"
-                );
+                CoditechNotification.DisplayNotificationMessage( "Failed to load activity dates.", "error" );
             }
         });
     },
@@ -243,6 +243,9 @@ var DBTMReports = {
             },
             success: function (data) {
                 activityPerformedDates = data || [];
+                if (!activityPerformedDates || activityPerformedDates.length === 0) {
+                    CoditechNotification.DisplayNotificationMessage("Batch has never been tested.", "error");
+                }
                 $("#FromDate,#ToDate").datepicker("refresh");
             },
             error: function () {
@@ -294,6 +297,10 @@ var DBTMReports = {
         $("#DBTMBatchWiseMultiReportsDivId").html("");
         if (generalBatchMasterId != "" && dBTMTestMasterId != "") {
             CoditechCommon.ShowLodder();
+            if (!activityPerformedDates || activityPerformedDates.length === 0) {
+                CoditechNotification.DisplayNotificationMessage("Batch has never been tested.", "error");
+                return;
+            }
             $.ajax({
                 cache: false,
                 type: "GET",
@@ -680,6 +687,10 @@ var DBTMReports = {
         $("#DBTMCampWiseMultiReportsDivId").html("");
         if (campId != "" && dBTMTestMasterId != "") {
             CoditechCommon.ShowLodder();
+            if (!activityPerformedDates || activityPerformedDates.length === 0) {
+                CoditechNotification.DisplayNotificationMessage("Camp has never been tested.", "error" );
+                return;
+            }
             $.ajax({
                 cache: false,
                 type: "GET",
@@ -772,6 +783,9 @@ var DBTMReports = {
                 activityPerformedDates = (data || []).map(function (d) {
                     return d.split('T')[0];
                 });
+                if (!activityPerformedDates || activityPerformedDates.length === 0) {
+                    CoditechNotification.DisplayNotificationMessage( "Camp has never been tested.", "error");
+                }
                 $("#FromDate,#ToDate").datepicker("refresh");
             },
             error: function () {
