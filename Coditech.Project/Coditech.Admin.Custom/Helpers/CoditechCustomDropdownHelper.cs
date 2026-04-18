@@ -169,18 +169,17 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
-                GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
+                long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
+                GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode, entityId);
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
 
                 // Filter the list if the user is a trainer
                 if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                 {
-                    list.GeneralTrainerList = list.GeneralTrainerList?.Where(x =>
-                        string.Equals(x.FirstName, userModel.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
-                        string.Equals(x.LastName, userModel.LastName, StringComparison.InvariantCultureIgnoreCase))?.ToList();
+                    var trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? "") ?.GeneralTrainerMasterId;
+                    list.GeneralTrainerList = list.GeneralTrainerList?.Where(x => x.GeneralTrainerMasterId == trainerId) ?.ToList();
                 }
             }
-
             if (!string.IsNullOrEmpty(dropdownViewModel.SelectedText) && userModel?.Custom1 != CustomConstants.DBTMTrainer)
                 dropdownList.Add(new SelectListItem() { Text = dropdownViewModel.SelectedText, Value = dropdownViewModel.SelectedValue });
 
@@ -538,8 +537,8 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
-
-                GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode);
+                long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
+                GeneralTrainerListResponse response = new DBTMTraineeAssignmentClient().GetTrainerByCentreCode(centreCode, entityId);
                 list = new GeneralTrainerListModel { GeneralTrainerList = response?.GeneralTrainerList };
                 foreach (var item in list?.GeneralTrainerList?.OrderBy(x => x.FirstName))
                 {
