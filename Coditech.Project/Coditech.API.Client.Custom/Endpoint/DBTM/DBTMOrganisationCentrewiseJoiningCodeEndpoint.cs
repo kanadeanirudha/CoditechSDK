@@ -9,6 +9,11 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCode?centreCode={centreCode}&trainerId={trainerId}";
             return endpoint;
         }
+        public string GetTrainerActiveJoiningCodeAsync(string centreCode)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/GetTrainerActiveJoiningCode?centreCode={centreCode}";
+            return endpoint;
+        }
         public string DeleteJoiningCodeFileAsync() =>
                  $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/DeleteOrganisationCentrewiseJoiningCodeFile";     
     }

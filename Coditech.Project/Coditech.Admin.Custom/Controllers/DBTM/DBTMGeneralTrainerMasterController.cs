@@ -1,23 +1,46 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Microsoft.AspNetCore.Mvc;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMGeneralTrainerMasterController : BaseController
     {
         private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
+        private readonly IDBTMOrganisationCentrewiseJoiningCodeAgent _dBTMOrganisationCentrewiseJoiningCodeAgent;
 
-        public DBTMGeneralTrainerMasterController(IDBTMNewRegistrationAgent dBTMNewRegistrationAgent)
+        public DBTMGeneralTrainerMasterController(IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent)
         {
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
+            _dBTMOrganisationCentrewiseJoiningCodeAgent = dBTMOrganisationCentrewiseJoiningCodeAgent;
         }
 
         [HttpGet]
         public ActionResult TrainerRegistration(string joiningCode)
         {
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
-            dBTMNewRegistrationViewModel.CentreCode = joiningCode;
+            if (!string.IsNullOrEmpty(joiningCode))
+            {
+                dBTMNewRegistrationViewModel.CentreCode = joiningCode;
+            }
+            else
+            {
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                if (userModel != null)
+                {
+                    DBTMOrganisationCentrewiseJoiningCodeViewModel result = _dBTMOrganisationCentrewiseJoiningCodeAgent.GetTrainerActiveJoiningCode(userModel.SelectedCentreCode);
+                    if (result != null && !string.IsNullOrEmpty(result.JoiningCode))
+                    {
+                        dBTMNewRegistrationViewModel.CentreCode = result.JoiningCode;
+                    }
+                    else
+                    {
+                        dBTMNewRegistrationViewModel.HasError = true;
+                        dBTMNewRegistrationViewModel.ErrorMessage = "No joining codes are available.";
+                    }
+                }
+            }
             return View("~/Views/DBTM/DBTMGeneralTrainerMaster/DBTMTrainerRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
 

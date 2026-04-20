@@ -46,6 +46,30 @@ namespace Coditech.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/DBTMOrganisationCentrewiseJoiningCode/GetTrainerActiveJoiningCode")]
+        [Produces(typeof(DBTMOrganisationCentrewiseJoiningCodeResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetTrainerActiveJoiningCode(string centreCode)
+        {
+            try
+            {
+                DBTMOrganisationCentrewiseJoiningCodeModel list = _dBTMOrganisationCentrewiseJoiningCodeService.GetTrainerActiveJoiningCode(centreCode);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMOrganisationCentrewiseJoiningCodeResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMOrganisationCentrewiseJoiningCodeResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMOrganisationCentrewiseJoiningCodeResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [Route("/DBTMOrganisationCentrewiseJoiningCode/DeleteOrganisationCentrewiseJoiningCodeFile")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
