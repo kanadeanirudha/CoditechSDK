@@ -129,6 +129,82 @@ namespace Coditech.API.Client
                 }
             }
         }
+
+        public virtual DBTMNewRegistrationResponse ValidateTrainerJoiningCode(string joiningCode)
+        {
+            return Task.Run(async () => await ValidateTrainerJoiningCodeAsync(joiningCode, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMNewRegistrationResponse> ValidateTrainerJoiningCodeAsync(string joiningCode, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMNewRegistrationEndpoint.ValidateTrainerJoiningCode(joiningCode);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var statusCode = (int)response.StatusCode;
+                if (statusCode == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMNewRegistrationResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string value = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
+                    DBTMNewRegistrationResponse result = JsonConvert.DeserializeObject<DBTMNewRegistrationResponse>(value);
+                    UpdateApiStatus(result, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
+        public virtual DBTMNewRegistrationResponse ValidateTraineeJoiningCode(string joiningCode)
+        {
+            return Task.Run(async () => await ValidateTraineeJoiningCodeAsync(joiningCode, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMNewRegistrationResponse> ValidateTraineeJoiningCodeAsync(string joiningCode, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMNewRegistrationEndpoint.ValidateTraineeJoiningCode(joiningCode);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var statusCode = (int)response.StatusCode;
+                if (statusCode == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMNewRegistrationResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string value = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
+                    DBTMNewRegistrationResponse result = JsonConvert.DeserializeObject<DBTMNewRegistrationResponse>(value);
+                    UpdateApiStatus(result, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
+
         public virtual DBTMNewRegistrationListResponse GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId)
         {
             return Task.Run(async () => await GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId, CancellationToken.None)).GetAwaiter().GetResult();
@@ -139,11 +215,9 @@ namespace Coditech.API.Client
             string endpoint = dBTMNewRegistrationEndpoint.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
-
             try
             {
                 ApiStatus status = new ApiStatus();
-
                 response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
                 Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
                 var status_ = (int)response.StatusCode;

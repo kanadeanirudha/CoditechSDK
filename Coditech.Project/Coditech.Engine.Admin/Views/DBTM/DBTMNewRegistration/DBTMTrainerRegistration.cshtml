@@ -12,13 +12,13 @@
             @* <a class="nav-link fw-semibold" href="/dbtmnewregistration/centreregistration" role="tab">Device Registration</a> *@
         </li>
         <li class="nav-item">
+            <a class="nav-link fw-semibold" href="/dbtmnewregistration/traineeRegistration" role="tab">Trainee Registration</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link active fw-semibold" href="/dbtmnewregistration/trainerRegistration" role="tab">Trainer Registration</a>
         </li>
         <li class="nav-item">
             @* <a class="nav-link fw-semibold" href="/dbtmnewregistration/individualRegistration" role="tab">Individual Registration</a> *@
-        </li>
-        <li class="nav-item">
-            <a class="nav-link fw-semibold" href="/dbtmnewregistration/traineeRegistration" role="tab">Trainee Registration</a>
         </li>
     </ul>
     <!-- Tab panes -->
@@ -26,18 +26,69 @@
         <div class="tab-pane active p-3" id="LogIn_Tab" role="tabpanel">
             @using (Html.BeginForm("TrainerRegistration", controllerName, FormMethod.Post))
             {
+                bool isCodeValidated = !string.IsNullOrEmpty(Model.JoiningCode) && Model.JoiningCode.Length >= 5;
+                string buttonText = isCodeValidated ? "Change" : "Join";
+                string clickHandler = isCodeValidated ? "ChangeJoinningCode()" : "ValidateJoiningCode()";
+                <div class="row align-items-end">
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label class="form-label required" for="JoiningCode">Joining Code</label>
+                            @if (isCodeValidated)
+                            {
+                                @Html.TextBoxFor(x => x.JoiningCode, new { id = "JoiningCode", @class = "form-control", @readonly = "readonly" })
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(x => x.JoiningCode, new { id = "JoiningCode", @class = "form-control" })
+                            }
+                            @Html.ValidationMessageFor(x => x.JoiningCode)
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-warning w-100" onclick="@clickHandler">@buttonText</button>
+                        </div>
+                    </div>
+                    @if (isCodeValidated)
+                    {
+                        <!-- Trainer Specialization -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                @Html.LabelFor(x => x.TrainerSpecialization, new { @class = "form-label required" })
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                                {
+                                    DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
+                                    DropdownName = "TrainerSpecializationEnumId",
+                                    GroupCode = DropdownTypeEnum.TrainerSpecialization.ToString()
+                                })
+                                @Html.ValidationMessageFor(x => x.TrainerSpecializationEnumId)
+                            </div>
+                        </div>
+                    }
+                </div>
                 @Html.AntiForgeryToken()
-                @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTrainerRegistration.cshtml", Model)
-                <div class="form-group row my-3">
-                    <div class="col-sm-6">
-                        <div class="custom-control custom-switch switch-success">
-                            <div class="col-sm-6 text-end">
-                                <button class="btn btn-primary w-100 waves-effect waves-light">Register<i class="fas fa-sign-in-alt ms-1"></i></button>
+                @if (isCodeValidated)
+                {
+                    @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTrainerRegistration.cshtml", Model)
+                }
+                @if (isCodeValidated)
+                {
+                    <div class="form-group row my-3">
+                        <div class="col-sm-6">
+                            <div class="custom-control custom-switch switch-success">
+                                <div class="col-sm-6 text-end">
+                                    <button class="btn btn-primary w-100 waves-effect waves-light">
+                                        Register<i class="fas fa-sign-in-alt ms-1"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                }
+                <div class="form-group row my-3">
+                    <div class="col-sm-6"></div>
                     <div class="col-sm-6 text-end">
-                        <a href="/user/login" class="text-muted font-13"><i class="dripicons-lock"></i>Log in</a>
+                        <a href="/user/login" class="theme-color ms-2"><i class="dripicons-lock"></i> Log in </a>
                     </div>
                 </div>
             }
@@ -61,5 +112,18 @@
                 }
             });
         });
+        function ValidateJoiningCode() {
+            const joiningCode = $("#JoiningCode").val();
+            if (joiningCode.length >= 5) {
+                window.location.href = `/DBTMNewRegistration/TrainerRegistration?joiningCode=${encodeURIComponent(joiningCode)}`;
+            } else {
+                alert("Joining code must be at least 5 characters.");
+            }
+        }
+        function ChangeJoinningCode() {
+            if (confirm("Are you sure?")) {
+                window.location.href = "/DBTMNewRegistration/TrainerRegistration";
+            }
+        }
     </script>
 }
