@@ -110,7 +110,7 @@ namespace Coditech.API.Controllers
             try
             {
                 DBTMNewRegistrationListModel list = _dbtmUserService.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
-                return IsNotNull(list) ? CreateOKResponse(new DBTMNewRegistrationListResponse { DBTMNewRegistrationList = list.DBTMNewRegistrationList, JoiningCode = list.JoiningCode, }) : CreateNoContentResponse();
+                return IsNotNull(list) ? CreateOKResponse(new DBTMNewRegistrationListResponse { DBTMNewRegistrationList = list.DBTMNewRegistrationList, JoiningCode = list.JoiningCode, SelectedTrainerId = list.SelectedTrainerId }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
             {

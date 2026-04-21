@@ -159,30 +159,50 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult TraineeRegistration(string joiningCode, long generalTrainerMasterId)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
+
+            DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
+
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
+                DBTMNewRegistrationListViewModel list =
+                    _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
+
                 if (!list.HasError)
                 {
-                    dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+                    var storedTrainerId = list.SelectedTrainerId;
+
+                    var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
+                    {
+                        DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                        Parameter = joiningCode
+                    }).DropdownList?.Where(x => x.Value != "").ToList();
+
+                    if (!string.IsNullOrEmpty(storedTrainerId))
+                    {
+                        foreach (var item in allTrainerList)
+                        {
+                            item.Selected = item.Value == storedTrainerId;
+                        }
+                    }
+
+                    model = new DBTMNewRegistrationViewModel
                     {
                         JoiningCode = joiningCode,
-                        AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-                        {
-                            DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                            Parameter = joiningCode
-                        }).DropdownList?.Where(x => x.Value != "")?.ToList()
-
+                        AllTrainerList = allTrainerList,
+                        SelectedTrainer = string.IsNullOrEmpty(storedTrainerId)
+                            ? new List<string>()
+                            : new List<string> { storedTrainerId }
                     };
                 }
-                if (list.HasError)
+                else
                 {
                     SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
                 }
-                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+
+                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", model);
             }
-            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
+
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -208,19 +228,23 @@ namespace Coditech.Admin.Controllers
                     //var regionmasterid = dBTMNewRegistrationViewModel.GeneralRegionMasterId;
                     //var isTermsAndCondition = dBTMNewRegistrationViewModel.IsTermsAndCondition;
 
-                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode,dBTMNewRegistrationViewModel.GeneralTrainerMasterId);
+                    DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(dBTMNewRegistrationViewModel.JoiningCode, dBTMNewRegistrationViewModel.GeneralTrainerMasterId);
                     if (!list.HasError)
                     {
-                        dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
+                        var trainers = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
                         {
-                            JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
-                            AllTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-                            {
-                                DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                                Parameter = dBTMNewRegistrationViewModel.JoiningCode
-                            }).DropdownList?.Where(x => x.Value != "")?.ToList()
+                            DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
+                            Parameter = dBTMNewRegistrationViewModel.JoiningCode
+                        }).DropdownList?.Where(x => x.Value != "")?.ToList();
 
-                        };
+                        // ONLY update dropdown
+                        dBTMNewRegistrationViewModel.AllTrainerList = trainers;
+
+                        // KEEP selected trainer safe
+                        if (dBTMNewRegistrationViewModel.SelectedTrainer == null)
+                        {
+                            dBTMNewRegistrationViewModel.SelectedTrainer = new List<string>();
+                        }
                     }
                     //dBTMNewRegistrationViewModel.GeneralRegionMasterId = regionmasterid;
                     //dBTMNewRegistrationViewModel.GeneralCountryMasterId = generalcountrymasterid;
@@ -242,7 +266,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("GeneralCountryMasterId");
                 ModelState.Remove("GeneralRegionMasterId");
                 ModelState.Remove("AddressLine1");
-                ModelState.Remove("Pincode"); 
+                ModelState.Remove("Pincode");
                 ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
