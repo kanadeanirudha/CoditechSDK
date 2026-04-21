@@ -219,9 +219,10 @@ namespace Coditech.Admin.Agents
             try
             {
                 DBTMNewRegistrationListResponse response = _dBTMNewRegistrationClient.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
-                DBTMNewRegistrationListModel dBTMNewRegistrationList = new DBTMNewRegistrationListModel { DBTMNewRegistrationList = response?.DBTMNewRegistrationList };
+                DBTMNewRegistrationListModel dBTMNewRegistrationList = new DBTMNewRegistrationListModel { DBTMNewRegistrationList = response?.DBTMNewRegistrationList, SelectedTrainerId = response.SelectedTrainerId };
                 DBTMNewRegistrationListViewModel listViewModel = new DBTMNewRegistrationListViewModel();
                 listViewModel.JoiningCode = response.JoiningCode;
+                listViewModel.SelectedTrainerId = response.SelectedTrainerId;
                 listViewModel.DBTMNewRegistrationList = dBTMNewRegistrationList?.DBTMNewRegistrationList?.ToViewModel<DBTMNewRegistrationViewModel>().ToList();
                 return listViewModel;
             }
