@@ -186,12 +186,12 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "WarrantyExpirationDate",
                 IsSortable = true,
             });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Is Master Device",
-                ColumnCode = "IsMasterDevice",
-                IsSortable = true,
-            });
+            //datatableColumnList.Add(new DatatableColumns()
+            //{
+            //    ColumnName = "Is Master Device",
+            //    ColumnCode = "IsMasterDevice",
+            //    IsSortable = true,
+            //});
             return datatableColumnList;
         }
         #endregion

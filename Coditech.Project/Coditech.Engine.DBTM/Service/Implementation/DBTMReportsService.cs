@@ -851,7 +851,7 @@ namespace Coditech.API.Service
                 return new List<DBTMReportsModel>();
             }
             List<DBTMReportsModel> dBTMReportsList = new List<DBTMReportsModel>();
-            if (userType == UserTypeEnum.Employee.ToString())
+            if (userType == UserTypeEnum.Employee.ToString() || userType == CustomConstants.DBTMCentreOwner.ToString())
             {
                 entityId = 0;
             }

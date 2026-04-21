@@ -69,5 +69,28 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/TrainerRegistration/ValidateTrainerJoiningCode")]
+        [HttpGet]
+        [Produces(typeof(DBTMNewRegistrationResponse))]
+        [AllowAnonymous]
+        public virtual IActionResult ValidateTrainerJoiningCode(string joiningCode)
+        {
+            try
+            {
+                DBTMNewRegistrationModel model = _dBTMNewRegistrationService.ValidateTrainerJoiningCode(joiningCode);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMNewRegistrationResponse { DBTMNewRegistrationModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TrainerRegistration.ToString(), TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TrainerRegistration.ToString(), TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

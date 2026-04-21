@@ -5,7 +5,9 @@ using Coditech.Common.API.Model.Response;
 using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -102,6 +104,30 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMUserResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMUser/ValidateTraineeJoiningCode")]
+        [HttpGet]
+        [Produces(typeof(DBTMNewRegistrationResponse))]
+        [AllowAnonymous]
+        public virtual IActionResult ValidateTraineeJoiningCode(string joiningCode)
+        {
+            try
+            {
+                DBTMNewRegistrationModel model = _dbtmUserService.ValidateTraineeJoiningCode(joiningCode);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMNewRegistrationResponse { DBTMNewRegistrationModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TrainerRegistration.ToString(), TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TrainerRegistration.ToString(), TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [Route("/DBTMUser/GetGeneralTrainerByJoiningCode")]
         [HttpGet]
         [Produces(typeof(DBTMNewRegistrationListResponse))]

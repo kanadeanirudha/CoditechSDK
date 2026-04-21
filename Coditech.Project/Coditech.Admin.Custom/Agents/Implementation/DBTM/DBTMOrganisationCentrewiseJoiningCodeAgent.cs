@@ -76,6 +76,18 @@ namespace Coditech.Admin.Agents
             return viewModel;
         }
 
+        public DBTMOrganisationCentrewiseJoiningCodeViewModel GetTrainerActiveJoiningCode(string centreCode)
+        {
+            DBTMOrganisationCentrewiseJoiningCodeResponse data = _dBTMOrganisationCentrewiseJoiningCodeClient.GetTrainerActiveJoiningCode(centreCode);
+            if (data == null)
+                return null;
+            DBTMOrganisationCentrewiseJoiningCodeViewModel dBTMOrganisationCentrewiseJoiningCodeViewModel = new DBTMOrganisationCentrewiseJoiningCodeViewModel
+            {
+                JoiningCode = data.JoiningCode
+            };
+            return dBTMOrganisationCentrewiseJoiningCodeViewModel;
+        }
+
         //Delete Report .
         public virtual bool DeleteJoiningCodeFile(string fileName)
         {

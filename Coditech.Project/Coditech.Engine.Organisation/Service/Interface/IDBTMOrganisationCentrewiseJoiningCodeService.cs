@@ -7,6 +7,7 @@ namespace Coditech.API.Service
     {
         List<OrganisationCentrewiseJoiningCodeModel> GetTraineeActiveJoiningCodeList(string centreCode, string trainerId,int rows);
         DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId,int rows);
+        DBTMOrganisationCentrewiseJoiningCodeModel GetTrainerActiveJoiningCode(string centreCode);
         bool DeleteOrganisationCentrewiseJoiningCodeFile(string fileName);
     }
 }

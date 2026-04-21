@@ -248,6 +248,43 @@ namespace Coditech.Admin.Agents
                 return (DBTMNewRegistrationListViewModel)GetViewModelWithErrorMessage(dBTMNewRegistrationViewModel, GeneralResources.UpdateErrorMessage);
             }
         }
+
+        public DBTMNewRegistrationViewModel ValidateTrainerJoiningCode(string joiningCode)
+        {
+            DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
+            try
+            {
+                DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.ValidateTrainerJoiningCode(joiningCode);
+                if (response?.DBTMNewRegistrationModel != null)
+                {
+                    model = response.DBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>();
+                }
+            }
+            catch (CoditechException ex)
+            {
+                model.HasError = true;
+                model.ErrorMessage = ex.Message;
+            }
+            return model;
+        }
+        public DBTMNewRegistrationViewModel ValidateTraineeJoiningCode(string joiningCode)
+        {
+            DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
+            try
+            {
+                DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.ValidateTraineeJoiningCode(joiningCode);
+                if (response?.DBTMNewRegistrationModel != null)
+                {
+                    model = response.DBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>();
+                }
+            }
+            catch (CoditechException ex)
+            {
+                model.HasError = true;
+                model.ErrorMessage = ex.Message;
+            }
+            return model;
+        }
         #endregion
     }
 }
