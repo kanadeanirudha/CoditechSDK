@@ -266,25 +266,22 @@ namespace Coditech.API.Service
 
             return dBTMTraineeAssignmentReminderModel;
         }
-        public GeneralTrainerListModel GetTrainerByCentreCode(string centreCode)
+        public GeneralTrainerListModel GetTrainerByCentreCode(string centreCode, long entityId)
         {
             var list = new GeneralTrainerListModel();
-
             list.GeneralTrainerList = (from a in _generalTrainerRepository.Table
                                        join b in _employeeMasterRepository.Table
-                                        on a.EmployeeId equals b.EmployeeId
+                                           on a.EmployeeId equals b.EmployeeId
                                        join c in _generalPersonRepository.Table
-                                       on b.PersonId equals c.PersonId
-
+                                           on b.PersonId equals c.PersonId
                                        where (b.CentreCode == centreCode || centreCode == null)
-
                                        select new GeneralTrainerModel()
                                        {
                                            GeneralTrainerMasterId = a.GeneralTrainerMasterId,
-                                           FirstName = c.FirstName,
-                                           LastName = c.LastName,
-                                       }).ToList();
-
+                                           FirstName = b.EmployeeId == entityId ? c.FirstName + " " + c.LastName + " (Self)" : c.FirstName + " " + c.LastName,
+                                           LastName = ""
+                                       })
+                                      .ToList().OrderBy(x => x.FirstName, StringComparer.OrdinalIgnoreCase).ToList();
             return list;
         }
         public DBTMTraineeDetailsListModel GetTraineeDetailByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId)

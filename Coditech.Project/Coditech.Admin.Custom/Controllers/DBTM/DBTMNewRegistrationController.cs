@@ -61,11 +61,28 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult TrainerRegistration()
+        public virtual ActionResult TrainerRegistration(string joiningCode)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTrainerRegistration.cshtml", new DBTMNewRegistrationViewModel());
+            DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
+            if (!string.IsNullOrEmpty(joiningCode))
+            {
+                if (!string.IsNullOrEmpty(joiningCode))
+                {
+                    DBTMNewRegistrationViewModel result = _dBTMNewRegistrationAgent.ValidateTrainerJoiningCode(joiningCode);
+                    if (result.HasError)
+                    {
+                        SetNotificationMessage(GetErrorNotificationMessage(result.ErrorMessage));
+                    }
+                    else
+                    {
+                        model.JoiningCode = joiningCode;
+                    }
+                }
+            }
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTrainerRegistration.cshtml", model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -85,6 +102,7 @@ namespace Coditech.Admin.Controllers
             {
                 ModelState.Remove("DeviceSerialCode");
                 ModelState.Remove("CentreName");
+                ModelState.Remove("CentreCode");
                 ModelState.Remove("DateOfBirth");
                 ModelState.Remove("JoiningCode");
                 ModelState.Remove("SpecializationEnumId");
@@ -97,6 +115,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
+                    dBTMNewRegistrationViewModel.CentreCode = dBTMNewRegistrationViewModel.JoiningCode;
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
@@ -159,14 +178,16 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult TraineeRegistration(string joiningCode, long generalTrainerMasterId)
         {
             TempData["FormSizeClass"] = "col-lg-8";
-
-            DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
-
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                DBTMNewRegistrationListViewModel list =
-                    _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
-
+                DBTMNewRegistrationViewModel validation = _dBTMNewRegistrationAgent.ValidateTraineeJoiningCode(joiningCode);
+                if (validation.HasError)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage(validation.ErrorMessage));
+                    return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", new DBTMNewRegistrationViewModel());
+                }
+                DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
                 if (!list.HasError)
                 {
                     var storedTrainerId = list.SelectedTrainerId;
@@ -185,7 +206,7 @@ namespace Coditech.Admin.Controllers
                         }
                     }
 
-                    model = new DBTMNewRegistrationViewModel
+                    dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel
                     {
                         JoiningCode = joiningCode,
                         AllTrainerList = allTrainerList,
@@ -198,12 +219,10 @@ namespace Coditech.Admin.Controllers
                 {
                     SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
                 }
-
-                return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", model);
             }
-
-            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", model);
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]

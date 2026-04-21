@@ -233,6 +233,28 @@ namespace Coditech.API.Service
             return dbtmUserModel;
         }
 
+        //validation Trainee Registration.
+        public DBTMNewRegistrationModel ValidateTraineeJoiningCode(string joiningCode)
+        {
+            DBTMNewRegistrationModel model = new DBTMNewRegistrationModel();
+            int traineeEnumId = GetEnumIdByEnumCode("Trainee", "OrganisationJoiningCodeType");
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
+            if (IsNull(joiningCodeDetails))
+            {
+                model.HasError = true;
+                model.ErrorMessage = "Invalid Trainee Joining Code.";
+                return model;
+            }
+            if (joiningCodeDetails.IsExpired)
+            {
+                model.HasError = true;
+                model.ErrorMessage = "Joining Code has expired.";
+                return model;
+            }
+            model.CentreCode = joiningCode;
+            return model;
+        }
+
         public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
             if (generalTrainerMasterId > 0)

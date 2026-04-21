@@ -153,6 +153,26 @@ namespace Coditech.API.Service
         }
 
         //Create Trainer Registration.
+        public DBTMNewRegistrationModel ValidateTrainerJoiningCode(string joiningCode)
+        {
+            DBTMNewRegistrationModel model = new DBTMNewRegistrationModel();
+            int trainerEnumId = GetEnumIdByEnumCode("Trainer", "OrganisationJoiningCodeType");
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == trainerEnumId);
+            if (IsNull(joiningCodeDetails))
+            {
+                model.HasError = true;
+                model.ErrorMessage = "Invalid Trainer Joining Code.";
+                return model;
+            }
+            if (joiningCodeDetails.IsExpired)
+            {
+                model.HasError = true;
+                model.ErrorMessage = "Joining Code has expired.";
+                return model;
+            }
+            model.CentreCode = joiningCode;
+            return model;
+        }
         public DBTMNewRegistrationModel TrainerRegistration(DBTMNewRegistrationModel dBTMNewRegistrationModel)
         {
             if (IsNull(dBTMNewRegistrationModel))

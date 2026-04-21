@@ -11,11 +11,16 @@ namespace Coditech.API.Endpoint
         public string TrainerRegistrationAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/TrainerRegistration/TrainerRegistration";
 
+        public string ValidateTrainerJoiningCode(string joiningCode) =>
+           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/TrainerRegistration/ValidateTrainerJoiningCode?joiningCode={joiningCode}";
+
         public string GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/GetGeneralTrainerByJoiningCode?joiningCode={joiningCode}&generalTrainerMasterId={generalTrainerMasterId}";
             return endpoint;
         }
+        public string ValidateTraineeJoiningCode(string joiningCode) =>
+        $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/ValidateTraineeJoiningCode?joiningCode={joiningCode}";
         public string ConvertCampUserToBatchUserAsync()
         {
             return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralBatchMaster/ConvertCampUserToBatchUser";

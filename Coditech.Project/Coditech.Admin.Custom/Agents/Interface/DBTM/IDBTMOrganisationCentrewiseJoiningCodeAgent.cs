@@ -9,6 +9,7 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMOrganisationCentreMasterId">dBTMOrganisationCentreMasterId</param>
         /// <returns>Returns DBTMOrganisationCentrewiseJoiningCodeViewModel.</returns>
         DBTMOrganisationCentrewiseJoiningCodeViewModel GetTraineeActiveJoiningCode(string centreCode);
+        DBTMOrganisationCentrewiseJoiningCodeViewModel GetTrainerActiveJoiningCode(string centreCode);
         bool DeleteJoiningCodeFile(string fileName);
     }
 }

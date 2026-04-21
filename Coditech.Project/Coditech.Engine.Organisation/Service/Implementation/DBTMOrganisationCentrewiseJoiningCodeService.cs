@@ -28,6 +28,7 @@ namespace Coditech.API.Service
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
+
         public override OrganisationCentrewiseJoiningCodeListModel GetOrganisationCentrewiseJoiningCodeList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             string selectedCentreCode = filters?.Find(x => string.Equals(x.FilterName, FilterKeys.SelectedCentreCode, StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
@@ -141,6 +142,31 @@ namespace Coditech.API.Service
                 FileName = fileName
             };
             return model;
+        }
+
+        public DBTMOrganisationCentrewiseJoiningCodeModel GetTrainerActiveJoiningCode(string centreCode)
+        {
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
+            repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@JoiningCodeTypeEnumId", 323, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String); 
+            repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@PageNo", 1, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Rows", 1, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Order_BY", "a.CreatedDate DESC", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@RowsCount", 0, ParameterDirection.Output, DbType.Int32);
+            List<OrganisationCentrewiseJoiningCodeModel> list = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            OrganisationCentrewiseJoiningCodeModel item = list?.FirstOrDefault();
+            if (item == null)
+                return new DBTMOrganisationCentrewiseJoiningCodeModel();
+            DBTMOrganisationCentrewiseJoiningCodeModel listModel = new DBTMOrganisationCentrewiseJoiningCodeModel()
+            {
+                JoiningCode = item.JoiningCode,
+                Custom1 = item.Custom1,
+                Custom2 = item.Custom2,
+                Custom3 = item.Custom3
+            };
+            return listModel;
         }
 
         // Delete Report File from Data folder
