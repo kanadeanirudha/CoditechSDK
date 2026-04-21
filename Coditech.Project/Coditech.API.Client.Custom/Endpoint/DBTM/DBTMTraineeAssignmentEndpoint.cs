@@ -22,9 +22,9 @@ namespace Coditech.API.Endpoint
 
         public string DeleteDBTMTraineeAssignmentAsync() =>
                   $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/DeleteDBTMTraineeAssignment";
-        public string GetDBTMTrainerByCentreCode(string centreCode)
+        public string GetDBTMTrainerByCentreCode(string centreCode, long entityId)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetTrainerByCentreCode?centreCode={centreCode}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeAssignment/GetTrainerByCentreCode?centreCode={centreCode}&entityId={entityId}";
             return endpoint;
         }
         public string GetTraineeDetailsByCentreCodeAndgeneralTrainerId(string centreCode, long generalTrainerId) =>

@@ -139,11 +139,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeAssignment/GetTrainerByCentreCode")]
         [HttpGet]
         [Produces(typeof(GeneralTrainerListResponse))]
-        public virtual IActionResult GetTrainerByCentreCode(string centreCode)
+        public virtual IActionResult GetTrainerByCentreCode(string centreCode, long entityId)
         {
             try
             {
-                GeneralTrainerListModel list = _dBTMTraineeAssignmentService.GetTrainerByCentreCode(centreCode);
+                GeneralTrainerListModel list = _dBTMTraineeAssignmentService.GetTrainerByCentreCode(centreCode, entityId);
                 return IsNotNull(list) ? CreateOKResponse(new GeneralTrainerListResponse { GeneralTrainerList = list.GeneralTrainerList }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
