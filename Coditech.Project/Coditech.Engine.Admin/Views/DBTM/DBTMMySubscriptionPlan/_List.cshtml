@@ -26,7 +26,16 @@
                             <td>@item.DurationInDays</td>
                             <td>@AdminGeneralHelper.FormatPriceWithCurrency(@item.PlanCost)</td>
                             <td>@AdminGeneralHelper.FormatPriceWithCurrency(@item.PlanDiscount)</td>
-                            <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsExpired)</td>
+                            <td>
+                                @if (item.IsExpired)
+                                {
+                                    <span class="badge bg-danger">Expired</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                            </td>
                             <td>@item.PlanDurationExpirationDate.ToCoditechDateFormat()</td>
                         </tr>
                     }
