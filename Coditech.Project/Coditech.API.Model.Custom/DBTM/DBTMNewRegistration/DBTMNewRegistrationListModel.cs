@@ -8,5 +8,6 @@
             DBTMNewRegistrationList = new List<DBTMNewRegistrationModel>();
         }
         public string JoiningCode { get; set; }
+        public string SelectedTrainerId { get; set; }
     }
 }

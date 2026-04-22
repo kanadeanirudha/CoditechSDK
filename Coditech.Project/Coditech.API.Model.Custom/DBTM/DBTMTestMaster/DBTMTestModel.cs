@@ -35,5 +35,6 @@ namespace Coditech.Common.API.Model
         [Required]
         public List<string> DBTMSelectedGraph { get; set; }
         public string PerformanceMatrix { get; set; }
+        public string TestOutputHigher { get; set; }
     }
 }
