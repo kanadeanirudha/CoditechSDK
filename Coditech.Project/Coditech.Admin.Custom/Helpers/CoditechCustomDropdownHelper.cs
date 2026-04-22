@@ -111,6 +111,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetCampWiseReportsList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, "TestOutputType"))
+            {
+                GetTestOutputTypeList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -702,6 +706,23 @@ namespace Coditech.Admin.Helpers
                     Selected = dropdownViewModel.DropdownSelectedValue == item.DBTMCampMasterId.ToString()
                 });
             }
+        }
+        private static void GetTestOutputTypeList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = "----Select Output Type----" });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Lower Output",
+                Value = "LO",
+                Selected = dropdownViewModel.DropdownSelectedValue == "LO"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Higher Output",
+                Value = "HO",
+                Selected = dropdownViewModel.DropdownSelectedValue == "HO"
+            });
         }
     }
 }

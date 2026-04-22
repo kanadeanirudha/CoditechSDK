@@ -87,6 +87,21 @@
                                         @Html.ValidationMessageFor(x => x.DBTMSelectedTestCalculation)
                                     </div>
                                 </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TestOutputHigher, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
+                                                 new DropdownViewModel()
+                                    {
+                                        DropdownType = "TestOutputType",
+                                        DropdownName = "TestOutputHigher",
+                                        DropdownSelectedValue = Model.TestOutputHigher,
+                                        IsCustomDropdown = true,
+                                        IsRequired = true
+                                    })
+                                        @Html.ValidationMessageFor(x => x.TestOutputHigher)
+                                    </div>
+                                </div>
                                 <div class="row">
                                     @if (Model.DBTMTestMasterId > 0)
                                     {

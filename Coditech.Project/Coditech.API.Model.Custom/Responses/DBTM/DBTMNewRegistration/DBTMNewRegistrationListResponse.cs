@@ -4,5 +4,6 @@
     {
         public List<DBTMNewRegistrationModel> DBTMNewRegistrationList { get; set; }
         public string JoiningCode { get; set; }
+        public string SelectedTrainerId { get; set; }
     }
 }

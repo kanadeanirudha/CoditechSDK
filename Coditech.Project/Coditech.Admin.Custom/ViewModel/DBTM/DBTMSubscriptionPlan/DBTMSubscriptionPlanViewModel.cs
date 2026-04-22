@@ -31,5 +31,7 @@ namespace Coditech.Admin.ViewModel
         public DateTime PlanDurationExpirationDate { get; set; }
         public bool IsExpired { get; set; }
         public string DeviceSerialCode { get; set; }
+        [Display(Name = "Duration In Days Left")]
+        public int DurationInDaysLeft { get; set; }
     }
 }
