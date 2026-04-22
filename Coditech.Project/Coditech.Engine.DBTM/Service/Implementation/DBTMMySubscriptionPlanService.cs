@@ -33,8 +33,23 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMSubscriptionPlanModel> dBTMMySubscriptionPlanList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMMySubscriptionPlanList @EntityId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT",5, out pageListModel.TotalRowCount)?.ToList();
-            DBTMMySubscriptionPlanListModel listModel = new DBTMMySubscriptionPlanListModel();
+            if (dBTMMySubscriptionPlanList != null)
+            {
+                foreach (var item in dBTMMySubscriptionPlanList)
+                {
+                    if (item.PlanDurationExpirationDate != null)
+                    {
+                        var daysLeft = (item.PlanDurationExpirationDate.Date - DateTime.Now.Date).Days;
 
+                        item.DurationInDaysLeft = daysLeft > 0 ? daysLeft : 0;
+                    }
+                    else
+                    {
+                        item.DurationInDaysLeft = 0;
+                    }
+                }
+            }
+            DBTMMySubscriptionPlanListModel listModel = new DBTMMySubscriptionPlanListModel();
             listModel.DBTMMySubscriptionPlanList = dBTMMySubscriptionPlanList?.Count > 0 ? dBTMMySubscriptionPlanList : new List<DBTMSubscriptionPlanModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;

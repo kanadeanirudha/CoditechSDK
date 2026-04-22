@@ -15,6 +15,6 @@
         public DateTime PlanDurationExpirationDate { get; set; }
         public bool IsExpired { get; set; }
         public string DeviceSerialCode { get; set; }
-
+        public int DurationInDaysLeft { get; set; }
     }
 }

@@ -102,6 +102,11 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "PlanDurationExpirationDate",
                 IsSortable = true,
             });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Duration In Days Left",
+                ColumnCode = "DurationInDaysLeft",
+            });
             return datatableColumnList;
         }
 

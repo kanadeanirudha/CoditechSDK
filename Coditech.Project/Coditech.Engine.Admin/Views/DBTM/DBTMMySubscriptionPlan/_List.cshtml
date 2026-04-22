@@ -37,6 +37,16 @@
                                 }
                             </td>
                             <td>@item.PlanDurationExpirationDate.ToCoditechDateFormat()</td>
+                            <td>
+                                @if (item.DurationInDaysLeft > 0)
+                                {
+                                    <span class="badge bg-success">@item.DurationInDaysLeft</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Expired</span>
+                                }
+                            </td>
                         </tr>
                     }
                 }
