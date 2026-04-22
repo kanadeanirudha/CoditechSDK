@@ -5,15 +5,15 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, "GeneralTrainerMaster"),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, "GeneralTrainerMaster"),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -26,7 +26,30 @@
                         {
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.AntiForgeryToken()
-                            @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTrainerRegistration.cshtml", Model)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">Joining Code</label>
+                                        @Html.TextBoxFor(x => x.JoiningCode, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TrainerSpecialization, new { @class = "form-label required" })
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.TrainerSpecializationEnumId.ToString(),
+                                   DropdownName = "TrainerSpecializationEnumId",
+                                   GroupCode = DropdownTypeEnum.TrainerSpecialization.ToString()
+                               })
+                                        @Html.ValidationMessageFor(x => x.TrainerSpecializationEnumId)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                @Html.Partial("~/Views/Shared/DBTMRegistration/_DBTMTrainerRegistration.cshtml", Model)
+                            </div>
                         }
                     </div>
                 </div>

@@ -22,7 +22,7 @@ namespace Coditech.Admin.Controllers
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                dBTMNewRegistrationViewModel.CentreCode = joiningCode;
+                dBTMNewRegistrationViewModel.JoiningCode = joiningCode;
             }
             else
             {
@@ -32,7 +32,7 @@ namespace Coditech.Admin.Controllers
                     DBTMOrganisationCentrewiseJoiningCodeViewModel result = _dBTMOrganisationCentrewiseJoiningCodeAgent.GetTrainerActiveJoiningCode(userModel.SelectedCentreCode);
                     if (result != null && !string.IsNullOrEmpty(result.JoiningCode))
                     {
-                        dBTMNewRegistrationViewModel.CentreCode = result.JoiningCode;
+                        dBTMNewRegistrationViewModel.JoiningCode = result.JoiningCode;
                     }
                     else
                     {
@@ -56,6 +56,7 @@ namespace Coditech.Admin.Controllers
             {
                 ModelState.Remove("DeviceSerialCode");
                 ModelState.Remove("CentreName");
+                ModelState.Remove("CentreCode");
                 ModelState.Remove("DateOfBirth");
                 ModelState.Remove("JoiningCode");
                 ModelState.Remove("SpecializationEnumId");
@@ -70,6 +71,7 @@ namespace Coditech.Admin.Controllers
                 ModelState.Remove("RegistrationType");
                 if (ModelState.IsValid)
                 {
+                    dBTMNewRegistrationViewModel.CentreCode = dBTMNewRegistrationViewModel.JoiningCode;
                     dBTMNewRegistrationViewModel = _dBTMNewRegistrationAgent.TrainerRegistration(dBTMNewRegistrationViewModel);
                     if (!dBTMNewRegistrationViewModel.HasError)
                     {
