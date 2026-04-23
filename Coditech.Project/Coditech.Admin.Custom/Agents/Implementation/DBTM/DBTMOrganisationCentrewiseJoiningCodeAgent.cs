@@ -107,6 +107,9 @@ namespace Coditech.Admin.Agents
         {
             try
             {
+                UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+                organisationCentrewiseJoiningCodeViewModel.CreatedBy = userModel.UserMasterId;
+
                 OrganisationCentrewiseJoiningCodeResponse response = _organisationCentrewiseJoiningCodeClient.CreateOrganisationCentrewiseJoiningCode(organisationCentrewiseJoiningCodeViewModel.ToModel<OrganisationCentrewiseJoiningCodeModel>());
                 OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = response?.OrganisationCentrewiseJoiningCodeModel;
                 return HelperUtility.IsNotNull(organisationCentrewiseJoiningCodeModel) ? organisationCentrewiseJoiningCodeModel.ToViewModel<OrganisationCentrewiseJoiningCodeViewModel>() : new OrganisationCentrewiseJoiningCodeViewModel();

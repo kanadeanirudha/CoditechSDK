@@ -33,6 +33,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
         private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
         private readonly ICoditechRepository<DBTMCampActivity> _dBTMCampActivityRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
 
 
         public DBTMApiService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
@@ -57,6 +58,7 @@ namespace Coditech.API.Service
             _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCampMasterRepository = new CoditechRepository<DBTMCampMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCampActivityRepository = new CoditechRepository<DBTMCampActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
         #region InsertDeviceData
         public bool InsertDeviceDataViaFile(IFormFile file)
@@ -561,6 +563,36 @@ namespace Coditech.API.Service
             bool isUpdated = _dBTMDeviceDataRepository.Update(deviceData);
 
             return isUpdated;
+        }
+        public DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(
+     string centreCode,
+     int joiningCodeTypeEnumId,
+     long generalTrainerMasterId)
+        {
+            var batches = (from a in _generalBatchRepository.Table
+                           join b in _userMasterRepository.Table
+                               on a.CreatedBy equals b.UserMasterId
+                           join c in _employeeMasterRepository.Table
+                               on b.EntityId equals c.EmployeeId
+                           join d in _generalTrainerMasterRepository.Table
+                               on c.EmployeeId equals d.EmployeeId
+                           where a.IsActive
+                                 && b.IsActive
+                                 && b.UserType == "Employee"
+                                 && a.CentreCode == centreCode
+                                 && d.GeneralTrainerMasterId == generalTrainerMasterId
+                           select new DBTMBatchModel
+                           {
+                               GeneralBatchMasterId = a.GeneralBatchMasterId,
+                               BatchName = a.BatchName
+                           })
+                           .OrderBy(x => x.BatchName)
+                           .ToList();
+
+            return new DBTMBatchListModel
+            {
+                DBTMBatchList = batches ?? new List<DBTMBatchModel>()
+            };
         }
     }
 }

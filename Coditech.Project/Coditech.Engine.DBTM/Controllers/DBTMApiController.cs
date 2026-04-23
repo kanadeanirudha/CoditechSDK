@@ -426,5 +426,28 @@ namespace Coditech.Engine.DBTM.Controllers
                 });
             }
         }
+        [HttpGet]
+        [Route("/DBTMApi/GetDBTMCentrAndTrainerewiseBatchList")]
+        [Produces(typeof(DBTMBatchListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetDBTMCentrAndTrainerewiseBatchList(string centreCode, int joiningCodeTypeEnumId, long generalTrainerMasterId)
+        {
+            try
+            {
+                DBTMBatchListModel list = _dBTMApiService.GetDBTMCentrAndTrainerewiseBatchList(centreCode, joiningCodeTypeEnumId, generalTrainerMasterId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMBatchListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentrAndTrainerewiseBatchList", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentrAndTrainerewiseBatchList", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
