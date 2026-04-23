@@ -5,17 +5,25 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "CentreCode", DropdownSelectedValue = Model.CentreCode, ChangeEvent = "DBTMOrganisationCentrewiseJoiningCode.GetDBTMTrainerListByCentreCode();" };
     DropdownViewModel joiningCodeType = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "OrganisationCentrewiseJoiningCodeType", DropdownSelectedValue = Model.JoiningCodeType };
-    DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTrainerCentrewise.ToString(), DropdownName = "Custom1", DropdownSelectedValue = Convert.ToString(Model.Custom1), Parameter = Model.CentreCode, IsCustomDropdown = true };
+    DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTrainerCentrewise.ToString(), DropdownName = "Custom1", DropdownSelectedValue = Convert.ToString(Model.Custom1), Parameter = Model.CentreCode, IsCustomDropdown = true, ChangeEvent = "DBTMOrganisationCentrewiseJoiningCode.GetDBTMBatchListByCentreCodeAndTrainer();" };
+    DropdownViewModel batchDropdown = new DropdownViewModel()
+    {
+        DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
+        DropdownName = "Custom3",
+        DropdownSelectedValue = Convert.ToString(Model.Custom3),
+        Parameter = $"{Model.CentreCode}~{Model.JoiningCodeTypeEnumId}~{(Model.Custom1 ?? "0")}",
+        IsCustomDropdown = true
+    };
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-            {
-                Title = ViewBag.Title,
-                SaveButtonText = GeneralResources.SaveButtonText,
-                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-                CancelButtonText = GeneralResources.CancelButtonText,
-                ControllerName = controllerName,
-                ActionName = actionName,
-                FormId = AdminConstants.FormId + controllerName,
-            };
+    {
+        Title = ViewBag.Title,
+        SaveButtonText = GeneralResources.SaveButtonText,
+        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+        CancelButtonText = GeneralResources.CancelButtonText,
+        ControllerName = controllerName,
+        ActionName = actionName,
+        FormId = AdminConstants.FormId + controllerName,
+    };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -40,11 +48,11 @@
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.JoiningCodeType, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                               {
-                                   DropdownSelectedValue = Model.JoiningCodeTypeEnumId.ToString(),
-                                   DropdownName = "JoiningCodeTypeEnumId",
-                                   GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString()
-                               })        @Html.ValidationMessageFor(x => x.JoiningCodeTypeEnumId)
+                                        {
+                                            DropdownSelectedValue = Model.JoiningCodeTypeEnumId.ToString(),
+                                            DropdownName = "JoiningCodeTypeEnumId",
+                                            GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString()
+                                        })        @Html.ValidationMessageFor(x => x.JoiningCodeTypeEnumId)
                                     </div>
                                 </div>
                                 <div class="col-lg-6" id="custom1Div">
@@ -52,6 +60,13 @@
                                     <div class="mb-3">
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
                                         @Html.ValidationMessageFor(x => x.Custom1)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6" id="custom3Div">
+                                    <label class="form-label required">Batch</label>
+                                    <div class="mb-3">
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
+                                        @Html.ValidationMessageFor(x => x.Custom3)
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -63,7 +78,7 @@
                                 </div>
                             </div>
                             @*  <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
-                    <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>*@         
+                        <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>*@         
                         }
                     </div>
                 </div>
@@ -79,8 +94,8 @@
 
 <script>
     $(document).ready(function () {
-        DBTMOrganisationCentrewiseJoiningCode.Initialize();
-        DBTMOrganisationCentrewiseJoiningCode.GetDBTMTrainerListByCentreCode();
+    DBTMOrganisationCentrewiseJoiningCode.Initialize();
+    DBTMOrganisationCentrewiseJoiningCode.GetDBTMTrainerListByCentreCode();
     });
 </script>
 
