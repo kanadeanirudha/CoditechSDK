@@ -48,7 +48,17 @@ namespace Coditech.Admin.Agents
             {
                 filters.Add("JoiningCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-
+            if (!string.IsNullOrEmpty(dataTableModel.SelectedParameter2) && dataTableModel.SelectedParameter2 != "0")
+            {
+                if (dataTableModel.SelectedParameter2 == "1")
+                {
+                    filters.Add("IsExpired", ProcedureFilterOperators.Equals, "0");
+                }
+                else if (dataTableModel.SelectedParameter2 == "2")
+                {
+                    filters.Add("IsExpired", ProcedureFilterOperators.Equals, "1");
+                }
+            }
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "IsExpired" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
             OrganisationCentrewiseJoiningCodeListResponse response = _organisationCentrewiseJoiningCodeClient.List(null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
