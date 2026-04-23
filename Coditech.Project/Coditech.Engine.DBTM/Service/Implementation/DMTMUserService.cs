@@ -265,7 +265,9 @@ namespace Coditech.API.Service
                     throw new CoditechException(ErrorCodes.InvalidData, "No Joining Code found for this trainer.");
             }
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
-            joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == joiningCode)?.FirstOrDefault();
+
+            int traineeEnumId = GetEnumIdByEnumCode("Trainee", "OrganisationJoiningCodeType");
+            joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
 
             if (IsNull(joiningCodeDetails))
                 throw new CoditechException(ErrorCodes.AlreadyExist, "Invalid Joining Code.");

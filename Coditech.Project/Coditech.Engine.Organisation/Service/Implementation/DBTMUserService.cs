@@ -241,12 +241,16 @@ namespace Coditech.API.Service
             if (userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 int traineeEnumId = GetEnumIdByEnumCode("Trainee", "OrganisationJoiningCodeType");
-                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode && x.JoiningCodeTypeEnumId == traineeEnumId );
+                joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
                 if (IsNull(joiningCodeDetails))
                     throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Trainee Joining Code."));
                 if (joiningCodeDetails.IsExpired)
                     throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
                 ValidateCentreUserLimit(joiningCodeDetails.CentreCode, dBTMCustomNewRegistrationModel?.RegistrationType);
+                if (dBTMCustomNewRegistrationModel.GeneralBatchMasterId == 0 && !string.IsNullOrEmpty(joiningCodeDetails.Custom3))
+                {
+                    dBTMCustomNewRegistrationModel.GeneralBatchMasterId = Convert.ToInt32(joiningCodeDetails.Custom3);
+                }
                 generalPersonModel.SelectedCentreCode = joiningCodeDetails.CentreCode;
 
             }
