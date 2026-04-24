@@ -110,6 +110,7 @@
     JoiningCodeListByCentreCodeList: function () {
         var selectedCentreCode = $("#SelectedCentreCode").val();
         var selectedParameter1 = $("#JoiningCodeTypeEnumId").val();
+        var selectedParameter2 = $('[name="SelectedParameter2"]').val();
         if (selectedCentreCode !== "" && selectedParameter1 !== "") {
             CoditechCommon.ShowLodder();
             $.ajax({
@@ -118,8 +119,9 @@
                 dataType: "html",
                 url: "/OrganisationCentrewiseJoiningCode/List",
                 data: {
-                    "selectedCentreCode": selectedCentreCode,
-                    "selectedParameter1": selectedParameter1
+                    SelectedCentreCode: selectedCentreCode,
+                    SelectedParameter1: selectedParameter1,
+                    SelectedParameter2: selectedParameter2
                 },
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
