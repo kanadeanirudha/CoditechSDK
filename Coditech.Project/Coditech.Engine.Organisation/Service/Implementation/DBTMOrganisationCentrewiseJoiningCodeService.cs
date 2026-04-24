@@ -84,7 +84,8 @@ namespace Coditech.API.Service
                     Quantity = 1,
                     CentreCode = organisationCentrewiseJoiningCodeModel.CentreCode,
                     JoiningCodeTypeEnumId = organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId,
-                    Custom1 = organisationCentrewiseJoiningCodeModel.Custom1
+                    Custom1 = organisationCentrewiseJoiningCodeModel.Custom1,
+                    Custom3 = organisationCentrewiseJoiningCodeModel.Custom3
                 });
             }
             _organisationCentrewiseJoiningCodeRepository.Insert(insertList, organisationCentrewiseJoiningCodeModel.CreatedBy);

@@ -349,6 +349,17 @@ namespace Coditech.Admin.Controllers
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
+        public ActionResult GetDBTMBatchListByCentreCodeAndTrainer(string centreCode,long generalTrainerMasterId,int joiningCodeTypeEnumId  )
+        {
+            DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
+                DropdownName = "Custom1",
+                Parameter = $"{centreCode}~{joiningCodeTypeEnumId}~{generalTrainerMasterId}",
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
+        }
 
         #region Send Reminder
         [HttpPost]

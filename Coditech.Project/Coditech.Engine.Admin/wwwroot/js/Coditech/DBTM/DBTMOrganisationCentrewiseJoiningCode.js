@@ -76,6 +76,45 @@
             $(document).trigger("DBTMTrainerListLoaded");
         }
     },
+    GetDBTMBatchListByCentreCodeAndTrainer: function () {
+
+        var centreCode = $("#CentreCode").val();
+        var generalTrainerMasterId = $("#Custom1").val(); // trainer dropdown
+        var joiningCodeTypeEnumId = $("#JoiningCodeTypeEnumId").val(); // joining type
+
+        if (centreCode && generalTrainerMasterId && joiningCodeTypeEnumId) {
+
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMDashboard/GetDBTMBatchListByCentreCodeAndTrainer",
+                data: {
+                    centreCode: centreCode,
+                    generalTrainerMasterId: generalTrainerMasterId,
+                    joiningCodeTypeEnumId: joiningCodeTypeEnumId
+                },
+                success: function (data) {
+                    $("#Custom3").html("").html(data); // batch dropdown
+                    $("#custom3Div").show(); // optional
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Batch List", "error");
+                    CoditechCommon.HideLodder();
+                }
+            });
+
+        } else {
+            $("#Custom3").html(""); // reset batch
+            $("#custom3Div").hide();
+        }
+    },
     DownloadTraineeJoiningCode: function () {
         var centreCode = $("#SelectedCentreCode").val();
         if (!centreCode) {

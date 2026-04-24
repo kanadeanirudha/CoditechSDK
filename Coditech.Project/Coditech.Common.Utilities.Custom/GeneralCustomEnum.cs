@@ -32,6 +32,7 @@
         DBTMCentreWiseTest,
         CampWiseReports,
         CampWiseMultiReports,
+        DBTMCentrAndTrainerewiseBatch
     }
     public enum DashboardFormCustomEnum
     {

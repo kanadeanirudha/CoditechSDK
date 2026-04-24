@@ -4,7 +4,6 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     bool IsCentreOrTrainer = false;
-
     DropdownViewModel centreDropdown = new DropdownViewModel()
             {
                 DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
@@ -18,15 +17,23 @@
                 DropdownType = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
                 DropdownName = "JoiningCodeTypeEnumId",
                 DropdownSelectedValue = string.IsNullOrEmpty(Model.JoiningCodeTypeEnumId.ToString())
-                                || Model.JoiningCodeTypeEnumId == 0
-                                ? "0"
-                                : Model.JoiningCodeTypeEnumId.ToString(),
+                        || Model.JoiningCodeTypeEnumId == 0
+                        ? "0"
+                        : Model.JoiningCodeTypeEnumId.ToString(),
                 GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
                 SelectedText = "All",
                 SelectedValue = "0",
                 ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
             };
-
+    DropdownViewModel joiningCodeStatus = new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.JoiningCodeStatus.ToString(),
+                DropdownName = "SelectedParameter2",
+                DropdownSelectedValue = string.IsNullOrEmpty(Model.SelectedParameter2) ? "0" : Model.SelectedParameter2,
+                SelectedText = "All",
+                SelectedValue = "0",
+                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+            };
     UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
     if (userModel.Custom1 == CustomConstants.DBTMCentreOwner || userModel.Custom1 == CustomConstants.DBTMTrainer)
     {
@@ -67,7 +74,7 @@
                             <div class="col-md-1">
                                 <label>@AdminResources.LabelCentre</label>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
                             </div>
                             <div class="col-md-1">
@@ -77,13 +84,22 @@
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", joiningCodeType)
                             </div>
                             <div class="col-md-1">
+                                <label>Joining Code Status</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", joiningCodeStatus)
+                            </div>
+                            <div class="col-md-2">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId"
                                        onclick="OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()" />
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-6">
                                 <label class="fw-bold">
+
                                     Total Joining Code:  <span class="badge badge-soft-primary me-2 "><span id="TotalCodeCount"></span> </span>
+
                                     Total Active Joining Code: <span class="badge badge-soft-success me-2"> <span id="ActiveCodeCount"></span> </span>
+
                                     Total Used Joining Code: <span class="badge badge-soft-danger"> <span id="ExpiredCodeCount"></span> </span>
                                 </label>
                             </div>
