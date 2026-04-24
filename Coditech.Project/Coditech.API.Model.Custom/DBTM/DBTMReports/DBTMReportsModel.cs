@@ -22,5 +22,6 @@
         public string Comment2 { get; set; }
         public string Comment3 { get; set; }
         public bool IsEncrypted { get; set; }
+        public long DBTMTraineeDetailId { get; set; }
     }
 }
