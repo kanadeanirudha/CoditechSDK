@@ -524,7 +524,7 @@ var DBTMReports = {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },
-    ShowActivityDetailPopup: function (modelPopContentId, deviceDataId, enableStackBlur) {
+    ShowActivityDetailPopup: function (modelPopContentId, deviceDataId, dBTMTraineeDetailId, enableStackBlur) {
         if (enableStackBlur === true) {
             var $openModal = $(".modal.show");
             if ($openModal.length > 0) {
@@ -536,7 +536,10 @@ var DBTMReports = {
         $.ajax({
             type: "GET",
             url: "/DBTMReports/ViewActivityDetailPopup",
-            data: { dBTMDeviceDataId: deviceDataId },
+            data: {
+                dBTMDeviceDataId: deviceDataId,
+                dBTMTraineeDetailId: dBTMTraineeDetailId
+            },
             success: function (result) {
                 $("#" + modelPopContentId).html(result);
                 CoditechCommon.HideLodder();
