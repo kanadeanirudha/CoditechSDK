@@ -162,6 +162,12 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
+                ColumnName = "Batch",
+                ColumnCode = "Custom3",
+                IsSortable = false,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
                 ColumnName = "Is Active Joining Code",
                 ColumnCode = "IsExpired",
                 IsSortable = false,
