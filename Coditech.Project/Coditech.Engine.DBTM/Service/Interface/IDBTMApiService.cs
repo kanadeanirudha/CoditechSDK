@@ -10,7 +10,7 @@ namespace Coditech.API.Service
         DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId);
         DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId);
         DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId);
-        string GetJoiningCode(string generalTrainerMasterId);
+        OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId);
         string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId);
         bool InsertDeviceDataViaFile(IFormFile file);
         DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode, long generalTrainerMasterId);

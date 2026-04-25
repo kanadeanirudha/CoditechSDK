@@ -414,10 +414,12 @@ namespace Coditech.API.Service
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
-        public string GetJoiningCode(string generalTrainerMasterId)
+        public OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId)
         {
-            string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired)?.Select(y => y.JoiningCode)?.FirstOrDefault();
-            return !string.IsNullOrEmpty(JoiningCode) ? JoiningCode : string.Empty;
+            OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _organisationCentrewiseJoiningCodeRepository.Table
+                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired).Select(x =>
+                new OrganisationCentrewiseJoiningCodeModel { JoiningCode = x.JoiningCode, Custom3 = x.Custom3 }).FirstOrDefault();
+            return organisationCentrewiseJoiningCodeModel ?? new OrganisationCentrewiseJoiningCodeModel { JoiningCode = string.Empty, Custom3 = string.Empty };
         }
         public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)
         {
