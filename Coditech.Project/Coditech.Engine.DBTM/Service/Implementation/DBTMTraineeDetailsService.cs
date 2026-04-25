@@ -525,18 +525,16 @@ namespace Coditech.API.Service
             DataTable dt = new DataTable();
             if (generalBatchMasterId <= 0)
                 return dt;
-            //List<string> batchTestList = (from a in _dbtmBatchActivityRepository.Table
-            //                              join b in _dBTMTestMasterRepository.Table on a.DBTMTestMasterId equals b.DBTMTestMasterId
-            //                              where a.GeneralBatchMasterId == generalBatchMasterId
-            //                              select b.TestCode)?.Distinct()?.ToList();
-            //if (batchTestList?.Count == 0)
-            //    return;
-
+          
             CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
             List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
             if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
             {
+                traineeProfilePerformanceRankDataList.ForEach(x =>
+                {
+                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                });
                 List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = traineeProfilePerformanceRankDataList
                             .GroupBy(x => new
                             {
@@ -556,28 +554,22 @@ namespace Coditech.API.Service
                                 TotalTime = g.Where(x =>
                                             x.ParameterCode == "Time" &&
                                             x.TestCode != "ReactionTimeTestThirtySec" &&
-                                            x.TestCode != "ReactionTimeTestThirtySix")
-                                        .Sum(x => x.IsEncrypted
-                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
-                                            : Convert.ToDecimal(x.ParameterValue)),
+                                            x.TestCode != "ReactionTimeTestThirtySix" &&
+                                            x.TestCode != "ReactionMovingTimeTestThirtySec")
+                                        .Sum(x => Convert.ToDecimal(x.ParameterValue)),
 
                                 TotalLength = g.Where(x => x.ParameterCode == "JumpLength")
-                                        .Sum(x => x.IsEncrypted
-                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
-                                            : Convert.ToDecimal(x.ParameterValue)),
+                                        .Sum(x => Convert.ToDecimal(x.ParameterValue)),
 
                                 TotalHeight = g.Where(x => x.ParameterCode == "JumpHeight")
-                                        .Sum(x => x.IsEncrypted
-                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
-                                            : Convert.ToDecimal(x.ParameterValue)),
+                                        .Sum(x => Convert.ToDecimal(x.ParameterValue)),
 
                                 TotalCount = g.Where(x =>
                                             x.ParameterCode == "Time" &&
                                            (x.TestCode == "ReactionTimeTestThirtySec" ||
-                                            x.TestCode == "ReactionTimeTestThirtySix"))
-                                        .Sum(x => x.IsEncrypted
-                                            ? Convert.ToDecimal(EncryptionHelper.Decrypt(x.ParameterValue))
-                                            : Convert.ToDecimal(x.ParameterValue))
+                                            x.TestCode == "ReactionTimeTestThirtySix" ||
+                                            x.TestCode == "ReactionMovingTimeTestThirtySec"))
+                                        .Sum(x => Convert.ToDecimal(x.ParameterValue))
                             })
                             .GroupBy(x => new
                             {
