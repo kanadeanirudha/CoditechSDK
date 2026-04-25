@@ -956,7 +956,7 @@ namespace Coditech.API.Service
                                     newRow["Activity Name"] = item.TestName;
                                     break;
                                 case "Person Name":
-                                    newRow["Person Name"] = $"{item.FirstName} {item.LastName}";
+                                    newRow["Person Name"] = $"{item.FirstName} {item.LastName}~False~~{item.DBTMTraineeDetailId}";
                                     break;
                                 case "Activity Status":
                                     newRow["Activity Status"] = item.ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
@@ -1046,7 +1046,7 @@ namespace Coditech.API.Service
                                 newRow["Activity Name"] = group.FirstOrDefault().TestName;
                                 break;
                             case "Person Name":
-                                newRow["Person Name"] = $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}";
+                                newRow["Person Name"] = $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}~False~~{group.FirstOrDefault().DBTMTraineeDetailId}";
                                 break;
                             //case "Activity Status":
                             //    newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";

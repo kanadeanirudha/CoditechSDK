@@ -259,9 +259,9 @@ namespace Coditech.API.Service
         {
             if (generalTrainerMasterId > 0)
             {
-                joiningCode = _dBTMApiService.GetJoiningCode(generalTrainerMasterId.ToString());
+                OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _dBTMApiService.GetJoiningCode(generalTrainerMasterId.ToString());
 
-                if (string.IsNullOrEmpty(joiningCode))
+                if (IsNotNull(organisationCentrewiseJoiningCodeModel.JoiningCode))
                     throw new CoditechException(ErrorCodes.InvalidData, "No Joining Code found for this trainer.");
             }
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;

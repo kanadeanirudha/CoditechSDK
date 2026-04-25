@@ -181,29 +181,21 @@ namespace Coditech.API.Service
 
             if (employeeData != null)
             {
-                string custom1 = _generalPersonRepository.Table
-                    .Where(x => x.PersonId == employeeData.PersonId)
-                    .Select(x => x.Custom1)
-                    .FirstOrDefault();
-
+                string custom1 = _generalPersonRepository.Table.Where(x => x.PersonId == employeeData.PersonId).Select(x => x.Custom1).FirstOrDefault();
                 if (custom1 == CustomConstants.DBTMTrainer)
                 {
-                    var user = _userMasterRepository.Table
-                        .Where(x => x.EntityId == entityId && x.UserType == userType)
-                        .Select(x => new { x.UserMasterId })
-                        .FirstOrDefault();
-
+                    var user = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).Select(x => new { x.UserMasterId }).FirstOrDefault();
                     if (user != null)
                     {
-                        batcheslist = _generalBatchRepository.Table
-                            .Where(x => x.CreatedBy == user.UserMasterId && x.IsActive)
-                            .Select(b => new DBTMBatchModel
-                            {
-                                GeneralBatchMasterId = b.GeneralBatchMasterId,
-                                BatchName = b.BatchName,
-                                BatchStartTime = b.BatchStartTime,
-                            })
-                             .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
+                        var batchList = _generalBatchRepository.Table.Where(b => b.CreatedBy == user.UserMasterId && b.IsActive)
+                        .Select(b => new DBTMBatchModel
+                        {
+                            GeneralBatchMasterId = b.GeneralBatchMasterId,
+                            BatchName = b.BatchName,
+                            BatchStartTime = b.BatchStartTime
+                        }).ToList();
+                        var validBatchIds = _dBTMDeviceDataRepository.Table.Where(d => d.TypeOfRecord == "Batch" && d.IsValidRecord).Select(d => d.TablePrimaryColumnId).Distinct().ToList();
+                        batcheslist = batchList.Where(b => validBatchIds.Contains(b.GeneralBatchMasterId)).OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
                     }
                     else
                     {
@@ -212,16 +204,21 @@ namespace Coditech.API.Service
                 }
                 else if (custom1 == CustomConstants.DBTMCentreOwner)
                 {
-                    batcheslist = (from b in _generalBatchRepository.Table
-                                   join u in _userMasterRepository.Table on b.CreatedBy equals u.UserMasterId
-                                   where b.CentreCode == employeeData.CentreCode && b.IsActive
-                                   select new DBTMBatchModel
-                                   {
-                                       GeneralBatchMasterId = b.GeneralBatchMasterId,
-                                       BatchName = u.EntityId == entityId ? $"{b.BatchName}(Self)" : $"{b.BatchName}({u.FirstName} {u.LastName})",
-                                       BatchStartTime = b.BatchStartTime,
-                                   })
-                                   .ToList().OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
+                    var batchList = (from b in _generalBatchRepository.Table
+                                     join u in _userMasterRepository.Table
+                                         on b.CreatedBy equals u.UserMasterId
+                                     where b.CentreCode == employeeData.CentreCode && b.IsActive
+                                     select new DBTMBatchModel
+                                     {
+                                         GeneralBatchMasterId = b.GeneralBatchMasterId,
+                                         BatchName = u.EntityId == entityId
+                                             ? $"{b.BatchName}(Self)"
+                                             : $"{b.BatchName}({u.FirstName} {u.LastName})",
+                                         BatchStartTime = b.BatchStartTime
+                                     }).ToList();
+
+                    var validBatchIds = _dBTMDeviceDataRepository.Table.Where(d => d.TypeOfRecord == "Batch" && d.IsValidRecord).Select(d => d.TablePrimaryColumnId).Distinct().ToList();
+                    batcheslist = batchList.Where(b => validBatchIds.Contains(b.GeneralBatchMasterId)).OrderBy(b => b.BatchName, StringComparer.OrdinalIgnoreCase).ToList();
                 }
                 else
                 {
@@ -417,10 +414,12 @@ namespace Coditech.API.Service
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
-        public string GetJoiningCode(string generalTrainerMasterId)
+        public OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId)
         {
-            string JoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired)?.Select(y => y.JoiningCode)?.FirstOrDefault();
-            return !string.IsNullOrEmpty(JoiningCode) ? JoiningCode : string.Empty;
+            OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _organisationCentrewiseJoiningCodeRepository.Table
+                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired).Select(x =>
+                new OrganisationCentrewiseJoiningCodeModel { JoiningCode = x.JoiningCode, Custom3 = x.Custom3 }).FirstOrDefault();
+            return organisationCentrewiseJoiningCodeModel ?? new OrganisationCentrewiseJoiningCodeModel { JoiningCode = string.Empty, Custom3 = string.Empty };
         }
         public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)
         {

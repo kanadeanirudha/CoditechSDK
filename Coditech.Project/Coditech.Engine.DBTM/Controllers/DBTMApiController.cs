@@ -1,3 +1,4 @@
+using Coditech.API.Data;
 using Coditech.API.Service;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
@@ -234,25 +235,23 @@ namespace Coditech.Engine.DBTM.Controllers
 
         [HttpGet]
         [Route("/dbtmapi/getjoiningcode")]
-        [Produces(typeof(StringResponse))]
+        [Produces(typeof(OrganisationCentrewiseJoiningCodeResponse))]
         public virtual IActionResult GetJoiningCode(string generalTrainerMasterId)
         {
             try
             {
-                string apiDomainkey = _dBTMApiService.GetJoiningCode(generalTrainerMasterId);
-                StringResponse response = new StringResponse() { Response = apiDomainkey };
-                string data = ApiHelper.ToJson(response);
-                return !string.IsNullOrEmpty(apiDomainkey) ? CreateOKResponse<StringResponse>(data) : CreateNoContentResponse();
+                OrganisationCentrewiseJoiningCodeModel model = _dBTMApiService.GetJoiningCode(generalTrainerMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new OrganisationCentrewiseJoiningCodeResponse { OrganisationCentrewiseJoiningCodeModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, "GetJoiningCode", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new StringResponse { Response = "", ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+                _coditechLogging.LogMessage(ex, "GetJoiningCode", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new OrganisationCentrewiseJoiningCodeResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "GetJoiningCode", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new StringResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new OrganisationCentrewiseJoiningCodeResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
 
