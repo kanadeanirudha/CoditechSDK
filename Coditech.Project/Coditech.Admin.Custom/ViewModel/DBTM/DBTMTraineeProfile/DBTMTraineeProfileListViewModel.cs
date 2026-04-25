@@ -1,4 +1,5 @@
 ﻿using Coditech.Common.Helper;
+using System.ComponentModel.DataAnnotations;
 namespace Coditech.Admin.ViewModel
 {
     public class DBTMTraineeProfileListViewModel : BaseViewModel
@@ -11,5 +12,6 @@ namespace Coditech.Admin.ViewModel
         public long DBTMTraineeDetailId { get; set; }
         public long GeneralBatchMasterId { get; set; }
         public string OrderBy { get; set; }
+        public DateTime ToDate { get; set; }
     }
 }

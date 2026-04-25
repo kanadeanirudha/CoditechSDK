@@ -20,5 +20,6 @@ namespace Coditech.API.Client
         DBTMTestWiseReportsListResponse CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode);
         DBTMTestWiseReportsListResponse CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId,  string userType, string centreCode, string reportType);
         List<string> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId);
+        List<string> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId);
     }
 }

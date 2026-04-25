@@ -85,5 +85,10 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetCampActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMCampMasterId={dBTMCampMasterId}";
             return endpoint;
         }
+        public string GetTraineeListActivityDatesAsync(string dBTMTraineeDetailIds, int generalBatchMasterId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetTraineeListActivityDates?dBTMTraineeDetailIds={dBTMTraineeDetailIds}&generalBatchMasterId={generalBatchMasterId}";
+            return endpoint;
+        }
     }
 }

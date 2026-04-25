@@ -382,6 +382,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeProfileListViewModel model = new DBTMTraineeProfileListViewModel();
             model.CustomDropdownList1 = new List<SelectListItem>();
+            model.ToDate = DateTime.Today;
             return View(profiledetailslist, model);
         }
 
@@ -409,6 +410,16 @@ namespace Coditech.Admin.Controllers
             List<DateTime> dates = _dBTMReportsAgent.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
             return Json(dates);
         }
+
+        [HttpGet]
+        public IActionResult GetTraineeListActivityDates(string traineeIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(traineeIds))
+                return Json(new List<string>());
+            List<DateTime> dates = _dBTMReportsAgent.GetTraineeListActivityDates(traineeIds, generalBatchMasterId);
+            return Json(dates);
+        }
+
         #endregion
     }
 }
