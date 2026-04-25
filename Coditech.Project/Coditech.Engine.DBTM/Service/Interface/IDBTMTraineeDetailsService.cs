@@ -1,6 +1,5 @@
 ﻿using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
-
 using System.Collections.Specialized;
 
 namespace Coditech.API.Service
@@ -18,5 +17,6 @@ namespace Coditech.API.Service
         string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks);
         RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId);
         DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy);
+        List<DateTime> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId);
     }
 }

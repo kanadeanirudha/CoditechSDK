@@ -11,6 +11,7 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using System.Collections.Specialized;
 using System.Data;
+using System.Linq;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -392,6 +393,15 @@ namespace Coditech.API.Service
             }
             dBTMTraineeProfileListModel.DBTMTraineeProfileList = list;
             return dBTMTraineeProfileListModel;
+        }
+        public List<DateTime> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(dBTMTraineeDetailIds))
+                return new List<DateTime>();
+            var traineeIds = dBTMTraineeDetailIds.Split(',').Select(id => Convert.ToInt64(id)).ToList();
+            var personCodes = _dBTMTraineeDetailsRepository.Table.Where(x => traineeIds.Contains(x.DBTMTraineeDetailId)).Select(x => x.PersonCode).ToList();
+            var dates = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode)).Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
+            return dates;
         }
         #endregion
 
