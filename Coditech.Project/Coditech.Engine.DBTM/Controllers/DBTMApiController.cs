@@ -83,11 +83,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/Getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]
-        public IActionResult GetBatchList(long entityId, string userType)
+        public IActionResult GetBatchList(long entityId, string userType, bool isCheckTestPerformed = true)
         {
             try
             {
-                List<DBTMBatchModel> list = _dBTMApiService.GetBatchList(entityId, userType);
+                List<DBTMBatchModel> list = _dBTMApiService.GetBatchList(entityId, userType, isCheckTestPerformed);
                 return IsNotNull(list) ? CreateOKResponse(new DBTMBatchListResponse { DBTMBatchList = list }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
