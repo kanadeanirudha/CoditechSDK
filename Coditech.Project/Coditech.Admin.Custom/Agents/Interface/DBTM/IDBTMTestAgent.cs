@@ -37,9 +37,7 @@ namespace Coditech.Admin.Agents
         /// <param name="dBTMTestMasterIds">dBTMTestMasterIdIds.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteDBTMTest(string dBTMTestMasterIds, out string errorMessage);
-        DBTMTestParameterListViewModel DBTMTestParameter();
         DBTMGraphMasterListViewModel DBTMGraph(int dBTMTestMasterId);
-        DBTMTestCalculationListViewModel DBTMTestCalculation();
 
         /// <summary>
         /// Get ActivityListViewSequence by dBTMTestMasterId.

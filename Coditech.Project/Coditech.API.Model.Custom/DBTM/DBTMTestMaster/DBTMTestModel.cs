@@ -21,13 +21,7 @@ namespace Coditech.Common.API.Model
         public bool IsMultiTest { get; set; }
         public bool IsActive { get; set; }
         public bool IsStartDirection { get; set; }
-        [Required]
-        public List<string> DBTMSelectedTestParameter { get; set; }
         public int TopActivityCount { get; set; }
-        public byte DBTMTestParameterId { get; set; }
-        [Required]
-        public List<string> DBTMSelectedTestCalculation { get; set; }
-        public byte DBTMTestCalculationId { get; set; }
         public string TestInstructions { get; set; }
         public long TestMediaId { get; set; }
         public string TestMediaPath { get; set; }

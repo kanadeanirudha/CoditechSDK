@@ -17,8 +17,6 @@ namespace Coditech.API.Data
         public DbSet<DBTMActivityCategory> DBTMActivityCategory { get; set; }
         public DbSet<DBTMTestMaster> DBTMTestMaster { get; set; }
         public DbSet<DBTMDeviceRegistrationDetails> DBTMDeviceRegistrationDetails { get; set; }
-        public DbSet<DBTMTestParameter> DBTMTestParameter { get; set; }
-        public DbSet<DBTMParametersAssociatedToTest> DBTMParametersAssociatedToTest { get; set; }
         public DbSet<DBTMTraineeAssignment> DBTMTraineeAssignment { get; set; }
         public DbSet<DBTMBatchActivity> DBTMBatchActivity { get; set; }
         public DbSet<DBTMSubscriptionPlan> DBTMSubscriptionPlan { get; set; }
@@ -27,8 +25,6 @@ namespace Coditech.API.Data
         public DbSet<DBTMPrivacySetting> DBTMPrivacySetting { get; set; }
         public DbSet<DBTMDeviceData> DBTMDeviceData { get; set; }
         public DbSet<DBTMDeviceDataDetails> DBTMDeviceDataDetails { get; set; }
-        public DbSet<DBTMTestCalculation> DBTMTestCalculation { get; set; }
-        public DbSet<DBTMCalculationAssociatedToTest> DBTMCalculationAssociatedToTest { get; set; }
         public DbSet<DBTMTraineeAssignmentToUser> DBTMTraineeAssignmentToUser { get; set; }
         public DbSet<DBTMGraphMaster> DBTMGraphMaster { get; set; }
         public DbSet<DBTMTestGraph> DBTMTestGraph { get; set; }

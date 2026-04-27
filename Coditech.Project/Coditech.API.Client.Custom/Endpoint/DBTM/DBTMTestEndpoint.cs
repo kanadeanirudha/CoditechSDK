@@ -23,11 +23,7 @@ namespace Coditech.API.Endpoint
         public string DeleteDBTMTestAsync() =>
                   $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/DeleteDBTMTest";
 
-        public string GetDBTMTestParameterAsync() =>
-           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestParameter";
 
-        public string GetDBTMTestCalculationAsync() =>
-           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestCalculation";
         public string GetDBTMGraphAsync(int dBTMTestMasterId) =>
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMGraph?dBTMTestMasterId={dBTMTestMasterId}";
         public string GetDBTMGraphByDBTMTestMasterId(int dBTMTestMasterId, string graphMode)
