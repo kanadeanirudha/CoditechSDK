@@ -15,7 +15,6 @@ namespace Coditech.API.Service
         DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate);
         DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate);
         string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate);
-        RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate);
         DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy,DateTime FromDate, DateTime ToDate);
         List<DateTime> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId);
     }

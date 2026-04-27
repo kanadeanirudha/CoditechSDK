@@ -14,6 +14,7 @@
         public decimal? BestCount { get; set; }
         public string TestOutputHigher { get; set; }
         public string TestResultBasedon { get; set; }
+        public string PerformanceMatrix { get; set; }
         public bool IsEncrypted { get; set; }
     }
 }
