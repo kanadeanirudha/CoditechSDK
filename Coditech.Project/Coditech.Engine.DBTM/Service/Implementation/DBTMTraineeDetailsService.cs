@@ -399,7 +399,19 @@ namespace Coditech.API.Service
             if (string.IsNullOrWhiteSpace(dBTMTraineeDetailIds))
                 return new List<DateTime>();
             var traineeIds = dBTMTraineeDetailIds.Split(',').Select(id => Convert.ToInt64(id)).ToList();
-            var personCodes = _dBTMTraineeDetailsRepository.Table.Where(x => traineeIds.Contains(x.DBTMTraineeDetailId)).Select(x => x.PersonCode).ToList();
+            bool isAllTrainee = traineeIds.Contains(0);
+            List<string> personCodes;
+            if (isAllTrainee)
+            {
+                var allTraineeIds = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId && x.UserType == "Trainee").Select(x => x.EntityId).ToList();
+                personCodes = _dBTMTraineeDetailsRepository.Table.Where(x => allTraineeIds.Contains(x.DBTMTraineeDetailId)).Select(x => x.PersonCode).ToList();
+            }
+            else
+            {
+                personCodes = _dBTMTraineeDetailsRepository.Table.Where(x => traineeIds.Contains(x.DBTMTraineeDetailId)).Select(x => x.PersonCode).ToList();
+            }
+            if (!personCodes.Any())
+                return new List<DateTime>();
             var dates = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode)).Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
             return dates;
         }
