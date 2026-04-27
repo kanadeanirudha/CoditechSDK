@@ -257,7 +257,7 @@ namespace Coditech.API.Service
                                             select a.GeneralBatchMasterId
                                         ).FirstOrDefault();
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty, FromDate,ToDate)?.DBTMTraineeProfileList?.FirstOrDefault();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty, FromDate, ToDate)?.DBTMTraineeProfileList?.FirstOrDefault();
             dBTMTraineeProfileModel.GeneralBatchMasterId = generalBatchMasterId;
 
             return dBTMTraineeProfileModel;
@@ -360,7 +360,7 @@ namespace Coditech.API.Service
                                       TrainerName = um.FirstName + " " + um.LastName
                                   };
 
-                List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = GetTraineePerformanceDetails(dBTMTraineeDetailIds);
+                List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = GetTraineePerformanceDetails(dBTMTraineeDetailIds, FromDate, ToDate);
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate);
                 foreach (var dBTMTraineeProfileModel in list)
                 {
@@ -530,7 +530,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
-            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking_A @GeneralBranchMasterId,@FromDate, @ToDate")?.ToList();
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId,@FromDate, @ToDate")?.ToList();
             if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
@@ -690,12 +690,14 @@ namespace Coditech.API.Service
             return dt;
         }
 
-        private List<DBTMTraineeProfilePerformanceModel> GetTraineePerformanceDetails(string dBTMTraineeDetailIds)
+        private List<DBTMTraineeProfilePerformanceModel> GetTraineePerformanceDetails(string dBTMTraineeDetailIds, DateTime FromDate, DateTime ToDate)
         {
             List<DBTMTraineeProfilePerformanceModel> listModel = new List<DBTMTraineeProfilePerformanceModel>();
             CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
-            List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceListData = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrixByTraineeDetailIds @DBTMTraineeDetailIds")?.ToList();
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
+            List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceListData = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrixByTraineeDetailIds @DBTMTraineeDetailIds,@FromDate, @ToDate")?.ToList();
             if (traineeProfilePerformanceListData != null && traineeProfilePerformanceListData.Count > 0)
             {
                 traineeProfilePerformanceListData.ForEach(x =>

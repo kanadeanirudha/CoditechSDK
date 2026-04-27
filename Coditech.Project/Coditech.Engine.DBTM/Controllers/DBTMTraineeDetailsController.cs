@@ -28,11 +28,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeDetails/GetDBTMTraineeDetailsList")]
         [Produces(typeof(DBTMTraineeDetailsListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMTraineeDetailsList(string selectedCentreCode,long generalTrainerMasterId,FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetDBTMTraineeDetailsList(string selectedCentreCode, long generalTrainerMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
-                DBTMTraineeDetailsListModel list = _dBTMTraineeDetailsService.GetDBTMTraineeDetailsList(selectedCentreCode,generalTrainerMasterId,filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                DBTMTraineeDetailsListModel list = _dBTMTraineeDetailsService.GetDBTMTraineeDetailsList(selectedCentreCode, generalTrainerMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
             }
@@ -118,11 +118,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeDetails/GetTraineeActivitiesList")]
         [Produces(typeof(DBTMActivitiesListResponse))]
         [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetTraineeActivitiesList(string personCode,int numberOfDaysRecord,FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        public virtual IActionResult GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
         {
             try
             {
-                DBTMActivitiesListModel list = _dBTMTraineeDetailsService.GetTraineeActivitiesList(personCode,numberOfDaysRecord,filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                DBTMActivitiesListModel list = _dBTMTraineeDetailsService.GetTraineeActivitiesList(personCode, numberOfDaysRecord, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMActivitiesListResponse>(data) : CreateNoContentResponse();
             }
@@ -188,7 +188,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Produces(typeof(DBTMReportsResponse))]
         public virtual IActionResult GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate)
         {
-           try
+            try
             {
                 DBTMReportsListModel dBTMTraineeProfileModel = _dBTMTraineeDetailsService.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks, FromDate, ToDate);
                 return IsNotNull(dBTMTraineeProfileModel) ? CreateOKResponse(new DBTMReportsResponse { DBTMReportsModel = dBTMTraineeProfileModel }) : CreateNoContentResponse();
@@ -229,11 +229,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMTraineeDetails/GetProfileDetailsList")]
         [Produces(typeof(DBTMTraineeProfileListResponse))]
-        public virtual IActionResult GetBatchWiseUser(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        public virtual IActionResult GetProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, string FromDate, string ToDate)
         {
             try
             {
-                DBTMTraineeProfileListModel list = _dBTMTraineeDetailsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
+                DBTMTraineeProfileListModel list = _dBTMTraineeDetailsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate));
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeProfileListResponse>(data) : CreateNoContentResponse();
             }
