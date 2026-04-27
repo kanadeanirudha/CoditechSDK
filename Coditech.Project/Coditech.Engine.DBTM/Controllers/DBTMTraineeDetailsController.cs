@@ -164,11 +164,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeDetails/GetProfileDetails")]
         [HttpGet]
         [Produces(typeof(DBTMTraineeProfileResponse))]
-        public virtual IActionResult GetProfileDetails(long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public virtual IActionResult GetProfileDetails(long dBTMTraineeDetailId)
         {
             try
             {
-                DBTMTraineeProfileModel dBTMTraineeProfileModel = _dBTMTraineeDetailsService.GetProfileDetails(dBTMTraineeDetailId, FromDate, ToDate);
+                DBTMTraineeProfileModel dBTMTraineeProfileModel = _dBTMTraineeDetailsService.GetProfileDetails(dBTMTraineeDetailId);
                 return IsNotNull(dBTMTraineeProfileModel) ? CreateOKResponse(new DBTMTraineeProfileResponse { DBTMTraineeProfileModel = dBTMTraineeProfileModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -186,11 +186,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMTraineeDetails/GenerateAthletePdfRemark")]
         [HttpGet]
         [Produces(typeof(DBTMReportsResponse))]
-        public virtual IActionResult GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate)
+        public virtual IActionResult GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
             try
             {
-                DBTMReportsListModel dBTMTraineeProfileModel = _dBTMTraineeDetailsService.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks, FromDate, ToDate);
+                DBTMReportsListModel dBTMTraineeProfileModel = _dBTMTraineeDetailsService.GenerateAthletePdfRemark(dBTMTraineeDetailId, remarks);
                 return IsNotNull(dBTMTraineeProfileModel) ? CreateOKResponse(new DBTMReportsResponse { DBTMReportsModel = dBTMTraineeProfileModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -208,11 +208,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMTraineeDetails/GetTraineeProfileHtml")]
         [Produces(typeof(StringResponse))]
-        public virtual IActionResult GetTraineeProfileHtml(long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public virtual IActionResult GetTraineeProfileHtml(long dBTMTraineeDetailId)
         {
             try
             {
-                string html = _dBTMTraineeDetailsService.GetTraineeProfileHtml(dBTMTraineeDetailId, string.Empty, FromDate, ToDate);
+                string html = _dBTMTraineeDetailsService.GetTraineeProfileHtml(dBTMTraineeDetailId, string.Empty);
                 return !string.IsNullOrEmpty(html) ? CreateOKResponse(new StringResponse { Response = html }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)

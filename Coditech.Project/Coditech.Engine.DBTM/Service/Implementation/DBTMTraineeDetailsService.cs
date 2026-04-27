@@ -235,7 +235,7 @@ namespace Coditech.API.Service
             return listModel;
         }
 
-        public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
+        public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
@@ -249,22 +249,22 @@ namespace Coditech.API.Service
                                             select a.GeneralBatchMasterId
                                         ).FirstOrDefault();
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty, FromDate, ToDate)?.DBTMTraineeProfileList?.FirstOrDefault();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty, DateTime.Now.AddDays(-365), DateTime.Now)?.DBTMTraineeProfileList?.FirstOrDefault();
             dBTMTraineeProfileModel.GeneralBatchMasterId = generalBatchMasterId;
 
             return dBTMTraineeProfileModel;
         }
 
-        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate)
+        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
         {
-            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId, FromDate, ToDate);
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
             if (profile == null)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
 
             string traineeName = $"{profile.FirstName}_{profile.LastName}".Trim('_');
             traineeName = string.Concat(traineeName.Split(Path.GetInvalidFileNameChars()));
             // GetTraineeProfileHtml
-            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks, FromDate, ToDate);
+            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
 
             // Generate PDF
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
@@ -289,13 +289,13 @@ namespace Coditech.API.Service
         }
 
         //Get trainee profile html
-        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate)
+        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
             // Get trainee profile
-            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId, FromDate, ToDate);
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
             if (profile == null)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
 
