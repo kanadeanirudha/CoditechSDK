@@ -58,7 +58,11 @@ namespace Coditech.Admin.ViewModel
         public string PerformanceMatrix { get; set; }
         [Display(Name = " Is Start Direction")]
         public bool IsStartDirection { get; set; }
+        [Required]
         [Display(Name = " Activity Output Higher")]
         public string TestOutputHigher { get; set; }
+        [Display(Name = "Test Result Basedon")]
+        [Required]
+        public string TestResultBasedon { get; set; }
     }
 }
