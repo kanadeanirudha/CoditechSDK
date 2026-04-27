@@ -40,8 +40,6 @@ namespace Coditech.API.Client
         /// <param name="ParameterModel">ParameterModel.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteDBTMTest(ParameterModel body);
-        DBTMTestParameterListResponse GetDBTMTestParameter();
-        DBTMTestCalculationListResponse GetDBTMTestCalculation();
         DBTMGraphMasterListResponse GetDBTMGraph(int dBTMTestMasterId);
 
         /// <summary>

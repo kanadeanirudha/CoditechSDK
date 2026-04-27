@@ -21,8 +21,6 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMTestListModel, DBTMTestListViewModel>().ReverseMap();
             CreateMap<DBTMDeviceRegistrationDetailsModel, DBTMDeviceRegistrationDetailsViewModel>().ReverseMap();
             CreateMap<DBTMDeviceRegistrationDetailsListModel, DBTMDeviceRegistrationDetailsListViewModel>().ReverseMap();
-            CreateMap<DBTMTestParameterModel, DBTMTestParameterViewModel>().ReverseMap();
-            CreateMap<DBTMTestParameterListModel, DBTMTestParameterListViewModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentModel, DBTMTraineeAssignmentViewModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentListModel, DBTMTraineeAssignmentListViewModel>().ReverseMap();
             CreateMap<DBTMNewRegistrationModel, DBTMNewRegistrationViewModel>().ReverseMap();
@@ -39,8 +37,6 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMActivitiesListModel, DBTMActivitiesListViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesDetailsModel, DBTMActivitiesDetailsViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesDetailsListModel, DBTMActivitiesDetailsListViewModel>().ReverseMap();
-            CreateMap<DBTMTestCalculationModel, DBTMTestCalculationViewModel>().ReverseMap();
-            CreateMap<DBTMTestCalculationListModel, DBTMTestCalculationListViewModel>().ReverseMap();
             CreateMap<DBTMNewRegistrationViewModel, GeneralPersonModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentToUserListModel, DBTMTraineeAssignmentToUserListViewModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentToUserModel, DBTMTraineeAssignmentToUserViewModel>().ReverseMap();

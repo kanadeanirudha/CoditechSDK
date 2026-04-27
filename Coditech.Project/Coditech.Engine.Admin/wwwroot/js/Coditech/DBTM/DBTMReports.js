@@ -607,6 +607,8 @@ var DBTMReports = {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var orderBy = $("#OrderBy").val();
+        var todate = $("#ToDate").val();
+        var fromdate = todate;
         if (Array.isArray(dbtmTraineeDetailId)) {
             dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
         }
@@ -621,7 +623,9 @@ var DBTMReports = {
                 data: {
                     generalBatchMasterId: generalBatchMasterId,
                     dbtmTraineeDetailIds: dbtmTraineeDetailId,
-                    orderBy: orderBy
+                    orderBy: orderBy,
+                    FromDate: fromdate,
+                    ToDate: todate
                 },
                 success: function (data) {
                     $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
@@ -795,5 +799,34 @@ var DBTMReports = {
                 activityPerformedDates = [];
             }
         });
-    }
+    },
+    LoadTraineeProfileActivityDates : function () {
+        var traineeIds = $("#DBTMTraineeDetailId").val();
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        if (!traineeIds || traineeIds.length === 0) {
+            activityPerformedDates = [];
+            $("#ToDate").datepicker("refresh");
+            return;
+        }
+        if (Array.isArray(traineeIds)) {
+            traineeIds = traineeIds.join(",");
+        }
+        $.ajax({
+            type: "GET",
+            url: "/DBTMReports/GetTraineeListActivityDates",
+            data: {
+                traineeIds: traineeIds,
+                generalBatchMasterId: generalBatchMasterId
+            },
+            success: function (data) {
+                activityPerformedDates = (data || []).map(d =>
+                    d.split("T")[0]
+                );
+                $("#ToDate").datepicker("refresh");
+            },
+            error: function () {
+                activityPerformedDates = [];
+            }
+        });
+    },
 };
