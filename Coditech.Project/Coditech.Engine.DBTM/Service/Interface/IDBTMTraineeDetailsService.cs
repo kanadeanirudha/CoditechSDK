@@ -12,11 +12,11 @@ namespace Coditech.API.Service
         bool DeleteDBTMTraineeDetails(ParameterModel parameterModel);
         DBTMActivitiesListModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMActivitiesDetailsListModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
-        DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId);
-        DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
-        string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks);
-        RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId);
-        DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy);
+        DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate);
+        DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate);
+        string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate);
+        RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate);
+        DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy,DateTime FromDate, DateTime ToDate);
         List<DateTime> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId);
     }
 }

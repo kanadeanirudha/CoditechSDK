@@ -607,6 +607,8 @@ var DBTMReports = {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
         var orderBy = $("#OrderBy").val();
+        var todate = $("#ToDate").val();
+        var fromdate = todate;
         if (Array.isArray(dbtmTraineeDetailId)) {
             dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
         }
@@ -621,7 +623,9 @@ var DBTMReports = {
                 data: {
                     generalBatchMasterId: generalBatchMasterId,
                     dbtmTraineeDetailIds: dbtmTraineeDetailId,
-                    orderBy: orderBy
+                    orderBy: orderBy,
+                    FromDate: fromdate,
+                    ToDate: todate
                 },
                 success: function (data) {
                     $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);

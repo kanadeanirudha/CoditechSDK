@@ -243,7 +243,7 @@ namespace Coditech.API.Service
             return listModel;
         }
 
-        public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId)
+        public DBTMTraineeProfileModel GetProfileDetails(long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
@@ -257,22 +257,22 @@ namespace Coditech.API.Service
                                             select a.GeneralBatchMasterId
                                         ).FirstOrDefault();
 
-            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty)?.DBTMTraineeProfileList?.FirstOrDefault();
+            DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty, FromDate,ToDate)?.DBTMTraineeProfileList?.FirstOrDefault();
             dBTMTraineeProfileModel.GeneralBatchMasterId = generalBatchMasterId;
 
             return dBTMTraineeProfileModel;
         }
 
-        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks)
+        public DBTMReportsListModel GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate)
         {
-            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId, FromDate, ToDate);
             if (profile == null)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
 
             string traineeName = $"{profile.FirstName}_{profile.LastName}".Trim('_');
             traineeName = string.Concat(traineeName.Split(Path.GetInvalidFileNameChars()));
             // GetTraineeProfileHtml
-            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks);
+            string html = GetTraineeProfileHtml(dBTMTraineeDetailId, remarks, FromDate, ToDate);
 
             // Generate PDF
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "AthleteReportPdf");
@@ -297,13 +297,13 @@ namespace Coditech.API.Service
         }
 
         //Get trainee profile html
-        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks)
+        public string GetTraineeProfileHtml(long dBTMTraineeDetailId, string remarks, DateTime FromDate, DateTime ToDate)
         {
             if (dBTMTraineeDetailId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
             // Get trainee profile
-            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId);
+            DBTMTraineeProfileModel profile = GetProfileDetails(dBTMTraineeDetailId, FromDate, ToDate);
             if (profile == null)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainee profile not found");
 
@@ -321,10 +321,10 @@ namespace Coditech.API.Service
             return html;
         }
 
-        public RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId)
+        public RadarChartModel GetRadarChart(long generalBatchMasterId, long dBTMTraineeDetailId, DateTime FromDate, DateTime ToDate)
         {
             RadarChartModel radarChart = new RadarChartModel();
-            DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId);
+            DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate);
             if (dt?.Rows?.Count > 0)
             {
                 DataRow dataRow = dt.Rows.Find(dBTMTraineeDetailId);
@@ -336,7 +336,7 @@ namespace Coditech.API.Service
             return radarChart;
         }
 
-        public DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy)
+        public DBTMTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
         {
             DBTMTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMTraineeProfileListModel();
             CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -361,7 +361,7 @@ namespace Coditech.API.Service
                                   };
 
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = GetTraineePerformanceDetails(dBTMTraineeDetailIds);
-                DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId);
+                DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate);
                 foreach (var dBTMTraineeProfileModel in list)
                 {
                     dBTMTraineeProfileModel.IsListView = true;
@@ -520,7 +520,7 @@ namespace Coditech.API.Service
             return html;
         }
 
-        private DataTable GetTraineePerformanceRankingDetails(long generalBatchMasterId)
+        private DataTable GetTraineePerformanceRankingDetails(long generalBatchMasterId, DateTime FromDate, DateTime ToDate)
         {
             DataTable dt = new DataTable();
             if (generalBatchMasterId <= 0)
@@ -528,8 +528,8 @@ namespace Coditech.API.Service
 
             CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
-            objStoredProc.SetParameter("@FromDate", DateTime.Now.Date.AddDays(-8), ParameterDirection.Input, DbType.Date);
-            objStoredProc.SetParameter("@ToDate", DateTime.Now.Date.AddDays(-8), ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
             List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking_A @GeneralBranchMasterId,@FromDate, @ToDate")?.ToList();
             if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
             {
