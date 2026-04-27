@@ -525,184 +525,157 @@ namespace Coditech.API.Service
             DataTable dt = new DataTable();
             if (generalBatchMasterId <= 0)
                 return dt;
-          
+
             CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
-            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId")?.ToList();
+            objStoredProc.SetParameter("@FromDate", DateTime.Now.Date.AddDays(-8), ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", DateTime.Now.Date.AddDays(-8), ParameterDirection.Input, DbType.Date);
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking_A @GeneralBranchMasterId,@FromDate, @ToDate")?.ToList();
             if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
                     x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
                 });
-                List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankList = traineeProfilePerformanceRankDataList
-                            .GroupBy(x => new
-                            {
-                                x.DBTMTraineeDetailId,
-                                x.Name,
-                                x.TestCode,
-                                x.TestName,
-                                x.CreatedDate
-                            })
-                            .Select(g => new
-                            {
-                                g.Key.DBTMTraineeDetailId,
-                                g.Key.Name,
-                                g.Key.TestCode,
-                                g.Key.TestName,
 
-                                TotalTime = g.Where(x =>
-                                            x.ParameterCode == "Time" &&
-                                            x.TestCode != "ReactionTimeTestThirtySec" &&
-                                            x.TestCode != "ReactionTimeTestThirtySix" &&
-                                            x.TestCode != "ReactionMovingTimeTestThirtySec")
-                                        .Sum(x => Convert.ToDecimal(x.ParameterValue)),
+                var testList = traineeProfilePerformanceRankDataList
+                               .Select(x => new { x.TestCode, x.TestOutputHigher, x.TestResultBasedon })
+                               .Distinct()
+                               .ToList();
 
-                                TotalLength = g.Where(x => x.ParameterCode == "JumpLength")
-                                        .Sum(x => Convert.ToDecimal(x.ParameterValue)),
-
-                                TotalHeight = g.Where(x => x.ParameterCode == "JumpHeight")
-                                        .Sum(x => Convert.ToDecimal(x.ParameterValue)),
-
-                                TotalCount = g.Where(x =>
-                                            x.ParameterCode == "Time" &&
-                                           (x.TestCode == "ReactionTimeTestThirtySec" ||
-                                            x.TestCode == "ReactionTimeTestThirtySix" ||
-                                            x.TestCode == "ReactionMovingTimeTestThirtySec"))
-                                        .Sum(x => Convert.ToDecimal(x.ParameterValue))
-                            })
-                            .GroupBy(x => new
-                            {
-                                x.DBTMTraineeDetailId,
-                                x.Name,
-                                x.TestCode,
-                                x.TestName
-                            })
-                            .Select(g =>
-                            {
-                                var bestTime = g.Where(x => x.TotalTime > 0)
-                                                .Select(x => x.TotalTime)
-                                                .DefaultIfEmpty()
-                                                .Min();
-
-                                var bestLength = g.Where(x => x.TotalLength > 0)
-                                                  .Select(x => x.TotalLength)
-                                                  .DefaultIfEmpty()
-                                                  .Max();
-
-                                var bestHeight = g.Where(x => x.TotalHeight > 0)
-                                                  .Select(x => x.TotalHeight)
-                                                  .DefaultIfEmpty()
-                                                  .Max();
-
-                                var bestCount = g.Where(x => x.TotalCount > 0)
-                                                 .Select(x => x.TotalCount)
-                                                 .DefaultIfEmpty()
-                                                 .Max();
-
-                                string testResultBasedOn =
-                                    bestTime != 0 ? "BestTime" :
-                                    bestLength != 0 ? "BestLength" :
-                                    bestHeight != 0 ? "BestHeight" :
-                                    bestCount != 0 ? "BestCount" :
-                                    null;
-
-                                return new DBTMTraineeProfilePerformanceRankingModel
-                                {
-                                    DBTMTraineeDetailId = g.Key.DBTMTraineeDetailId,
-                                    Name = g.Key.Name,
-                                    TestName = g.Key.TestName,
-                                    TestCode = g.Key.TestCode,
-                                    BestTime = bestTime == 0 ? (decimal?)null : bestTime,
-                                    BestLength = bestLength == 0 ? (decimal?)null : bestLength,
-                                    BestHeight = bestHeight == 0 ? (decimal?)null : bestHeight,
-                                    BestCount = bestCount == 0 ? (decimal?)null : bestCount,
-                                    TestResultBasedon = testResultBasedOn
-                                };
-                            })
-                            .OrderBy(x => x.Name)
-                            .ThenBy(x => x.TestCode)
-                            .ToList();
-                List<string> testList = traineeProfilePerformanceRankList.Select(x => x.TestName).Distinct().ToList();
-                var result = traineeProfilePerformanceRankList.GroupBy(x => x.TestName)
-                                                               .Select(g => new
-                                                               {
-                                                                   TestName = g.Key,
-                                                                   MinTime = g.Min(x => x.BestTime),
-                                                                   MaxTime = g.Max(x => x.BestTime),
-                                                                   MinLength = g.Min(x => x.BestLength),
-                                                                   MaxLength = g.Max(x => x.BestLength),
-                                                                   MinHeight = g.Min(x => x.BestHeight),
-                                                                   MaxHeight = g.Max(x => x.BestHeight),
-                                                                   MinCount = g.Min(x => x.BestCount),
-                                                                   MaxCount = g.Max(x => x.BestCount),
-                                                               }).ToList();
-                decimal weights = 100 / testList.Count;
+                dt = new DataTable();
+                List<string> excludeColumnNames = new List<string> { "DBTMTraineeDetailId", "Name", "FinalScore" };
                 dt.Columns.Add("DBTMTraineeDetailId", typeof(long));
+                dt.PrimaryKey = new DataColumn[] { dt.Columns["DBTMTraineeDetailId"] };
                 dt.Columns.Add("Name", typeof(string));
                 foreach (var test in testList)
-                    dt.Columns.Add(test, typeof(decimal));
-                dt.Columns.Add("FinalScore", typeof(decimal));
-                dt.Columns.Add("Rank", typeof(int));
-                dt.PrimaryKey = new DataColumn[] { dt.Columns["DBTMTraineeDetailId"] };
-
-                foreach (var item in traineeProfilePerformanceRankList)
                 {
-                    DataRow dr = dt.Rows.Find(item.DBTMTraineeDetailId);
-                    if (dr == null)
-                    {
-                        dr = dt.NewRow();
-                        dr["DBTMTraineeDetailId"] = item.DBTMTraineeDetailId;
-                        dr["Name"] = item.Name;
-                        dt.Rows.Add(dr);
-                    }
-                    if (testList.Contains(item.TestName))
-                    {
-                        var testResult = result.FirstOrDefault(x => x.TestName == item.TestName);
-                        if (testResult != null)
-                        {
-                            decimal score = 0;
-                            if (item.TestResultBasedon == "BestTime" && item.BestTime > 0 && testResult.MaxTime > testResult.MinTime)
-                            {
-                                score = (((decimal)testResult.MaxTime - (decimal)item.BestTime) / ((decimal)testResult.MaxTime - (decimal)testResult.MinTime)) * 100;
-                            }
-                            else if (item.TestResultBasedon == "BestLength" && item.BestLength > 0 && testResult.MaxLength > testResult.MinLength)
-                            {
-                                score = (((decimal)item.BestLength - (decimal)testResult.MinLength) / ((decimal)testResult.MaxLength - (decimal)testResult.MinLength)) * 100;
-                            }
-                            else if (item.TestResultBasedon == "BestHeight" && item.BestHeight > 0 && testResult.MaxHeight > testResult.MinHeight)
-                            {
-                                score = (((decimal)item.BestHeight - (decimal)testResult.MinHeight) / ((decimal)testResult.MaxHeight - (decimal)testResult.MinHeight)) * 100;
-                            }
-                            else if (item.TestResultBasedon == "BestCount" && item.BestCount > 0 && testResult.MaxCount > testResult.MinCount)
-                            {
-                                score = (((decimal)item.BestCount - (decimal)testResult.MinCount) / ((decimal)testResult.MaxCount - (decimal)testResult.MinCount)) * 100;
-                            }
-                            dr[item.TestName] = Math.Round(score, 2);
-                        }
-                    }
+                    dt.Columns.Add(test.TestCode, typeof(double));
+                    dt.Columns.Add($"{test.TestCode}Score", typeof(double));
+                    excludeColumnNames.Add($"{test.TestCode}Score");
                 }
+                dt.Columns.Add("FinalScore", typeof(double));
+                dt.Columns.Add("Rank", typeof(int));
 
-                foreach (DataRow dr in dt.Rows)
+                List<long> dbtmTraineeDetailIdList = traineeProfilePerformanceRankDataList
+                    .Select(x => x.DBTMTraineeDetailId)
+                    .Distinct()
+                    .ToList();
+
+                foreach (long traineeId in dbtmTraineeDetailIdList)
                 {
-                    decimal finalScore = 0;
+                    var traineeProfile = traineeProfilePerformanceRankDataList.First(x => x.DBTMTraineeDetailId == traineeId);
+
+                    DataRow dr = dt.NewRow();
+                    dr["DBTMTraineeDetailId"] = traineeProfile.DBTMTraineeDetailId;
+                    dr["Name"] = traineeProfile.Name;
+
+                    var traineeProfileList = traineeProfilePerformanceRankDataList.Where(x => x.DBTMTraineeDetailId == traineeId);
+
                     foreach (var test in testList)
                     {
-                        if (dr[test] != DBNull.Value)
+                        var testResultData = traineeProfileList
+                            .Where(x => x.TestCode == test.TestCode)
+                            .Select(x => new { x.TestResultBasedon, x.TestOutputHigher })
+                            .FirstOrDefault();
+
+                        if (testResultData == null)
                         {
-                            finalScore += ((decimal)dr[test] * weights) / 100;
+                            dr[test.TestCode] = 0d;
+                            continue;
+                        }
+
+                        var groupedData = traineeProfileList.Where(x => x.TestCode == test.TestCode && x.ParameterCode == testResultData.TestResultBasedon)
+                                        .GroupBy(x => x.CreatedDate)
+                                        .Select(g => new
+                                        {
+                                            CreatedDate = g.Key,
+                                            ParameterValueSum = g.Sum(x =>
+                                                string.IsNullOrEmpty(x.ParameterValue) ? 0 : Convert.ToDouble(x.ParameterValue))
+                                        }).ToList();
+
+                        if (!groupedData.Any())
+                        {
+                            dr[test.TestCode] = 0d;
+                            continue;
+                        }
+
+                        double value = 0;
+
+                        if (testResultData.TestOutputHigher == "LO")
+                            value = groupedData.Min(x => x.ParameterValueSum);
+                        else if (testResultData.TestOutputHigher == "HO")
+                            value = groupedData.Max(x => x.ParameterValueSum);
+
+                        dr[test.TestCode] = value;
+                    }
+
+                    dt.Rows.Add(dr);
+                }
+
+                /*
+                    Define Weights for the Final Score				
+                    All activities are equally weighted by default.				
+                    Each activity weight = 1 ÷ total number of activities.				
+                    Total of all weights equals 1.				
+                    Weight can be changed as per required (sepcific requirement of sport) based on the final score and rank will be updated				
+                 */
+                foreach (DataColumn column in dt.Columns.Cast<DataColumn>().Where(c => !excludeColumnNames.Contains(c.ColumnName)))
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        foreach (var test in testList.Where(x => x.TestCode == column.ColumnName))
+                        {
+                            if (dr[column] != DBNull.Value)
+                            {
+                                double testValue = Convert.ToDouble(dr[column]);
+                                double score = 0;
+                                if (testValue > 0)
+                                {
+                                    /*
+                                        Score Calculation: 
+                                        If the test output is higher the better (HO), then Score = (Test Value - Minimum Value) ÷ (Maximum Value - Minimum Value) × 100. 
+                                        If the test output is lower the better (LO), then Score = ((Maximum Value - Test Value) ÷ (Maximum Value - Minimum Value)) × 100. 
+                                     */
+                                    double maxValue = Convert.ToDouble(dt.Compute($"MAX([{column.ColumnName}])", ""));
+                                    double minValue = Convert.ToDouble(dt.Compute($"MIN([{column.ColumnName}])", ""));
+                                    if (test.TestOutputHigher == "HO")
+                                    {
+                                        score = (testValue - minValue) / (maxValue - minValue) * 100;
+                                    }
+                                    else if (test.TestOutputHigher == "LO")
+                                    {
+                                        score = ((maxValue - testValue) / (maxValue - minValue)) * 100;
+                                    }
+                                }
+                                dr[$"{test.TestCode}Score"] = score;
+                            }
                         }
                     }
+                }
+                double weights = 100 / testList.Count;
+                //Calculate Final Score
+                foreach (DataRow dr in dt.Rows)
+                {
+                    double finalScore = 0;
+
+                    foreach (var test in testList)
+                    {
+                        double value = dr.Field<double?>($"{test.TestCode}Score") ?? 0;
+                        finalScore += (value * weights) / 100;
+                    }
+
                     dr["FinalScore"] = Math.Round(finalScore, 3);
                 }
+                //Calculate Rank
                 var rankedList = dt.AsEnumerable()
-                                   .OrderByDescending(r => r.Field<decimal>("FinalScore"))
+                                   .OrderByDescending(r => r.Field<double>("FinalScore"))
                                    .Select((r, index) => new
                                    {
 
                                        DBTMTraineeDetailId = r.Field<long>("DBTMTraineeDetailId"),
                                        Name = r.Field<string>("Name"),
-                                       FinalScore = r.Field<decimal>("FinalScore"),
+                                       FinalScore = r.Field<double>("FinalScore"),
                                        Rank = index + 1
                                    }).ToList();
                 foreach (var item in rankedList)
@@ -797,13 +770,14 @@ namespace Coditech.API.Service
             {
                 RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
                 Title = "Score",
-                Labels = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank").Select(c => c.ColumnName)),
+                Labels = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank" && !c.ColumnName.Contains("Score")).Select(c => c.ColumnName)),
                 Datasets = new List<RadarGraphsDatasetModel>()
                             {
                                 new RadarGraphsDatasetModel()
                                 {
                                     Label = dataRow["Name"].ToString(),
-                                    Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank").Select(c => dataRow[c].ToString())),
+                                    //Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "DBTMTraineeDetailId" && c.ColumnName != "Name" && c.ColumnName != "FinalScore" && c.ColumnName != "Rank" && !c.ColumnName.Contains("Score")).Select(c => dataRow[c].ToString())),
+                                    Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName.Contains("Score")).Select(c => dataRow[c].ToString())),
                                     Color = "rgba(255, 99, 132, 0.2)"
                                 }
                             }
