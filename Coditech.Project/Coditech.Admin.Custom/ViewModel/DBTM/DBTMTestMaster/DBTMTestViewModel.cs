@@ -53,7 +53,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = " Activity Output Higher")]
         public string TestOutputHigher { get; set; }
-        [Display(Name = "Test Result Basedon")]
+        [Display(Name = "Activity Result Basedon")]
         [Required]
         public string TestResultBasedon { get; set; }
     }

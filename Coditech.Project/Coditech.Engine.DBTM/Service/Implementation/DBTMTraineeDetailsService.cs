@@ -338,7 +338,12 @@ namespace Coditech.API.Service
                                   };
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
-
+                string[] testName = null;
+                if (dt?.Rows?.Count > 0)
+                {
+                    string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" && c.ColumnName.Contains("Score")).Select(c => c.ColumnName.Replace("Score", "")).ToArray();
+                    testName = _dBTMTestMasterRepository.Table.Where(x => testCode.Contains(x.TestCode)).Select(x => x.TestName).ToArray();
+                }
                 foreach (var dBTMTraineeProfileModel in list)
                 {
                     dBTMTraineeProfileModel.IsListView = true;
@@ -354,7 +359,8 @@ namespace Coditech.API.Service
                         if (dataRow != null)
                         {
                             dBTMTraineeProfileModel.Rank = dataRow["Rank"].ToString();
-                            dBTMTraineeProfileModel.RadarChart = BindRadarChartDetails(dt, dataRow);
+                            if (testName?.Count() > 2)
+                                dBTMTraineeProfileModel.RadarChart = BindRadarChartDetails(dt, dataRow, testName);
                         }
                     }
                 }
@@ -766,11 +772,8 @@ namespace Coditech.API.Service
             }
         }
 
-        private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow)
+        private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow, string[] testName)
         {
-            string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" && c.ColumnName.Contains("Score")).Select(c => c.ColumnName.Replace("Score", "")).ToArray();
-            string[] testName = _dBTMTestMasterRepository.Table.Where(x => testCode.Contains(x.TestCode)).Select(x => x.TestName).ToArray();
-
             return new RadarChartModel()
             {
                 RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
