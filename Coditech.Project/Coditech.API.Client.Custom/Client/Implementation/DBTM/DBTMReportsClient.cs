@@ -483,6 +483,62 @@ namespace Coditech.API.Client
             }
         }
 
+        public virtual List<string> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId)
+        {
+            return Task.Run(async () => await GetTraineeListActivityDatesAsync(dBTMTraineeDetailIds, generalBatchMasterId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<List<string>> GetTraineeListActivityDatesAsync(string dBTMTraineeDetailIds, int generalBatchMasterId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.GetTraineeListActivityDatesAsync(dBTMTraineeDetailIds, generalBatchMasterId);
+
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(
+                    endpoint,
+                    status,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<List<string>>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object ?? new List<string>();
+                }
+                else if (status_ == 204)
+                {
+                    return new List<string>();
+                }
+                else
+                {
+                    string responseData = response.Content == null
+                        ? null
+                        : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    UpdateApiStatus(null, status, response);
+
+                    throw new CoditechException(
+                        status.ErrorCode,
+                        status.ErrorMessage,
+                        status.StatusCode
+                    );
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
+
         public virtual DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId)
         {
             return Task.Run(async () => await GetActivityVerticalDetailsAsync(dBTMDeviceDataId, CancellationToken.None)).GetAwaiter().GetResult();
@@ -593,14 +649,14 @@ namespace Coditech.API.Client
                     response?.Dispose();
             }
         }
-        public virtual DBTMTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
+        public virtual DBTMTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
         {
-            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsync(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
+            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
 
             HttpResponseMessage response = null;
             var disposeResponse = true;

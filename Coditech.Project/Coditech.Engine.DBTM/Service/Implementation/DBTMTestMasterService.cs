@@ -17,10 +17,6 @@ namespace Coditech.API.Service
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMActivityListViewSequenceMasterRepository;
-        private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
-        private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
-        private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
-        private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
         private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
@@ -34,10 +30,6 @@ namespace Coditech.API.Service
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMActivityListViewSequenceMasterRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMActivityVerticalViewSequenceMasterRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -103,31 +95,6 @@ namespace Coditech.API.Service
             if (dBTMTestData?.DBTMTestMasterId > 0)
             {
                 dBTMTestModel.DBTMTestMasterId = dBTMTestData.DBTMTestMasterId;
-                List<DBTMParametersAssociatedToTest> parametersAssociatedToTestlist = new List<DBTMParametersAssociatedToTest>();
-                foreach (string item in dBTMTestModel.DBTMSelectedTestParameter)
-                {
-                    parametersAssociatedToTestlist.Add(new DBTMParametersAssociatedToTest()
-                    {
-                        DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                        DBTMTestParameterId = Convert.ToByte(item),
-                        IsActive = true
-                    });
-                }
-
-                _dBTMParametersAssociatedToTestRepository.Insert(parametersAssociatedToTestlist);
-
-                List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestlist = new List<DBTMCalculationAssociatedToTest>();
-                foreach (string item in dBTMTestModel.DBTMSelectedTestCalculation)
-                {
-                    calculationAssociatedToTestlist.Add(new DBTMCalculationAssociatedToTest()
-                    {
-                        DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                        DBTMTestCalculationId = Convert.ToByte(item)
-                    });
-                }
-
-                _dBTMCalculationAssociatedToTestRepository.Insert(calculationAssociatedToTestlist);
-
 
                 List<DBTMTestGraph> dBTMTestGraphlist = new List<DBTMTestGraph>();
                 foreach (string dBTMGraphMasterId in dBTMTestModel.DBTMSelectedGraph)
@@ -161,8 +128,6 @@ namespace Coditech.API.Service
             DBTMTestModel dBTMTestModel = dBTMTestMaster?.FromEntityToModel<DBTMTestModel>();
             if (IsNotNull(dBTMTestMaster))
             {
-                dBTMTestModel.DBTMSelectedTestParameter = _dBTMParametersAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMTestParameterId.ToString())?.ToList();
-                dBTMTestModel.DBTMSelectedTestCalculation = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMTestCalculationId.ToString())?.ToList();
                 dBTMTestModel.DBTMSelectedGraph = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMGraphMasterId.ToString())?.ToList();
             }
             if (dBTMTestModel.TestMediaId > 0)
@@ -193,86 +158,6 @@ namespace Coditech.API.Service
             bool isdBTMTestUpdated = _dBTMTestMasterRepository.Update(dBTMTestMaster);
             if (isdBTMTestUpdated)
             {
-                List<DBTMParametersAssociatedToTest> deleteDBTMParametersAssociatedToTest = null;
-                List<DBTMParametersAssociatedToTest> insertDBTMParametersAssociatedToTest = null;
-                List<DBTMParametersAssociatedToTest> parametersAssociatedToTestList = _dBTMParametersAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();
-
-                foreach (string item in dBTMTestModel.DBTMSelectedTestParameter)
-                {
-                    if (!parametersAssociatedToTestList.Any(x => x.DBTMTestParameterId.ToString() == item))
-                    {
-                        if (IsNull(insertDBTMParametersAssociatedToTest))
-                        {
-                            insertDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
-                        }
-                        insertDBTMParametersAssociatedToTest.Add(new DBTMParametersAssociatedToTest()
-                        {
-                            DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                            DBTMTestParameterId = Convert.ToByte(item),
-                            IsActive = true
-                        });
-                    }
-                }
-                foreach (DBTMParametersAssociatedToTest item in parametersAssociatedToTestList)
-                {
-                    if (!dBTMTestModel.DBTMSelectedTestParameter.Any(x => x == item.DBTMTestParameterId.ToString()))
-                    {
-                        if (IsNull(deleteDBTMParametersAssociatedToTest))
-                        {
-                            deleteDBTMParametersAssociatedToTest = new List<DBTMParametersAssociatedToTest>();
-                        }
-                        item.IsActive = false;
-                        deleteDBTMParametersAssociatedToTest.Add(item);
-                    }
-                }
-                if (insertDBTMParametersAssociatedToTest?.Count > 0)
-                {
-                    _dBTMParametersAssociatedToTestRepository.Insert(insertDBTMParametersAssociatedToTest);
-                }
-                if (deleteDBTMParametersAssociatedToTest?.Count > 0)
-                {
-                    _dBTMParametersAssociatedToTestRepository.Delete(deleteDBTMParametersAssociatedToTest);
-                }
-
-                List<DBTMCalculationAssociatedToTest> deleteDBTMCalculationAssociatedToTest = null;
-                List<DBTMCalculationAssociatedToTest> insertDBTMCalculationAssociatedToTest = null;
-                List<DBTMCalculationAssociatedToTest> calculationAssociatedToTestList = _dBTMCalculationAssociatedToTestRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId)?.ToList();
-
-                foreach (string item in dBTMTestModel.DBTMSelectedTestCalculation)
-                {
-                    if (!calculationAssociatedToTestList.Any(x => x.DBTMTestCalculationId.ToString() == item))
-                    {
-                        if (IsNull(insertDBTMCalculationAssociatedToTest))
-                        {
-                            insertDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
-                        }
-                        insertDBTMCalculationAssociatedToTest.Add(new DBTMCalculationAssociatedToTest()
-                        {
-                            DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                            DBTMTestCalculationId = Convert.ToByte(item)
-                        });
-                    }
-                }
-                foreach (DBTMCalculationAssociatedToTest item in calculationAssociatedToTestList)
-                {
-                    if (!dBTMTestModel.DBTMSelectedTestCalculation.Any(x => x == item.DBTMTestCalculationId.ToString()))
-                    {
-                        if (IsNull(deleteDBTMCalculationAssociatedToTest))
-                        {
-                            deleteDBTMCalculationAssociatedToTest = new List<DBTMCalculationAssociatedToTest>();
-                        }
-                        deleteDBTMCalculationAssociatedToTest.Add(item);
-                    }
-                }
-                if (insertDBTMCalculationAssociatedToTest?.Count > 0)
-                {
-                    _dBTMCalculationAssociatedToTestRepository.Insert(insertDBTMCalculationAssociatedToTest);
-                }
-                if (deleteDBTMCalculationAssociatedToTest?.Count > 0)
-                {
-                    _dBTMCalculationAssociatedToTestRepository.Delete(deleteDBTMCalculationAssociatedToTest);
-                }
-
                 List<DBTMTestGraph> deleteDBTMTestGraphList = null;
                 List<DBTMTestGraph> insertDBTMTestGraphList = null;
 
@@ -339,34 +224,6 @@ namespace Coditech.API.Service
             objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTest @DBTMTestMasterId,  @Status OUT", 1, out status);
 
             return status == 1 ? true : false;
-        }
-
-        public virtual DBTMTestParameterListModel GetDBTMTestParameter()
-        {
-            DBTMTestParameterListModel list = new DBTMTestParameterListModel
-            {
-                DBTMTestParameterList = (from a in _dBTMTestParameterRepository.Table
-                                         select new DBTMTestParameterModel
-                                         {
-                                             DBTMTestParameterId = a.DBTMTestParameterId,
-                                             ParameterName = a.ParameterName,
-                                         }).ToList()
-            };
-            return list;
-        }
-
-        public virtual DBTMTestCalculationListModel GetDBTMTestCalculation()
-        {
-            DBTMTestCalculationListModel list = new DBTMTestCalculationListModel
-            {
-                DBTMTestCalculationList = (from a in _dBTMTestCalculationRepository.Table
-                                           select new DBTMTestCalculationModel
-                                           {
-                                               DBTMTestCalculationId = a.DBTMTestCalculationId,
-                                               CalculationName = a.CalculationName,
-                                           }).ToList()
-            };
-            return list;
         }
 
         public virtual DBTMGraphMasterListModel GetDBTMGraph(int dBTMTestMasterId)

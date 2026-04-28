@@ -32,8 +32,6 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult Create()
         {
             DBTMTestViewModel dBTMTestViewModel = new DBTMTestViewModel();
-            BindDBTMTestParameter(dBTMTestViewModel);
-            BindDBTMTestCalculation(dBTMTestViewModel);
             BindDBTMGraph(dBTMTestViewModel);
             return View(createEdit, dBTMTestViewModel);
         }
@@ -57,8 +55,6 @@ namespace Coditech.Admin.Controllers
                     }
                 }
             }
-            BindDBTMTestParameter(dBTMTestViewModel);
-            BindDBTMTestCalculation(dBTMTestViewModel);
             BindDBTMGraph(dBTMTestViewModel);
             SetNotificationMessage(GetErrorNotificationMessage(dBTMTestViewModel.ErrorMessage));
             return View(createEdit, dBTMTestViewModel);
@@ -68,8 +64,6 @@ namespace Coditech.Admin.Controllers
         public virtual ActionResult Edit(int dBTMTestMasterId)
         {
             DBTMTestViewModel dBTMTestViewModel = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId);
-            BindDBTMTestParameter(dBTMTestViewModel);
-            BindDBTMTestCalculation(dBTMTestViewModel);
             BindDBTMGraph(dBTMTestViewModel);
             return ActionView(createEdit, dBTMTestViewModel);
         }
@@ -91,8 +85,6 @@ namespace Coditech.Admin.Controllers
                     return RedirectToAction(AdminConstants.ActionRedirectToList);
                 }
             }
-            BindDBTMTestParameter(dBTMTestViewModel);
-            BindDBTMTestCalculation(dBTMTestViewModel);
             BindDBTMGraph(dBTMTestViewModel);
             return View(createEdit, dBTMTestViewModel);
         }
@@ -416,40 +408,7 @@ namespace Coditech.Admin.Controllers
         }
         #endregion
         #region Protected
-        protected virtual void BindDBTMTestParameter(DBTMTestViewModel dBTMTestViewModel)
-        {
-            dBTMTestViewModel.DBTMTestParameterList = dBTMTestViewModel.DBTMTestParameterList ?? new List<SelectListItem>();
-            DBTMTestParameterListViewModel parameterList = _dBTMTestAgent.DBTMTestParameter();
-
-            if (parameterList?.DBTMTestParameterList != null)
-            {
-                foreach (var item in parameterList.DBTMTestParameterList)
-                {
-                    dBTMTestViewModel.DBTMTestParameterList.Add(new SelectListItem
-                    {
-                        Text = item.ParameterName,
-                        Value = item.DBTMTestParameterId.ToString()
-                    });
-                }
-            }
-        }
-        protected virtual void BindDBTMTestCalculation(DBTMTestViewModel dBTMTestViewModel)
-        {
-            dBTMTestViewModel.DBTMTestCalculationList = dBTMTestViewModel.DBTMTestCalculationList ?? new List<SelectListItem>();
-            DBTMTestCalculationListViewModel parameterList = _dBTMTestAgent.DBTMTestCalculation();
-
-            if (parameterList?.DBTMTestCalculationList != null)
-            {
-                foreach (var item in parameterList.DBTMTestCalculationList)
-                {
-                    dBTMTestViewModel.DBTMTestCalculationList.Add(new SelectListItem
-                    {
-                        Text = item.CalculationName,
-                        Value = item.DBTMTestCalculationId.ToString()
-                    });
-                }
-            }
-        }
+      
         protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)
         {
             dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();

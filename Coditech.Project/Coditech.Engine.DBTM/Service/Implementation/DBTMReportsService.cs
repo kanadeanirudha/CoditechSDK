@@ -20,10 +20,6 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         private readonly ICoditechRepository<DBTMDeviceDataDetails> _dBTMDeviceDataDetailsRepository;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
-        private readonly ICoditechRepository<DBTMParametersAssociatedToTest> _dBTMParametersAssociatedToTestRepository;
-        private readonly ICoditechRepository<DBTMTestParameter> _dBTMTestParameterRepository;
-        private readonly ICoditechRepository<DBTMCalculationAssociatedToTest> _dBTMCalculationAssociatedToTestRepository;
-        private readonly ICoditechRepository<DBTMTestCalculation> _dBTMTestCalculationRepository;
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMTestParameterListviewSequenceRepository;
@@ -41,12 +37,8 @@ namespace Coditech.API.Service
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataDetailsRepository = new CoditechRepository<DBTMDeviceDataDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMTestParameterRepository = new CoditechRepository<DBTMTestParameter>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMTestCalculationRepository = new CoditechRepository<DBTMTestCalculation>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMCalculationAssociatedToTestRepository = new CoditechRepository<DBTMCalculationAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dBTMParametersAssociatedToTestRepository = new CoditechRepository<DBTMParametersAssociatedToTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterListviewSequenceRepository = new CoditechRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestParameterVerticalViewSequenceRepository = new CoditechRepository<DBTMTestParameterVerticalViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -916,98 +908,6 @@ namespace Coditech.API.Service
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
                     return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport);
-                }
-
-                List<string> displayColumn = isMobileRequest
-                       ? new List<string> { "Activity Time", "Person Name" }
-                       : new List<string> { "Activity Time", "Person Name", "Activity Status", "Weight", "Height" };
-
-                foreach (var item in displayColumn)
-                    dataTable.Columns.Add(item, typeof(string));
-
-                var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
-                                      join b in _dBTMTestParameterRepository.Table
-                                      on a.DBTMTestParameterId equals b.DBTMTestParameterId
-                                      where a.DBTMTestMasterId == dBTMTestMasterId && a.IsActive
-                                      select new
-                                      {
-                                          b.ParameterName,
-                                          b.ParameterCode
-                                      })?.Distinct()?.ToList();
-                var calculationColumns = (from a in _dBTMCalculationAssociatedToTestRepository.Table
-                                          join b in _dBTMTestCalculationRepository.Table
-                                          on a.DBTMTestCalculationId equals b.DBTMTestCalculationId
-                                          where a.DBTMTestMasterId == dBTMTestMasterId
-                                          orderby b.OrderBy ascending
-                                          select new { b.CalculationName, b.CalculationCode })?.Distinct()?.ToList();
-
-                DataRow newRow = null;
-                DateTime? dateTime = null;
-                foreach (var item in dBTMReportsList)
-                {
-                    if (dateTime != item.CreatedDate)
-                    {
-                        newRow = dataTable.NewRow();
-                        foreach (string displayColumnName in displayColumn)
-                        {
-                            switch (displayColumnName)
-                            {
-                                case "Activity Name":
-                                    newRow["Activity Name"] = item.TestName;
-                                    break;
-                                case "Person Name":
-                                    newRow["Person Name"] = $"{item.FirstName} {item.LastName}~False~~{item.DBTMTraineeDetailId}";
-                                    break;
-                                case "Activity Status":
-                                    newRow["Activity Status"] = item.ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
-                                    break;
-                                case "Weight":
-                                    newRow["Weight"] = $"{item.Weight} {DBTMCustomHelper.Unit("Weight")}";
-                                    break;
-                                case "Height":
-                                    newRow["Height"] = $"{item.Height} {DBTMCustomHelper.Unit("Height")}";
-                                    break;
-                                case "Activity Time":
-                                    newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
-                                        ? item.TestPerformedTime.ToString("hh:mm:ss tt")
-                                        : item.TestPerformedTime;
-                                    break;
-                            }
-                        }
-                    }
-
-                    if (dateTime != item.CreatedDate && !string.IsNullOrEmpty(item.ParameterCode))
-                    {
-                        foreach (var item1 in calculationColumns)
-                        {
-                            if (!dataTable.Columns.Contains(item1.CalculationName))
-                            {
-                                dataTable.Columns.Add(item1.CalculationName, typeof(String));
-                            }
-                            DBTMCustomHelper.Calculation(item1.CalculationCode, item1.CalculationName, newRow, dBTMReportsList, item.CreatedDate);
-                        }
-                    }
-                    string parameterName = testColumnList.FirstOrDefault(x => x.ParameterCode == item.ParameterCode)?.ParameterName;
-                    if (!string.IsNullOrEmpty(parameterName))
-                    {
-                        string columnName = string.IsNullOrEmpty(item.FromTo) ? parameterName : $"{item.FromTo}-{parameterName}";
-                        if (!dataTable.Columns.Contains(columnName))
-                        {
-                            dataTable.Columns.Add(columnName, typeof(String));
-                        }
-
-                        newRow[columnName] = $"{item.ParameterValue} {DBTMCustomHelper.Unit(item.ParameterCode)}";
-                    }
-                    if (dateTime != item.CreatedDate)
-                    {
-                        dataTable.Rows.Add(newRow);
-                    }
-                    dateTime = item.CreatedDate;
-                }
-
-                foreach (DataColumn col in dataTable.Columns)
-                {
-                    col.ColumnName = $"{col.ColumnName} {DBTMCustomHelper.Unit(col.ColumnName)}";
                 }
             }
             return dataTable;

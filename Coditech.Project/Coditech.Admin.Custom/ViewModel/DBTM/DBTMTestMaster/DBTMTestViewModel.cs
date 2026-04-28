@@ -24,17 +24,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
 
-        [Required]
-        [Display(Name = "Parameter")]
-        public List<string> DBTMSelectedTestParameter { get; set; }
         [Display(Name = "Graph")]
         public List<string> DBTMSelectedGraph { get; set; }
-        [Required]
-        [Display(Name = "Calculation")]
-        public List<string> DBTMSelectedTestCalculation { get; set; }
-        public List<SelectListItem> DBTMTestParameterList { get; set; }
         public List<SelectListItem> DBTMGraphMasterList { get; set; }
-        public List<SelectListItem> DBTMTestCalculationList { get; set; }
         [Display(Name = "Minimun Paired Device")]
         public short MinimunPairedDevice { get; set; }
         [Display(Name = "Lap Distance")]
@@ -58,7 +50,11 @@ namespace Coditech.Admin.ViewModel
         public string PerformanceMatrix { get; set; }
         [Display(Name = " Is Start Direction")]
         public bool IsStartDirection { get; set; }
+        [Required]
         [Display(Name = " Activity Output Higher")]
         public string TestOutputHigher { get; set; }
+        [Display(Name = "Test Result Basedon")]
+        [Required]
+        public string TestResultBasedon { get; set; }
     }
 }

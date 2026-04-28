@@ -382,6 +382,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeProfileListViewModel model = new DBTMTraineeProfileListViewModel();
             model.CustomDropdownList1 = new List<SelectListItem>();
+            model.ToDate = DateTime.Today;
             return View(profiledetailslist, model);
         }
 
@@ -397,9 +398,9 @@ namespace Coditech.Admin.Controllers
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
         }
         [HttpGet]
-        public ActionResult GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy)
+        public ActionResult GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
         {
-            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy);
+            DBTMTraineeProfileListViewModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
             list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
@@ -409,6 +410,16 @@ namespace Coditech.Admin.Controllers
             List<DateTime> dates = _dBTMReportsAgent.GetCampActivityPerformedDates(dBTMTestMasterIds, dBTMCampMasterId);
             return Json(dates);
         }
+
+        [HttpGet]
+        public IActionResult GetTraineeListActivityDates(string traineeIds, int generalBatchMasterId)
+        {
+            if (string.IsNullOrWhiteSpace(traineeIds))
+                return Json(new List<string>());
+            List<DateTime> dates = _dBTMReportsAgent.GetTraineeListActivityDates(traineeIds, generalBatchMasterId);
+            return Json(dates);
+        }
+
         #endregion
     }
 }

@@ -135,25 +135,6 @@ namespace Coditech.Admin.Agents
             }
         }
 
-        public virtual DBTMTestParameterListViewModel DBTMTestParameter()
-        {
-
-            DBTMTestParameterListResponse response = _dBTMTestClient.GetDBTMTestParameter();
-            DBTMTestParameterListModel dBTMTestParameterList = new DBTMTestParameterListModel { DBTMTestParameterList = response?.DBTMTestParameterList };
-            DBTMTestParameterListViewModel listViewModel = new DBTMTestParameterListViewModel();
-            listViewModel.DBTMTestParameterList = dBTMTestParameterList?.DBTMTestParameterList?.ToViewModel<DBTMTestParameterViewModel>().ToList();
-            return listViewModel;
-        }
-
-        public virtual DBTMTestCalculationListViewModel DBTMTestCalculation()
-        {
-
-            DBTMTestCalculationListResponse response = _dBTMTestClient.GetDBTMTestCalculation();
-            DBTMTestCalculationListModel dBTMTestCalculationList = new DBTMTestCalculationListModel { DBTMTestCalculationList = response?.DBTMTestCalculationList };
-            DBTMTestCalculationListViewModel listViewModel = new DBTMTestCalculationListViewModel();
-            listViewModel.DBTMTestCalculationList = dBTMTestCalculationList?.DBTMTestCalculationList?.ToViewModel<DBTMTestCalculationViewModel>().ToList();
-            return listViewModel;
-        }
         public virtual DBTMGraphMasterListViewModel DBTMGraph(int dBTMTestMasterId)
         {
             DBTMGraphMasterListResponse response = _dBTMTestClient.GetDBTMGraph(dBTMTestMasterId);
@@ -430,7 +411,7 @@ namespace Coditech.Admin.Agents
         public virtual DBTMCentreWiseTestListViewModel GetTestsByCentreCode(string centreCode)
         {
             DBTMCentreWiseTestListResponse response = _dBTMTestClient.GetTestsByCentreCode(centreCode);
-            DBTMCentreWiseTestListViewModel listViewModel =  new DBTMCentreWiseTestListViewModel();
+            DBTMCentreWiseTestListViewModel listViewModel = new DBTMCentreWiseTestListViewModel();
             listViewModel.DBTMCentreWiseTestList = response?.DBTMCentreWiseTestList?.ToViewModel<DBTMCentreWiseTestViewModel>().ToList();
             return listViewModel;
         }

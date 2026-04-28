@@ -154,54 +154,6 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
-        
-        [HttpGet]
-        [Route("/DBTMTestMaster/GetDBTMTestParameter")]
-        [Produces(typeof(DBTMTestParameterListResponse))]
-        [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMTestParameter()
-        {
-            try
-            {
-                DBTMTestParameterListModel list = _dBTMTestMasterService.GetDBTMTestParameter();
-                string data = ApiHelper.ToJson(list);
-                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestParameterListResponse>(data) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTestParameter", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestParameterListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTestParameter", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestParameterListResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("/DBTMTestMaster/GetDBTMTestCalculation")]
-        [Produces(typeof(DBTMTestCalculationListResponse))]
-        [TypeFilter(typeof(BindQueryFilter))]
-        public virtual IActionResult GetDBTMTestCalculation()
-        {
-            try
-            {
-                DBTMTestCalculationListModel list = _dBTMTestMasterService.GetDBTMTestCalculation();
-                string data = ApiHelper.ToJson(list);
-                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestCalculationListResponse>(data) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTestCalculation", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestCalculationListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTestCalculation", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestCalculationListResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
 
         [HttpGet]
         [Route("/DBTMTestMaster/GetDBTMGraph")]

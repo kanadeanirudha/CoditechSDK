@@ -36,6 +36,12 @@
                                 </div>
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label">Date</label>
+                            </div>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="col-md-1">
                                 <label class="form-label">Order By</label>
                             </div>
                             <div class="col-md-2">
@@ -56,56 +62,82 @@
             </div>
         </div>
     </div>
+    <style>
+        .activity-date a {
+            background-color: #198754 !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+    </style>
     <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
     <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
-    <!-- ✅ ADD THIS FIRST -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section scripts {
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
+            $("#DBTMTraineeDetailId").on("changed.bs.select", function () {
+                DBTMReports.LoadTraineeProfileActivityDates();
+            });
+            $("#GeneralBatchMasterId").change(function () {
+                DBTMReports.LoadTraineeProfileActivityDates();
+            });
+        var dateFormat = "@AdminGeneralHelper.DateFormatForCalendar()";
+        $("#ToDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: dateFormat,
+            maxDate: new Date(),
+            beforeShowDay: function (date) {
+                if (!activityPerformedDates || activityPerformedDates.length === 0) {
+                    return [false, "", ""];
+                }
+                var d = date.getFullYear() + "-" +
+                    String(date.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(date.getDate()).padStart(2, "0");
 
-            // ✅ initialize selectpicker
+                if (activityPerformedDates.includes(d)) {
+                    return [true, "activity-date", "Trainee Performed"]; 
+                }
+                return [false, "", "No Trainee"]; 
+            }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
             $('#DBTMTraineeDetailId').selectpicker();
-
-            // ✅ disable initially
             $("#DBTMTraineeDetailId")
                 .prop("disabled", true)
                 .selectpicker('refresh');
-
-            // ✅ batch change
             $("#GeneralBatchMasterId").on("change", function () {
-
                 var batchId = $(this).val();
-
                 $("#DBTMTraineeDetailId")
                     .prop("disabled", !batchId)
                     .selectpicker('refresh');
             });
-
-            // ✅ select all logic
             $('#DBTMTraineeDetailId').on('changed.bs.select',
                 function (e, clickedIndex, isSelected) {
-
                 var $select = $(this);
                 var selectedValues = $select.val() || [];
                 var allValue = "0";
                 var totalOptions = $select.find('option').length - 1;
-
                 if (clickedIndex === 0) {
                     $select.find('option')
                            .prop('selected', isSelected);
                     $select.selectpicker('refresh');
                     return;
                 }
-
                 var selectedWithoutAll =
                     selectedValues.filter(v => v !== allValue);
-
                 $select.find('option[value="0"]')
                        .prop('selected',
                              selectedWithoutAll.length === totalOptions);
-
                 $select.selectpicker('refresh');
             });
 
         });
     </script>
+}
