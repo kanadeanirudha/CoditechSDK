@@ -251,7 +251,11 @@ namespace Coditech.API.Service
 
             DBTMTraineeProfileModel dBTMTraineeProfileModel = GetProfileDetailsList(generalBatchMasterId, dBTMTraineeDetailId.ToString(), string.Empty, DateTime.Now.AddDays(-365), DateTime.Now)?.DBTMTraineeProfileList?.FirstOrDefault();
             dBTMTraineeProfileModel.GeneralBatchMasterId = generalBatchMasterId;
-
+            GeneralBatchMaster batch = _generalBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchMasterId);
+            if (batch != null)
+            {
+                dBTMTraineeProfileModel.BatchName = batch.BatchName;
+            }
             return dBTMTraineeProfileModel;
         }
 
@@ -456,6 +460,12 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.WeeklyHours, profile.WeekelyHours?.ToString("hh\\:mm"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TotalDuration, profile.TotalDuration, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TrainerName, profile.TrainerName, html);
+            html = html.Replace("#Batch#", profile.BatchName ?? "");
+            html = html.Replace("#WeeklyHours#", profile.WeekelyHours?.ToString());
+            html = html.Replace("#Sport#", profile.Sport ?? "");
+            html = html.Replace("#Rank#", profile.Rank ?? "");
+            html = html.Replace("#Session#", profile.Session ?? "");
+            html = html.Replace("#Participants#", profile.Participants ?? "");
             html = ReplaceTokenWithMessageText("#ReportIssuedDate#", DateTime.Now.ToString("dd-MMM-yyyy"), html);
             if (string.IsNullOrWhiteSpace(remarks))
             {
