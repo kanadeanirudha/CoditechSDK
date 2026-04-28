@@ -47,8 +47,22 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMDeviceRegistrationDetailsModel> dBTMDeviceRegistrationDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMDeviceRegistrationDetailsList @UserId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 5, out pageListModel.TotalRowCount)?.ToList();
+            if (dBTMDeviceRegistrationDetailsList != null)
+            {
+                foreach (var item in dBTMDeviceRegistrationDetailsList)
+                {
+                    if (item.WarrantyExpirationDate != null)
+                    {
+                        var daysLeft = (item.WarrantyExpirationDate.Date - DateTime.Now.Date).Days;
+                        item.DurationInDaysLeft = daysLeft > 0 ? daysLeft : 0;
+                    }
+                    else
+                    {
+                        item.DurationInDaysLeft = 0;
+                    }
+                }
+            }
             DBTMDeviceRegistrationDetailsListModel listModel = new DBTMDeviceRegistrationDetailsListModel();
-
             listModel.RegistrationDetailsList = dBTMDeviceRegistrationDetailsList?.Count > 0 ? dBTMDeviceRegistrationDetailsList : new List<DBTMDeviceRegistrationDetailsModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;

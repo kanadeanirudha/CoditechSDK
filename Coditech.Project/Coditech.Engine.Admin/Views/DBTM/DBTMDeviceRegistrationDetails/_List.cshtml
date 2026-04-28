@@ -23,6 +23,16 @@
                             <td>@item.SlaveDeviceCode</td>
                             <td>@item.PurchaseDate.ToCoditechDateFormat()</td>
                             <td>@item.WarrantyExpirationDate.ToCoditechDateFormat()</td>
+                            <td>
+                                @if (item.DurationInDaysLeft > 0)
+                                {
+                                    <span class="badge bg-success">@item.DurationInDaysLeft</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Expired</span>
+                                }
+                            </td>
                            @*  <td> @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsMasterDevice)</td> *@
                         </tr>
                     }

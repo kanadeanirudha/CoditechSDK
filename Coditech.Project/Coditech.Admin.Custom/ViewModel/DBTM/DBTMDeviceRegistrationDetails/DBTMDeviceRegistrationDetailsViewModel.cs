@@ -22,5 +22,7 @@ namespace Coditech.Admin.ViewModel
         public DateTime WarrantyExpirationDate { get; set; }
         public bool IsMasterDevice { get; set; }
         public string SlaveDeviceCode { get; set; }
+        [Display(Name = "Duration In Days Left")]
+        public int DurationInDaysLeft { get; set; }
     }
 }
