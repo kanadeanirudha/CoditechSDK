@@ -1389,7 +1389,20 @@ namespace Coditech.API.Service
                     if (sheetName.Length > 31)
                         sheetName = sheetName.Substring(0, 31);
                     var worksheet = workbook.Worksheets.Add(sheetName);
-                    worksheet.Cell(1, 1).InsertTable(table.Value, sheetName, true);
+                    var dt = table.Value;
+                    for (int col = 0; col < dt.Columns.Count; col++)
+                    {
+                        worksheet.Cell(1, col + 1).Value = dt.Columns[col].ColumnName.Split('~')[0];
+                    }
+                    for (int row = 0; row < dt.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dt.Columns.Count; col++)
+                        {
+                            var rawValue = dt.Rows[row][col]?.ToString() ?? "";
+                            var value = rawValue.Split('~');
+                            worksheet.Cell(row + 2, col + 1).Value = value[0]; 
+                        }
+                    }
                 }
                 workbook.SaveAs(filePath);
             }
