@@ -398,7 +398,7 @@ namespace Coditech.API.Service
             }
             if (!personCodes.Any())
                 return new List<DateTime>();
-            var dates = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode)).Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
+            var dates = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode) && x.TypeOfRecord == "Batch" && x.TablePrimaryColumnId == generalBatchMasterId ).Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
             return dates;
         }
         #endregion

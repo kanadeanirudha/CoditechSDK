@@ -227,34 +227,16 @@ namespace Coditech.API.Service
                 return new List<DateTime>();
             List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
             bool isAllTest = testIds.Contains(0);
-            var traineeDetailIds = _generalBatchUserRepository.Table
-                .Where(a => a.GeneralBatchMasterId == generalBatchMasterId
-                            && a.UserType == "Trainee")
-                .Select(a => a.EntityId)
-                .ToList();
+            var traineeDetailIds = _generalBatchUserRepository.Table.Where(a => a.GeneralBatchMasterId == generalBatchMasterId && a.UserType == "Trainee").Select(a => a.EntityId).ToList();
             if (!traineeDetailIds.Any())
                 return new List<DateTime>();
-            var personCodes = _dBTMTraineeDetailsRepository.Table
-                .Where(t => traineeDetailIds.Contains(t.DBTMTraineeDetailId))
-                .Select(t => t.PersonCode)
-                .ToList();
+            var personCodes = _dBTMTraineeDetailsRepository.Table.Where(t => traineeDetailIds.Contains(t.DBTMTraineeDetailId)).Select(t => t.PersonCode).ToList();
             if (!personCodes.Any())
                 return new List<DateTime>();
-            var testCodes = _dBTMTestMasterRepository.Table
-                .Where(x => isAllTest || testIds.Contains(x.DBTMTestMasterId))
-                .Select(x => x.TestCode)
-                .ToList();
+            var testCodes = _dBTMTestMasterRepository.Table.Where(x => isAllTest || testIds.Contains(x.DBTMTestMasterId)).Select(x => x.TestCode).ToList();
             if (!testCodes.Any())
                 return new List<DateTime>();
-            var dates = _dBTMDeviceDataRepository.Table
-                .Where(f => personCodes.Contains(f.PersonCode)
-                            && f.TypeOfRecord == "Batch"
-                            && f.TablePrimaryColumnId == generalBatchMasterId
-                            && testCodes.Contains(f.TestCode))
-                .Select(f => (f.CreatedDate ?? f.TestPerformedTime).Date)
-                .Distinct()
-                .OrderBy(d => d)
-                .ToList();
+            var dates = _dBTMDeviceDataRepository.Table.Where(f => personCodes.Contains(f.PersonCode) && f.TypeOfRecord == "Batch" && f.TablePrimaryColumnId == generalBatchMasterId && testCodes.Contains(f.TestCode)).Select(f => (f.CreatedDate ?? f.TestPerformedTime).Date).Distinct().OrderBy(d => d).ToList();
             return dates;
         }
         private void BindInstantaneousChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<DateTime, DBTMReportsModel>> groupedReports, string[] colorPalette)
