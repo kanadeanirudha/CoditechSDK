@@ -946,7 +946,7 @@ namespace Coditech.API.Service
                                 newRow["Activity Name"] = group.FirstOrDefault().TestName;
                                 break;
                             case "Person Name":
-                                newRow["Person Name"] = $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}~False~~{group.FirstOrDefault().DBTMTraineeDetailId}";
+                                newRow["Person Name"] = !isDownloadReport ? $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}~False~~{group.FirstOrDefault().DBTMTraineeDetailId}" : $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}";
                                 break;
                             //case "Activity Status":
                             //    newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
