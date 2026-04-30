@@ -11,7 +11,6 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using System.Collections.Specialized;
 using System.Data;
-using System.Linq;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -448,9 +447,44 @@ namespace Coditech.API.Service
             return $"{years} years {months} months {days} days";
         }
 
+        public static string ImageUrlToBase64(string imageUrl)
+        {
+            var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+
+            using var client = new HttpClient(handler);
+
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
+            client.DefaultRequestHeaders.Add("Accept", "*/*");
+
+            HttpResponseMessage response = client.GetAsync(imageUrl).Result;
+
+            response.EnsureSuccessStatusCode();
+
+            byte[] bytes = response.Content.ReadAsByteArrayAsync().Result;
+
+            string contentType =
+                response.Content.Headers.ContentType?.MediaType ?? "image/png";
+
+            string base64 = Convert.ToBase64String(bytes);
+
+            return $"data:{contentType};base64,{base64}";
+        }
         //Template Html Replacement
         private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
         {
+            string logoImage = ImageUrlToBase64("https://dbtm-prod-api-mediamanager.poweredsportstech.com/Data/ApplicationImages/ApplicationLogo.png");
+            html = ReplaceTokenWithMessageText("#LogoImage#", logoImage, html);
+
+            string personImage = ImageUrlToBase64("https://dbtm-prod-api-mediamanager.poweredsportstech.com/Data/Media/eeaf0d14-bff4-4f30-a159-e66cc24d750e_maleavatar.png");
+            html = ReplaceTokenWithMessageText("#PersonImage#", personImage, html);
+
+            //string logoImage = ConvertImageToBase64("https://dbtm-prod-api-mediamanager.poweredsportstech.com/Data/Media/a5a540e1-b5d0-4325-a3ec-754e9b2905ca_female.jpg");
+            //html = ReplaceTokenWithMessageText("#LogoImage#", logoImage, html);
+
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
@@ -467,22 +501,14 @@ namespace Coditech.API.Service
             html = html.Replace("#Session#", profile.Session ?? "");
             html = html.Replace("#Participants#", profile.Participants ?? "");
             html = ReplaceTokenWithMessageText("#ReportIssuedDate#", DateTime.Now.ToString("dd-MMM-yyyy"), html);
-            if (string.IsNullOrWhiteSpace(remarks))
-            {
-                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, html);
-            }
-            else
-            {
-                string remarksHtml = $@"<div style=""margin-top:15px;border:1px solid #333;padding:10px;min-height:60px;""><strong>Remarks:</strong><br/>{remarks}</div>";
-                html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarksHtml, html);
-            }
+
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
             if (profile?.TraineeProfilePerformanceList?.Count > 0)
             {
                 var traineeProfilePerformanceList = (profile.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
                .GroupBy(x => x.PerformanceMatrix).ToDictionary(g => g.Key, g => g.ToList());
                 int maxRows = traineeProfilePerformanceList.Values.Max(g => g.Count);
-                string performanceMatrixHtml = "<table style=\"width:100%;min-width:900px;border-collapse:collapse;font-size:14px;\">";
+                string performanceMatrixHtml = "<table width=\"100%\" cellpadding=\"10\" cellspacing=\"0\" style=\"border-collapse:collapse; margin-top:30px;\">";
                 //Bind Table Header
                 performanceMatrixHtml += " <thead><tr>";
                 foreach (var matrix in traineeProfilePerformanceList.Keys)
@@ -502,17 +528,27 @@ namespace Coditech.API.Service
                         var tests = traineeProfilePerformanceList[matrix];
                         if (i < tests.Count)
                         {
-                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">" + tests[i].TestName + "</td>";
-                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">" + tests[i].Score + "</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #182650;padding: 8px;text-align:center;font-size:14px;\">" + tests[i].TestName + "</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #182650;padding: 8px;text-align:center;font-size:14px;\">" + tests[i].Score + "</td>";
                         }
                         else
                         {
-                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">-</td>";
-                            performanceMatrixHtml += "<td style=\"border:1px solid #333;padding:8px;text-align:center;\">-</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #182650;padding: 8px;text-align:center;font-size:14px;\">-</td>";
+                            performanceMatrixHtml += "<td style=\"border:1px solid #182650;padding: 8px;text-align:center;font-size:14px;\">-</td>";
                         }
                     }
                     performanceMatrixHtml += "</tr>";
                 }
+                string remarksHtml = "<tr><td colspan=\"10\" style=\"border:1px solid #182650;padding: 8px;text-align:left;font-size:14px;\"><strong>Remark:</strong> #Remarks#</td></tr>";
+                if (string.IsNullOrWhiteSpace(remarks))
+                {
+                    remarksHtml = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, remarksHtml);
+                }
+                else
+                {
+                    remarksHtml = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, remarks, remarksHtml);
+                }
+                performanceMatrixHtml += remarksHtml;
                 performanceMatrixHtml += "</tbody>";
                 //End Bind Table Rows
                 performanceMatrixHtml += "</table>";
