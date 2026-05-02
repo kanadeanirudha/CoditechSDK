@@ -9,9 +9,11 @@ using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using ScottPlot;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
+
 namespace Coditech.API.Service
 {
     public class DBTMTraineeDetailsService : BaseService, IDBTMTraineeDetailsService
@@ -279,7 +281,7 @@ namespace Coditech.API.Service
 
             var pdf = new HtmlToPdfDocument
             {
-                GlobalSettings = { PaperSize = PaperKind.A4, Orientation = Orientation.Portrait, Out = filePath },
+                GlobalSettings = { PaperSize = PaperKind.A4, Orientation = DinkToPdf.Orientation.Portrait, Out = filePath },
                 Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
             };
             _converter.Convert(pdf);
@@ -354,7 +356,7 @@ namespace Coditech.API.Service
                       ? CalculateDuration(dBTMTraineeProfileModel.DateOfJoining.Value, DateTime.Now)
                       : "N/A";
 
-                    dBTMTraineeProfileModel.TrainerName = trainerList.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId)?.TrainerName ?? "N/A";
+                    dBTMTraineeProfileModel.TrainerName = string.Join(", ", trainerList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId).Select(x => x.TrainerName).Distinct()) ?? "N/A";
                     dBTMTraineeProfileModel.TraineeProfilePerformanceList = traineeProfilePerformanceList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId)?.ToList();
                     if (dt?.Rows?.Count > 0)
                     {
@@ -447,7 +449,7 @@ namespace Coditech.API.Service
             return $"{years} years {months} months {days} days";
         }
 
-        public static string ImageUrlToBase64(string imageUrl)
+        private string ImageUrlToBase64(string imageUrl)
         {
             var handler = new HttpClientHandler()
             {
@@ -473,18 +475,36 @@ namespace Coditech.API.Service
 
             return $"data:{contentType};base64,{base64}";
         }
+
+        private string ConvertFolderPathImageToBase64(string path, string contentType)
+        {
+            byte[] imageBytes = File.ReadAllBytes(path);
+            string base64String = Convert.ToBase64String(imageBytes);
+            return $"data:{contentType};base64,{base64String}";
+        }
+
         //Template Html Replacement
         private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
         {
-            string logoImage = ImageUrlToBase64("https://dbtm-prod-api-mediamanager.poweredsportstech.com/Data/ApplicationImages/ApplicationLogo.png");
-            html = ReplaceTokenWithMessageText("#LogoImage#", logoImage, html);
-
-            string personImage = ImageUrlToBase64("https://dbtm-prod-api-mediamanager.poweredsportstech.com/Data/Media/eeaf0d14-bff4-4f30-a159-e66cc24d750e_maleavatar.png");
+            string gender = GetEnumCodeByEnumId(profile.GenderEnumId);
+            string personImage = "";
+            if (!string.IsNullOrEmpty(profile.PhotoMediaPath))
+            {
+                personImage = ImageUrlToBase64(profile.PhotoMediaPath);
+            }
+            else
+            {
+                string path = gender == "Male" ? "data/Images/MaleAvatar.png" : "data/Images/MaleAvatar.png";
+                personImage = ConvertFolderPathImageToBase64(path, "image/png");
+            }
             html = ReplaceTokenWithMessageText("#PersonImage#", personImage, html);
 
-            //string logoImage = ConvertImageToBase64("https://dbtm-prod-api-mediamanager.poweredsportstech.com/Data/Media/a5a540e1-b5d0-4325-a3ec-754e9b2905ca_female.jpg");
-            //html = ReplaceTokenWithMessageText("#LogoImage#", logoImage, html);
+            string heightWeightImage = ConvertFolderPathImageToBase64(gender == "Male" ? "data/Images/HeightWeightMale.png" : "data/Images/HeightWeightFemale.png", "image/png");
 
+            string radarImage = $"data:image/png;base64,{GenerateRadarChartBase64(profile.RadarChart)}";
+            html = ReplaceTokenWithMessageText("#PersonImage#", personImage, html);
+            html = ReplaceTokenWithMessageText("#HeightWeightImage#", heightWeightImage, html);
+            html = ReplaceTokenWithMessageText("#Graph#", radarImage, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
@@ -496,10 +516,10 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.TrainerName, profile.TrainerName, html);
             html = html.Replace("#Batch#", profile.BatchName ?? "");
             html = html.Replace("#WeeklyHours#", profile.WeekelyHours?.ToString());
-            html = html.Replace("#Sport#", profile.Sport ?? "");
+            html = html.Replace("#Sport#", profile.Specialization ?? "");
             html = html.Replace("#Rank#", profile.Rank ?? "");
             html = html.Replace("#Session#", profile.Session ?? "");
-            html = html.Replace("#Participants#", profile.Participants ?? "");
+            html = html.Replace("#Participants#", Convert.ToString(profile.TotalParticipants) ?? "");
             html = ReplaceTokenWithMessageText("#ReportIssuedDate#", DateTime.Now.ToString("dd-MMM-yyyy"), html);
 
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, centreName, html);
@@ -742,66 +762,6 @@ namespace Coditech.API.Service
             return dt;
         }
 
-        //private List<DBTMTraineeProfilePerformanceModel> GetTraineePerformanceDetails(string dBTMTraineeDetailIds, DateTime FromDate, DateTime ToDate)
-        //{
-        //    List<DBTMTraineeProfilePerformanceModel> listModel = new List<DBTMTraineeProfilePerformanceModel>();
-        //    CoditechViewRepository<DBTMTraineeProfilePerformanceModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-        //    objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
-        //    objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
-        //    objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
-        //    List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceListData = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestAndPerformanceMatrixByTraineeDetailIds @DBTMTraineeDetailIds,@FromDate, @ToDate")?.ToList();
-        //    if (traineeProfilePerformanceListData != null && traineeProfilePerformanceListData.Count > 0)
-        //    {
-        //        traineeProfilePerformanceListData.ForEach(x =>
-        //        {
-        //            x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
-        //        });
-        //        foreach (string dBTMTraineeDetailId in dBTMTraineeDetailIds.Split(","))
-        //        {
-        //            foreach (var item in traineeProfilePerformanceListData.Where(x => x.DBTMTraineeDetailId.ToString() == dBTMTraineeDetailId).GroupBy(x => x.TestCode))
-        //            {
-        //                List<DBTMTraineeProfilePerformanceModel> list = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.RowNumber == 1 && x.DBTMTraineeDetailId == item.FirstOrDefault().DBTMTraineeDetailId).ToList();
-        //                DBTMTraineeProfilePerformanceModel performanceModel = new DBTMTraineeProfilePerformanceModel();
-        //                performanceModel.TestCode = item.Key;
-        //                performanceModel.TestName = list.FirstOrDefault().TestName;
-        //                performanceModel.PerformanceMatrix = list.FirstOrDefault().PerformanceMatrix;
-        //                performanceModel.DBTMTraineeDetailId = Convert.ToInt64(dBTMTraineeDetailId);
-        //                decimal lastRecordSum, previousResordSum;
-        //                if (list.Any(x => x.ParameterCode == CustomConstants.Count && (x.TestCode != CustomConstants.PlateTapTest)))
-        //                {
-        //                    lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Count).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    performanceModel.Score = $"{Convert.ToUInt32(lastRecordSum)} {DBTMCustomHelper.Unit(CustomConstants.Count)} (Total Count)";
-        //                    previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Count && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
-        //                }
-        //                else if (list.Any(x => x.ParameterCode == CustomConstants.Time))
-        //                {
-        //                    lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.Time).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.Time)} (Total Time)";
-        //                    previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.Time && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
-        //                }
-        //                if (list.Any(x => x.ParameterCode == CustomConstants.JumpHeight))
-        //                {
-        //                    lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpHeight).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpHeight)} (Jump Height)";
-        //                    previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpHeight && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
-        //                }
-        //                if (list.Any(x => x.ParameterCode == CustomConstants.JumpLength))
-        //                {
-        //                    lastRecordSum = list.Where(y => y.ParameterCode == CustomConstants.JumpLength).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    performanceModel.Score = $"{lastRecordSum} {DBTMCustomHelper.Unit(CustomConstants.JumpLength)} (Jump Length)";
-        //                    previousResordSum = traineeProfilePerformanceListData.Where(x => x.TestCode == item.Key && x.ParameterCode == CustomConstants.JumpLength && x.RowNumber == 2).Sum(x => Convert.ToDecimal(x.ParameterValue));
-        //                    UpdateArrowStatus(performanceModel, lastRecordSum, previousResordSum);
-        //                }
-        //                listModel.Add(performanceModel);
-        //            }
-        //        }
-        //    }
-        //    return listModel;
-        //}
-
         private static void UpdateArrowStatus(DBTMTraineeProfilePerformanceModel performanceModel, decimal lastRecordSum, decimal previousResordSum)
         {
             if (previousResordSum == 0 || lastRecordSum == previousResordSum)
@@ -835,6 +795,139 @@ namespace Coditech.API.Service
                                 }
                             }
             };
+        }
+
+        private string GenerateRadarChartBase64(RadarChartModel model)
+        {
+            var plt = new Plot();
+
+            // -----------------------------------
+            // Labels
+            // -----------------------------------
+            string[] labels = model.Labels
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
+
+            int count = labels.Length;
+
+            if (count < 3)
+                return string.Empty;
+
+            // -----------------------------------
+            // Dynamic Angles
+            // -----------------------------------
+            double[] angles = new double[count];
+
+            for (int i = 0; i < count; i++)
+                angles[i] = (2 * Math.PI * i / count) - Math.PI / 2;
+
+            // -----------------------------------
+            // Grid
+            // -----------------------------------
+            for (int level = 10; level <= 100; level += 10)
+            {
+                double[] gx = new double[count + 1];
+                double[] gy = new double[count + 1];
+
+                for (int i = 0; i < count; i++)
+                {
+                    gx[i] = Math.Cos(angles[i]) * level;
+                    gy[i] = Math.Sin(angles[i]) * level;
+                }
+
+                gx[count] = gx[0];
+                gy[count] = gy[0];
+
+                var grid = plt.Add.Scatter(gx, gy);
+                grid.Color = ScottPlot.Colors.Red;
+                grid.LineWidth = 1;
+            }
+
+            // -----------------------------------
+            // Axis + Labels
+            // -----------------------------------
+            for (int i = 0; i < count; i++)
+            {
+                double x = Math.Cos(angles[i]) * 100;
+                double y = Math.Sin(angles[i]) * 100;
+
+                var line = plt.Add.Line(0, 0, x, y);
+                line.Color = ScottPlot.Colors.Red;
+                line.LineWidth = 1;
+
+                double tx = Math.Cos(angles[i]) * 118;
+                double ty = Math.Sin(angles[i]) * 118;
+
+                plt.Add.Text(labels[i], tx, ty);
+            }
+
+            // -----------------------------------
+            // Multiple Datasets
+            // -----------------------------------
+            foreach (var ds in model.Datasets)
+            {
+                double[] values = ds.Data
+                    .Split(',')
+                    .Select(x => Math.Clamp(Convert.ToDouble(x.Trim()), 0, 100))
+                    .ToArray();
+
+                if (values.Length != count)
+                    continue;
+
+                // default color
+                ScottPlot.Color lineColor = ScottPlot.Colors.GreenYellow;
+
+                // if user passes hex color like #ff0000
+                if (!string.IsNullOrWhiteSpace(ds.Color))
+                    lineColor = ScottPlot.Color.FromHex(ds.Color);
+
+                ScottPlot.Color fillColor = lineColor.WithAlpha(.25);
+
+                double[] px = new double[count + 1];
+                double[] py = new double[count + 1];
+
+                for (int i = 0; i < count; i++)
+                {
+                    px[i] = Math.Cos(angles[i]) * values[i];
+                    py[i] = Math.Sin(angles[i]) * values[i];
+                }
+
+                px[count] = px[0];
+                py[count] = py[0];
+
+                var poly = plt.Add.Polygon(px, py);
+                poly.LineColor = lineColor;
+                poly.FillColor = fillColor;
+                poly.LineWidth = 2;
+            }
+
+            // -----------------------------------
+            // Scale Numbers
+            // -----------------------------------
+            for (int i = 10; i <= 100; i += 10)
+                plt.Add.Text(i.ToString(), 0, -i);
+
+            //// -----------------------------------
+            //// Title
+            //// -----------------------------------
+            //plt.Add.Text(model.Title, 0, -135);
+
+            // -----------------------------------
+            // Style
+            // -----------------------------------
+            plt.Axes.SetLimits(-130, 130, 130, -140);
+            plt.HideAxesAndGrid();
+            plt.FigureBackground.Color = ScottPlot.Colors.White;
+            plt.DataBackground.Color = ScottPlot.Colors.White;
+
+            // -----------------------------------
+            // Export Base64
+            // -----------------------------------
+            byte[] bytes = plt.GetImageBytes(700, 700, ImageFormat.Png);
+
+            return Convert.ToBase64String(bytes);
         }
         #endregion
     }
