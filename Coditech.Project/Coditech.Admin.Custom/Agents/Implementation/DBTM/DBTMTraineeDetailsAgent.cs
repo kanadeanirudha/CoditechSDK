@@ -222,8 +222,9 @@ namespace Coditech.Admin.Agents
             GeneralTraineeAssociatedToTrainerListModel associatedTrainerList = new GeneralTraineeAssociatedToTrainerListModel { AssociatedTrainerList = response?.AssociatedTrainerList };
             GeneralTraineeAssociatedToTrainerListViewModel listViewModel = new GeneralTraineeAssociatedToTrainerListViewModel();
             listViewModel.AssociatedTrainerList = associatedTrainerList?.AssociatedTrainerList?.ToViewModel<GeneralTraineeAssociatedToTrainerViewModel>().ToList();
-
-            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.AssociatedTrainerList.Count, BindAssociatedTraineeColumns());
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            bool isTrainerLogin = userModel?.Custom1 == CustomConstants.DBTMTrainer;
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.AssociatedTrainerList.Count, BindAssociatedTraineeColumns(), isTrainerLogin ? false : true);
             listViewModel.DBTMTraineeDetailId = dBTMTraineeDetailId;
             listViewModel.EntityId = dBTMTraineeDetailId;
             listViewModel.PersonId = personId;
