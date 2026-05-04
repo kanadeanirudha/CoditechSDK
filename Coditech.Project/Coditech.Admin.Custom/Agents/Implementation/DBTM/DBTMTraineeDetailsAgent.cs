@@ -230,7 +230,10 @@ namespace Coditech.Admin.Agents
             listViewModel.PersonId = personId;
             listViewModel.FirstName = response.FirstName;
             listViewModel.LastName = response.LastName;
-            listViewModel.IsEntityActive = response.IsEntityActive;
+            if (userModel?.Custom1 == CustomConstants.DBTMCentreOwner)
+            {
+                listViewModel.IsEntityActive = true;
+            }
             return listViewModel;
         }
 

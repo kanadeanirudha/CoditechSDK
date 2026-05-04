@@ -886,6 +886,8 @@ namespace Coditech.API.Service
             {
                 ReportsListDecryption(dBTMReportsList);
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
+                if (isDownloadReport)
+                    displayOn = "All";
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
