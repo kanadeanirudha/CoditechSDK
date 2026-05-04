@@ -268,6 +268,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    generalTraineeAssociatedToTrainerViewModel.IsCurrentTrainer = true;
                     generalTraineeAssociatedToTrainerViewModel = _dBTMTraineeDetailsAgent.InsertAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel);
                     if (!generalTraineeAssociatedToTrainerViewModel.HasError)
                     {
@@ -306,6 +307,7 @@ namespace Coditech.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                generalTraineeAssociatedToTrainerViewModel.IsCurrentTrainer = true;
                 SetNotificationMessage(_dBTMTraineeDetailsAgent.UpdateAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));

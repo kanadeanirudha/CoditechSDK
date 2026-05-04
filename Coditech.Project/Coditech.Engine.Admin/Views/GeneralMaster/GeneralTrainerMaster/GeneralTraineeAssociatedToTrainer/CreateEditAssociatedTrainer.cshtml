@@ -40,6 +40,7 @@
                             @Html.HiddenFor(m => m.LastName)
                             @Html.HiddenFor(m => m.PersonId)
                             @Html.HiddenFor(x => x.EntityId)
+                            @Html.Hidden("IsCurrentTrainer", "true")
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="mb-3">
@@ -77,14 +78,14 @@
                                         }
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                               @*  <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.IsCurrentTrainer, new { @class = "form-check-label" })
                                         <div class="form-check">
                                             @Html.CheckBoxFor(x => x.IsCurrentTrainer, new { @class = "form-check-input" })
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
                             </div>
                         }
                     </div>

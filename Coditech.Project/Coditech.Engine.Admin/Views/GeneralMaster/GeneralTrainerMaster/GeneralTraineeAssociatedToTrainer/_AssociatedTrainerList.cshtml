@@ -47,42 +47,14 @@
                                 {
                                     @if (item.IsCurrentTrainer)
                                     {
-                                        <!-- Delete Button Triggering Modal -->
-                                        <a href="#" title="Delete" class="btn btn-sm btn-soft-danger btn-circle" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal_@item.GeneralTraineeAssociatedToTrainerId"><i class="fas fa-trash-alt"></i></a>
-                                        <!-- Delete Confirmation Modal -->
-                                        <div class="modal fade" id="confirmDeleteModal_@item.GeneralTraineeAssociatedToTrainerId" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="d-flex align-items-start">
-                                                            <i class="fas fa-exclamation-triangle text-danger me-2 mt-1"></i>
-                                                            <p class="mb-0 text-wrap">
-                                                                Are you sure you want to unassociate
-                                                                <strong>@item.FirstName @item.LastName</strong> as current trainer?
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                            Cancel
-                                                        </button>
-                                                        <a href="@Url.Action("DeleteAssociatedTrainer", controllerName,
-                                                         new {
-                                                                generalTraineeAssociatedToTrainerIds = item.GeneralTraineeAssociatedToTrainerId,
-                                                                SelectedParameter1  = Model.SelectedParameter1,
-                                                                SelectedParameter2  = Model.SelectedParameter2
-                                                           })"
-                                                           class="btn btn-outline-danger">
-                                                           Delete
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <a href="javascript:void(0);"
+                                           title="UnAssociate Trainer"
+                                           class="btn btn-sm btn-soft-danger btn-circle"
+                                           onclick="GeneralTrainerMaster.GetAssociateUnAssociateTrainer('AssociateUnAssociateTrainerPopupContentId','@item.GeneralTraineeAssociatedToTrainerId', '@Model.DBTMTraineeDetailId', '@Model.PersonId', '@item.FirstName', '@item.LastName', '@item.GeneralTrainerMasterId' )"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#AssociateUnAssociateTrainerPopupId">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
                                     }
                                 }
                             </td>
