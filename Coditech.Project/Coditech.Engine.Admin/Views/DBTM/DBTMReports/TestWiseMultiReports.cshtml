@@ -233,7 +233,7 @@
             if (activityPerformedDates.includes(d)) {
                 return [true, "activity-date", "Activity Performed"];
             }
-            return [false, "", "No activity"];
+            return [true, "", ""];
         },
                 onSelect: function () {
                      isFromDateSelected = true;
@@ -264,7 +264,7 @@
             if (activityPerformedDates.includes(d)) {
                 return [true, "activity-date", "Activity Performed"];
             }
-            return [false, "", "No activity"];
+            return [true, "", ""];
         },
                 onSelect: function () {
                     updateToDate();
