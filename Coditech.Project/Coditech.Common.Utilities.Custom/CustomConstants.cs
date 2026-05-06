@@ -53,6 +53,7 @@
         public const string ProgressChart = "ProgressChart";
         public const string Dropdown = "Dropdown";
         public const string Trainee = "Trainee";
+        public const string InvalidData = "Invalid Data";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";
