@@ -1,4 +1,6 @@
-﻿namespace Coditech.Common.API.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Coditech.Common.API.Model
 {
     public class DBTMDeviceRegistrationDetailsModel : BaseModel
     {
@@ -12,5 +14,6 @@
         public DateTime WarrantyExpirationDate { get; set; }
         public bool IsMasterDevice { get; set; }
         public string SlaveDeviceCode { get; set; }
+        public int DurationInDaysLeft { get; set; }
     }
 }

@@ -38,7 +38,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("BatchStartTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("BatchFrequency", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, dataTableModel.SortBy = IsNotNull(dataTableModel.SortByColumn) ? "desc" : string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             long userId = 0;
             if (userModel.Custom1 == CustomConstants.DBTMTrainer)

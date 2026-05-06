@@ -29,11 +29,11 @@
                             <td>
                                 @if (item.IsExpired)
                                 {
-                                    <span class="badge bg-danger">Expired</span>
+                                    <span class="badge bg-danger">Yes</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">No</span>
                                 }
                             </td>
                             <td>@item.PlanDurationExpirationDate.ToCoditechDateFormat()</td>

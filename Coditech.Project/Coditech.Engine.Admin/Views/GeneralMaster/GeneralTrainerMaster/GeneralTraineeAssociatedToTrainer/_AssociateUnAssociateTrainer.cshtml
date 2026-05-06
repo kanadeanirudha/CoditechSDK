@@ -14,14 +14,12 @@
     }
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
-@using (Html.BeginForm("AssociateUnAssociateTrainer", controllerName, FormMethod.Post, new { id = "frmAssociateUnAssociateTrainer" }))
+@using (Html.BeginForm("DeleteAssociatedTrainer", controllerName, FormMethod.Post, new { id = "frmAssociateUnAssociateTrainer" }))
 {
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(x => x.GeneralTraineeAssociatedToTrainerId)
-    @Html.HiddenFor(x => x.DBTMTraineeDetailId)
-    @Html.HiddenFor(x => x.EntityId)
-    @Html.HiddenFor(x => x.GeneralTrainerMasterId)
-    @Html.HiddenFor(x => x.PersonId)
+    @Html.Hidden("generalTraineeAssociatedToTrainerIds", Model.GeneralTraineeAssociatedToTrainerId)
+    @Html.Hidden("SelectedParameter1", Model.DBTMTraineeDetailId)
+    @Html.Hidden("SelectedParameter2", Model.PersonId)
     <div class="modal-body">
         <div class="row">
             <div class="col-lg-12">
@@ -33,20 +31,20 @@
                             <span class="font-15">@Model.FirstName @Model.LastName</span> as current trainer?
                         </span>
                     }
-                    else
+                    @* else
                     {
                         <span>
                             Are you sure that you want to associate
                             <span class="font-15">@Model.FirstName @Model.LastName</span> as current trainer?
                         </span>
-                    }
+                    } *@
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-success" onclick="GeneralTrainerMaster.AssociateUnAssociateTrainer(); return false;"> @AdminResources.LabelSave</button>
-        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal"> Close </button>
+        <button type="submit" class="btn btn-success"> Yes</button>
+        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal"> No </button>
     </div>
 }
 @Html.Partial("_ValidationScriptsPartial")

@@ -5,6 +5,7 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     ModelPopUpViewModel trainerPopup = new ModelPopUpViewModel() { ModelPopUpId = "AssociateUnAssociateTrainerPopupId", ModalContentId = "AssociateUnAssociateTrainerPopupContentId" };
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 }
 <div class="row">
     @Html.Partial("~/Views/Shared/Datatable/_DatatableShowResult.cshtml", Model.PageListViewModel.RecordPerPage)
@@ -42,14 +43,20 @@
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsCurrentTrainer)
                             </td>
                             <td class="text-center">
-                                @if (item.IsCurrentTrainer)
+                                @if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
                                 {
-                                    <a data-bs-toggle="modal" data-bs-target="#AssociateUnAssociateTrainerPopupId" href="javascript:void(0)" onclick="GeneralTrainerMaster.GetAssociateUnAssociateTrainer('AssociateUnAssociateTrainerPopupContentId', '@item.GeneralTraineeAssociatedToTrainerId',  '@Model.SelectedParameter1', '@Model.SelectedParameter2', '@item.FirstName', '@item.LastName', '@item.GeneralTrainerMasterId' )" title="Unassociate Trainer" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
+                                    @if (item.IsCurrentTrainer)
+                                    {
+                                        <a href="javascript:void(0);"
+                                           title="UnAssociate Trainer"
+                                           class="btn btn-sm btn-soft-danger btn-circle"
+                                           onclick="GeneralTrainerMaster.GetAssociateUnAssociateTrainer('AssociateUnAssociateTrainerPopupContentId','@item.GeneralTraineeAssociatedToTrainerId', '@Model.DBTMTraineeDetailId', '@Model.PersonId', '@item.FirstName', '@item.LastName', '@item.GeneralTrainerMasterId' )"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#AssociateUnAssociateTrainerPopupId">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    }
                                 }
-                                else
-                                {
-                                    <a data-bs-toggle="modal" data-bs-target="#AssociateUnAssociateTrainerPopupId" href="javascript:void(0)" onclick="GeneralTrainerMaster.GetAssociateUnAssociateTrainer('AssociateUnAssociateTrainerPopupContentId',  0, '@Model.SelectedParameter1', '@Model.SelectedParameter2', '@item.FirstName', '@item.LastName', '@item.GeneralTrainerMasterId')" title="Associate Trainer" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
-                                }                             
                             </td>
                         </tr>
                     }

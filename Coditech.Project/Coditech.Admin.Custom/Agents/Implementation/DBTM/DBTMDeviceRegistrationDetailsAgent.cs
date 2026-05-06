@@ -186,6 +186,11 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "WarrantyExpirationDate",
                 IsSortable = true,
             });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Duration In Days Left",
+                ColumnCode = "DurationInDaysLeft",
+            });
             //datatableColumnList.Add(new DatatableColumns()
             //{
             //    ColumnName = "Is Master Device",

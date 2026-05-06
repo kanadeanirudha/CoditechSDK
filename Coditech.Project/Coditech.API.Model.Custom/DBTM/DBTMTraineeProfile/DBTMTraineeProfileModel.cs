@@ -32,5 +32,9 @@ namespace Coditech.Common.API.Model
         public DataTable RankingScoreDataTable { get; set; }
         public long GeneralBatchMasterId { get; set; }
         public bool IsListView { get; set; }
+        public string BatchName { get; set; }
+        public string Session { get; set; }
+        public int TotalParticipants { get; set; }
+        public int GenderEnumId { get; set; }
     }
 }
