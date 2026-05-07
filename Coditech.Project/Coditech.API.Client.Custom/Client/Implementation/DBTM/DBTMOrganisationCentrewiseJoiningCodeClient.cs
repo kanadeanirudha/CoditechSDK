@@ -105,6 +105,49 @@ namespace Coditech.API.Client
             }
         }
 
+        public virtual OrganisationCentrewiseJoiningCodeListResponse GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows)
+        {
+            return Task.Run(async () => await GetTraineeActiveJoiningCodeListAsync(centreCode, trainerId, rows, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<OrganisationCentrewiseJoiningCodeListResponse> GetTraineeActiveJoiningCodeListAsync(string centreCode, string trainerId, int rows, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMOrganisationCentrewiseJoiningCodeEndpoint.GetTraineeActiveJoiningCodeListAsync(centreCode, trainerId, rows);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var statusCode = (int)response.StatusCode;
+                if (statusCode == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<OrganisationCentrewiseJoiningCodeListResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(status.ErrorCode, status.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (statusCode == 204)
+                {
+                    return new OrganisationCentrewiseJoiningCodeListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var typedBody = JsonConvert.DeserializeObject<OrganisationCentrewiseJoiningCodeListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+
         public virtual TrueFalseResponse DeleteJoiningCodeFile(ParameterModel body)
         {
             return Task.Run(async () => await DeleteJoiningCodeFileAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
