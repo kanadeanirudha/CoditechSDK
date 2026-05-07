@@ -15,6 +15,10 @@ namespace Coditech.API.Endpoint
             return endpoint;
         }
         public string DeleteJoiningCodeFileAsync() =>
-                 $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/DeleteOrganisationCentrewiseJoiningCodeFile";     
+                 $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/DeleteOrganisationCentrewiseJoiningCodeFile";
+        public string GetTraineeActiveJoiningCodeListAsync(string centreCode, string trainerId, int rows)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCodeList?centreCode={centreCode}&trainerId={trainerId}&rows={rows}";
+        }
     }
 }
