@@ -171,7 +171,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Trainer",
+                ColumnName = "Created By",
                 ColumnCode = "Custom2",
                 IsSortable = false,
             });
