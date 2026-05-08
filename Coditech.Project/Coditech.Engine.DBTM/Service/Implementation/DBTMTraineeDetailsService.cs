@@ -7,12 +7,14 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
+using PuppeteerSharp;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using ScottPlot;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
+using PuppeteerSharp.Media;
 
 namespace Coditech.API.Service
 {
@@ -278,14 +280,27 @@ namespace Coditech.API.Service
 
             string fileName = $"Athlete_Profile_{traineeName}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
             string filePath = Path.Combine(folderPath, fileName);
-
-            var pdf = new HtmlToPdfDocument
+            new BrowserFetcher().DownloadAsync().GetAwaiter().GetResult();
+            using var browser = Puppeteer.LaunchAsync(
+                new LaunchOptions
+                {
+                    Headless = true,
+                    Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--allow-file-access-from-files" }
+                }).GetAwaiter().GetResult();
+            using var page = browser.NewPageAsync().GetAwaiter().GetResult();
+            page.SetContentAsync(html).GetAwaiter().GetResult();
+            System.Threading.Thread.Sleep(3000);
+            page.PdfAsync(filePath,
+                new PdfOptions
+                {
+                    Format = PaperFormat.A4,
+                    PrintBackground = true
+                }).GetAwaiter().GetResult();
+            browser.CloseAsync().GetAwaiter().GetResult();
+            if (!System.IO.File.Exists(filePath))
             {
-                GlobalSettings = { PaperSize = PaperKind.A4, Orientation = DinkToPdf.Orientation.Portrait, Out = filePath },
-                Objects = { new ObjectSettings { HtmlContent = html, WebSettings = { DefaultEncoding = "utf-8" } } }
-            };
-            _converter.Convert(pdf);
-
+                throw new Exception("PDF file was not created.");
+            }
             return new DBTMReportsListModel
             {
                 FileName = fileName,
@@ -490,18 +505,37 @@ namespace Coditech.API.Service
             string personImage = "";
             if (!string.IsNullOrEmpty(profile.PhotoMediaPath))
             {
-                personImage = ImageUrlToBase64(profile.PhotoMediaPath);
+
+                string imagePath = Path.Combine( Directory.GetCurrentDirectory(), "wwwroot", profile.PhotoMediaPath.TrimStart('/').Replace("/", "\\"));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    personImage = ConvertFolderPathImageToBase64(imagePath, "image/png");
+                }
+                else
+                {
+                    string path = "data/Images/MaleAvatar.png";
+                    string fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
+                    personImage = ConvertFolderPathImageToBase64(fullPath, "image/png");
+                }
             }
             else
             {
                 string path = gender == "Male" ? "data/Images/MaleAvatar.png" : "data/Images/MaleAvatar.png";
-                personImage = ConvertFolderPathImageToBase64(path, "image/png");
+                string fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
+                personImage = ConvertFolderPathImageToBase64(fullPath, "image/png");
             }
             html = ReplaceTokenWithMessageText("#PersonImage#", personImage, html);
-
-            string heightWeightImage = ConvertFolderPathImageToBase64(gender == "Male" ? "data/Images/HeightWeightMale.png" : "data/Images/HeightWeightFemale.png", "image/png");
-
-            string radarImage = $"data:image/png;base64,{GenerateRadarChartBase64(profile.RadarChart)}";
+            string heightWeightPath = Path.Combine(Directory.GetCurrentDirectory(), gender == "Male" ? "data/Images/HeightWeightMale.png" : "data/Images/HeightWeightFemale.png");
+            string heightWeightImage = ConvertFolderPathImageToBase64(heightWeightPath, "image/png");
+            string chartFolder = Path.Combine(Directory.GetCurrentDirectory(), "data", "TempCharts");
+            if (!Directory.Exists(chartFolder))
+            {
+                Directory.CreateDirectory(chartFolder);
+            }
+            string radarChartPath = Path.Combine(chartFolder, $"Radar_{Guid.NewGuid()}.png");
+            byte[] radarBytes = Convert.FromBase64String(GenerateRadarChartBase64(profile.RadarChart));
+            System.IO.File.WriteAllBytes(radarChartPath, radarBytes);
+            string radarImage = ConvertFolderPathImageToBase64(radarChartPath, "image/png");
             html = ReplaceTokenWithMessageText("#PersonImage#", personImage, html);
             html = ReplaceTokenWithMessageText("#HeightWeightImage#", heightWeightImage, html);
             html = ReplaceTokenWithMessageText("#Graph#", radarImage, html);
