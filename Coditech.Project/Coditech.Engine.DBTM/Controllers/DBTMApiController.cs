@@ -80,6 +80,41 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMApi/InsertDeviceDataV2")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public IActionResult InsertDeviceDataV2()
+        {
+            using var reader = new StreamReader(Request.Body);
+
+            string rawJson = reader.ReadToEnd();
+
+            if (string.IsNullOrWhiteSpace(rawJson))
+            {
+                return BadRequest(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = "Request body is empty."
+                });
+            }
+
+            try
+            {
+                bool status = _dBTMApiService.InsertDeviceDataV2(rawJson);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = status });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex.Message, "DBTMDeviceData", TraceLevel.Warning, rawJson, "Application");
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex.Message, "DBTMDeviceData", TraceLevel.Error, rawJson, "Application");
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
         [Route("/DBTMApi/Getbatchlist")]
         [HttpGet]
         [Produces(typeof(DBTMBatchListResponse))]

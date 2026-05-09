@@ -3,7 +3,9 @@ namespace Coditech.API.Service
 {
     public interface IDBTMApiService
     {
+        bool InsertDeviceDataViaFile(IFormFile file);
         bool InsertDeviceData(List<DBTMDeviceDataModel> model);
+        bool InsertDeviceDataV2(string rawJson);
         List<DBTMBatchModel> GetBatchList(long entityId, string userType, bool isCheckTestPerformed);
         DBTMBatchModel GetBatchDetails(int generalBatchMasterId);
         List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType);
@@ -12,7 +14,6 @@ namespace Coditech.API.Service
         DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId);
         OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId);
         string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId);
-        bool InsertDeviceDataViaFile(IFormFile file);
         DBTMTraineeDetailsListModel GetTraineesByPerformedActivity(string dBTMTestMasterIds, string centreCode, long generalTrainerMasterId);
         DBTMTestListModel GetactivitiesBytrainee(long selectedTraineeId);
         List<DBTMGeneralBatchUserModel> GetBatchAndActivityWiseUserDetails(int generalBatchMasterId, int dbtmTestMasterId);

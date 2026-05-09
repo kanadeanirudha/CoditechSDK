@@ -8,6 +8,7 @@ using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
 using System.Data;
+using System.Text.Json;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -137,34 +138,22 @@ namespace Coditech.API.Service
                             };
                             dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
                         }
-                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
-                        if (data != null || data.Count() > 0)
-                        {
-                            int statusOutput = 0;
-                            CoditechViewRepository<DBTMDeviceDataModel> objStoredProc = new CoditechViewRepository<DBTMDeviceDataModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-                            objStoredProc.SetParameter("@TestCode", DBTMDeviceDataDetails.TestCode, ParameterDirection.Input, DbType.String);
-                            objStoredProc.SetParameter("@DBTMDeviceDataId", DBTMDeviceDataDetails.DBTMDeviceDataId, ParameterDirection.Input, DbType.Int64);
-                            objStoredProc.SetParameter("@Status", statusOutput, ParameterDirection.Output, DbType.Int32);
-                            objStoredProc.ExecuteStoredProcedureList("Coditech_DBTMUpdateDeviceData @TestCode,@DBTMDeviceDataId,@Status OUT", 2, out statusOutput);
-                        }
-                    }
-                }
-
-                string typeOfRecord = dBTMDeviceDataModelList.FirstOrDefault().TypeOfRecord;
-                long tablePrimaryColumnId = dBTMDeviceDataModelList.FirstOrDefault().TablePrimaryColumnId;
-                if (typeOfRecord == "Batch")
-                {
-                    List<long> entityIds = dBTMDeviceDataModelList.Where(x => x.EntityId > 0).Select(x => x.EntityId).ToList();
-                    if (entityIds?.Count > 0)
-                    {
-                        List<GeneralBatchUser> generalBatchUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == tablePrimaryColumnId && entityIds.Contains(x.EntityId)).ToList();
-                        int activityStatusEnumId = GetEnumIdByEnumCode("Completed", "DBTMTestStatus");
-                        generalBatchUsers.ForEach(x => { x.ActivityStatusEnumId = activityStatusEnumId; });
-                        _generalBatchUserRepository.BatchUpdate(generalBatchUsers);
+                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList, dBTMDeviceDataModel.CreatedBy);
                     }
                 }
             }
             return true;
+        }
+
+        //Add DBTMDeviceData.
+        public bool InsertDeviceDataV2(string rawJson)
+        {
+            List<DBTMDeviceDataModelV2> dBTMDeviceDataModelList = JsonConvert.DeserializeObject<List<DBTMDeviceDataModelV2>>(rawJson);
+
+            if (IsNull(dBTMDeviceDataModelList))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            return false;// InsertDeviceData(dBTMDeviceDataModelList.ToModel<List<DBTMDeviceDataModel>>());
         }
         #endregion
         #region DBTMBatch
