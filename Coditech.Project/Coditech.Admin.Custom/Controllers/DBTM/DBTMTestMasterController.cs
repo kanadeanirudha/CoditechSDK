@@ -254,10 +254,12 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId});
+               // return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId});
+                return RedirectToAction("ActivityListViewSequenceList", new { dataTableViewModel = new DataTableViewModel { SelectedParameter1 = dBTMTestMasterId.ToString() } });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+           // return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+            return RedirectToAction("ActivityListViewSequenceList", new { dataTableViewModel = new DataTableViewModel { SelectedParameter1 = dBTMTestMasterId.ToString() } });
         }
 
         #region Activity Vertical View Sequence
@@ -401,10 +403,12 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("ActivityVerticalViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+               // return RedirectToAction("ActivityVerticalViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+                return RedirectToAction("ActivityVerticalViewSequenceList", new { dataTableViewModel = new DataTableViewModel { SelectedParameter1 = dBTMTestMasterId.ToString() } });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("ActivityVerticalViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+           // return RedirectToAction("ActivityVerticalViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+            return RedirectToAction("ActivityVerticalViewSequenceList", new { dataTableViewModel = new DataTableViewModel { SelectedParameter1 = dBTMTestMasterId.ToString() } });
         }
         #endregion
         #region Protected

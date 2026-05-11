@@ -73,8 +73,8 @@ namespace Coditech.Admin.Agents
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Column Name",
-                ColumnCode = "ColumnName",
+                ColumnName = "Column Display Name",
+                ColumnCode = "ColumnDisplayName",
             });
             datatableColumnList.Add(new DatatableColumns()
             {
