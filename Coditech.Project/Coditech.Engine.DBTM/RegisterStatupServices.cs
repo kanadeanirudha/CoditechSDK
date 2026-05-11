@@ -316,6 +316,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<IDBTMCampMasterService, DBTMCampMasterService>();
             builder.Services.AddScoped<IDBTMOrganisationCentreMasterService, DBTMOrganisationCentreMasterService>();
             builder.Services.AddScoped<IDBTMCentreWiseSettingService, DBTMCentreWiseSettingService>();
+            builder.Services.AddScoped<IDBTMGeneralCommonService, DBTMGeneralCommonService>();
         }
         #endregion
     }

@@ -34,6 +34,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMOrganisationCentreAgent, DBTMOrganisationCentreAgent>();
             builder.Services.AddScoped<IDBTMCentreWiseSettingAgent, DBTMCentreWiseSettingAgent>();
             builder.Services.AddScoped<IDBTMOrganisationCentrewiseJoiningCodeAgent, DBTMOrganisationCentrewiseJoiningCodeAgent>();
+            builder.Services.AddScoped<IDBTMGeneralCommonAgent, DBTMGeneralCommonAgent>();
             #endregion
             #endregion Agent
 
@@ -60,6 +61,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMOrganisationCentreClient, DBTMOrganisationCentreClient>();
             builder.Services.AddScoped<IDBTMCentreWiseSettingClient, DBTMCentreWiseSettingClient>();
             builder.Services.AddScoped<IDBTMOrganisationCentrewiseJoiningCodeClient, DBTMOrganisationCentrewiseJoiningCodeClient>();
+            builder.Services.AddScoped<IDBTMGeneralCommonClient, DBTMGeneralCommonClient>();
             #endregion 
             #endregion Client
         }

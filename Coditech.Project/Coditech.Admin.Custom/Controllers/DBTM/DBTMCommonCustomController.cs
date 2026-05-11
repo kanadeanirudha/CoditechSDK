@@ -1,5 +1,6 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Coditech.Common.Helper.HelperUtility;
@@ -8,9 +9,11 @@ namespace Coditech.Admin.Controllers
     public class DBTMCommonCustomController : BaseController
     {
         private readonly IGeneralCommonAgent _generalCommonAgent;
-        public DBTMCommonCustomController(IGeneralCommonAgent generalCommonAgent)
+        private readonly IDBTMGeneralCommonAgent _dBTMGeneralCommonAgent;
+        public DBTMCommonCustomController(IGeneralCommonAgent generalCommonAgent, IDBTMGeneralCommonAgent dBTMGeneralCommonAgent)
         {
             _generalCommonAgent = generalCommonAgent;
+            _dBTMGeneralCommonAgent = dBTMGeneralCommonAgent;
         }
 
         [AllowAnonymous]
@@ -28,6 +31,19 @@ namespace Coditech.Admin.Controllers
                 termsAndCondition = coditechApplicationSettingListViewModel.CoditechApplicationSettingList.FirstOrDefault().ApplicationValue3;
             }
             return PartialView("~/Views/Shared/PageTemplates/_dBTMTermsAndCondition.cshtml", termsAndCondition);
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult GetDBTMDeviceDataDecrypted(string dBTMDeviceDataIds)
+        {
+            DBTMDeviceDataDetailsModel model = new DBTMDeviceDataDetailsModel();
+
+            if (!string.IsNullOrEmpty(dBTMDeviceDataIds))
+            {
+                model = _dBTMGeneralCommonAgent.GetDBTMDeviceDataDecrypted(dBTMDeviceDataIds);
+            }
+
+            return View("~/Views/DBTM/DBTMGeneralCommon/DBTMDeviceDataDecryptedView.cshtml", model);
         }
     }
 }
