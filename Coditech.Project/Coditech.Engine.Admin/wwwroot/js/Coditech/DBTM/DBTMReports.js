@@ -201,6 +201,9 @@ var DBTMReports = {
             $("#FromDate,#ToDate").datepicker("refresh");
             return;
         }
+        if (!Array.isArray(dBTMTestMasterIds)) {
+            dBTMTestMasterIds = [dBTMTestMasterIds];
+        }
         $.ajax({
             type: "GET",
             url: "/DBTMReports/GetActivityPerformedDates",

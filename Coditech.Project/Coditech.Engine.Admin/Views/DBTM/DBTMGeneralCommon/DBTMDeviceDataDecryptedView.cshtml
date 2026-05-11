@@ -1,0 +1,134 @@
+﻿@using Coditech.Admin.ViewModel
+@model DBTMDeviceDataDetailsModel
+
+<div style="padding:40px 30px; font-family:Arial; background-color:#f4f6f9; min-height:100vh;">
+
+    <!-- 🔍 Search Form -->
+    <div style="margin-bottom:30px;">
+        <form method="get" action="/DBTMCommonCustom/GetDBTMDeviceDataDecrypted">
+
+            <input type="text"
+                   name="dBTMDeviceDataIds"
+                   placeholder="Enter IDs (e.g. 13940,13942)"
+                   value="@Context.Request.Query["dBTMDeviceDataIds"]"
+                   style="padding:12px 15px; width:320px; border:1px solid #ccc; border-radius:6px; margin-right:10px;" />
+
+            <button type="submit"
+                    style="padding:12px 20px; background-color:#007bff; color:white; border:none; border-radius:6px; cursor:pointer;">
+                🔍 Search
+            </button>
+
+        </form>
+    </div>
+
+    <!-- 📊 Table Container -->
+    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); overflow-x:auto;">
+
+        <table style="width:100%; border-collapse:collapse;">
+
+            <thead style="background-color:#343a40; color:white;">
+                <tr>
+                    <th style="padding:14px;">DBTMDeviceDataDetailId</th>
+                    <th style="padding:14px;">DBTMDeviceDataId</th>
+                    <th style="padding:14px;">Parameter Code</th>
+                    <th style="padding:14px;">Parameter Value</th>
+                    <th style="padding:14px;">Unit</th>
+                    <th style="padding:14px;">From-To</th>
+                    <th style="padding:14px;">Row</th>
+                    <th style="padding:14px;">Comment1</th>
+                    <th style="padding:14px;">Comment2</th>
+                    <th style="padding:14px;">Comment3</th>
+                    <th style="padding:14px;">Encrypted</th>
+                    <th style="padding:14px;">CreatedBy</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model?.DBTMDeviceDataDetailsList != null && Model.DBTMDeviceDataDetailsList.Any())
+                {
+                    var sortedList = Model.DBTMDeviceDataDetailsList
+                        .OrderBy(x => x.DBTMDeviceDataDetailId);
+
+                    foreach (var item in sortedList)
+                    {
+                        <tr style="border-bottom:1px solid #eee; text-align:center; background-color:#ffffff;"
+                            onmouseover="this.style.backgroundColor='#f1f3f5'"
+                            onmouseout="this.style.backgroundColor='#ffffff'">
+
+                            <td style="padding:14px; font-weight:bold;">
+                                @item.DBTMDeviceDataDetailId
+                            </td>
+
+                            <td style="padding:14px;">
+                                @item.DBTMDeviceDataId
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.ParameterCode ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.ParameterValue ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.Unit ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.FromTo ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @item.Row
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.Comment1 ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.Comment2 ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.Comment3 ?? "-")
+                            </td>
+
+                            <td style="padding:14px;">
+                                @if (item.IsEncrypted)
+                                {
+                                    <span style="background-color:#ffc107; color:black; padding:6px 12px; border-radius:6px;">
+                                        Encrypted
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="background-color:#28a745; color:white; padding:6px 12px; border-radius:6px;">
+                                        Normal
+                                    </span>
+                                }
+                            </td>
+
+                            <td style="padding:14px;">
+                                @(item.CreatedBy)
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="12" style="padding:30px; text-align:center; color:#888;">
+                            No Data Found
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
