@@ -7,14 +7,13 @@ using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
-using PuppeteerSharp;
-using DinkToPdf;
 using DinkToPdf.Contracts;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
 using ScottPlot;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
-using PuppeteerSharp.Media;
 
 namespace Coditech.API.Service
 {
@@ -574,6 +573,7 @@ namespace Coditech.API.Service
                 //End Bind Table Header
                 //Bind Table Rows
                 performanceMatrixHtml += "<tbody>";
+                int columnCount = traineeProfilePerformanceList.Count;
                 for (int i = 0; i < maxRows; i++)
                 {
                     performanceMatrixHtml += "<tr>";
@@ -593,7 +593,7 @@ namespace Coditech.API.Service
                     }
                     performanceMatrixHtml += "</tr>";
                 }
-                string remarksHtml = "<tr><td colspan=\"10\" style=\"border:1px solid #182650;padding: 8px;text-align:left;font-size:14px;\"><strong>Remark:</strong> #Remarks#</td></tr>";
+                string remarksHtml = $"<tr><td colspan=\"{columnCount*2}\" style=\"border:1px solid #182650;padding: 8px;text-align:left;font-size:14px;\"><strong>Remark:</strong> #Remarks#</td></tr>";
                 if (string.IsNullOrWhiteSpace(remarks))
                 {
                     remarksHtml = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, remarksHtml);

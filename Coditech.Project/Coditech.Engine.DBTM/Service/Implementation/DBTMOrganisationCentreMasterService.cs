@@ -63,7 +63,7 @@ namespace Coditech.API.Service
             {
                 DBTMCentrewiseTestParameterListViewId = dBTMOrganisationCentreParameterListViewSequenceId,
                 DBTMTestParameterListViewSequenceId = sequenceEntity.DBTMTestParameterListViewSequenceId,
-                ColumnName = sequenceEntity.ColumnName,
+                ColumnName = sequenceEntity.ColumnDisplayName,
                 DisplayOn = sequenceEntity.DisplayOn,
                 IsColumnCellBold = sequenceEntity.IsColumnCellBold ?? false
             };
