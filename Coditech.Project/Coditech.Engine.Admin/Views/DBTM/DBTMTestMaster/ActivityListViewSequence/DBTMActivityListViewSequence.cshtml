@@ -110,6 +110,13 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
+                                        @Html.LabelFor(x => x.ColumnDisplayName, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.ColumnDisplayName, new { @class = "form-control" })
+                                        <span id="ColumnDisplayNameError" class="text-danger" style="display:none;">The Column Display Name field is required.</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
                                         @Html.LabelFor(x => x.HelpText, new { @class = "form-label" })
                                         @Html.TextBoxFor(x => x.HelpText, new { @class = "form-control" })
                                         @Html.ValidationMessageFor(x => x.HelpText)
@@ -158,6 +165,7 @@
             var isValid = true;
             var parameterCode = $("#ParameterCode").val().trim();
             var columnName = $("#ColumnName").val().trim();
+            var columnDisplayName = $("#ColumnDisplayName").val().trim();
 
             if (parameterCode === "") {
                 $("#ParameterCodeError").show();
@@ -170,6 +178,12 @@
                 isValid = false;
             } else {
                 $("#ColumnNameError").hide();
+            }
+             if (columnName === "") {
+                $("#ColumnDisplayNameError").show();
+                isValid = false;
+            } else {
+                $("#ColumnDisplayNameError").hide();
             }
 
             if (!isValid) {

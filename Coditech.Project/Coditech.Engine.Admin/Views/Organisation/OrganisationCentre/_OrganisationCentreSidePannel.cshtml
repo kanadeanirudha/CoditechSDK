@@ -53,16 +53,12 @@
                         <i class="mdi mdi-whatsapp"></i>
                         <h5 class="m-0 ps-2">Centre WhatsApp Template</h5>
                     </a>
-                   
                 }
-                @if (!userModel.IsAdminUser)
-                {
-                    <a class="nav-link" href="@Url.Action("ActivityListViewSequenceList", "DBTMOrganisationCentreMaster", new { organisationCentreId = @Model })" aria-selected="true">
-                        <i class="fas fa-id-card-alt"></i>
-                        <h5 class="m-0 ps-2">Activity List View Sequence List</h5>
-                    </a>
-                }
-                </div>
+                <a class="nav-link" href="@Url.Action("ActivityListViewSequenceList", "DBTMOrganisationCentreMaster", new { organisationCentreId = @Model })" aria-selected="true">
+                    <i class="fas fa-id-card-alt"></i>
+                    <h5 class="m-0 ps-2">Activity List View Sequence List</h5>
+                </a>
             </div>
         </div>
     </div>
+</div>

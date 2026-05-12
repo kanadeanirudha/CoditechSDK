@@ -14,6 +14,7 @@ namespace Coditech.API.Data
         public string ConsecutiveParameterCode { get; set; }
         public bool? IsCalculatedConsecutiveParameterCode { get; set; }
         public string? ColumnName { get; set; }
+        public string? ColumnDisplayName { get; set; }
         public string HelpText { get; set; }
         public string DisplayOn { get; set; }
         public string ColumnCellColor { get; set; }

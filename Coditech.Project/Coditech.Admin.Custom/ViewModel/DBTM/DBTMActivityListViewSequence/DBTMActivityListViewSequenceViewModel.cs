@@ -31,6 +31,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Column Name")]
         public string ColumnName { get; set; }
 
+        [Display(Name = "Column Display Name")]
+        public string ColumnDisplayName { get; set; }
+
         [Display(Name = "Help Text")]
         public string HelpText { get; set; }
         public string DBTMSequenceData { get; set; }
