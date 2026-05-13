@@ -124,7 +124,9 @@ namespace Coditech.API.Service
                             DBTMDeviceDataDetails dBTMDeviceDataDetails = new DBTMDeviceDataDetails()
                             {
                                 DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
-                                ParameterCode = item.ParameterCode,
+                                ParameterCode = int.TryParse(Convert.ToString(item.ParameterCode), out int parameterCode)
+                                                ? ((TestParameterCode)parameterCode).ToString()
+                                                : Convert.ToString(item.ParameterCode),
                                 ParameterValue = EncryptionHelper.Encrypt(Convert.ToString(item.ParameterValue)),
                                 IsEncrypted = true,
                                 FromTo = item.FromTo,
@@ -148,12 +150,15 @@ namespace Coditech.API.Service
         //Add DBTMDeviceData.
         public bool InsertDeviceDataV2(string rawJson)
         {
-            List<DBTMDeviceDataModelV2> dBTMDeviceDataModelList = JsonConvert.DeserializeObject<List<DBTMDeviceDataModelV2>>(rawJson);
+            List<DBTMDeviceDataModel> dBTMDeviceDataModelList = JsonConvert.DeserializeObject<List<DBTMDeviceDataModel>>(rawJson);
 
             if (IsNull(dBTMDeviceDataModelList))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            return false;// InsertDeviceData(dBTMDeviceDataModelList.ToModel<List<DBTMDeviceDataModel>>());
+            ValidateEnum(dBTMDeviceDataModelList);
+
+
+            return InsertDeviceData(dBTMDeviceDataModelList);
         }
         #endregion
         #region DBTMBatch
@@ -529,7 +534,7 @@ namespace Coditech.API.Service
             return campUserList;
         }
         #endregion
-        public virtual bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord)
+        public bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord)
         {
             if (dBTMDeviceDataId < 1)
                 throw new CoditechException(
@@ -548,10 +553,7 @@ namespace Coditech.API.Service
 
             return isUpdated;
         }
-        public DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(
-     string centreCode,
-     int joiningCodeTypeEnumId,
-     long generalTrainerMasterId)
+        public DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(string centreCode, int joiningCodeTypeEnumId, long generalTrainerMasterId)
         {
             var batches = (from a in _generalBatchRepository.Table
                            join b in _userMasterRepository.Table
@@ -578,6 +580,56 @@ namespace Coditech.API.Service
                 DBTMBatchList = batches ?? new List<DBTMBatchModel>()
             };
         }
+
+        private void ValidateEnum(List<DBTMDeviceDataModel> dBTMDeviceDataModelList)
+        {
+            foreach (var item in dBTMDeviceDataModelList)
+            {
+                List<string> parameterCodes = item.DataList
+                                                  .Select(x => x.ParameterCode)
+                                                  .Distinct()
+                                                  .ToList();
+
+                foreach (string code in parameterCodes)
+                {
+                    if (!int.TryParse(code, out int enumValue) ||
+                        !Enum.IsDefined(typeof(TestParameterCode), enumValue))
+                    {
+                        throw new CoditechException(
+                            0,
+                            $"DBTM Insert Device Data Invalid Parameter Code: {code}"
+                        );
+                    }
+                }
+            }
+        }
+
+
+
     }
+
+    public enum TestParameterCode
+    {
+        AirTime = 1,
+        Count = 2,
+        Direction = 3,
+        Distance = 4,
+        DistanceMultiplyByRow = 5,
+        JumpHeight = 6,
+        JumpLength = 7,
+        ModeOfStart = 8,
+        PersonDetectionRange = 9,
+        Position = 10,
+        Round = 11,
+        ShuttleNo = 12,
+        Speed = 13,
+        SpeedLevel = 14,
+        Time = 15,
+        TimeC = 16,
+        Velocity = 17,
+        Vo2Max = 18
+    }
+
+
 }
 
