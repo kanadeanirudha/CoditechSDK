@@ -110,6 +110,7 @@
     JoiningCodeListByCentreCodeList: function () {
         var selectedCentreCode = $("#SelectedCentreCode").val();
         var selectedParameter1 = $("#JoiningCodeTypeEnumId").val();
+        $("#SelectedParameter1").val(selectedParameter1);
         var selectedParameter2 = $('[name="SelectedParameter2"]').val();
         if (selectedCentreCode !== "" && selectedParameter1 !== "") {
             CoditechCommon.ShowLodder();
@@ -146,9 +147,9 @@
         var selectedCentreCode = $("#SelectedCentreCode").val();
         var selectedParameter1 = $("#JoiningCodeTypeEnumId").val();
         if (listType === "General") {
-            CoditechDataTable.LoadList("OrganisationCentrewiseJoiningCode", "JoiningCodeListByCentreCodeList");
+            OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList();
         } else {
-            CoditechDataTable.LoadList("OrganisationCentrewiseJoiningCode", "List");
+            OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList();
         }
     },
 }
