@@ -37,6 +37,7 @@ namespace Coditech.API.Service
             int JoiningCodeTypeEnumId = Convert.ToInt32(filters?.Find(x => string.Equals(x.FilterName, FilterKeys.JoiningCodeTypeEnumId, StringComparison.CurrentCultureIgnoreCase))?.FilterValue);
             filters.RemoveAll(x => x.FilterName == FilterKeys.JoiningCodeTypeEnumId);
             string trainerId = filters?.Find(x => string.Equals(x.FilterName, "Custom1", StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
+            filters.RemoveAll(x => string.Equals(x.FilterName, "Custom1", StringComparison.CurrentCultureIgnoreCase));
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> objStoredProc = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
