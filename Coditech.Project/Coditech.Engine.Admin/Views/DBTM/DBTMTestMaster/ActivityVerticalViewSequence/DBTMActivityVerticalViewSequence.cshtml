@@ -46,14 +46,7 @@
                                 <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.ParameterCode, new { @class = "form-label required" })
-                                        @if (Model.DBTMTestParameterVerticalViewSequenceId > 0)
-                                        {
-                                            @Html.TextBoxFor(x => x.ParameterCode, new { @class = "form-control", @readonly = "readonly" })
-                                        }
-                                        else
-                                        {
-                                            @Html.TextBoxFor(x => x.ParameterCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
-                                        }
+                                        @Html.TextBoxFor(x => x.ParameterCode, new { @class = "form-control", @onkeypress = "return CoditechCommon.AvoidSpacing()" })
                                         <span id="ParameterCodeError" class="text-danger" style="display:none;">The Parameter Code field is required.</span>
                                     </div>
                                 </div>
