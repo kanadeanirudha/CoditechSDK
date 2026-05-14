@@ -4,7 +4,17 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()" };
-    DropdownViewModel departmentDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(), DropdownName = "SelectedDepartmentId", DropdownSelectedValue = Model.SelectedDepartmentId.ToString(), Parameter = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCodeAndDepartmentId('" + @controllerName + "','" + @actionName + "')" };
+    DropdownViewModel departmentDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(),
+                DropdownName = "SelectedDepartmentId",
+                DropdownSelectedValue = Model.SelectedDepartmentId > 0 ? Model.SelectedDepartmentId.ToString() : "0",
+                Parameter = Model.SelectedCentreCode,
+                ChangeEvent = "CoditechCommon.LoadListByCentreCodeAndDepartmentId('" + @controllerName + "','" + @actionName + "')",
+                IsCustomDropdown = true,
+                SelectedText = "All",
+                SelectedValue = "0"
+            };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
