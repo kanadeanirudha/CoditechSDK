@@ -119,6 +119,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetTestOutputTypeList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.CentrewiseDepartment.ToString()))
+            {
+                GetCentrewiseDepartmentList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -761,6 +765,37 @@ namespace Coditech.Admin.Helpers
                     Text = item.BatchName,
                     Value = item.GeneralBatchMasterId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralBatchMasterId)
+                });
+            }
+        }
+        private static void GetCentrewiseDepartmentList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (string.IsNullOrEmpty(dropdownViewModel.Parameter) && AccessibleCentreList()?.Count == 1)
+            {
+                dropdownViewModel.Parameter = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).SelectedCentreCode;
+            }
+            GeneralDepartmentListModel list = new GeneralDepartmentListModel();
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                string centreCode = SpiltCentreCode(dropdownViewModel.Parameter);
+                GeneralDepartmentListResponse response = new GeneralDepartmentClient().GetDepartmentsByCentreCode(centreCode);
+                list = new GeneralDepartmentListModel
+                {
+                    GeneralDepartmentList = response?.GeneralDepartmentList
+                };
+            }
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "All",
+                Value = "0"
+            });
+            foreach (var item in list?.GeneralDepartmentList.OrderBy(x => x.DepartmentName))
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = item.DepartmentName,
+                    Value = item.GeneralDepartmentMasterId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralDepartmentMasterId)
                 });
             }
         }
