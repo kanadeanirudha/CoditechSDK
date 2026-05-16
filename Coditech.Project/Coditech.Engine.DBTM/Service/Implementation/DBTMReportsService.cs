@@ -101,6 +101,17 @@ namespace Coditech.API.Service
                     {
                         XValuesList = new string[] { "A-B", "B-C", "C-B" };
                     }
+                    else
+                    {
+                        List<string> xValues = new List<string>();
+                        xValues.AddRange(dBTMReportsList
+                                    .GroupBy(x => x.FromTo)
+                                    .OrderBy(g => g.Min(x => x.Row))
+                                    .Select(g => g.Key)
+                        );
+
+                        XValuesList = xValues.ToArray();
+                    }
                 }
                 else if (graphMaster.XParameter == CustomConstants.Date)
                 {
@@ -113,15 +124,46 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.XParameter == CustomConstants.Distance)
                 {
+                    List<string> xValues = new List<string>();
                     if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
-                        List<string> xValues = new List<string>();
                         double distance = 22.86;
                         for (double i = distance; i <= (distance * 12); i = i + distance)
                         {
                             xValues.Add(Math.Round(i, 2).ToString());
                         }
                         XValuesList = xValues.ToArray();
+                    }
+                    else
+                    {
+                        if(dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
+                        {
+                            xValues.AddRange(dBTMReportsList
+                                      .Where(x => x.ParameterCode == CustomConstants.Distance ||
+                                                  x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
+                                      .GroupBy(x => x.FromTo)
+                                      .OrderBy(g => g.Min(x => x.Row))
+                                      .Select(g => g.Key));
+                            XValuesList = xValues.ToArray();
+                        }
+                        else if(dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow))
+                        {
+                            xValues.AddRange(dBTMReportsList
+                                      .Where(x => x.ParameterCode == CustomConstants.Distance ||
+                                                  x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
+                                      .GroupBy(x => x.FromTo)
+                                      .OrderBy(g => g.Min(x => x.Row))
+                                      .Select(g =>
+                                      {
+                                          decimal value = decimal.TryParse(g.First().ParameterValue?.ToString(), out decimal result)
+                                              ? result
+                                              : 0;
+
+                                          return (value * g.First().Row).ToString();
+                                      }));
+                            XValuesList = xValues.ToArray();
+                        }
+                      
                     }
                 }
                 else if (graphMaster.XParameter == CustomConstants.Turns)
