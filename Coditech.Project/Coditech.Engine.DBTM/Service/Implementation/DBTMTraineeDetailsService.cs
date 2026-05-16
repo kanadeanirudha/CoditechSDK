@@ -505,7 +505,7 @@ namespace Coditech.API.Service
             if (!string.IsNullOrEmpty(profile.PhotoMediaPath))
             {
 
-                string imagePath = Path.Combine( Directory.GetCurrentDirectory(), "wwwroot", profile.PhotoMediaPath.TrimStart('/').Replace("/", "\\"));
+                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", profile.PhotoMediaPath.TrimStart('/').Replace("/", "\\"));
                 if (System.IO.File.Exists(imagePath))
                 {
                     personImage = ConvertFolderPathImageToBase64(imagePath, "image/png");
@@ -593,7 +593,7 @@ namespace Coditech.API.Service
                     }
                     performanceMatrixHtml += "</tr>";
                 }
-                string remarksHtml = $"<tr><td colspan=\"{columnCount*2}\" style=\"border:1px solid #182650;padding: 8px;text-align:left;font-size:14px;\"><strong>Remark:</strong> #Remarks#</td></tr>";
+                string remarksHtml = $"<tr><td colspan=\"{columnCount * 2}\" style=\"border:1px solid #182650;padding: 8px;text-align:left;font-size:14px;\"><strong>Remark:</strong> #Remarks#</td></tr>";
                 if (string.IsNullOrWhiteSpace(remarks))
                 {
                     remarksHtml = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Remarks, string.Empty, remarksHtml);
@@ -709,6 +709,7 @@ namespace Coditech.API.Service
                         else if (testResultData.TestOutputHigher == "HO")
                             value = groupedData.Max(x => x.ParameterValueSum);
 
+                        value = Math.Round(value, CustomConstants.GraphListRoundUpValue);
                         dr[test.TestCode] = value;
                         DBTMTraineeProfilePerformanceModel dBTMTraineeProfilePerformanceModel = new DBTMTraineeProfilePerformanceModel
                         {
