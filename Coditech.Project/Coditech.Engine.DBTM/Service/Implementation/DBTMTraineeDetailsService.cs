@@ -613,6 +613,10 @@ namespace Coditech.API.Service
                 html = ReplaceTokenWithMessageText("#bodyopen#", "<body style=\"margin:0; padding:0; font-family: Arial, sans-serif; background-color:#ffffff;\">", html);
                 html = ReplaceTokenWithMessageText("#bodyclose#", "</body>", html);
                 html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
+                if (System.IO.File.Exists(radarChartPath))
+                {
+                    System.IO.File.Delete(radarChartPath);
+                }
             }
             else
             {
@@ -1001,7 +1005,7 @@ namespace Coditech.API.Service
             // -----------------------------------
             // Export Base64
             // -----------------------------------
-            byte[] bytes = plt.GetImageBytes(700, 700, ImageFormat.Png);
+            byte[] bytes = plt.GetImageBytes(1000, 1000, ImageFormat.Png);
 
             return Convert.ToBase64String(bytes);
         }
