@@ -70,6 +70,28 @@ namespace Coditech.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCodeList")]
+        [Produces(typeof(OrganisationCentrewiseJoiningCodeListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public IActionResult GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows)
+        {
+            try
+            {
+                OrganisationCentrewiseJoiningCodeListModel list = new OrganisationCentrewiseJoiningCodeListModel
+                {
+                    OrganisationCentrewiseJoiningCodeList = _dBTMOrganisationCentrewiseJoiningCodeService.GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows)
+                };
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<OrganisationCentrewiseJoiningCodeListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new OrganisationCentrewiseJoiningCodeListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [Route("/DBTMOrganisationCentrewiseJoiningCode/DeleteOrganisationCentrewiseJoiningCodeFile")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]

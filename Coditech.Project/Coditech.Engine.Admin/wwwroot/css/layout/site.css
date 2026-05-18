@@ -556,3 +556,6 @@ a.dashboard-menu-list span {
     color: black;
     font-weight: bold;
 }
+.navigation-menu > li:first-child {
+    margin-left: 15px;
+}

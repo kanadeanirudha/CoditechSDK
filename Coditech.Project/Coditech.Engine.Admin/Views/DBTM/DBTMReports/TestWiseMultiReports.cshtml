@@ -181,13 +181,13 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
-            DBTMReports.LoadActivityPerformedDates();
+            DBTMReports.LoadActivityPerformedDates(false);
             $("#DBTMTestMasterId").on("changed.bs.select", function () {
-               DBTMReports.LoadActivityPerformedDates();
+               DBTMReports.LoadActivityPerformedDates(false);
             });
 
             $("#DBTMTraineeDetailId").change(function () {
-               DBTMReports.LoadActivityPerformedDates();
+               DBTMReports.LoadActivityPerformedDates(false);
             });
         });
     </script>
@@ -233,7 +233,7 @@
             if (activityPerformedDates.includes(d)) {
                 return [true, "activity-date", "Activity Performed"];
             }
-            return [false, "", "No activity"];
+            return [true, "", ""];
         },
                 onSelect: function () {
                      isFromDateSelected = true;
@@ -264,7 +264,7 @@
             if (activityPerformedDates.includes(d)) {
                 return [true, "activity-date", "Activity Performed"];
             }
-            return [false, "", "No activity"];
+            return [true, "", ""];
         },
                 onSelect: function () {
                     updateToDate();

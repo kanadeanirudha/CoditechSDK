@@ -244,7 +244,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTestMaster/ActivityListViewSequence/DBTMActivityListViewSequence.cshtml", dBTMActivityListViewSequenceViewModel);
         }
 
-        public virtual ActionResult DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, int dBTMTestMasterId)
+        public virtual ActionResult DeleteActivityListViewSequence(string dBTMTestParameterListViewSequenceIds, string SelectedParameter1)
         {
             string message = string.Empty;
             bool status = false;
@@ -254,10 +254,10 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId});
+                return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = SelectedParameter1 });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("ActivityListViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+            return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel(){ SelectedParameter1 = SelectedParameter1 });
         }
 
         #region Activity Vertical View Sequence
@@ -391,7 +391,7 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTestMaster/ActivityVerticalViewSequence/DBTMActivityVerticalViewSequence.cshtml", dBTMActivityVerticalViewSequenceViewModel);
         }
 
-        public virtual ActionResult DeleteActivityVerticalViewSequence(string dBTMTestParameterVerticalViewSequenceIds, int dBTMTestMasterId)
+        public virtual ActionResult DeleteActivityVerticalViewSequence(string dBTMTestParameterVerticalViewSequenceIds, string SelectedParameter1)
         {
             string message = string.Empty;
             bool status = false;
@@ -401,10 +401,10 @@ namespace Coditech.Admin.Controllers
                 SetNotificationMessage(!status
                 ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("ActivityVerticalViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+                return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1 });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("ActivityVerticalViewSequenceList", new { SelectedParameter1 = dBTMTestMasterId });
+            return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1 });
         }
         #endregion
         #region Protected

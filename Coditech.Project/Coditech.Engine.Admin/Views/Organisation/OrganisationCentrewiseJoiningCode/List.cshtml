@@ -17,21 +17,22 @@
                 DropdownType = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
                 DropdownName = "JoiningCodeTypeEnumId",
                 DropdownSelectedValue = string.IsNullOrEmpty(Model.JoiningCodeTypeEnumId.ToString())
-                        || Model.JoiningCodeTypeEnumId == 0
-                        ? "0"
-                        : Model.JoiningCodeTypeEnumId.ToString(),
+                || Model.JoiningCodeTypeEnumId == 0
+                ? "0" // All
+                : Model.JoiningCodeTypeEnumId.ToString(),
                 GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString(),
                 SelectedText = "All",
                 SelectedValue = "0",
                 ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
             };
+
     DropdownViewModel joiningCodeStatus = new DropdownViewModel()
             {
                 DropdownType = DropdownTypeEnum.JoiningCodeStatus.ToString(),
                 DropdownName = "SelectedParameter2",
-                DropdownSelectedValue = string.IsNullOrEmpty(Model.SelectedParameter2) ? "0" : Model.SelectedParameter2,
-                SelectedText = "All",
-                SelectedValue = "0",
+                DropdownSelectedValue = string.IsNullOrEmpty(Model.SelectedParameter2) ? "1" : Model.SelectedParameter2,
+                SelectedText = "Available",
+                SelectedValue = "1",
                 ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
             };
     UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
@@ -92,7 +93,7 @@
                             <div class="col-md-2">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId"
                                        onclick="OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()" />
-                            </div>
+                            </div>                        
                             <div class="col-md-6">
                                 <label class="fw-bold">
 
@@ -105,7 +106,7 @@
                             </div>
                         </div>
                     </div>
-
+                    <input type="hidden" name="SelectedParameter1" id="SelectedParameter1" value="@Model.SelectedParameter1" />
                     <div class="card-body">
                         <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
                             @Html.Partial("~/Views/Organisation/OrganisationCentrewiseJoiningCode/_List.cshtml", Model)

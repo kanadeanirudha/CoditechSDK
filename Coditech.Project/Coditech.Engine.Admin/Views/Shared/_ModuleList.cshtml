@@ -9,7 +9,7 @@
     List<UserMainMenuModel> menuList = userMenuModel != null ? Model?.MenuList?.Where(x => x.ModuleCode == userMenuModel.ModuleCode)?.ToList() : null;
     UserModuleModel userModuleModel = userMenuModel != null ? Model?.ModuleList?.FirstOrDefault(x => x.ModuleCode == userMenuModel.ModuleCode) : new UserModuleModel();
 }
-
+@* 
 <li class="has-submenu">
     <a href="#" class="dashboard-menu-list">
         <span>
@@ -26,7 +26,7 @@
             </li>
         }
     </ul><!--end submenu-->
-</li><!--end has-submenu-->
+</li><!--end has-submenu--> *@
 <!-- BEGIN: Main Menu-->
 @Html.Partial("~/Views/Shared/_MenuList.cshtml", menuList)
 <!-- END: Main Menu-->

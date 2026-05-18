@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
@@ -231,8 +232,12 @@ namespace Coditech.API.Common
             builder.Services.Configure<IISServerOptions>(options =>
             {
                 options.MaxRequestBodySize = 104857600;
+                options.AllowSynchronousIO = true;
             });
-
+            builder.Services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
             builder.Services.Configure<FormOptions>(options =>
             {
                 options.ValueLengthLimit = 104857600;
@@ -311,6 +316,7 @@ namespace Coditech.API.Common
             builder.Services.AddScoped<IDBTMCampMasterService, DBTMCampMasterService>();
             builder.Services.AddScoped<IDBTMOrganisationCentreMasterService, DBTMOrganisationCentreMasterService>();
             builder.Services.AddScoped<IDBTMCentreWiseSettingService, DBTMCentreWiseSettingService>();
+            builder.Services.AddScoped<IDBTMGeneralCommonService, DBTMGeneralCommonService>();
         }
         #endregion
     }

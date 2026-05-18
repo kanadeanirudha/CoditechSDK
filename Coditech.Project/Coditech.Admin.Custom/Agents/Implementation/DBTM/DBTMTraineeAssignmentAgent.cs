@@ -44,9 +44,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("AssignmentDate", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("AssignmentTime", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-
-            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, dataTableModel.SortBy = IsNotNull(dataTableModel.SortByColumn) ? "desc" : string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
-
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "createddate" : dataTableModel.SortByColumn, string.IsNullOrEmpty(dataTableModel.SortBy) ? "asc" : dataTableModel.SortBy);
             DBTMTraineeAssignmentListResponse response = _dBTMTraineeAssignmentClient.List(Convert.ToInt64(dataTableModel.SelectedParameter1), null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMTraineeAssignmentListModel deviceList = new DBTMTraineeAssignmentListModel { DBTMTraineeAssignmentList = response?.DBTMTraineeAssignmentList };
             DBTMTraineeAssignmentListViewModel listViewModel = new DBTMTraineeAssignmentListViewModel();

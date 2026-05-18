@@ -98,6 +98,21 @@ namespace Coditech.Admin.Agents
             return dBTMOrganisationCentrewiseJoiningCodeViewModel;
         }
 
+        public List<OrganisationCentrewiseJoiningCodeViewModel> GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("GetTraineeActiveJoiningCodeList method execution started.", "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Info);
+                OrganisationCentrewiseJoiningCodeListResponse response = _dBTMOrganisationCentrewiseJoiningCodeClient.GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows);
+                return response?.OrganisationCentrewiseJoiningCodeList?.ToViewModel<OrganisationCentrewiseJoiningCodeViewModel>() ?.ToList() ?? new List<OrganisationCentrewiseJoiningCodeViewModel>();             
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return new List<OrganisationCentrewiseJoiningCodeViewModel>();
+            }
+        }
+
         //Delete Report .
         public virtual bool DeleteJoiningCodeFile(string fileName)
         {
@@ -156,7 +171,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Trainer",
+                ColumnName = "Created By",
                 ColumnCode = "Custom2",
                 IsSortable = false,
             });

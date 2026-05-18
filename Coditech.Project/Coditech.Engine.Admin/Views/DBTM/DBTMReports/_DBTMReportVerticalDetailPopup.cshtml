@@ -1,13 +1,10 @@
 ﻿@using System.Data
 @model DBTMReportVerticalDataViewModel
-
 <div class="modal-header">
     <h6 class="modal-title m-0">Activity View Details</h6>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
-
 <div class="modal-body">
-
     <!-- Details Table -->
     <table class="table table-bordered table-sm mb-3">
         <tr>
@@ -26,7 +23,7 @@
                 </span>
             </td>
         </tr>
-     @*    <tr>
+        @*    <tr>
             <th>Direction:</th>
             <td>@Model.Direction</td>
         </tr> *@
@@ -35,46 +32,161 @@
             <td style="white-space: nowrap;"> @Model.TestPerformedTime.ToString("dd/MM/yyyy hh:mm tt")</td>
         </tr>
     </table>
-
     <!-- Data Table -->
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered table-sm">
-            <thead>
-                <tr>
-                    @foreach (DataColumn col in Model.DataTable.Columns)
-                    {
-                        <th>@col.ColumnName</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.DataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in Model.DataTable.Rows)
-                    {
-                        <tr>
-                            @foreach (DataColumn col in Model.DataTable.Columns)
+    <div class="accordion" id="activityViewAccordion">
+        <!-- TABLE VIEW -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="tableHeading">
+                <button class="accordion-button fw-bold"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#tableCollapse"
+                        aria-expanded="true">
+                    Table View
+                </button>
+            </h2>
+            <div id="tableCollapse"
+                 class="accordion-collapse collapse show"
+                 data-bs-parent="#activityViewAccordion">
+                <div class="accordion-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    @foreach (DataColumn col in Model.DataTable.Columns)
+                                    {
+                                        <th>@col.ColumnName</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.DataTable.Rows.Count > 0)
+                                {
+                                    foreach (DataRow row in Model.DataTable.Rows)
+                                    {
+                                        <tr>
+                                            @foreach (DataColumn col in Model.DataTable.Columns)
+                                            {
+                                                <td>@row[col]</td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="@Model.DataTable.Columns.Count"
+                                            class="text-center text-danger fw-bold">
+                                            No Data Found
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- GRAPH VIEW -->
+        @if (Model.GraphModelList != null && Model.GraphModelList.Count > 0)
+        {
+            <div class="accordion-item mt-2">
+                <h2 class="accordion-header" id="graphHeading">
+                    <button class="accordion-button collapsed fw-bold"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#graphCollapse"
+                            aria-expanded="false">
+                        Graph View
+                    </button>
+                </h2>
+                <div id="graphCollapse"
+                     class="accordion-collapse collapse"
+                     data-bs-parent="#activityViewAccordion">
+                    <div class="accordion-body">
+                        @foreach (var graph in Model.GraphModelList)
+                        {
+                            if (graph.LineChartModel != null)
                             {
-                                <td>@row[col]</td>
+                                string canvasId = "chart_" + Guid.NewGuid().ToString("N");
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6>@graph.GraphName</h6>
+                                        <div style="height:300px;">
+                                            <canvas id="@canvasId"></canvas>
+                                        </div>
+                                        <script>
+                                            function renderChart_@(canvasId)() {
+                                                var canvas = document.getElementById('@canvasId');
+                                                if (!canvas)
+                                                    return;
+                                                if (canvas.dataset.rendered === "true")
+                                                    return;
+                                                canvas.dataset.rendered = "true";
+                                                var ctx = canvas.getContext('2d');
+                                                new Chart(ctx, {
+                                                    type: '@graph.LineChartModel.GraphType.ToLower()',
+                                                    data: {
+                                                        labels: @Html.Raw(graph.LineChartModel.XValues),
+                                                        datasets: [
+                                                        @foreach (var dataset in graph.LineChartModel.Datasets)
+                                                        {
+                                                            <text>
+                                                                    {
+                                                                        label: '@dataset.Label',
+                                                                        data: @Html.Raw(dataset.Data),
+                                                                        borderColor: '@dataset.Color',
+                                                                        backgroundColor: '@dataset.Color',
+                                                                        borderWidth: 2,
+                                                                        fill: false,
+                                                                        tension: 0.3
+                                                                    },
+                                                            </text>
+                                                        }
+                                                                 ]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        maintainAspectRatio: true,
+                                                        aspectRatio: 2,
+                                                        plugins: {
+                                                            legend: {
+                                                                display: true
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            document.getElementById('graphCollapse').addEventListener('shown.bs.collapse', function () {
+                                                renderChart_@(canvasId)();
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
                             }
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="@Model.DataTable.Columns.Count"
-                            class="text-center text-danger fw-bold">
-                            No Data Found
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-
 </div>
-
 <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 </div>
+<style>
+        #activityViewAccordion .accordion-item:first-child {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        #activityViewAccordion .accordion-item:first-child .accordion-header {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        #activityViewAccordion .accordion-item:first-child .accordion-button {
+            margin-top: 0 !important;
+            padding-top: 4px !important;
+        }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

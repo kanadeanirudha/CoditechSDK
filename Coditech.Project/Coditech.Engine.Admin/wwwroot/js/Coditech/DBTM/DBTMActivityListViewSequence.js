@@ -3,11 +3,9 @@
         DBTMActivityListViewSequence.constructor();
     },
     constructor: function () { },
-
     UpdateSequenceNumber: function (modelPopContentId, dBTMTestMasterId) {
         CoditechCommon.ShowLodder();
         $("#" + modelPopContentId).html("");
-
         $.ajax({
             type: "GET",
             url: "/DBTMTestMaster/UpdateSequenceNumber",
@@ -28,17 +26,13 @@
             }
         });
     },
-
     SaveData: function () {
         $("#saveSequenceButton").prop("disabled", true);
-
         var data = [];
-
         $("#sequenceTable tbody tr").each(function () {
             var row = $(this);
             var id = row.find('.DBTMTestParameterListViewSequenceId').val();
             var seq = row.find('.SequenceNumber').val();
-
             data.push({
                 DBTMTestParameterListViewSequenceId: parseInt(id),
                 SequenceNumber: parseInt(seq)
@@ -46,7 +40,6 @@
         });
         var jsonData = JSON.stringify(data);
         $("#DBTMSequenceData").val(jsonData);
-
         $.ajax({
             type: "POST",
             url: "/DBTMTestMaster/UpdateSequenceNumber",
@@ -74,7 +67,6 @@
     UpdateVerticalSequenceNumber: function (modelPopContentId, dBTMTestMasterId) {
         CoditechCommon.ShowLodder();
         $("#" + modelPopContentId).html("");
-
         $.ajax({
             type: "GET",
             url: "/DBTMTestMaster/UpdateVerticalSequenceNumber",
@@ -82,7 +74,6 @@
             success: function (result) {
                 $("#" + modelPopContentId).html(result);
                 CoditechCommon.HideLodder();
-
                 var modal = new bootstrap.Modal(document.getElementById('AddVerticalSequenceNumberPopupId'));
                 modal.show();
             },
@@ -95,12 +86,9 @@
             }
         });
     },
-
     SaveVerticalData: function () {
         $("#saveSequenceButton").prop("disabled", true);
-
         var data = [];
-
         $("#sequenceVerticalTable tbody tr").each(function () {
             var row = $(this);
             var id = row.find('.DBTMTestParameterVerticalViewSequenceId').val();
@@ -113,7 +101,6 @@
         });
         var jsonData = JSON.stringify(data);
         $("#DBTMSequenceData").val(jsonData);
-
         $.ajax({
             type: "POST",
             url: "/DBTMTestMaster/UpdateVerticalSequenceNumber",
@@ -137,5 +124,54 @@
                 $("#saveVerticalSequenceButton").prop("disabled", false);
             }
         });
-    }
+    },
+    EditRow: function (id) {
+        var row = $("#row_" + id);
+        row.find(".view-mode").hide();
+        row.find(".edit-mode").show();
+        row.find(".edit-btn").hide();
+        row.find(".save-btn").show();
+        row.find(".cancel-btn").show();
+    },
+    CancelRow: function (id) {
+        var row = $("#row_" + id);
+        row.find(".view-mode").show();
+        row.find(".edit-mode").hide();
+        row.find(".edit-btn").show();
+        row.find(".save-btn").hide();
+        row.find(".cancel-btn").hide();
+    },
+    SaveRow: function (id, centreCode) {
+        var row = $("#row_" + id);
+        var displayOn = row.find(".display-dropdown").val();
+        var isBold = row.find(".bold-checkbox").is(":checked");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            type: "POST",
+            url: "/DBTMOrganisationCentreMaster/GetActivityListViewEditPopup",
+            data: {
+                DBTMTestParameterListViewSequenceId: id,
+                DisplayOn: displayOn,
+                IsColumnCellBold: isBold,
+                CentreCode: centreCode
+            },
+            success: function (response) {
+                if (response.success) {
+                
+                    window.location.reload();
+                }
+                else {
+                    CoditechCommon.HideLodder();
+                    window.location.reload();
+                }    
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechCommon.HideLodder();
+                CoditechNotification.DisplayNotificationMessage("Error while saving sequence number. " + xhr.statusText, "error");
+            }
+        });
+    },
 };

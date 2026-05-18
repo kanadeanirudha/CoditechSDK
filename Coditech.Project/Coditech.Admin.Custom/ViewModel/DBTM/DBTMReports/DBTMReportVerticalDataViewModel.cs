@@ -1,4 +1,5 @@
-﻿using Coditech.Common.Helper;
+﻿using Coditech.Common.API.Model;
+using Coditech.Common.Helper;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 
@@ -14,5 +15,6 @@ namespace Coditech.Admin.ViewModel
         public DateTime TestPerformedTime { get; set; }
         public string Direction { get; set; }
         public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
+        public List<GraphModel> GraphModelList { get; set; }
     }
 }

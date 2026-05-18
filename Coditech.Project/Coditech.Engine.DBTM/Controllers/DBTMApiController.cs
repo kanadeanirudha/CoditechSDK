@@ -61,23 +61,58 @@ namespace Coditech.Engine.DBTM.Controllers
 
         [Route("/DBTMApi/InsertDeviceData")]
         [HttpPost, ValidateModel]
-        [Produces(typeof(TrueFalseResponse))]
+        [Produces(typeof(CustomTrueFalseResponse))]
         public IActionResult InsertDeviceData([FromBody] List<DBTMDeviceDataModel> model)
         {
             try
             {
                 bool status = _dBTMApiService.InsertDeviceData(model);
-                return CreateOKResponse(new TrueFalseResponse { IsSuccess = status });
+                return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status });
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+                return CreateInternalServerErrorResponse(new CustomTrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
                 _coditechLogging.LogMessage(ex, "DBTMDeviceData", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+                return CreateInternalServerErrorResponse(new CustomTrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMApi/InsertDeviceDataV2")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(CustomTrueFalseResponse))]
+        public IActionResult InsertDeviceDataV2()
+        {
+            using var reader = new StreamReader(Request.Body);
+
+            string rawJson = reader.ReadToEnd();
+
+            if (string.IsNullOrWhiteSpace(rawJson))
+            {
+                return BadRequest(new CustomTrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = "Request body is empty."
+                });
+            }
+
+            try
+            {
+                bool status = _dBTMApiService.InsertDeviceDataV2(rawJson);
+                return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex.Message, "DBTMDeviceDataV2", TraceLevel.Warning, rawJson, "Application");
+                return CreateInternalServerErrorResponse(new CustomTrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex.Message, "DBTMDeviceDataV2", TraceLevel.Error, rawJson, "Application");
+                return CreateInternalServerErrorResponse(new CustomTrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
         [Route("/DBTMApi/Getbatchlist")]

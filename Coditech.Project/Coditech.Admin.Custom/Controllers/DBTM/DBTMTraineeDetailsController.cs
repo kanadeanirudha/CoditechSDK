@@ -18,16 +18,18 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IDBTMTraineeDetailsAgent _dBTMTraineeDetailsAgent;
         private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
+        private readonly IDBTMOrganisationCentrewiseJoiningCodeAgent _dBTMOrganisationCentrewiseJoiningCodeAgent;
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly IServiceProvider _serviceProvider;
 
         private const string createEditTraineeDetails = "~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeDetails.cshtml";
         private const string createEditAssociatedTrainer = "~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/CreateEditAssociatedTrainer.cshtml";
-        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
+        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             _dBTMTraineeDetailsAgent = dBTMTraineeDetailsAgent;
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
+            _dBTMOrganisationCentrewiseJoiningCodeAgent = dBTMOrganisationCentrewiseJoiningCodeAgent;
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
@@ -268,6 +270,7 @@ namespace Coditech.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    generalTraineeAssociatedToTrainerViewModel.IsCurrentTrainer = true;
                     generalTraineeAssociatedToTrainerViewModel = _dBTMTraineeDetailsAgent.InsertAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel);
                     if (!generalTraineeAssociatedToTrainerViewModel.HasError)
                     {
@@ -306,6 +309,7 @@ namespace Coditech.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                generalTraineeAssociatedToTrainerViewModel.IsCurrentTrainer = true;
                 SetNotificationMessage(_dBTMTraineeDetailsAgent.UpdateAssociatedTrainer(generalTraineeAssociatedToTrainerViewModel).HasError
                 ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                 : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
@@ -439,7 +443,7 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public virtual ActionResult TraineeRegistration(string joiningCode, string custom1, long trainerId = 0)
+        public virtual ActionResult TraineeRegistration(string joiningCode, string custom1, long trainerId = 0, bool isChange = false)
         {
             DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
@@ -447,64 +451,55 @@ namespace Coditech.Admin.Controllers
             {
                 trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? "")?.GeneralTrainerMasterId ?? 0;
             }
-            if (trainerId > 0)
+            string joiningCodeTrainerId = string.Empty;
+            if (string.IsNullOrEmpty(joiningCode) && userModel != null && !isChange)
             {
-                var listTrainer = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, trainerId);
-                if (listTrainer.HasError)
+                var joiningCodeList = _dBTMOrganisationCentrewiseJoiningCodeAgent.GetTraineeActiveJoiningCodeList(userModel.SelectedCentreCode, trainerId.ToString(), 1);
+                OrganisationCentrewiseJoiningCodeViewModel firstItem = joiningCodeList?.FirstOrDefault();
+                if (firstItem != null && !string.IsNullOrEmpty(firstItem.JoiningCode))
                 {
-                    SetNotificationMessage(GetErrorNotificationMessage(listTrainer.ErrorMessage));
-                    return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
+                    joiningCode = firstItem.JoiningCode;
+                    joiningCodeTrainerId = firstItem.Custom1;
                 }
-                joiningCode = listTrainer.JoiningCode;
-                var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-                {
-                    DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                    Parameter = joiningCode
-                }).DropdownList?.Where(x => x.Value != "").ToList();
-                allTrainerList = allTrainerList.Where(x => x.Value == trainerId.ToString()).ToList();
-                allTrainerList.ForEach(x => x.Selected = true);
-                model = new DBTMNewRegistrationViewModel
-                {
-                    JoiningCode = joiningCode,
-                    AllTrainerList = allTrainerList,
-                    SelectedTrainer = new List<string> { trainerId.ToString() }
-                };
+            }
+            if (string.IsNullOrWhiteSpace(joiningCode))
+            {
                 return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
             }
-
-            if (!string.IsNullOrWhiteSpace(joiningCode))
+            DBTMNewRegistrationListViewModel list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, 0);
+            if (list.HasError)
             {
-                var list = _dBTMNewRegistrationAgent.GetGeneralTrainerByJoiningCode(joiningCode, 0);
-                if (list.HasError)
-                {
-                    SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
-                    return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
-                }
-                joiningCode = list.JoiningCode;
-                var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
-                {
-                    DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(),
-                    Parameter = joiningCode
-                }).DropdownList?.Where(x => x.Value != "").ToList();
-
-                List<string> selected = new List<string>();
-                if (!string.IsNullOrEmpty(custom1))
-                {
-                    selected = custom1.Split(',').ToList();
-                    foreach (var item in allTrainerList)
-                        item.Selected = selected.Contains(item.Value);
-                }
-
-                model = new DBTMNewRegistrationViewModel
-                {
-                    JoiningCode = joiningCode,
-                    AllTrainerList = allTrainerList,
-                    SelectedTrainer = selected
-                };
+                SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
                 return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
             }
+            joiningCode = list.JoiningCode;
+            if (string.IsNullOrEmpty(joiningCodeTrainerId))
+            {
+                joiningCodeTrainerId = list.SelectedTrainerId;
+            }
+            var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel{ DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(), Parameter = joiningCode }).DropdownList?.Where(x => x.Value != "").ToList();
+            List<string> selected = new List<string>();
+            if (!string.IsNullOrEmpty(joiningCodeTrainerId))
+            {
+                selected.Add(joiningCodeTrainerId);
+            }
+            else if (trainerId > 0)
+            {
+                selected.Add(trainerId.ToString());
+            }
+            foreach (var item in allTrainerList)
+            {
+                item.Selected = selected.Contains(item.Value);
+            }
+            model = new DBTMNewRegistrationViewModel
+            {
+                JoiningCode = joiningCode,
+                AllTrainerList = allTrainerList,
+                SelectedTrainer = selected
+            };
             return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public virtual ActionResult TraineeRegistration(DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel)
@@ -598,6 +593,7 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(dBTMNewRegistrationViewModel.ErrorMessage));
             return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
+
         [HttpPost]
         public JsonResult ConvertCampUserToBatchUser(long dBTMTraineeDetailId)
         {

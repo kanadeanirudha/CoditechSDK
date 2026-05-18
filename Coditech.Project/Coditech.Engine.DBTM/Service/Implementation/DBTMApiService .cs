@@ -8,6 +8,7 @@ using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
 using System.Data;
+using System.Text.Json;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -123,7 +124,9 @@ namespace Coditech.API.Service
                             DBTMDeviceDataDetails dBTMDeviceDataDetails = new DBTMDeviceDataDetails()
                             {
                                 DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
-                                ParameterCode = item.ParameterCode,
+                                ParameterCode = int.TryParse(Convert.ToString(item.ParameterCode), out int parameterCode)
+                                                ? ((TestParameterCode)parameterCode).ToString()
+                                                : Convert.ToString(item.ParameterCode),
                                 ParameterValue = EncryptionHelper.Encrypt(Convert.ToString(item.ParameterValue)),
                                 IsEncrypted = true,
                                 FromTo = item.FromTo,
@@ -137,34 +140,25 @@ namespace Coditech.API.Service
                             };
                             dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
                         }
-                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList);
-                        if (data != null || data.Count() > 0)
-                        {
-                            int statusOutput = 0;
-                            CoditechViewRepository<DBTMDeviceDataModel> objStoredProc = new CoditechViewRepository<DBTMDeviceDataModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-                            objStoredProc.SetParameter("@TestCode", DBTMDeviceDataDetails.TestCode, ParameterDirection.Input, DbType.String);
-                            objStoredProc.SetParameter("@DBTMDeviceDataId", DBTMDeviceDataDetails.DBTMDeviceDataId, ParameterDirection.Input, DbType.Int64);
-                            objStoredProc.SetParameter("@Status", statusOutput, ParameterDirection.Output, DbType.Int32);
-                            objStoredProc.ExecuteStoredProcedureList("Coditech_DBTMUpdateDeviceData @TestCode,@DBTMDeviceDataId,@Status OUT", 2, out statusOutput);
-                        }
-                    }
-                }
-
-                string typeOfRecord = dBTMDeviceDataModelList.FirstOrDefault().TypeOfRecord;
-                long tablePrimaryColumnId = dBTMDeviceDataModelList.FirstOrDefault().TablePrimaryColumnId;
-                if (typeOfRecord == "Batch")
-                {
-                    List<long> entityIds = dBTMDeviceDataModelList.Where(x => x.EntityId > 0).Select(x => x.EntityId).ToList();
-                    if (entityIds?.Count > 0)
-                    {
-                        List<GeneralBatchUser> generalBatchUsers = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == tablePrimaryColumnId && entityIds.Contains(x.EntityId)).ToList();
-                        int activityStatusEnumId = GetEnumIdByEnumCode("Completed", "DBTMTestStatus");
-                        generalBatchUsers.ForEach(x => { x.ActivityStatusEnumId = activityStatusEnumId; });
-                        _generalBatchUserRepository.BatchUpdate(generalBatchUsers);
+                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList, dBTMDeviceDataModel.CreatedBy);
                     }
                 }
             }
             return true;
+        }
+
+        //Add DBTMDeviceData.
+        public bool InsertDeviceDataV2(string rawJson)
+        {
+            List<DBTMDeviceDataModel> dBTMDeviceDataModelList = JsonConvert.DeserializeObject<List<DBTMDeviceDataModel>>(rawJson);
+
+            if (IsNull(dBTMDeviceDataModelList))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+
+            ValidateEnum(dBTMDeviceDataModelList);
+
+
+            return InsertDeviceData(dBTMDeviceDataModelList);
         }
         #endregion
         #region DBTMBatch
@@ -540,7 +534,7 @@ namespace Coditech.API.Service
             return campUserList;
         }
         #endregion
-        public virtual bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord)
+        public bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord)
         {
             if (dBTMDeviceDataId < 1)
                 throw new CoditechException(
@@ -559,10 +553,7 @@ namespace Coditech.API.Service
 
             return isUpdated;
         }
-        public DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(
-     string centreCode,
-     int joiningCodeTypeEnumId,
-     long generalTrainerMasterId)
+        public DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(string centreCode, int joiningCodeTypeEnumId, long generalTrainerMasterId)
         {
             var batches = (from a in _generalBatchRepository.Table
                            join b in _userMasterRepository.Table
@@ -589,6 +580,56 @@ namespace Coditech.API.Service
                 DBTMBatchList = batches ?? new List<DBTMBatchModel>()
             };
         }
+
+        private void ValidateEnum(List<DBTMDeviceDataModel> dBTMDeviceDataModelList)
+        {
+            foreach (var item in dBTMDeviceDataModelList)
+            {
+                List<string> parameterCodes = item.DataList
+                                                  .Select(x => x.ParameterCode)
+                                                  .Distinct()
+                                                  .ToList();
+
+                foreach (string code in parameterCodes)
+                {
+                    if (!int.TryParse(code, out int enumValue) ||
+                        !Enum.IsDefined(typeof(TestParameterCode), enumValue))
+                    {
+                        throw new CoditechException(
+                            0,
+                            $"DBTM Insert Device Data Invalid Parameter Code: {code}"
+                        );
+                    }
+                }
+            }
+        }
+
+
+
     }
+
+    public enum TestParameterCode
+    {
+        AirTime = 1,
+        Count = 2,
+        Direction = 3,
+        Distance = 4,
+        DistanceMultiplyByRow = 5,
+        JumpHeight = 6,
+        JumpLength = 7,
+        ModeOfStart = 8,
+        PersonDetectionRange = 9,
+        Position = 10,
+        Round = 11,
+        ShuttleNo = 12,
+        Speed = 13,
+        SpeedLevel = 14,
+        Time = 15,
+        TimeC = 16,
+        Velocity = 17,
+        Vo2Max = 18
+    }
+
+
 }
 

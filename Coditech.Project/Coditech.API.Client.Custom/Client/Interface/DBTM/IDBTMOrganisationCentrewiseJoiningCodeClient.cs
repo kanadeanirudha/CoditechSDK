@@ -13,6 +13,7 @@ namespace Coditech.API.Client
         /// <returns>Returns DBTMOrganisationCentrewiseJoiningCodeResponse.</returns>
         DBTMOrganisationCentrewiseJoiningCodeResponse GetTraineeActiveJoiningCode(string centreCode, string trainerId);
         DBTMOrganisationCentrewiseJoiningCodeResponse GetTrainerActiveJoiningCode(string centreCode);
+        OrganisationCentrewiseJoiningCodeListResponse GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows);
         TrueFalseResponse DeleteJoiningCodeFile(ParameterModel body);
     }
 }

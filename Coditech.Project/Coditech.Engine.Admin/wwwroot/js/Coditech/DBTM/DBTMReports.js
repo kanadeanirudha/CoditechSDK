@@ -16,8 +16,8 @@ var DBTMReports = {
         $("#DBTMTestWiseMultiReportsDivId").html("");
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
+            DBTMReports.LoadActivityPerformedDates(true);
             CoditechCommon.ShowLodder();
-
             $.ajax({
                 cache: false,
                 type: "GET",
@@ -188,10 +188,14 @@ var DBTMReports = {
         }
     },
 
-    LoadActivityPerformedDates: function () {
+    LoadActivityPerformedDates: function (showMessage = false) {
         var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
-
+        if (!dBTMTraineeDetailId || dBTMTraineeDetailId == "0") {
+            activityPerformedDates = [];
+            $("#FromDate,#ToDate").datepicker("refresh");
+            return;
+        }
         if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0) {
             activityPerformedDates = [];
             $("#FromDate,#ToDate").datepicker("refresh");
@@ -209,9 +213,6 @@ var DBTMReports = {
             },
             success: function (data) {
                 activityPerformedDates = data || [];
-                if (!activityPerformedDates || activityPerformedDates.length === 0) {
-                    CoditechNotification.DisplayNotificationMessage( "Activity has never been tested.", "error" );
-                }
                 $("#FromDate,#ToDate").datepicker("refresh");
             },
             error: function (xhr) {
@@ -219,7 +220,7 @@ var DBTMReports = {
                     location.reload();
                 }
                 activityPerformedDates = [];
-                CoditechNotification.DisplayNotificationMessage( "Failed to load activity dates.", "error" );
+                CoditechNotification.DisplayNotificationMessage("Failed to load activity dates.", "error");
             }
         });
     },
@@ -398,8 +399,7 @@ var DBTMReports = {
         $("#DBTMTestWiseMultiReportsDivId").html("");
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
-            CoditechCommon.ShowLodder();
-
+            CoditechCommon.ShowLodder();         
             $.ajax({
                 cache: false,
                 type: "GET",
