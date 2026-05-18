@@ -73,6 +73,7 @@ namespace Coditech.API.Service
             GraphModel graphModel = new GraphModel();
             DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
             string xParameter = string.IsNullOrEmpty(graphMaster.XParameterBasedOn) ? graphMaster.XParameter : graphMaster.XParameterBasedOn;
+            xParameter = $"{xParameter},Direction";
             string yParameter = string.IsNullOrEmpty(graphMaster.YParameterBasedOn) ? graphMaster.YParameter : graphMaster.YParameterBasedOn;
 
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode, typeOfRecord);
@@ -97,14 +98,11 @@ namespace Coditech.API.Service
                     {
                         XValuesList = new string[] { "S1", "S2", "S3", "S4" };
                     }
-                    else if (dbtmTestMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || dbtmTestMaster.TestCode == CustomConstants.ProAgilityTest)
-                    {
-                        XValuesList = new string[] { "A-B", "B-C", "C-B" };
-                    }
                     else
                     {
                         List<string> xValues = new List<string>();
                         xValues.AddRange(dBTMReportsList
+                                    .Where(x => !string.IsNullOrEmpty(x.FromTo))
                                     .GroupBy(x => x.FromTo)
                                     .OrderBy(g => g.Min(x => x.Row))
                                     .Select(g => g.Key)
@@ -136,7 +134,7 @@ namespace Coditech.API.Service
                     }
                     else
                     {
-                        if(dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
+                        if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
                         {
                             xValues.AddRange(dBTMReportsList
                                       .Where(x => x.ParameterCode == CustomConstants.Distance ||
@@ -146,7 +144,7 @@ namespace Coditech.API.Service
                                       .Select(g => g.Key));
                             XValuesList = xValues.ToArray();
                         }
-                        else if(dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow))
+                        else if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow))
                         {
                             xValues.AddRange(dBTMReportsList
                                       .Where(x => x.ParameterCode == CustomConstants.Distance ||
@@ -163,7 +161,7 @@ namespace Coditech.API.Service
                                       }));
                             XValuesList = xValues.ToArray();
                         }
-                      
+
                     }
                 }
                 else if (graphMaster.XParameter == CustomConstants.Turns)
@@ -304,7 +302,7 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.IsYParameterCalculated)
                 {
-                    foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                    foreach (var item in group.Where(x => yParameter.Contains(x.ParameterCode)))
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
                         j++;
@@ -312,16 +310,17 @@ namespace Coditech.API.Service
                 }
                 else
                 {
-                    foreach (var item in group.Where(x => x.ParameterCode == yParameter))
+                    foreach (var item in group.Where(x => yParameter.Contains(x.ParameterCode)))
                     {
-                        yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => x.ParameterCode == yParameter && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
+                        yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => yParameter.Contains(x.ParameterCode) && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
                         j++;
                     }
                 }
+                string direction = group.Where(x => x.ParameterCode == "Direction").Select(x => x.Comment1).FirstOrDefault();
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
                     Color = colorPalette[colorIndex % colorPalette.Length],
-                    Label = $"Turn {i} {graphMaster.YAxixLabel}",
+                    Label = $"{direction} Turn {i} {graphMaster.YAxixLabel}",
                     Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
                 });
                 colorIndex++;
@@ -342,7 +341,7 @@ namespace Coditech.API.Service
                         var dataArray = JsonConvert.DeserializeObject<decimal[]>(dataset.Data);
                         sum += dataArray[index];
                     }
-                    yValuesList.Add(Math.Round(sum / dataCount, CustomConstants.GraphListRoundUpValue));
+                    yValuesList.Add(Math.Round(sum / datasetsCount, CustomConstants.GraphListRoundUpValue));
 
                 }
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
