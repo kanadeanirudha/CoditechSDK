@@ -613,6 +613,10 @@ namespace Coditech.API.Service
                 html = ReplaceTokenWithMessageText("#bodyopen#", "<body style=\"margin:0; padding:0; font-family: Arial, sans-serif; background-color:#ffffff;\">", html);
                 html = ReplaceTokenWithMessageText("#bodyclose#", "</body>", html);
                 html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
+                if (System.IO.File.Exists(radarChartPath))
+                {
+                    System.IO.File.Delete(radarChartPath);
+                }
             }
             else
             {
