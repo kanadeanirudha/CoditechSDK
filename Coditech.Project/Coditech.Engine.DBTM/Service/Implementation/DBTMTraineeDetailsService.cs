@@ -1005,7 +1005,7 @@ namespace Coditech.API.Service
             // -----------------------------------
             // Export Base64
             // -----------------------------------
-            byte[] bytes = plt.GetImageBytes(700, 700, ImageFormat.Png);
+            byte[] bytes = plt.GetImageBytes(1000, 1000, ImageFormat.Png);
 
             return Convert.ToBase64String(bytes);
         }

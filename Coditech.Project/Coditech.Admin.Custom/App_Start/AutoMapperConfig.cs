@@ -35,7 +35,6 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMPrivacySettingListModel, DBTMPrivacySettingListViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesModel, DBTMActivitiesViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesListModel, DBTMActivitiesListViewModel>().ReverseMap();
-            CreateMap<DBTMActivitiesDetailsModel, DBTMActivitiesDetailsViewModel>().ReverseMap();
             CreateMap<DBTMActivitiesDetailsListModel, DBTMActivitiesDetailsListViewModel>().ReverseMap();
             CreateMap<DBTMNewRegistrationViewModel, GeneralPersonModel>().ReverseMap();
             CreateMap<DBTMTraineeAssignmentToUserListModel, DBTMTraineeAssignmentToUserListViewModel>().ReverseMap();

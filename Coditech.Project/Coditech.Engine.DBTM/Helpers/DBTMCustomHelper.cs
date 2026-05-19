@@ -1,5 +1,6 @@
 ﻿using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
+using ScottPlot.Colormaps;
 using System.Data;
 namespace Coditech.Engine.DBTM.Helpers
 {
@@ -105,7 +106,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = $"{Math.Round(cumulativeDistance, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.Velocity:
-                    distance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                    distance =  Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue);
                     decimal time = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue);
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
                     break;
@@ -121,7 +122,7 @@ namespace Coditech.Engine.DBTM.Helpers
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
                     break;
                 case CustomConstants.CumulativeVelocity:
-                    distance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                    distance = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue);
                     cumulativeTime = 0;
                     for (int i = 1; i <= recurtion; i++)
                     {
