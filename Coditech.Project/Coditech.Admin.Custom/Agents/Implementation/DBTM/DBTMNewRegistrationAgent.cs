@@ -153,7 +153,6 @@ namespace Coditech.Admin.Agents
                     JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
                     SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId,
                     RegistrationType = dBTMNewRegistrationViewModel.RegistrationType,
-                    AgeGroup = dBTMNewRegistrationViewModel.AgeGroup
                 };
 
                 dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);

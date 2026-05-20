@@ -140,19 +140,7 @@
                 showButtonPanel: true,
                 closeText: 'Clear',
                 minDate: "-80Y",
-                maxDate: new Date(),
-                onSelect: function (dateText) {
-                    var dob = new Date(dateText);
-                    var today = new Date();
-                    var age = today.getFullYear() - dob.getFullYear();
-                    var monthDiff = today.getMonth() - dob.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-                        age--;
-                    }
-                    var ageGroups = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
-                    var selectedAgeGroup = ageGroups.find(x => age <= x);
-                    $("#AgeGroup").val("Under " + selectedAgeGroup);
-                },
+                maxDate: new Date(),              
                 onClose: function () {
                     if ($(document.activeElement).hasClass("ui-datepicker-close")) {
                         $(this).val('');
