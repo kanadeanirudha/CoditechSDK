@@ -89,9 +89,7 @@ namespace Coditech.API.Service
                         continue;
                     }
                     createdDate = DateTime.Now;
-                    DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails();
-                    if (dBTMDeviceDataModel.Weight == 0 || dBTMTraineeDetails.Height == 0)
-                        dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
+                    DBTMTraineeDetails dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
 
                     if (IsNull(dBTMTraineeDetails))
                         throw new CoditechException(ErrorCodes.InvalidData, "Invalid Person Code");
@@ -110,7 +108,8 @@ namespace Coditech.API.Service
                         NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
                         CreatedBy = dBTMDeviceDataModel.CreatedBy,
                         CreatedDate = createdDate,
-                        IsValidRecord = true
+                        IsValidRecord = true,
+                        AgeGroupEnumId = dBTMTraineeDetails.AgeGroupEnumId
                     };
 
                     DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
