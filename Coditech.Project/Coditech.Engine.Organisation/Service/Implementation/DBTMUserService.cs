@@ -184,6 +184,10 @@ namespace Coditech.API.Service
         {
             DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = !string.IsNullOrEmpty(customData) ? JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customData) : new DBTMCustomNewRegistrationModel();
             generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
+            if (dBTMCustomNewRegistrationModel.AgeGroupEnumId <= 0)
+            {
+                dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
+            }
             DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails()
             {
                 CentreCode = generalPersonModel.SelectedCentreCode,
@@ -193,7 +197,7 @@ namespace Coditech.API.Service
                 Height = dBTMCustomNewRegistrationModel.height,
                 Weight = dBTMCustomNewRegistrationModel.weight,
                 SchoolName = dBTMCustomNewRegistrationModel.SchoolName,
-                AgeGroup = dBTMCustomNewRegistrationModel.AgeGroup,
+                AgeGroupEnumId = dBTMCustomNewRegistrationModel.AgeGroupEnumId,
                 IsActive = true,
                 SpecializationEnumId = dBTMCustomNewRegistrationModel.SpecializationEnumId
             };
@@ -744,6 +748,11 @@ namespace Coditech.API.Service
             decimal height = Convert.ToDecimal(GetValue(row, ExcelTemplateColumns.HeightCm));
             decimal weight = Convert.ToDecimal(GetValue(row, ExcelTemplateColumns.WeightKg));
             string specialization = GetValue(row, ExcelTemplateColumns.Specialization);
+            int ageGroupEnumId = 0;
+            if (!string.IsNullOrWhiteSpace(ageGroup))
+            {
+                ageGroupEnumId = GetEnumIdByEnumCode(ageGroup.Replace(" ", ""), DropdownCustomTypeEnum.AgeGroup.ToString());
+            }
             DBTMCustomNewRegistrationModel customModel = new DBTMCustomNewRegistrationModel
             {
                 JoiningCode = joiningCode,
@@ -752,7 +761,7 @@ namespace Coditech.API.Service
                 SpecializationEnumId = GetEnumIdByEnumCode(specialization, DropdownCustomTypeEnum.TraineeSpecialization.ToString()),
                 GeneralBatchMasterId = batchId,
                 SchoolName = schoolName,
-                AgeGroup = ageGroup,
+                AgeGroupEnumId = ageGroupEnumId,
                 RegistrationType = "Batch",
                 GeneralTraineeAssociatedToTrainerIds = new List<string>()
             };
@@ -1010,6 +1019,32 @@ namespace Coditech.API.Service
         private int GetTemplateIdByCode(string templateCode)
         {
             return new CoditechRepository<GeneralTemplateMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.TemplateCode == templateCode).Select(x => x.GeneralTemplateMasterId).FirstOrDefault();
+        }
+        private int GetAgeGroupEnumIdByDOB(DateTime? dob)
+        {
+            if (!dob.HasValue)
+                return 0;
+            int age = DateTime.Today.Year - dob.Value.Year;
+            if (dob.Value.Date > DateTime.Today.AddYears(-age))
+                age--;
+            List<GeneralEnumaratorMaster> ageGroups =
+            (
+                from gm in new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table
+                join gg in new CoditechRepository<GeneralEnumaratorGroup>(_serviceProvider.GetService<Coditech_Entities>()).Table
+                on gm.GeneralEnumaratorGroupId equals gg.GeneralEnumaratorGroupId
+                where gg.EnumGroupCode == "AgeGroup" && gm.IsActive
+                orderby gm.SequenceNumber select gm).ToList();
+            foreach (var item in ageGroups)
+            {
+                Match match = Regex.Match(item.EnumDisplayText, @"\d+");
+                if (match.Success)
+                {
+                    int maxAge = Convert.ToInt32(match.Value);
+                    if (age <= maxAge)
+                        return item.GeneralEnumaratorId;
+                }
+            }
+            return ageGroups.LastOrDefault()?.GeneralEnumaratorId ?? 0;
         }
         private bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
         {

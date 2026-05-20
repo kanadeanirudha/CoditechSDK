@@ -52,7 +52,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "School Name")]
         public string SchoolName { get; set; }
         [Display(Name = "Age Group")]
-        public string AgeGroup { get; set; }
+        public int AgeGroupEnumId { get; set; }
         [Required]
         [Display(Name = "Standard")]
         public string Standard { get; set; }

@@ -25,7 +25,7 @@
         public long GeneralTrainerMasterId { get; set; }
         public string DisplayName { get; set; }
         public string SchoolName { get; set; }
-        public string AgeGroup { get; set; }
+        public int AgeGroupEnumId { get; set; }
         public string Standard { get; set; }
         public string Section { get; set; }
         public string TypeOfCentre { get; set; }

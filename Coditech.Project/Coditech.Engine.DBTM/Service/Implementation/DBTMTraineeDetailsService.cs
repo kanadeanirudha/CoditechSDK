@@ -133,6 +133,7 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.SchoolName = dBTMTraineeDetailsModel.SchoolName;
             dBTMTraineeDetails.Section = dBTMTraineeDetailsModel.Section;
             dBTMTraineeDetails.Standard = dBTMTraineeDetailsModel.Standard;
+            dBTMTraineeDetails.AgeGroupEnumId = dBTMTraineeDetailsModel.AgeGroupEnumId;
 
             isUpdated = _dBTMTraineeDetailsRepository.Update(dBTMTraineeDetails);
             if (isUpdated)
