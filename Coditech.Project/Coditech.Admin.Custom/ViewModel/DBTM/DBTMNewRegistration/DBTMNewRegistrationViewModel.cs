@@ -130,5 +130,6 @@ namespace Coditech.Admin.ViewModel
         public bool IsCampUser { get; set; }
         [Required(ErrorMessage = "Please select user type.")]
         public string RegistrationType { get; set; }
+        public string AgeGroup { get; set; }
     }
 }

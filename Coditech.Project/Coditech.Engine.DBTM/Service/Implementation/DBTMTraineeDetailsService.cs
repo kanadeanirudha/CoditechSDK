@@ -101,6 +101,7 @@ namespace Coditech.API.Service
                     dBTMTraineeDetailsModel.LastName = generalPersonModel.LastName;
                     dBTMTraineeDetailsModel.IsActive = dBTMTraineeDetails.IsActive;
                     dBTMTraineeDetailsModel.TypeOfCentre = dBTMCentreWiseSetting?.TypeOfCentre;
+                    dBTMTraineeDetails.AgeGroup = dBTMTraineeDetailsModel.AgeGroup;
                 }
             }
             return dBTMTraineeDetailsModel;
@@ -133,6 +134,7 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.SchoolName = dBTMTraineeDetailsModel.SchoolName;
             dBTMTraineeDetails.Section = dBTMTraineeDetailsModel.Section;
             dBTMTraineeDetails.Standard = dBTMTraineeDetailsModel.Standard;
+            dBTMTraineeDetails.AgeGroup = dBTMTraineeDetailsModel.AgeGroup;
 
             isUpdated = _dBTMTraineeDetailsRepository.Update(dBTMTraineeDetails);
             if (isUpdated)
