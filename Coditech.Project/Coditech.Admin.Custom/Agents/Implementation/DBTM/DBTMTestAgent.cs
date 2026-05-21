@@ -408,6 +408,57 @@ namespace Coditech.Admin.Agents
             }
         }
         #endregion
+        public virtual DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId)
+        {
+            DBTMTestWisePerformanceStandardListResponse response = _dBTMTestClient.GetDBTMTestWisePerformanceStandardList(dBTMTestMasterId);
+            DBTMTestWisePerformanceStandardListModel listModel = new DBTMTestWisePerformanceStandardListModel { DBTMTestWisePerformanceStandardList = response?.DBTMTestWisePerformanceStandardList };
+            DBTMTestWisePerformanceStandardListViewModel listViewModel = new DBTMTestWisePerformanceStandardListViewModel();
+            listViewModel.DBTMTestWisePerformanceStandardList = listModel?.DBTMTestWisePerformanceStandardList ?.ToViewModel<DBTMTestWisePerformanceStandardViewModel>().ToList();
+            listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            listViewModel.TestName = response.TestName;
+            return listViewModel;
+        }
+        public virtual DBTMTestWisePerformanceStandardViewModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
+        {
+            try
+            {
+                DBTMTestWisePerformanceStandardResponse response = _dBTMTestClient.CreateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel.ToModel<DBTMTestWisePerformanceStandardModel>());
+                DBTMTestWisePerformanceStandardModel model = response?.DBTMTestWisePerformanceStandardModel;
+                return IsNotNull(model) ? model.ToViewModel<DBTMTestWisePerformanceStandardViewModel>() : new DBTMTestWisePerformanceStandardViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMTestWisePerformanceStandardViewModel) GetViewModelWithErrorMessage(dBTMTestWisePerformanceStandardViewModel, ex.ErrorMessage);
+                    default:
+                        return (DBTMTestWisePerformanceStandardViewModel) GetViewModelWithErrorMessage(dBTMTestWisePerformanceStandardViewModel, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMTestWisePerformanceStandardViewModel) GetViewModelWithErrorMessage(dBTMTestWisePerformanceStandardViewModel, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+        public virtual DBTMTestWisePerformanceStandardViewModel UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMTest", TraceLevel.Info);
+                DBTMTestWisePerformanceStandardResponse response = _dBTMTestClient.UpdateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel.ToModel<DBTMTestWisePerformanceStandardModel>());
+                DBTMTestWisePerformanceStandardModel model = response?.DBTMTestWisePerformanceStandardModel;
+                _coditechLogging.LogMessage("Agent method execution done.", "DBTMTest", TraceLevel.Info);
+                return IsNotNull(model) ? model.ToViewModel<DBTMTestWisePerformanceStandardViewModel>() : (DBTMTestWisePerformanceStandardViewModel) GetViewModelWithErrorMessage( new DBTMTestWisePerformanceStandardViewModel(), GeneralResources.UpdateErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
+                return (DBTMTestWisePerformanceStandardViewModel) GetViewModelWithErrorMessage(dBTMTestWisePerformanceStandardViewModel, GeneralResources.UpdateErrorMessage);
+            }
+        }
         public virtual DBTMCentreWiseTestListViewModel GetTestsByCentreCode(string centreCode)
         {
             DBTMCentreWiseTestListResponse response = _dBTMTestClient.GetTestsByCentreCode(centreCode);
