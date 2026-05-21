@@ -9,7 +9,6 @@
 }
 @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
 {
-    @Html.HiddenFor(x => x.AgeGroupEnumId, new { id = "AgeGroupEnumId" })
     <div class="row">
         <div class="col-lg-2">
             <div class="mb-3">

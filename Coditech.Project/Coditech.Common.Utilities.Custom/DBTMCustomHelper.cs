@@ -331,5 +331,22 @@ namespace Coditech.Common.Helper.Utilities
             }
             return data;
         }
+
+        public static int GetAgeGroupEnumIdByDOB(DateTime? dob, List<(int EnumId, int EnumValue)> ageGroups)
+        {
+            if (!dob.HasValue)
+                return 0;
+            int age = DateTime.Today.Year - dob.Value.Year;
+            if (dob.Value.Date > DateTime.Today.AddYears(-age))
+                age--;
+            foreach (var item in ageGroups.OrderBy(x => x.EnumValue))
+            {
+                if (age <= item.EnumValue)
+                {
+                    return item.EnumId;
+                }
+            }
+            return ageGroups.LastOrDefault().EnumId;
+        }
     }
 }
