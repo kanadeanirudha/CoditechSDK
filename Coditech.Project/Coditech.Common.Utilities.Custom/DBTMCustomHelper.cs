@@ -1,8 +1,6 @@
 ﻿using Coditech.Common.API.Model;
-using Coditech.Common.Helper.Utilities;
-using ScottPlot.Colormaps;
 using System.Data;
-namespace Coditech.Engine.DBTM.Helpers
+namespace Coditech.Common.Helper.Utilities
 {
     public static class DBTMCustomHelper
     {
