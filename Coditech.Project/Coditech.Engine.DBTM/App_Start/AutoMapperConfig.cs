@@ -42,6 +42,7 @@ namespace Coditech.API.Mapper
             CreateMap<DBTMTestParameterListViewSequence, DBTMTestParameterVerticalViewSequence>().ReverseMap();
             CreateMap<DBTMCentreWiseTestModel, DBTMCentreWiseTest > ().ReverseMap();
             CreateMap<DBTMCampActivity, DBTMCampActivityModel>().ReverseMap();
+            CreateMap<DBTMTestWisePerformanceStandard, DBTMTestWisePerformanceStandardModel>().ReverseMap();
         }
     }
 }

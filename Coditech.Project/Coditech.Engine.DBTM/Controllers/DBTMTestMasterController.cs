@@ -490,5 +490,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMActivityVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMTestMaster/DBTMTestWisePerformanceStandard")]
+        [Produces(typeof(DBTMTestWisePerformanceStandardListResponse))]
+        public virtual IActionResult DBTMTestWisePerformanceStandard(int dBTMTestMasterId)
+        {
+            try
+            {
+                List<DBTMTestWisePerformanceStandardModel> model = _dBTMTestMasterService.DBTMTestWisePerformanceStandard(dBTMTestMasterId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMTestWisePerformanceStandardListResponse { DBTMTestWisePerformanceStandardList = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWisePerformanceStandard", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWisePerformanceStandard", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

@@ -152,7 +152,7 @@ namespace Coditech.Admin.Agents
                     GeneralTraineeAssociatedToTrainerIds = dBTMNewRegistrationViewModel.SelectedTrainer,
                     JoiningCode = dBTMNewRegistrationViewModel.JoiningCode,
                     SpecializationEnumId = dBTMNewRegistrationViewModel.SpecializationEnumId,
-                    RegistrationType = dBTMNewRegistrationViewModel.RegistrationType
+                    RegistrationType = dBTMNewRegistrationViewModel.RegistrationType,
                 };
 
                 dBTMNewRegistrationViewModel.Custom1 = JsonConvert.SerializeObject(dBTMCustomNewRegistrationModel);

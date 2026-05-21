@@ -23,6 +23,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMPerformanceMatrix> _dBTMPerformanceMatrixRepository;
         private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMActivityVerticalViewSequenceMasterRepository;
         private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
+        private readonly ICoditechRepository<DBTMTestWisePerformanceStandard> _dBTMTestWisePerformanceStandardRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -35,6 +36,7 @@ namespace Coditech.API.Service
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMPerformanceMatrixRepository = new CoditechRepository<DBTMPerformanceMatrix>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestWisePerformanceStandardRepository = new CoditechRepository<DBTMTestWisePerformanceStandard>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -560,6 +562,14 @@ namespace Coditech.API.Service
             objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMActivityVerticalViewSequence @DBTMTestParameterVerticalViewSequenceId,  @Status OUT", 1, out status);
 
             return status == 1 ? true : false;
+        }
+
+        //DBTMTestWisePerformanceStandard
+        public List<DBTMTestWisePerformanceStandardModel> DBTMTestWisePerformanceStandard(int dBTMTestMasterId)
+        {
+            List<DBTMTestWisePerformanceStandardModel> dBTMTestWisePerformanceStandardList = new List<DBTMTestWisePerformanceStandardModel>();
+           
+            return dBTMTestWisePerformanceStandardList;
         }
 
         #region Protected Method

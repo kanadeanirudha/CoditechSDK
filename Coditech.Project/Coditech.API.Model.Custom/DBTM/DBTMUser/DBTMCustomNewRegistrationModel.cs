@@ -10,7 +10,7 @@
         public int GeneralBatchMasterId { get; set; }
         public int DBTMCampMasterId { get; set; }
         public string SchoolName { get; set; }
-        public string AgeGroup { get; set; }
+        public int AgeGroupEnumId { get; set; }
         public string RegistrationType { get; set; }
     }
 }
