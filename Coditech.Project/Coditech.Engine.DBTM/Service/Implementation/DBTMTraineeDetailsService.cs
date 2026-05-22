@@ -5,7 +5,6 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
-using Coditech.Engine.DBTM.Helpers;
 using Coditech.Resources;
 using DinkToPdf.Contracts;
 using PuppeteerSharp;

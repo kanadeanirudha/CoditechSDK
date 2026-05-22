@@ -37,12 +37,15 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralCountryMaster> _generalCountryRepository;
         protected readonly ICoditechRepository<DBTMCampUser> _dbtmCampUserRepository;
         protected readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
+        private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
+        private readonly ICoditechRepository<GeneralEnumaratorGroup> _generalEnumaratorGroupRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _generalTemplateService = generalTemplateService;
+            _joiningCodeService = joiningCodeService;
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
@@ -53,13 +56,14 @@ namespace Coditech.API.Service
             _dBTMSubscriptionPlanRepository = new CoditechRepository<DBTMSubscriptionPlan>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMSubscriptionPlanAssociatedToUserRepository = new CoditechRepository<DBTMSubscriptionPlanAssociatedToUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
-            _joiningCodeService = joiningCodeService;
             _generalTemplateHeaderConfigurationRepository = new CoditechRepository<GeneralTemplateHeaderConfiguration>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalCountryRepository = new CoditechRepository<GeneralCountryMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dbtmCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalEnumaratorGroupRepository = new CoditechRepository<GeneralEnumaratorGroup>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         //public override UserModel Login(UserLoginModel userLoginModel)
@@ -125,6 +129,21 @@ namespace Coditech.API.Service
                 base.InsertPersonDetails(generalPersonModel, settingMasterList);
             }
         }
+        public override bool UpdatePersonInformation(GeneralPersonModel generalPersonModel)
+        {
+            bool isUpdated = base.UpdatePersonInformation(generalPersonModel);
+            if (isUpdated && generalPersonModel.UserType == UserTypeEnum.Trainee.ToString())
+            {
+                DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonId == generalPersonModel.PersonId);
+                if (traineeDetails != null)
+                {
+                    int calculatedAgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
+                    traineeDetails.AgeGroupEnumId = calculatedAgeGroupEnumId;
+                    _dBTMTraineeDetailsRepository.Update(traineeDetails);
+                }
+            }
+            return isUpdated;
+        }
         protected override bool ValidateUserwiseGeneralPerson(GeneralPersonModel generalPersonModel, ref string errorMessage, ref int generalEnumaratorId)
         {
             if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
@@ -183,7 +202,7 @@ namespace Coditech.API.Service
         private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
             DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = !string.IsNullOrEmpty(customData) ? JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customData) : new DBTMCustomNewRegistrationModel();
-            generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
+            generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);       
             if (dBTMCustomNewRegistrationModel.AgeGroupEnumId <= 0)
             {
                 dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
@@ -695,6 +714,14 @@ namespace Coditech.API.Service
                 {
                     errors.Add("Age Group is invalid");
                 }
+                else if (DateTime.TryParse(dob, out DateTime dobDate))
+                {
+                    int actualAgeGroupEnumId = GetAgeGroupEnumIdByDOB(dobDate);
+                    if (ageGroupEnumId != actualAgeGroupEnumId)
+                    {
+                        errors.Add("Age Group does not match Date Of Birth");
+                    }
+                }
             }
             if (!string.IsNullOrWhiteSpace(joiningCode))
             {
@@ -1019,33 +1046,7 @@ namespace Coditech.API.Service
         private int GetTemplateIdByCode(string templateCode)
         {
             return new CoditechRepository<GeneralTemplateMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.TemplateCode == templateCode).Select(x => x.GeneralTemplateMasterId).FirstOrDefault();
-        }
-        private int GetAgeGroupEnumIdByDOB(DateTime? dob)
-        {
-            if (!dob.HasValue)
-                return 0;
-            int age = DateTime.Today.Year - dob.Value.Year;
-            if (dob.Value.Date > DateTime.Today.AddYears(-age))
-                age--;
-            List<GeneralEnumaratorMaster> ageGroups =
-            (
-                from gm in new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table
-                join gg in new CoditechRepository<GeneralEnumaratorGroup>(_serviceProvider.GetService<Coditech_Entities>()).Table
-                on gm.GeneralEnumaratorGroupId equals gg.GeneralEnumaratorGroupId
-                where gg.EnumGroupCode == "AgeGroup" && gm.IsActive
-                orderby gm.SequenceNumber select gm).ToList();
-            foreach (var item in ageGroups)
-            {
-                Match match = Regex.Match(item.EnumDisplayText, @"\d+");
-                if (match.Success)
-                {
-                    int maxAge = Convert.ToInt32(match.Value);
-                    if (age <= maxAge)
-                        return item.GeneralEnumaratorId;
-                }
-            }
-            return ageGroups.LastOrDefault()?.GeneralEnumaratorId ?? 0;
-        }
+        }      
         private bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
         {
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
@@ -1099,6 +1100,24 @@ namespace Coditech.API.Service
             {
                 throw new CoditechException(ErrorCodes.InvalidData, "Invalid registration type.");
             }
+        }
+
+        private int GetAgeGroupEnumIdByDOB(DateTime? dob)
+        {
+            var ageGroups =
+            (
+                from gm in _generalEnumaratorMasterRepository.Table
+                join gg in _generalEnumaratorGroupRepository.Table
+                on gm.GeneralEnumaratorGroupId equals gg.GeneralEnumaratorGroupId
+                where gg.EnumGroupCode == "AgeGroup" && gm.IsActive
+                orderby gm.SequenceNumber
+                select new
+                {
+                    EnumId = gm.GeneralEnumaratorId,
+                    EnumValue = Convert.ToInt32(gm.EnumValue)
+                }
+            ).ToList();
+            return DBTMCustomHelper.GetAgeGroupEnumIdByDOB(dob, ageGroups.Select(x => (x.EnumId, x.EnumValue)).ToList());
         }
         #endregion
 

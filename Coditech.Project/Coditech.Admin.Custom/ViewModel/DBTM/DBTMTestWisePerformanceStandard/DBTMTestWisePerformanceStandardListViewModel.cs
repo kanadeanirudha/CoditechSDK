@@ -8,5 +8,7 @@ namespace Coditech.Admin.ViewModel
         {
             DBTMTestWisePerformanceStandardList = new List<DBTMTestWisePerformanceStandardViewModel>();
         }
+        public int DBTMTestMasterId { get; set; }
+        public string TestName { get; set; }
     }
 }

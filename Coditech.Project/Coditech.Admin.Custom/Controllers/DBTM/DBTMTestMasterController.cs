@@ -406,9 +406,40 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1 });
         }
+        public virtual ActionResult DBTMTestWisePerformanceStandardList(DataTableViewModel dataTableViewModel)
+        {
+            DBTMTestWisePerformanceStandardListViewModel list = _dBTMTestAgent.DBTMTestWisePerformanceStandardList( Convert.ToInt32(dataTableViewModel.SelectedParameter1));
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml",list);
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml",list);
+        }
+        [HttpPost]
+        public virtual ActionResult SaveDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                if (dBTMTestWisePerformanceStandardViewModel.DBTMTestWisePerformanceStandardId > 0)
+                {
+                    dBTMTestWisePerformanceStandardViewModel =_dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
+                }
+                else
+                {
+                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.CreateDBTMTestWisePerformanceStandard( dBTMTestWisePerformanceStandardViewModel);
+                }
+                if (!dBTMTestWisePerformanceStandardViewModel.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    return Json(new { success = true });
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
+            return Json(new { success = false });
+        }
         #endregion
         #region Protected
-      
+
         protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)
         {
             dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();
