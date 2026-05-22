@@ -71,5 +71,16 @@ namespace Coditech.API.Endpoint
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityVerticalViewSequence";
         public string GetTestsByCentreCode(string centreCode) =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetTestsByCentreCode?centreCode={centreCode}";
+       
+        public string GetDBTMTestWisePerformanceStandardListAsync(int dBTMTestMasterId)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestWisePerformanceStandardList?dBTMTestMasterId={dBTMTestMasterId}";
+        }
+        
+        public string CreateDBTMTestWisePerformanceStandardAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateDBTMTestWisePerformanceStandard";
+        
+        public string UpdateDBTMTestWisePerformanceStandardAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateDBTMTestWisePerformanceStandard";
     }
 }

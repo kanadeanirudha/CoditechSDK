@@ -1048,5 +1048,147 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+
+        public virtual DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId)
+        { 
+            return Task.Run(async () => await GetDBTMTestWisePerformanceStandardListAsync( dBTMTestMasterId, CancellationToken.None)).GetAwaiter().GetResult(); 
+        }
+        public virtual async Task<DBTMTestWisePerformanceStandardListResponse> GetDBTMTestWisePerformanceStandardListAsync( int dBTMTestMasterId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.GetDBTMTestWisePerformanceStandardListAsync(dBTMTestMasterId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync( endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardListResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException( objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTestWisePerformanceStandardListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTestWisePerformanceStandardListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTestWisePerformanceStandardResponse CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body)
+        {
+            return Task.Run(async () => await CreateDBTMTestWisePerformanceStandardAsync( body, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestWisePerformanceStandardResponse> CreateDBTMTestWisePerformanceStandardAsync( DBTMTestWisePerformanceStandardModel body, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.CreateDBTMTestWisePerformanceStandardAsync();
+            HttpResponseMessage response = null;
+            bool disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await PostResourceToEndpointAsync( endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> dictionary = BindHeaders(response);
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        {
+                            ObjectResponseResult<DBTMTestWisePerformanceStandardResponse> objectResponseResult2 = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>( response, BindHeaders(response), cancellationToken).ConfigureAwait(false);
+                            if (objectResponseResult2.Object == null)
+                            {
+                                throw new CoditechException(objectResponseResult2.Object.ErrorCode,  objectResponseResult2.Object.ErrorMessage);
+                            }
+                            return objectResponseResult2.Object;
+                        }
+                    case HttpStatusCode.Created:
+                        {
+                            ObjectResponseResult<DBTMTestWisePerformanceStandardResponse> objectResponseResult = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>(response, dictionary, cancellationToken).ConfigureAwait(false);
+                            if (objectResponseResult.Object == null)
+                            {
+                                throw new CoditechException( objectResponseResult.Object.ErrorCode, objectResponseResult.Object.ErrorMessage);
+                            }
+                            return objectResponseResult.Object;
+                        }
+                    default:
+                        {
+                            string value = response.Content != null ? await response.Content.ReadAsStringAsync().ConfigureAwait(false) : null;
+                            DBTMTestWisePerformanceStandardResponse result = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardResponse>(value);
+                            UpdateApiStatus(result, status, response);
+                            throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                        }
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                {
+                    response.Dispose();
+                }
+            }
+        }
+
+        public virtual DBTMTestWisePerformanceStandardResponse UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body)
+        {
+            return Task.Run(async () => await UpdateDBTMTestWisePerformanceStandardAsync( body, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestWisePerformanceStandardResponse> UpdateDBTMTestWisePerformanceStandardAsync( DBTMTestWisePerformanceStandardModel body, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.UpdateDBTMTestWisePerformanceStandardAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await PutResourceToEndpointAsync( endpoint, JsonConvert.SerializeObject(body), status,cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse =  await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException( objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 201)
+                {
+                    var objectResponse =  await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException( objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string responseData =  response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTestWisePerformanceStandardResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException( status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

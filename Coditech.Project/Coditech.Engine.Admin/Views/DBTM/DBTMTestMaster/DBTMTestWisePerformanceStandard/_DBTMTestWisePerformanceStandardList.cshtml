@@ -1,0 +1,68 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMTestWisePerformanceStandardListViewModel
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Age Group</th>
+                <th>Gender</th>
+                <th>Excellent</th>
+                <th>Good</th>
+                <th>Average</th>
+                <th>Poor</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model?.DBTMTestWisePerformanceStandardList?.Count > 0)
+            {
+                foreach (var item in Model.DBTMTestWisePerformanceStandardList)
+                {
+                    <tr id="row_@(item.AgeGroupEnumId)_@(item.GenderEnumId)">
+                        <td>
+                            @item.AgeGroupDisplayText
+                        </td>
+                        <td>
+                            @item.GenderDisplayText
+                        </td>
+                        <td>
+                            <span class="view-mode">
+                                @item.ExcellentValue
+                            </span>
+                            <input type="number" class="form-control form-control-sm edit-mode excellent-input" value="@item.ExcellentValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
+                        </td>
+                        <td>
+                            <span class="view-mode">
+                                @item.GoodValue
+                            </span>
+                            <input type="number" class="form-control form-control-sm edit-mode good-input" value="@item.GoodValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
+                        </td>
+                        <td>
+                            <span class="view-mode">
+                                @item.AverageValue
+                            </span>
+                            <input type="number" class="form-control form-control-sm edit-mode average-input" value="@item.AverageValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
+                        </td>
+                        <td>
+                            <span class="view-mode">
+                                @item.PoorValue
+                            </span>
+                            <input type="number" class="form-control form-control-sm edit-mode poor-input" value="@item.PoorValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-soft-success edit-btn" onclick="DBTMTestWisePerformanceStandard.EditRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-soft-primary save-btn" style="display:none;" onclick="DBTMTestWisePerformanceStandard.SaveRow(@item.DBTMTestWisePerformanceStandardId, @Model.DBTMTestMasterId, @item.AgeGroupEnumId, @item.GenderEnumId)">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-soft-danger cancel-btn" style="display:none;" onclick="DBTMTestWisePerformanceStandard.CancelRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>                

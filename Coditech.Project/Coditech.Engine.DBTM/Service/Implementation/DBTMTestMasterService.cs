@@ -564,14 +564,53 @@ namespace Coditech.API.Service
             return status == 1 ? true : false;
         }
 
-        //DBTMTestWisePerformanceStandard
-        public List<DBTMTestWisePerformanceStandardModel> DBTMTestWisePerformanceStandard(int dBTMTestMasterId)
+        public virtual DBTMTestWisePerformanceStandardListModel GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId)
         {
-            List<DBTMTestWisePerformanceStandardModel> dBTMTestWisePerformanceStandardList = new List<DBTMTestWisePerformanceStandardModel>();
-           
+            CoditechViewRepository<DBTMTestWisePerformanceStandardModel> objStoredProc = new CoditechViewRepository<DBTMTestWisePerformanceStandardModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            List<DBTMTestWisePerformanceStandardModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestwisePerformanceStandard @DBTMTestMasterId")?.ToList();
+            DBTMTestWisePerformanceStandardListModel dBTMTestWisePerformanceStandardList = new DBTMTestWisePerformanceStandardListModel
+            {
+                DBTMTestWisePerformanceStandardList = list,
+                DBTMTestMasterId = dBTMTestMasterId,
+                TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault()
+            };
             return dBTMTestWisePerformanceStandardList;
         }
 
+        public virtual DBTMTestWisePerformanceStandardModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel dBTMTestWisePerformanceStandardModel)
+        {
+            if (IsNull(dBTMTestWisePerformanceStandardModel))
+                throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
+            DBTMTestWisePerformanceStandard entity = dBTMTestWisePerformanceStandardModel.FromModelToEntity<DBTMTestWisePerformanceStandard>();
+            DBTMTestWisePerformanceStandard dBTMTestWisePerformanceStandard = _dBTMTestWisePerformanceStandardRepository.Insert(entity);
+            if (dBTMTestWisePerformanceStandard?.DBTMTestWisePerformanceStandardId > 0)
+            {
+                dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId = dBTMTestWisePerformanceStandard.DBTMTestWisePerformanceStandardId;
+            }
+            else
+            {
+                dBTMTestWisePerformanceStandardModel.HasError = true;
+                dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return dBTMTestWisePerformanceStandardModel;
+        }
+        public virtual bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel dBTMTestWisePerformanceStandardModel)
+        {
+            if (IsNull(dBTMTestWisePerformanceStandardModel))
+                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
+            if (dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId < 1)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestWisePerformanceStandardId"));
+            DBTMTestWisePerformanceStandard dBTMTestWisePerformanceStandard = dBTMTestWisePerformanceStandardModel.FromModelToEntity<DBTMTestWisePerformanceStandard>();
+            //Update DBTMTestWisePerformanceStandard
+            bool isdBTMTestWisePerformanceStandardUpdated = _dBTMTestWisePerformanceStandardRepository.Update(dBTMTestWisePerformanceStandard);
+            if (!isdBTMTestWisePerformanceStandardUpdated)
+            {
+                dBTMTestWisePerformanceStandardModel.HasError = true;
+                dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
+            }
+            return isdBTMTestWisePerformanceStandardUpdated;
+        }
         #region Protected Method
         // Check if Test Name is already present or not.
         protected virtual bool IsDBTMTestNameAlreadyExist(string testCode, int dBTMTestMasterId = 0)

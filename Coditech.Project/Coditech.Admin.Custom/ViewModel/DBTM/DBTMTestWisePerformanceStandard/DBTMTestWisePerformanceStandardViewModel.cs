@@ -17,5 +17,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Average Value")]
         public short AverageValue { get; set; }
         public short PoorValue { get; set; }
+        public string AgeGroupDisplayText { get; set; }
+        public string GenderDisplayText { get; set; }
     }
 }

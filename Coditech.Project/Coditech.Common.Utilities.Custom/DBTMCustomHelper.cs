@@ -1,8 +1,6 @@
 ﻿using Coditech.Common.API.Model;
-using Coditech.Common.Helper.Utilities;
-using ScottPlot.Colormaps;
 using System.Data;
-namespace Coditech.Engine.DBTM.Helpers
+namespace Coditech.Common.Helper.Utilities
 {
     public static class DBTMCustomHelper
     {
@@ -332,6 +330,23 @@ namespace Coditech.Engine.DBTM.Helpers
                     break;
             }
             return data;
+        }
+
+        public static int GetAgeGroupEnumIdByDOB(DateTime? dob, List<(int EnumId, int EnumValue)> ageGroups)
+        {
+            if (!dob.HasValue)
+                return 0;
+            int age = DateTime.Today.Year - dob.Value.Year;
+            if (dob.Value.Date > DateTime.Today.AddYears(-age))
+                age--;
+            foreach (var item in ageGroups.OrderBy(x => x.EnumValue))
+            {
+                if (age <= item.EnumValue)
+                {
+                    return item.EnumId;
+                }
+            }
+            return ageGroups.LastOrDefault().EnumId;
         }
     }
 }

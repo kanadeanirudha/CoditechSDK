@@ -12,6 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Coditech.API.Model.Custom\Coditech.API.Model.Custom.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Coditech.Common.API.Model">
+      <HintPath>..\SharedLibraries\Coditech.Common.API.Model.dll</HintPath>
+    </Reference>
     <Reference Include="Coditech.Common.Helper">
       <HintPath>..\SharedLibraries\Coditech.Common.Helper.dll</HintPath>
     </Reference>
