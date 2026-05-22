@@ -1121,9 +1121,9 @@ namespace Coditech.API.Service
                     if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
                     {
                         if (spilt.Length == 1)
-                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, 1);
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, 1,false,false, dBTMTestParameterListviewSequence.DBTMTestMasterId);
                         else
-                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, Convert.ToInt16(spilt[1]));
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, Convert.ToInt16(spilt[1]),false,false, dBTMTestParameterListviewSequence.DBTMTestMasterId);
                     }
                     else
                     {
