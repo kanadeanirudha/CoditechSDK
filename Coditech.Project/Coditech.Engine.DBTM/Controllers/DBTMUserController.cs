@@ -41,7 +41,6 @@ namespace Coditech.API.Controllers
             {
                 DBTMUserModel user = _dbtmUserService.Login(model);
                 return HelperUtility.IsNotNull(user) ? CreateOKResponse(user) : null;
-
             }
             catch (CoditechUnauthorizedException ex)
             {

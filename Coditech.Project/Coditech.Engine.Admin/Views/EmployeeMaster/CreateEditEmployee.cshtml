@@ -11,18 +11,19 @@
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.GetDepartmentByCentreCode()", IsDisabled = Model.EmployeeId > 0 };
     DropdownViewModel departmentDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.CentrewiseDepartment.ToString(), DropdownName = "SelectedDepartmentId", DropdownSelectedValue = Convert.ToString(Model.SelectedDepartmentId), Parameter = Model.SelectedCentreCode, IsDisabled = Model.EmployeeId > 0 };
     DropdownViewModel designationDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.Designation.ToString(), DropdownName = "EmployeeDesignationMasterId", DropdownSelectedValue = Convert.ToString(Model.EmployeeDesignationMasterId), IsDisabled = Model.EmployeeId > 0 };
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = Model.EmployeeId > 0
-        ? $"{ViewBag.Title} : {Model.FirstName} {Model.LastName}"
-        : ViewBag.Title,
-        SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = @Url.Action(AdminConstants.ActionRedirectToList, controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId }),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = Model.EmployeeId > 0
+                ? $"{ViewBag.Title} : {Model.FirstName} {Model.LastName}"
+                : ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = @Url.Action(AdminConstants.ActionRedirectToList, controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId }),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -68,6 +69,21 @@
                                         @Html.ValidationMessageFor(x => x.EmployeeDesignationMasterId)
                                     </div>
                                 </div>
+                                @if (userModel.UserType == "Admin")
+                                {
+                                    <div class="col-lg-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Is App Test User</label>
+                                            <div class="form-check">
+                                                @Html.CheckBoxFor(x => x.IsTestUser, new { @class = "form-check-input" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @Html.HiddenFor(x => x.IsTestUser)
+                                }
                             </div>
                             @Html.Partial("~/Views/Shared/GeneralPerson/_CreateEditGeneralPerson.cshtml", Model)
                             @* <a href="@Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedDepartmentId = Model.SelectedDepartmentId })"
