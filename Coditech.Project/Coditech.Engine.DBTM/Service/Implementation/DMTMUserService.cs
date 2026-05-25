@@ -91,6 +91,11 @@ namespace Coditech.API.Service
             userModel.EmailId = userMasterData.EmailId;
             userModel.IsPasswordChange = userMasterData.IsPasswordChange;
             userModel.IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions;
+            userModel.IsTestUser = false;
+            if (userMasterData.UserType == UserTypeEnum.Employee.ToString())
+            {
+                userModel.IsTestUser = Convert.ToBoolean(userMasterData.IsTestUser);
+            }
             userModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
             userModel.PersonTitle = generalPersonModel.PersonTitle;
             userModel.FirstName = generalPersonModel.FirstName;
