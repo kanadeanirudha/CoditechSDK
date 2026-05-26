@@ -317,7 +317,7 @@ namespace Coditech.Common.Helper.Utilities
             }
             else
             {
-                string velocityByRow = VelocityByRow(group, 1, isGraph);
+                string velocityByRow = VelocityByRow(group, recurtion, isGraph);
                 if (velocityByRow != CustomConstants.InvalidData)
                 {
                     var velocityValueCurrent = Convert.ToDecimal(velocityByRow);
