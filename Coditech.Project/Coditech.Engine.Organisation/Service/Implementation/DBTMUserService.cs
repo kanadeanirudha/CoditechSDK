@@ -468,7 +468,7 @@ namespace Coditech.API.Service
             string fileUserName = "TraineeTemplate";
             if (userType == CustomConstants.DBTMCentreOwner)
             {
-                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
+                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
             }
             else
             {
