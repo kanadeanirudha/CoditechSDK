@@ -41,7 +41,7 @@ namespace Coditech.Common.Helper.Utilities
             }
         }
 
-        public static string Calculation(string calculationCode, string calculationName, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false, bool isGraph = false)
+        public static string Calculation(string calculationCode, string calculationName, IGrouping<string, DBTMReportsModel> group, Int16 recurtion, bool isDisplayUnit = false, bool isGraph = false, int DBTMTestMasterId = 0)
         {
             double weight = Convert.ToDouble(group.FirstOrDefault()?.Weight);
             calculationName = string.IsNullOrEmpty(calculationName) ? calculationCode : calculationName;
@@ -104,7 +104,7 @@ namespace Coditech.Common.Helper.Utilities
                     result = $"{Math.Round(cumulativeDistance, CustomConstants.GraphListRoundUpValue)}";
                     break;
                 case CustomConstants.Velocity:
-                    distance =  Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue);
+                    distance = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue);
                     decimal time = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue);
                     result = time != 0 && distance != 0 ? $"{Math.Round(distance / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
                     break;
@@ -156,23 +156,19 @@ namespace Coditech.Common.Helper.Utilities
                     }
                     break;
                 case CustomConstants.ChangeOfDirection:
-                    decimal time2, time3;
-                    result = ChangeOfDirection(group);
+                    result = ChangeOfDirection(group, DBTMTestMasterId);
                     break;
                 case CustomConstants.AgilityDeficitRatio:
-                    var changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group));
-                    var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
-                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / time1, CustomConstants.GraphListRoundUpValue)}" : "0";
+                    result = AgilityDeficitRatio(group, DBTMTestMasterId);
                     break;
                 case CustomConstants.ChangeOfDirectionDeficit:
-                    changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group));
-                    time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
-                    result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - time1, CustomConstants.GraphListRoundUpValue)}" : "0";
+                    result = ChangeOfDirectionDeficit(group, DBTMTestMasterId);
                     break;
                 case CustomConstants.ChangeOfDirectionRatio:
-                    time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
-                    time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
-                    result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, CustomConstants.GraphListRoundUpValue)}" : "0";
+                    result = ChangeOfDirectionRatio(group, DBTMTestMasterId);
+                    break;
+                case CustomConstants.FrontToBackRunRation:
+                    result = FrontToBackRunRation(group, DBTMTestMasterId);
                     break;
                 case CustomConstants.JumpHeight:
                     decimal totalJumpHeight = group.Where(x => x.ParameterCode == CustomConstants.JumpHeight).Sum(x => Convert.ToDecimal(x.ParameterValue));
@@ -195,12 +191,94 @@ namespace Coditech.Common.Helper.Utilities
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
         }
 
-        private static string ChangeOfDirection(IGrouping<string, DBTMReportsModel> group)
+        private static string ChangeOfDirectionRatio(IGrouping<string, DBTMReportsModel> group, int DBTMTestMasterId)
         {
             string result;
-            var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
-            var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
-            result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, CustomConstants.GraphListRoundUpValue)}" : "0";
+            if (DBTMTestMasterId == 5)
+            {
+                var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
+                var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-D")?.ParameterValue);
+                var time4 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "D-B")?.ParameterValue);
+                result = time2 > 0 & time3 > 0 & time4 > 0 ? $"{Math.Round((time2 + time4) / time3, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            else
+            {
+                var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
+                var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
+                result = time2 > 0 & time3 > 0 ? $"{Math.Round(time3 / time2, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            return result;
+        }
+
+        private static string FrontToBackRunRation(IGrouping<string, DBTMReportsModel> group, int DBTMTestMasterId)
+        {
+            string result;
+            if (DBTMTestMasterId == 5)
+            {
+                var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
+                var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
+                result = time1 > 0 & time2 > 0 ? $"{Math.Round(time1 + time2, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            else
+            {
+                result = "0";
+            }
+            return result;
+        }
+
+        private static string ChangeOfDirectionDeficit(IGrouping<string, DBTMReportsModel> group, int DBTMTestMasterId)
+        {
+            string result;
+            decimal changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group, DBTMTestMasterId));
+            if (DBTMTestMasterId == 5)
+            {
+                var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
+                var time5 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-A")?.ParameterValue);
+                result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - (time1 + time5), CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            else
+            {
+                var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
+                result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection - time1, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            return result;
+        }
+
+        private static string AgilityDeficitRatio(IGrouping<string, DBTMReportsModel> group, int DBTMTestMasterId)
+        {
+            string result;
+            var changeOfDirection = Convert.ToDecimal(ChangeOfDirection(group, DBTMTestMasterId));
+            if (DBTMTestMasterId == 5)
+            {
+                var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
+                var time5 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-A")?.ParameterValue);
+                result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / (time1 + time5), CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            else
+            {
+                var time1 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "A-B")?.ParameterValue);
+                result = changeOfDirection > 0 && time1 > 0 ? $"{Math.Round(changeOfDirection / time1, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            return result;
+        }
+
+        private static string ChangeOfDirection(IGrouping<string, DBTMReportsModel> group, int DBTMTestMasterId)
+        {
+            string result;
+            if (DBTMTestMasterId == 5)
+            {
+                var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
+                var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-D")?.ParameterValue);
+                var time4 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "D-B")?.ParameterValue);
+                result = time2 > 0 && time3 > 0 && time4 > 0 ? $"{Math.Round(time2 + time3 + time4, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
+            else
+            {
+
+                var time2 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "B-C")?.ParameterValue);
+                var time3 = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.FromTo == "C-B")?.ParameterValue);
+                result = time2 > 0 & time3 > 0 ? $"{Math.Round(time2 + time3, CustomConstants.GraphListRoundUpValue)}" : "0";
+            }
             return result;
         }
 
@@ -239,7 +317,7 @@ namespace Coditech.Common.Helper.Utilities
             }
             else
             {
-                string velocityByRow = VelocityByRow(group, 1, isGraph);
+                string velocityByRow = VelocityByRow(group, recurtion, isGraph);
                 if (velocityByRow != CustomConstants.InvalidData)
                 {
                     var velocityValueCurrent = Convert.ToDecimal(velocityByRow);

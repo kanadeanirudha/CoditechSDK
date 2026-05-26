@@ -37,6 +37,7 @@
         public const string ChangeOfDirectionDeficit = "ChangeOfDirectionDeficit";
         public const string AverageTime = "AverageTime";
         public const string ChangeOfDirectionRatio = "ChangeOfDirectionRatio";
+        public const string FrontToBackRunRation = "FrontToBackRunRation";
         public const string AirTime = "AirTime";
         public const string PersonDetectionRange = "PersonDetectionRange";
         public const string Weight = "Weight";
