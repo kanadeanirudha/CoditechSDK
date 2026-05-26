@@ -27,7 +27,8 @@
         public const string Velocity = "Velocity";
         public const string VelocityByRow = "VelocityByRow";
         public const string VelocityByRowWithFirstDistance = "VelocityByRowWithFirstDistance";
-        public const string CumulativeVelocityByRow = "CumulativeVelocityByRow";
+        public const string CumulativeVelocityWithSameDistance = "CumulativeVelocityWithSameDistance";
+        public const string CumulativeVelocityWithChangeDistance = "CumulativeVelocityWithChangeDistance";
         public const string CumulativeVelocity = "CumulativeVelocity";
         public const string AccelerationByRow = "AccelerationByRow";
         public const string ForceByRow = "ForceByRow";
@@ -55,6 +56,7 @@
         public const string Dropdown = "Dropdown";
         public const string Trainee = "Trainee";
         public const string InvalidData = "Invalid Data";
+        public const string TotalLaps = "TotalLaps";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";
