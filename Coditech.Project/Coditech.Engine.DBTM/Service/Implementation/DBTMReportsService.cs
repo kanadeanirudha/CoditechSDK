@@ -1024,7 +1024,8 @@ namespace Coditech.API.Service
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocity ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.Velocity ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.VelocityByRow ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityWithSameDistance ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityWithChangeDistance ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.AccelerationByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.ForceByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.PowerByRow
