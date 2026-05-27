@@ -468,7 +468,7 @@ namespace Coditech.API.Service
             string fileUserName = "TraineeTemplate";
             if (userType == CustomConstants.DBTMCentreOwner)
             {
-                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
+                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
             }
             else
             {
@@ -643,6 +643,11 @@ namespace Coditech.API.Service
             }
             else
             {
+                callingCode = callingCode?.Trim();
+                if (!string.IsNullOrEmpty(callingCode) && !callingCode.StartsWith("+"))
+                {
+                    callingCode = "+" + callingCode;
+                }
                 if (!Regex.IsMatch(callingCode, @"^\+\d{1,4}$") || !callingCodeSet.Contains(callingCode))
                 {
                     errors.Add("Calling Code is invalid");
@@ -792,6 +797,11 @@ namespace Coditech.API.Service
                 RegistrationType = "Batch",
                 GeneralTraineeAssociatedToTrainerIds = new List<string>()
             };
+            rawCallingCode = rawCallingCode?.Trim();
+            if (!string.IsNullOrEmpty(rawCallingCode) && !rawCallingCode.StartsWith("+"))
+            {
+                rawCallingCode = "+" + rawCallingCode;
+            }
             GeneralPersonModel model = new GeneralPersonModel
             {
                 UserType = UserTypeEnum.Trainee.ToString(),
@@ -803,9 +813,7 @@ namespace Coditech.API.Service
                 EmailId = GetValue(row, ExcelTemplateColumns.EmailAddress),
                 MobileNumber = GetValue(row, ExcelTemplateColumns.MobileNumber),
                 CallingCode = rawCallingCode,
-                GenderEnumId = GetEnumIdByEnumCode(
-                GetValue(row, ExcelTemplateColumns.Gender),
-                DropdownTypeEnum.Gender.ToString()),
+                GenderEnumId = GetEnumIdByEnumCode(GetValue(row, ExcelTemplateColumns.Gender), DropdownTypeEnum.Gender.ToString()),
                 DateOfBirth = Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)),
                 Custom1 = JsonConvert.SerializeObject(customModel)
             };
@@ -955,22 +963,14 @@ namespace Coditech.API.Service
                 }
                 if (header.HeaderCode == ExcelTemplateColumns.CallingCode)
                 {
-                    for (int i = 0; i < callingCodes.Count; i++)
-                        lookupSheet.Cell(i + 1, lookupCol).Value = callingCodes[i];
                     for (int row = 2; row <= joiningCodes.Count + 1; row++)
                     {
                         var validation = sheet.Cell(row, col).CreateDataValidation();
                         validation.IgnoreBlanks = true;
                         validation.InCellDropdown = true;
-                        validation.List(
-                            lookupSheet.Range(
-                                lookupSheet.Cell(1, lookupCol),
-                                lookupSheet.Cell(callingCodes.Count, lookupCol)
-                            ),
-                            true
-                        );
+                        string callingCodeList = string.Join(",", callingCodes);
+                        validation.List($"\"{callingCodeList}\"", true);
                     }
-                    lookupCol++;
                 }
                 if (headerGroupCodeMap.TryGetValue(header.HeaderCode, out string groupCode))
                 {

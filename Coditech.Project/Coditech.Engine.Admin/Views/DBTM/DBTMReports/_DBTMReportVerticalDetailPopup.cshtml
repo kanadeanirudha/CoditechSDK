@@ -129,20 +129,20 @@
                                                     data: {
                                                         labels: @Html.Raw(graph.LineChartModel.XValues),
                                                         datasets: [
-                                                        @foreach (var dataset in graph.LineChartModel.Datasets)
-                                                        {
-                                                            <text>
-                                                                    {
-                                                                        label: '@dataset.Label',
-                                                                        data: @Html.Raw(dataset.Data),
-                                                                        borderColor: '@dataset.Color',
-                                                                        backgroundColor: '@dataset.Color',
-                                                                        borderWidth: 2,
-                                                                        fill: false,
-                                                                        tension: 0.3
-                                                                    },
-                                                            </text>
-                                                        }
+                                            @foreach (var dataset in graph.LineChartModel.Datasets)
+                                            {
+                                                <text>
+                                                              {
+                                                                         label: '@dataset.Label',
+                                                                         data: @Html.Raw(dataset.Data),
+                                                                         borderColor: '@dataset.Color',
+                                                                         backgroundColor: '@dataset.Color',
+                                                                         borderWidth: 2,
+                                                                         fill: false,
+                                                                         tension: 0.3
+                                                               },
+                                                </text>
+                                            }
                                                                  ]
                                                     },
                                                     options: {
@@ -150,9 +150,23 @@
                                                         maintainAspectRatio: true,
                                                         aspectRatio: 2,
                                                         plugins: {
-                                                            legend: {
-                                                                display: true
-                                                            }
+                                                                  legend: {
+                                                                           display: true
+                                                                  },
+                                                        },
+                                                        scales: {
+                                                                 x: {
+                                                                       title: {
+                                                                       display: true,
+                                                                       text: '@graph.LineChartModel.XAxisLabel'
+                                                                        }
+                                                                    },
+                                                                 y: {
+                                                                       title: {
+                                                                       display: true,
+                                                                       text: '@graph.LineChartModel.YAxisLabel'
+                                                                        }
+                                                                    }
                                                         }
                                                     }
                                                 });
@@ -175,10 +189,10 @@
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 </div>
 <style>
-        #activityViewAccordion .accordion-item:first-child {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
+    #activityViewAccordion .accordion-item:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
         #activityViewAccordion .accordion-item:first-child .accordion-header {
             margin-top: 0 !important;
             padding-top: 0 !important;
