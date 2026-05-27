@@ -48,6 +48,10 @@ namespace Coditech.Common.Helper.Utilities
             string result = isGraph ? "0" : "NA";
             switch (calculationCode)
             {
+                case CustomConstants.TotalLaps:
+                    int totalLaps = group.Max(x => x.Row);
+                    result = $"{totalLaps}";
+                    break;
                 case CustomConstants.CompletionTime:
                     decimal completionTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => Convert.ToDecimal(x.ParameterValue));
                     result = $"{Math.Round(completionTime / recurtion, CustomConstants.GraphListRoundUpValue)}";
@@ -99,7 +103,7 @@ namespace Coditech.Common.Helper.Utilities
                     decimal cumulativeDistance = 0;
                     for (int i = 1; i <= recurtion; i++)
                     {
-                        cumulativeDistance += Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance && x.Row == i).ParameterValue);
+                        cumulativeDistance += Convert.ToDecimal(group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow) && x.Row == i).ParameterValue);
                     }
                     result = $"{Math.Round(cumulativeDistance, CustomConstants.GraphListRoundUpValue)}";
                     break;
@@ -114,19 +118,11 @@ namespace Coditech.Common.Helper.Utilities
                 case CustomConstants.VelocityByRowWithFirstDistance:
                     result = VelocityByRowWithFirstDistance(group, recurtion, isGraph);
                     break;
-                case CustomConstants.CumulativeVelocityByRow:
-                    distance = Convert.ToDecimal(group.FirstOrDefault(x => (x.ParameterCode == CustomConstants.DistanceMultiplyByRow || x.ParameterCode == CustomConstants.Distance) && x.Row == recurtion).ParameterValue);
-                    time = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue);
-                    result = time != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
+                case CustomConstants.CumulativeVelocityWithSameDistance:
+                    result = CumulativeVelocityWithSameDistance(group, recurtion, isGraph);
                     break;
-                case CustomConstants.CumulativeVelocity:
-                    distance = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue);
-                    cumulativeTime = 0;
-                    for (int i = 1; i <= recurtion; i++)
-                    {
-                        cumulativeTime += Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == i).ParameterValue);
-                    }
-                    result = cumulativeTime != 0 && distance != 0 ? $"{Math.Round(distance * recurtion / cumulativeTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
+                case CustomConstants.CumulativeVelocityWithChangeDistance:
+                    result = CumulativeVelocityWithChangeDistance(group, recurtion, isGraph);
                     break;
                 case CustomConstants.AccelerationByRow:
                     result = AccelerationByRow(group, recurtion, isGraph);
@@ -189,6 +185,46 @@ namespace Coditech.Common.Helper.Utilities
                     break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
+        }
+
+        private static string CumulativeVelocityWithSameDistance(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
+        {
+            string result = string.Empty;
+            decimal cumulativeTime = 0;
+            for (short i = 1; i <= recurtion; i++)
+            {
+                string velocityByRowValue = VelocityByRowWithFirstDistance(group, i, isGraph);
+                if (velocityByRowValue != CustomConstants.InvalidData)
+                {
+                    cumulativeTime += Convert.ToDecimal(velocityByRowValue);
+                }
+                else
+                {
+                    return isGraph ? "0" : CustomConstants.InvalidData;
+                }
+            }
+            result = cumulativeTime != 0 ? $"{Math.Round(cumulativeTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
+            return result;
+        }
+
+        private static string CumulativeVelocityWithChangeDistance(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
+        {
+            string result = string.Empty;
+            decimal cumulativeTime = 0;
+            for (short i = 1; i <= recurtion; i++)
+            {
+                string velocityByRowValue = VelocityByRow(group, i, isGraph);
+                if (velocityByRowValue != CustomConstants.InvalidData)
+                {
+                    cumulativeTime += Convert.ToDecimal(velocityByRowValue);
+                }
+                else
+                {
+                    return isGraph ? "0" : CustomConstants.InvalidData;
+                }
+            }
+            result = cumulativeTime != 0 ? $"{Math.Round(cumulativeTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
+            return result;
         }
 
         private static string ChangeOfDirectionRatio(IGrouping<string, DBTMReportsModel> group, int DBTMTestMasterId)
@@ -317,7 +353,7 @@ namespace Coditech.Common.Helper.Utilities
             }
             else
             {
-                string velocityByRow = VelocityByRow(group, 1, isGraph);
+                string velocityByRow = VelocityByRow(group, recurtion, isGraph);
                 if (velocityByRow != CustomConstants.InvalidData)
                 {
                     var velocityValueCurrent = Convert.ToDecimal(velocityByRow);
@@ -377,7 +413,8 @@ namespace Coditech.Common.Helper.Utilities
                 case CustomConstants.CumulativeVelocity:
                 case CustomConstants.AverageVelocity:
                 case CustomConstants.VelocityByRow:
-                case CustomConstants.CumulativeVelocityByRow:
+                case CustomConstants.CumulativeVelocityWithSameDistance:
+                case CustomConstants.CumulativeVelocityWithChangeDistance:
                 case CustomConstants.Velocity:
                 case CustomConstants.VelocityByRowWithFirstDistance:
                     data = "m/s";

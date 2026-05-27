@@ -82,6 +82,7 @@ namespace Coditech.API.Service
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
                 graphMaster.TestCode = dbtmTestMaster.TestCode;
                 string[] XValuesList = null;
+                List<string> segments = null;
 
                 if (graphMaster.XParameter == "Split")
                 {
@@ -152,15 +153,12 @@ namespace Coditech.API.Service
                                       .OrderBy(g => g.Min(x => x.Row))
                                       .Select(g =>
                                       {
-                                          decimal value = decimal.TryParse(g.First().ParameterValue?.ToString(), out decimal result)
-                                              ? result
-                                              : 0;
-
+                                          decimal value = decimal.TryParse(g.First().ParameterValue?.ToString(), out decimal result) ? result : 0;
                                           return (value * g.First().Row).ToString();
                                       }));
                             XValuesList = xValues.ToArray();
                         }
-
+                        //segments = dBTMReportsList.OrderBy(x => x.Row).Select(x => x.FromTo).Distinct().ToList();
                     }
                 }
                 else if (graphMaster.XParameter == CustomConstants.Turns)
@@ -815,7 +813,7 @@ namespace Coditech.API.Service
 
             DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
 
-            if (DateTime.Now > expireTime)
+            if (DateTime.Now > expireTime || deviceData.IsValidRecord)
                 model.IsValidRecordButton = false;
             else
                 model.IsValidRecordButton = true;
@@ -1026,7 +1024,8 @@ namespace Coditech.API.Service
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocity ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.Velocity ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.VelocityByRow ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityWithSameDistance ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityWithChangeDistance ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.AccelerationByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.ForceByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.PowerByRow
@@ -1121,9 +1120,9 @@ namespace Coditech.API.Service
                     if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
                     {
                         if (spilt.Length == 1)
-                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, 1,false,false, dBTMTestParameterListviewSequence.DBTMTestMasterId);
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, 1, false, false, dBTMTestParameterListviewSequence.DBTMTestMasterId);
                         else
-                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, Convert.ToInt16(spilt[1]),false,false, dBTMTestParameterListviewSequence.DBTMTestMasterId);
+                            rowValue = DBTMCustomHelper.Calculation(dBTMTestParameterListviewSequence.ParameterCode, dBTMTestParameterListviewSequence.ParameterCode, group, Convert.ToInt16(spilt[1]), false, false, dBTMTestParameterListviewSequence.DBTMTestMasterId);
                     }
                     else
                     {
