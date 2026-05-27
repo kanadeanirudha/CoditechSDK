@@ -813,7 +813,7 @@ namespace Coditech.API.Service
 
             DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
 
-            if (DateTime.Now > expireTime)
+            if (DateTime.Now > expireTime || deviceData.IsValidRecord)
                 model.IsValidRecordButton = false;
             else
                 model.IsValidRecordButton = true;
