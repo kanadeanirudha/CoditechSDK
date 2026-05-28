@@ -3,8 +3,6 @@
     Layout = null;
 }
 <canvas id="@Model.PieChartId"></canvas>
-@* <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> *@
-<script src="~/lib/chart/chart.min.js"></script>
 <script>
     var xValues = @Html.Raw(Model.XValues);
     var yValues = @Html.Raw(Model.YValues);
