@@ -504,7 +504,6 @@ namespace Coditech.API.Service
             string personImage = "";
             if (!string.IsNullOrEmpty(profile.PhotoMediaPath))
             {
-
                 string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", profile.PhotoMediaPath.TrimStart('/').Replace("/", "\\"));
                 if (System.IO.File.Exists(imagePath))
                 {
@@ -531,10 +530,15 @@ namespace Coditech.API.Service
             {
                 Directory.CreateDirectory(chartFolder);
             }
-            string radarChartPath = Path.Combine(chartFolder, $"Radar_{Guid.NewGuid()}.png");
-            byte[] radarBytes = Convert.FromBase64String(GenerateRadarChartBase64(profile.RadarChart));
-            System.IO.File.WriteAllBytes(radarChartPath, radarBytes);
-            string radarImage = ConvertFolderPathImageToBase64(radarChartPath, "image/png");
+            string radarImage = string.Empty;
+            string radarChartPath = string.Empty;
+            if (profile?.TraineeProfilePerformanceList?.Count > 0)
+            {
+                radarChartPath = Path.Combine(chartFolder, $"Radar_{Guid.NewGuid()}.png");
+                byte[] radarBytes = Convert.FromBase64String(GenerateRadarChartBase64(profile.RadarChart));
+                System.IO.File.WriteAllBytes(radarChartPath, radarBytes);
+                radarImage = ConvertFolderPathImageToBase64(radarChartPath, "image/png");
+            }
             html = ReplaceTokenWithMessageText("#PersonImage#", personImage, html);
             html = ReplaceTokenWithMessageText("#HeightWeightImage#", heightWeightImage, html);
             html = ReplaceTokenWithMessageText("#Graph#", radarImage, html);
@@ -607,12 +611,6 @@ namespace Coditech.API.Service
                 //End Bind Table Rows
                 performanceMatrixHtml += "</table>";
                 html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DataTable, performanceMatrixHtml, html);
-                html = ReplaceTokenWithMessageText("#htmlopen#", "<html>", html);
-                html = ReplaceTokenWithMessageText("#headopen#", "<head>", html);
-                html = ReplaceTokenWithMessageText("#headclose#", "</head>", html);
-                html = ReplaceTokenWithMessageText("#bodyopen#", "<body style=\"margin:0; padding:0; font-family: Arial, sans-serif; background-color:#ffffff;\">", html);
-                html = ReplaceTokenWithMessageText("#bodyclose#", "</body>", html);
-                html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
                 if (System.IO.File.Exists(radarChartPath))
                 {
                     System.IO.File.Delete(radarChartPath);
@@ -622,6 +620,12 @@ namespace Coditech.API.Service
             {
                 html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DataTable, "No Record Found", html);
             }
+            html = ReplaceTokenWithMessageText("#htmlopen#", "<html>", html);
+            html = ReplaceTokenWithMessageText("#headopen#", "<head>", html);
+            html = ReplaceTokenWithMessageText("#headclose#", "</head>", html);
+            html = ReplaceTokenWithMessageText("#bodyopen#", "<body style=\"margin:0; padding:0; font-family: Arial, sans-serif; background-color:#ffffff;\">", html);
+            html = ReplaceTokenWithMessageText("#bodyclose#", "</body>", html);
+            html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
             return html;
         }
 

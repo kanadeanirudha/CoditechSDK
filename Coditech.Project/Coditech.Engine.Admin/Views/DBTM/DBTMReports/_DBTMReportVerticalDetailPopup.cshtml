@@ -1,5 +1,11 @@
 ﻿@using System.Data
 @model DBTMReportVerticalDataViewModel
+@{
+    if (Model?.GraphModelList?.Count > 0)
+    {
+        Model.GraphModelList.ForEach(x => x.GraphSize = "col-lg-12");
+    }
+}
 <div class="modal-header">
     <h6 class="modal-title m-0">Activity View Details</h6>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -88,87 +94,37 @@
             </div>
         </div>
         <!-- GRAPH VIEW -->
-        @if (Model.GraphModelList != null && Model.GraphModelList.Count > 0)
-        {
-            <div class="accordion-item mt-2">
-                <h2 class="accordion-header" id="graphHeading">
-                    <button class="accordion-button collapsed fw-bold"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#graphCollapse"
-                            aria-expanded="false">
-                        Graph View
-                    </button>
-                </h2>
-                <div id="graphCollapse"
-                     class="accordion-collapse collapse"
-                     data-bs-parent="#activityViewAccordion">
-                    <div class="accordion-body">
-                        @foreach (var graph in Model.GraphModelList)
-                        {
-                            if (graph.LineChartModel != null)
-                            {
-                                string canvasId = "chart_" + Guid.NewGuid().ToString("N");
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h6>@graph.GraphName</h6>
-                                        <div style="height:300px;">
-                                            <canvas id="@canvasId"></canvas>
-                                        </div>
-                                        <script>
-                                            function renderChart_@(canvasId)() {
-                                                var canvas = document.getElementById('@canvasId');
-                                                if (!canvas)
-                                                    return;
-                                                if (canvas.dataset.rendered === "true")
-                                                    return;
-                                                canvas.dataset.rendered = "true";
-                                                var ctx = canvas.getContext('2d');
-                                                new Chart(ctx, {
-                                                    type: '@graph.LineChartModel.GraphType.ToLower()',
-                                                    data: {
-                                                        labels: @Html.Raw(graph.LineChartModel.XValues),
-                                                        datasets: [
-                                                        @foreach (var dataset in graph.LineChartModel.Datasets)
-                                                        {
-                                                            <text>
-                                                                    {
-                                                                        label: '@dataset.Label',
-                                                                        data: @Html.Raw(dataset.Data),
-                                                                        borderColor: '@dataset.Color',
-                                                                        backgroundColor: '@dataset.Color',
-                                                                        borderWidth: 2,
-                                                                        fill: false,
-                                                                        tension: 0.3
-                                                                    },
-                                                            </text>
-                                                        }
-                                                                 ]
-                                                    },
-                                                    options: {
-                                                        responsive: true,
-                                                        maintainAspectRatio: true,
-                                                        aspectRatio: 2,
-                                                        plugins: {
-                                                            legend: {
-                                                                display: true
-                                                            }
-                                                        }
-                                                    }
-                                                });
-                                            }
-                                            document.getElementById('graphCollapse').addEventListener('shown.bs.collapse', function () {
-                                                renderChart_@(canvasId)();
-                                            });
-                                        </script>
-                                    </div>
-                                </div>
-                            }
-                        }
+        <div class="accordion-item mt-2">
+            <h2 class="accordion-header" id="graphHeading">
+                <button class="accordion-button collapsed fw-bold"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#graphCollapse"
+                        aria-expanded="false">
+                    Graph View
+                </button>
+            </h2>
+            <div id="graphCollapse"
+                 class="accordion-collapse collapse"
+                 data-bs-parent="#activityViewAccordion">
+                @if (Model.GraphModelList != null && Model.GraphModelList.Count > 0)
+                {
+                    <div class="accordion-body p-4">
+                        <div style="width:100%; min-height:500px;">
+                            @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", Model.GraphModelList)
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="accordion-body text-center p-5">
+                        <h5 class="text-muted">
+                            Graph Coming Soon
+                        </h5>
+                    </div>
+                }
             </div>
-        }
+        </div>
     </div>
 </div>
 <div class="modal-footer">
@@ -187,6 +143,8 @@
             margin-top: 0 !important;
             padding-top: 4px !important;
         }
+        #graphCollapse .graph-wrapper {
+            padding: 40px 40px 60px 60px !important;
+            box-sizing: border-box;
+        }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
