@@ -924,9 +924,7 @@ namespace Coditech.API.Service
             {
                 ReportsListDecryption(dBTMReportsList);
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
-                if (isDownloadReport)
-                    displayOn = "All";
-                List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest);
+                List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest, isDownloadReport);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
                     return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport);
@@ -1269,9 +1267,9 @@ namespace Coditech.API.Service
             return result;
         }
 
-        private List<DBTMTestParameterListViewSequence> GetListViewSequenceByCentre(int dBTMTestMasterId, string centreCode, bool isMobileRequest)
+        private List<DBTMTestParameterListViewSequence> GetListViewSequenceByCentre(int dBTMTestMasterId, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
-            string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
+            string displayOn = isDownloadReport ? "All" : (isMobileRequest ? "OnlyMobileApp" : "OnlyWeb");
             CoditechViewRepository<DBTMTestParameterListViewSequence> repo = new CoditechViewRepository<DBTMTestParameterListViewSequence>(_serviceProvider.GetService<CoditechCustom_Entities>());
             repo.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);

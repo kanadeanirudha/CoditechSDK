@@ -69,21 +69,29 @@
                                                 {
                                                     <option value="Both">Both</option>
                                                 }
-                                                @if (item.DisplayOn == "MobileApp")
+                                                @if (item.DisplayOn == "OnlyMobileApp")
                                                 {
-                                                    <option value="MobileApp" selected>Mobile App</option>
+                                                    <option value="OnlyMobileApp" selected>Only Mobile App</option>
                                                 }
                                                 else
                                                 {
-                                                    <option value="MobileApp">Mobile App</option>
+                                                    <option value="OnlyMobileApp">Only Mobile App</option>
                                                 }
-                                                @if (item.DisplayOn == "WebApp")
+                                                @if (item.DisplayOn == "OnlyWeb")
                                                 {
-                                                    <option value="WebApp" selected>Web App</option>
+                                                    <option value="OnlyWeb" selected>Only Web App</option>
                                                 }
                                                 else
                                                 {
-                                                    <option value="WebApp">Web App</option>
+                                                    <option value="OnlyWeb">Only Web App</option>
+                                                }
+                                                @if (item.DisplayOn == "None")
+                                                {
+                                                    <option value="None" selected>None</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="None">None</option>
                                                 }
                                             </select>
                                         </td>
