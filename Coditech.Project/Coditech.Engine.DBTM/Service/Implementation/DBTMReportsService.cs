@@ -132,6 +132,24 @@ namespace Coditech.API.Service
                         }
                         XValuesList = xValues.ToArray();
                     }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                    {
+                        double distance = 10;
+                        for (double i = distance; i <= (distance * 6); i = i + distance)
+                        {
+                            xValues.Add(Math.Round(i, 2).ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                    {
+                        double distance = 10;
+                        for (double i = distance; i <= (distance * 4); i = i + distance)
+                        {
+                            xValues.Add(Math.Round(i, 2).ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
                     else
                     {
                         if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
