@@ -8,6 +8,7 @@
         public int AllowBatchUser { get; set; }
         public int AllowCampUser { get; set; }
         public int OrganisationCentreMasterId { get; set; }
+        public bool IsDisplayPerformanceStandard { get; set; }
         public DBTMCentreWiseTestListModel TestListModel { get; set; }
     }
 }
