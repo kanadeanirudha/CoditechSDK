@@ -13,6 +13,7 @@ namespace Coditech.API.Data
         public string TypeOfCentre { get; set; }
         public int AllowBatchUser { get; set; }
         public int AllowCampUser { get; set; }
+        public bool IsDisplayPerformanceStandard { get; set; }
         public long? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public long? ModifiedBy { get; set; }
