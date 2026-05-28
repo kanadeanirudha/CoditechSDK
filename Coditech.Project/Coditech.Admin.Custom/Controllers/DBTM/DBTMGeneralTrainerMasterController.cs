@@ -36,8 +36,8 @@ namespace Coditech.Admin.Controllers
                     }
                     else
                     {
-                        dBTMNewRegistrationViewModel.HasError = true;
-                        dBTMNewRegistrationViewModel.ErrorMessage = "No joining codes are available.";
+                        SetNotificationMessage(GetErrorNotificationMessage("No Joining Code found for this trainer."));
+                        return RedirectToAction("List", "GeneralTrainerMaster");
                     }
                 }
             }
