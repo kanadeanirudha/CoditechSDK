@@ -61,14 +61,14 @@ namespace Coditech.API.Service
         public virtual DBTMCentreWiseTestListModel GetTestsByCentreCode(string centreCode)
         {
             var testList = (from test in _dBTMTestMasterRepository.Table
-                            join centreTest in _dBTMCentreWiseTestRepository.Table
-                                on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                            join centreTest in _dBTMCentreWiseTestRepository.Table on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                            join performanceMatrix in _dBTMPerformanceMatrixRepository.Table on test.DBTMPerformanceMatrixId equals performanceMatrix.DBTMPerformanceMatrixId
                             where centreTest.CentreCode == centreCode
                             select new DBTMCentreWiseTestModel
                             {
                                 DBTMTestMasterId = test.DBTMTestMasterId,
                                 TestName = test.TestName,
-                                CentreCode = centreTest.CentreCode,
+                                CentreCode = $"{centreTest.CentreCode} ({performanceMatrix.PerformanceMatrix})",
                                 DBTMCentreWiseTestId = centreTest.DBTMCentreWiseTestId,
                                 IsAssociated = true
                             })

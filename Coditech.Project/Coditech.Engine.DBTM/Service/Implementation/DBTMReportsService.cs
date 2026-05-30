@@ -136,6 +136,24 @@ namespace Coditech.API.Service
                         }
                         XValuesList = xValues.ToArray();
                     }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                    {
+                        double distance = 10;
+                        for (double i = distance; i <= (distance * 6); i = i + distance)
+                        {
+                            xValues.Add(Math.Round(i, 2).ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
+                    else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                    {
+                        double distance = 10;
+                        for (double i = distance; i <= (distance * 4); i = i + distance)
+                        {
+                            xValues.Add(Math.Round(i, 2).ToString());
+                        }
+                        XValuesList = xValues.ToArray();
+                    }
                     else
                     {
                         if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
@@ -815,9 +833,9 @@ namespace Coditech.API.Service
             model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false, typeOfRecord);
             int expireMinutes = ApiCustomSettings.IsValidRecordButtonExpireTimeOnMobile;
 
-            DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
+            DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(300);
 
-            if (DateTime.Now > expireTime || deviceData.IsValidRecord)
+            if (DateTime.Now > expireTime || !deviceData.IsValidRecord)
                 model.IsValidRecordButton = false;
             else
                 model.IsValidRecordButton = true;
