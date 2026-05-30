@@ -9,9 +9,13 @@
 	<ItemGroup>
 		<Content Include="data\**" CopyToPublishDirectory="PreserveNewest" />
 		<Compile Remove="data\BatchReport\**" />
+		<Compile Remove="Helpers\**" />
 		<Content Remove="data\BatchReport\**" />
+		<Content Remove="Helpers\**" />
 		<EmbeddedResource Remove="data\BatchReport\**" />
+		<EmbeddedResource Remove="Helpers\**" />
 		<None Remove="data\BatchReport\**" />
+		<None Remove="Helpers\**" />
 		<Content Update="appsettings.Development.json">
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -67,7 +71,6 @@
 	<ItemGroup>
 	  <Folder Include="data\ActivityReport\" />
 	  <Folder Include="data\Images\" />
-	  <Folder Include="Helpers\" />
 	</ItemGroup>
 
 </Project>
