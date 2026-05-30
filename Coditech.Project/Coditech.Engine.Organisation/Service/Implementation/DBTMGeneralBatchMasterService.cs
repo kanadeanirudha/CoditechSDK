@@ -236,7 +236,7 @@ namespace Coditech.API.Service
             bool isReferenced = _dBTMDeviceDataRepository.Table.Any(d => d.TablePrimaryColumnId == generalBatchMasterId && d.TypeOfRecord == batch);
             if (isReferenced)
             {
-                throw new CoditechException(ErrorCodes.AssociationDeleteError, "The batch is in use deleteion not allowed.");
+                throw new CoditechException(ErrorCodes.AssociationDeleteError, "The batch is in use deletion not allowed.");
             }
             return base.DeleteGeneralBatch(parameterModel);
         }

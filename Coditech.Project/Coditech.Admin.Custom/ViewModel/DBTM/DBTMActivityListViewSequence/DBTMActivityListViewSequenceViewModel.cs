@@ -50,5 +50,7 @@ namespace Coditech.Admin.ViewModel
         public string TestName { get; set; }
         [Display(Name = "Static Value")]
         public string StaticValue { get; set; }
+        [Display(Name = "Is Display Performance Standard")]
+        public bool IsDisplayPerformanceStandard { get; set; }
     }
 }

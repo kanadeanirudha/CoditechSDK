@@ -28,6 +28,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
         private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
+        private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
+        private readonly ICoditechRepository<DBTMTestWisePerformanceStandard> _dBTMTestWisePerformanceStandardRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -45,6 +47,8 @@ namespace Coditech.API.Service
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCampMasterRepository = new CoditechRepository<DBTMCampMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestWisePerformanceStandardRepository = new CoditechRepository<DBTMTestWisePerformanceStandard>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph
@@ -945,15 +949,24 @@ namespace Coditech.API.Service
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest, isDownloadReport);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
-                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport);
+                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport, centreCode);
                 }
             }
             return dataTable;
         }
 
-        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport)
+        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport, string centreCode)
         {
             DataTable dataTable = new DataTable();
+            bool isDisplayPerformanceStandard = _dBTMCentreWiseSettingRepository.Table.Where(x => x.CentreCode == centreCode).Select(x => x.IsDisplayPerformanceStandard).FirstOrDefault();
+            List<DBTMTestWisePerformanceStandard> performanceStandardList = new List<DBTMTestWisePerformanceStandard>();
+            bool isHigherBetter = false;
+            if (isDisplayPerformanceStandard)
+            {
+                performanceStandardList = _dBTMTestWisePerformanceStandardRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).ToList();
+                if (performanceStandardList?.Count > 0)
+                    isHigherBetter = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestOutputHigher).FirstOrDefault() == "HO"; //HO =HigherOutput
+            }
             if (dBTMReportsList?.Count > 0)
             {
                 List<string> displayColumnList = isMobileRequest
@@ -1006,7 +1019,7 @@ namespace Coditech.API.Service
                                 break;
                         }
                     }
-                    BindParameterValue(listviewSequenceColumnList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow, isMobileRequest, isDownloadReport);
+                    BindParameterValue(listviewSequenceColumnList, performanceStandardList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow, isMobileRequest, isDownloadReport, isHigherBetter);
                     dataTable.Rows.Add(newRow);
                 }
 
@@ -1112,8 +1125,10 @@ namespace Coditech.API.Service
             }
         }
 
-        private void BindParameterValue(List<string> listviewSequenceColumnList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow, bool isMobileRequest, bool isDownloadReport)
+        private void BindParameterValue(List<string> listviewSequenceColumnList, List<DBTMTestWisePerformanceStandard> performanceStandardList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow, bool isMobileRequest, bool isDownloadReport, bool isHigherBetter)
         {
+            int ageGroupEnumId = group.FirstOrDefault()?.AgeGroupEnumId ?? 0;
+            int genderEnumId = group.FirstOrDefault()?.GenderEnumId ?? 0;
             foreach (var displayColumn in listviewSequenceColumnList)
             {
                 if (displayColumn == "View")
@@ -1163,7 +1178,13 @@ namespace Coditech.API.Service
                         rowValue = isWholeNumber ? Math.Truncate(number).ToString() : number.ToString();
                     }
                 }
-                newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}";
+                string performanceGrade = "";
+
+                if (performanceStandardList?.Count > 0 && dBTMTestParameterListviewSequence.IsDisplayPerformanceStandard && rowValue != CustomConstants.InvalidData && decimal.TryParse(rowValue, out decimal score))
+                {
+                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDouble(score), performanceStandardList, isHigherBetter);
+                }
+                newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{performanceGrade}";
             }
         }
 
@@ -1271,7 +1292,32 @@ namespace Coditech.API.Service
             }
             return words.Trim();
         }
-
+        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, double score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
+        {
+            DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
+            if (record == null)
+                return "0";
+            if (isHigherBetter)
+            {
+                if (score >= record.ExcellentValue)
+                    return "5";
+                if (score >= record.GoodValue)
+                    return "4";
+                if (score >= record.AverageValue)
+                    return "3";
+                return "1";
+            }
+            else
+            {
+                if (score <= record.ExcellentValue)
+                    return "5";
+                if (score <= record.GoodValue)
+                    return "4";
+                if (score <= record.AverageValue)
+                    return "3";
+                return "1";
+            }
+        }
         private List<DBTMTestModel> GetTestList(string dBTMTestMasterIds)
         {
             List<int> dBTMTestMasterIdList = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
