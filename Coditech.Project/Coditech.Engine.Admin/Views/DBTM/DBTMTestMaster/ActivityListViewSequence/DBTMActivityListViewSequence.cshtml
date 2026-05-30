@@ -144,6 +144,14 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.IsDisplayPerformanceStandard, new { @class = "form-label" })
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(x => x.IsDisplayPerformanceStandard, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         }
                     </div>
