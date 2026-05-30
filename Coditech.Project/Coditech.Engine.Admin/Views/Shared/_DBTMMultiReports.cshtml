@@ -62,7 +62,8 @@
                                                     var rawValue = row[col]?.ToString() ?? "";
                                                     string[] value = rawValue.Split('~');
                                                     string style = string.Empty;
-                                                    var traineeId = value.Length > 3 ? value[3] : "0";
+                                                    var performanceGrade = value.Length > 3 ? value[3] : "";
+                                                    var traineeId = value.Length > 4 ? value[4] : "0";
                                                     if (value.Length > 1)
                                                     {
                                                         style = value[1] == "True" ? "font-weight: bold;" : "";
@@ -93,6 +94,23 @@
                                                         else
                                                         {
                                                             @value[0]
+
+                                                            @if (performanceGrade == "5")
+                                                            {
+                                                                <span title="Excellent">⭐⭐⭐⭐⭐</span>
+                                                            }
+                                                            else if (performanceGrade == "4")
+                                                            {
+                                                                <span title="Good">⭐⭐⭐⭐</span>
+                                                            }
+                                                            else if (performanceGrade == "3")
+                                                            {
+                                                                <span title="Average">⭐⭐⭐</span>
+                                                            }
+                                                            else if (performanceGrade == "1")
+                                                            {
+                                                                <span title="Poor">⭐</span>
+                                                            }                                                          
                                                         }
                                                     </td>
                                                 }
