@@ -1,0 +1,94 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@model UserModel
+@{
+    Layout = null;
+    string controllerName = Convert.ToString(ViewContext.RouteData.Values["controller"]).ToLower();
+    string actionName = Convert.ToString(ViewContext.RouteData.Values["action"]).ToLower();
+    UserMainMenuModel userMenuModel = Model?.MenuList?.Where(x => x.ParentMenuCode != null).FirstOrDefault(x => controllerName.ToLower().Contains(x.ControllerName.ToLower()));
+    List<UserMainMenuModel> menuList = userMenuModel != null ? Model?.MenuList?.Where(x => x.ModuleCode == userMenuModel.ModuleCode)?.ToList() : null;
+    UserModuleModel userModuleModel = userMenuModel != null ? Model?.ModuleList?.FirstOrDefault(x => x.ModuleCode == userMenuModel.ModuleCode) : new UserModuleModel();
+}
+<div class="menu-content h-100 mm-active" data-simplebar="init">
+    <div class="simplebar-wrapper" style="margin: 0px 0px -70px;">
+        <div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div>
+        <div class="simplebar-mask">
+            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                <div class="simplebar-content-wrapper" style="height: 100%; overflow: hidden scroll;">
+                    <div class="simplebar-content" style="padding: 0px 0px 70px;">
+                        <ul class="metismenu left-sidenav-menu mm-show">
+                            @{
+                                short count = 1;
+                                foreach (UserModuleModel item in Model?.ModuleList?.OrderBy(x => x.ModuleSeqNumber))
+                                {
+                                    if (count > 1)
+                                    {
+                                        <hr class="hr-dashed hr-menu" />
+                                    }
+                                    count++;
+                                    if (!string.Equals(item.ModuleCode, "DASHBOARD", StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        <li class="menu-label mt-0" style="font-size:14px !important">
+                                            <i class="@item.ModuleIconName"></i> @item.ModuleName
+                                        </li>
+                                    }
+                                    @if (Model?.MenuList.Count > 0)
+                                    {
+                                        @foreach (UserMainMenuModel itemParent in Model.MenuList.Where(x => x.ParentMenuCode == null && x.ModuleCode == item.ModuleCode).OrderBy(y => y.MenuDisplaySeqNo))
+                                        {
+                                            if (string.Equals(itemParent.MenuCode, "DASHBOARD", StringComparison.InvariantCultureIgnoreCase))
+                                            {
+                                                <li>
+                                                    <a href="/@Model.MenuList.Where(x => x.ParentMenuCode == itemParent.MenuCode).FirstOrDefault().MenuLink">
+                                                        @if (!string.IsNullOrEmpty(itemParent.MenuIconName))
+                                                        {
+                                                            <i class="@itemParent.MenuIconName"></i>
+                                                        }
+                                                        <span>@itemParent.MenuName</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <a href="javascript: void(0);">
+                                                        @if (!string.IsNullOrEmpty(itemParent.MenuIconName))
+                                                        {
+                                                            <i class="@itemParent.MenuIconName"></i>
+                                                        }
+                                                        <span>@itemParent.MenuName</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
+                                                    </a>
+                                                    <ul class="nav-second-level mm-collapse" aria-expanded="false">
+                                                        @foreach (UserMainMenuModel itemMenu in Model.MenuList.Where(x => x.ParentMenuCode == itemParent.MenuCode).OrderBy(y => y.MenuDisplaySeqNo))
+                                                        {
+                                                            <li class="nav-item">
+                                                                <a href="/@itemMenu.MenuLink" class="nav-link">
+                                                                    @if (!string.IsNullOrEmpty(itemMenu.MenuIconName))
+                                                                    {
+                                                                        <i class="@itemMenu.MenuIconName"></i>
+                                                                    }
+                                                                    @itemMenu.MenuName
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="simplebar-placeholder" style="width: auto; height: 904px;"></div>
+    </div>
+    <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+        <div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+    </div>
+    <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+        <div class="simplebar-scrollbar" style="height: 534px; transform: translate3d(0px, 0px, 0px); display: block;"></div>
+    </div>
+</div>

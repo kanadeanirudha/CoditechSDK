@@ -66,27 +66,6 @@ namespace Coditech.API.Service
             _generalEnumaratorGroupRepository = new CoditechRepository<GeneralEnumaratorGroup>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
-        //public override UserModel Login(UserLoginModel userLoginModel)
-        //{
-        //    UserModel model = base.Login(userLoginModel);
-
-        //    if (!model.HasError && model.UserType != UserTypeEnum.Admin.ToString())
-        //    {
-        //        GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(model.EntityId, model.UserType);
-        //        if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
-        //        {
-        //            model.Custom1 = generalPersonModel.Custom1;
-        //        }
-        //        if (model.Custom1 == CustomConstants.DBTMTrainer || model.Custom1 == CustomConstants.DBTMCentreOwner)
-        //        {
-        //            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
-        //            dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
-        //            model.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
-        //        }
-        //    }
-        //    return model;
-        //}
-
         public override ChangePasswordModel ChangePassword(ChangePasswordModel changePasswordModel)
         {
             if (IsNull(changePasswordModel))
