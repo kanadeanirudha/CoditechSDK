@@ -256,6 +256,12 @@ namespace Coditech.API.Service
                 model.ErrorMessage = "Joining Code has expired.";
                 return model;
             }
+            if (joiningCodeDetails.IsInQueue && joiningCodeDetails.QueueValidTill.HasValue && joiningCodeDetails.QueueValidTill > DateTime.Now)
+            {
+                model.HasError = true;
+                model.ErrorMessage = "This joining code is currently being used by another user. Please try again after some time.";
+                return model;
+            }
             model.CentreCode = joiningCode;
             return model;
         }
@@ -272,11 +278,9 @@ namespace Coditech.API.Service
             OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
 
             int traineeEnumId = GetEnumIdByEnumCode("Trainee", "OrganisationJoiningCodeType");
-            joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
-
+            joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);           
             if (IsNull(joiningCodeDetails))
                 throw new CoditechException(ErrorCodes.AlreadyExist, "Invalid Joining Code.");
-
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);

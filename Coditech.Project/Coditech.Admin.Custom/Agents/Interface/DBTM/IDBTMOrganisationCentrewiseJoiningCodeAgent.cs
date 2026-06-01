@@ -12,5 +12,6 @@ namespace Coditech.Admin.Agents
         List<OrganisationCentrewiseJoiningCodeViewModel> GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows);
         DBTMOrganisationCentrewiseJoiningCodeViewModel GetTrainerActiveJoiningCode(string centreCode);
         bool DeleteJoiningCodeFile(string fileName);
+        bool IsTrainerJoiningCodeLocked(string joiningCode);
     }
 }

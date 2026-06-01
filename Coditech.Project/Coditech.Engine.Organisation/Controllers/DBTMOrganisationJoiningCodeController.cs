@@ -114,5 +114,27 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("/DBTMOrganisationCentrewiseJoiningCode/IsTrainerJoiningCodeLocked")]
+        [Produces(typeof(TrueFalseResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult IsTrainerJoiningCodeLocked(string joiningCode)
+        {
+            try
+            {
+                bool isLocked = _dBTMOrganisationCentrewiseJoiningCodeService.IsTrainerJoiningCodeLocked(joiningCode);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = isLocked });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMOrganisationCentrewiseJoiningCode", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

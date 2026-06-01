@@ -170,6 +170,12 @@ namespace Coditech.API.Service
                 model.ErrorMessage = "Joining Code has expired.";
                 return model;
             }
+            if (joiningCodeDetails.IsInQueue && joiningCodeDetails.QueueValidTill.HasValue && joiningCodeDetails.QueueValidTill > DateTime.Now)
+            {
+                model.HasError = true;
+                model.ErrorMessage = "This joining code is currently being used by another user. Please try again after some time.";
+                return model;
+            }
             model.CentreCode = joiningCode;
             return model;
         }
@@ -249,6 +255,8 @@ namespace Coditech.API.Service
                     // Trainer to Batch
                     CreateTrainerBatch(dBTMNewRegistrationModel, generalTrainerMasterId, currentDate);
                     joiningCodeDetails.IsExpired = true;
+                    joiningCodeDetails.IsInQueue = false;
+                    joiningCodeDetails.QueueValidTill = null;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                 }
             }
@@ -266,6 +274,12 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
                 int status = 0;
                 objStoredProc.ExecuteStoredProcedureList("Coditech_DeleteDBTMTrainerNewRegistration @CentreCode,@EntityId,@UserType,@PersonId,@Status OUT", 4, out status);
+            }
+            if (joiningCodeDetails != null)
+            {
+                joiningCodeDetails.IsInQueue = false;
+                joiningCodeDetails.QueueValidTill = null;
+                _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
             }
             return dBTMNewRegistrationModel;
         }

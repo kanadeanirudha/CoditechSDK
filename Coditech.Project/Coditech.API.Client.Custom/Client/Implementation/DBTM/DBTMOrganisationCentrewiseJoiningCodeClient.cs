@@ -186,5 +186,43 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+        public virtual bool IsTrainerJoiningCodeLocked(string joiningCode)
+        {
+            return Task.Run(async () => await IsTrainerJoiningCodeLockedAsync(joiningCode, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<bool> IsTrainerJoiningCodeLockedAsync(string joiningCode, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMOrganisationCentrewiseJoiningCodeEndpoint.IsTrainerJoiningCodeLockedAsync(joiningCode);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<TrueFalseResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object?.IsSuccess ?? false;
+                }
+                else if (status_ == 204)
+                {
+                    return false;
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    TrueFalseResponse typedBody = JsonConvert.DeserializeObject<TrueFalseResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
     }
 }

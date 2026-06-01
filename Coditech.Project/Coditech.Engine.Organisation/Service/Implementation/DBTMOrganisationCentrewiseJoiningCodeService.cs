@@ -105,16 +105,50 @@ namespace Coditech.API.Service
             repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Rows", 100, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            return repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            List<OrganisationCentrewiseJoiningCodeModel> list = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            if (IsNull(list) || !list.Any())
+            {
+                return new List<OrganisationCentrewiseJoiningCodeModel>();
+            }
+            OrganisationCentrewiseJoiningCodeModel item = null;
+            foreach (var code in list)
+            {
+                OrganisationCentrewiseJoiningCode joiningCode = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == code.JoiningCode);
+                if (joiningCode == null)
+                    continue;
+                if (joiningCode.IsInQueue && joiningCode.QueueValidTill.HasValue && joiningCode.QueueValidTill <= DateTime.Now)
+                {
+                    joiningCode.IsInQueue = false;
+                    joiningCode.QueueValidTill = null;
+                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCode);
+                }
+                bool isLocked = joiningCode.IsInQueue && joiningCode.QueueValidTill.HasValue && joiningCode.QueueValidTill > DateTime.Now;
+                if (!isLocked)
+                {
+                    item = code;
+                    joiningCode.IsInQueue = true;
+                    joiningCode.QueueValidTill = DateTime.Now.AddMinutes(ApiCustomSettings.JoiningCodeQueueTimeInMinutes);
+                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCode);
+                    break;
+                }
+            }
+            if (IsNull(item))
+            {
+                return new List<OrganisationCentrewiseJoiningCodeModel>();
+            }
+            return new List<OrganisationCentrewiseJoiningCodeModel>()
+            {
+                item
+            };
         }
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId, int rows)
         {
             List<OrganisationCentrewiseJoiningCodeModel> list = GetTraineeActiveJoiningCodeList(centreCode, trainerId, rows).OrderBy(x => x.Custom2).ToList();
-            if (list == null || !list.Any())
+            if (IsNull(list) || !list.Any())
                 return new DBTMOrganisationCentrewiseJoiningCodeModel();
             string currentDir = Directory.GetCurrentDirectory();
             string dataFolder = Path.Combine(currentDir, "data", "JoiningCodeForTrainee");
@@ -148,25 +182,44 @@ namespace Coditech.API.Service
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTrainerActiveJoiningCode(string centreCode)
         {
-            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 323, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String); 
+            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@PageNo", 1, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@Rows", 1, ParameterDirection.Input, DbType.Int32);
+            repo.SetParameter("@Rows", 100, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Order_BY", "a.CreatedDate DESC", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@RowsCount", 0, ParameterDirection.Output, DbType.Int32);
             List<OrganisationCentrewiseJoiningCodeModel> list = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
-            OrganisationCentrewiseJoiningCodeModel item = list?.FirstOrDefault();
-            if (item == null)
+            OrganisationCentrewiseJoiningCodeModel item = null;
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
+            foreach (OrganisationCentrewiseJoiningCodeModel code in list)
+            {
+                OrganisationCentrewiseJoiningCode joiningCode = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == code.JoiningCode);
+                if (IsNull(joiningCode))
+                    continue;
+                bool isLocked = joiningCode.IsInQueue && joiningCode.QueueValidTill.HasValue && joiningCode.QueueValidTill > DateTime.Now;
+                if (!isLocked)
+                {
+                    item = code;
+                    joiningCodeDetails = joiningCode;
+                    break;
+                }
+            }
+            if (item == null || joiningCodeDetails == null)
                 return new DBTMOrganisationCentrewiseJoiningCodeModel();
+            joiningCodeDetails.IsInQueue = true;
+            joiningCodeDetails.QueueValidTill = DateTime.Now.AddMinutes(ApiCustomSettings.JoiningCodeQueueTimeInMinutes);
+            _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
             DBTMOrganisationCentrewiseJoiningCodeModel listModel = new DBTMOrganisationCentrewiseJoiningCodeModel()
             {
                 JoiningCode = item.JoiningCode,
                 Custom1 = item.Custom1,
                 Custom2 = item.Custom2,
-                Custom3 = item.Custom3
+                Custom3 = item.Custom3,
+                IsInQueue = joiningCodeDetails.IsInQueue,
+                QueueValidTill = joiningCodeDetails.QueueValidTill
             };
             return listModel;
         }
@@ -191,6 +244,16 @@ namespace Coditech.API.Service
             {
                 return false;
             }
+        }
+
+        public bool IsTrainerJoiningCodeLocked(string joiningCode)
+        {
+            OrganisationCentrewiseJoiningCode codeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode);
+            if (codeDetails == null)
+                return false;
+            return codeDetails.IsInQueue
+                && codeDetails.QueueValidTill.HasValue
+                && codeDetails.QueueValidTill > DateTime.Now;
         }
     }
 }

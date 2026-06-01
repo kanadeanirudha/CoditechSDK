@@ -9,5 +9,6 @@ namespace Coditech.API.Service
         DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId,int rows);
         DBTMOrganisationCentrewiseJoiningCodeModel GetTrainerActiveJoiningCode(string centreCode);
         bool DeleteOrganisationCentrewiseJoiningCodeFile(string fileName);
+        bool IsTrainerJoiningCodeLocked(string joiningCode);
     }
 }
