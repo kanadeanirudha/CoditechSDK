@@ -1,0 +1,326 @@
+﻿@using Coditech.Admin.Utilities;
+@using Coditech.Common.API.Model;
+@{
+    string messageData = Convert.ToString(TempData["Notifications"]);
+    UserModel userData = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+    string applicationLogoPath = CoditechAdminSettings.ApplicationLogoPath;
+    string applicationLogoSmallPath = CoditechAdminSettings.ApplicationLogoSmallPath;
+    string applicationLayoutBackground = CoditechAdminSettings.ApplicationLayoutBackground;
+    string applicationTitle = CoditechAdminSettings.ApplicationTitle;
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+    TempData.Remove("Notifications");
+}
+<!DOCTYPE html>
+<!-- saved from url=(0059)https://mannatthemes.com/dastone/default/pages-profile.html -->
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>@ViewData["Title"] | @applicationTitle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/favicon.ico">
+
+    <!-- App css -->
+    <link href="~/css/layout/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/metisMenu.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/daterangepicker.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/app.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/layout/datatables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/layout/buttons.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/css/layout/bootstrap-select.min.css" rel="stylesheet" />
+    @* <link href="~/css/layout/site.css" rel="stylesheet" /> *@
+    <link href="~/css/layout/jstree.css" rel="stylesheet" />
+    <link href="~/css/layout/select2.min.css" rel="stylesheet" />
+    @if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
+    {
+        <link href="~/css/layout/theme-@CoditechAdminSettings.ThemeColor" rel="stylesheet" />
+    }
+
+    @if (Convert.ToString(ViewBag.IsDashboardPopup) == "true")
+    {
+        <style>
+            .topbar, .footer, .left-sidenav, .page-header {
+                display: none !important;
+            }
+
+            .page-wrapper {
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: auto !important;
+            }
+
+            .page-content {
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+        </style>
+    }
+    <script src="~/lib/chart/Chart.min.js"></script>
+</head>
+<body data-layout="vertical" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
+    @Html.Partial("~/Views/Shared/_Loader.cshtml")
+    @if (userData != null)
+    {
+        <!-- Left Sidenav -->
+        <div class="left-sidenav">
+            <div class="brand logo-background">
+                <a href="..@dashboardUrl" class="logo">
+                    <span class="logo-small-wrapper">
+                        @if (!string.IsNullOrEmpty(userData?.LogoSmallMediaPath))
+                        {
+                            <img src="@userData.LogoSmallMediaPath" alt="logo-small" class="logo-sm">
+                        }
+                        else
+                        {
+                            <img src="@applicationLogoSmallPath" alt="logo-small" class="logo-sm">
+                        }
+                    </span>
+                    <span class="logo-large-wrapper">
+                        @if (!string.IsNullOrEmpty(userData?.LogoMediaPath))
+                        {
+                            <img src="@userData?.LogoMediaPath" alt="logo-large" class="logo-lg logo-dark">
+                        }
+                        else
+                        {
+                            <img src="@applicationLogoPath" alt="logo-large" class="logo-lg logo-dark">
+                        }
+                    </span>
+                </a>
+            </div>
+            <!--end logo-->
+            @Html.Partial("~/Views/Shared/_ModuleListVertical.cshtml", userData)
+        </div>
+        <!-- end left-sidenav-->
+
+        <div class="page-wrapper">
+            <!-- Top Bar Start -->
+            <div class="topbar">
+                <!-- Navbar -->
+                <nav class="navbar-custom">
+                    <ul class="list-unstyled topbar-nav float-end mb-0">
+                        @*   <li class="dropdown hide-phone">
+                        <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-bs-toggle="dropdown" href="https://mannatthemes.com/dastone/default/pages-profile.html#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search topbar-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end dropdown-lg p-0">
+                            <!-- Top Search Bar -->
+                            <div class="app-search-topbar">
+                                <form action="https://mannatthemes.com/dastone/default/pages-profile.html#" method="get">
+                                    <input type="search" name="search" class="from-control top-search mb-0" placeholder="Type text...">
+                                    <button type="submit"><i class="ti-search"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </li> *@
+
+                        @* <li class="dropdown notification-list">
+                        <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-bs-toggle="dropdown" href="https://mannatthemes.com/dastone/default/pages-profile.html#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell align-self-center topbar-icon"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            <span class="badge bg-danger rounded-pill noti-icon-badge">2</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-lg pt-0">
+
+                            <h6 class="dropdown-item-text font-15 m-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                Notifications <span class="badge bg-primary rounded-pill">2</span>
+                            </h6>
+                            <div class="notification-menu" data-simplebar="init">
+                                <div class="simplebar-wrapper" style="margin: 0px;">
+                                    <div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask">
+                                        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                                            <div class="simplebar-content-wrapper" style="height: auto; overflow: hidden;">
+                                                <div class="simplebar-content" style="padding: 0px;">
+                                                    <!-- item-->
+                                                    <a href="https://mannatthemes.com/dastone/default/pages-profile.html#" class="dropdown-item py-3">
+                                                        <small class="float-end text-muted ps-2">2 min ago</small>
+                                                        <div class="media">
+                                                            <div class="avatar-md bg-soft-primary">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart align-self-center icon-xs"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                                                            </div>
+                                                            <div class="media-body align-self-center ms-2 text-truncate">
+                                                                <h6 class="my-0 fw-normal text-dark">Your order is placed</h6>
+                                                                <small class="text-muted mb-0">Dummy text of the printing and industry.</small>
+                                                            </div><!--end media-body-->
+                                                        </div><!--end media-->
+                                                    </a><!--end-item-->
+                                                    <!-- item-->
+                                                    <a href="https://mannatthemes.com/dastone/default/pages-profile.html#" class="dropdown-item py-3">
+                                                        <small class="float-end text-muted ps-2">10 min ago</small>
+                                                        <div class="media">
+                                                            <div class="avatar-md bg-soft-primary">
+                                                                <img src="./Dastone - Admin &amp; Dashboard Template_files/user-4.jpg" alt="" class="thumb-sm rounded-circle">
+                                                            </div>
+                                                            <div class="media-body align-self-center ms-2 text-truncate">
+                                                                <h6 class="my-0 fw-normal text-dark">Meeting with designers</h6>
+                                                                <small class="text-muted mb-0">It is a long established fact that a reader.</small>
+                                                            </div><!--end media-body-->
+                                                        </div><!--end media-->
+                                                    </a><!--end-item-->
+                                                    <!-- item-->
+                                                    <a href="https://mannatthemes.com/dastone/default/pages-profile.html#" class="dropdown-item py-3">
+                                                        <small class="float-end text-muted ps-2">40 min ago</small>
+                                                        <div class="media">
+                                                            <div class="avatar-md bg-soft-primary">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users align-self-center icon-xs"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                                            </div>
+                                                            <div class="media-body align-self-center ms-2 text-truncate">
+                                                                <h6 class="my-0 fw-normal text-dark">UX 3 Task complete.</h6>
+                                                                <small class="text-muted mb-0">Dummy text of the printing.</small>
+                                                            </div><!--end media-body-->
+                                                        </div><!--end media-->
+                                                    </a><!--end-item-->
+                                                    <!-- item-->
+                                                    <a href="https://mannatthemes.com/dastone/default/pages-profile.html#" class="dropdown-item py-3">
+                                                        <small class="float-end text-muted ps-2">1 hr ago</small>
+                                                        <div class="media">
+                                                            <div class="avatar-md bg-soft-primary">
+                                                                <img src="./Dastone - Admin &amp; Dashboard Template_files/user-5.jpg" alt="" class="thumb-sm rounded-circle">
+                                                            </div>
+                                                            <div class="media-body align-self-center ms-2 text-truncate">
+                                                                <h6 class="my-0 fw-normal text-dark">Your order is placed</h6>
+                                                                <small class="text-muted mb-0">It is a long established fact that a reader.</small>
+                                                            </div><!--end media-body-->
+                                                        </div><!--end media-->
+                                                    </a><!--end-item-->
+                                                    <!-- item-->
+                                                    <a href="https://mannatthemes.com/dastone/default/pages-profile.html#" class="dropdown-item py-3">
+                                                        <small class="float-end text-muted ps-2">2 hrs ago</small>
+                                                        <div class="media">
+                                                            <div class="avatar-md bg-soft-primary">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-self-center icon-xs"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                            </div>
+                                                            <div class="media-body align-self-center ms-2 text-truncate">
+                                                                <h6 class="my-0 fw-normal text-dark">Payment Successfull</h6>
+                                                                <small class="text-muted mb-0">Dummy text of the printing.</small>
+                                                            </div><!--end media-body-->
+                                                        </div><!--end media-->
+                                                    </a><!--end-item-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><div class="simplebar-placeholder" style="width: 0px; height: 0px;"></div>
+                                </div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: hidden;"><div class="simplebar-scrollbar" style="height: 0px; display: none;"></div></div>
+                            </div>
+                            <!-- All-->
+                            <a href="javascript:void(0);" class="dropdown-item text-center text-primary">
+                                View all <i class="fi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </li> *@
+                        @if (userData?.BalanceSheetList?.Count > 0)
+                        {
+                            @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData);
+                        }
+                        @Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
+                    </ul><!--end topbar-nav-->
+
+                    <ul class="list-unstyled topbar-nav mb-0">
+                        <li>
+                            <button class="nav-link button-menu-mobile" fdprocessedid="y0c0n">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu align-self-center topbar-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- end navbar-->
+            </div>
+            <!-- Top Bar End -->
+            <!-- Page Content-->
+            @RenderBody()
+            <!-- end page content -->
+        </div>
+      @*   <footer class="footer text-center text-sm-start">
+            <div class="boxed-footer">
+                Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
+            </div>
+        </footer> *@
+        <!-- end page-wrapper -->
+    }
+    <!-- jQuery  -->
+    <!-- jQuery  -->
+    <script src="~/js/layout/jquery.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/layout/bootstrap.bundle.min.js"></script>
+    <script src="~/js/layout/metismenu.min.js"></script>
+    <script src="~/js/layout/waves.js"></script>
+    <script src="~/js/layout/feather.min.js"></script>
+    <script src="~/js/layout/simplebar.min.js"></script>
+    <script src="~/js/layout/moment.js"></script>
+    <script src="~/js/layout/daterangepicker.js"></script>
+    <script src="~/js/layout/app.js"></script>
+    <script src="~/js/layout/bootstrap-select.min.js"></script>
+    <script src="~/js/layout/select2.min.js"></script>
+
+    <!-- coditech script-->
+    <script src="~/js/coditech/common/coditechcommon.js"></script>
+    <script src="~/js/coditech/common/coditechdatatable.js"></script>
+    <script src="~/js/coditech/common/coditechnotification.js"></script>
+    <script src="~/js/coditech/user.js"></script>
+    <script>
+        if (performance.navigation.type == 2) {
+            location.reload();
+        }
+
+        window.onbeforeunload = function () {
+            var inputs = document.getElementsByTagName("button");
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type == "button" || inputs[i].type == "submit") {
+                    inputs[i].disabled = true;
+                }
+            }
+        };
+        function initializeSelect2Dropdowns(context) {
+            var $context = context ? $(context) : $(document);
+            var isIOS = $('body').hasClass('is-ios');
+            var selector = isIOS ? 'select.js-select2, select.selectpicker' : 'select.js-select2';
+            $context.find(selector).each(function () {
+                var $select = $(this);
+                if ($select.hasClass('select2-hidden-accessible')) return;
+                if (isIOS && $select.data('selectpicker')) {
+                    $select.selectpicker('destroy');
+                    $select.removeClass('selectpicker');
+                }
+                var dropdownParentElement = $select.closest('.modal').length ? $select.closest('.modal') : null;
+                $select.select2({
+                    allowClear: false,
+                    width: '100%',
+                    dropdownParent: dropdownParentElement,
+                    minimumResultsForSearch: 0
+                }).on('select2:opening', function (e) {
+                    $(this).next('.select2-container').css('width', '100%');
+                });
+            });
+        }
+        $(document).ready(function () {
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                $('body').addClass('is-ios');
+            }
+            initializeSelect2Dropdowns();
+            $(document).on('focus', '.select2-selection--single', function (e) {
+                var $select = $(this).closest('.select2-container').prev('select');
+                if (!$select.prop('disabled')) {
+                    $select.select2('open');
+                }
+            });
+            $(document).on('select2:open', function (e) {
+                if ($('body').hasClass('is-ios')) {
+                    setTimeout(function () {
+                        var searchField = document.querySelector('.select2-search__field');
+                        if (searchField) {
+                            searchField.focus();
+                        }
+                    }, 100);
+                }
+            });
+        });
+    </script>
+</body>
+@await RenderSectionAsync("Scripts", required: false)
+</html>

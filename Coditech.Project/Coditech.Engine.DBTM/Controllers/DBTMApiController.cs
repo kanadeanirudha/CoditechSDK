@@ -67,7 +67,12 @@ namespace Coditech.Engine.DBTM.Controllers
             try
             {
                 bool status = _dBTMApiService.InsertDeviceData(model);
-                return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status });
+                string DataUniqueIds = null;
+                if (status)
+                {
+                    DataUniqueIds = string.Join(",",model.Where(x => !string.IsNullOrEmpty(x.DataUniqueId)).Select(x => x.DataUniqueId));
+                }
+                return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status, DataUniqueIds = DataUniqueIds });
             }
             catch (CoditechException ex)
             {
