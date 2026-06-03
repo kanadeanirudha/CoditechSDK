@@ -833,7 +833,7 @@ namespace Coditech.API.Service
             model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false, typeOfRecord);
             int expireMinutes = ApiCustomSettings.IsValidRecordButtonExpireTimeOnMobile;
 
-            DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(300);
+            DateTime expireTime = deviceData.TestPerformedTime.AddMinutes(expireMinutes);
 
             if (DateTime.Now > expireTime || !deviceData.IsValidRecord)
                 model.IsValidRecordButton = false;
