@@ -256,6 +256,12 @@ namespace Coditech.API.Service
                 model.ErrorMessage = "Joining Code has expired.";
                 return model;
             }
+            if (joiningCodeDetails.IsInQueue)
+            {
+                model.HasError = true;
+                model.ErrorMessage = "This joining code is currently being used by another user. Please try again after some time.";
+                return model;
+            }
             model.CentreCode = joiningCode;
             return model;
         }
@@ -279,6 +285,7 @@ namespace Coditech.API.Service
 
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
+            
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<DBTMNewRegistrationModel> objStoredProc = new CoditechViewRepository<DBTMNewRegistrationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);

@@ -141,7 +141,7 @@ namespace Coditech.API.Service
                                 string paramCodeStr = Convert.ToString(item.ParameterCode);
                                 string parameterCode = int.TryParse(paramCodeStr, out int parameterCodeInt) ? ((TestParameterCode)parameterCodeInt).ToString() : paramCodeStr;
                                 string parameterValue = item.ParameterValue.ToString() ?? string.Empty;
-                                string encryptedValue =EncryptionHelper.Encrypt(parameterValue);
+                                string encryptedValue = EncryptionHelper.Encrypt(parameterValue);
 
                                 detailList.Add(new DBTMDeviceDataDetails
                                 {
@@ -160,11 +160,11 @@ namespace Coditech.API.Service
                                 });
                             }
 
-                            var insertedDetails =_dBTMDeviceDataDetailsRepository.Insert(detailList,dBTMDeviceDataModel.CreatedBy);
+                            var insertedDetails = _dBTMDeviceDataDetailsRepository.Insert(detailList, dBTMDeviceDataModel.CreatedBy);
 
                             if (insertedDetails == null)
                             {
-                                throw new CoditechException(ErrorCodes.InvalidData,"Failed to insert device data details.");
+                                throw new CoditechException(ErrorCodes.InvalidData, "Failed to insert device data details.");
                             }
                         }
                     }
@@ -175,7 +175,7 @@ namespace Coditech.API.Service
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex,"InsertDeviceData failed. Transaction rolled back.");
+                _coditechLogging.LogMessage(ex, "InsertDeviceData failed. Transaction rolled back.");
                 return false;
             }
         }
@@ -439,8 +439,13 @@ namespace Coditech.API.Service
         }
         public OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId)
         {
+            List<OrganisationCentrewiseJoiningCode> list = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && x.QueueValidTill != null && x.IsInQueue && x.QueueValidTill <= DateTime.Now).ToList();
+            if (list?.Count > 0)
+            {
+                _organisationCentrewiseJoiningCodeRepository.BatchUpdate(list);
+            }
             OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _organisationCentrewiseJoiningCodeRepository.Table
-                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired).Select(x =>
+                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && !x.IsInQueue).Select(x =>
                 new OrganisationCentrewiseJoiningCodeModel { JoiningCode = x.JoiningCode, Custom3 = x.Custom3 }).FirstOrDefault();
             return organisationCentrewiseJoiningCodeModel ?? new OrganisationCentrewiseJoiningCodeModel { JoiningCode = string.Empty, Custom3 = string.Empty };
         }
