@@ -444,9 +444,16 @@ namespace Coditech.API.Service
             {
                 _organisationCentrewiseJoiningCodeRepository.BatchUpdate(list);
             }
-            OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _organisationCentrewiseJoiningCodeRepository.Table
-                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && !x.IsInQueue).Select(x =>
-                new OrganisationCentrewiseJoiningCodeModel { JoiningCode = x.JoiningCode, Custom3 = x.Custom3 }).FirstOrDefault();
+            OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = _organisationCentrewiseJoiningCodeRepository.Table
+                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && !x.IsInQueue).FirstOrDefault();
+
+            OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = organisationCentrewiseJoiningCode.FromEntityToModel<OrganisationCentrewiseJoiningCodeModel>();
+            if(organisationCentrewiseJoiningCodeModel != null)
+            {
+                organisationCentrewiseJoiningCode.IsInQueue = true;
+                organisationCentrewiseJoiningCode.QueueValidTill = DateTime.Now.AddMinutes(3);
+                _organisationCentrewiseJoiningCodeRepository.Update(organisationCentrewiseJoiningCode);
+            }
             return organisationCentrewiseJoiningCodeModel ?? new OrganisationCentrewiseJoiningCodeModel { JoiningCode = string.Empty, Custom3 = string.Empty };
         }
         public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)

@@ -109,13 +109,6 @@ namespace Coditech.API.Service
             repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<OrganisationCentrewiseJoiningCodeModel> aa = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
-            if (aa.Count > 0 && rows == 1)
-            {
-                OrganisationCentrewiseJoiningCode pp = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.OrganisationCentrewiseJoiningCodeId == aa.FirstOrDefault().OrganisationCentrewiseJoiningCodeId);
-                pp.IsInQueue = true;
-                pp.QueueValidTill = DateTime.Now;
-                _organisationCentrewiseJoiningCodeRepository.Update(pp);
-            }
             return aa;
         }
 

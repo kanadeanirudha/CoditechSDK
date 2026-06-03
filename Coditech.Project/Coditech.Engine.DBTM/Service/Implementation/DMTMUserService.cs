@@ -268,38 +268,36 @@ namespace Coditech.API.Service
 
         public virtual DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
-            if (generalTrainerMasterId > 0)
-            {
-                OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _dBTMApiService.GetJoiningCode(generalTrainerMasterId.ToString());
+            if (string.IsNullOrEmpty(joiningCode))
+                throw new CoditechException(ErrorCodes.AlreadyExist, "Joining Code is empty.");
 
-                if (IsNotNull(organisationCentrewiseJoiningCodeModel.JoiningCode))
-                    throw new CoditechException(ErrorCodes.InvalidData, "No Joining Code found for this trainer.");
+            List<OrganisationCentrewiseJoiningCode> list = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.JoiningCode == joiningCode.ToString() && x.QueueValidTill != null && x.IsInQueue && x.QueueValidTill <= DateTime.Now).ToList();
+            if (list?.Count > 0)
+            {
+                list.ForEach(x => { x.IsInQueue = false; x.QueueValidTill = null; });
+                _organisationCentrewiseJoiningCodeRepository.BatchUpdate(list);
             }
-            OrganisationCentrewiseJoiningCode joiningCodeDetails = null;
 
             int traineeEnumId = GetEnumIdByEnumCode("Trainee", "OrganisationJoiningCodeType");
-            joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
+            OrganisationCentrewiseJoiningCode joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == joiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
 
             if (IsNull(joiningCodeDetails))
                 throw new CoditechException(ErrorCodes.AlreadyExist, "Invalid Joining Code.");
 
             if (joiningCodeDetails.IsExpired)
                 throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
-            
-            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
-            CoditechViewRepository<DBTMNewRegistrationModel> objStoredProc = new CoditechViewRepository<DBTMNewRegistrationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMNewRegistrationModel> dBTMNewRegistrationList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+
+            if (joiningCodeDetails.IsInQueue && generalTrainerMasterId == 0)
+                throw new CoditechException(ErrorCodes.AlreadyExist, "This joining code is currently being used by another user. Please try again after some time.");
+
             DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel
             {
                 JoiningCode = joiningCode,
                 SelectedTrainerId = joiningCodeDetails.Custom1,
-                DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>()
             };
-
-            if (listModel.DBTMNewRegistrationList == null || listModel.DBTMNewRegistrationList.Count == 0)
-                throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator.");
+            joiningCodeDetails.IsInQueue = true;
+            joiningCodeDetails.QueueValidTill = DateTime.Now.AddMinutes(3);
+            _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
             return listModel;
         }
     }
