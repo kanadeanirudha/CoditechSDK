@@ -36,7 +36,7 @@ namespace Coditech.Admin.Controllers
                     }
                     else
                     {
-                        SetNotificationMessage(GetErrorNotificationMessage("No Joining Code found for this trainer."));
+                        SetNotificationMessage(GetErrorNotificationMessage("No Active Joining Code found for this trainer."));
                         return RedirectToAction("List", "GeneralTrainerMaster");
                     }
                 }

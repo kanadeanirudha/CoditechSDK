@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -256,7 +257,7 @@ namespace Coditech.API.Service
                 model.ErrorMessage = "Joining Code has expired.";
                 return model;
             }
-            if (joiningCodeDetails.IsInQueue)
+            if (joiningCodeDetails.IsInQueue && joiningCodeDetails.QueueValidTill.HasValue && joiningCodeDetails.QueueValidTill > DateTime.Now)
             {
                 model.HasError = true;
                 model.ErrorMessage = "This joining code is currently being used by another user. Please try again after some time.";
@@ -296,8 +297,26 @@ namespace Coditech.API.Service
                 SelectedTrainerId = joiningCodeDetails.Custom1,
             };
             joiningCodeDetails.IsInQueue = true;
-            joiningCodeDetails.QueueValidTill = DateTime.Now.AddMinutes(3);
+            joiningCodeDetails.QueueValidTill = DateTime.Now.AddMinutes(ApiCustomSettings.JoiningCodeQueueTimeInMinutes);
             _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
+            return listModel;
+        }
+
+        //trainers by joiningcode 
+        public virtual DBTMNewRegistrationListModel GetTrainerListByJoiningCode(string joiningCode)
+        {           
+        
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMNewRegistrationModel> objStoredProc = new CoditechViewRepository<DBTMNewRegistrationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMNewRegistrationModel> dBTMNewRegistrationList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel
+            {
+                DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>()
+            };
+            if (listModel.DBTMNewRegistrationList == null || listModel.DBTMNewRegistrationList.Count == 0)
+                throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator.");
             return listModel;
         }
     }

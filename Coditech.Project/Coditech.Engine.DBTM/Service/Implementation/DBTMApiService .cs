@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -442,16 +443,16 @@ namespace Coditech.API.Service
             List<OrganisationCentrewiseJoiningCode> list = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && x.QueueValidTill != null && x.IsInQueue && x.QueueValidTill <= DateTime.Now).ToList();
             if (list?.Count > 0)
             {
+                list.ForEach(x =>
+                { x.IsInQueue = false; x.QueueValidTill = null; });
                 _organisationCentrewiseJoiningCodeRepository.BatchUpdate(list);
             }
-            OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = _organisationCentrewiseJoiningCodeRepository.Table
-                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && !x.IsInQueue).FirstOrDefault();
-
+            OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && !x.IsInQueue).FirstOrDefault();
             OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = organisationCentrewiseJoiningCode.FromEntityToModel<OrganisationCentrewiseJoiningCodeModel>();
-            if(organisationCentrewiseJoiningCodeModel != null)
+            if (organisationCentrewiseJoiningCodeModel != null)
             {
                 organisationCentrewiseJoiningCode.IsInQueue = true;
-                organisationCentrewiseJoiningCode.QueueValidTill = DateTime.Now.AddMinutes(3);
+                organisationCentrewiseJoiningCode.QueueValidTill = DateTime.Now.AddMinutes(ApiCustomSettings.JoiningCodeQueueTimeInMinutes);
                 _organisationCentrewiseJoiningCodeRepository.Update(organisationCentrewiseJoiningCode);
             }
             return organisationCentrewiseJoiningCodeModel ?? new OrganisationCentrewiseJoiningCodeModel { JoiningCode = string.Empty, Custom3 = string.Empty };
