@@ -15,6 +15,5 @@ namespace Coditech.API.Client
         DBTMOrganisationCentrewiseJoiningCodeResponse GetTrainerActiveJoiningCode(string centreCode);
         OrganisationCentrewiseJoiningCodeListResponse GetTraineeActiveJoiningCodeList(string centreCode, string trainerId, int rows);
         TrueFalseResponse DeleteJoiningCodeFile(ParameterModel body);
-        bool IsTrainerJoiningCodeLocked(string joiningCode);
     }
 }

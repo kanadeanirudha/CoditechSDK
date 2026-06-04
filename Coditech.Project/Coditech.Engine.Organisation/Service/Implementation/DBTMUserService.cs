@@ -298,8 +298,6 @@ namespace Coditech.API.Service
                 {
                     string registrationType = dBTMCustomNewRegistrationModel?.RegistrationType;
                     joiningCodeDetails.IsExpired = true;
-                    joiningCodeDetails.IsInQueue = false;
-                    joiningCodeDetails.QueueValidTill = null;
                     joiningCodeDetails.Custom2 = registrationType;
                     _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
                     if (registrationType.Equals("Batch", StringComparison.InvariantCultureIgnoreCase))

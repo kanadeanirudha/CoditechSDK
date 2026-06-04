@@ -93,9 +93,7 @@ namespace Coditech.Admin.Agents
                 return null;
             DBTMOrganisationCentrewiseJoiningCodeViewModel dBTMOrganisationCentrewiseJoiningCodeViewModel = new DBTMOrganisationCentrewiseJoiningCodeViewModel
             {
-                JoiningCode = data.JoiningCode,
-                IsInQueue = data.IsInQueue,
-                QueueValidTill = data.QueueValidTill
+                JoiningCode = data.JoiningCode
             };
             return dBTMOrganisationCentrewiseJoiningCodeViewModel;
         }
@@ -152,10 +150,6 @@ namespace Coditech.Admin.Agents
                 _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.OrganisationCentrewiseJoiningCode.ToString(), TraceLevel.Error);
                 return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, GeneralResources.ErrorFailedToCreate);
             }
-        }
-        public bool IsTrainerJoiningCodeLocked(string joiningCode)
-        {
-            return _dBTMOrganisationCentrewiseJoiningCodeClient.IsTrainerJoiningCodeLocked(joiningCode);
         }
         #endregion
 

@@ -20,9 +20,5 @@ namespace Coditech.API.Endpoint
         {
             return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/GetTraineeActiveJoiningCodeList?centreCode={centreCode}&trainerId={trainerId}&rows={rows}";
         }
-        public string IsTrainerJoiningCodeLockedAsync(string joiningCode)
-        {
-            return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMOrganisationCentrewiseJoiningCode/IsTrainerJoiningCodeLocked?joiningCode={joiningCode}";
-        }
     }
 }

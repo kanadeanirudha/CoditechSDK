@@ -447,15 +447,6 @@ namespace Coditech.Admin.Controllers
         {
             DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-            if (!string.IsNullOrEmpty(joiningCode))
-            {
-                bool isLocked = _dBTMOrganisationCentrewiseJoiningCodeAgent.IsTrainerJoiningCodeLocked(joiningCode);
-                if (isLocked)
-                {
-                    SetNotificationMessage(GetErrorNotificationMessage("Joining code is already being used by another user. Please try again after some time." ));
-                    return RedirectToAction("List", new DataTableViewModel() { SelectedCentreCode = userModel?.SelectedCentreCode,SelectedParameter1 = trainerId.ToString()});
-                }
-            }
             if (trainerId == 0 && userModel?.Custom1 == CustomConstants.DBTMTrainer)
             {
                 trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? "")?.GeneralTrainerMasterId ?? 0;
@@ -479,7 +470,7 @@ namespace Coditech.Admin.Controllers
             if (list.HasError)
             {
                 SetNotificationMessage(GetErrorNotificationMessage(list.ErrorMessage));
-                return RedirectToAction("List", new DataTableViewModel(){ SelectedCentreCode = userModel?.SelectedCentreCode, SelectedParameter1 = trainerId.ToString()});
+                return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
             }
             joiningCode = list.JoiningCode;
             if (string.IsNullOrEmpty(joiningCodeTrainerId))

@@ -22,12 +22,6 @@ namespace Coditech.Admin.Controllers
             DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
             if (!string.IsNullOrEmpty(joiningCode))
             {
-                bool isLocked = _dBTMOrganisationCentrewiseJoiningCodeAgent.IsTrainerJoiningCodeLocked(joiningCode);
-                if (isLocked)
-                {
-                    SetNotificationMessage(GetErrorNotificationMessage("Joining code is being used by another user. Please try another joining code or try again after some time."));
-                    return RedirectToAction("List", "OrganisationCentrewiseJoiningCode");
-                }
                 dBTMNewRegistrationViewModel.JoiningCode = joiningCode;
             }
             else

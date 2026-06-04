@@ -92,12 +92,5 @@ namespace Coditech.Common.API
                 return Convert.ToInt16(settings["IsValidRecordButtonExpireTimeOnMobile"]);
             }
         }
-        public static int JoiningCodeQueueTimeInMinutes
-        {
-            get
-            {
-                return Convert.ToInt32(settings["JoiningCodeQueueTimeInMinutes"]);
-            }
-        }
     }
 }
