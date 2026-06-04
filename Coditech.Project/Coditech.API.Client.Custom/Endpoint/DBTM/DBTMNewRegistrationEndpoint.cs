@@ -19,11 +19,20 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/GetGeneralTrainerByJoiningCode?joiningCode={joiningCode}&generalTrainerMasterId={generalTrainerMasterId}";
             return endpoint;
         }
+        public string GetTrainerListByJoiningCode(string joiningCode)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/GetTrainerListByJoiningCode?joiningCode={joiningCode}";
+            return endpoint;
+        }
         public string ValidateTraineeJoiningCode(string joiningCode) =>
         $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/ValidateTraineeJoiningCode?joiningCode={joiningCode}";
         public string ConvertCampUserToBatchUserAsync()
         {
             return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralBatchMaster/ConvertCampUserToBatchUser";
+        }
+        public string GetJoiningCode(string generalTrainerMasterId)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetJoiningCode?generalTrainerMasterId={generalTrainerMasterId}";
         }
     }
 }

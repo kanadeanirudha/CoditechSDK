@@ -77,7 +77,7 @@ namespace Coditech.Admin.Helpers
             }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString()))
             {
-                GetGeneralTrainerByJoiningCodeList(dropdownViewModel, dropdownList);
+                GetTrainerListByJoiningCode(dropdownViewModel, dropdownList);
             }
             else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMGraph.ToString()))
             {
@@ -430,7 +430,7 @@ namespace Coditech.Admin.Helpers
                 });
             }
         }
-        private static void GetGeneralTrainerByJoiningCodeList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        private static void GetTrainerListByJoiningCode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         {
             if (dropdownViewModel.IsRequired)
                 dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
@@ -440,9 +440,7 @@ namespace Coditech.Admin.Helpers
             if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
             {
                 string joiningCode = (dropdownViewModel.Parameter);
-                long generalTrainerMasterId = 0;
-
-                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetGeneralTrainerByJoiningCode(joiningCode, generalTrainerMasterId);
+                DBTMNewRegistrationListResponse response = new DBTMNewRegistrationClient().GetTrainerListByJoiningCode(joiningCode);
                 DBTMNewRegistrationListModel list = new DBTMNewRegistrationListModel() { DBTMNewRegistrationList = response.DBTMNewRegistrationList };
                 foreach (var item in list?.DBTMNewRegistrationList.OrderBy(x => x.FirstName))
                 {

@@ -108,7 +108,8 @@ namespace Coditech.API.Service
             repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            return repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            List<OrganisationCentrewiseJoiningCodeModel> aa = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            return aa;
         }
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId, int rows)
@@ -148,10 +149,10 @@ namespace Coditech.API.Service
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTrainerActiveJoiningCode(string centreCode)
         {
-            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 323, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String); 
+            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@PageNo", 1, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Rows", 1, ParameterDirection.Input, DbType.Int32);
