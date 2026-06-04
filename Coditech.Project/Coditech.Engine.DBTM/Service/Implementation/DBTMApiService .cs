@@ -8,7 +8,7 @@ using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
 using System.Data;
-using System.Text.Json;
+using System.Transactions;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -78,72 +78,106 @@ namespace Coditech.API.Service
             if (IsNull(dBTMDeviceDataModelList))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
+            if (dBTMDeviceDataModelList.Count == 0)
+                return false;
 
-            if (dBTMDeviceDataModelList.Count > 0)
+            try
             {
-                DateTime? createdDate = null;
-                foreach (DBTMDeviceDataModel dBTMDeviceDataModel in dBTMDeviceDataModelList)
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    if (dBTMDeviceDataModel.PersonCode == "DryRun")
+                    // Cache trainee details to avoid duplicate DB hits
+                    var traineeCache = new Dictionary<string, DBTMTraineeDetails>(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var dBTMDeviceDataModel in dBTMDeviceDataModelList)
                     {
-                        continue;
-                    }
-                    createdDate = DateTime.Now;
-                    DBTMTraineeDetails dBTMTraineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
-
-                    if (IsNull(dBTMTraineeDetails))
-                        throw new CoditechException(ErrorCodes.InvalidData, "Invalid Person Code");
-
-                    DBTMDeviceData dBTMDeviceData = new DBTMDeviceData()
-                    {
-                        TypeOfRecord = dBTMDeviceDataModel.TypeOfRecord,
-                        TablePrimaryColumnId = dBTMDeviceDataModel.TablePrimaryColumnId,
-                        DeviceSerialCode = dBTMDeviceDataModel.DeviceSerialCode,
-                        PersonCode = dBTMDeviceDataModel.PersonCode,
-                        TestCode = dBTMDeviceDataModel.TestCode,
-                        Comments = dBTMDeviceDataModel.Comments,
-                        Height = dBTMDeviceDataModel.Height == 0 ? dBTMTraineeDetails.Height : dBTMDeviceDataModel.Height,
-                        Weight = dBTMDeviceDataModel.Weight == 0 ? dBTMTraineeDetails.Weight : dBTMDeviceDataModel.Weight,
-                        TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
-                        NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
-                        CreatedBy = dBTMDeviceDataModel.CreatedBy,
-                        CreatedDate = createdDate,
-                        IsValidRecord = true,
-                        AgeGroupEnumId = dBTMTraineeDetails.AgeGroupEnumId
-                    };
-
-                    DBTMDeviceData DBTMDeviceDataDetails = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
-
-                    if (DBTMDeviceDataDetails?.DBTMDeviceDataId > 0)
-                    {
-                        dBTMDeviceDataModel.DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId;
-                        List<DBTMDeviceDataDetails> dBTMDeviceDataDetailsList = new List<DBTMDeviceDataDetails>();
-                        foreach (var item in dBTMDeviceDataModel?.DataList)
+                        if (string.Equals(dBTMDeviceDataModel.PersonCode, "DryRun", StringComparison.OrdinalIgnoreCase))
                         {
-                            DBTMDeviceDataDetails dBTMDeviceDataDetails = new DBTMDeviceDataDetails()
-                            {
-                                DBTMDeviceDataId = DBTMDeviceDataDetails.DBTMDeviceDataId,
-                                ParameterCode = int.TryParse(Convert.ToString(item.ParameterCode), out int parameterCode)
-                                                ? ((TestParameterCode)parameterCode).ToString()
-                                                : Convert.ToString(item.ParameterCode),
-                                ParameterValue = EncryptionHelper.Encrypt(Convert.ToString(item.ParameterValue)),
-                                IsEncrypted = true,
-                                FromTo = item.FromTo,
-                                Row = item.Row,
-                                Unit = item.Unit,
-                                Comment1 = item.Comment1,
-                                Comment2 = item.Comment2,
-                                Comment3 = item.Comment3,
-                                CreatedBy = dBTMDeviceDataModel.CreatedBy,
-                                CreatedDate = createdDate
-                            };
-                            dBTMDeviceDataDetailsList.Add(dBTMDeviceDataDetails);
+                            continue;
                         }
-                        var data = _dBTMDeviceDataDetailsRepository.Insert(dBTMDeviceDataDetailsList, dBTMDeviceDataModel.CreatedBy);
+
+                        // Get trainee details from cache or DB
+                        if (!traineeCache.TryGetValue(dBTMDeviceDataModel.PersonCode, out DBTMTraineeDetails traineeDetails))
+                        {
+                            traineeDetails = GetDBTMTraineeDetailsByCode(dBTMDeviceDataModel.PersonCode);
+
+                            if (IsNull(traineeDetails))
+                                throw new CoditechException(ErrorCodes.InvalidData, $"Invalid Person Code : {dBTMDeviceDataModel.PersonCode}");
+                            traineeCache[dBTMDeviceDataModel.PersonCode] = traineeDetails;
+                        }
+                        DateTime createdDate = DateTime.Now;
+                        var dBTMDeviceData = new DBTMDeviceData
+                        {
+                            TypeOfRecord = dBTMDeviceDataModel.TypeOfRecord,
+                            TablePrimaryColumnId = dBTMDeviceDataModel.TablePrimaryColumnId,
+                            DeviceSerialCode = dBTMDeviceDataModel.DeviceSerialCode,
+                            PersonCode = dBTMDeviceDataModel.PersonCode,
+                            TestCode = dBTMDeviceDataModel.TestCode,
+                            Comments = dBTMDeviceDataModel.Comments,
+                            Height = dBTMDeviceDataModel.Height == 0 ? traineeDetails.Height : dBTMDeviceDataModel.Height,
+                            Weight = dBTMDeviceDataModel.Weight == 0 ? traineeDetails.Weight : dBTMDeviceDataModel.Weight,
+                            TestPerformedTime = dBTMDeviceDataModel.TestPerformedTime,
+                            NumberOfTurn = dBTMDeviceDataModel.NumberOfTurn,
+                            CreatedBy = dBTMDeviceDataModel.CreatedBy,
+                            CreatedDate = createdDate,
+                            IsValidRecord = true,
+                            AgeGroupEnumId = traineeDetails.AgeGroupEnumId
+                        };
+
+                        // Insert master record
+                        DBTMDeviceData insertedDeviceData = _dBTMDeviceDataRepository.Insert(dBTMDeviceData, dBTMDeviceDataModel.CreatedBy);
+
+                        if (insertedDeviceData?.DBTMDeviceDataId <= 0)
+                        {
+                            throw new CoditechException(ErrorCodes.InvalidData, "Failed to insert device data.");
+                        }
+
+                        // Insert detail records
+                        if (dBTMDeviceDataModel.DataList != null && dBTMDeviceDataModel.DataList.Count > 0)
+                        {
+                            var detailList = new List<DBTMDeviceDataDetails>(dBTMDeviceDataModel.DataList.Count);
+
+                            foreach (var item in dBTMDeviceDataModel.DataList)
+                            {
+                                string paramCodeStr = Convert.ToString(item.ParameterCode);
+                                string parameterCode = int.TryParse(paramCodeStr, out int parameterCodeInt) ? ((TestParameterCode)parameterCodeInt).ToString() : paramCodeStr;
+                                string parameterValue = item.ParameterValue.ToString() ?? string.Empty;
+                                string encryptedValue =EncryptionHelper.Encrypt(parameterValue);
+
+                                detailList.Add(new DBTMDeviceDataDetails
+                                {
+                                    DBTMDeviceDataId = insertedDeviceData.DBTMDeviceDataId,
+                                    ParameterCode = parameterCode,
+                                    ParameterValue = encryptedValue,
+                                    IsEncrypted = true,
+                                    FromTo = item.FromTo,
+                                    Row = item.Row,
+                                    Unit = item.Unit,
+                                    Comment1 = item.Comment1,
+                                    Comment2 = item.Comment2,
+                                    Comment3 = item.Comment3,
+                                    CreatedBy = dBTMDeviceDataModel.CreatedBy,
+                                    CreatedDate = createdDate
+                                });
+                            }
+
+                            var insertedDetails =_dBTMDeviceDataDetailsRepository.Insert(detailList,dBTMDeviceDataModel.CreatedBy);
+
+                            if (insertedDetails == null)
+                            {
+                                throw new CoditechException(ErrorCodes.InvalidData,"Failed to insert device data details.");
+                            }
+                        }
                     }
+
+                    scope.Complete();
+                    return true;
                 }
             }
-            return true;
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex,"InsertDeviceData failed. Transaction rolled back.");
+                return false;
+            }
         }
 
         //Add DBTMDeviceData.

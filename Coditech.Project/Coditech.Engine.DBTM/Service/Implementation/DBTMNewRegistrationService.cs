@@ -385,7 +385,8 @@ namespace Coditech.API.Service
         private List<short> InsertOrganisationCentrewiseDepartment(DateTime currentDate, OrganisationCentreMaster organisationCentreMaster)
         {
             List<string> departmentList = new List<string>();
-            departmentList = ("DBTMCentreDirector,DBTMManager,DBTMTrainer").Split(",").ToList();
+            //departmentList = ("DBTMCentreDirector,DBTMManager,DBTMTrainer").Split(",").ToList();
+            departmentList = ("DBTMCentreDirector,DBTMTrainer").Split(",").ToList();
             List<short> generalDepartmentMasterList = new CoditechRepository<GeneralDepartmentMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => departmentList.Contains(x.DepartmentShortCode))?.Select(x => x.GeneralDepartmentMasterId).ToList();
             if (generalDepartmentMasterList?.Count == 0)
             {
