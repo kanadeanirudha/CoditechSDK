@@ -7,23 +7,23 @@
     DropdownViewModel joiningCodeType = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "OrganisationCentrewiseJoiningCodeType", DropdownSelectedValue = Model.JoiningCodeType };
     DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTrainerCentrewise.ToString(), DropdownName = "Custom1", DropdownSelectedValue = Convert.ToString(Model.Custom1), Parameter = Model.CentreCode, IsCustomDropdown = true, ChangeEvent = "DBTMOrganisationCentrewiseJoiningCode.GetDBTMBatchListByCentreCodeAndTrainer();" };
     DropdownViewModel batchDropdown = new DropdownViewModel()
-    {
-        DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
-        DropdownName = "Custom3",
-        DropdownSelectedValue = Convert.ToString(Model.Custom3),
-        Parameter = $"{Model.CentreCode}~{Model.JoiningCodeTypeEnumId}~{(Model.Custom1 ?? "0")}",
-        IsCustomDropdown = true
-    };
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
+                DropdownName = "Custom3",
+                DropdownSelectedValue = Convert.ToString(Model.Custom3),
+                Parameter = $"{Model.CentreCode}~{Model.JoiningCodeTypeEnumId}~{(Model.Custom1 ?? "0")}",
+                IsCustomDropdown = true
+            };
     PageHeaderViewModel headerModel = new PageHeaderViewModel
-    {
-        Title = ViewBag.Title,
-        SaveButtonText = GeneralResources.SaveButtonText,
-        CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
-        CancelButtonText = GeneralResources.CancelButtonText,
-        ControllerName = controllerName,
-        ActionName = actionName,
-        FormId = AdminConstants.FormId + controllerName,
-    };
+            {
+                Title = ViewBag.Title,
+                SaveButtonText = GeneralResources.SaveButtonText,
+                CancelUrl = Url.Action(AdminConstants.ActionRedirectToList, controllerName),
+                CancelButtonText = GeneralResources.CancelButtonText,
+                ControllerName = controllerName,
+                ActionName = actionName,
+                FormId = AdminConstants.FormId + controllerName,
+            };
 }
 <!-- Page Content-->
 <div class="page-content">
@@ -44,65 +44,67 @@
                                         @Html.ValidationMessageFor(x => x.CentreCode)
                                     </div>
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.JoiningCodeType, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                                        {
-                                            DropdownSelectedValue = Model.JoiningCodeTypeEnumId.ToString(),
-                                            DropdownName = "JoiningCodeTypeEnumId",
-                                            GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString()
-                                        })        @Html.ValidationMessageFor(x => x.JoiningCodeTypeEnumId)
+                               {
+                                   DropdownSelectedValue = Model.JoiningCodeTypeEnumId.ToString(),
+                                   DropdownName = "JoiningCodeTypeEnumId",
+                                   GroupCode = DropdownTypeEnum.OrganisationJoiningCodeType.ToString()
+                               })        @Html.ValidationMessageFor(x => x.JoiningCodeTypeEnumId)
                                     </div>
                                 </div>
-                                <div class="col-lg-6" id="custom1Div">
+                                <div class="col-lg-4" id="custom1Div">
                                     <label class="form-label required" for="UserName">Trainer</label>
                                     <div class="mb-3">
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
                                         @Html.ValidationMessageFor(x => x.Custom1)
                                     </div>
                                 </div>
-                                <div class="col-lg-3" id="custom3Div">
+                                <div class="col-lg-4" id="custom3Div">
                                     <label class="form-label">Batch</label>
                                     <div class="mb-3">
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
                                         @Html.ValidationMessageFor(x => x.Custom3)
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.Quantity, new { @class = "form-label required" })
                                         @Html.TextBoxFor(x => x.Quantity, new { @class = "form-control", onkeypress = "return CoditechCommon.ValidNumeric()", maxlength = "3", min = "1" })
                                         @Html.ValidationMessageFor(x => x.Quantity)
                                     </div>
                                 </div>
-                               @*  <div class="col-lg-3">
-                                    <label class="form-label">Need to Block Joining Code?</label>
+                                <div class="col-lg-2" id="reservedDiv">
+                                    <label class="form-label">Need to Reserved Joining Code?</label>
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.IsBlock, new { @class = "form-label" })
                                         <div class="form-check">
-                                            @Html.CheckBoxFor(x => x.IsBlock, new { @class = "form-check-input" })
+                                            @Html.CheckBoxFor(x => x.IsReserved, new { @class = "form-check-input" })
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-2" id="expiryDiv">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.QueueValidTill, new { @class = "form-label required" })
+                                        <label class="form-label">Expiry Time</label>
                                         <div class="d-flex gap-3">
                                             @Html.DropDownListFor(x => x.ValidTillHours,
-                                                     new SelectList(Enumerable.Range(0, 12).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
+                                                     new SelectList(Enumerable.Range(0, 49).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
                                                      "Value", "Text"),
                                                      "HH",
                                                      new { @class = "form-select", id = "ValidTillHours" })
-
                                             @Html.DropDownListFor(x => x.ValidTillMinutes,
                                                      new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
                                                      "Value", "Text"),
                                                      "MM",
                                                      new { @class = "form-select", id = "ValidTillMinutes" })
                                         </div>
+                                        <small class="text-danger  d-block mt-1">
+                                            Note: Reserved joining codes will expire automatically after the selected Expiry Time.
+                                        </small>
+                                        <span data-valmsg-for="QueueValidTill" class="text-danger field-validation-valid"></span>
                                     </div>
-                                </div> *@
+                                </div>
                             </div>
                             @*  <button type="submit" class="btn btn-success">@AdminResources.LabelSave</button>
                         <a href="../@controllerName/List" class="btn btn-secondary"><i class="ft-x"></i>@AdminResources.LabelCancel</a>*@         
@@ -115,31 +117,58 @@
 </div>
 <!-- 1. jQuery library -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <!-- 2. Tumhara custom JS file -->
 <script src="~/js/coditech/DBTM/DBTMOrganisationCentrewiseJoiningCode.js"></script>
-
 <script>
     $(document).ready(function () {
-    DBTMOrganisationCentrewiseJoiningCode.Initialize();
-    DBTMOrganisationCentrewiseJoiningCode.GetDBTMTrainerListByCentreCode();
+        DBTMOrganisationCentrewiseJoiningCode.Initialize();
+        DBTMOrganisationCentrewiseJoiningCode.GetDBTMTrainerListByCentreCode();
+        $('#reservedDiv').hide();
+        $('#expiryDiv').hide();
+        $('#JoiningCodeTypeEnumId').change(function () {
+            var joiningTypeText = $("#JoiningCodeTypeEnumId option:selected").text().trim();
+            if (joiningTypeText === "Trainee") {
+                $('#reservedDiv').show();
+                if ($('#IsReserved').is(':checked')) {
+                    $('#expiryDiv').show();
+                } else {
+                    $('#expiryDiv').hide();
+                }
+            }
+            else {
+                $('#reservedDiv').hide();
+                $('#expiryDiv').hide();
+                $('#IsReserved').prop('checked', false);
+                $('#ValidTillHours').val('');
+                $('#ValidTillMinutes').val('');
+                $('[data-valmsg-for="QueueValidTill"]').text('');
+            }
+        });
+        $('#IsReserved').change(function () {
+            if ($(this).is(':checked')) {
+                $('#expiryDiv').show();
+            }
+            else {
+                $('#expiryDiv').hide();
+                $('#ValidTillHours').val('');
+                $('#ValidTillMinutes').val('');
+                $('[data-valmsg-for="QueueValidTill"]').text('');
+            }
+        });
+        $('#JoiningCodeTypeEnumId').trigger('change');
     });
-    $('form').submit(function (e) {
-        var hours = $('#ValidTillHours').val();
-        var minutes = $('#ValidTillMinutes').val();
-        if (hours === "00" && minutes === "00") 
-        {
-            var validationSpan = $('[data-valmsg-for="Duration"]');
-            validationSpan.text("Duration cannot be 00 Hours and 00 Minutes.");
-            validationSpan.addClass("field-validation-error").removeClass("field-validation-valid");
-            e.preventDefault();
-        } else {
-              var validationSpan = $('[data-valmsg-for="Duration"]');
-              validationSpan.text("");
-              validationSpan.addClass("field-validation-valid").removeClass("field-validation-error");
+       $('form').submit(function (e) {
+        if ($('#IsReserved').is(':checked')) {
+            var hours = $('#ValidTillHours').val();
+            var minutes = $('#ValidTillMinutes').val();
+            var validationSpan = $('[data-valmsg-for="QueueValidTill"]');
+            if ((!hours || hours === "00") && (!minutes || minutes === "00")) {
+                validationSpan
+                    .text("Expiry Time is required.").addClass("field-validation-error").removeClass("field-validation-valid");
+                e.preventDefault();
+                return false;
+            }
+            validationSpan.text("").addClass("field-validation-valid").removeClass("field-validation-error");
         }
     });
 </script>
-
-
-

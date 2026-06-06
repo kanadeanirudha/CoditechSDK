@@ -73,7 +73,6 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTraineeDetails/List.cshtml", list);
         }
 
-
         public ActionResult ActiveMemberList(DataTableViewModel dataTableViewModel)
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
@@ -99,7 +98,6 @@ namespace Coditech.Admin.Controllers
             }
             return View($"~/Views/DBTM/DBTMTraineeDetails/List.cshtml", list);
         }
-
         public ActionResult InActiveMemberList(DataTableViewModel dataTableViewModel)
         {
             DBTMTraineeDetailsListViewModel list = new DBTMTraineeDetailsListViewModel();
