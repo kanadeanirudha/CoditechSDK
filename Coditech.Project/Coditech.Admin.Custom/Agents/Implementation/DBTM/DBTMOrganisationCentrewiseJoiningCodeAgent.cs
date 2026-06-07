@@ -187,6 +187,12 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "IsExpired",
                 IsSortable = false,
             });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Expiry Time",
+                ColumnCode = "QueueValidTill",
+                IsSortable = false,
+            });
             return datatableColumnList;
         }
         #endregion

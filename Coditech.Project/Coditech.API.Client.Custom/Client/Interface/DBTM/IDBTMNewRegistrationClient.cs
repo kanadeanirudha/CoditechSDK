@@ -25,8 +25,10 @@ namespace Coditech.API.Client
         /// <param name="joiningCode">joiningCode</param>
         /// <returns>Returns Response.</returns>
         DBTMNewRegistrationListResponse GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId);
+        DBTMNewRegistrationListResponse GetTrainerListByJoiningCode(string joiningCode);
         TrueFalseResponse ConvertCampUserToBatchUser(long dBTMTraineeDetailId);
         DBTMNewRegistrationResponse ValidateTrainerJoiningCode(string joiningCode);
         DBTMNewRegistrationResponse ValidateTraineeJoiningCode(string joiningCode);
+        OrganisationCentrewiseJoiningCodeResponse GetJoiningCode(string trainerId);
     }
 }
