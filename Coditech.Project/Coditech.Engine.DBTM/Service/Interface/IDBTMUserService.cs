@@ -10,5 +10,6 @@ namespace Coditech.API.Service
         DBTMUserModel GetDBTMTraineeDetails(long entityId, string userType);
         DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId);
         DBTMNewRegistrationModel ValidateTraineeJoiningCode(string joiningCode);
+        DBTMNewRegistrationListModel GetTrainerListByJoiningCode(string joiningCode);
     }
 }
