@@ -72,7 +72,7 @@ namespace Coditech.Engine.DBTM.Controllers
                 {
                     DataUniqueIds = string.Join(",",model.Where(x => !string.IsNullOrEmpty(x.DataUniqueId)).Select(x => x.DataUniqueId));
                 }
-                return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status, DataUniqueIds = DataUniqueIds });
+                return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status, DUI = DataUniqueIds });
             }
             catch (CoditechException ex)
             {
