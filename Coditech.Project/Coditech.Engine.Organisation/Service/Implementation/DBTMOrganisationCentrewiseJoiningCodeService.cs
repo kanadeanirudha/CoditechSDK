@@ -83,8 +83,8 @@ namespace Coditech.API.Service
             }
             if (organisationCentrewiseJoiningCodeModel.IsReserved)
             {
-                var enumValue = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == Convert.ToInt32(organisationCentrewiseJoiningCodeModel.ValidTillHours)).Select(x => x.EnumValue).FirstOrDefault();
-                organisationCentrewiseJoiningCodeModel.QueueValidTill = DateTime.Now.AddHours(Convert.ToDouble(enumValue));
+                string hours = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == Convert.ToInt32(organisationCentrewiseJoiningCodeModel.ValidTillHours)).Select(x => x.EnumName).FirstOrDefault();
+                organisationCentrewiseJoiningCodeModel.QueueValidTill =  DateTime.Now.AddHours(Convert.ToDouble(hours));
             }
             List<OrganisationCentrewiseJoiningCode> insertList = new List<OrganisationCentrewiseJoiningCode>();
             for (int i = 1; i <= organisationCentrewiseJoiningCodeModel.Quantity; i++)
