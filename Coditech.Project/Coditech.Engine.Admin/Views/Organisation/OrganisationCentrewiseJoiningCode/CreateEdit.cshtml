@@ -88,59 +88,20 @@
                                     <div class="mb-3">
                                         <label class="form-label">Expiry Time</label>
                                         <div class="d-flex gap-3">
-                                            @Html.DropDownListFor(x => x.ValidTillHours,
-                                                     new SelectList(new[] {
-                                                        new { Value = "1", Text = "1 hr" },
-                                                        new { Value = "2", Text = "2 hr" },
-                                                        new { Value = "3", Text = "3 hr" },
-                                                        new { Value = "4", Text = "4 hr" },
-                                                        new { Value = "5", Text = "5 hr" },
-                                                        new { Value = "6", Text = "6 hr" },
-                                                        new { Value = "7", Text = "7 hr" },
-                                                        new { Value = "8", Text = "8 hr" },
-                                                        new { Value = "9", Text = "9 hr" },
-                                                        new { Value = "10", Text = "10 hr" },
-                                                        new { Value = "11", Text = "11 hr" },
-                                                        new { Value = "12", Text = "12 hr" },
-                                                        new { Value = "24", Text = "1 Day" },
-                                                        new { Value = "48", Text = "2 Day" },
-                                                        new { Value = "72", Text = "3 Day" },
-                                                        new { Value = "96", Text = "4 Day" },
-                                                        new { Value = "120", Text = "5 Day" },
-                                                        new { Value = "144", Text = "6 Day" },
-                                                        new { Value = "168", Text = "7 Day" },
-                                                        new { Value = "192", Text = "8 Day" },
-                                                        new { Value = "216", Text = "9 Day" },
-                                                        new { Value = "240", Text = "10 Day" },
-                                                        new { Value = "264", Text = "11 Day" },
-                                                        new { Value = "288", Text = "12 Day" },
-                                                        new { Value = "312", Text = "13 Day" },
-                                                        new { Value = "336", Text = "14 Day" },
-                                                        new { Value = "360", Text = "15 Day" },
-                                                        new { Value = "720", Text = "1 month" },
-                                                        new { Value = "1440", Text = "2 month" },
-                                                        new { Value = "2160", Text = "3 month" },
-                                                        new { Value = "2880", Text = "4 month" },
-                                                        new { Value = "3600", Text = "5 month" },
-                                                        new { Value = "4320", Text = "6 month" },
-                                                        new { Value = "8760", Text = "1 Year" },
-                                                        new { Value = "17520", Text = "2 Year" },
-                                                        new { Value = "26280", Text = "3 Year" },
-                                                        new { Value = "35040", Text = "4 Year" },
-                                                        new { Value = "43800", Text = "5 Year" }
-                                                     }, "Value", "Text"),
-                                                     "HH",
-                                                     new { @class = "form-select", id = "ValidTillHours" })
-                                            @Html.DropDownListFor(x => x.ValidTillMinutes,
-                                                     new SelectList(Enumerable.Range(0, 60).Where(i => i % 5 == 0).Select(i => new { Value = i.ToString("D2"), Text = i.ToString("D2") }),
-                                                     "Value", "Text"),
-                                                     "MM",
-                                                     new { @class = "form-select", id = "ValidTillMinutes" })
+                                            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
+                                                     new DropdownViewModel()
+                                        {
+                                            DropdownSelectedValue = Convert.ToString(Model.ValidTillHours),
+                                            DropdownName = "ValidTillHours",
+                                            GroupCode = DropdownCustomTypeEnum.JoiningCodeExpiryTime.ToString(),
+                                            IsRequired = true
+                                        })
                                         </div>
+                                        @Html.ValidationMessageFor(x => x.ValidTillHours)
                                         <small class="text-danger  d-block mt-1">
                                             Note: Reserved joining codes will expire automatically after the selected Expiry Time.
                                         </small>
-                                        <span data-valmsg-for="QueueValidTill" class="text-danger field-validation-valid"></span>
+                                        <span data-valmsg-for="ValidTillHours" class="text-danger field-validation-valid"></span>
                                     </div>
                                 </div>
                             </div>
@@ -179,7 +140,7 @@
                 $('#IsReserved').prop('checked', false);
                 $('#ValidTillHours').val('');
                 $('#ValidTillMinutes').val('');
-                $('[data-valmsg-for="QueueValidTill"]').text('');
+                $('[data-valmsg-for="ValidTillHours"]').text('');
             }
         });
         $('#IsReserved').change(function () {
@@ -190,23 +151,25 @@
                 $('#expiryDiv').hide();
                 $('#ValidTillHours').val('');
                 $('#ValidTillMinutes').val('');
-                $('[data-valmsg-for="QueueValidTill"]').text('');
+                $('[data-valmsg-for="ValidTillHours"]').text('');
             }
         });
         $('#JoiningCodeTypeEnumId').trigger('change');
     });
-       $('form').submit(function (e) {
-        if ($('#IsReserved').is(':checked')) {
-            var hours = $('#ValidTillHours').val();
-            var minutes = $('#ValidTillMinutes').val();
-            var validationSpan = $('[data-valmsg-for="QueueValidTill"]');
-            if ((!hours || hours === "00") && (!minutes || minutes === "00")) {
-                validationSpan
-                    .text("Expiry Time is required.").addClass("field-validation-error").removeClass("field-validation-valid");
-                e.preventDefault();
-                return false;
+    $('form').submit(function (e) {
+         $(document).on('submit', 'form', function (e) {
+
+            if ($('#IsReserved').is(':checked')) {
+
+                var expiryTime = $('#ValidTillHours option:selected').val();
+
+                if (expiryTime == null || expiryTime == '' || expiryTime == '0') {
+
+                    $('[data-valmsg-for="ValidTillHours"]').text('Please select Expiry Time.');
+                    e.preventDefault();
+                    return false;
+                }
             }
-            validationSpan.text("").addClass("field-validation-valid").removeClass("field-validation-error");
-        }
+        });
     });
 </script>
