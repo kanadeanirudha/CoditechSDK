@@ -90,6 +90,8 @@ namespace Coditech.Common.API.Model
             get => DataList;
             set => DataList = value;
         }
+        [JsonPropertyName("DUI")]
+        public string DataUniqueId { get; set; }
     }
 
     public class DBTMDeviceDataDetailModel

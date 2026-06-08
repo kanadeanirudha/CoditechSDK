@@ -32,8 +32,9 @@
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", !item.IsExpired)
                             </td>
+                            <td>@item.QueueValidTill</td>
                             <td class="text-center data-action">
-                                @if (!item.IsExpired)
+                                @if (!item.IsExpired && !item.IsReserved)
                                 {
                                     <a data-bs-toggle="modal"
                                        data-bs-target="#@sendDetailsModel.ModelPopUpId"
@@ -69,7 +70,7 @@
                                     }
                                 }
                             </td>
-
+                          
                         </tr>
                     }
                 }

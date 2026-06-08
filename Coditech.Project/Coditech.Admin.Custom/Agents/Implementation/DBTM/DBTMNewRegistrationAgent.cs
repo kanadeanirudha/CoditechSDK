@@ -286,6 +286,35 @@ namespace Coditech.Admin.Agents
             }
             return model;
         }
+        public virtual OrganisationCentrewiseJoiningCodeViewModel GetJoiningCode(string trainerId)
+        {
+            OrganisationCentrewiseJoiningCodeViewModel organisationCentrewiseJoiningCodeViewModel = new OrganisationCentrewiseJoiningCodeViewModel();
+            try
+            {
+                OrganisationCentrewiseJoiningCodeResponse response = _dBTMNewRegistrationClient.GetJoiningCode(trainerId);
+                OrganisationCentrewiseJoiningCodeModel model = response?.OrganisationCentrewiseJoiningCodeModel;
+                return IsNotNull(model) ? model.ToViewModel<OrganisationCentrewiseJoiningCodeViewModel>() : new OrganisationCentrewiseJoiningCodeViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                organisationCentrewiseJoiningCodeViewModel.ErrorMessage = ex.Message;
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TraineeRegistration.ToString(), TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, ex.ErrorMessage);
+                    case ErrorCodes.InvalidData:
+                        return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, ex.ErrorMessage);
+                    default:
+                        return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, GeneralResources.ErrorCodeExists);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TraineeRegistration.ToString(), TraceLevel.Error);
+                return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, GeneralResources.UpdateErrorMessage);
+            }
+        }
         #endregion
     }
 }

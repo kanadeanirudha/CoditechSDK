@@ -8,7 +8,6 @@ namespace Coditech.Admin.Controllers
     public class DBTMOrganisationCentrewiseJoiningCodeController : BaseController
     {
         private readonly IDBTMOrganisationCentrewiseJoiningCodeAgent _dBTMOrganisationCentrewiseJoiningCodeAgent;
-
         public DBTMOrganisationCentrewiseJoiningCodeController(IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent)
         {
             _dBTMOrganisationCentrewiseJoiningCodeAgent = dBTMOrganisationCentrewiseJoiningCodeAgent;
@@ -27,7 +26,6 @@ namespace Coditech.Admin.Controllers
             _dBTMOrganisationCentrewiseJoiningCodeAgent.DeleteJoiningCodeFile(fileName);
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
-
         #region Protected
         #endregion
     }

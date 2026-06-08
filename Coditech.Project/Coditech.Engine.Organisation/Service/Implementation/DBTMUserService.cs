@@ -66,27 +66,6 @@ namespace Coditech.API.Service
             _generalEnumaratorGroupRepository = new CoditechRepository<GeneralEnumaratorGroup>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
-        //public override UserModel Login(UserLoginModel userLoginModel)
-        //{
-        //    UserModel model = base.Login(userLoginModel);
-
-        //    if (!model.HasError && model.UserType != UserTypeEnum.Admin.ToString())
-        //    {
-        //        GeneralPersonModel generalPersonModel = GetGeneralPersonDetailsByEntityType(model.EntityId, model.UserType);
-        //        if (!string.IsNullOrEmpty(generalPersonModel.Custom1))
-        //        {
-        //            model.Custom1 = generalPersonModel.Custom1;
-        //        }
-        //        if (model.Custom1 == CustomConstants.DBTMTrainer || model.Custom1 == CustomConstants.DBTMCentreOwner)
-        //        {
-        //            DBTMCustomUserModel dBTMCustomUserModel = new DBTMCustomUserModel();
-        //            dBTMCustomUserModel.GeneralTrainerMasterId = _generalTrainerMasterRepository.Table.Where(x => x.EmployeeId == model.EntityId)?.Select(y => y.GeneralTrainerMasterId)?.FirstOrDefault();
-        //            model.Custom3 = JsonConvert.SerializeObject(dBTMCustomUserModel);
-        //        }
-        //    }
-        //    return model;
-        //}
-
         public override ChangePasswordModel ChangePassword(ChangePasswordModel changePasswordModel)
         {
             if (IsNull(changePasswordModel))
@@ -202,7 +181,7 @@ namespace Coditech.API.Service
         private void InsertDBTMTraineeDetails(GeneralPersonModel generalPersonModel, List<GeneralSystemGlobleSettingModel> settingMasterList, string customData = null)
         {
             DBTMCustomNewRegistrationModel dBTMCustomNewRegistrationModel = !string.IsNullOrEmpty(customData) ? JsonConvert.DeserializeObject<DBTMCustomNewRegistrationModel>(customData) : new DBTMCustomNewRegistrationModel();
-            generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);       
+            generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
             if (dBTMCustomNewRegistrationModel.AgeGroupEnumId <= 0)
             {
                 dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
@@ -267,6 +246,11 @@ namespace Coditech.API.Service
                 joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.FirstOrDefault(x => x.JoiningCode == dBTMCustomNewRegistrationModel.JoiningCode && x.JoiningCodeTypeEnumId == traineeEnumId);
                 if (IsNull(joiningCodeDetails))
                     throw new CoditechException(ErrorCodes.AlreadyExist, string.Format("Invalid Trainee Joining Code."));
+                if (!joiningCodeDetails.IsExpired && joiningCodeDetails.IsReserved && joiningCodeDetails.QueueValidTill.HasValue && joiningCodeDetails.QueueValidTill <= DateTime.Now)
+                {
+                    joiningCodeDetails.IsExpired = true;
+                    _organisationCentrewiseJoiningCodeRepository.Update(joiningCodeDetails);
+                }
                 if (joiningCodeDetails.IsExpired)
                     throw new CoditechException(ErrorCodes.InvalidData, "Joining Code has expired.");
                 ValidateCentreUserLimit(joiningCodeDetails.CentreCode, dBTMCustomNewRegistrationModel?.RegistrationType);
@@ -1046,7 +1030,7 @@ namespace Coditech.API.Service
         private int GetTemplateIdByCode(string templateCode)
         {
             return new CoditechRepository<GeneralTemplateMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.TemplateCode == templateCode).Select(x => x.GeneralTemplateMasterId).FirstOrDefault();
-        }      
+        }
         private bool IsDeviceSerialCodeAlreadyExist(long dBTMDeviceMasterId)
         {
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
