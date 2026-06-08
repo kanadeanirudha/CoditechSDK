@@ -33,11 +33,16 @@ namespace Coditech.API.Service
         {
             string selectedCentreCode = filters?.Find(x => string.Equals(x.FilterName, FilterKeys.SelectedCentreCode, StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
             filters.RemoveAll(x => x.FilterName == FilterKeys.SelectedCentreCode);
-
             int JoiningCodeTypeEnumId = Convert.ToInt32(filters?.Find(x => string.Equals(x.FilterName, FilterKeys.JoiningCodeTypeEnumId, StringComparison.CurrentCultureIgnoreCase))?.FilterValue);
             filters.RemoveAll(x => x.FilterName == FilterKeys.JoiningCodeTypeEnumId);
             string trainerId = filters?.Find(x => string.Equals(x.FilterName, "Custom1", StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
             filters.RemoveAll(x => string.Equals(x.FilterName, "Custom1", StringComparison.CurrentCultureIgnoreCase));
+            List<OrganisationCentrewiseJoiningCode> joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => !x.IsExpired && x.IsReserved && x.QueueValidTill.HasValue && x.QueueValidTill <= DateTime.Now).ToList();
+            if (joiningCodeDetails.Count > 0)
+            {
+                joiningCodeDetails.ForEach(x => x.IsExpired = true);
+                _organisationCentrewiseJoiningCodeRepository.BatchUpdate(joiningCodeDetails);
+            }
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> objStoredProc = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
@@ -76,6 +81,11 @@ namespace Coditech.API.Service
                     throw new CoditechException(ErrorCodes.InvalidData, $"Joining code limit exceeded. Allowed: {allowJoiningCodeCount.Value}, Existing: {existingJoiningCodeCount}. Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
                 }
             }
+            if (organisationCentrewiseJoiningCodeModel.IsReserved)
+            {
+                string hours = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == Convert.ToInt32(organisationCentrewiseJoiningCodeModel.ValidTillHours)).Select(x => x.EnumName).FirstOrDefault();
+                organisationCentrewiseJoiningCodeModel.QueueValidTill =  DateTime.Now.AddHours(Convert.ToDouble(hours));
+            }
             List<OrganisationCentrewiseJoiningCode> insertList = new List<OrganisationCentrewiseJoiningCode>();
             for (int i = 1; i <= organisationCentrewiseJoiningCodeModel.Quantity; i++)
             {
@@ -86,7 +96,9 @@ namespace Coditech.API.Service
                     CentreCode = organisationCentrewiseJoiningCodeModel.CentreCode,
                     JoiningCodeTypeEnumId = organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId,
                     Custom1 = organisationCentrewiseJoiningCodeModel.Custom1,
-                    Custom3 = organisationCentrewiseJoiningCodeModel.Custom3
+                    Custom3 = organisationCentrewiseJoiningCodeModel.Custom3,
+                    QueueValidTill = organisationCentrewiseJoiningCodeModel.QueueValidTill,
+                    IsReserved = organisationCentrewiseJoiningCodeModel.IsReserved,
                 });
             }
             _organisationCentrewiseJoiningCodeRepository.Insert(insertList, organisationCentrewiseJoiningCodeModel.CreatedBy);
@@ -103,7 +115,7 @@ namespace Coditech.API.Service
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 324, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
-            repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@WhereClause", "IsExpired = 0 AND IsReserved = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
