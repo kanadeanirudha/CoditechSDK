@@ -1,6 +1,6 @@
 ﻿namespace Coditech.Common.API.Model.Response;
 
-public class CustomTrueFalseResponse 
+public class CustomTrueFalseResponse
 {
     public bool IsSuccess { get; set; }
     public bool HasError { get; set; }
@@ -9,5 +9,5 @@ public class CustomTrueFalseResponse
 
     public int? ErrorCode { get; set; }
 
-    public string DataUniqueIds { get; set; }
+    public string DUI { get; set; }
 }
