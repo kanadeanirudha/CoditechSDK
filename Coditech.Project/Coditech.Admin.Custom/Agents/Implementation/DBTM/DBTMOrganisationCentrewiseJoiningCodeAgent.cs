@@ -193,6 +193,12 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "QueueValidTill",
                 IsSortable = false,
             });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Is Reserved Joining Code",
+                ColumnCode = "IsReserved",
+                IsSortable = false,
+            });
             return datatableColumnList;
         }
         #endregion
