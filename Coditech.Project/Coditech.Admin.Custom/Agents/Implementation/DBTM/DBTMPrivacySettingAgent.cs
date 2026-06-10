@@ -138,13 +138,13 @@ namespace Coditech.Admin.Agents
            
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Notification On",
+                ColumnName = "Notification On",
                 ColumnCode = "IsNotificationOn",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Location On",
+                ColumnName = "Location On",
                 ColumnCode = "IsLocationOn",
                 IsSortable = true,
             });

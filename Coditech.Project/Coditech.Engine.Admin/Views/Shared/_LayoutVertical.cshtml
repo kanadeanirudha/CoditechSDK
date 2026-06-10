@@ -214,7 +214,8 @@
                     </li> *@
                         @if (userData?.BalanceSheetList?.Count > 0)
                         {
-                            @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData);
+                            @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData)
+                            ;
                         }
                         @Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
                     </ul><!--end topbar-nav-->
@@ -226,7 +227,14 @@
                             </button>
                         </li>
                         <li class="d-flex">
-                            <h4 class="center-name m-0">DBTM</h4>
+                            @if (userData.AccessibleCentreList != null && userData.AccessibleCentreList.Count > 1)
+                            {
+                                <h4 class="center-name m-0">@userData.AccessibleCentreList.FirstOrDefault().CentreName</h4>
+                            }
+                            else
+                            {
+                                <h4 class="center-name m-0">Powered Sports Tech</h4>
+                            }
                         </li>
                     </ul>
                 </nav>

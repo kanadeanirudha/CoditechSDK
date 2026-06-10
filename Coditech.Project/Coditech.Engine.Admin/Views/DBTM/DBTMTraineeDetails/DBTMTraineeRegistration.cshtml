@@ -66,10 +66,10 @@
                                     <div class="mb-1">
                                         <label class="form-label">&nbsp;</label>
                                         <div class="form-check" style="padding-left:0px !important; display:block !important">
-                                            @if (!isTrainer)
-                                            {
+                                            @* @if (!isTrainer)
+                                            { *@
                                                 <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
-                                            }
+                                            @* } *@
                                         </div>
                                     </div>
                                 </div>
@@ -80,7 +80,13 @@
                                             @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
                                             @Html.ListBoxFor(m => m.SelectedTrainer,
                                                      new SelectList(Model.AllTrainerList, "Value", "Text"),
-                                                     new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                                     new
+                                                     {
+                                                         @class = "selectpicker form-control",
+                                                         multiple = "multiple",
+                                                         data_live_search = "true",
+                                                         disabled = "disabled"   // makes dropdown readonly 
+                                                     })
                                             @Html.ValidationMessageFor(x => x.SelectedTrainer)
                                         </div>
                                     </div>
