@@ -27,7 +27,7 @@
     };
     LineBarChartModel traineeTrainedviewModel = new LineBarChartModel()
             {
-                GraphType= "bar",
+                GraphType = "bar",
                 LineBarChartId = "YearlyTraineeTrainedOverviewChart",
                 XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
                 XAxisLabel = "Months",
@@ -35,6 +35,7 @@
                 Datasets = traineeDataset
             };
     ModelPopUpViewModel getTrainerDashboard = new ModelPopUpViewModel() { ModelPopUpId = "GetTrainerDashboard", ModalContentId = "GetTrainerDashboardContentId" };
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -169,63 +170,68 @@
 
         @if (Model.TrainersList != null && Model.TrainersList.Any())
         {
+            var loggedInUserId = userModel.UserMasterId;
             <div class="row mt-4 g-4">
                 @foreach (var trainer in Model.TrainersList)
                 {
-                    <div class="col-lg-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="text-center">
-                                    <div class="position-relative" style="width: 110px; height: 110px; margin: 0 auto;">
-                                        @if (!string.IsNullOrEmpty(trainer.PhotoMediaPath))
-                                        {
-                                            <img src="@trainer.PhotoMediaPath" alt="Trainer Image"
-                                                 class="rounded-circle w-100 h-100" style="object-fit: cover;">
-                                        }
-                                        else
-                                        {
-                                            <div class="rounded-circle bg-soft-primary text-white w-100 h-100
+                if (trainer.UserMasterId == loggedInUserId)
+                {
+                    continue;
+                }
+                <div class="col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <div class="position-relative" style="width: 110px; height: 110px; margin: 0 auto;">
+                                    @if (!string.IsNullOrEmpty(trainer.PhotoMediaPath))
+                                    {
+                                        <img src="@trainer.PhotoMediaPath" alt="Trainer Image"
+                                             class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded-circle bg-soft-primary text-white w-100 h-100
                                                             d-flex align-items-center justify-content-center"
-                                                 style="font-size: 36px; object-fit: cover;">
-                                                @trainer.FirstName.Substring(0, 1)@trainer.LastName.Substring(0, 1)
-                                            </div>
-                                        }
-                                    </div>
-                                    <ul class="list-unstyled my-1 mt-2">
-                                        <li><h5 class="mb-0">@trainer.FirstName @trainer.LastName</h5></li>
-                                        <li><small class="text-muted">@trainer.EmployeeDesignation</small></li>
-                                        @* <li><small class="text-muted">CertificateNo</small></li> *@
-                                    </ul>
+                                             style="font-size: 36px; object-fit: cover;">
+                                            @trainer.FirstName.Substring(0, 1)@trainer.LastName.Substring(0, 1)
+                                        </div>
+                                    }
                                 </div>
-                                <ul class="list-unstyled personal-detail mb-0 text-center">
-                                    <li class="mt-2"><b>Specialization:</b> @trainer.TrainerSpecialization</li>
-                                    <li class="mt-2"><b>Date Of Joining:</b> @trainer.DateOfJoining.ToCoditechDateFormat()</li>
-                                    <li class="mt-2"><b>Total Duration Completed:</b> @trainer.DurationWithUs</li>
-                                    <li class="mt-2"><b>Number Of Trainees Linked:</b> @trainer.NumberOfTrainees</li>
-                                    <li class="mt-2"><b>Number Of Batches:</b> @trainer.NumberOfBatchesCreated</li>
-                                    <li class="mt-2"><b>Weekly Working Hrs:</b> @trainer.WeeklyWorkingHours</li>
-                                    @*  <div class="text-center mt-3">
+                                <ul class="list-unstyled my-1 mt-2">
+                                    <li><h5 class="mb-0">@trainer.FirstName @trainer.LastName</h5></li>
+                                    <li><small class="text-muted">@trainer.EmployeeDesignation</small></li>
+                                    @* <li><small class="text-muted">CertificateNo</small></li> *@
+                                </ul>
+                            </div>
+                            <ul class="list-unstyled personal-detail mb-0 text-center">
+                                <li class="mt-2"><b>Specialization:</b> @trainer.TrainerSpecialization</li>
+                                <li class="mt-2"><b>Date Of Joining:</b> @trainer.DateOfJoining.ToCoditechDateFormat()</li>
+                                <li class="mt-2"><b>Total Duration Completed:</b> @trainer.DurationWithUs</li>
+                                <li class="mt-2"><b>Number Of Trainees Linked:</b> @trainer.NumberOfTrainees</li>
+                                <li class="mt-2"><b>Number Of Batches:</b> @trainer.NumberOfBatchesCreated</li>
+                                <li class="mt-2"><b>Weekly Working Hrs:</b> @trainer.WeeklyWorkingHours</li>
+                                @*  <div class="text-center mt-3">
                                         <a href="#" class="btn btn-sm btn-soft-primary">More Detail</a>
                                     </div> *@
-                                    <div class="text-center mt-3">
-                                        <div class="mb-6">
-                                            <button type="button"
-                                                    class="btn btn-gradient-info"
-                                                    onclick="DBTMDashboard.OpenTrainerDetail('@trainer.EmployeeDesignation',
+                                <div class="text-center mt-3">
+                                    <div class="mb-6">
+                                        <button type="button"
+                                                class="btn btn-gradient-info"
+                                                onclick="DBTMDashboard.OpenTrainerDetail('@trainer.EmployeeDesignation',
                                    '@getTrainerDashboard.ModalContentId',
                                    '@Model.NumberOfDaysRecord',
                                    '@trainer.GeneralTrainerMasterId',
                                    '@trainer.AdminRoleMasterId',
                                    '@trainer.UserMasterId')">
-                                                More Detail
-                                            </button>
-                                        </div>
+                                            More Detail
+                                        </button>
                                     </div>
+                                </div>
 
-                                </ul>
-                            </div>
+                            </ul>
                         </div>
                     </div>
+                </div>
                 }
             </div>
         }
