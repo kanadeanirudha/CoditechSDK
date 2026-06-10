@@ -230,13 +230,13 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Active",
+                ColumnName = "Active",
                 ColumnCode = "IsActive",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Tax Exclusive",
+                ColumnName = "Tax Exclusive",
                 ColumnCode = "IsTaxExclusive",
                 IsSortable = true,
             });

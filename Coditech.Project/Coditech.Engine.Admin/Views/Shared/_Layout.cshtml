@@ -187,14 +187,28 @@
             location.reload();
         }
 
-        window.onbeforeunload = function () {
+        // Disable form buttons to prevent duplicate submits when navigating away,
+        // but ensure buttons are re-enabled when the page is restored from the
+        // bfcache (back/forward cache) so the browser Back button works properly.
+        window.addEventListener('beforeunload', function () {
             var inputs = document.getElementsByTagName("button");
             for (var i = 0; i < inputs.length; i++) {
                 if (inputs[i].type == "button" || inputs[i].type == "submit") {
-                    inputs[i].disabled = true;
+                    try { inputs[i].disabled = true; } catch (e) { }
                 }
             }
-        };
+        });
+
+        // When the page is shown (including when coming back via Back button and
+        // restored from bfcache), re-enable buttons so the UI remains interactive.
+        window.addEventListener('pageshow', function (event) {
+            var inputs = document.getElementsByTagName("button");
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type == "button" || inputs[i].type == "submit") {
+                    try { inputs[i].disabled = false; } catch (e) { }
+                }
+            }
+        });
         function initializeSelect2Dropdowns(context) {
             var $context = context ? $(context) : $(document);
             var isIOS = $('body').hasClass('is-ios');
