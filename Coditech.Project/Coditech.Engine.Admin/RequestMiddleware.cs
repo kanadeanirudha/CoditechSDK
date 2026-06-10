@@ -34,11 +34,35 @@ namespace Coditech.Admin
                 bool isMaintenance = CoditechAdminSettings.MaintenanceMode;
                 if (isMaintenance)
                 {
-                    // Redirect to maintenance page and short-circuit the pipeline so
-                    // no further middleware modifies the response. Awaiting the next
-                    // middleware after a redirect can cause unpredictable response
-                    // behavior and interfere with browser navigation (back button).
-                    context.Response.Redirect("maintenance.html");
+                    // Allow the maintenance page and its static assets to be served
+                    // (CSS/JS/images/fonts) so the maintenance page can load properly.
+                    // Otherwise redirect all other requests to the maintenance page.
+                    var requestPath = context.Request.Path.HasValue ? context.Request.Path.Value : string.Empty;
+                    var pathLower = requestPath.ToLowerInvariant();
+
+                    // If already requesting the maintenance page, let it through.
+                    if (string.Equals(pathLower, "/maintenance.html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await _next(context);
+                        return;
+                    }
+
+                    // Allow common static asset paths and file extensions so assets
+                    // required by the maintenance page are not redirected.
+                    string ext = System.IO.Path.GetExtension(pathLower);
+                    var allowedExts = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".woff", ".woff2", ".ttf", ".map"
+                    };
+
+                    if (allowedExts.Contains(ext) || pathLower.StartsWith("/css/") || pathLower.StartsWith("/js/") || pathLower.StartsWith("/lib/") || pathLower.StartsWith("/images/") || pathLower.StartsWith("/img/"))
+                    {
+                        await _next(context);
+                        return;
+                    }
+
+                    // Redirect other requests to the maintenance page and short-circuit.
+                    context.Response.Redirect("/maintenance.html");
                     return;
                 }
 
