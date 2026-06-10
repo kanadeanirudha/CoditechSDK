@@ -34,8 +34,12 @@ namespace Coditech.Admin
                 bool isMaintenance = CoditechAdminSettings.MaintenanceMode;
                 if (isMaintenance)
                 {
+                    // Redirect to maintenance page and short-circuit the pipeline so
+                    // no further middleware modifies the response. Awaiting the next
+                    // middleware after a redirect can cause unpredictable response
+                    // behavior and interfere with browser navigation (back button).
                     context.Response.Redirect("maintenance.html");
-                    await _next(context);
+                    return;
                 }
 
                 HelperUtility.ReplaceProxyToClientIp();
