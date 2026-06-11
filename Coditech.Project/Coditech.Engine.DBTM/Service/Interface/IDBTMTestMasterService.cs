@@ -27,6 +27,7 @@ namespace Coditech.API.Service
         DBTMActivityVerticalViewSequenceModel UpdateVerticalSequenceNumber(DBTMActivityVerticalViewSequenceModel model);
         DBTMActivityVerticalViewSequenceModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel model);
         DBTMCentreWiseTestListModel GetTestsByCentreCode(string centreCode);
+        DBTMCentreWiseTestListModel GetTestsByCentreCodeV2(string centreCode, long? entityId, string userType);
         DBTMTestWisePerformanceStandardListModel GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId);
         DBTMTestWisePerformanceStandardModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model);
         bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model);

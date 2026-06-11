@@ -66,6 +66,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMCentreWiseTestListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMTestMaster/GetTestsByCentreCodeV2")]
+        [HttpGet]
+        [Produces(typeof(DBTMCentreWiseTestResponse))]
+        public virtual IActionResult GetTestsByCentreCodeV2(string centreCode, long? entityId, string userType)
+        {
+            try
+            {
+                DBTMCentreWiseTestListModel list = _dBTMTestMasterService.GetTestsByCentreCodeV2(centreCode, entityId, userType);
+                return IsNotNull(list) ? CreateOKResponse(new DBTMCentreWiseTestListResponse { DBTMCentreWiseTestList = list.DBTMCentreWiseTestList }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseTest", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseTest", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
 
         [Route("/DBTMTestMaster/CreateDBTMTest")]
         [HttpPost, ValidateModel]
@@ -522,7 +543,7 @@ namespace Coditech.Engine.DBTM.Controllers
             try
             {
                 DBTMTestWisePerformanceStandardModel result = _dBTMTestMasterService.CreateDBTMTestWisePerformanceStandard(model);
-                return IsNotNull(result) ? CreateCreatedResponse( new DBTMTestWisePerformanceStandardResponse { DBTMTestWisePerformanceStandardModel = result }) : CreateInternalServerErrorResponse();
+                return IsNotNull(result) ? CreateCreatedResponse(new DBTMTestWisePerformanceStandardResponse { DBTMTestWisePerformanceStandardModel = result }) : CreateInternalServerErrorResponse();
             }
             catch (CoditechException ex)
             {
@@ -543,7 +564,7 @@ namespace Coditech.Engine.DBTM.Controllers
             try
             {
                 bool isUpdated = _dBTMTestMasterService.UpdateDBTMTestWisePerformanceStandard(model);
-                return isUpdated ? CreateOKResponse( new DBTMTestWisePerformanceStandardResponse { DBTMTestWisePerformanceStandardModel = model }) : CreateInternalServerErrorResponse();
+                return isUpdated ? CreateOKResponse(new DBTMTestWisePerformanceStandardResponse { DBTMTestWisePerformanceStandardModel = model }) : CreateInternalServerErrorResponse();
             }
             catch (CoditechException ex)
             {
