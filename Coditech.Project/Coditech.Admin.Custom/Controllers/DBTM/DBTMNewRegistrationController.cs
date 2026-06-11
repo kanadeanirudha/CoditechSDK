@@ -17,10 +17,23 @@ namespace Coditech.Admin.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual ActionResult CentreRegistration()
+        public virtual ActionResult CentreRegistration(string deviceSerialCode)
         {
+            DBTMNewRegistrationViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationViewModel();
+            if (!string.IsNullOrEmpty(deviceSerialCode))
+            {
+                DBTMNewRegistrationViewModel result = _dBTMNewRegistrationAgent.ValidateDeviceSerialCode(deviceSerialCode);
+                if (result.HasError)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage(result.ErrorMessage));
+                }
+                else
+                {
+                    dBTMNewRegistrationViewModel.DeviceSerialCode = deviceSerialCode;
+                }
+            }
             TempData["FormSizeClass"] = "col-lg-8";
-            return View("~/Views/DBTM/DBTMNewRegistration/DBTMCentreRegistration.cshtml", new DBTMNewRegistrationViewModel());
+            return View("~/Views/DBTM/DBTMNewRegistration/DBTMCentreRegistration.cshtml", dBTMNewRegistrationViewModel);
         }
 
         [HttpPost]

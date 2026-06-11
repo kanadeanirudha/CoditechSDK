@@ -7,5 +7,6 @@ namespace Coditech.API.Service
         DBTMNewRegistrationModel DBTMCentreRegistration(DBTMNewRegistrationModel model);
         DBTMNewRegistrationModel TrainerRegistration(DBTMNewRegistrationModel model);
         DBTMNewRegistrationModel ValidateTrainerJoiningCode(string joiningCode);
+        DBTMNewRegistrationModel ValidateDeviceSerialCode(string deviceSerialCode);
     }
 }

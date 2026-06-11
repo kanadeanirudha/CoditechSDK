@@ -29,6 +29,7 @@ namespace Coditech.Admin.Agents
         bool ConvertCampUserToBatchUser(long dBTMTraineeDetailId, out string message);
         DBTMNewRegistrationViewModel ValidateTrainerJoiningCode(string joiningCode);
         DBTMNewRegistrationViewModel ValidateTraineeJoiningCode(string joiningCode);
+        DBTMNewRegistrationViewModel ValidateDeviceSerialCode(string deviceSerialCode);
         OrganisationCentrewiseJoiningCodeViewModel GetJoiningCode(string trainerId);
     }
 }
