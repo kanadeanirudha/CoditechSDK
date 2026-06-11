@@ -34,7 +34,7 @@ namespace Coditech.API.Service
         }
 
         public GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate)
-        {       
+        {
             PageListModel pageListModel = new PageListModel(null, null, 0, 0);
             CoditechViewRepository<GeneralBatchModel> objStoredProc = new CoditechViewRepository<GeneralBatchModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
@@ -135,7 +135,7 @@ namespace Coditech.API.Service
                     var activityToDelete = _dBTMBatchActivityRepository.Table
                             .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId && idsToDelete.Contains(x.DBTMTestMasterId));
 
-                    if (activityToDelete != null)
+                    if (activityToDelete?.Count() > 0)
                         _dBTMBatchActivityRepository.Delete(activityToDelete);
 
                     // Insert activities that are new
@@ -155,7 +155,18 @@ namespace Coditech.API.Service
                         _dBTMBatchActivityRepository.Insert(activityList);
                     }
                 }
-                if (generalBatchModel.CustomDropdownSelectedValue2 != null && generalBatchModel.CustomDropdownSelectedValue2.Any())
+
+                if (generalBatchModel?.CustomDropdownSelectedValue2.Count == 0)
+                {
+                    // Get current and new trainee entity IDs
+                    var currentUserIds = _generalBatchUserRepository.Table
+                        .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId)
+                        .ToList();
+                    if (currentUserIds?.Count > 0)
+                        _generalBatchUserRepository.Delete(currentUserIds);
+
+                }
+                else if (generalBatchModel.CustomDropdownSelectedValue2 != null && generalBatchModel.CustomDropdownSelectedValue2.Any())
                 {
                     // Get current and new trainee entity IDs
                     var currentUserIds = _generalBatchUserRepository.Table

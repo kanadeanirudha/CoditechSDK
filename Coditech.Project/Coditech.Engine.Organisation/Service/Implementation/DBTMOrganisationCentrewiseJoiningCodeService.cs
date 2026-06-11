@@ -20,6 +20,9 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
         private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         public DBTMOrganisationCentrewiseJoiningCodeService(ICoditechLogging coditechLogging, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IServiceProvider serviceProvider) : base(coditechLogging, coditechEmail, coditechSMS, coditechWhatsApp, serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -27,17 +30,25 @@ namespace Coditech.API.Service
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public override OrganisationCentrewiseJoiningCodeListModel GetOrganisationCentrewiseJoiningCodeList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             string selectedCentreCode = filters?.Find(x => string.Equals(x.FilterName, FilterKeys.SelectedCentreCode, StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
             filters.RemoveAll(x => x.FilterName == FilterKeys.SelectedCentreCode);
-
             int JoiningCodeTypeEnumId = Convert.ToInt32(filters?.Find(x => string.Equals(x.FilterName, FilterKeys.JoiningCodeTypeEnumId, StringComparison.CurrentCultureIgnoreCase))?.FilterValue);
             filters.RemoveAll(x => x.FilterName == FilterKeys.JoiningCodeTypeEnumId);
             string trainerId = filters?.Find(x => string.Equals(x.FilterName, "Custom1", StringComparison.CurrentCultureIgnoreCase))?.FilterValue;
             filters.RemoveAll(x => string.Equals(x.FilterName, "Custom1", StringComparison.CurrentCultureIgnoreCase));
+            List<OrganisationCentrewiseJoiningCode> joiningCodeDetails = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => !x.IsExpired && x.IsReserved && x.QueueValidTill.HasValue && x.QueueValidTill <= DateTime.Now).ToList();
+            if (joiningCodeDetails.Count > 0)
+            {
+                joiningCodeDetails.ForEach(x => x.IsExpired = true);
+                _organisationCentrewiseJoiningCodeRepository.BatchUpdate(joiningCodeDetails);
+            }
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> objStoredProc = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
@@ -76,6 +87,11 @@ namespace Coditech.API.Service
                     throw new CoditechException(ErrorCodes.InvalidData, $"Joining code limit exceeded. Allowed: {allowJoiningCodeCount.Value}, Existing: {existingJoiningCodeCount}. Kindly contact Powered Sports Tech or raise a support ticket for assistance.");
                 }
             }
+            if (organisationCentrewiseJoiningCodeModel.IsReserved)
+            {
+                string hours = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == Convert.ToInt32(organisationCentrewiseJoiningCodeModel.ValidTillHours)).Select(x => x.EnumName).FirstOrDefault();
+                organisationCentrewiseJoiningCodeModel.QueueValidTill =  DateTime.Now.AddHours(Convert.ToDouble(hours));
+            }
             List<OrganisationCentrewiseJoiningCode> insertList = new List<OrganisationCentrewiseJoiningCode>();
             for (int i = 1; i <= organisationCentrewiseJoiningCodeModel.Quantity; i++)
             {
@@ -86,7 +102,9 @@ namespace Coditech.API.Service
                     CentreCode = organisationCentrewiseJoiningCodeModel.CentreCode,
                     JoiningCodeTypeEnumId = organisationCentrewiseJoiningCodeModel.JoiningCodeTypeEnumId,
                     Custom1 = organisationCentrewiseJoiningCodeModel.Custom1,
-                    Custom3 = organisationCentrewiseJoiningCodeModel.Custom3
+                    Custom3 = organisationCentrewiseJoiningCodeModel.Custom3,
+                    QueueValidTill = organisationCentrewiseJoiningCodeModel.QueueValidTill,
+                    IsReserved = organisationCentrewiseJoiningCodeModel.IsReserved,
                 });
             }
             _organisationCentrewiseJoiningCodeRepository.Insert(insertList, organisationCentrewiseJoiningCodeModel.CreatedBy);
@@ -103,12 +121,13 @@ namespace Coditech.API.Service
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 324, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.String);
-            repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
+            repo.SetParameter("@WhereClause", "IsExpired = 0 AND IsReserved = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            return repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            List<OrganisationCentrewiseJoiningCodeModel> aa = repo.ExecuteStoredProcedureList("Coditech_GetDBTMOrganisationCentrewiseJoiningCodeList @CentreCode,@JoiningCodeTypeEnumId,@TrainerId,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out int totalRows)?.ToList();
+            return aa;
         }
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTraineeActiveJoiningCode(string centreCode, string trainerId, int rows)
@@ -127,11 +146,23 @@ namespace Coditech.API.Service
                 var worksheet = workbook.Worksheets.Add("TraineeJoiningCode");
                 worksheet.Cell(1, 1).Value = "Joining Code";
                 worksheet.Cell(1, 2).Value = "Trainer";
+                worksheet.Cell(1, 3).Value = "Batch";
                 int row = 2;
                 foreach (var item in list)
                 {
+                    long trainerMasterId = Convert.ToInt64(item.Custom1);
+                    string batches = string.Join(", ",
+                        (from gbm in _generalBatchRepository.Table
+                         join um in _userMasterRepository.Table
+                            on gbm.CreatedBy equals um.UserMasterId
+                         join gtm in _generalTrainerMasterRepository.Table
+                            on um.EntityId equals gtm.EmployeeId
+                         where gtm.GeneralTrainerMasterId == trainerMasterId
+                         select gbm.BatchName)
+                        .Distinct().ToList());
                     worksheet.Cell(row, 1).Value = item.JoiningCode;
                     worksheet.Cell(row, 2).Value = item.Custom2;
+                    worksheet.Cell(row, 3).Value = batches;
                     row++;
                 }
                 worksheet.Columns().AdjustToContents();
@@ -148,10 +179,10 @@ namespace Coditech.API.Service
 
         public DBTMOrganisationCentrewiseJoiningCodeModel GetTrainerActiveJoiningCode(string centreCode)
         {
-            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>( _serviceProvider.GetService<Coditech_Entities>());
+            CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel> repo = new CoditechViewRepository<OrganisationCentrewiseJoiningCodeModel>(_serviceProvider.GetService<Coditech_Entities>());
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@JoiningCodeTypeEnumId", 323, ParameterDirection.Input, DbType.Int32);
-            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String); 
+            repo.SetParameter("@TrainerId", "", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@WhereClause", "IsExpired = 0", ParameterDirection.Input, DbType.String);
             repo.SetParameter("@PageNo", 1, ParameterDirection.Input, DbType.Int32);
             repo.SetParameter("@Rows", 1, ParameterDirection.Input, DbType.Int32);

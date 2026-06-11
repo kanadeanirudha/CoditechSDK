@@ -29,7 +29,7 @@
                                     if (!string.Equals(item.ModuleCode, "DASHBOARD", StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         <li class="menu-label mt-0" style="font-size:14px !important">
-                                            <i class="@item.ModuleIconName"></i> @item.ModuleName
+                                            <i class="@item.ModuleIconName"></i> <span>@item.ModuleName</span>
                                         </li>
                                     }
                                     @if (Model?.MenuList.Count > 0)
@@ -39,7 +39,7 @@
                                             if (string.Equals(itemParent.MenuCode, "DASHBOARD", StringComparison.InvariantCultureIgnoreCase))
                                             {
                                                 <li>
-                                                    <a href="/@Model.MenuList.Where(x => x.ParentMenuCode == itemParent.MenuCode).FirstOrDefault().MenuLink">
+                                                    <a href="/@Model.MenuList.Where(x => x.ParentMenuCode == itemParent.MenuCode).FirstOrDefault().MenuLink" title="@itemParent.MenuName">
                                                         @if (!string.IsNullOrEmpty(itemParent.MenuIconName))
                                                         {
                                                             <i class="@itemParent.MenuIconName"></i>
@@ -51,7 +51,7 @@
                                             else
                                             {
                                                 <li>
-                                                    <a href="javascript: void(0);">
+                                                    <a href="javascript: void(0);" title="@itemParent.MenuName">
                                                         @if (!string.IsNullOrEmpty(itemParent.MenuIconName))
                                                         {
                                                             <i class="@itemParent.MenuIconName"></i>
@@ -62,12 +62,15 @@
                                                         @foreach (UserMainMenuModel itemMenu in Model.MenuList.Where(x => x.ParentMenuCode == itemParent.MenuCode).OrderBy(y => y.MenuDisplaySeqNo))
                                                         {
                                                             <li class="nav-item">
-                                                                <a href="/@itemMenu.MenuLink" class="nav-link">
+                                                                <a href="/@itemMenu.MenuLink" class="nav-link" title="@itemParent.MenuName">
                                                                     @if (!string.IsNullOrEmpty(itemMenu.MenuIconName))
                                                                     {
                                                                         <i class="@itemMenu.MenuIconName"></i>
                                                                     }
-                                                                    @itemMenu.MenuName
+                                                                    <span>
+
+                                                                        @itemMenu.MenuName
+                                                                    </span>
                                                                 </a>
                                                             </li>
                                                         }

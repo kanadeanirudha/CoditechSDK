@@ -35,6 +35,7 @@
         DBTMCentrAndTrainerewiseBatch,
         TestResultBasedon,
         CentrewiseDepartment,
+        JoiningCodeExpiryTime,
     }
     public enum DashboardFormCustomEnum
     {

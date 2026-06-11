@@ -33,9 +33,9 @@
     <link href="~/css/layout/datatables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
     <link href="~/css/layout/buttons.bootstrap5.min.css" rel="stylesheet" />
     <link href="~/css/layout/bootstrap-select.min.css" rel="stylesheet" />
-    @* <link href="~/css/layout/site.css" rel="stylesheet" /> *@
     <link href="~/css/layout/jstree.css" rel="stylesheet" />
     <link href="~/css/layout/select2.min.css" rel="stylesheet" />
+    <link href="~/css/layout/layout-vertical-site.css" rel="stylesheet" />
     @if (!Convert.ToBoolean(CoditechAdminSettings.IsDefaultTheme))
     {
         <link href="~/css/layout/theme-@CoditechAdminSettings.ThemeColor" rel="stylesheet" />
@@ -67,7 +67,7 @@
     @if (userData != null)
     {
         <!-- Left Sidenav -->
-        <div class="left-sidenav">
+        <div class="left-sidenav hidden-xs">
             <div class="brand logo-background">
                 <a href="..@dashboardUrl" class="logo">
                     <span class="logo-small-wrapper">
@@ -214,7 +214,8 @@
                     </li> *@
                         @if (userData?.BalanceSheetList?.Count > 0)
                         {
-                            @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData);
+                            @Html.Partial("~/Views/Shared/_AccBalanceSheetList.cshtml", userData)
+                            ;
                         }
                         @Html.Partial("~/Views/Shared/_Profile.cshtml", userData)
                     </ul><!--end topbar-nav-->
@@ -225,6 +226,16 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu align-self-center topbar-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                             </button>
                         </li>
+                        <li class="d-flex">
+                            @if (userData.AccessibleCentreList != null && userData.AccessibleCentreList.Count > 1)
+                            {
+                                <h4 class="center-name m-0">@userData.AccessibleCentreList.FirstOrDefault().CentreName</h4>
+                            }
+                            else
+                            {
+                                <h4 class="center-name m-0">Powered Sports Tech</h4>
+                            }
+                        </li>
                     </ul>
                 </nav>
                 <!-- end navbar-->
@@ -233,12 +244,12 @@
             <!-- Page Content-->
             @RenderBody()
             <!-- end page content -->
+            <footer class="footer text-center text-sm-start">
+                <div class="boxed-footer">
+                    Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
+                </div>
+            </footer>
         </div>
-      @*   <footer class="footer text-center text-sm-start">
-            <div class="boxed-footer">
-                Copyright © @System.DateTime.Now.Year <a href="http://coditechsoftware.com/" target="_blank">Coditech Innovations Pvt. Ltd</a>
-            </div>
-        </footer> *@
         <!-- end page-wrapper -->
     }
     <!-- jQuery  -->
@@ -250,7 +261,7 @@
     <script src="~/js/layout/metismenu.min.js"></script>
     <script src="~/js/layout/waves.js"></script>
     <script src="~/js/layout/feather.min.js"></script>
-    <script src="~/js/layout/simplebar.min.js"></script>
+    @* <script src="~/js/layout/simplebar.min.js"></script> *@
     <script src="~/js/layout/moment.js"></script>
     <script src="~/js/layout/daterangepicker.js"></script>
     <script src="~/js/layout/app.js"></script>

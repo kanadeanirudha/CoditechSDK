@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Data;
+using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
@@ -141,7 +142,7 @@ namespace Coditech.API.Service
                                 string paramCodeStr = Convert.ToString(item.ParameterCode);
                                 string parameterCode = int.TryParse(paramCodeStr, out int parameterCodeInt) ? ((TestParameterCode)parameterCodeInt).ToString() : paramCodeStr;
                                 string parameterValue = item.ParameterValue.ToString() ?? string.Empty;
-                                string encryptedValue =EncryptionHelper.Encrypt(parameterValue);
+                                string encryptedValue = EncryptionHelper.Encrypt(parameterValue);
 
                                 detailList.Add(new DBTMDeviceDataDetails
                                 {
@@ -160,11 +161,11 @@ namespace Coditech.API.Service
                                 });
                             }
 
-                            var insertedDetails =_dBTMDeviceDataDetailsRepository.Insert(detailList,dBTMDeviceDataModel.CreatedBy);
+                            var insertedDetails = _dBTMDeviceDataDetailsRepository.Insert(detailList, dBTMDeviceDataModel.CreatedBy);
 
                             if (insertedDetails == null)
                             {
-                                throw new CoditechException(ErrorCodes.InvalidData,"Failed to insert device data details.");
+                                throw new CoditechException(ErrorCodes.InvalidData, "Failed to insert device data details.");
                             }
                         }
                     }
@@ -175,7 +176,7 @@ namespace Coditech.API.Service
             }
             catch (Exception ex)
             {
-                _coditechLogging.LogMessage(ex,"InsertDeviceData failed. Transaction rolled back.");
+                _coditechLogging.LogMessage(ex, "InsertDeviceData failed. Transaction rolled back.");
                 return false;
             }
         }
@@ -439,9 +440,19 @@ namespace Coditech.API.Service
         }
         public OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId)
         {
-            OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = _organisationCentrewiseJoiningCodeRepository.Table
-                .Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired).Select(x =>
-                new OrganisationCentrewiseJoiningCodeModel { JoiningCode = x.JoiningCode, Custom3 = x.Custom3 }).FirstOrDefault();
+            List<OrganisationCentrewiseJoiningCode> list = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && x.QueueValidTill != null && x.QueueValidTill <= DateTime.Now).ToList();
+            if (list?.Count > 0)
+            {
+                list.ForEach(x =>{ x.QueueValidTill = null; });
+                _organisationCentrewiseJoiningCodeRepository.BatchUpdate(list);
+            }
+            OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && x.QueueValidTill == null).FirstOrDefault();
+            OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = organisationCentrewiseJoiningCode.FromEntityToModel<OrganisationCentrewiseJoiningCodeModel>();
+            if (organisationCentrewiseJoiningCodeModel != null)
+            {            
+                organisationCentrewiseJoiningCode.QueueValidTill = DateTime.Now.AddMinutes(ApiCustomSettings.JoiningCodeQueueTimeInMinutes);
+                _organisationCentrewiseJoiningCodeRepository.Update(organisationCentrewiseJoiningCode);
+            }
             return organisationCentrewiseJoiningCodeModel ?? new OrganisationCentrewiseJoiningCodeModel { JoiningCode = string.Empty, Custom3 = string.Empty };
         }
         public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)

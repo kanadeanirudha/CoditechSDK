@@ -92,7 +92,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Expired",
+                ColumnName = "Expired",
                 ColumnCode = "IsExpired",
                 IsSortable = true,
             });
