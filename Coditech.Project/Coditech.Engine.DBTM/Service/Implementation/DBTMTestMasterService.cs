@@ -24,6 +24,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMActivityVerticalViewSequenceMasterRepository;
         private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
         private readonly ICoditechRepository<DBTMTestWisePerformanceStandard> _dBTMTestWisePerformanceStandardRepository;
+        private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
+        private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -37,6 +39,8 @@ namespace Coditech.API.Service
             _dBTMPerformanceMatrixRepository = new CoditechRepository<DBTMPerformanceMatrix>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestWisePerformanceStandardRepository = new CoditechRepository<DBTMTestWisePerformanceStandard>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -80,6 +84,65 @@ namespace Coditech.API.Service
             return model;
         }
 
+        public virtual DBTMCentreWiseTestListModel GetTestsByCentreCodeV2(string centreCode, long? entityId, string userType)
+        {
+            List<DBTMCentreWiseTestModel> testList;
+
+            if (entityId.HasValue && entityId.Value > 0 && string.Equals(userType, CustomConstants.Trainee, StringComparison.OrdinalIgnoreCase))
+            {
+                //performed tests
+                testList = (
+                    from trainee in _dBTMTraineeDetailsRepository.Table
+                    join deviceData in _dBTMDeviceDataRepository.Table
+                        on trainee.PersonCode equals deviceData.PersonCode
+                    join test in _dBTMTestMasterRepository.Table
+                        on deviceData.TestCode equals test.TestCode
+                    join centreTest in _dBTMCentreWiseTestRepository.Table
+                        on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                    join performanceMatrix in _dBTMPerformanceMatrixRepository.Table
+                        on test.DBTMPerformanceMatrixId equals performanceMatrix.DBTMPerformanceMatrixId
+                    where trainee.DBTMTraineeDetailId == entityId.Value
+                          && trainee.CentreCode == centreCode
+                          && deviceData.IsValidRecord
+                    select new DBTMCentreWiseTestModel
+                    {
+                        DBTMTestMasterId = test.DBTMTestMasterId,
+                        TestName = $"{test.TestName}({performanceMatrix.PerformanceMatrix})",
+                        CentreCode = centreTest.CentreCode,
+                        DBTMCentreWiseTestId = centreTest.DBTMCentreWiseTestId,
+                        IsAssociated = true
+                    }
+                )
+                .GroupBy(x => x.DBTMTestMasterId)
+                .Select(g => g.FirstOrDefault())
+                .ToList();
+            }
+            else
+            {
+                // Centre-wise tests
+                testList = (
+                    from test in _dBTMTestMasterRepository.Table
+                    join centreTest in _dBTMCentreWiseTestRepository.Table
+                        on test.DBTMTestMasterId equals centreTest.DBTMTestMasterId
+                    join performanceMatrix in _dBTMPerformanceMatrixRepository.Table
+                        on test.DBTMPerformanceMatrixId equals performanceMatrix.DBTMPerformanceMatrixId
+                    where centreTest.CentreCode == centreCode
+                    select new DBTMCentreWiseTestModel
+                    {
+                        DBTMTestMasterId = test.DBTMTestMasterId,
+                        TestName = $"{test.TestName}({performanceMatrix.PerformanceMatrix})",
+                        CentreCode = centreTest.CentreCode,
+                        DBTMCentreWiseTestId = centreTest.DBTMCentreWiseTestId,
+                        IsAssociated = true
+                    }
+                ).ToList();
+            }
+
+            return new DBTMCentreWiseTestListModel
+            {
+                DBTMCentreWiseTestList = testList
+            };
+        }
         //Create DBTMTest.
         public virtual DBTMTestModel CreateDBTMTest(DBTMTestModel dBTMTestModel)
         {
