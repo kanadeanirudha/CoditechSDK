@@ -42,6 +42,30 @@ namespace Coditech.API.Service
         }
 
         #region Public
+        public DBTMNewRegistrationModel ValidateDeviceSerialCode(string deviceSerialCode)
+        {
+            DBTMNewRegistrationModel dBTMNewRegistrationModel = new DBTMNewRegistrationModel();
+            DBTMDeviceMaster device = _dbtmDeviceMasterRepository.Table.FirstOrDefault(x => x.DeviceSerialCode == deviceSerialCode);
+            if (device == null)
+            {
+                dBTMNewRegistrationModel.HasError = true;
+                dBTMNewRegistrationModel.ErrorMessage = "Invalid Device Serial Code.";
+                return dBTMNewRegistrationModel;
+            }
+            if (!device.IsMasterDevice)
+            {
+                dBTMNewRegistrationModel.HasError = true;
+                dBTMNewRegistrationModel.ErrorMessage = "Please Enter Master Device Serial Code.";
+                return dBTMNewRegistrationModel;
+            }
+            if (new DBTMDeviceRegistrationDetailsService(_coditechLogging, _serviceProvider).IsDeviceSerialCodeAlreadyExist(device.DBTMDeviceMasterId))
+            {
+                dBTMNewRegistrationModel.HasError = true;
+                dBTMNewRegistrationModel.ErrorMessage = "Device Serial Code has already been used.";
+                return dBTMNewRegistrationModel;
+            }
+            return dBTMNewRegistrationModel;
+        }
         //Create DBTM Centre Registration.
         public DBTMNewRegistrationModel DBTMCentreRegistration(DBTMNewRegistrationModel dBTMNewRegistrationModel)
         {

@@ -92,5 +92,27 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMCentreRegistration/ValidateDeviceSerialCode")]
+        [HttpGet]
+        [Produces(typeof(DBTMNewRegistrationResponse))]
+        [AllowAnonymous]
+        public virtual IActionResult ValidateDeviceSerialCode(string deviceSerialCode)
+        {
+            try
+            {
+                DBTMNewRegistrationModel model = _dBTMNewRegistrationService.ValidateDeviceSerialCode(deviceSerialCode);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMNewRegistrationResponse { DBTMNewRegistrationModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TrainerRegistration.ToString(), TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TrainerRegistration.ToString(), TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMNewRegistrationResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

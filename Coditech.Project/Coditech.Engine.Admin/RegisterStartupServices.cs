@@ -100,6 +100,30 @@ namespace Coditech.Admin
 
             // Adds the<see cref= "AuthorizationMiddleware" /> to the specified < see cref = "IApplicationBuilder" />, which enables authorization capabilities.
             app.UseAuthorization();
+            // Prevent caching of authenticated pages so browser back button will revalidate session
+            app.Use(async (context, next) =>
+            {
+                // Run the rest of the pipeline first so authentication is populated
+                await next();
+
+                try
+                {
+                    var user = context.User;
+                    // If the response is HTML and the user was authenticated for the request,
+                    // set no-cache headers so browser won't serve a cached page after session expires.
+                    var contentType = context.Response.ContentType ?? string.Empty;
+                    if (user?.Identity?.IsAuthenticated == true && contentType.Contains("text/html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                        context.Response.Headers["Pragma"] = "no-cache";
+                        context.Response.Headers["Expires"] = "0";
+                    }
+                }
+                catch
+                {
+                    // Swallow header-setting errors to avoid breaking responses
+                }
+            });
             // Adds a route to the Microsoft.AspNetCore.Routing.IRouteBuilder with the specified
             // name and template.
             app.RegisterRoute();
