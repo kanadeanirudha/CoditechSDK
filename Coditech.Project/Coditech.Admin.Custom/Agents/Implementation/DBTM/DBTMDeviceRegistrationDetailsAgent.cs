@@ -193,7 +193,7 @@ namespace Coditech.Admin.Agents
             });
             //datatableColumnList.Add(new DatatableColumns()
             //{
-            //    ColumnName = "Is Master Device",
+            //    ColumnName = "Master Device",
             //    ColumnCode = "IsMasterDevice",
             //    IsSortable = true,
             //});

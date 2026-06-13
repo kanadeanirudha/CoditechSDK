@@ -213,7 +213,7 @@ namespace Coditech.Admin.Agents
             }
         }
         //GetGeneralTrainerByJoiningCode
-        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId)
+        public virtual DBTMNewRegistrationListViewModel GetGeneralTrainerByJoiningCode(string joiningCode, long generalTrainerMasterId)
         {
             DBTMNewRegistrationListViewModel dBTMNewRegistrationViewModel = new DBTMNewRegistrationListViewModel();
             try
@@ -314,6 +314,24 @@ namespace Coditech.Admin.Agents
                 _coditechLogging.LogMessage(ex, LogComponentCustomEnum.TraineeRegistration.ToString(), TraceLevel.Error);
                 return (OrganisationCentrewiseJoiningCodeViewModel)GetViewModelWithErrorMessage(organisationCentrewiseJoiningCodeViewModel, GeneralResources.UpdateErrorMessage);
             }
+        }
+        public DBTMNewRegistrationViewModel ValidateDeviceSerialCode(string deviceSerialCode)
+        {
+            DBTMNewRegistrationViewModel model = new DBTMNewRegistrationViewModel();
+            try
+            {
+                DBTMNewRegistrationResponse response = _dBTMNewRegistrationClient.ValidateDeviceSerialCode(deviceSerialCode);
+                if (response?.DBTMNewRegistrationModel != null)
+                {
+                    model = response.DBTMNewRegistrationModel.ToViewModel<DBTMNewRegistrationViewModel>();
+                }
+            }
+            catch (CoditechException ex)
+            {
+                model.HasError = true;
+                model.ErrorMessage = ex.Message;
+            }
+            return model;
         }
         #endregion
     }

@@ -34,5 +34,7 @@ namespace Coditech.API.Endpoint
         {
             return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetJoiningCode?generalTrainerMasterId={generalTrainerMasterId}";
         }
+        public string ValidateDeviceSerialCode(string deviceSerialCode) =>
+        $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreRegistration/ValidateDeviceSerialCode?deviceSerialCode={deviceSerialCode}";
     }
 }

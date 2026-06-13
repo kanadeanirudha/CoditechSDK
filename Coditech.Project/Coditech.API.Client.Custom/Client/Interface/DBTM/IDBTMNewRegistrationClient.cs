@@ -29,6 +29,7 @@ namespace Coditech.API.Client
         TrueFalseResponse ConvertCampUserToBatchUser(long dBTMTraineeDetailId);
         DBTMNewRegistrationResponse ValidateTrainerJoiningCode(string joiningCode);
         DBTMNewRegistrationResponse ValidateTraineeJoiningCode(string joiningCode);
+        DBTMNewRegistrationResponse ValidateDeviceSerialCode(string deviceSerialCode);
         OrganisationCentrewiseJoiningCodeResponse GetJoiningCode(string trainerId);
     }
 }

@@ -83,7 +83,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Column Cell Bold",
+                ColumnName = "Column Cell Bold",
                 ColumnCode = "IsColumnCellBold",
             });
             return datatableColumnList;

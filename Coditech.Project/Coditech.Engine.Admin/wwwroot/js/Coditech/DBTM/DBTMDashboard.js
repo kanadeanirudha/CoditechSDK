@@ -99,3 +99,8 @@
 $(document).ready(function () {
     DBTMDashboard.Initialize();
 });
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        location.reload();
+    }
+});

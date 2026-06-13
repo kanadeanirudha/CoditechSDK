@@ -385,5 +385,42 @@ namespace Coditech.API.Client
                     response?.Dispose();
             }
         }
+        public virtual DBTMNewRegistrationResponse ValidateDeviceSerialCode(string deviceSerialCode)
+        {
+            return Task.Run(async () => await ValidateDeviceSerialCodeAsync(deviceSerialCode, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMNewRegistrationResponse> ValidateDeviceSerialCodeAsync(string deviceSerialCode, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMNewRegistrationEndpoint.ValidateDeviceSerialCode(deviceSerialCode);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var statusCode = (int)response.StatusCode;
+                if (statusCode == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMNewRegistrationResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string value = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
+                    DBTMNewRegistrationResponse result = JsonConvert.DeserializeObject<DBTMNewRegistrationResponse>(value);
+                    UpdateApiStatus(result, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
     }
 }

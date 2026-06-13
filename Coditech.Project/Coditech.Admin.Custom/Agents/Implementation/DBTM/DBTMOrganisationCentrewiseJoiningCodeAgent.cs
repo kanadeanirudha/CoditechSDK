@@ -183,7 +183,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Is Active Joining Code",
+                ColumnName = "Active Joining Code",
                 ColumnCode = "IsExpired",
                 IsSortable = false,
             });
@@ -191,6 +191,12 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Expiry Time",
                 ColumnCode = "QueueValidTill",
+                IsSortable = false,
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Reserved Joining Code",
+                ColumnCode = "IsReserved",
                 IsSortable = false,
             });
             return datatableColumnList;

@@ -84,8 +84,8 @@
                                                         }
                                                         else if (col.ColumnName == "Person Name")
                                                         {
-                                                            var personId = value.Length > 4 ? value[4] : "0";
-                                                            <a href="@Url.Action("Profile", "DBTMTraineeDetails", new { dBTMTraineeDetailId = traineeId })"
+                                                            var personId = value.Length > 3 ? value[3] : "0";
+                                                            <a href="@Url.Action("Profile", "DBTMTraineeDetails", new { dBTMTraineeDetailId = personId })"
                                                                target="_blank"
                                                                class="text-primary fw-bold">
                                                                 @value[0]

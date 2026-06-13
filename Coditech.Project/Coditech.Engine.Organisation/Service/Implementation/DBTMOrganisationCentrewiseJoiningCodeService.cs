@@ -20,6 +20,9 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<OrganisationCentrewiseJoiningCode> _organisationCentrewiseJoiningCodeRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
         private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         public DBTMOrganisationCentrewiseJoiningCodeService(ICoditechLogging coditechLogging, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IServiceProvider serviceProvider) : base(coditechLogging, coditechEmail, coditechSMS, coditechWhatsApp, serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -27,6 +30,9 @@ namespace Coditech.API.Service
             _organisationCentrewiseJoiningCodeRepository = new CoditechRepository<OrganisationCentrewiseJoiningCode>(_serviceProvider.GetService<Coditech_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public override OrganisationCentrewiseJoiningCodeListModel GetOrganisationCentrewiseJoiningCodeList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -140,11 +146,23 @@ namespace Coditech.API.Service
                 var worksheet = workbook.Worksheets.Add("TraineeJoiningCode");
                 worksheet.Cell(1, 1).Value = "Joining Code";
                 worksheet.Cell(1, 2).Value = "Trainer";
+                worksheet.Cell(1, 3).Value = "Batch";
                 int row = 2;
                 foreach (var item in list)
                 {
+                    long trainerMasterId = Convert.ToInt64(item.Custom1);
+                    string batches = string.Join(", ",
+                        (from gbm in _generalBatchRepository.Table
+                         join um in _userMasterRepository.Table
+                            on gbm.CreatedBy equals um.UserMasterId
+                         join gtm in _generalTrainerMasterRepository.Table
+                            on um.EntityId equals gtm.EmployeeId
+                         where gtm.GeneralTrainerMasterId == trainerMasterId
+                         select gbm.BatchName)
+                        .Distinct().ToList());
                     worksheet.Cell(row, 1).Value = item.JoiningCode;
                     worksheet.Cell(row, 2).Value = item.Custom2;
+                    worksheet.Cell(row, 3).Value = batches;
                     row++;
                 }
                 worksheet.Columns().AdjustToContents();
