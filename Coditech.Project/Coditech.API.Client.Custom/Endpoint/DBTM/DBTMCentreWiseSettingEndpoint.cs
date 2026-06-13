@@ -5,13 +5,14 @@ namespace Coditech.API.Endpoint
     public class DBTMCentreWiseSettingEndpoint : BaseEndpoint
     {
         public string GetDBTMCentreWiseSettingAsync(int organisationCentreId) =>
-            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/GetDBTMCentreWiseSetting?organisationCentreId={organisationCentreId}";
-
+             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/GetDBTMCentreWiseSetting?organisationCentreId={organisationCentreId}";
         public string UpdateDBTMCentreWiseSettingAsync() =>
-               $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/UpdateDBTMCentreWiseSetting";
-        public string AssociateUnAssociateCentreTestAsync()
-        {
-            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/AssociateUnAssociateCentreTest";
-        }
+             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/UpdateDBTMCentreWiseSetting";
+        public string AssociateUnAssociateCentreTestAsync() =>
+             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/AssociateUnAssociateCentreTest";
+        public string AssociateCentreTests() =>
+             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/AssociateCentreTests";
+        public string UnAssociateCentreTests() =>
+             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMCentreWiseSetting/UnAssociateCentreTests";
     }
 }

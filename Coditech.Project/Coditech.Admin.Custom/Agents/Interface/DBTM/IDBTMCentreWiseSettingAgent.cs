@@ -18,6 +18,8 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns updated DBTMCentreWiseSettingViewModel</returns>
         DBTMCentreWiseSettingViewModel UpdateDBTMCentreWiseSetting(DBTMCentreWiseSettingViewModel dBTMCentreWiseSettingViewModel);
         DBTMCentreWiseTestViewModel AssociateUnAssociateCentreTest(DBTMCentreWiseTestViewModel dBTMCentreWiseTestViewModel);
+        DBTMCentreWiseTestViewModel AssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds);
+        DBTMCentreWiseTestViewModel UnAssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds);
     }
 }
 

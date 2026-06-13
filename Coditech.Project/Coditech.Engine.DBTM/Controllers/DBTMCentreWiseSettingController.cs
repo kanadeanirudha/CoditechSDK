@@ -83,5 +83,48 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMCentreWiseSetting/AssociateCentreTests")]
+        [HttpPut]
+        [Produces(typeof(DBTMCentreWiseTestResponse))]
+        public virtual IActionResult AssociateCentreTests([FromBody] DBTMCentreWiseTestModel dBTMCentreWiseTestModel)
+        {
+            try
+            {
+                DBTMCentreWiseTestModel result = _dBTMCentreWiseSettingService.AssociateCentreTests(dBTMCentreWiseTestModel.OrganisationCentreMasterId, dBTMCentreWiseTestModel.CentreCode, dBTMCentreWiseTestModel.TestIds);
+                return CreateOKResponse(new DBTMCentreWiseTestResponse { DBTMCentreWiseTestModel = result });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssociateCentreTests", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssociateCentreTests", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMCentreWiseSetting/UnAssociateCentreTests")]
+        [HttpPut]
+        [Produces(typeof(DBTMCentreWiseTestResponse))]
+        public virtual IActionResult UnAssociateCentreTests([FromBody] DBTMCentreWiseTestModel dBTMCentreWiseTestModel)
+        {
+            try
+            {
+                DBTMCentreWiseTestModel result = _dBTMCentreWiseSettingService.UnAssociateCentreTests(dBTMCentreWiseTestModel.OrganisationCentreMasterId, dBTMCentreWiseTestModel.CentreCode, dBTMCentreWiseTestModel.TestIds);
+                return CreateOKResponse(new DBTMCentreWiseTestResponse { DBTMCentreWiseTestModel = result });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "UnAssociateCentreTests", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "UnAssociateCentreTests", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMCentreWiseTestResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

@@ -10,5 +10,6 @@
         public int OrganisationCentreMasterId { get; set; }
         public bool IsDisplayPerformanceStandard { get; set; }
         public DBTMCentreWiseTestListModel TestListModel { get; set; }
+        public string CentreName { get; set; }
     }
 }
