@@ -86,8 +86,7 @@ namespace Coditech.Common.Helper.Utilities
                     result = $"{group.Where(x => x.ParameterCode == CustomConstants.Time).Min(x => x.ParameterValue)}";
                     break;
                 case CustomConstants.Power:
-                    double jumpHeight = Convert.ToDouble(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.JumpHeight)?.ParameterValue);
-                    return weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, CustomConstants.GraphListRoundUpValue)}";
+                    return Power(group, weight, isGraph);
                 case CustomConstants.Force:
                     result = weight == 0 ? "NA" : $"{Math.Round(4 * weight * 9.81, CustomConstants.GraphListRoundUpValue)}";
                     break;
@@ -139,7 +138,12 @@ namespace Coditech.Common.Helper.Utilities
                         if (forceByRowValue != CustomConstants.InvalidData)
                         {
                             var forceByRow = Convert.ToDecimal(forceByRowValue);
-                            result = weight == 0 ? "NA" : $"{Math.Round(forceByRow * velocityByRow, CustomConstants.GraphListRoundUpValue)}";
+                            if (weight == 0 && isGraph)
+                            {
+                                result = "0";
+                            }
+                            else
+                                result = weight == 0 ? "NA" : $"{Math.Round(forceByRow * velocityByRow, CustomConstants.GraphListRoundUpValue)}";
                         }
                         else
                         {
@@ -185,6 +189,15 @@ namespace Coditech.Common.Helper.Utilities
                     break;
             }
             return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
+        }
+
+        private static string Power(IGrouping<string, DBTMReportsModel> group, double weight, bool isGraph)
+        {
+            double jumpHeight = Convert.ToDouble(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.JumpHeight)?.ParameterValue);
+            if (weight == 0 && isGraph)
+                return "0";
+            else
+                return weight == 0 ? "NA" : $"{Math.Round(weight * Math.Pow(9.81, 1.5) * Math.Sqrt(2 * jumpHeight) / 4, CustomConstants.GraphListRoundUpValue)}";
         }
 
         private static string CumulativeVelocityWithSameDistance(IGrouping<string, DBTMReportsModel> group, short recurtion, bool isGraph)
@@ -325,7 +338,14 @@ namespace Coditech.Common.Helper.Utilities
             if (accelerationByRowValue != CustomConstants.InvalidData)
             {
                 var accelerationByRow = Convert.ToDecimal(accelerationByRowValue);
-                result = weight == 0 ? "NA" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, CustomConstants.GraphListRoundUpValue)}";
+                if (weight == 0 && isGraph)
+                {
+                    result = "0";
+                }
+                else
+                {
+                    result = weight == 0 ? "NA" : $"{Math.Round(Convert.ToDecimal(weight) * accelerationByRow, CustomConstants.GraphListRoundUpValue)}";
+                }
             }
             else
             {

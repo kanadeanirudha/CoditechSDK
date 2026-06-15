@@ -330,7 +330,7 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public ActionResult GetAssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerViewModel model)
         {
-            model.EntityId = model.DBTMTraineeDetailId > 0  ? model.DBTMTraineeDetailId : model.EntityId;
+            model.EntityId = model.DBTMTraineeDetailId > 0 ? model.DBTMTraineeDetailId : model.EntityId;
             return PartialView("~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/_AssociateUnAssociateTrainer.cshtml", model);
         }
 
@@ -340,7 +340,7 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(_dBTMTraineeDetailsAgent.AssociateUnAssociateTrainer(model).HasError
                ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-            return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel{ SelectedParameter1 = model.DBTMTraineeDetailId.ToString(), SelectedParameter2 = model.PersonId.ToString()});
+            return RedirectToAction("GetAssociatedTrainerList", new DataTableViewModel { SelectedParameter1 = model.DBTMTraineeDetailId.ToString(), SelectedParameter2 = model.PersonId.ToString() });
         }
 
         public virtual ActionResult DeleteAssociatedTrainer(string generalTraineeAssociatedToTrainerIds, string SelectedParameter1, string SelectedParameter2)
@@ -482,7 +482,7 @@ namespace Coditech.Admin.Controllers
             {
                 return View("~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeRegistration.cshtml", model);
             }
-            var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel{ DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(), Parameter = joiningCode }).DropdownList?.Where(x => x.Value != "").ToList();
+            var allTrainerList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel { DropdownType = DropdownCustomTypeEnum.JoiningCodewiseGeneralTrainer.ToString(), Parameter = joiningCode }).DropdownList?.Where(x => x.Value != "").ToList();
             List<string> selected = new List<string>();
             if (!string.IsNullOrEmpty(joiningCodeTrainerId))
             {
@@ -520,6 +520,7 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("Pincode");
             ModelState.Remove("ConfirmPassword");
             ModelState.Remove("Password");
+            ModelState.Remove("SelectedTrainer");
 
             // Main validation check
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition
@@ -657,7 +658,7 @@ namespace Coditech.Admin.Controllers
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (extension != ".xlsx")
             {
-                return Json(new { success = false, message = "Only Excel (.xlsx) file is allowed."});
+                return Json(new { success = false, message = "Only Excel (.xlsx) file is allowed." });
             }
             DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadTraineeFromFile(file);
             if (result.HasError)
@@ -666,7 +667,7 @@ namespace Coditech.Admin.Controllers
             }
             if (result.FailedRows != null && result.FailedRows.Count > 0)
             {
-                return Json(new{ success = false, message = "Data correction required.", failedRows = result.FailedRows});
+                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows });
             }
             SetNotificationMessage(GetSuccessNotificationMessage("Trainee uploaded successfully."));
             return Json(new { success = true });

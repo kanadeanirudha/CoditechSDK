@@ -10,7 +10,8 @@
             {
                 <a href="@Model.CancelUrl" class="btn btn-secondary">@Model.CancelButtonText</a>
             }
-            @if (!string.IsNullOrEmpty(@Model.ActionName))
+            @if (!string.IsNullOrEmpty(@Model.ActionName) &&
+            (Model.IsSaveCloseIsShow || Model.IsSaveIsShow))
             {
                 <div class="btn-group">
                     <button type="button"

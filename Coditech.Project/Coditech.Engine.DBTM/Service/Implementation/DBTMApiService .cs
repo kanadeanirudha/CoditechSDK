@@ -443,13 +443,13 @@ namespace Coditech.API.Service
             List<OrganisationCentrewiseJoiningCode> list = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && x.QueueValidTill != null && x.QueueValidTill <= DateTime.Now).ToList();
             if (list?.Count > 0)
             {
-                list.ForEach(x =>{ x.QueueValidTill = null; });
+                list.ForEach(x => { x.QueueValidTill = null; });
                 _organisationCentrewiseJoiningCodeRepository.BatchUpdate(list);
             }
             OrganisationCentrewiseJoiningCode organisationCentrewiseJoiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.Custom1 == generalTrainerMasterId && !x.IsExpired && x.QueueValidTill == null).FirstOrDefault();
             OrganisationCentrewiseJoiningCodeModel organisationCentrewiseJoiningCodeModel = organisationCentrewiseJoiningCode.FromEntityToModel<OrganisationCentrewiseJoiningCodeModel>();
             if (organisationCentrewiseJoiningCodeModel != null)
-            {            
+            {
                 organisationCentrewiseJoiningCode.QueueValidTill = DateTime.Now.AddMinutes(ApiCustomSettings.JoiningCodeQueueTimeInMinutes);
                 _organisationCentrewiseJoiningCodeRepository.Update(organisationCentrewiseJoiningCode);
             }
