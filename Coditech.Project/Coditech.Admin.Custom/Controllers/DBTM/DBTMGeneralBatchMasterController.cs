@@ -167,6 +167,35 @@ namespace Coditech.Admin.Controllers
             return View(createEditBatch, generalBatchViewModel);
         }
 
+        [HttpGet]
+        public ActionResult GetTransferBatchPopup(int generalBatchMasterId)
+        {
+           GeneralBatchViewModel model = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
+            DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "GeneralTrainerMasterId",
+                Parameter = model.CentreCode,
+                IsCustomDropdown = true
+            };
+            ViewBag.TrainerDropdown = trainerDropdown;
+            return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/_ConvertBatchPopup.cshtml", model);
+        }
+        [HttpPost]
+        public JsonResult TransferBatch(int generalBatchMasterId, long trainerId)
+        {
+            bool status = _dBTMBatchAgent.TransferBatch(generalBatchMasterId,  trainerId, out string message);
+            if (status)
+            {
+                SetNotificationMessage(GetSuccessNotificationMessage(message));
+            }
+            else
+            {
+                SetNotificationMessage( GetErrorNotificationMessage(message));
+            }
+            return Json(new { success = status , message = message });
+        }
+
         //Calendar
         [HttpGet]
         public ActionResult DBTMCalendar()

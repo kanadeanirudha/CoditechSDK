@@ -20,6 +20,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
         private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
+        private readonly ICoditechRepository<UserMaster> _userMasterRepository;
+        private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         public DBTMGeneralBatchMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -31,6 +33,8 @@ namespace Coditech.API.Service
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate)
@@ -105,6 +109,8 @@ namespace Coditech.API.Service
             generalBatchModel.CustomDropdownSelectedValue1 = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
             generalBatchModel.CustomDropdownSelectedValue2 = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.EntityId.ToString()).ToList();
             generalBatchModel.Duration = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.Duration).FirstOrDefault();
+            string trainerName = _userMasterRepository.Table.Where(x => x.UserMasterId == generalBatchModel.CreatedBy).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
+            generalBatchModel.AssignedBy = trainerName;
             return generalBatchModel;
         }
 
@@ -291,6 +297,27 @@ namespace Coditech.API.Service
             _generalBatchUserRepository.Insert(batchUser);
             trainee.IsBatchUser = true;
             _dBTMTraineeDetailsRepository.Update(trainee);
+            return true;
+        }
+
+        public bool TransferBatch(int generalBatchMasterId, long trainerId)
+        {
+            if (generalBatchMasterId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "GeneralBatchMasterId"));
+            if (trainerId <= 0)
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "TrainerId"));
+            long employeeId = _generalTrainerMasterRepository.Table.Where(t => t.GeneralTrainerMasterId == trainerId).Select(t => t.EmployeeId).FirstOrDefault();
+            if (employeeId <= 0)
+                throw new CoditechException(ErrorCodes.NullModel, "EmployeeId not found.");
+            long userMasterId = _userMasterRepository.Table.Where(u => u.EntityId == employeeId && u.UserType == "Employee").Select(u => u.UserMasterId).FirstOrDefault();
+            if (userMasterId <= 0)
+                throw new CoditechException(ErrorCodes.NullModel, "Trainer's user not found for given EmployeeId.");
+            GeneralBatchMaster batch = _generalBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchMasterId);
+            if (IsNull(batch))
+                throw new CoditechException(ErrorCodes.NullModel, "Batch not found.");
+            batch.CreatedBy = userMasterId;
+            batch.ModifiedDate = DateTime.Now;
+            _generalBatchMasterRepository.Update(batch);
             return true;
         }
         #endregion

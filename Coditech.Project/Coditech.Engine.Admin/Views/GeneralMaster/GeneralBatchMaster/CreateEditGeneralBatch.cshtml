@@ -27,6 +27,7 @@
                 ActionName = actionName,
                 FormId = AdminConstants.FormId + controllerName,
             };
+    ModelPopUpViewModel transferBatchPopup = new ModelPopUpViewModel() { ModelPopUpId = "TransferBatchPopupId", ModalContentId = "TransferBatchContentId" };
 }
 <!-- Page Content-->
 <div class="@(isPopup ? "" : "page-content")">
@@ -145,8 +146,19 @@
                                         </div>
                                     </div>
                                 }
+                               @*  @if (Model.GeneralBatchMasterId > 0)
+                                {
+                                    <div class="col-lg-3 mt-3">
+                                        <button type="button"
+                                                class="btn btn-sm btn-soft-primary btn-circle"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#TransferBatchPopupId"
+                                                onclick="DBTMBatch.OpenTransferBatchPopup('TransferBatchContentId', @Model.GeneralBatchMasterId)">
+                                            <i class="fas fa-exchange-alt"></i> Transfer Batch
+                                        </button>
+                                    </div>
+                                } *@
                             </div>
-
                         }
                     </div>
                 </div>
@@ -154,6 +166,23 @@
         </div>
     </div>
 </div>
+<style>
+    .stack-blur {
+        filter: blur(4px);
+        pointer-events: none;
+    }
+    #notificationDivId {
+        position: fixed;
+        z-index: 9999;
+    }
+    .spinner,
+    .coditech-loader,
+    #divLodder {
+        position: fixed !important;
+        z-index: 99999 !important;
+    }
+</style>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", transferBatchPopup)
 @section scripts {
     <script src="~/js/coditech/Common/CoditechCommon.js"></script>
     <script src="~/js/coditech/DBTM/DBTMBatch.js"></script>

@@ -3,8 +3,11 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
+using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
+using Coditech.Resources;
+using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Admin.Agents
 {
@@ -104,6 +107,37 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
         #endregion
+
+        public bool TransferBatch(int generalBatchMasterId, long trainerId, out string message)
+        {
+            message = string.Empty;
+            try
+            {
+                TrueFalseResponse response = _dBTMBatchClient.TransferBatch(generalBatchMasterId, trainerId);
+                if (response.IsSuccess)
+                {
+                    message = "Batch transferred successfully.";
+                    return true;
+                }
+                else
+                {
+                    message = GeneralResources.UpdateErrorMessage;
+                    return false;
+                }
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ConvertCampUserToBatchUser", TraceLevel.Warning);
+                message = ex.Message;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ConvertCampUserToBatchUser", TraceLevel.Error);
+                message = GeneralResources.UpdateErrorMessage;
+                return false;
+            }
+        }
         #endregion
     }
 }

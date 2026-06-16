@@ -13,5 +13,6 @@ namespace Coditech.Admin.Agents
         /// <returns>GeneralBatchUserListViewModel</returns>
         GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId);
         GeneralBatchListViewModel GetCalendarBatches(string centreCode, long userMasterId, DateTime startDate, DateTime endDate);
+        bool TransferBatch(int generalBatchMasterId, long trainerId, out string message);
     }
 }

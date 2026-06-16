@@ -94,5 +94,30 @@ namespace Coditech.API.Controllers
                 });
             }
         }
+        [HttpPost]
+        [Route("/DBTMGeneralBatchMaster/TransferBatch")]
+        [Produces(typeof(TrueFalseResponse))]
+        public IActionResult TransferBatch([FromBody] ParameterModel parameterModel)
+        {
+            string[] ids = parameterModel.Ids.Split(',');
+            try
+            {
+                int generalBatchMasterId = Convert.ToInt32(ids[0]);
+                long trainerId = Convert.ToInt64(ids[1]);
+                bool result = _dbtmGeneralBatchMasterService.TransferBatch(generalBatchMasterId,trainerId);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = result });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ConvertCampUser", TraceLevel.Warning);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                });
+            }
+        }
     }
 }
