@@ -68,7 +68,7 @@
                                         <div class="form-check" style="padding-left:0px !important; display:block !important">
                                             @* @if (!isTrainer)
                                             { *@
-                                                <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
+                                            <button type="button" class="btn btn-success" onclick="@clickHandler">@buttonText</button>
                                             @* } *@
                                         </div>
                                     </div>
@@ -78,16 +78,37 @@
                                     <div class="col-lg-3">
                                         <div class="mb-3 multiselect-dropdown">
                                             @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
-                                            @Html.ListBoxFor(m => m.SelectedTrainer,
-                                                     new SelectList(Model.AllTrainerList, "Value", "Text"),
-                                                     new
-                                                     {
-                                                         @class = "selectpicker form-control",
-                                                         multiple = "multiple",
-                                                         data_live_search = "true",
-                                                         disabled = "disabled"   // makes dropdown readonly 
-                                                     })
+                                            @if (isTrainer)
+                                            {
+                                                @Html.ListBoxFor(m => m.SelectedTrainer,
+                                                         new SelectList(Model.AllTrainerList, "Value", "Text"),
+                                                         new
+                                                         {
+                                                             @class = "selectpicker form-control",
+                                                             multiple = "multiple",
+                                                             data_live_search = "true",
+                                                             disabled = "disabled"
+                                                         })
+                                            }
+                                            else
+                                            {
+                                                @Html.ListBoxFor(m => m.SelectedTrainer,
+                                                         new SelectList(Model.AllTrainerList, "Value", "Text"),
+                                                         new
+                                                         {
+                                                             @class = "selectpicker form-control",
+                                                             multiple = "multiple",
+                                                             data_live_search = "true"
+                                                         })
+                                            }
                                             @Html.ValidationMessageFor(x => x.SelectedTrainer)
+                                            @if (isTrainer)
+                                            {
+                                                foreach (var trainerId in Model.SelectedTrainer)
+                                                {
+                                                    <input type="hidden" name="SelectedTrainer" value="@trainerId" />
+                                                }
+                                            }
                                         </div>
                                     </div>
                                     <!-- Radio Buttons Section -->
@@ -146,7 +167,7 @@
                 showButtonPanel: true,
                 closeText: 'Clear',
                 minDate: "-80Y",
-                maxDate: new Date(),              
+                maxDate: new Date(),
                 onClose: function () {
                     if ($(document.activeElement).hasClass("ui-datepicker-close")) {
                         $(this).val('');

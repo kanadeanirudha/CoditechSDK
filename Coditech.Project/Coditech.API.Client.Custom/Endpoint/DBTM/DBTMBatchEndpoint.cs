@@ -26,5 +26,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetDBTMCentrAndTrainerewiseBatchList?centreCode={centreCode}&joiningCodeTypeEnumId={joiningCodeTypeEnumId}&generalTrainerMasterId={generalTrainerMasterId}{BuildEndpointQueryString(true)}";
             return endpoint;
         }
+        public string TransferBatchAsync()
+        {
+            return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralBatchMaster/TransferBatch";
+        }
     }
 }

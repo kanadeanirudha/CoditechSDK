@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
 using System.Data;
+using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
     public class DBTMCentreWiseSettingService : IDBTMCentreWiseSettingService
@@ -34,6 +35,7 @@ namespace Coditech.API.Service
             DBTMCentreWiseSetting dBTMCentreWiseSetting = _dBTMCentreWiseSettingRepository.Table.FirstOrDefault(x => x.CentreCode == centreCode);
             DBTMCentreWiseSettingModel model = dBTMCentreWiseSetting?.FromEntityToModel<DBTMCentreWiseSettingModel>() ?? new DBTMCentreWiseSettingModel();
             model.CentreCode = centreCode;
+            model.CentreName = organisationData.CentreName;
             model.TestListModel = GetCentreTests(centreCode);
             model.OrganisationCentreMasterId = organisationData.OrganisationCentreMasterId;
             if (model.TestListModel?.DBTMCentreWiseTestList != null)
@@ -84,37 +86,81 @@ namespace Coditech.API.Service
         //Update OrganisationMaster.
         public virtual DBTMCentreWiseSettingModel UpdateDBTMCentreWiseSetting(DBTMCentreWiseSettingModel model)
         {
-            if (HelperUtility.IsNull(model))
+            if (IsNull(model))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
-
             bool isSuccess;
             DBTMCentreWiseSetting entity = model.FromModelToEntity<DBTMCentreWiseSetting>();
-
-            // UPDATE
             if (model.DBTMCentreWiseSettingId > 0)
             {
                 isSuccess = _dBTMCentreWiseSettingRepository.Update(entity);
             }
-            // INSERT
             else
             {
-                DBTMCentreWiseSetting insertedEntity =
-                    _dBTMCentreWiseSettingRepository.Insert(entity);
-
+                DBTMCentreWiseSetting insertedEntity =  _dBTMCentreWiseSettingRepository.Insert(entity);
                 isSuccess = insertedEntity != null;
-
                 if (isSuccess)
                     model.DBTMCentreWiseSettingId = insertedEntity.DBTMCentreWiseSettingId;
             }
-
             if (!isSuccess)
             {
                 model.HasError = true;
                 model.ErrorMessage = GeneralResources.UpdateErrorMessage;
             }
-
             return model;
         }
+        public virtual DBTMCentreWiseTestModel AssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds)
+        {
+            DBTMCentreWiseTestModel result = new DBTMCentreWiseTestModel
+            {
+                OrganisationCentreMasterId = organisationCentreId,
+                CentreCode = centreCode,
+                HasError = false
+            };
+            if (testIds?.Count > 0)
+            {
+                foreach (var testId in testIds)
+                {
+                    var exists = _dBTMCentreWiseTestRepository.Table.Any(x => x.CentreCode == centreCode && x.DBTMTestMasterId == testId);
+                    if (!exists)
+                    {
+                        DBTMCentreWiseTest entity = new DBTMCentreWiseTest
+                        {
+                            DBTMTestMasterId = testId,
+                            CentreCode = centreCode,
+                            CreatedDate = DateTime.Now
+                        };
+                        _dBTMCentreWiseTestRepository.Insert(entity);
+                    }
+                }
+            }
+            else
+            {
+                result.HasError = true;
+                result.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return result;
+        }
 
+        public virtual DBTMCentreWiseTestModel UnAssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds)
+        {
+            DBTMCentreWiseTestModel result = new DBTMCentreWiseTestModel
+            {
+                OrganisationCentreMasterId = organisationCentreId,
+                CentreCode = centreCode,
+                HasError = false
+            };
+            if (testIds?.Count > 0)
+            {
+                foreach (var testId in testIds)
+                {
+                    DBTMCentreWiseTest entity = _dBTMCentreWiseTestRepository.Table.FirstOrDefault(x => x.CentreCode == centreCode && x.DBTMTestMasterId == testId);
+                    if (entity != null)
+                    {
+                        _dBTMCentreWiseTestRepository.Delete(entity);
+                    }
+                }
+            }
+            return result;
+        }
     }
 }

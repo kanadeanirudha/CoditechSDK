@@ -1,35 +1,37 @@
 ﻿@model DBTMCentreWiseTestListViewModel
 @{
     Layout = null;
-    ModelPopUpViewModel popup = new ModelPopUpViewModel() { ModelPopUpId = "AssociateTestPopup",  ModalContentId = "AssociateTestPopupContent" };
+    ModelPopUpViewModel popup = new ModelPopUpViewModel() { ModelPopUpId = "AssociateTestPopup", ModalContentId = "AssociateTestPopupContent" };
 }
 <div class="row">
     <div class="col-sm-12 table-responsive">
         <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="chkSelectAll" /> All
+                    </th>
+                    <th>Activity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
             <tbody>
                 @if (Model?.DBTMCentreWiseTestList?.Count > 0)
                 {
                     foreach (var test in Model.DBTMCentreWiseTestList)
                     {
                         <tr>
+                            <td>
+                                <input type="checkbox"
+                                       class="activity-checkbox"
+                                       value="@test.DBTMTestMasterId"
+                                       data-centrewisetestid="@test.DBTMCentreWiseTestId"
+                                       data-associated="@test.IsAssociated.ToString().ToLower()"
+                                @(test.IsAssociated ? "checked" : "") />
+                            </td>
                             <td>@test.TestName</td>
                             <td class="text-center">
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", test.IsAssociated)
-                            </td>
-                            <td class="text-center">
-                                <a class="btn btn-sm btn-circle
-                                   @(test.IsAssociated ? "btn-soft-danger" : "btn-soft-success")"
-                                   data-bs-toggle="modal"
-                                   data-bs-target="#AssociateTestPopup"
-                                   onclick="DBTMCentreWiseTest.GetAssociateUnAssociateCentreTest(
-                                        'AssociateTestPopupContent',
-                                        '@test.DBTMCentreWiseTestId',
-                                        '@test.DBTMTestMasterId',
-                                        '@test.OrganisationCentreMasterId',
-                                        '@test.CentreCode',
-                                        '@test.TestName')">
-                                    <i class="fas @(test.IsAssociated ? "fa-redo" : "fa-check")"></i>
-                                </a>
                             </td>
                         </tr>
                     }

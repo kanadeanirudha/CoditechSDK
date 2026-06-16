@@ -1,4 +1,5 @@
 ﻿using Coditech.API.Endpoint;
+using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
@@ -192,6 +193,45 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-
+        public virtual TrueFalseResponse TransferBatch(int generalBatchMasterId, long trainerId)
+        {
+            return Task.Run(async () => await TransferBatchAsync(generalBatchMasterId, trainerId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<TrueFalseResponse> TransferBatchAsync(int generalBatchMasterId, long trainerId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMBatchEndpoint.TransferBatchAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                ParameterModel parameterModel = new ParameterModel
+                {
+                    Ids = $"{generalBatchMasterId},{trainerId}"
+                };
+                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(parameterModel), status, cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<TrueFalseResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                        throw new CoditechException(ErrorCodes.NullModel, "ConvertCampUserToBatchUser returned empty response.");
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    TrueFalseResponse typedBody = JsonConvert.DeserializeObject<TrueFalseResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
     }
 }

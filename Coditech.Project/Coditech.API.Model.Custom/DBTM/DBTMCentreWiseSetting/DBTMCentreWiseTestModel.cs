@@ -9,5 +9,6 @@ namespace Coditech.Common.API.Model
         public string CentreCode { get; set; }
         public string TestName { get; set; }
         public bool IsAssociated { get; set; }
+        public List<int> TestIds { get; set; }
     }
 }

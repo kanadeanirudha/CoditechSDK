@@ -97,6 +97,36 @@ namespace Coditech.Admin.Agents
                 return (DBTMCentreWiseSettingViewModel)GetViewModelWithErrorMessage(dBTMCentreWiseSettingViewModel, GeneralResources.UpdateErrorMessage);
             }
         }
+
+        public virtual DBTMCentreWiseTestViewModel AssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds)
+        {
+            try
+            {
+                DBTMCentreWiseTestResponse response = _dBTMCentreWiseSettingClient.AssociateCentreTests(organisationCentreId, centreCode, testIds);
+                DBTMCentreWiseTestModel resultModel = response?.DBTMCentreWiseTestModel;
+                return resultModel != null ? resultModel.ToViewModel<DBTMCentreWiseTestViewModel>() : new DBTMCentreWiseTestViewModel { HasError = true, ErrorMessage = "Failed to associate tests." };
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseSetting", TraceLevel.Error);
+                return new DBTMCentreWiseTestViewModel { HasError = true, ErrorMessage = ex.Message };
+            }
+        }
+
+        public virtual DBTMCentreWiseTestViewModel UnAssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds)
+        {
+            try
+            {
+                DBTMCentreWiseTestResponse response = _dBTMCentreWiseSettingClient.UnAssociateCentreTests(organisationCentreId, centreCode, testIds);
+                DBTMCentreWiseTestModel resultModel = response?.DBTMCentreWiseTestModel;
+                return resultModel != null ? resultModel.ToViewModel<DBTMCentreWiseTestViewModel>() : new DBTMCentreWiseTestViewModel { HasError = true, ErrorMessage = "Failed to unassociate tests." };
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMCentreWiseSetting", TraceLevel.Error);
+                return new DBTMCentreWiseTestViewModel { HasError = true, ErrorMessage = ex.Message };
+            }
+        }
         #endregion
         #endregion
     }

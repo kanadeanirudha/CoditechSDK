@@ -20,6 +20,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Is Display Performance Standard")]
         public bool IsDisplayPerformanceStandard { get; set; }
         public DBTMCentreWiseTestListViewModel TestListViewModel { get; set; }
+        public string CentreName { get; set; }
     }
 }
 
