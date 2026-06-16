@@ -520,7 +520,6 @@ namespace Coditech.Admin.Controllers
             ModelState.Remove("Pincode");
             ModelState.Remove("ConfirmPassword");
             ModelState.Remove("Password");
-            ModelState.Remove("SelectedTrainer");
 
             // Main validation check
             if (!dBTMNewRegistrationViewModel.IsTermsAndCondition
