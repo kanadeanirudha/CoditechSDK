@@ -1,0 +1,25 @@
+﻿@model GeneralBatchViewModel
+<div class="modal-header">
+    <h5 class="modal-title">Transfer Batch To Other Trainer</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <p>
+        Are you sure you want to transfer this batch from
+        <b>@Model.AssignedBy</b> to another trainer?
+    </p>
+    <div class="mb-3">
+        <label class="form-label">Select Trainer</label>
+        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
+                 (DropdownViewModel)ViewBag.TrainerDropdown)
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+    <button class="btn btn-success"
+            onclick="DBTMBatch.ConfirmTransfer(@Model.GeneralBatchMasterId)">
+        Confirm
+    </button>
+</div>
