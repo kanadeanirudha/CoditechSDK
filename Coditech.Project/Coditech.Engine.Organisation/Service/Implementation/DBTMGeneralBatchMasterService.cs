@@ -162,15 +162,13 @@ namespace Coditech.API.Service
                     }
                 }
 
-                if (generalBatchModel?.CustomDropdownSelectedValue2.Count == 0)
+                if (generalBatchModel.Custom5 != "Web" && generalBatchModel?.CustomDropdownSelectedValue2?.Count == 0)
                 {
-                    // Get current and new trainee entity IDs
                     var currentUserIds = _generalBatchUserRepository.Table
                         .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId)
                         .ToList();
                     if (currentUserIds?.Count > 0)
                         _generalBatchUserRepository.Delete(currentUserIds);
-
                 }
                 else if (generalBatchModel.CustomDropdownSelectedValue2 != null && generalBatchModel.CustomDropdownSelectedValue2.Any())
                 {
