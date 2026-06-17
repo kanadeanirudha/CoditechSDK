@@ -260,6 +260,7 @@ var DBTMReports = {
     },
 
     GetDBTMMultiTestListByGeneralBatchMasterId: function () {
+        $("#DBTMBatchWiseMultiReportsDivId").html("");
         var selectedItem = $("#GeneralBatchMasterId").val();
         if (selectedItem != "") {
             CoditechCommon.ShowLodder();
@@ -826,6 +827,26 @@ var DBTMReports = {
             },
             error: function () {
                 activityPerformedDates = [];
+            }
+        });
+    },
+    GetBatchByTrainerId: function () {
+        var generalTrainerMasterId = $("#GeneralTrainerMasterId").val();
+        $("#DBTMBatchWiseMultiReportsDivId").html("");
+        $("#DBTMTestMasterId").html("");
+        $('#DBTMTestMasterId').selectpicker('refresh');
+        activityPerformedDates = [];
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMReports/GetBatchByTrainerId",
+            data: {
+                generalTrainerMasterId: generalTrainerMasterId
+            },
+            success: function (data) {
+                $("#GeneralBatchMasterId").html(data);
+                $('#GeneralBatchMasterId').selectpicker('refresh');
             }
         });
     },

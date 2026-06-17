@@ -1,6 +1,16 @@
 ﻿@model DBTMReportsListViewModel
 @{
     ViewBag.Title = "Batchwise Multiple Reports";
+    DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "GeneralTrainerMasterId",
+                Parameter = Model.CentreCode,
+                IsCustomDropdown = true,
+                SelectedText = "All",
+                SelectedValue = "0",
+                ChangeEvent = "DBTMReports.GetBatchByTrainerId()"
+            };
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetDBTMMultiTestListByGeneralBatchMasterId()", IsCustomDropdown = true };
     DropdownViewModel testDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseMultiReports.ToString(), DropdownName = "DBTMTestMasterId", DropdownSelectedValue = Model.DBTMTestMasterId.ToString(), Parameter = $"{Model.GeneralBatchMasterId}~false", ChangeEvent = "DBTMReports.GetDBTMBatchWiseMultiReports('" + Model.GeneralBatchMasterId + "')", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
     ModelPopUpViewModel activityPopup = new ModelPopUpViewModel() { ModelPopUpId = "DBTMActivityDetailPopupId", ModalContentId = "DBTMActivityDetailPopupContentId" };
@@ -21,6 +31,12 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-1">
+                                <label>Trainer</label>
+                            </div>
+                            <div class="col-md-3">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
+                            </div>
+                            <div class="col-md-1">
                                 <label>Batch List</label>
                             </div>
                             <div class="col-md-3">
@@ -29,7 +45,7 @@
                             <div class="col-md-1">
                                 <label class="form-label" for="CustomDropdownSelectedValue1">Activity List</label>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-3">
                                 <div class="mb-3 multiselect-dropdown">
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTestMasterId", multiple = "multiple", data_live_search = "true" })
                                 </div>

@@ -5,6 +5,7 @@ using Coditech.Common.Helper.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Coditech.Admin.Utilities;
+using Coditech.Admin.Helpers;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMReportsController : BaseController
@@ -27,6 +28,8 @@ namespace Coditech.Admin.Controllers
         public ActionResult BatchWiseReports()
         {
             DBTMReportsListViewModel dBTMReportsViewModel = new DBTMReportsListViewModel();
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            dBTMReportsViewModel.CentreCode = userModel?.SelectedCentreCode;
             dBTMReportsViewModel.FromDate = DateTime.Today;
             dBTMReportsViewModel.ToDate = DateTime.Today;
             dBTMReportsViewModel.CustomDropdownList1 = new List<SelectListItem>();
@@ -286,6 +289,26 @@ namespace Coditech.Admin.Controllers
                 DropdownList = model.CustomDropdownList1
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", testDropdown);
+        }
+        public ActionResult GetBatchByTrainerId(long generalTrainerMasterId)
+        {
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            string centreCode = userModel?.SelectedCentreCode;
+            DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownName = "GeneralBatchMasterId",
+                IsCustomDropdown = true
+            };
+            if (generalTrainerMasterId == 0)
+            {
+                trainerDropdown.DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString();
+            }
+            else
+            {
+                trainerDropdown.DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString();
+                trainerDropdown.Parameter = $"{centreCode}~324~{generalTrainerMasterId}";
+            }
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
 
         #region Protected Methods
