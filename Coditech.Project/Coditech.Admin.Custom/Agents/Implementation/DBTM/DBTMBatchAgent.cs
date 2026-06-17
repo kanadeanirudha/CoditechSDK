@@ -95,6 +95,15 @@ namespace Coditech.Admin.Agents
             listViewModel.GeneralBatchUserList = generalBatchUserList?.GeneralBatchUserList?.ToViewModel<GeneralBatchUserViewModel>().ToList();
             return listViewModel;
         }
+        public override GeneralBatchViewModel GetGeneralBatch(int generalBatchMasterId)
+        {
+            GeneralBatchViewModel model = base.GetGeneralBatch(generalBatchMasterId);
+            if (model.GeneralBatchMasterId > 0)
+            {
+                model.Custom5 = "Web";
+            }
+            return model;
+        }
         #endregion
         #region Calendar
         public virtual GeneralBatchListViewModel GetCalendarBatches(string centreCode, long userMasterId, DateTime startDate, DateTime endDate)

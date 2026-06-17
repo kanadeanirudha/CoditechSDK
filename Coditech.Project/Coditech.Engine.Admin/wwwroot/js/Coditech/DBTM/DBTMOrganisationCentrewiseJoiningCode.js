@@ -56,11 +56,18 @@
                 type: "GET",
                 dataType: "html",
                 url: "/DBTMDashboard/GetDBTMTrainerListByCentreCode",
-                data: { "centreCode": centreCode },
+                data: {
+                    "centreCode": centreCode,
+                    selectedTrainerId: $("#SelectedTrainer").val()
+                },
                 success: function (data) {
-                    $("#Custom1").html("").html(data);
+                    var selectedTrainer = $("#SelectedTrainer").val();
+                    $("#Custom1").html(data);
+                    if (selectedTrainer) {
+                        $("#Custom1").val(selectedTrainer).trigger("change");
+                    }
                     CoditechCommon.HideLodder();
-                    $(document).trigger("DBTMTrainerListLoaded");
+                    $(document).trigger("DBTMTrainerListLoaded");                  
                 },
                 error: function (xhr) {
                     if (xhr.status == 401 || xhr.status == 403) {
