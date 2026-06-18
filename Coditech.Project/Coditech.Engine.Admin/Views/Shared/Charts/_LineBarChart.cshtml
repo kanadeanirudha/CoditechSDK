@@ -14,19 +14,18 @@
         var xValues = @Html.Raw(Model.XValues);
         var datasets = [];
 
-    @if (Model.GraphType == "BarChart")
+    @if (Model.GraphType == "BarChart" || Model.GraphType == "bar")
     {
         @foreach (var dataset in Model.Datasets)
         {
             <text>
-                    datasets.push({
-                        label: "@dataset.Label",
-                        data: @Html.Raw(dataset.Data),
-                        backgroundColor: "@dataset.Color",
-                        borderColor: "@dataset.Color",
-                        borderWidth: 2,
-                        tension: 0.4
-                    });
+                     datasets.push({
+                     label: "@dataset.Label",
+                     data: @Html.Raw(dataset.Data),
+                           backgroundColor: "#dc3545",
+                           borderColor: "#dc3545",
+                           borderWidth: 2
+                     });
             </text>
         }
     }
@@ -46,28 +45,48 @@
             </text>
         }
     }
-
+    var textColor = getComputedStyle(document.body).color;
             new Chart(ctx, {
                 type: "@Model.GraphType.ToLower()",
                 data: {
                     labels: xValues,
                     datasets: datasets
                 },
-                options: {
+                    options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    legend: {
+                        labels: {
+                            fontColor: textColor
+                        }
+                    },
                     title: {
                         display: true,
-                        text: '@Model.Title'
+                        text: '@Model.Title',
+                        fontColor: textColor
                     },
                     scales: {
                         xAxes: [{
                             display: true,
-                            scaleLabel: { display: true, labelString: '@Model.XAxisLabel' }
+                            ticks: {
+                                fontColor: textColor
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: '@Model.XAxisLabel',
+                                fontColor: textColor
+                            }
                         }],
                         yAxes: [{
                             display: true,
-                            scaleLabel: { display: true, labelString: '@Model.YAxisLabel' }
+                            ticks: {
+                                fontColor: textColor
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: '@Model.YAxisLabel',
+                                fontColor: textColor
+                            }
                         }]
                     }
                 }
