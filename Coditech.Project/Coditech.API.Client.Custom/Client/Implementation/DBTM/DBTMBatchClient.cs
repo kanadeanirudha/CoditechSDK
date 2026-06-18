@@ -193,6 +193,49 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
+
+        public virtual DBTMBatchListResponse GetDBTMTrainerwiseBatchList(string centreCode, long generalTrainerMasterId)
+        {
+            return Task.Run(async () => await GetDBTMTrainerwiseBatchListAsync(centreCode, generalTrainerMasterId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMBatchListResponse> GetDBTMTrainerwiseBatchListAsync(string centreCode, long generalTrainerMasterId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMBatchEndpoint.GetDBTMTrainerwiseBatchListAsync(centreCode, generalTrainerMasterId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMBatchListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMBatchListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMBatchListResponse typedBody = JsonConvert.DeserializeObject<DBTMBatchListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
         public virtual TrueFalseResponse TransferBatch(int generalBatchMasterId, long trainerId)
         {
             return Task.Run(async () => await TransferBatchAsync(generalBatchMasterId, trainerId, CancellationToken.None)).GetAwaiter().GetResult();

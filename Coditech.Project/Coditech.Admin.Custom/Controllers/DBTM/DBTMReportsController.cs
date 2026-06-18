@@ -305,8 +305,8 @@ namespace Coditech.Admin.Controllers
             }
             else
             {
-                trainerDropdown.DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString();
-                trainerDropdown.Parameter = $"{centreCode}~324~{generalTrainerMasterId}";
+                trainerDropdown.DropdownType = DropdownCustomTypeEnum.DBTMTrainerwiseBatch.ToString();
+                trainerDropdown.Parameter = $"{centreCode}~{generalTrainerMasterId}";
             }
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
