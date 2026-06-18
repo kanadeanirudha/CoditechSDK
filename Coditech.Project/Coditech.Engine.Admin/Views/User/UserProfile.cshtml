@@ -107,12 +107,35 @@
                                     @Html.TextBoxFor(x => x.EmergencyContact, new { @class = "form-control" })
                                     @Html.ValidationMessageFor(x => x.EmergencyContact)
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-4 mb-4">
                                     <div class="mb-3">
-                                        @Html.LabelFor(x => x.DateOfBirth, new { @class = "form-label" })
-                                        @Html.TextBoxFor(x => x.DateOfBirth, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "true", @Isdisabled = "true" })
+                                        @Html.LabelFor(x => x.DateOfBirth, new { @class = "form-label required" })
+                                        @Html.TextBoxFor(x => x.DateOfBirth, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", id = "DateOfBirth", @readonly = "readonly" })
                                         @Html.ValidationMessageFor(x => x.DateOfBirth)
                                     </div>
+                                </div>
+                                <div class="col-lg-4 mb-4">
+                                    @Html.LabelFor(x => x.GenderEnumId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
+                                             new DropdownViewModel()
+                                {
+                                    DropdownName = "GenderEnumId",
+                                    GroupCode = DropdownTypeEnum.Gender.ToString(),
+                                    DropdownSelectedValue = Model.GenderEnumId.ToString(),
+                                    IsDisabled = true
+                                })
+                                </div>
+
+                                <div class="col-lg-4 mb-4">
+                                    @Html.LabelFor(x => x.EmployeeDesignationMasterId, new { @class = "form-label" })
+                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
+                                             new DropdownViewModel()
+                                {
+                                    DropdownType = DropdownTypeEnum.Designation.ToString(),
+                                    DropdownName = "EmployeeDesignationMasterId",
+                                    DropdownSelectedValue = Model.EmployeeDesignationMasterId.ToString(),
+                                    IsDisabled = true
+                                })
                                 </div>
                                 <div class="col-lg-4 mb-4">
                                     @Html.LabelFor(x => x.MaritalStatus, new { @class = "form-label" })
@@ -234,28 +257,23 @@
     //     }
     // });
 
-
-
-        // // Initialize DatePicker
-        // $("#DateOfBirth").datepicker({
-        //     changeMonth: true,
-        //     changeYear: true,
-        //     yearRange: "-100:+100",
-        //     dateFormat: "@AdminGeneralHelper.DateFormatForCalendar()",
-        //     language: "en",
-        //     autoSize: true,
-        //     gotoCurrent: true,
-        //     clearBtn: true,
-        //     showButtonPanel: true,
-        //     closeText: 'Clear',
-        //     onClose: function (dateText, inst) {
-        //         if ($(window.event.srcElement).hasClass('ui-datepicker-close')) {
-        //             document.getElementById(this.id).value = '';
-        //         }
-        //     },
-        //     minDate: "-80Y",
-        //     maxDate: new Date()
-        // });
+         $("#DateOfBirth").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0",
+                dateFormat: "yy-mm-dd",
+                autoSize: true,
+                gotoCurrent: true,
+                showButtonPanel: true,
+                closeText: 'Clear',
+                minDate: "-80Y",
+                maxDate: new Date(),
+                onClose: function () {
+                    if ($(document.activeElement).hasClass("ui-datepicker-close")) {
+                        $(this).val('');
+                    }
+                }
+            });
 
         // // When DOB changes, calculate age
         // $('#DateOfBirth').change(function () {
