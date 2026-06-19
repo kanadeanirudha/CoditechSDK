@@ -311,12 +311,13 @@ namespace Coditech.API.Service
             if (userMasterId <= 0)
                 throw new CoditechException(ErrorCodes.NullModel, "Trainer's user not found for given EmployeeId.");
             GeneralBatchMaster batch = _generalBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchMasterId);
-            if (IsNull(batch))
-                throw new CoditechException(ErrorCodes.NullModel, "Batch not found.");
-            batch.CreatedBy = userMasterId;
-            batch.ModifiedDate = DateTime.Now;
-            _generalBatchMasterRepository.Update(batch);
-            return true;
+            CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>();
+            objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@TrainerId", userMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("Status", null, ParameterDirection.Output, DbType.Int32);
+            int status = 0;
+            objStoredProc.ExecuteStoredProcedureList("Coditech_DBTMBatchTransferToOther @GeneralBatchMasterId, @TrainerId, @Status OUT", 1, out status);
+            return status == 1 ? true : false;
         }
         #endregion
     }
