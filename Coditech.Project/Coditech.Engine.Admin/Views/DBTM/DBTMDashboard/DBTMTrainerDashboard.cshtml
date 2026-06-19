@@ -5,7 +5,6 @@
 @{
     ViewBag.Title = "Dashboard";
     // Yearly Trainee Overview
-    string[] backgroundColor = ["rgba(42, 118, 244, 0.18)", "rgba(42, 118, 244, 0.30)"];
     int monthCount = Model.YearlyTraineeOverviewList.Count();
     string[] XValuesBarYearlyTraineeTrainedOverview = new string[monthCount];
     decimal[] YValuesBarYearlyTraineeTrainedOverview = new decimal[monthCount];
@@ -22,7 +21,7 @@
         {
             Label = "Trainees",
             Data = JsonConvert.SerializeObject(YValuesBarYearlyTraineeTrainedOverview),
-            Color = JsonConvert.SerializeObject(backgroundColor)
+            Color = "#dc3545"
         }
     };
     LineBarChartModel trainerviewModel = new LineBarChartModel()
