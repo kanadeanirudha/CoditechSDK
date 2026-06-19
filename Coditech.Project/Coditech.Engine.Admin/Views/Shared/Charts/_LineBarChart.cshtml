@@ -14,18 +14,18 @@
         var xValues = @Html.Raw(Model.XValues);
         var datasets = [];
 
-    @if (Model.GraphType == "BarChart" || Model.GraphType == "bar")
+    @if (Model.GraphType.Equals("Bar", StringComparison.OrdinalIgnoreCase))
     {
         @foreach (var dataset in Model.Datasets)
         {
             <text>
-                     datasets.push({
-                     label: "@dataset.Label",
-                     data: @Html.Raw(dataset.Data),
-                           backgroundColor: "#dc3545",
-                           borderColor: "#dc3545",
-                           borderWidth: 2
-                     });
+                            datasets.push({
+                                label: "@dataset.Label",
+                                data: @Html.Raw(dataset.Data),
+                                backgroundColor: "@dataset.Color",
+                                borderColor: "@dataset.Color",
+                                borderWidth: 2
+                            });
             </text>
         }
     }
@@ -34,62 +34,62 @@
         @foreach (var dataset in Model.Datasets)
         {
             <text>
-                    datasets.push({
-                        label: "@dataset.Label",
-                        data: @Html.Raw(dataset.Data),
-                        fill: false,
-                        borderColor: "@dataset.Color",
-                        borderWidth: 2,
-                        tension: 0.4
-                    });
+                            datasets.push({
+                                label: "@dataset.Label",
+                                data: @Html.Raw(dataset.Data),
+                                fill: false,
+                                borderColor: "@dataset.Color",
+                                borderWidth: 2,
+                                tension: 0.4
+                            });
             </text>
         }
     }
     var textColor = getComputedStyle(document.body).color;
-            new Chart(ctx, {
-                type: "@Model.GraphType.ToLower()",
-                data: {
-                    labels: xValues,
-                    datasets: datasets
-                },
-                    options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        labels: {
+                new Chart(ctx, {
+                    type: "@Model.GraphType.ToLower()",
+                    data: {
+                        labels: xValues,
+                        datasets: datasets
+                    },
+                        options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            labels: {
+                                fontColor: textColor
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '@Model.Title',
                             fontColor: textColor
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                ticks: {
+                                    fontColor: textColor
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: '@Model.XAxisLabel',
+                                    fontColor: textColor
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    fontColor: textColor
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: '@Model.YAxisLabel',
+                                    fontColor: textColor
+                                }
+                            }]
                         }
-                    },
-                    title: {
-                        display: true,
-                        text: '@Model.Title',
-                        fontColor: textColor
-                    },
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            ticks: {
-                                fontColor: textColor
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: '@Model.XAxisLabel',
-                                fontColor: textColor
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            ticks: {
-                                fontColor: textColor
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: '@Model.YAxisLabel',
-                                fontColor: textColor
-                            }
-                        }]
                     }
-                }
-            });
-    })();
+                });
+        })();
 </script>
