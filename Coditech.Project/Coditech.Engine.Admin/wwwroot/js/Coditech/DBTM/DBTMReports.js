@@ -260,6 +260,7 @@ var DBTMReports = {
     },
 
     GetDBTMMultiTestListByGeneralBatchMasterId: function () {
+        $("#DBTMBatchWiseMultiReportsDivId").html("");
         var selectedItem = $("#GeneralBatchMasterId").val();
         if (selectedItem != "") {
             CoditechCommon.ShowLodder();
@@ -399,7 +400,7 @@ var DBTMReports = {
         $("#DBTMTestWiseMultiReportsDivId").html("");
 
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
-            CoditechCommon.ShowLodder();         
+            CoditechCommon.ShowLodder();
             $.ajax({
                 cache: false,
                 type: "GET",
@@ -666,7 +667,7 @@ var DBTMReports = {
             $.ajax({
                 cache: false,
                 type: "GET",
-                url: "/DBTMReports/GetMultiTestByCampMasterId", 
+                url: "/DBTMReports/GetMultiTestByCampMasterId",
                 data: { dBTMCampMasterId: campId },
                 success: function (data) {
                     $("#DBTMTestMasterId").html(data);
@@ -695,7 +696,7 @@ var DBTMReports = {
         if (campId != "" && dBTMTestMasterId != "") {
             CoditechCommon.ShowLodder();
             if (!activityPerformedDates || activityPerformedDates.length === 0) {
-                CoditechNotification.DisplayNotificationMessage("Camp has never been tested.", "error" );
+                CoditechNotification.DisplayNotificationMessage("Camp has never been tested.", "error");
                 return;
             }
             $.ajax({
@@ -791,7 +792,7 @@ var DBTMReports = {
                     return d.split('T')[0];
                 });
                 if (!activityPerformedDates || activityPerformedDates.length === 0) {
-                    CoditechNotification.DisplayNotificationMessage( "Camp has never been tested.", "error");
+                    CoditechNotification.DisplayNotificationMessage("Camp has never been tested.", "error");
                 }
                 $("#FromDate,#ToDate").datepicker("refresh");
             },
@@ -800,7 +801,7 @@ var DBTMReports = {
             }
         });
     },
-    LoadTraineeProfileActivityDates : function () {
+    LoadTraineeProfileActivityDates: function () {
         var traineeIds = $("#DBTMTraineeDetailId").val();
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         if (!traineeIds || traineeIds.length === 0) {
@@ -826,6 +827,35 @@ var DBTMReports = {
             },
             error: function () {
                 activityPerformedDates = [];
+            }
+        });
+    },
+    GetBatchByTrainerId: function () {
+        var generalTrainerMasterId = $("#GeneralTrainerMasterId").val();
+        $("#DBTMBatchWiseMultiReportsDivId").html("");
+        $("#DBTMTestMasterId").html("");
+        $('#DBTMTestMasterId').selectpicker('refresh');
+        activityPerformedDates = [];
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMReports/GetBatchByTrainerId",
+            data: {
+                generalTrainerMasterId: generalTrainerMasterId
+            },
+            success: function (data) {
+                $("#GeneralBatchMasterId").html(data);
+                $('#GeneralBatchMasterId').selectpicker('refresh');
+                CoditechCommon.HideLodder();
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load batches.", "error");
+                CoditechCommon.HideLodder();
             }
         });
     },

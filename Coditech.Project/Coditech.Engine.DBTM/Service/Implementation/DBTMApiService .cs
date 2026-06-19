@@ -599,6 +599,11 @@ namespace Coditech.API.Service
         }
         public DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(string centreCode, int joiningCodeTypeEnumId, long generalTrainerMasterId)
         {
+            var validBatchIds = _dBTMDeviceDataRepository.Table
+                                .Where(x => x.TypeOfRecord == "Batch" && x.IsValidRecord)
+                                .Select(x => x.TablePrimaryColumnId)
+                                .Distinct()
+                                .ToList();
             var batches = (from a in _generalBatchRepository.Table
                            join b in _userMasterRepository.Table
                                on a.CreatedBy equals b.UserMasterId
@@ -611,6 +616,40 @@ namespace Coditech.API.Service
                                  && b.UserType == "Employee"
                                  && a.CentreCode == centreCode
                                  && d.GeneralTrainerMasterId == generalTrainerMasterId
+                           select new DBTMBatchModel
+                           {
+                               GeneralBatchMasterId = a.GeneralBatchMasterId,
+                               BatchName = a.BatchName
+                           })
+                           .OrderBy(x => x.BatchName)
+                           .ToList();
+
+            return new DBTMBatchListModel
+            {
+                DBTMBatchList = batches ?? new List<DBTMBatchModel>()
+            };
+        }
+
+        public DBTMBatchListModel GetDBTMTrainerwiseBatchList(string centreCode, long generalTrainerMasterId)
+        {
+            var validBatchIds = _dBTMDeviceDataRepository.Table
+                                .Where(x => x.TypeOfRecord == "Batch" && x.IsValidRecord)
+                                .Select(x => x.TablePrimaryColumnId)
+                                .Distinct()
+                                .ToList();
+            var batches = (from a in _generalBatchRepository.Table
+                           join b in _userMasterRepository.Table
+                               on a.CreatedBy equals b.UserMasterId
+                           join c in _employeeMasterRepository.Table
+                               on b.EntityId equals c.EmployeeId
+                           join d in _generalTrainerMasterRepository.Table
+                               on c.EmployeeId equals d.EmployeeId
+                           where a.IsActive
+                                 && b.IsActive
+                                 && b.UserType == "Employee"
+                                 && a.CentreCode == centreCode
+                                 && d.GeneralTrainerMasterId == generalTrainerMasterId
+                                 && validBatchIds.Contains(a.GeneralBatchMasterId)
                            select new DBTMBatchModel
                            {
                                GeneralBatchMasterId = a.GeneralBatchMasterId,
@@ -647,9 +686,6 @@ namespace Coditech.API.Service
                 }
             }
         }
-
-
-
     }
 
     public enum TestParameterCode
