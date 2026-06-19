@@ -30,5 +30,10 @@ namespace Coditech.API.Endpoint
         {
             return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralBatchMaster/TransferBatch";
         }
+        public string GetDBTMTrainerwiseBatchListAsync(string centreCode, long generalTrainerMasterId)
+        {
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetDBTMTrainerwiseBatchList?centreCode={centreCode}&generalTrainerMasterId={generalTrainerMasterId}{BuildEndpointQueryString(true)}";
+            return endpoint;
+        }
     }
 }

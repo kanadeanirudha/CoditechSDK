@@ -22,5 +22,6 @@ namespace Coditech.API.Service
         DBTMBatchModel GetCampDetails(int dBTMCampMasterId);
         bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord);
         DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(string centreCode, int joiningCodeTypeEnumId, long generalTrainerMasterId);
+        DBTMBatchListModel GetDBTMTrainerwiseBatchList(string centreCode, long generalTrainerMasterId);
     }
 }

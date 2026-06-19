@@ -61,6 +61,13 @@
         </style>
     }
     <script src="~/lib/chart/Chart.min.js"></script>
+    <style>
+        @@media (min-width: 1024px) {
+            #moduleList {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body data-layout="vertical" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
     @Html.Partial("~/Views/Shared/_Loader.cshtml")
@@ -161,13 +168,28 @@
                         </a><!-- End mobile menu toggle-->
                     </li> <!--end menu item-->
                 </ul><!--end topbar-nav-->
-
+                <ul class="list-unstyled topbar-nav mb-0">
+                    <li>
+                        <button class="nav-link button-menu-mobile" fdprocessedid="y0c0n">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu align-self-center topbar-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                    </li>
+                    <li class="d-flex">
+                        @if (userData.AccessibleCentreList != null && userData.AccessibleCentreList.Count > 1)
+                        {
+                            <h4 class="center-name m-0">@userData.AccessibleCentreList.FirstOrDefault().CentreName</h4>
+                        }
+                        else
+                        {
+                            <h4 class="center-name m-0">Powered Sports Tech</h4>
+                        }
+                    </li>
+                </ul>
                 <div class="navbar-custom-menu">
                     <div id="navigation">
                         <!-- Navigation Menu-->
-                        <ul class="navigation-menu">
+                        <ul class="navigation-menu" id="moduleList">
                             @Html.Partial("~/Views/Shared/_ModuleList.cshtml", userData)
-
                             <!-- END: Main Menu-->
                         </ul><!-- End navigation menu -->
                     </div> <!-- end navigation -->

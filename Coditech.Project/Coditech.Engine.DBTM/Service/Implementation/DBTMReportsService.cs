@@ -92,19 +92,20 @@ namespace Coditech.API.Service
                 {
                     if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
-                        XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
+                        XValuesList = new string[] {"S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
                     }
                     else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
                     {
-                        XValuesList = new string[] { "S1", "S2", "S3", "S4", "S5", "S6" };
+                        XValuesList = new string[] { "S0", "S1", "S2", "S3", "S4", "S5", "S6" };
                     }
                     else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
                     {
-                        XValuesList = new string[] { "S1", "S2", "S3", "S4" };
+                        XValuesList = new string[] { "S0", "S1", "S2", "S3", "S4" };
                     }
                     else
                     {
                         List<string> xValues = new List<string>();
+                        xValues.Add("A");
                         xValues.AddRange(dBTMReportsList
                                     .Where(x => !string.IsNullOrEmpty(x.FromTo))
                                     .GroupBy(x => x.FromTo)
@@ -127,6 +128,7 @@ namespace Coditech.API.Service
                 else if (graphMaster.XParameter == CustomConstants.Distance)
                 {
                     List<string> xValues = new List<string>();
+                    xValues.Add("0");
                     if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
                         double distance = 22.86;
@@ -305,8 +307,10 @@ namespace Coditech.API.Service
             {
                 short j = 1;
                 List<decimal> yValuesList = new List<decimal>();
+                yValuesList.Add(0);
                 if (graphMaster.XParameter == CustomConstants.Turns && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
                 {
+                    yValuesList.Remove(0);
                     for (int index = 1; index <= groupedReports.Count(); index++)
                     {
                         if (index == i)
