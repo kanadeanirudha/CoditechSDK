@@ -17,5 +17,8 @@ namespace Coditech.Common.API.Model
             DataTable = new DataTable();
         }
         public List<GraphModel> GraphModelList = new List<GraphModel>();
+        public decimal Weight { get; set; }
+        public decimal Height { get; set; }
+        public Dictionary<string, string> ActivityDetails { get; set; }
     }
 }

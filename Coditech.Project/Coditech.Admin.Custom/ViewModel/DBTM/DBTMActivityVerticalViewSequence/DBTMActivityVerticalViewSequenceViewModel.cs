@@ -49,5 +49,7 @@ namespace Coditech.Admin.ViewModel
         public string TestName { get; set; }
         [Display(Name = "Static Value")]
         public string StaticValue { get; set; }
+        [Display(Name = "Is Common Column")]
+        public bool IsCommonColumn { get; set; }
     }
 }

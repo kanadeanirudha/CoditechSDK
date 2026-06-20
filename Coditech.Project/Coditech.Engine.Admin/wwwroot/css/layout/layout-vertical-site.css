@@ -618,13 +618,16 @@ a.dashboard-menu-list span {
         align-items: center;
         justify-content: center;
     }
+
         .brand.logo-background img {
             width: 100%;
             height: 100%;
         }
-        .topbar .brand.logo-background {
-            display: flex !important;
-        }
+
+    .topbar .brand.logo-background {
+        display: flex !important;
+    }
+
     .brand.logo-background .logo-large-wrapper {
         display: none !important;
     }
@@ -632,6 +635,9 @@ a.dashboard-menu-list span {
     .brand.logo-background .logo-small-wrapper {
         display: inline-block !important;
         width: 100%;
+    }
+    .page-wrapper .page-content {
+        padding: 30px 15px;
     }
 }
 
