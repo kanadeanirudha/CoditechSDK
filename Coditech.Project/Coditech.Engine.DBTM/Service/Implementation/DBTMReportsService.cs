@@ -127,62 +127,56 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.XParameter == CustomConstants.Distance)
                 {
-                    List<string> xValues = new List<string>();
-                    xValues.Add("0");
+                    // Local helper to generate distance steps safely (avoids accumulating floating-point errors)
+                    string[] GenerateDistanceSteps(double distance, int steps)
+                    {
+                        var list = new List<string> { "0" };
+                        for (int s = 1; s <= steps; s++)
+                        {
+                            list.Add(Math.Round(distance * s, 2).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                        }
+                        return list.ToArray();
+                    }
+
                     if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
                     {
-                        double distance = 22.86;
-                        for (double i = distance; i <= (distance * 12); i = i + distance)
-                        {
-                            xValues.Add(Math.Round(i, 2).ToString());
-                        }
-                        XValuesList = xValues.ToArray();
+                        XValuesList = GenerateDistanceSteps(22.86, 12);
                     }
                     else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
                     {
-                        double distance = 10;
-                        for (double i = distance; i <= (distance * 6); i = i + distance)
-                        {
-                            xValues.Add(Math.Round(i, 2).ToString());
-                        }
-                        XValuesList = xValues.ToArray();
+                        XValuesList = GenerateDistanceSteps(10, 6);
                     }
                     else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
                     {
-                        double distance = 10;
-                        for (double i = distance; i <= (distance * 4); i = i + distance)
-                        {
-                            xValues.Add(Math.Round(i, 2).ToString());
-                        }
-                        XValuesList = xValues.ToArray();
+                        XValuesList = GenerateDistanceSteps(10, 4);
                     }
                     else
                     {
+                        // Fallback: derive X values from available report data
                         if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
                         {
-                            xValues.AddRange(dBTMReportsList
-                                      .Where(x => x.ParameterCode == CustomConstants.Distance ||
-                                                  x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
+                            var values = dBTMReportsList
+                                      .Where(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
                                       .GroupBy(x => x.FromTo)
                                       .OrderBy(g => g.Min(x => x.Row))
-                                      .Select(g => g.Key));
-                            XValuesList = xValues.ToArray();
+                                      .Select(g => g.Key)
+                                      .ToList();
+                            XValuesList = (new[] { "0" }).Concat(values).ToArray();
                         }
                         else if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow))
                         {
-                            xValues.AddRange(dBTMReportsList
-                                      .Where(x => x.ParameterCode == CustomConstants.Distance ||
-                                                  x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
+                            var values = dBTMReportsList
+                                      .Where(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
                                       .GroupBy(x => x.FromTo)
                                       .OrderBy(g => g.Min(x => x.Row))
                                       .Select(g =>
                                       {
                                           decimal value = decimal.TryParse(g.First().ParameterValue?.ToString(), out decimal result) ? result : 0;
-                                          return (value * g.First().Row).ToString();
-                                      }));
-                            XValuesList = xValues.ToArray();
+                                          return (value * g.First().Row).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                      })
+                                      .ToList();
+                            XValuesList = (new[] { "0" }).Concat(values).ToArray();
                         }
-                        //segments = dBTMReportsList.OrderBy(x => x.Row).Select(x => x.FromTo).Distinct().ToList();
                     }
                 }
                 else if (graphMaster.XParameter == CustomConstants.Turns)
