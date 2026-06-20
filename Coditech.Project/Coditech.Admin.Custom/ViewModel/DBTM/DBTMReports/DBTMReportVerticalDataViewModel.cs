@@ -16,5 +16,8 @@ namespace Coditech.Admin.ViewModel
         public string Direction { get; set; }
         public List<KeyValuePair<string, DataTable>> DataTableList { get; set; }
         public List<GraphModel> GraphModelList { get; set; }
+        public decimal Weight { get; set; }
+        public decimal Height { get; set; }
+        public Dictionary<string, string> ActivityDetails { get; set; }
     }
 }

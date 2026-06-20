@@ -19,5 +19,6 @@
         public bool IsColumnCellBold { get; set; }
         public string TestName { get; set; }
         public string StaticValue { get; set; }
+        public bool IsCommonColumn { get; set; }
     }
 }

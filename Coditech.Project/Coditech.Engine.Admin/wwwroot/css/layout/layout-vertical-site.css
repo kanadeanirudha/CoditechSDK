@@ -598,8 +598,50 @@ a.dashboard-menu-list span {
     line-height: 52px;
     max-height: 52px;
 }
+.brand.logo-background .logo-small-wrapper {
+    display: none !important;
+}
+.topbar .brand.logo-background {
+    display: none;
+}
+.brand.logo-background .logo-large-wrapper .logo-lg {
+    display: inline-block !important;
+    width: 88%;
+    height: auto;
+}
 
-@media only screen and (min-width:992px) {
+@media only screen and (max-width: 1025px) {
+    .brand.logo-background {
+        min-height: 52px;
+        max-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .brand.logo-background img {
+            width: 100%;
+            height: 100%;
+        }
+
+    .topbar .brand.logo-background {
+        display: flex !important;
+    }
+
+    .brand.logo-background .logo-large-wrapper {
+        display: none !important;
+    }
+
+    .brand.logo-background .logo-small-wrapper {
+        display: inline-block !important;
+        width: 100%;
+    }
+    .page-wrapper .page-content {
+        padding: 30px 15px;
+    }
+}
+
+@media only screen and (min-width:1025px) {
     .hidden-lg {
         display: none;
     }
@@ -631,7 +673,7 @@ a.dashboard-menu-list span {
             text-align: center;
         }
 
-    .left-sidenav .brand .logo .logo-lg {
-        height: 23px;
+    .left-sidenav .brand {
+        width: 100% !important;
     }
 }

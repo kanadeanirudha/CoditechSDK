@@ -123,6 +123,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetCentrewiseDepartmentList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTrainerwiseBatch.ToString()))
+            {
+                GetDBTMTrainerwiseBatchList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -755,6 +759,32 @@ namespace Coditech.Admin.Helpers
                 return;
 
             DBTMBatchListResponse response = new DBTMBatchClient().GetDBTMCentrAndTrainerewiseBatchList(centreCode, joiningCodeTypeEnumId, generalTrainerMasterId);
+            DBTMBatchListModel list = new DBTMBatchListModel() { DBTMBatchList = response.DBTMBatchList };
+            foreach (var item in list?.DBTMBatchList.OrderBy(x => x.BatchName))
+            {
+                dropdownList.Add(new SelectListItem
+                {
+                    Text = item.BatchName,
+                    Value = item.GeneralBatchMasterId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralBatchMasterId)
+                });
+            }
+        }
+        private static void GetDBTMTrainerwiseBatchList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem { Value = "0", Text = GeneralResources.SelectLabel });
+            var param = dropdownViewModel.Parameter?.Split('~');
+            if (param == null || param.Length < 2)
+                return;
+            string centreCode = param[0];
+            if (!long.TryParse(param[1], out long generalTrainerMasterId))
+                return;
+            if (string.IsNullOrEmpty(centreCode) || generalTrainerMasterId == 0)
+                return;
+            DBTMBatchListResponse response = new DBTMBatchClient().GetDBTMTrainerwiseBatchList(centreCode, generalTrainerMasterId);
             DBTMBatchListModel list = new DBTMBatchListModel() { DBTMBatchList = response.DBTMBatchList };
             foreach (var item in list?.DBTMBatchList.OrderBy(x => x.BatchName))
             {
