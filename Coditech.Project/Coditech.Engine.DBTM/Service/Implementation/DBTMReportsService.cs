@@ -827,6 +827,8 @@ namespace Coditech.API.Service
             model.TestName = testData.TestName;
             model.Status = "Completed";
             model.TestPerformedTime = deviceData.TestPerformedTime;
+            model.Height = deviceData.Height;
+            model.Weight = deviceData.Weight;
             model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, false);
             model.GraphModelList = TestWiseGraphReportsV2(testData.DBTMTestMasterId, traineeDetails.DBTMTraineeDetailId, string.Empty, CustomConstants.InstantaneousChart, deviceData.TestPerformedTime, deviceData.TestPerformedTime, 0, UserTypeEnum.Employee.ToString(), traineeDetails.CentreCode, false, typeOfRecord);
             int expireMinutes = ApiCustomSettings.IsValidRecordButtonExpireTimeOnMobile;

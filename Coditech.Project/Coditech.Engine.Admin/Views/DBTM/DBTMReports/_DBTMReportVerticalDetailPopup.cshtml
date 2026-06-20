@@ -14,29 +14,44 @@
     <!-- Details Table -->
     <table class="table table-bordered table-sm mb-3">
         <tr>
-            <th style="width: 30%;">Athlete Name:</th>
-            <td>@Model.AthleteName</td>
+            <th style="width:20%;">Athlete Name:</th>
+            <td style="width:30%;">@Model.AthleteName</td>
+
+            <th style="width:20%;">Activity Name:</th>
+            <td style="width:30%;">@Model.TestName</td>
         </tr>
+
         <tr>
-            <th>Activity Name:</th>
-            <td>@Model.TestName</td>
-        </tr>
-        <tr>
+            <th>Height:</th>
+            <td>@Model.Height</td>
+
             <th>Status:</th>
             <td>
-                <span class="badge bg-success">
-                    @Model.Status
-                </span>
+                <span class="badge bg-success">@Model.Status</span>
             </td>
         </tr>
-        @*    <tr>
-            <th>Direction:</th>
-            <td>@Model.Direction</td>
-        </tr> *@
+
         <tr>
-            <th style="width: 35%; white-space: nowrap;"> Activity Performed On: </th>
-            <td style="white-space: nowrap;"> @Model.TestPerformedTime.ToString("dd/MM/yyyy hh:mm tt")</td>
+            <th>Weight:</th>
+            <td>@Model.Weight</td>
+
+            <th>Activity Performed:</th>
+            <td>@Model.TestPerformedTime.ToString("dd/MM/yyyy hh:mm tt")</td>
         </tr>
+
+        @if (Model.ActivityDetails?.Count > 0)
+        {
+            foreach (var item in Model.ActivityDetails)
+            {
+                <tr>
+                    <th></th>
+                    <td></td>
+
+                    <th>@item.Key:</th>
+                    <td>@item.Value</td>
+                </tr>
+            }
+        }
     </table>
     <!-- Data Table -->
     <div class="accordion" id="activityViewAccordion">
