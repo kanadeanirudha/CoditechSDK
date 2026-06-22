@@ -1481,9 +1481,9 @@ namespace Coditech.API.Service
                         else if (displayColumn.IsCalculatedParameter)
                         {
                             if (displayColumn.ParameterCode == CustomConstants.CompletionTime)
-                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
+                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
                             else
-                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
+                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
                         }
                         else
                         {
@@ -1500,17 +1500,17 @@ namespace Coditech.API.Service
                             }
                         }
                         newRow[displayColumn.ColumnName] = value;
-                        if (displayColumn.IsCommonColumn)
+                        if (i == 1 && displayColumn.IsCommonColumn)
                         {
-                            previousValue = value;
                             if (dBTMTestMaster.TestOutputHigher == "LO")
                             {
-                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = Convert.ToDecimal(value) <= Convert.ToDecimal(previousValue) ? previousValue : value;
+                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = turn == 1 ? value : Convert.ToDecimal(value) <= Convert.ToDecimal(previousValue) ? value : previousValue;
                             }
                             else
                             {
-                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = Convert.ToDecimal(value) >= Convert.ToDecimal(previousValue) ? previousValue : value;
+                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = turn == 1 ? value : Convert.ToDecimal(value) >= Convert.ToDecimal(previousValue) ? value : previousValue;
                             }
+                            previousValue = value;
                         }
                     }
                     dataTable.Rows.Add(newRow);
@@ -1523,7 +1523,7 @@ namespace Coditech.API.Service
                 keyValuePairs.Add($"Turn {turn}", dataTable);
                 turn++;
             }
-           
+
             foreach (DBTMTestParameterVerticalViewSequence col in listviewSequenceColumns)
             {
                 if (dbtmReportVerticalDataModel.ActivityDetails.Any(x => x.Key == col.ParameterCode))
