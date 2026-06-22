@@ -45,7 +45,13 @@ namespace Coditech.Admin.Agents
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             long userId = 0;
             if (userModel.Custom1 == CustomConstants.DBTMTrainer)
+            {
                 userId = userModel.UserMasterId;
+            }
+            else if (!string.IsNullOrEmpty(dataTableModel.SelectedParameter2))
+            {
+                long.TryParse(dataTableModel.SelectedParameter2, out userId);
+            }
 
             GeneralBatchListResponse response = _generalBatchClient.List(dataTableModel.SelectedCentreCode, userId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             GeneralBatchListModel generalBatchList = new GeneralBatchListModel { GeneralBatchList = response?.GeneralBatchList };
