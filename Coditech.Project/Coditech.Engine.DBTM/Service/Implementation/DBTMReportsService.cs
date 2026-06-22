@@ -76,7 +76,7 @@ namespace Coditech.API.Service
             string yParameter = string.IsNullOrEmpty(graphMaster.YParameterBasedOn) ? graphMaster.YParameter : graphMaster.YParameterBasedOn;
 
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode, typeOfRecord);
-            if (dBTMReportsList?.Count > 0)
+            if (dBTMReportsList?.Any() == true)
             {
                 ReportsListDecryption(dBTMReportsList);
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
@@ -178,7 +178,8 @@ namespace Coditech.API.Service
                 else if (graphMaster.XParameter == CustomConstants.Turns)
                 {
                     List<string> xValues = new List<string>();
-                    for (int count = 1; count <= dBTMReportsList.Count(); count++)
+                    int totalCount = dBTMReportsList.Count;
+                    for (int count = 1; count <= totalCount; count++)
                     {
                         xValues.Add(count.ToString());
                     }
@@ -197,9 +198,10 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.XParameter == CustomConstants.NumberOfTurns)
                 {
-                    int aa = dBTMReportsList.Select(x => x.CreatedDate).Distinct().Count();
+                    var distinctDates = dBTMReportsList.Select(x => x.CreatedDate).Distinct().ToList();
+                    int aa = distinctDates.Count;
                     List<string> xValues = new List<string>();
-                    for (int count = 1; count <= dBTMReportsList.Select(x => x.CreatedDate).Distinct().Count(); count++)
+                    for (int count = 1; count <= aa; count++)
                     {
                         xValues.Add(count.ToString());
                     }
@@ -212,9 +214,9 @@ namespace Coditech.API.Service
                     graphModel.GraphName = graphMaster.GraphName;
                     graphModel.GraphSize = graphMaster.GraphSize;
                     int colorIndex = 0;
-                    var groupedReports = dBTMReportsList.GroupBy(x => x.CreatedDate);
-                    var groupedReportsByDateFormat = dBTMReportsList.GroupBy(x => x.CreatedDate.ToString(CustomConstants.GraphDateFormat));
-                    int groupedReportCount = groupedReports.Count();
+                    var groupedReports = dBTMReportsList.GroupBy(x => x.CreatedDate).ToList();
+                    var groupedReportsByDateFormat = dBTMReportsList.GroupBy(x => x.CreatedDate.ToString(CustomConstants.GraphDateFormat)).ToList();
+                    int groupedReportCount = groupedReports.Count;
                     if (graphMaster.IsCalculateAverage && groupedReportCount > 1)
                     {
                         groupedReportCount++;
@@ -292,20 +294,24 @@ namespace Coditech.API.Service
         }
         private void BindInstantaneousChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<DateTime, DBTMReportsModel>> groupedReports, string[] colorPalette)
         {
+            var groupedReportsList = groupedReports as IList<IGrouping<DateTime, DBTMReportsModel>> ?? groupedReports.ToList();
             short i = 1;
-            foreach (var group in groupedReports)
+            foreach (var group in groupedReportsList)
             {
+                var groupList = group as IList<DBTMReportsModel> ?? group.ToList();
+                var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
+                var firstOfGroup = groupList.FirstOrDefault();
                 short j = 1;
-                List<decimal> yValuesList = new List<decimal>();
-                yValuesList.Add(0);
+                var yValuesList = new List<decimal> { 0 };
+
                 if (graphMaster.XParameter == CustomConstants.Turns && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
                 {
-                    yValuesList.Remove(0);
-                    for (int index = 1; index <= groupedReports.Count(); index++)
+                    yValuesList.RemoveAt(0);
+                    for (int index = 1; index <= groupedReportsList.Count; index++)
                     {
                         if (index == i)
                         {
-                            yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
+                            yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, singleDateLookup, j, false, true)));
                         }
                         else
                         {
@@ -315,21 +321,23 @@ namespace Coditech.API.Service
                 }
                 else if (graphMaster.IsYParameterCalculated)
                 {
-                    foreach (var item in group.Where(x => yParameter.Contains(x.ParameterCode)))
+                    foreach (var item in groupList.Where(x => yParameter.Contains(x.ParameterCode)))
                     {
-                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), j, false, true)));
+                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, singleDateLookup, j, false, true)));
                         j++;
                     }
                 }
                 else
                 {
-                    foreach (var item in group.Where(x => yParameter.Contains(x.ParameterCode)))
+                    foreach (var item in groupList.Where(x => yParameter.Contains(x.ParameterCode)))
                     {
-                        yValuesList.Add(Convert.ToDecimal(dBTMReportsList.Where(x => yParameter.Contains(x.ParameterCode) && x.CreatedDate == group.Key && x.Row == j).Select(x => x.ParameterValue).FirstOrDefault()));
+                        var val = dBTMReportsList.FirstOrDefault(x => yParameter.Contains(x.ParameterCode) && x.CreatedDate == group.Key && x.Row == j)?.ParameterValue;
+                        yValuesList.Add(Convert.ToDecimal(val));
                         j++;
                     }
                 }
-                string direction = group.Where(x => x.ParameterCode == "Direction").Select(x => x.Comment1).FirstOrDefault();
+
+                string direction = groupList.Where(x => x.ParameterCode == "Direction").Select(x => x.Comment1).FirstOrDefault();
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
                     Color = colorPalette[colorIndex % colorPalette.Length],
@@ -342,10 +350,10 @@ namespace Coditech.API.Service
 
             if (graphMaster.IsCalculateAverage && graphModel.LineChartModel.Datasets.Count() > 1)
             {
-                List<decimal> yValuesList = new List<decimal>();
+                var yValuesList = new List<decimal>();
                 int datasetsCount = graphModel.LineChartModel.Datasets.Count();
                 var dataArray1 = JsonConvert.DeserializeObject<decimal[]>(graphModel.LineChartModel.Datasets[0].Data);
-                int dataCount = dataArray1.Count();
+                int dataCount = dataArray1.Length;
                 for (int index = 0; index < dataCount; index++)
                 {
                     decimal sum = 0;
@@ -355,7 +363,6 @@ namespace Coditech.API.Service
                         sum += dataArray[index];
                     }
                     yValuesList.Add(Math.Round(sum / datasetsCount, CustomConstants.GraphListRoundUpValue));
-
                 }
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
@@ -368,15 +375,18 @@ namespace Coditech.API.Service
 
         private void BindProgressChart(GraphModel graphModel, DBTMGraphMaster graphMaster, string yParameter, List<DBTMReportsModel> dBTMReportsList, int colorIndex, IEnumerable<IGrouping<string, DBTMReportsModel>> groupedReports, string[] colorPalette)
         {
+            var groupedReportsList = groupedReports as IList<IGrouping<string, DBTMReportsModel>> ?? groupedReports.ToList();
             List<decimal> yValuesList = new List<decimal>();
-            foreach (var group in groupedReports)
+            foreach (var group in groupedReportsList)
             {
+                var groupList = group as IList<DBTMReportsModel> ?? group.ToList();
+                var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                 if (graphMaster.IsYParameterCalculated)
                 {
-                    short count = Convert.ToInt16(group.Select(x => x.CreatedDate).Distinct().Count());
+                    short count = Convert.ToInt16(groupList.Select(x => x.CreatedDate).Distinct().Count());
                     if (graphMaster.XParameter == CustomConstants.Date && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
                     {
-                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group, count, false, true)));
+                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, singleDateLookup, count, false, true)));
                     }
                     else if (graphMaster.GraphCode == "AverageTotalTimeVsSplitDatewise")
                     {
@@ -385,41 +395,41 @@ namespace Coditech.API.Service
                         {
                             for (short index = 1; index <= 12; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
                         {
                             for (int index = 1; index <= 6; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
                         {
                             for (int index = 1; index <= 4; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
                         {
                             for (int index = 1; index <= 3; index++)
                             {
-                                yValuesList.Add(group.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                             }
                         }
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
                             Color = colorPalette[colorIndex % colorPalette.Length],
-                            Label = $"{group.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
+                            Label = $"{groupList.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
                             Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
                         });
                         colorIndex++;
                     }
                     else
                     {
-                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), count, false, true)));
+                        yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, singleDateLookup, count, false, true)));
                     }
                 }
             }
@@ -869,7 +879,7 @@ namespace Coditech.API.Service
         {
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, fromDate, toDate, ref entityId, userType, centreCode);
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
-            if (dBTMReportsList?.Count > 0)
+            if (dBTMReportsList?.Any() == true)
             {
                 dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
             }
@@ -941,7 +951,7 @@ namespace Coditech.API.Service
         private DataTable BindDBTMDataDetails(int dBTMTestMasterId, string centreCode, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
         {
             DataTable dataTable = new DataTable();
-            if (dBTMReportsList?.Count > 0)
+            if (dBTMReportsList?.Any() == true)
             {
                 ReportsListDecryption(dBTMReportsList);
                 string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
@@ -986,6 +996,8 @@ namespace Coditech.API.Service
                 foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
                 {
                     newRow = dataTable.NewRow();
+                    var firstInGroup = group.FirstOrDefault();
+                    var singleDateLookup = group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
 
                     //Bind Activity Person Details
                     foreach (string displayColumnName in displayColumnList)
@@ -993,32 +1005,32 @@ namespace Coditech.API.Service
                         switch (displayColumnName)
                         {
                             case "Activity Name":
-                                newRow["Activity Name"] = group.FirstOrDefault().TestName;
+                                newRow["Activity Name"] = firstInGroup?.TestName;
                                 break;
                             case "Person Name":
-                                newRow["Person Name"] = !isDownloadReport ? $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}~False~~{group.FirstOrDefault().DBTMTraineeDetailId}" : $"{group.FirstOrDefault().FirstName} {group.FirstOrDefault().LastName}";
+                                newRow["Person Name"] = !isDownloadReport ? $"{firstInGroup?.FirstName} {firstInGroup?.LastName}~False~~{firstInGroup?.DBTMTraineeDetailId}" : $"{firstInGroup?.FirstName} {firstInGroup?.LastName}";
                                 break;
                             //case "Activity Status":
                             //    newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
                             //    break;
                             case "Weight(kg)":
-                                newRow["Weight(kg)"] = $"{group.FirstOrDefault().Weight}";
+                                newRow["Weight(kg)"] = $"{firstInGroup?.Weight}";
                                 break;
                             case "Height(cm)":
-                                newRow["Height(cm)"] = $"{group.FirstOrDefault().Height}";
+                                newRow["Height(cm)"] = $"{firstInGroup?.Height}";
                                 break;
                             case "Activity Time":
                                 newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
-                                    ? group.FirstOrDefault().TestPerformedTime.ToString("hh:mm:ss tt")
-                                    : group.FirstOrDefault().TestPerformedTime;
+                                    ? firstInGroup?.TestPerformedTime.ToString("hh:mm:ss tt")
+                                    : firstInGroup?.TestPerformedTime;
                                 break;
                             case "View":
                                 if (!isDownloadReport)
-                                    newRow["View"] = group.FirstOrDefault().DBTMDeviceDataId.ToString();
+                                    newRow["View"] = firstInGroup?.DBTMDeviceDataId.ToString();
                                 break;
                         }
                     }
-                    BindParameterValue(listviewSequenceColumnList, performanceStandardList, group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), listviewSequenceColumnsOriginal, newRow, isMobileRequest, isDownloadReport, isHigherBetter);
+                    BindParameterValue(listviewSequenceColumnList, performanceStandardList, singleDateLookup, listviewSequenceColumnsOriginal, newRow, isMobileRequest, isDownloadReport, isHigherBetter);
                     dataTable.Rows.Add(newRow);
                 }
 
@@ -1031,6 +1043,7 @@ namespace Coditech.API.Service
         private static void UpdateDatatableColumnName(List<DBTMReportsModel> dBTMReportsList, DataTable dataTable, List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal, bool isMobileRequest)
         {
             string updatedColumnName = string.Empty;
+            var dBTMReportsListGroupByData = dBTMReportsList?.GroupBy(x => x.CreatedDate).LastOrDefault();
             foreach (DataColumn col in dataTable.Columns)
             {
                 string[] spilt = col.ColumnName.Split('-');
@@ -1043,7 +1056,6 @@ namespace Coditech.API.Service
                     if (spilt.Length > 1)
                     {
                         string fromTo = string.Empty;
-                        var dBTMReportsListGroupByData = dBTMReportsList.GroupBy(x => x.CreatedDate).LastOrDefault();
                         if (!string.IsNullOrEmpty(dBTMTestParameterListviewSequence.ConsecutiveParameterCode) && dBTMTestParameterListviewSequence.IsCalculatedParameter)
                         {
                             if (dBTMTestParameterListviewSequence.IsCalculatedParameter)
@@ -1087,14 +1099,14 @@ namespace Coditech.API.Service
                         {
 
                             //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
-                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue ?? "0") * Convert.ToInt32(spilt[1]);
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData?.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)?.ParameterValue ?? "0") * Convert.ToInt32(spilt[1]);
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{Distance*Row}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
                         else if (updatedColumnName.Contains("{FromToDistance}"))
                         {
                             //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
-                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue ?? "0");
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData?.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)?.ParameterValue ?? "0");
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{FromToDistance}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
@@ -1126,8 +1138,9 @@ namespace Coditech.API.Service
 
         private void BindParameterValue(List<string> listviewSequenceColumnList, List<DBTMTestWisePerformanceStandard> performanceStandardList, IGrouping<string, DBTMReportsModel> group, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, DataRow newRow, bool isMobileRequest, bool isDownloadReport, bool isHigherBetter)
         {
-            int ageGroupEnumId = group.FirstOrDefault()?.AgeGroupEnumId ?? 0;
-            int genderEnumId = group.FirstOrDefault()?.GenderEnumId ?? 0;
+            var first = group.FirstOrDefault();
+            int ageGroupEnumId = first?.AgeGroupEnumId ?? 0;
+            int genderEnumId = first?.GenderEnumId ?? 0;
             foreach (var displayColumn in listviewSequenceColumnList)
             {
                 if (displayColumn == "View")
@@ -1272,25 +1285,24 @@ namespace Coditech.API.Service
 
             if (number > 0)
             {
-                string[] unitsMap = { "Zero", "One", "Two", "Three", "Four", "Five", "Six",
-                              "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
-                              "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
-                              "Eighteen", "Nineteen" };
-
-                string[] tensMap = { "Zero", "Ten", "Twenty", "Thirty", "Forty", "Fifty",
-                             "Sixty", "Seventy", "Eighty", "Ninety" };
-
-                if (number < 20)
-                    words += unitsMap[number];
-                else
-                {
-                    words += tensMap[number / 10];
-                    if ((number % 10) > 0)
-                        words += " " + unitsMap[number % 10];
-                }
+                words += number < 20 ? _unitsMap[number] : _tensMap[number / 10] + ((number % 10) > 0 ? " " + _unitsMap[number % 10] : string.Empty);
             }
             return words.Trim();
         }
+
+        private static readonly string[] _unitsMap =
+        {
+            "Zero","One","Two","Three","Four","Five","Six",
+            "Seven","Eight","Nine","Ten","Eleven","Twelve",
+            "Thirteen","Fourteen","Fifteen","Sixteen","Seventeen",
+            "Eighteen","Nineteen"
+        };
+
+        private static readonly string[] _tensMap =
+        {
+            "Zero","Ten","Twenty","Thirty","Forty","Fifty",
+            "Sixty","Seventy","Eighty","Ninety"
+        };
         private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, double score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
         {
             DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
@@ -1360,7 +1372,7 @@ namespace Coditech.API.Service
                 item.Weight = deviceData?.Weight ?? 0;
                 item.Height = deviceData?.Height ?? 0;
             }
-            var reportsLookup = dBTMReportsList.GroupBy(x => new { x.ParameterCode, x.Row }).ToDictionary(g => g.Key, g => g.First());
+            var reportsLookup = dBTMReportsList.GroupBy(x => $"{x.ParameterCode}-{x.Row}").ToDictionary(g => g.Key, g => g.First());
 
             short maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
 
@@ -1393,8 +1405,7 @@ namespace Coditech.API.Service
                     }
                     else
                     {
-                        var dataDetails = dBTMReportsList.FirstOrDefault(x => x.ParameterCode == displayColumn.ParameterCode && x.Row == i);
-                        if (dataDetails != null)
+                        if (reportsLookup.TryGetValue($"{displayColumn.ParameterCode}-{i}", out var dataDetails))
                             value = dataDetails.ParameterValue.ToString();
                     }
                     if (!string.IsNullOrWhiteSpace(value))
@@ -1428,6 +1439,7 @@ namespace Coditech.API.Service
             List<DBTMDeviceData> deviceDataList = _dBTMDeviceDataRepository.Table
                                                   .Where(x => x.TestPerformedTime.Date == deviceData.TestPerformedTime.Date
                                                           && x.PersonCode == deviceData.PersonCode
+                                                          && x.TestCode == dBTMTestMaster.TestCode
                                                           && x.IsValidRecord).ToList();
             List<long> dbtmDeviceDataIds = deviceDataList.Select(x => x.DBTMDeviceDataId).ToList();
             List<DBTMReportsModel> dBTMReportsList = _dBTMDeviceDataDetailsRepository.Table.Where(x => dbtmDeviceDataIds.Contains(x.DBTMDeviceDataId)).Select(x => x.FromEntityToModel<DBTMReportsModel>()).ToList();
@@ -1438,7 +1450,7 @@ namespace Coditech.API.Service
                 dbtmReportVerticalDataModel.ActivityDetails.Add("Mode Of Start", dBTMReportsList.FirstOrDefault(x => x.ParameterCode == CustomConstants.ModeOfStart).Comment1);
             }
             short turn = 1;
-            string previousValue = string.Empty;
+            string previousValue = "0";
             foreach (DBTMDeviceData item1 in deviceDataList.OrderBy(y => y.CreatedDate))
             {
                 foreach (var item in dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId))
@@ -1446,7 +1458,7 @@ namespace Coditech.API.Service
                     item.Weight = item1?.Weight ?? 0;
                     item.Height = item1?.Height ?? 0;
                 }
-                var reportsLookup = dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).GroupBy(x => new { x.ParameterCode, x.Row }).ToDictionary(g => g.Key, g => g.First());
+                var reportsLookup = dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).GroupBy(x => $"{x.ParameterCode}-{x.Row}").ToDictionary(g => g.Key, g => g.First());
 
                 short maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
                 DataTable dataTable = new DataTable();
@@ -1480,15 +1492,15 @@ namespace Coditech.API.Service
                         }
                         else if (displayColumn.IsCalculatedParameter)
                         {
+                            var lookup = dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                             if (displayColumn.ParameterCode == CustomConstants.CompletionTime)
-                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
+                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, lookup, 1);
                             else
-                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
+                                value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, lookup, i);
                         }
                         else
                         {
-                            var dataDetails = dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).FirstOrDefault(x => x.ParameterCode == displayColumn.ParameterCode && x.Row == i);
-                            if (dataDetails != null)
+                            if (reportsLookup.TryGetValue($"{displayColumn.ParameterCode}-{i}", out var dataDetails))
                                 value = dataDetails.ParameterValue.ToString();
                         }
                         if (!string.IsNullOrWhiteSpace(value))
@@ -1502,15 +1514,28 @@ namespace Coditech.API.Service
                         newRow[displayColumn.ColumnName] = value;
                         if (i == 1 && displayColumn.IsCommonColumn)
                         {
-                            if (dBTMTestMaster.TestOutputHigher == "LO")
+                            if (turn == 1)
                             {
-                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = turn == 1 ? value : Convert.ToDecimal(value) <= Convert.ToDecimal(previousValue) ? value : previousValue;
+                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = value;
+                                previousValue = value;
+                            }
+                            else if (dBTMTestMaster.TestOutputHigher == "LO")
+                            {
+                                if (Convert.ToDecimal(value) <= Convert.ToDecimal(previousValue))
+                                {
+                                    dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = value;
+                                    previousValue = value;
+                                }
                             }
                             else
                             {
-                                dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = turn == 1 ? value : Convert.ToDecimal(value) >= Convert.ToDecimal(previousValue) ? value : previousValue;
+                                if (Convert.ToDecimal(value) >= Convert.ToDecimal(previousValue))
+                                {
+                                    dbtmReportVerticalDataModel.ActivityDetails[displayColumn.ParameterCode] = value;
+                                    previousValue = value;
+                                }
                             }
-                            previousValue = value;
+
                         }
                     }
                     dataTable.Rows.Add(newRow);
