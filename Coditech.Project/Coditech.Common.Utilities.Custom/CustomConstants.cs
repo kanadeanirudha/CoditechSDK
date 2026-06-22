@@ -57,6 +57,7 @@
         public const string Trainee = "Trainee";
         public const string InvalidData = "Invalid Data";
         public const string TotalLaps = "TotalLaps";
+        public const string ModeOfStart = "ModeOfStart";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

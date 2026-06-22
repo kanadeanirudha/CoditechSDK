@@ -304,11 +304,11 @@
                     }
                 }, { once: true });
             },
-            error: function () {
+            error: function (xhr) {
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
                 }
-                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup","error");
+                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup", "error" );
                 CoditechCommon.HideLodder();
             }
         });
@@ -324,9 +324,8 @@
         DBTMTraineeDetails.CheckAndDownloadTemplate(count);
     },
     CheckAndDownloadTemplate: function (count) {
-
         var centreCode = $("#SelectedCentreCode").val();
-        var trainerId = $("#SelectedParameter1").val();
+        var trainerId = $("#GeneralTrainerMasterId").val();
         var userType = $("#UserType").val();
         CoditechCommon.ShowLodder();
         $.ajax({
