@@ -689,8 +689,8 @@ namespace Coditech.API.Service
                     errors.Add("Gender is invalid");
                 }
             }
-            if (string.IsNullOrWhiteSpace(GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub)))
-                errors.Add("School Or College Or Club  is empty");
+            //if (string.IsNullOrWhiteSpace(GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub)))
+            //    errors.Add("School Or College Or Club  is empty");
             if (string.IsNullOrWhiteSpace(batchName))
             {
                 errors.Add("Batch is required");
@@ -764,6 +764,7 @@ namespace Coditech.API.Service
             decimal height = Convert.ToDecimal(GetValue(row, ExcelTemplateColumns.HeightCm));
             decimal weight = Convert.ToDecimal(GetValue(row, ExcelTemplateColumns.WeightKg));
             string specialization = GetValue(row, ExcelTemplateColumns.Specialization);
+            string specializationName = _generalEnumaratorMasterRepository.Table.Where(x => x.EnumDisplayText == specialization).Select(x => x.EnumName).FirstOrDefault();
             int ageGroupEnumId = 0;
             if (!string.IsNullOrWhiteSpace(ageGroup))
             {
@@ -774,7 +775,7 @@ namespace Coditech.API.Service
                 JoiningCode = joiningCode,
                 height = height,
                 weight = weight,
-                SpecializationEnumId = GetEnumIdByEnumCode(specialization, DropdownCustomTypeEnum.TraineeSpecialization.ToString()),
+                SpecializationEnumId = GetEnumIdByEnumCode(specializationName, DropdownCustomTypeEnum.TraineeSpecialization.ToString()),
                 GeneralBatchMasterId = batchId,
                 SchoolName = schoolName,
                 AgeGroupEnumId = ageGroupEnumId,
