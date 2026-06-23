@@ -19,5 +19,6 @@ namespace Coditech.Admin.ViewModel
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
         public Dictionary<string, string> ActivityDetails { get; set; }
+        public Dictionary<string, DataTable> TurnList { get; set; }
     }
 }

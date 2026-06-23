@@ -15,5 +15,6 @@
         public string Label { get; set; }
         public string Data { get; set; }
         public string Color { get; set; }
+        public Dictionary<string, string> TooltipFields { get; set; } = new Dictionary<string, string>();
     }
 }

@@ -31,7 +31,7 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
             if (!new CoditechRepository<DBTMDeviceMaster>(_serviceProvider.GetService<CoditechCustom_Entities>()).Table.Any(x => x.DeviceSerialCode == liveTestResultLoginModel.DeviceSerialCode && x.IsActive && x.IsMasterDevice))
-                throw new CoditechException(ErrorCodes.InvalidData, "Invalide device serial code");
+                throw new CoditechException(ErrorCodes.InvalidData, "Invalid device serial code");
 
             liveTestResultLoginModel.Password = MD5Hash(liveTestResultLoginModel.Password);
             UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x => x.UserName == liveTestResultLoginModel.UserName && x.Password == liveTestResultLoginModel.Password
