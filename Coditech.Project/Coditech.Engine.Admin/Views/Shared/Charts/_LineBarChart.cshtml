@@ -1,4 +1,5 @@
-﻿@model LineBarChartModel
+﻿@using Newtonsoft.Json
+@model LineBarChartModel
 @{
     Layout = null;
     var chartId = $"{Model.LineBarChartId}_{Guid.NewGuid().ToString("N")}";
@@ -24,7 +25,8 @@
                                 data: @Html.Raw(dataset.Data),
                                 backgroundColor: "@dataset.Color",
                                 borderColor: "@dataset.Color",
-                                borderWidth: 2
+                                borderWidth: 2,
+                                tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
                             });
             </text>
         }
@@ -40,7 +42,8 @@
                                 fill: false,
                                 borderColor: "@dataset.Color",
                                 borderWidth: 2,
-                                tension: 0.4
+                                tension: 0.4,
+                                tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
                             });
             </text>
         }
@@ -55,6 +58,24 @@
                         options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                            tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem, data) {
+                                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                                    var lines = [];
+                                    lines.push(dataset.label + ': ' + tooltipItem.yLabel);
+                                       if (dataset.tooltipFields) {
+                                        Object.keys(dataset.tooltipFields).forEach(function (key) {
+                                            var value = dataset.tooltipFields[key];
+                                            if (value && value !== "NA") {
+                                                lines.push(key + ': ' + value);
+                                            }
+                                        });
+                                    }
+                                    return lines;
+                                }
+                            }
+                        },
                         legend: {
                             labels: {
                                 fontColor: textColor
