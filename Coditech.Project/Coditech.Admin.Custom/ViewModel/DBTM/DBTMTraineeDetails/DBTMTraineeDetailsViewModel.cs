@@ -19,10 +19,8 @@ namespace Coditech.Admin.ViewModel
         [MaxLength(500)]
         [Display(Name = "Other Information")]
         public string OtherInformation { get; set; }
-        [Required]
         [Display(Name = "Group")]
         public int? GroupEnumId { get; set; }
-        [Required]
         [Display(Name = "Source")]
         public int? SourceEnumId { get; set; }
         [Display(Name = "Is Active")]
@@ -48,15 +46,12 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Specialization")]
         public int? SpecializationEnumId { get; set; }
         public string DisplayName { get; set; }
-        [Required]
         [Display(Name = "School Name")]
         public string SchoolName { get; set; }
         [Display(Name = "Age Group")]
         public int AgeGroupEnumId { get; set; }
-        [Required]
         [Display(Name = "Standard")]
         public string Standard { get; set; }
-        [Required]
         [Display(Name = "Section")]
         public string Section { get; set; }
         public string TypeOfCentre { get; set; }
