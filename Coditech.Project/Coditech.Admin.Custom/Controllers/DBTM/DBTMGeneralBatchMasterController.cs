@@ -171,13 +171,15 @@ namespace Coditech.Admin.Controllers
         public ActionResult GetTransferBatchPopup(int generalBatchMasterId)
         {
            GeneralBatchViewModel model = _generalBatchAgent.GetGeneralBatch(generalBatchMasterId);
-            DropdownViewModel trainerDropdown = new DropdownViewModel()
-            {
-                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
-                DropdownName = "GeneralTrainerMasterId",
-                Parameter = model.CentreCode,
-                IsCustomDropdown = true
-            };
+            DropdownViewModel trainerDropdown = CoditechCustomDropdownHelper.GeneralDropdownList(
+               new DropdownViewModel()
+               {
+                   DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                   DropdownName = "GeneralTrainerMasterId",
+                   Parameter = model.CentreCode,
+                   IsCustomDropdown = true
+               });
+            trainerDropdown.DropdownList = trainerDropdown.DropdownList.Where(x => !x.Text.Contains(model.AssignedBy.Trim())).ToList();
             ViewBag.TrainerDropdown = trainerDropdown;
             return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/_ConvertBatchPopup.cshtml", model);
         }
