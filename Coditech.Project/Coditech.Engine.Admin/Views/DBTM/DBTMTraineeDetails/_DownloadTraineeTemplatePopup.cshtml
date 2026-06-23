@@ -1,5 +1,13 @@
 ﻿@{
     Layout = null;
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+    DropdownViewModel trainerDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(),
+                DropdownName = "GeneralTrainerMasterId",
+                Parameter = userModel?.SelectedCentreCode,
+                IsCustomDropdown = true
+            };
 }
 <div class="modal-header">
     <h5 class="modal-title">Download Trainee Template</h5>
@@ -11,6 +19,13 @@
         <input type="text" id="TraineeCount" class="form-control" maxlength="3" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/\D/g,'').slice(0,3)" placeholder="Enter number of trainees" />
         <span class="text-danger field-validation-valid" data-valmsg-for="TraineeCount" data-valmsg-replace="true"></span>
     </div>
+    @if (userModel?.Custom1 == CustomConstants.DBTMCentreOwner)
+    {
+        <div class="mb-3">
+            <label class="form-label required">Trainer</label>
+            @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
+        </div>
+    }
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancel </button>

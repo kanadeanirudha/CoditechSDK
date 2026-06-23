@@ -186,12 +186,10 @@ namespace Coditech.API.Service
                           .Where(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId && idsToDelete.Contains(x.EntityId));
                     if (userToDelete != null)
                         _generalBatchUserRepository.Delete(userToDelete);
-
                     // Insert users that are new
                     var idsToInsert = newUserIds.Except(currentUserIds).ToList();
                     List<GeneralBatchUser> userList = new List<GeneralBatchUser>();
                     int activityStatusEnumId = GetEnumIdByEnumCode("Pending", "DBTMTestStatus");
-
                     foreach (var id in idsToInsert)
                     {
                         userList.Add(new GeneralBatchUser
@@ -208,7 +206,6 @@ namespace Coditech.API.Service
             }
             return isGeneralBatchUpdated;
         }
-
         #region GeneralBatchUser
         public override bool AssociateUnAssociateBatchwiseUser(GeneralBatchUserModel generalBatchUserModel)
         {
@@ -217,7 +214,6 @@ namespace Coditech.API.Service
 
             return base.AssociateUnAssociateBatchwiseUser(generalBatchUserModel);
         }
-
         public override GeneralBatchUserListModel GetGeneralBatchUserList(int generalBatchMasterId, string userType, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
@@ -255,7 +251,6 @@ namespace Coditech.API.Service
             }
             return base.DeleteGeneralBatch(parameterModel);
         }
-
         public virtual GeneralBatchUserListModel GetDBTMBatchUserList(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId)
         {
             //Bind the Filter, sorts & Paging details.
