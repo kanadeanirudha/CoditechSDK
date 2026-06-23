@@ -72,7 +72,7 @@ namespace Coditech.API.Service
             GraphModel graphModel = new GraphModel();
             DBTMGraphMaster graphMaster = _dBTMGraphMasterRepository.Table.Where(x => x.DBTMGraphMasterId == dBTMGraphMasterId).FirstOrDefault();
             string xParameter = string.IsNullOrEmpty(graphMaster.XParameterBasedOn) ? graphMaster.XParameter : graphMaster.XParameterBasedOn;
-            xParameter = $"{xParameter},Direction";
+            xParameter = $"{xParameter},Direction,PersonDetectionRange";
             string yParameter = string.IsNullOrEmpty(graphMaster.YParameterBasedOn) ? graphMaster.YParameter : graphMaster.YParameterBasedOn;
 
             List<DBTMReportsModel> dBTMReportsList = GetTestWiseGraphReportFromDB(dBTMTestMasterId, dBTMTraineeDetailId, xParameter, yParameter, fromDate, toDate, ref entityId, userType, centreCode, typeOfRecord);
@@ -299,6 +299,11 @@ namespace Coditech.API.Service
             foreach (var group in groupedReportsList)
             {
                 var groupList = group as IList<DBTMReportsModel> ?? group.ToList();
+                var allowedTooltipFields = new List<string>
+                {
+                    CustomConstants.PersonDetectionRange
+                };
+                var tooltipFields = groupList.Where(x => allowedTooltipFields.Contains(x.ParameterCode)).GroupBy(x => x.ParameterCode).ToDictionary(x => x.Key, x => x.FirstOrDefault()?.ParameterValue ?? string.Empty );
                 var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                 var firstOfGroup = groupList.FirstOrDefault();
                 short j = 1;
@@ -343,6 +348,7 @@ namespace Coditech.API.Service
                     Color = colorPalette[colorIndex % colorPalette.Length],
                     Label = $"{direction} Turn {i} {graphMaster.YAxixLabel}",
                     Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                    TooltipFields = tooltipFields,
                 });
                 colorIndex++;
                 i++;
