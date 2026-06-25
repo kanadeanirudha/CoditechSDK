@@ -686,6 +686,124 @@ namespace Coditech.API.Service
                 }
             }
         }
+
+        public DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId, long personId)
+        {
+            if (personId <= 0) throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "PersonId"));
+
+            GeneralPerson personData = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == personId);
+
+            GeneralPersonModel generalPersonModel = personData?.FromEntityToModel<GeneralPersonModel>();
+
+            DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId);
+
+            DBTMTraineeDetailsModel dBTMTraineeDetailsModel = dBTMTraineeDetails?.FromEntityToModel<DBTMTraineeDetailsModel>();
+
+            EmployeeMaster employeeMaster = _employeeMasterRepository.Table.FirstOrDefault(x => x.PersonId == personId);
+
+            if (employeeMaster != null)
+            {
+                UserMaster userMaster = _userMasterRepository.Table
+                    .FirstOrDefault(x => x.EntityId == employeeMaster.EmployeeId
+                                      && x.UserType == UserTypeEnum.Employee.ToString());
+
+                if (userMaster != null)
+                {
+                    dBTMTraineeDetailsModel.IsActive = userMaster.IsActive;
+                }
+            }
+
+
+            if (dBTMTraineeDetailsModel == null)
+                return null;
+
+            if (generalPersonModel != null)
+            {
+                dBTMTraineeDetailsModel.FirstName = generalPersonModel.FirstName;
+                dBTMTraineeDetailsModel.MiddleName = generalPersonModel.MiddleName;
+                dBTMTraineeDetailsModel.LastName = generalPersonModel.LastName;
+                dBTMTraineeDetailsModel.DisplayName = generalPersonModel.Custom2;
+                dBTMTraineeDetailsModel.EmailId = generalPersonModel.EmailId;
+                dBTMTraineeDetailsModel.MobileNumber = generalPersonModel.MobileNumber;
+                dBTMTraineeDetailsModel.DateOfBirth = generalPersonModel.DateOfBirth;
+                dBTMTraineeDetailsModel.PersonTitle = generalPersonModel.PersonTitle;
+            }
+
+            return dBTMTraineeDetailsModel;
+        }
+        //Update DBTM Trainee Other Details
+        public bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
+        {
+            if (dBTMTraineeDetailsModel == null)
+                throw new CoditechException(ErrorCodes.NullModel, "Model is null.");
+
+            // Update DBTMTraineeDetails
+            DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table
+                .FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailsModel.DBTMTraineeDetailId);
+
+            if (traineeDetails == null)
+                throw new CoditechException(ErrorCodes.NotFound, "Trainee details not found.");
+
+            traineeDetails.Height = dBTMTraineeDetailsModel.Height;
+            traineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
+            traineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
+
+            _dBTMTraineeDetailsRepository.Update(traineeDetails);
+
+            // Update GeneralPerson
+            GeneralPerson person = _generalPersonRepository.Table
+                .FirstOrDefault(x => x.PersonId == dBTMTraineeDetailsModel.PersonId);
+
+            if (person != null)
+            {
+                person.FirstName = dBTMTraineeDetailsModel.FirstName;
+                person.MiddleName = dBTMTraineeDetailsModel.MiddleName;
+                person.LastName = dBTMTraineeDetailsModel.LastName;
+                person.EmailId = dBTMTraineeDetailsModel.EmailId;
+                person.MobileNumber = dBTMTraineeDetailsModel.MobileNumber;
+                person.DateOfBirth = dBTMTraineeDetailsModel.DateOfBirth;
+                person.PersonTitle = dBTMTraineeDetailsModel.PersonTitle;
+                person.Custom2 = dBTMTraineeDetailsModel.DisplayName;
+
+                _generalPersonRepository.Update(person);
+            }
+
+            // Update data in usermaster
+            EmployeeMaster employeeMaster = _employeeMasterRepository.Table
+                .FirstOrDefault(x => x.PersonId == dBTMTraineeDetailsModel.PersonId);
+
+            if (employeeMaster != null)
+            {
+                UserMaster userMaster = _userMasterRepository.Table
+                    .FirstOrDefault(x => x.EntityId == employeeMaster.EmployeeId
+                                      && x.UserType == UserTypeEnum.Employee.ToString());
+
+                if (userMaster != null)
+                {
+                    userMaster.IsActive = dBTMTraineeDetailsModel.IsActive;
+                    userMaster.FirstName = dBTMTraineeDetailsModel.FirstName;
+                    userMaster.MiddleName = dBTMTraineeDetailsModel.MiddleName;
+                    userMaster.LastName = dBTMTraineeDetailsModel.LastName;
+                    userMaster.EmailId = dBTMTraineeDetailsModel.EmailId;
+                    _userMasterRepository.Update(userMaster);
+                }
+            }
+
+            return true;
+        }
+
+        protected virtual int CalculateAge(DateTime dateOfBirth)
+        {
+            DateTime today = DateTime.Today;
+            int age = today.Year - dateOfBirth.Year;
+
+            // Go back to the year the person was born in case of a leap year
+            if (dateOfBirth > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
+        }
     }
 
     public enum TestParameterCode
