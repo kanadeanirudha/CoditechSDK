@@ -533,7 +533,7 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
-        [Route("/DBTMTraineeDetails/UpdateDBTMTraineeDetails")]
+        [Route("/DBTMApi/UpdateDBTMTraineeDetails")]
         [HttpPut, ValidateModel]
         [Produces(typeof(DBTMTraineeDetailsResponse))]
         public virtual IActionResult UpdateDBTMTraineeDetails([FromBody] DBTMTraineeDetailsModel model)
