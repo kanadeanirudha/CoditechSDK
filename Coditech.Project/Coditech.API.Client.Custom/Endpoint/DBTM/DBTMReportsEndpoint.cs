@@ -44,9 +44,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/TestWiseGraphReportsV2?dBTMTestMasterId={dBTMTestMasterId}&dBTMTraineeDetailId={dBTMTraineeDetailId}&dBTMGraphMasterIds={dBTMGraphMasterIds}&graphMode={graphMode}&fromDate={fromDate}&toDate={toDate}&entityId={entityId}&userType={userType}&centreCode={centreCode}";
             return endpoint;
         }
-        public string GetActivityPerformedDatesAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId)
+        public string GetActivityPerformedDatesAsync(string dBTMTestMasterIds, long dBTMTraineeDetailId, string centreCode)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMTraineeDetailId={dBTMTraineeDetailId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&dBTMTraineeDetailId={dBTMTraineeDetailId}&centreCode={centreCode}";
             return endpoint;
         }
         public string GetBatchActivityPerformedDatesAsync(string dBTMTestMasterIds, int generalBatchMasterId)

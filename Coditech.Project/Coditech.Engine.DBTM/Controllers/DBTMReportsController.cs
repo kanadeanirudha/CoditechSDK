@@ -306,11 +306,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/GetActivityPerformedDates")]
         [Produces("application/json")]
-        public virtual IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
+        public virtual IActionResult GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId, string centreCode)
         {
             try
             {
-                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
+                List<DateTime> dates = _dBTMReportsService.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId, centreCode);
                 if (dates == null || !dates.Any())
                     return Ok(new List<string>());
 
