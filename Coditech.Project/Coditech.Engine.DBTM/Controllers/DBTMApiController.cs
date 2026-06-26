@@ -514,11 +514,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetDBTMTraineeDetails")]
         [HttpGet]
         [Produces(typeof(DBTMTraineeDetailsResponse))]
-        public virtual IActionResult GetDBTMTraineeDetails(long dBTMTraineeDetailId, long personId)
+        public virtual IActionResult GetDBTMTraineeDetails(long dBTMTraineeDetailId)
         {
             try
             {
-                DBTMTraineeDetailsModel dBTMTraineeDetailsModel = _dBTMApiService.GetDBTMTraineeDetails(dBTMTraineeDetailId, personId);
+                DBTMTraineeDetailsModel dBTMTraineeDetailsModel = _dBTMApiService.GetDBTMTraineeDetails(dBTMTraineeDetailId);
                 return IsNotNull(dBTMTraineeDetailsModel) ? CreateOKResponse(new DBTMTraineeDetailsResponse { DBTMTraineeDetailsModel = dBTMTraineeDetailsModel }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
