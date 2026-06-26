@@ -687,50 +687,32 @@ namespace Coditech.API.Service
             }
         }
 
-        public DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId, long personId)
+        public DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId)
         {
-            if (personId <= 0) throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "PersonId"));
-
-            GeneralPerson personData = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == personId);
-
-            GeneralPersonModel generalPersonModel = personData?.FromEntityToModel<GeneralPersonModel>();
+            if (dBTMTraineeDetailId <= 0) throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
 
             DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId);
+            if (IsNull(dBTMTraineeDetails))
+                return null;
 
             DBTMTraineeDetailsModel dBTMTraineeDetailsModel = dBTMTraineeDetails?.FromEntityToModel<DBTMTraineeDetailsModel>();
 
-            EmployeeMaster employeeMaster = _employeeMasterRepository.Table.FirstOrDefault(x => x.PersonId == personId);
+            GeneralPerson personData = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == dBTMTraineeDetails.PersonId);
 
-            if (employeeMaster != null)
+            if (personData != null)
             {
-                UserMaster userMaster = _userMasterRepository.Table
-                    .FirstOrDefault(x => x.EntityId == employeeMaster.EmployeeId
-                                      && x.UserType == UserTypeEnum.Employee.ToString());
-
-                if (userMaster != null)
-                {
-                    dBTMTraineeDetailsModel.IsActive = userMaster.IsActive;
-                }
+                dBTMTraineeDetailsModel.FirstName = personData.FirstName;
+                dBTMTraineeDetailsModel.MiddleName = personData.MiddleName;
+                dBTMTraineeDetailsModel.LastName = personData.LastName;
+                dBTMTraineeDetailsModel.DisplayName = personData.Custom2;
+                dBTMTraineeDetailsModel.EmailId = personData.EmailId;
+                dBTMTraineeDetailsModel.MobileNumber = personData.MobileNumber;
+                dBTMTraineeDetailsModel.DateOfBirth = personData.DateOfBirth;
+                dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
             }
-
-
-            if (dBTMTraineeDetailsModel == null)
-                return null;
-
-            if (generalPersonModel != null)
-            {
-                dBTMTraineeDetailsModel.FirstName = generalPersonModel.FirstName;
-                dBTMTraineeDetailsModel.MiddleName = generalPersonModel.MiddleName;
-                dBTMTraineeDetailsModel.LastName = generalPersonModel.LastName;
-                dBTMTraineeDetailsModel.DisplayName = generalPersonModel.Custom2;
-                dBTMTraineeDetailsModel.EmailId = generalPersonModel.EmailId;
-                dBTMTraineeDetailsModel.MobileNumber = generalPersonModel.MobileNumber;
-                dBTMTraineeDetailsModel.DateOfBirth = generalPersonModel.DateOfBirth;
-                dBTMTraineeDetailsModel.PersonTitle = generalPersonModel.PersonTitle;
-            }
-
             return dBTMTraineeDetailsModel;
         }
+
         //Update DBTM Trainee Other Details
         public bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
         {
@@ -751,8 +733,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository.Update(traineeDetails);
 
             // Update GeneralPerson
-            GeneralPerson person = _generalPersonRepository.Table
-                .FirstOrDefault(x => x.PersonId == dBTMTraineeDetailsModel.PersonId);
+            GeneralPerson person = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == dBTMTraineeDetailsModel.PersonId);
 
             if (person != null)
             {
@@ -764,29 +745,21 @@ namespace Coditech.API.Service
                 person.DateOfBirth = dBTMTraineeDetailsModel.DateOfBirth;
                 person.PersonTitle = dBTMTraineeDetailsModel.PersonTitle;
                 person.Custom2 = dBTMTraineeDetailsModel.DisplayName;
-
                 _generalPersonRepository.Update(person);
             }
 
-            // Update data in usermaster
-            EmployeeMaster employeeMaster = _employeeMasterRepository.Table
-                .FirstOrDefault(x => x.PersonId == dBTMTraineeDetailsModel.PersonId);
+            UserMaster userMaster = _userMasterRepository.Table
+                .FirstOrDefault(x => x.EntityId == traineeDetails.DBTMTraineeDetailId
+                                  && x.UserType == UserTypeEnum.Trainee.ToString());
 
-            if (employeeMaster != null)
+            if (userMaster != null)
             {
-                UserMaster userMaster = _userMasterRepository.Table
-                    .FirstOrDefault(x => x.EntityId == employeeMaster.EmployeeId
-                                      && x.UserType == UserTypeEnum.Employee.ToString());
-
-                if (userMaster != null)
-                {
-                    userMaster.IsActive = dBTMTraineeDetailsModel.IsActive;
-                    userMaster.FirstName = dBTMTraineeDetailsModel.FirstName;
-                    userMaster.MiddleName = dBTMTraineeDetailsModel.MiddleName;
-                    userMaster.LastName = dBTMTraineeDetailsModel.LastName;
-                    userMaster.EmailId = dBTMTraineeDetailsModel.EmailId;
-                    _userMasterRepository.Update(userMaster);
-                }
+                userMaster.IsActive = dBTMTraineeDetailsModel.IsActive;
+                userMaster.FirstName = dBTMTraineeDetailsModel.FirstName;
+                userMaster.MiddleName = dBTMTraineeDetailsModel.MiddleName;
+                userMaster.LastName = dBTMTraineeDetailsModel.LastName;
+                userMaster.EmailId = dBTMTraineeDetailsModel.EmailId;
+                _userMasterRepository.Update(userMaster);
             }
 
             return true;

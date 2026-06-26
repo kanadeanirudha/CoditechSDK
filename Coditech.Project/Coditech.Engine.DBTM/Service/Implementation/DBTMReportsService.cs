@@ -249,27 +249,28 @@ namespace Coditech.API.Service
             return graphModel;
         }
 
-        public List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
+        public List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId,string centreCode)
         {
             if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return new List<DateTime>();
-            if (dBTMTraineeDetailId <= 0)
+            bool isAllTrainee = dBTMTraineeDetailId == 0;
+            if (dBTMTraineeDetailId < 0)
                 return new List<DateTime>();
             List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
             bool isAllTest = testIds.Contains(0);
             var dates =
-                (from dd in _dBTMDeviceDataRepository.Table
-                 join td in _dBTMTraineeDetailsRepository.Table
-                     on dd.PersonCode equals td.PersonCode
-                 join tm in _dBTMTestMasterRepository.Table
-                     on dd.TestCode equals tm.TestCode
-                 where
-                     td.DBTMTraineeDetailId == dBTMTraineeDetailId
+                 (from dd in _dBTMDeviceDataRepository.Table
+                  join td in _dBTMTraineeDetailsRepository.Table
+                      on dd.PersonCode equals td.PersonCode
+                  join tm in _dBTMTestMasterRepository.Table
+                      on dd.TestCode equals tm.TestCode
+                  where td.CentreCode == centreCode
+                     && (isAllTrainee || td.DBTMTraineeDetailId == dBTMTraineeDetailId)
                      && (isAllTest || testIds.Contains(tm.DBTMTestMasterId))
-                 select (dd.CreatedDate ?? dd.TestPerformedTime).Date)
-                .Distinct()
-                .OrderBy(d => d)
-                .ToList();
+                  select (dd.CreatedDate ?? dd.TestPerformedTime).Date)
+                 .Distinct()
+                 .OrderBy(d => d)
+                 .ToList();
             return dates;
         }
         public List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
