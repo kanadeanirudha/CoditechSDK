@@ -21,7 +21,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Activity Code")]
         public string TestCode { get; set; }
 
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
         [Display(Name = "Graph")]
@@ -32,9 +32,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Lap Distance")]
         [Required]
         public string LapDistance { get; set; }
-        [Display(Name = "Is Lap Distance Change")]
+        [Display(Name = "Lap Distance Change")]
         public bool IsLapDistanceChange { get; set; }
-        [Display(Name = "Is Multi Test")]
+        [Display(Name = "Multi Test")]
         public bool IsMultiTest { get; set; }
         [Display(Name = "Activity Instructions")]
         public string TestInstructions { get; set; }
@@ -48,10 +48,10 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Performance Matrix")]
         public byte DBTMPerformanceMatrixId { get; set; }
         public string PerformanceMatrix { get; set; }
-        [Display(Name = " Is Start Direction")]
+        [Display(Name = "Start Direction")]
         public bool IsStartDirection { get; set; }
         [Required]
-        [Display(Name = " Activity Output Higher")]
+        [Display(Name = "Activity Output Higher")]
         public string TestOutputHigher { get; set; }
         [Display(Name = "Activity Result Basedon")]
         [Required]

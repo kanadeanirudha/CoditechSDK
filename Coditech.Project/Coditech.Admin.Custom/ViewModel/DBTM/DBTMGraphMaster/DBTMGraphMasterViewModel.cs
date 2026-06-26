@@ -19,7 +19,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "X Parameter Based On")]
         public string XParameterBasedOn { get; set; }
         [Required]
-        [Display(Name = "Is Y Parameter Calculated")]
+        [Display(Name = "Y Parameter Calculated")]
         public bool IsYParameterCalculated { get; set; }
         [Required]
         [Display(Name = "Y Parameter")]
@@ -51,9 +51,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Graph Size")]
         public string GraphSize { get; set; }
         public List<string> DBTMSelectedGraph { get; set; }
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
-        [Display(Name = "Is Calculate Average")]
+        [Display(Name = "Calculate Average")]
         public bool IsCalculateAverage { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Activity")]
         public int DBTMTestMasterId { get; set; }
         public string TestName { get; set; }
-        [Display(Name = "Is Associated")]
+        [Display(Name = "Associated")]
         public bool IsAssociated { get; set; }
         public string BatchName { get; set; }
     }
