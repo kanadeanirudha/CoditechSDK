@@ -711,7 +711,7 @@ namespace Coditech.API.Service
                 dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
             }
             return dBTMTraineeDetailsModel;
-        }
+        }   q11
 
         //Update DBTM Trainee Other Details
         public bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
@@ -733,7 +733,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository.Update(traineeDetails);
 
             // Update GeneralPerson
-            GeneralPerson person = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == dBTMTraineeDetailsModel.PersonId);
+            GeneralPerson person = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == traineeDetails.PersonId);
 
             if (person != null)
             {
