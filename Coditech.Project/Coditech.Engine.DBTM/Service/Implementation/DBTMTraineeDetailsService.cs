@@ -769,7 +769,7 @@ namespace Coditech.API.Service
                                         score = ((maxValue - testValue) / (maxValue - minValue)) * 100;
                                     }
                                 }
-                                dr[$"{test.TestCode}Score"] = score;
+                                dr[$"{test.TestCode}Score"] = Math.Round(score, CustomConstants.GraphListRoundUpValue);
                             }
                         }
                     }
@@ -786,7 +786,7 @@ namespace Coditech.API.Service
                         finalScore += (value * weights) / 100;
                     }
 
-                    dr["FinalScore"] = Math.Round(finalScore, 3);
+                    dr["FinalScore"] = Math.Round(finalScore, CustomConstants.GraphListRoundUpValue);
                 }
                 //Calculate Rank
                 var rankedList = dt.AsEnumerable()
