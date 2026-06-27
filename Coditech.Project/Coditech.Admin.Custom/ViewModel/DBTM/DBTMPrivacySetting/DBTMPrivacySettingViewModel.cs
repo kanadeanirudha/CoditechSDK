@@ -9,10 +9,10 @@ namespace Coditech.Admin.ViewModel
     {
         public int DBTMPrivacySettingId { get; set; }
 
-        [Display(Name = "Is Notification On")]
+        [Display(Name = "Notification On")]
         public bool IsNotificationOn { get; set; }
 
-        [Display(Name = "Is Location On")]
+        [Display(Name = "Location On")]
         public bool IsLocationOn { get; set; }
         [Required]
         [Display(Name = "LabelCentre", ResourceType = typeof(AdminResources))]

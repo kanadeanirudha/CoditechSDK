@@ -19,7 +19,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Display On")]
         public string DisplayOn { get; set; }
 
-        [Display(Name = "Is Column Cell Bold")]
+        [Display(Name = "Column Cell Bold")]
         public bool IsColumnCellBold { get; set; }
         public string TestName { get; set; }
         public string CentreCode { get; set; }

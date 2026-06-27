@@ -16,10 +16,75 @@
         </div>
     </div>
 </div>
-
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<style>
+    #calendar {
+        margin-top: 30px;
+    }
+        .fc .fc-day-today {
+            background-color: #E8F1FF !important;
+        }
+        .fc .fc-day-today .fc-daygrid-day-number {
+            background: #ff3b5c;
+            color: #fff !important;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fc .fc-col-header-cell.fc-day-today,
+        .fc .fc-timegrid-col.fc-day-today {
+            background-color: #E8F1FF !important;
+        }
+        .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+            background: #ff3b5c;
+            color: #fff !important;
+            border-radius: 15px;
+            padding: 4px 10px;
+            font-weight: 600;
+        }
+        .fc .fc-toolbar-title {
+            color: #243447 !important;
+            background: rgba(255,255,255,.88);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            text-shadow: none;
+        }
 
+    .fc .fc-header-toolbar {
+        margin-top: 10px !important;
+        margin-bottom: 18px !important;
+    }
+    /* Time column background */
+    .fc .fc-timegrid-axis,
+    .fc .fc-timegrid-axis-frame,
+    .fc .fc-timegrid-slot-label,
+    .fc .fc-timegrid-slot-label-frame {
+        background: #eef6ff !important;
+        color: #333 !important;
+    }
+
+    /* Left top "all-day" cell */
+    .fc .fc-timegrid-axis-cushion,
+    .fc .fc-scrollgrid-section-header th:first-child {
+        background: #f8f9fa !important;
+    }
+
+    /* Entire calendar grid */
+    .fc .fc-scrollgrid,
+    .fc .fc-scrollgrid td,
+    .fc .fc-scrollgrid th {
+        background-color: #fff !important;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script>
        document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
