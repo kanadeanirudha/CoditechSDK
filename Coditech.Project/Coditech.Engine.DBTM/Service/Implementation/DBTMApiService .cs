@@ -711,7 +711,7 @@ namespace Coditech.API.Service
                 dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
             }
             return dBTMTraineeDetailsModel;
-        }   q11
+        }
 
         //Update DBTM Trainee Other Details
         public bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
