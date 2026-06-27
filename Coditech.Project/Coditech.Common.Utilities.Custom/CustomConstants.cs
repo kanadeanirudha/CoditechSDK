@@ -58,6 +58,7 @@
         public const string InvalidData = "Invalid Data";
         public const string TotalLaps = "TotalLaps";
         public const string ModeOfStart = "ModeOfStart";
+        public const string NA = "NA";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

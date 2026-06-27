@@ -23,7 +23,7 @@ namespace Coditech.API.Service
         bool UpdateValidRecord(long dBTMDeviceDataId, bool isValidRecord);
         DBTMBatchListModel GetDBTMCentrAndTrainerewiseBatchList(string centreCode, int joiningCodeTypeEnumId, long generalTrainerMasterId);
         DBTMBatchListModel GetDBTMTrainerwiseBatchList(string centreCode, long generalTrainerMasterId);
-        DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId, long personId);
+        DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId);
         bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel model);
     }
 }

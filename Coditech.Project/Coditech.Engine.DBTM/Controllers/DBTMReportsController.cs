@@ -362,7 +362,7 @@ namespace Coditech.Engine.DBTM.Controllers
             try
             {
                 DBTMReportVerticalDataModel model = _dBTMReportsService.GetActivityVerticalDetails(dBTMDeviceDataId, typeOfRecord);
-                if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
+                if (model == null || model.TurnList == null || model.TurnList.Count == 0)
                     return CreateNoContentResponse();
                 return CreateOKResponse(new DBTMReportVerticalDataResponse { DBTMReportVerticalDataModel = model });
             }
