@@ -10,11 +10,9 @@ namespace Coditech.Common.API.Model
         public string Direction { get; set; }
         public string Status { get; set; } = "Completed";
         public DateTime TestPerformedTime { get; set; }
-        public DataTable DataTable { get; set; }
         public bool IsValidRecordButton { get; set; }
         public DBTMReportVerticalDataModel()
         {
-            DataTable = new DataTable();
         }
         public List<GraphModel> GraphModelList = new List<GraphModel>();
         public decimal Weight { get; set; }

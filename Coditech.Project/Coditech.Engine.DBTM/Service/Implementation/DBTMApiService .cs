@@ -729,6 +729,7 @@ namespace Coditech.API.Service
             traineeDetails.Height = dBTMTraineeDetailsModel.Height;
             traineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
             traineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
+            traineeDetails.IsActive = dBTMTraineeDetailsModel.IsActive;
 
             _dBTMTraineeDetailsRepository.Update(traineeDetails);
 
@@ -761,7 +762,6 @@ namespace Coditech.API.Service
                 userMaster.EmailId = dBTMTraineeDetailsModel.EmailId;
                 _userMasterRepository.Update(userMaster);
             }
-
             return true;
         }
 
