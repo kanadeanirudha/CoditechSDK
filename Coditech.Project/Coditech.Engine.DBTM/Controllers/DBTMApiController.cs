@@ -511,5 +511,49 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMBatchListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMApi/GetDBTMTraineeDetails")]
+        [HttpGet]
+        [Produces(typeof(DBTMTraineeDetailsResponse))]
+        public virtual IActionResult GetDBTMTraineeDetails(long dBTMTraineeDetailId)
+        {
+            try
+            {
+                DBTMTraineeDetailsModel dBTMTraineeDetailsModel = _dBTMApiService.GetDBTMTraineeDetails(dBTMTraineeDetailId);
+                return IsNotNull(dBTMTraineeDetailsModel) ? CreateOKResponse(new DBTMTraineeDetailsResponse { DBTMTraineeDetailsModel = dBTMTraineeDetailsModel }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMApi/UpdateDBTMTraineeDetails")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMTraineeDetailsResponse))]
+        public virtual IActionResult UpdateDBTMTraineeDetails([FromBody] DBTMTraineeDetailsModel model)
+        {
+            try
+            {
+                bool isUpdated = _dBTMApiService.UpdateDBTMTraineeDetails(model);
+                return isUpdated ? CreateOKResponse(new DBTMTraineeDetailsResponse { DBTMTraineeDetailsModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTraineeDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
     }
 }

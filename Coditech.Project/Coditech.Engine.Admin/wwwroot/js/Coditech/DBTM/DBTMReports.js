@@ -191,7 +191,7 @@ var DBTMReports = {
     LoadActivityPerformedDates: function (showMessage = false) {
         var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
         var dBTMTraineeDetailId = $("#DBTMTraineeDetailId").val();
-        if (!dBTMTraineeDetailId || dBTMTraineeDetailId == "0") {
+        if (!dBTMTraineeDetailId) {
             activityPerformedDates = [];
             $("#FromDate,#ToDate").datepicker("refresh");
             return;

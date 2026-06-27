@@ -686,6 +686,97 @@ namespace Coditech.API.Service
                 }
             }
         }
+
+        public DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId)
+        {
+            if (dBTMTraineeDetailId <= 0) throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTraineeDetailId"));
+
+            DBTMTraineeDetails dBTMTraineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailId);
+            if (IsNull(dBTMTraineeDetails))
+                return null;
+
+            DBTMTraineeDetailsModel dBTMTraineeDetailsModel = dBTMTraineeDetails?.FromEntityToModel<DBTMTraineeDetailsModel>();
+
+            GeneralPerson personData = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == dBTMTraineeDetails.PersonId);
+
+            if (personData != null)
+            {
+                dBTMTraineeDetailsModel.FirstName = personData.FirstName;
+                dBTMTraineeDetailsModel.MiddleName = personData.MiddleName;
+                dBTMTraineeDetailsModel.LastName = personData.LastName;
+                dBTMTraineeDetailsModel.DisplayName = personData.Custom2;
+                dBTMTraineeDetailsModel.EmailId = personData.EmailId;
+                dBTMTraineeDetailsModel.MobileNumber = personData.MobileNumber;
+                dBTMTraineeDetailsModel.DateOfBirth = personData.DateOfBirth;
+                dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
+            }
+            return dBTMTraineeDetailsModel;
+        }   q11
+
+        //Update DBTM Trainee Other Details
+        public bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel dBTMTraineeDetailsModel)
+        {
+            if (dBTMTraineeDetailsModel == null)
+                throw new CoditechException(ErrorCodes.NullModel, "Model is null.");
+
+            // Update DBTMTraineeDetails
+            DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table
+                .FirstOrDefault(x => x.DBTMTraineeDetailId == dBTMTraineeDetailsModel.DBTMTraineeDetailId);
+
+            if (traineeDetails == null)
+                throw new CoditechException(ErrorCodes.NotFound, "Trainee details not found.");
+
+            traineeDetails.Height = dBTMTraineeDetailsModel.Height;
+            traineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
+            traineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
+
+            _dBTMTraineeDetailsRepository.Update(traineeDetails);
+
+            // Update GeneralPerson
+            GeneralPerson person = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == traineeDetails.PersonId);
+
+            if (person != null)
+            {
+                person.FirstName = dBTMTraineeDetailsModel.FirstName;
+                person.MiddleName = dBTMTraineeDetailsModel.MiddleName;
+                person.LastName = dBTMTraineeDetailsModel.LastName;
+                person.EmailId = dBTMTraineeDetailsModel.EmailId;
+                person.MobileNumber = dBTMTraineeDetailsModel.MobileNumber;
+                person.DateOfBirth = dBTMTraineeDetailsModel.DateOfBirth;
+                person.PersonTitle = dBTMTraineeDetailsModel.PersonTitle;
+                person.Custom2 = dBTMTraineeDetailsModel.DisplayName;
+                _generalPersonRepository.Update(person);
+            }
+
+            UserMaster userMaster = _userMasterRepository.Table
+                .FirstOrDefault(x => x.EntityId == traineeDetails.DBTMTraineeDetailId
+                                  && x.UserType == UserTypeEnum.Trainee.ToString());
+
+            if (userMaster != null)
+            {
+                userMaster.IsActive = dBTMTraineeDetailsModel.IsActive;
+                userMaster.FirstName = dBTMTraineeDetailsModel.FirstName;
+                userMaster.MiddleName = dBTMTraineeDetailsModel.MiddleName;
+                userMaster.LastName = dBTMTraineeDetailsModel.LastName;
+                userMaster.EmailId = dBTMTraineeDetailsModel.EmailId;
+                _userMasterRepository.Update(userMaster);
+            }
+
+            return true;
+        }
+
+        protected virtual int CalculateAge(DateTime dateOfBirth)
+        {
+            DateTime today = DateTime.Today;
+            int age = today.Year - dateOfBirth.Year;
+
+            // Go back to the year the person was born in case of a leap year
+            if (dateOfBirth > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
+        }
     }
 
     public enum TestParameterCode

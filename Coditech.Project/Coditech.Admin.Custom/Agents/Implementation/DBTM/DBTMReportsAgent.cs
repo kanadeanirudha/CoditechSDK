@@ -202,7 +202,9 @@ namespace Coditech.Admin.Agents
         }
         public virtual List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
         {
-            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId);
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            string centreCode = userModel?.SelectedCentreCode;
+            List<string> dateStrings = _dBTMReportsClient.GetActivityPerformedDates(dBTMTestMasterIds, dBTMTraineeDetailId, centreCode);
 
             if (dateStrings == null || !dateStrings.Any())
                 return new List<DateTime>();

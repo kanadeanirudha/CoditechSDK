@@ -249,27 +249,28 @@ namespace Coditech.API.Service
             return graphModel;
         }
 
-        public List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId)
+        public List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId, string centreCode)
         {
             if (string.IsNullOrWhiteSpace(dBTMTestMasterIds))
                 return new List<DateTime>();
-            if (dBTMTraineeDetailId <= 0)
+            bool isAllTrainee = dBTMTraineeDetailId == 0;
+            if (dBTMTraineeDetailId < 0)
                 return new List<DateTime>();
             List<int> testIds = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
             bool isAllTest = testIds.Contains(0);
             var dates =
-                (from dd in _dBTMDeviceDataRepository.Table
-                 join td in _dBTMTraineeDetailsRepository.Table
-                     on dd.PersonCode equals td.PersonCode
-                 join tm in _dBTMTestMasterRepository.Table
-                     on dd.TestCode equals tm.TestCode
-                 where
-                     td.DBTMTraineeDetailId == dBTMTraineeDetailId
+                 (from dd in _dBTMDeviceDataRepository.Table
+                  join td in _dBTMTraineeDetailsRepository.Table
+                      on dd.PersonCode equals td.PersonCode
+                  join tm in _dBTMTestMasterRepository.Table
+                      on dd.TestCode equals tm.TestCode
+                  where td.CentreCode == centreCode
+                     && (isAllTrainee || td.DBTMTraineeDetailId == dBTMTraineeDetailId)
                      && (isAllTest || testIds.Contains(tm.DBTMTestMasterId))
-                 select (dd.CreatedDate ?? dd.TestPerformedTime).Date)
-                .Distinct()
-                .OrderBy(d => d)
-                .ToList();
+                  select (dd.CreatedDate ?? dd.TestPerformedTime).Date)
+                 .Distinct()
+                 .OrderBy(d => d)
+                 .ToList();
             return dates;
         }
         public List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId)
@@ -303,7 +304,7 @@ namespace Coditech.API.Service
                 {
                     CustomConstants.PersonDetectionRange
                 };
-                var tooltipFields = groupList.Where(x => allowedTooltipFields.Contains(x.ParameterCode)).GroupBy(x => x.ParameterCode).ToDictionary(x => x.Key, x => x.FirstOrDefault()?.ParameterValue ?? string.Empty );
+                var tooltipFields = groupList.Where(x => allowedTooltipFields.Contains(x.ParameterCode)).GroupBy(x => x.ParameterCode).ToDictionary(x => x.Key, x => x.FirstOrDefault()?.ParameterValue ?? string.Empty);
                 var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                 var firstOfGroup = groupList.FirstOrDefault();
                 short j = 1;
@@ -852,8 +853,6 @@ namespace Coditech.API.Service
             else
                 model.IsValidRecordButton = true;
 
-            //Remove This method once implement in mobile
-            model.DataTable = BindDBTMDataVerticalFormat(testData.DBTMTestMasterId, dBTMDeviceDataId, deviceData, false);
             BindDBTMDataVerticalFormatV2(model, testData.DBTMTestMasterId, dBTMDeviceDataId, deviceData, false);
             return model;
         }
@@ -1356,81 +1355,6 @@ namespace Coditech.API.Service
             repo.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             repo.SetParameter("@DisplayOn", displayOn, ParameterDirection.Input, DbType.String);
             return repo.ExecuteStoredProcedureList("Coditech_GetDBTMTestParameterListViewSequence @DBTMTestMasterId,@CentreCode,@DisplayOn").ToList();
-        }
-
-        //Remove This method once implement in mobile
-        private DataTable BindDBTMDataVerticalFormat(int DBTMTestMasterId, long DBTMDeviceDataId, DBTMDeviceData deviceData, bool isMobileRequest = false)
-        {
-            DataTable dataTable = new DataTable();
-            string displayOn = isMobileRequest ? "OnlyMobileApp" : "OnlyWeb";
-            var entities = _dBTMTestParameterVerticalViewSequenceRepository.Table.Where(x => x.DBTMTestMasterId == DBTMTestMasterId && x.DisplayOn != "None" && (x.DisplayOn.Contains("Both") || x.DisplayOn == displayOn)).OrderBy(x => x.SequenceNumber).ToList();
-            var listviewSequenceColumns = entities.Select(x => x.FromEntityToModel<DBTMTestParameterVerticalViewSequence>()).ToList();
-
-            foreach (DBTMTestParameterVerticalViewSequence col in listviewSequenceColumns)
-            {
-                dataTable.Columns.Add(col.ColumnName, typeof(string));
-            }
-
-            var dBTMReportsList = _dBTMDeviceDataDetailsRepository.Table.Where(x => x.DBTMDeviceDataId == DBTMDeviceDataId).Select(x => x.FromEntityToModel<DBTMReportsModel>()).ToList();
-            ReportsListDecryption(dBTMReportsList);
-            foreach (var item in dBTMReportsList)
-            {
-                item.Weight = deviceData?.Weight ?? 0;
-                item.Height = deviceData?.Height ?? 0;
-            }
-            var reportsLookup = dBTMReportsList.GroupBy(x => $"{x.ParameterCode}-{x.Row}").ToDictionary(g => g.Key, g => g.First());
-
-            short maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
-
-            for (short i = 1; i <= maxRecursion; i++)
-            {
-                var newRow = dataTable.NewRow();
-
-                foreach (var displayColumn in listviewSequenceColumns)
-                {
-                    string value = string.Empty;
-                    if (displayColumn.ParameterCode == "Row")
-                    {
-                        value = i.ToString();
-                    }
-                    else if (displayColumn.ParameterCode == "FromTo")
-                    {
-                        var fromTo = dBTMReportsList.FirstOrDefault(x => x.Row == i && !string.IsNullOrEmpty(x.FromTo))?.FromTo;
-                        value = fromTo ?? string.Empty;
-                    }
-                    else if (displayColumn.ParameterCode == CustomConstants.StaticValue)
-                    {
-                        value = displayColumn.StaticValue;
-                    }
-                    else if (displayColumn.IsCalculatedParameter)
-                    {
-                        if (displayColumn.ParameterCode == CustomConstants.CompletionTime)
-                            value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), 1);
-                        else
-                            value = DBTMCustomHelper.Calculation(displayColumn.ParameterCode, displayColumn.ParameterCode, dBTMReportsList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault(), i);
-                    }
-                    else
-                    {
-                        if (reportsLookup.TryGetValue($"{displayColumn.ParameterCode}-{i}", out var dataDetails))
-                            value = dataDetails.ParameterValue.ToString();
-                    }
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        if (decimal.TryParse(value, out decimal number))
-                        {
-                            bool isWholeNumber = number == Math.Truncate(number);
-                            value = isWholeNumber ? Math.Truncate(number).ToString() : number.ToString();
-                        }
-                    }
-                    newRow[displayColumn.ColumnName] = value;
-                }
-                dataTable.Rows.Add(newRow);
-            }
-            foreach (DataColumn col in dataTable.Columns)
-            {
-                col.ColumnName = col.ColumnName.Replace("{Unit}", DBTMCustomHelper.Unit(listviewSequenceColumns.FirstOrDefault(x => x.ColumnName == col.ColumnName).ParameterCode));
-            }
-            return dataTable;
         }
 
         private void BindDBTMDataVerticalFormatV2(DBTMReportVerticalDataModel dbtmReportVerticalDataModel, int DBTMTestMasterId, long DBTMDeviceDataId, DBTMDeviceData deviceData, bool isMobileRequest = false)
