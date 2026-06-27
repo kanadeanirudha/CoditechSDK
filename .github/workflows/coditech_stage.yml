@@ -63,9 +63,6 @@ jobs:
     steps:
       - name: Stop ADMIN IIS Site and App Pool
         run: |
-          # Start the associated app pool
-          Start-WebAppPool -Name "dbtm-stage-admin"
-
           # Stop the IIS site
           Stop-WebSite -Name "dbtm-stage-admin" 
 
