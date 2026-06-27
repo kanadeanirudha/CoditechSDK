@@ -99,7 +99,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult ViewActivityDetailPopup(long dBTMDeviceDataId)
         {
             DBTMReportVerticalDataViewModel model = _dBTMReportsAgent.GetActivityVerticalDetails(dBTMDeviceDataId);
-            if (model == null || model.DataTable == null || model.DataTable.Rows.Count == 0)
+            if (model == null || model.TurnList == null || model.TurnList.Count == 0)
                 return Content("No activity details found.");
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMReportVerticalDetailPopup.cshtml", model);
         }
