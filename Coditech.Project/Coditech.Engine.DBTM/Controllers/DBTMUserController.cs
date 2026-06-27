@@ -45,12 +45,12 @@ namespace Coditech.API.Controllers
             catch (CoditechUnauthorizedException ex)
             {
                 _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.UserLogin.ToString(), TraceLevel.Warning);
-                return CreateUnauthorizedResponse(new DBTMUserModel { HasError = true, ErrorCode = ex.ErrorCode });
+                return CreateUnauthorizedResponse(new DBTMUserModel { HasError = true, ErrorCode = ex.ErrorCode, ErrorMessage = ex.Message });
             }
             catch (CoditechException ex)
             {
                 _coditechLogging.LogMessage(ex, CoditechLoggingEnum.Components.UserLogin.ToString(), TraceLevel.Warning);
-                return CreateUnauthorizedResponse(new DBTMUserModel { HasError = true, ErrorCode = ex.ErrorCode });
+                return CreateUnauthorizedResponse(new DBTMUserModel { HasError = true, ErrorCode = ex.ErrorCode, ErrorMessage = ex.Message });
             }
             catch (Exception ex)
             {

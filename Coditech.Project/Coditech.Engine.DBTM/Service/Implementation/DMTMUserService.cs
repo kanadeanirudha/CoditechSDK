@@ -50,7 +50,7 @@ namespace Coditech.API.Service
             if (IsNull(userMasterData))
                 throw new CoditechException(ErrorCodes.NotFound, null);
             else if (!userMasterData.IsActive)
-                throw new CoditechException(ErrorCodes.ContactAdministrator, null);
+                throw new CoditechException(ErrorCodes.ContactAdministrator, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
 
             DBTMUserModel userModel = new DBTMUserModel();
             long personId = 0;
