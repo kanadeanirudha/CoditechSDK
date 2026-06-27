@@ -637,7 +637,10 @@ a.dashboard-menu-list span {
         width: 100%;
     }
     .page-wrapper .page-content {
-        padding: 30px 15px;
+        padding: 20% 2%;
+    }
+    .footer {
+        position: fixed;
     }
 }
 
