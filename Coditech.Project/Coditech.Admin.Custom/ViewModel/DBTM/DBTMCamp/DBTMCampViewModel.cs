@@ -32,7 +32,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Weekly")]
         public List<string> SelectedWeekDays { get; set; } = new List<string>();
         public List<SelectListItem> SchedulerWeekDaysList { get; set; }
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
         [Required(ErrorMessage = "Duration Hours is required.")]
         public string DurationHours { get; set; }

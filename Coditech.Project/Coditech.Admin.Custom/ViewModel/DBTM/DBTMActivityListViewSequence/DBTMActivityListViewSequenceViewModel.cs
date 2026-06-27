@@ -12,7 +12,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Parameter Code")]
         public string ParameterCode { get; set; }
 
-        [Display(Name = "Is Calculated Parameter")]
+        [Display(Name = "Calculated Parameter")]
         public bool IsCalculatedParameter { get; set; }
 
         [Required(ErrorMessage = "Recursion is required.")]
@@ -25,7 +25,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Consecutive Parameter Code")]
         public string ConsecutiveParameterCode { get; set; }
 
-        [Display(Name = "Is Calculated Consecutive Parameter Code")]
+        [Display(Name = "Calculated Consecutive Parameter Code")]
         public bool IsCalculatedConsecutiveParameterCode { get; set; }
 
         [Display(Name = "Column Name")]
@@ -45,12 +45,12 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Column Cell Color")]
         public string ColumnCellColor { get; set; }
 
-        [Display(Name = "Is Column Cell Bold")]
+        [Display(Name = "Column Cell Bold")]
         public bool IsColumnCellBold { get; set; }
         public string TestName { get; set; }
         [Display(Name = "Static Value")]
         public string StaticValue { get; set; }
-        [Display(Name = "Is Display Performance Standard")]
+        [Display(Name = "Display Performance Standard")]
         public bool IsDisplayPerformanceStandard { get; set; }
     }
 }

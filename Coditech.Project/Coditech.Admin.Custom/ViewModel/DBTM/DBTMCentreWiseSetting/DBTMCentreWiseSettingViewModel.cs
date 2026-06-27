@@ -17,7 +17,7 @@ namespace Coditech.Admin.ViewModel
         [Required]
         public int AllowCampUser { get; set; }
         public int OrganisationCentreMasterId { get; set; }
-        [Display(Name = "Is Display Performance Standard")]
+        [Display(Name = "Display Performance Standard")]
         public bool IsDisplayPerformanceStandard { get; set; }
         public DBTMCentreWiseTestListViewModel TestListViewModel { get; set; }
         public string CentreName { get; set; }

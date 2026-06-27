@@ -23,9 +23,9 @@ namespace Coditech.Admin.ViewModel
         public int SubscriptionPlanTypeEnumId { get; set; }
         [Display(Name = "Subscription Plan Type")]
         public string SubscriptionPlanType { get; set; }
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
-        [Display(Name = "Is Tax Exclusive")]
+        [Display(Name = "Tax Exclusive")]
         public bool IsTaxExclusive { get; set; }
         public long DBTMDeviceMasterId { get; set; }
         public DateTime PlanDurationExpirationDate { get; set; }
