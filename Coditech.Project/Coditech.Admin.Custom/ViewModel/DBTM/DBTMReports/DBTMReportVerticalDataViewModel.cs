@@ -7,7 +7,6 @@ namespace Coditech.Admin.ViewModel
 {
     public class DBTMReportVerticalDataViewModel : BaseViewModel
     {
-        public DataTable DataTable { get; set; }
         public long DBTMDeviceDataId { get; set; }
         public string AthleteName { get; set; }
         public string TestName { get; set; }
