@@ -12,7 +12,7 @@ namespace Coditech.Admin.ViewModel
         public int DBTMTestMasterId { get; set; }
         public string TestName { get; set; }
         public string TestCode { get; set; }
-        [Display(Name = "Is Associated")]
+        [Display(Name = "Associated")]
         public bool IsAssociated { get; set; }
         public string PlanName { get; set; }
 

@@ -20,7 +20,7 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Activity Category Name")]
         public string ActivityCategoryName { get; set; }
 
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
     }
 }

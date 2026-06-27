@@ -23,7 +23,7 @@ namespace Coditech.Admin.ViewModel
         public int? GroupEnumId { get; set; }
         [Display(Name = "Source")]
         public int? SourceEnumId { get; set; }
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
         public string ImagePath { get; set; }
         public string FirstName { get; set; }
