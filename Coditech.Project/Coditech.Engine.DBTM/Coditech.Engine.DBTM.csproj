@@ -34,7 +34,7 @@
 		<PackageReference Include="ScottPlot" Version="5.1.58" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-		<PackageReference Include="MailKit" Version="4.0.0" />
+		<PackageReference Include="MailKit" Version="4.17.0" />
 		<PackageReference Include="Twilio" Version="7.9.0" />
 	</ItemGroup>
 
