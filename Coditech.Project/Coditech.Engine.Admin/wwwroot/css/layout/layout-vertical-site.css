@@ -461,19 +461,6 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
 .topbar .navigation-menu > li > a span {
     padding: 6px !important;
 }
-.saveandclose {
-    position: fixed;
-    top: 58px;
-    left: 14.5%;
-    right: 0;
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    z-index: 998;
-    padding: 5px 10px;
-    border-radius: 4px;
-    width: 81.8%;
-    margin: 0 auto;
-}
 @media only screen and (max-width: 991px) {
     .topbar .brand.logo-background .logo-large-wrapper {
         display: none !important;
@@ -696,24 +683,38 @@ a.dashboard-menu-list span {
         max-width: 100px;
     }
 
-        .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a span, .enlarge-menu .left-sidenav .menu-label span {
-            display: none;
-        }
+    .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a span, .enlarge-menu .left-sidenav .menu-label span {
+        display: none;
+    }
 
-        .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a {
-            justify-content: center;
-        }
+    .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a {
+        justify-content: center;
+    }
 
-            .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i. .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i:before {
-                width: 35px;
-                height: 35px;
-            }
+    .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i. .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i:before {
+        width: 35px;
+        height: 35px;
+    }
 
-        .enlarge-menu .left-sidenav .menu-label {
-            text-align: center;
-        }
+    .enlarge-menu .left-sidenav .menu-label {
+        text-align: center;
+    }
 
     .left-sidenav .brand {
         width: 100% !important;
+    }
+
+    .saveandclose {
+        position: fixed;
+        top: 58px;
+        left: 14.5%;
+        right: 0;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        z-index: 998;
+        padding: 5px 10px;
+        border-radius: 4px;
+        width: 81.8%;
+        margin: 0 auto;
     }
 }
