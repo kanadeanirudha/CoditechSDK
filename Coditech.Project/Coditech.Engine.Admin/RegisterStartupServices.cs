@@ -85,6 +85,9 @@ namespace Coditech.Admin
             // Adds UseStatusCodePagesWithReExecute
             app.UseStatusCodePagesWithReExecute("/User/PageNotFoundRequest");
 
+            // Adds the internet connectivity check middleware
+            app.UseInternetConnectivityCheck();
+
             // Adds the static file configurations with custom path.
             app.UseStaticFiles(builder);
 
