@@ -644,6 +644,9 @@ a.dashboard-menu-list span {
     .footer {
         position: fixed;
     }
+    .center-name {
+        margin-left: 55px !important;
+    }
 }
 
 @media only screen and (min-width:1025px) {
