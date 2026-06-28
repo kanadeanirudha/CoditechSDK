@@ -461,7 +461,19 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
 .topbar .navigation-menu > li > a span {
     padding: 6px !important;
 }
-
+.saveandclose {
+    position: fixed;
+    top: 58px;
+    left: 14.5%;
+    right: 0;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    z-index: 998;
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: 81.8%;
+    margin: 0 auto;
+}
 @media only screen and (max-width: 991px) {
     .topbar .brand.logo-background .logo-large-wrapper {
         display: none !important;
@@ -595,17 +607,21 @@ a.dashboard-menu-list span {
 .hidden-xs {
     display: none;
 }
+
 .center-name {
     padding: 0 0.75rem;
     line-height: 52px;
     max-height: 52px;
 }
+
 .brand.logo-background .logo-small-wrapper {
     display: none !important;
 }
+
 .topbar .brand.logo-background {
     display: none;
 }
+
 .brand.logo-background .logo-large-wrapper .logo-lg {
     display: inline-block !important;
     width: 88%;
@@ -621,10 +637,10 @@ a.dashboard-menu-list span {
         justify-content: center;
     }
 
-        .brand.logo-background img {
-            width: 100%;
-            height: 100%;
-        }
+    .brand.logo-background img {
+        width: 100%;
+        height: 100%;
+    }
 
     .topbar .brand.logo-background {
         display: flex !important;
@@ -638,14 +654,30 @@ a.dashboard-menu-list span {
         display: inline-block !important;
         width: 100%;
     }
+
     .page-wrapper .page-content {
-        padding: 20% 2%;
+        padding: 25% 2%;
     }
+
     .footer {
         position: fixed;
     }
+
     .center-name {
         margin-left: 55px !important;
+    }
+    .saveandclose {
+        position: fixed;
+        top: 58px;
+        left: 0%;
+        right: 0;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        z-index: 998;
+        padding: 5px 10px;
+        border-radius: 4px;
+        width: 100%;
+        margin: 0 auto;
     }
 }
 
