@@ -1,6 +1,16 @@
 ﻿@model PageHeaderViewModel
 <input type="hidden" name="ActionMode" value="" form="@Model.FormId" />
-<div style="position:relative; top:0; left:0; right:0; background:#fff; border-bottom:1px solid #ddd; z-index:998; padding:10px 20px; margin-bottom:10px;">
+<div style="position: fixed;
+    top: 58px;
+    left: 13.5%;
+    right: 0;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    z-index: 998;
+    padding: 10px 20px;
+    border-radius: 4px;
+    width: 83.8%;
+    margin: 0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <!-- Page Title -->
         <h4 style="margin:0;">@Model.Title</h4>

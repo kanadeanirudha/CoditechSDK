@@ -33,7 +33,7 @@
                             <div class="col-md-1">
                                 <label>Trainer</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
                             </div>
                             <div class="col-md-1">
@@ -45,7 +45,7 @@
                             <div class="col-md-1">
                                 <label class="form-label" for="CustomDropdownSelectedValue1">Activity List</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="mb-3 multiselect-dropdown">
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTestMasterId", multiple = "multiple", data_live_search = "true" })
                                 </div>
@@ -53,13 +53,13 @@
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control" })
                                 <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>

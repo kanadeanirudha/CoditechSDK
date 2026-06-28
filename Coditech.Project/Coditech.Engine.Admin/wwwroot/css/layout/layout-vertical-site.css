@@ -89,7 +89,7 @@ html {
 
 .page-wrapper {
     height: 100vh;
-    overflow-y: auto;
+    overflow-y: hidden;
     margin: 0 auto 0 !important;
     padding-top: 0 !important;
 }
@@ -209,6 +209,8 @@ label {
     padding: 15px;
     min-height: calc(100vh - 107px) !important;
     margin-top: 0 !important;
+    max-height: calc((100vh) - 107px) !important;
+    overflow-y: auto;
 }
 
 
@@ -641,6 +643,9 @@ a.dashboard-menu-list span {
     }
     .footer {
         position: fixed;
+    }
+    .center-name {
+        margin-left: 55px !important;
     }
 }
 

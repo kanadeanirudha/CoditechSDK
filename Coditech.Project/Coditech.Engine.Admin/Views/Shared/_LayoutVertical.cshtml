@@ -71,6 +71,10 @@
 </head>
 <body data-layout="vertical" class="dark-topbar" data-new-gr-c-s-check-loaded="14.1113.0" data-gr-ext-installed="" style="background: url(@applicationLayoutBackground);background-position: center;background-repeat: no-repeat;background-size: cover;">
     @Html.Partial("~/Views/Shared/_Loader.cshtml")
+    <!-- Internet connectivity offline badge (hidden by default) -->
+    <div id="internet-connectivity-status" style="position: fixed; top: 12px; right: 12px; z-index: 1050; display: none;">
+        <span id="internet-connectivity-badge" class="badge bg-danger">Offline</span>
+    </div>
     @if (userData != null)
     {
         <!-- Left Sidenav -->
@@ -103,7 +107,7 @@
             @Html.Partial("~/Views/Shared/_ModuleListVertical.cshtml", userData)
         </div>
         <!-- end left-sidenav-->
-        
+
 
         <div class="page-wrapper">
             <!-- Top Bar Start -->
@@ -172,11 +176,11 @@
                         </li> <!--end menu item-->
                     </ul><!--end topbar-nav-->
                     <ul class="list-unstyled topbar-nav mb-0">
-                        <li>
+                        @* <li>
                             <button class="nav-link button-menu-mobile" fdprocessedid="y0c0n">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu align-self-center topbar-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                             </button>
-                        </li>
+                        </li> *@
                         <li class="d-flex">
                             @if (userData.AccessibleCentreList != null && userData.AccessibleCentreList.Count > 1)
                             {
@@ -233,6 +237,7 @@
     <script src="~/js/coditech/common/coditechcommon.js"></script>
     <script src="~/js/coditech/common/coditechdatatable.js"></script>
     <script src="~/js/coditech/common/coditechnotification.js"></script>
+    <script src="~/js/coditech/common/InternetConnectivityCheck.js"></script>
     <script src="~/js/coditech/user.js"></script>
     <script>
         if (performance.navigation.type == 2) {

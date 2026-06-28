@@ -74,8 +74,10 @@
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                                 <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>
-                            <div class="col-md-2 align-items-end">
+                            <div class="col-md-1">
                                 <input type="button" class="btn btn-success me-3" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMTestWiseMultiReports()" />
+                            </div>
+                            <div class="col-md-2">
                                 <a id="DownloadBtn" class="btn btn-success" onclick="DBTMReports.DownloadExcelReport()">
                                     <i class="fa fa-download"></i> Download
                                 </a>
