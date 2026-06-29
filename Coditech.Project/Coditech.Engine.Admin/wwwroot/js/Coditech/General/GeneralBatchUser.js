@@ -13,8 +13,8 @@
             BatchName: batchName,
             FirstName: firstName,
             LastName:lastName,
-            EntityId:entityId
-            
+            EntityId:entityId,
+            Custom4: $("#Custom4").val()
         };
         CoditechCommon.ShowLodder();
         $.ajax(
