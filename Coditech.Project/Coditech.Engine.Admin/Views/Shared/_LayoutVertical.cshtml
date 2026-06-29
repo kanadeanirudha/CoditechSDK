@@ -206,6 +206,7 @@
                 <!-- end navbar-->
             </div>
             <!-- Top Bar End -->
+            @Html.Partial("~/Views/Shared/_NotificationMessage.cshtml", @messageData)
             <!-- Page Content-->
             @RenderBody()
             <!-- end page content -->
