@@ -89,7 +89,7 @@ html {
 
 .page-wrapper {
     height: 100vh;
-    overflow-y: auto;
+    overflow-y: hidden;
     margin: 0 auto 0 !important;
     padding-top: 0 !important;
 }
@@ -209,6 +209,8 @@ label {
     padding: 15px;
     min-height: calc(100vh - 107px) !important;
     margin-top: 0 !important;
+    max-height: calc((100vh) - 107px) !important;
+    overflow-y: auto;
 }
 
 
@@ -459,7 +461,6 @@ body[data-layout="horizontal"] .page-wrapper .page-content {
 .topbar .navigation-menu > li > a span {
     padding: 6px !important;
 }
-
 @media only screen and (max-width: 991px) {
     .topbar .brand.logo-background .logo-large-wrapper {
         display: none !important;
@@ -593,17 +594,21 @@ a.dashboard-menu-list span {
 .hidden-xs {
     display: none;
 }
+
 .center-name {
     padding: 0 0.75rem;
     line-height: 52px;
     max-height: 52px;
 }
+
 .brand.logo-background .logo-small-wrapper {
     display: none !important;
 }
+
 .topbar .brand.logo-background {
     display: none;
 }
+
 .brand.logo-background .logo-large-wrapper .logo-lg {
     display: inline-block !important;
     width: 88%;
@@ -619,10 +624,10 @@ a.dashboard-menu-list span {
         justify-content: center;
     }
 
-        .brand.logo-background img {
-            width: 100%;
-            height: 100%;
-        }
+    .brand.logo-background img {
+        width: 100%;
+        height: 100%;
+    }
 
     .topbar .brand.logo-background {
         display: flex !important;
@@ -636,8 +641,30 @@ a.dashboard-menu-list span {
         display: inline-block !important;
         width: 100%;
     }
+
     .page-wrapper .page-content {
-        padding: 30px 15px;
+        padding: 25% 2%;
+    }
+
+    .footer {
+        position: fixed;
+    }
+
+    .center-name {
+        margin-left: 55px !important;
+    }
+    .saveandclose {
+        position: fixed;
+        top: 58px;
+        left: 0%;
+        right: 0;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        z-index: 998;
+        padding: 5px 10px;
+        border-radius: 4px;
+        width: 100%;
+        margin: 0 auto;
     }
 }
 
@@ -656,24 +683,38 @@ a.dashboard-menu-list span {
         max-width: 100px;
     }
 
-        .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a span, .enlarge-menu .left-sidenav .menu-label span {
-            display: none;
-        }
+    .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a span, .enlarge-menu .left-sidenav .menu-label span {
+        display: none;
+    }
 
-        .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a {
-            justify-content: center;
-        }
+    .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a {
+        justify-content: center;
+    }
 
-            .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i. .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i:before {
-                width: 35px;
-                height: 35px;
-            }
+    .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i. .enlarge-menu .left-sidenav .metismenu.left-sidenav-menu a i:before {
+        width: 35px;
+        height: 35px;
+    }
 
-        .enlarge-menu .left-sidenav .menu-label {
-            text-align: center;
-        }
+    .enlarge-menu .left-sidenav .menu-label {
+        text-align: center;
+    }
 
     .left-sidenav .brand {
         width: 100% !important;
+    }
+
+    .saveandclose {
+        position: fixed;
+        top: 58px;
+        left: 14.5%;
+        right: 0;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        z-index: 998;
+        padding: 5px 10px;
+        border-radius: 4px;
+        width: 81.8%;
+        margin: 0 auto;
     }
 }

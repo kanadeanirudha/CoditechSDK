@@ -1,18 +1,21 @@
 ﻿@using Newtonsoft.Json
 @model DBTMDashboardViewModel
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div id="calendar" style="margin-top:20px;"></div>
+            </div>
 
-<div class="row">
-    <div class="col-md-8">
-        <div id="calendar" style="margin-top:20px;"></div>
-    </div>
-
-    <div class="col-md-4">
-        <div id="eventDetails" class="card p-3 shadow-sm">
-            <h5>Event Details</h5>
-            <p><strong>Title:</strong> <span id="detailTitle">--</span></p>
-            <p><strong>Description:</strong> <span id="detailDesc">--</span></p>
-            <p><strong>Start Batch:</strong> <span id="detailStart">--</span></p>
-            <p><strong>End Batch:</strong> <span id="detailEnd">--</span></p>
+            <div class="col-md-4">
+                <div id="eventDetails" class="card p-3 shadow-sm">
+                    <h5>Event Details</h5>
+                    <p><strong>Title:</strong> <span id="detailTitle">--</span></p>
+                    <p><strong>Description:</strong> <span id="detailDesc">--</span></p>
+                    <p><strong>Start Batch:</strong> <span id="detailStart">--</span></p>
+                    <p><strong>End Batch:</strong> <span id="detailEnd">--</span></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -21,9 +24,11 @@
     #calendar {
         margin-top: 30px;
     }
-        .fc .fc-day-today {
-            background-color: #E8F1FF !important;
-        }
+
+    .fc .fc-day-today {
+        background-color: #E8F1FF !important;
+    }
+
         .fc .fc-day-today .fc-daygrid-day-number {
             background: #ff3b5c;
             color: #fff !important;
@@ -37,10 +42,12 @@
             align-items: center;
             justify-content: center;
         }
-        .fc .fc-col-header-cell.fc-day-today,
-        .fc .fc-timegrid-col.fc-day-today {
-            background-color: #E8F1FF !important;
-        }
+
+    .fc .fc-col-header-cell.fc-day-today,
+    .fc .fc-timegrid-col.fc-day-today {
+        background-color: #E8F1FF !important;
+    }
+
         .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
             background: #ff3b5c;
             color: #fff !important;
@@ -48,15 +55,16 @@
             padding: 4px 10px;
             font-weight: 600;
         }
-        .fc .fc-toolbar-title {
-            color: #243447 !important;
-            background: rgba(255,255,255,.88);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(0,0,0,.15);
-            text-shadow: none;
-        }
+
+    .fc .fc-toolbar-title {
+        color: #243447 !important;
+        background: rgba(255,255,255,.88);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+        text-shadow: none;
+    }
 
     .fc .fc-header-toolbar {
         margin-top: 10px !important;
