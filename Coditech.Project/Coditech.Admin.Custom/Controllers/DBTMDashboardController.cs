@@ -60,7 +60,7 @@ namespace Coditech.Admin.Controllers
             {
                 dataTableModel = new DataTableViewModel();
             }
-            GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
+            GeneralBatchListViewModel list = GetBatchListData(dataTableModel);        
             DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null
                 ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString())
                 : new DBTMDashboardViewModel();
@@ -79,14 +79,12 @@ namespace Coditech.Admin.Controllers
 
             // Final check: Trainer gets access ONLY if NOT in ReadOnly mode. Owner is always ReadOnly here.
             bool isTrainer = (isTrainerRole || isOwnerRole || userModel?.Custom1 == "DBTMTrainer" || userModel?.Custom1 == "DBTMCentreOwner") && !isReadOnlyContext;
-            ViewBag.IsTrainer = isTrainer;
-
+            ViewBag.IsTrainer = isTrainer;    
             string isPopUpView = Convert.ToString(ViewBag.IsDashboardPopup);
             if (!string.IsNullOrEmpty(isPopUpView))
             {
                 list.PageListViewModel.IsActionColumn = isTrainer;
             }
-
             TempData.Keep();
             // If it's an AJAX request (DataTables refreshing), return the partial fragment.
             // If it's the initial iframe load (POST or direct), return the full View.
