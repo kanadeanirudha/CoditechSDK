@@ -15,7 +15,7 @@ namespace Coditech.Admin.Agents
         bool DeleteReportsFile(string fileName);
         List<DateTime> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId);
         List<DateTime> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId);
-        DBTMReportVerticalDataViewModel GetActivityVerticalDetails(long dBTMDeviceDataId);
+        DBTMReportVerticalDataViewModel GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord);
         DBTMTraineeProfileListViewModel GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate);
         DBTMReportsListViewModel CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate);
         DBTMReportsListViewModel CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate, string ReportType);

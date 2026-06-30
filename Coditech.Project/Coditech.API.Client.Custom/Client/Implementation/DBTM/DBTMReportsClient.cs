@@ -539,14 +539,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId)
+        public virtual DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord)
         {
-            return Task.Run(async () => await GetActivityVerticalDetailsAsync(dBTMDeviceDataId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetActivityVerticalDetailsAsync(dBTMDeviceDataId, typeOfRecord, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMReportVerticalDataResponse> GetActivityVerticalDetailsAsync(long dBTMDeviceDataId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMReportVerticalDataResponse> GetActivityVerticalDetailsAsync(long dBTMDeviceDataId, string typeOfRecord, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.GetActivityVerticalDetailsAsync(dBTMDeviceDataId);
+            string endpoint = dBTMReportsEndpoint.GetActivityVerticalDetailsAsync(dBTMDeviceDataId, typeOfRecord);
 
             HttpResponseMessage response = null;
             var disposeResponse = true;

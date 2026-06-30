@@ -96,9 +96,9 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult ViewActivityDetailPopup(long dBTMDeviceDataId)
+        public ActionResult ViewActivityDetailPopup(long dBTMDeviceDataId, string typeOfRecord)
         {
-            DBTMReportVerticalDataViewModel model = _dBTMReportsAgent.GetActivityVerticalDetails(dBTMDeviceDataId);
+            DBTMReportVerticalDataViewModel model = _dBTMReportsAgent.GetActivityVerticalDetails(dBTMDeviceDataId, typeOfRecord);
             if (model == null || model.TurnList == null || model.TurnList.Count == 0)
                 return Content("No activity details found.");
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMReportVerticalDetailPopup.cshtml", model);
@@ -249,6 +249,7 @@ namespace Coditech.Admin.Controllers
         public ActionResult GetCampWiseReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate)
         {
             DBTMReportsListViewModel model = _dBTMReportsAgent.CampWiseMultipleReports(dBTMTestMasterIds, dBTMCampMasterId, FromDate, ToDate);
+            model.TypeOfRecord = "Camp";
             return PartialView("~/Views/Shared/_DBTMMultiReports.cshtml", model);
         }
 

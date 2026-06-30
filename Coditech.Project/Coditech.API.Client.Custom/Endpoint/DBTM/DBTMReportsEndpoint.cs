@@ -54,9 +54,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetBatchActivityPerformedDates?dBTMTestMasterIds={dBTMTestMasterIds}&generalBatchMasterId={generalBatchMasterId}";
             return endpoint;
         }
-        public string GetActivityVerticalDetailsAsync(long dBTMDeviceDataId)
+        public string GetActivityVerticalDetailsAsync(long dBTMDeviceDataId, string typeOfRecord)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityVerticalDetails?dBTMDeviceDataId={dBTMDeviceDataId}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetActivityVerticalDetails?dBTMDeviceDataId={dBTMDeviceDataId}&typeOfRecord={typeOfRecord}";
             return endpoint;
         }
         public string GetBatchWiseUserAsync(long generalBatchMasterId)

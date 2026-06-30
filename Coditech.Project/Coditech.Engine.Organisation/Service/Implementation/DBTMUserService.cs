@@ -649,13 +649,29 @@ namespace Coditech.API.Service
                     errors.Add("Mobile Number must be 10 digits");
             }
             if (string.IsNullOrWhiteSpace(height))
+            {
                 errors.Add("Height is empty");
-            else if (!decimal.TryParse(height, out _))
+            }
+            else if (!decimal.TryParse(height, out decimal heightValue))
+            {
                 errors.Add("Height must be numeric");
+            }
+            else if (heightValue <= 0)
+            {
+                errors.Add("Height must be greater than 0");
+            }
             if (string.IsNullOrWhiteSpace(weight))
+            {
                 errors.Add("Weight is empty");
-            else if (!decimal.TryParse(weight, out _))
+            }
+            else if (!decimal.TryParse(weight, out decimal weightValue))
+            {
                 errors.Add("Weight must be numeric");
+            }
+            else if (weightValue <= 0)
+            {
+                errors.Add("Weight must be greater than 0");
+            }
             if (string.IsNullOrWhiteSpace(dob))
                 errors.Add("Date Of Birth is empty");
             else if (!DateTime.TryParse(dob, out _))
