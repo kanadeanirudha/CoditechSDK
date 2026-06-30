@@ -14,5 +14,6 @@ namespace Coditech.Common.API.Model
         public string FileName { get; set; }
         public DateTime? TestPerformedTime { get; set; }
         public DBTMReportsListModel DBTMReportsModel { get; set; }
+        public string TypeOfRecord { get; set; }
     }
 }

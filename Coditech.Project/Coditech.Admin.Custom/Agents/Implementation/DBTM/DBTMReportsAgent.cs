@@ -96,13 +96,13 @@ namespace Coditech.Admin.Agents
         }
 
         //Vertical Popup Details
-        public virtual DBTMReportVerticalDataViewModel GetActivityVerticalDetails(long dBTMDeviceDataId)
+        public virtual DBTMReportVerticalDataViewModel GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord)
         {
             if (dBTMDeviceDataId <= 0)
                 return new DBTMReportVerticalDataViewModel();
             try
             {
-                DBTMReportVerticalDataResponse response =  _dBTMReportsClient.GetActivityVerticalDetails(dBTMDeviceDataId);
+                DBTMReportVerticalDataResponse response =  _dBTMReportsClient.GetActivityVerticalDetails(dBTMDeviceDataId, typeOfRecord);
                 return response?.DBTMReportVerticalDataModel.ToViewModel<DBTMReportVerticalDataViewModel>();
             }
             catch (Exception ex)
