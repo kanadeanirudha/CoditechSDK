@@ -238,29 +238,29 @@ var InternetConnectivityCheck = {
     setInteractiveDisabled: function (isDisabled) {
         try {
             // Select all button-like controls across the page
-            var controls = Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"], textarea, select'));
+            //var controls = Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"], textarea, select'));
 
-            controls.forEach(function (el) {
-                // Allow explicit opt-out
-                if (el.dataset && el.dataset.ignoreOffline === 'true') return;
+            //controls.forEach(function (el) {
+            //    // Allow explicit opt-out
+            //    if (el.dataset && el.dataset.ignoreOffline === 'true') return;
 
-                // Do NOT disable controls that belong to topbar/navigation to avoid hiding essential UI
-                if (el.closest && (el.closest('.topbar') || el.closest('.navbar-custom') || el.closest('.brand') || el.closest('.logo') || el.closest('header') || el.closest('.left-sidenav'))) {
-                    return;
-                }
+            //    // Do NOT disable controls that belong to topbar/navigation to avoid hiding essential UI
+            //    if (el.closest && (el.closest('.topbar') || el.closest('.navbar-custom') || el.closest('.brand') || el.closest('.logo') || el.closest('header') || el.closest('.left-sidenav'))) {
+            //        return;
+            //    }
 
-                try {
-                    el.disabled = isDisabled;
-                } catch (e) { }
+            //    try {
+            //        el.disabled = isDisabled;
+            //    } catch (e) { }
 
-                if (isDisabled) {
-                    el.classList.add('disabled', 'offline-disabled');
-                    el.setAttribute('aria-disabled', 'true');
-                } else {
-                    el.classList.remove('disabled', 'offline-disabled');
-                    el.removeAttribute('aria-disabled');
-                }
-            });
+            //    if (isDisabled) {
+            //        el.classList.add('disabled', 'offline-disabled');
+            //        el.setAttribute('aria-disabled', 'true');
+            //    } else {
+            //        el.classList.remove('disabled', 'offline-disabled');
+            //        el.removeAttribute('aria-disabled');
+            //    }
+            //});
 
             // Also disable anchor elements (hyperlinks)
             var anchors = Array.from(document.querySelectorAll('a[href]'));
