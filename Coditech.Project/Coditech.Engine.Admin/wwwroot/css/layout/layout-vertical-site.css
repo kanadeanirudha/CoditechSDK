@@ -644,6 +644,8 @@ a.dashboard-menu-list span {
 
     .page-wrapper .page-content {
         padding: 25% 2%;
+        min-height: calc(100vh - 75px);
+        max-height: calc((100vh) - 75px);
     }
 
     .footer {
@@ -652,6 +654,7 @@ a.dashboard-menu-list span {
 
     .center-name {
         margin-left: 55px !important;
+        font-size: 16px;
     }
     .saveandclose {
         position: fixed;
@@ -716,5 +719,17 @@ a.dashboard-menu-list span {
         border-radius: 4px;
         width: 81.8%;
         margin: 0 auto;
+    }
+}
+
+
+@media screen and (max-width: 1024px) and (orientation: landscape) {
+    .page-wrapper .page-content {
+        padding: 10% 2% !important;
+    }
+
+    .page-wrapper .page-content {
+        min-height: 100vh !important;
+        max-height: 100vh !important;
     }
 }
