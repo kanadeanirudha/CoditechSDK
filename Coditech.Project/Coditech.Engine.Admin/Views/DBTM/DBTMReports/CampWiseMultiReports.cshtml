@@ -23,13 +23,13 @@
                             <div class="col-md-1">
                                 <label>Camp List</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", CampDropdown)
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label" for="CustomDropdownSelectedValue1">Activity List</label>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-8">
                                 <div class="mb-3 multiselect-dropdown">
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTestMasterId", multiple = "multiple", data_live_search = "true" })
                                 </div>
@@ -37,13 +37,13 @@
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.FromDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
                                 @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                                 <small id="toDateError" style="color:red; display:none;"> Please select From Date first </small>
                             </div>
@@ -51,14 +51,10 @@
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetDBTMCampWiseMultiReports()" />
                             </div>
                             <div class="col-md-3">
-                                <!-- View in new tab -->
-                                @*      <button type="button" class="btn btn-success" onclick="DBTMReports.GetDBTMCampWiseMultiReportsFile()">View in xls</button> *@
-
                                 <!-- Download latest -->
                                 <a id="DownloadBtn" class="btn btn-success" onclick="DBTMReports.DownloadCampExcelReport()">
                                     <i class="fa fa-download"></i> Download
                                 </a>
-
                             </div>
                             <div id="DBTMCampWiseMultiReportsDivId" class="mt-3">
                             </div>

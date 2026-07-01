@@ -62,15 +62,16 @@
             </div>
         </div>
     </div>
-    <style>
-        .activity-date a {
-            background-color: #198754 !important;
-            color: #fff !important;
-            font-weight: 600;
-        }
-    </style>
-    <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
-    <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+</div>
+<style>
+    .activity-date a {
+        background-color: #198754 !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+</style>
+<script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 @section scripts {
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -99,7 +100,7 @@
                     String(date.getDate()).padStart(2, "0");
 
                 if (activityPerformedDates.includes(d)) {
-                    return [true, "activity-date", "Trainee Performed"]; 
+                    return [true, "activity-date", "Trainee Performed"];
                 }
                    return [true, "", ""];
             }

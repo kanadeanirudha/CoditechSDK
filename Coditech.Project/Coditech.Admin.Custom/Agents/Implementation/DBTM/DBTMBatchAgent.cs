@@ -91,6 +91,7 @@ namespace Coditech.Admin.Agents
             SetListPagingData( listViewModel.PageListViewModel, response, dataTableModel, listViewModel.GeneralBatchUserList.Count, BindAssociatedBatchColumns());
             listViewModel.GeneralBatchMasterId = generalBatchMasterId;
             listViewModel.BatchName = response.BatchName;
+            listViewModel.Custom4 = dataTableModel.SelectedParameter4;
             return listViewModel;
         }
         public virtual GeneralBatchUserListViewModel GetBatchUserListByCentreCodeAndGeneralTrainerMasterId(string selectedCentreCode, long generalTrainerMasterId, int generalBatchMasterId)

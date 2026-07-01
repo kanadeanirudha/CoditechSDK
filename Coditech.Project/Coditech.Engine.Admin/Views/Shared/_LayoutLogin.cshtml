@@ -104,6 +104,10 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Internet connectivity status badge (displayed on login page) -->
+                    <div id="internet-connectivity-status" style="position: fixed; top: 12px; right: 12px; z-index: 1050; display: none;">
+                        <span id="internet-connectivity-badge" class="badge bg-success">Checking...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -128,6 +132,7 @@
     <script src="~/js/coditech/common/coditechcommon.js"></script>
     <script src="~/js/coditech/common/coditechdatatable.js"></script>
     <script src="~/js/coditech/common/coditechnotification.js"></script>
+    <script src="~/js/coditech/common/InternetConnectivityCheck.js"></script>
     <script src="~/js/coditech/user.js"></script>
 </body>
 @await RenderSectionAsync("Scripts", required: false)

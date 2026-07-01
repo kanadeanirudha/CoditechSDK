@@ -85,7 +85,7 @@ namespace Coditech.Admin.Controllers
                     {
                         if (!string.IsNullOrEmpty(ispopup) && ispopup.ToLower() == "true")
                         {
-                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true, isReadOnly = true });
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true, isReadOnly = false });
                         }
                         if (generalBatchViewModel.Custom4 == "Mobile View")
                         {
@@ -146,7 +146,7 @@ namespace Coditech.Admin.Controllers
                     {
                         if (!string.IsNullOrEmpty(ispopup) && ispopup.ToLower() == "true")
                         {
-                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true, isReadOnly = true });
+                            return RedirectToAction("LoadBatchesPartial", "DBTMDashboard", new { isIframe = true, isReadOnly = false });
                         }
                         if (generalBatchViewModel.Custom4 == "Mobile View")
                         {

@@ -28,5 +28,6 @@ namespace Coditech.Admin.ViewModel
         public string FileName { get; set; }
         public string CentreCode { get; set; }
         public int DBTMCampMasterId { get; set; }
+        public string TypeOfRecord { get; set; }
     }
 }

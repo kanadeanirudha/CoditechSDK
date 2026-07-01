@@ -25,8 +25,8 @@
     </div>
 </div>
 
-<script src="~/js/coditech/DBTM/DBTMGeneralBatchMaster.js"></script>
-
+<script src="~/js/coditech/DBTM/DBTMBatch.js"></script>
+<script src="~/js/coditech/General/GeneralBatchUser.js"></script>
 <script>
     setTimeout(function () {
         var notif = document.getElementById("notificationDivId");
@@ -36,4 +36,21 @@
             setTimeout(function () { notif.style.display = "none"; }, 500);
         }
     }, 4000);
+</script>
+<script>
+    function resizeParentIframe() {
+        if (window.parent && window.parent !== window && window.frameElement) {
+            window.frameElement.style.height =
+                document.documentElement.scrollHeight + "px";
+        }
+    }
+
+    $(document).ready(function () {
+        resizeParentIframe();
+
+        setTimeout(resizeParentIframe, 300);
+        setTimeout(resizeParentIframe, 800);
+    });
+
+    window.addEventListener("load", resizeParentIframe);
 </script>

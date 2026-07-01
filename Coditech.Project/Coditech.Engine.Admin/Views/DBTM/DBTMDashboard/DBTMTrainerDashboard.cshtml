@@ -25,27 +25,27 @@
         }
     };
     LineBarChartModel trainerviewModel = new LineBarChartModel()
-            {
-                GraphType = "bar",
-                LineBarChartId = "YearlyTraineeTrainedOverviewChart",
-                XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
-                XAxisLabel = "Months",
-                YAxisLabel = "Trainees Count",
-                Datasets = traineeDataset
-            };
+    {
+        GraphType = "bar",
+        LineBarChartId = "YearlyTraineeTrainedOverviewChart",
+        XValues = JsonConvert.SerializeObject(XValuesBarYearlyTraineeTrainedOverview),
+        XAxisLabel = "Months",
+        YAxisLabel = "Trainees Count",
+        Datasets = traineeDataset
+    };
     GeneralBatchListViewModel generalBatchListViewModel = new GeneralBatchListViewModel
-            {
+    {
 
-                GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
-                PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
-                Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
-            };
+        GeneralBatchList = Model.GeneralBatchList.FirstOrDefault()?.GeneralBatchList,
+        PageListViewModel = Model.GeneralBatchList.FirstOrDefault()?.PageListViewModel,
+        Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
+    };
     DBTMTraineeAssignmentListViewModel dBTMTraineeAssignmentListViewModel = new DBTMTraineeAssignmentListViewModel
-            {
-                DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
-                PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
-                Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
-            };
+    {
+        DBTMTraineeAssignmentList = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.DBTMTraineeAssignmentList,
+        PageListViewModel = Model.DBTMTraineeAssignmentList.FirstOrDefault()?.PageListViewModel,
+        Custom4 = Model.GeneralBatchList.FirstOrDefault()?.Custom4
+    };
 }
 <div class="page-content">
     <div class="container-fluid">
@@ -271,106 +271,107 @@
             </div>
         </div><!-- container -->
     </div>
-    <style>
-        iframe {
-            display: block;
-            width: 100% !important;
-        }
-
-        .graph-card {
-            margin-bottom: 30px !important;
-        }
-
-            .graph-card .card-body {
-                padding-bottom: 10px !important;
-            }
-
-        #myTab {
-            margin-top: 30px !important;
-        }
-    </style>
-    @section scripts {
-        <!-- end page content -->
-        <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
-        <script>
-                        function resizeIframe(obj) {
-                if (obj && obj.contentWindow && obj.contentWindow.document.body) {
-                    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-                }
-            }
-            $(function () {
-              // Initialize datepicker (if needed)
-              $(".datepicker").datepicker({
-                  format: "dd/mm/yyyy",
-                  autoclose: true
-              });
-
-              // Handle tab switch and iframe loading
-              $('#myTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-                var $btn = $(this);
-                var pane = $btn.data('bs-target'); // "#batchesPane" / "#assignmentPane"
-                var method = $btn.data('method') || ($btn.attr('id') === 'batches-tab' ? 'LoadBatchesPartial' : 'LoadAssignmentPartial');
-                var methodType = String($btn.data('method-type') || 'POST').toUpperCase();
-
-                var $iframe = $(pane).find('iframe');
-                if (!$iframe.length) return;
-
-                // ensure iframe has a name so target works
-                var iframeName = $iframe.attr('name');
-                if (!iframeName) {
-                  iframeName = 'iframe_' + Date.now();
-                  $iframe.attr('name', iframeName);
-                }
-
-                // read values from hidden fields
-                var selectedVal1 = $('#hdnSelectedParameter1').val() || '';
-                var selectedVal2 = $('#hdnSelectedParameter2').val() || '';
-
-                if (methodType === 'POST') {
-                  // POST into iframe
-                  var $form = $('<form>', {
-                    method: 'POST',
-                    action: '/DBTMDashboard/' + method,
-                    target: iframeName
-                  });
-
-                  // send both params for model binding
-                  $form.append($('<input>', {
-                    type: 'hidden',
-                    name: 'dataTableModel.SelectedParameter1',
-                    value: selectedVal1
-                  }));
-                  $form.append($('<input>', {
-                    type: 'hidden',
-                    name: 'dataTableModel.SelectedParameter2',
-                    value: selectedVal2
-                  }));
-
-                  $form.append($('<input>', {
-                    type: 'hidden',
-                    name: 'isIframe',
-                    value: 'true'
-                  }));
-
-                  // add antiforgery token if present
-                  var $aft = $('input[name="__RequestVerificationToken"]').first();
-                  if ($aft.length) $form.append($aft.clone());
-
-                  $('body').append($form);
-                  $form.trigger('submit').remove();
-                } else {
-                  // GET fallback with querystring
-                  var url = '/DBTMDashboard/' + method + '?' + $.param({
-                    'dataTableModel.SelectedParameter1': selectedVal1,
-                    'dataTableModel.SelectedParameter2': selectedVal2
-                  });
-                  $iframe.attr('src', url);
-                }
-              });
-
-              // initial load for the first active tab
-              $('#myTab button.active').trigger('shown.bs.tab');
-            });
-        </script>
-
+</div>
+<style>
+    iframe {
+        display: block;
+        width: 100% !important;
     }
+
+    .graph-card {
+        margin-bottom: 30px !important;
+    }
+
+        .graph-card .card-body {
+            padding-bottom: 10px !important;
+        }
+
+    #myTab {
+        margin-top: 30px !important;
+    }
+</style>
+@section scripts {
+    <!-- end page content -->
+    <script src="~/js/coditech/DBTM/DBTMDashboard.js"></script>
+    <script>
+                    function resizeIframe(obj) {
+            if (obj && obj.contentWindow && obj.contentWindow.document.body) {
+                obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+            }
+        }
+        $(function () {
+          // Initialize datepicker (if needed)
+          $(".datepicker").datepicker({
+              format: "dd/mm/yyyy",
+              autoclose: true
+          });
+
+          // Handle tab switch and iframe loading
+          $('#myTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var $btn = $(this);
+            var pane = $btn.data('bs-target'); // "#batchesPane" / "#assignmentPane"
+            var method = $btn.data('method') || ($btn.attr('id') === 'batches-tab' ? 'LoadBatchesPartial' : 'LoadAssignmentPartial');
+            var methodType = String($btn.data('method-type') || 'POST').toUpperCase();
+
+            var $iframe = $(pane).find('iframe');
+            if (!$iframe.length) return;
+
+            // ensure iframe has a name so target works
+            var iframeName = $iframe.attr('name');
+            if (!iframeName) {
+              iframeName = 'iframe_' + Date.now();
+              $iframe.attr('name', iframeName);
+            }
+
+            // read values from hidden fields
+            var selectedVal1 = $('#hdnSelectedParameter1').val() || '';
+            var selectedVal2 = $('#hdnSelectedParameter2').val() || '';
+
+            if (methodType === 'POST') {
+              // POST into iframe
+              var $form = $('<form>', {
+                method: 'POST',
+                action: '/DBTMDashboard/' + method,
+                target: iframeName
+              });
+
+              // send both params for model binding
+              $form.append($('<input>', {
+                type: 'hidden',
+                name: 'dataTableModel.SelectedParameter1',
+                value: selectedVal1
+              }));
+              $form.append($('<input>', {
+                type: 'hidden',
+                name: 'dataTableModel.SelectedParameter2',
+                value: selectedVal2
+              }));
+
+              $form.append($('<input>', {
+                type: 'hidden',
+                name: 'isIframe',
+                value: 'true'
+              }));
+
+              // add antiforgery token if present
+              var $aft = $('input[name="__RequestVerificationToken"]').first();
+              if ($aft.length) $form.append($aft.clone());
+
+              $('body').append($form);
+              $form.trigger('submit').remove();
+            } else {
+              // GET fallback with querystring
+              var url = '/DBTMDashboard/' + method + '?' + $.param({
+                'dataTableModel.SelectedParameter1': selectedVal1,
+                'dataTableModel.SelectedParameter2': selectedVal2
+              });
+              $iframe.attr('src', url);
+            }
+          });
+
+          // initial load for the first active tab
+          $('#myTab button.active').trigger('shown.bs.tab');
+        });
+    </script>
+
+}

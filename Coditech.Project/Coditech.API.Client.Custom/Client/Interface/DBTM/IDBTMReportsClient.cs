@@ -16,7 +16,7 @@ namespace Coditech.API.Client
         TrueFalseResponse DeleteReportsFile(ParameterModel body);
         List<string> GetActivityPerformedDates(string dBTMTestMasterIds, long dBTMTraineeDetailId, string centreCode);
         List<string> GetBatchActivityPerformedDates(string dBTMTestMasterIds, int generalBatchMasterId);
-        DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId);
+        DBTMReportVerticalDataResponse GetActivityVerticalDetails(long dBTMDeviceDataId, string typeOfRecord);
         DBTMTestWiseReportsListResponse CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode);
         DBTMTestWiseReportsListResponse CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId,  string userType, string centreCode, string reportType);
         List<string> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId);
