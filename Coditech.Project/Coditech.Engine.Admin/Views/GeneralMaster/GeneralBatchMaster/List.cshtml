@@ -1,74 +1,41 @@
 ﻿@model GeneralBatchListViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
     ViewBag.Title = "All Batch Details List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
-    string isPopUpView = Convert.ToString(ViewBag.IsDashboardPopup);
-    if (string.IsNullOrEmpty(isPopUpView))
-    {
-        isPopUpView = Convert.ToString(TempData["IsMobileCustom"]);
-    }
-    if (string.IsNullOrEmpty(isPopUpView) && !string.IsNullOrEmpty(Model.Custom4) && Model.Custom4.Equals("Mobile View", StringComparison.OrdinalIgnoreCase))
-    {
-        isPopUpView = "true";
-    }
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        controllerName = "generalbatchmaster";
-        actionName = "list";
-    }
 }
-@if (string.IsNullOrEmpty(isPopUpView))
-{
-    <!-- Page Content-->
-    <div class="page-content mt-5">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">All Batch Details List</span>
+<!-- Page Content-->
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">All Batch Details List</span>
 
-                            <a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("Create", "DBTMGeneralBatchMaster", new { custom4 = @Model.Custom4, ispopup = string.IsNullOrEmpty(isPopUpView) ? "" : "true", istrainer = ViewBag.IsTrainer == true ? "true" : "" })" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
-                        </div>
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-md-1">
-                                    <label>@AdminResources.LabelCentre</label>
-                                </div>
-                                <div class="col-md-4">
-                                    @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
-                                </div>
-                                <div class="col-md-1">
-                                    <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
-                                </div>
+                        <a class=" btn btn-sm btn-soft-primary float-end" href="@Url.Action("Create", "DBTMGeneralBatchMaster", new { custom4 = @Model.Custom4, istrainer = ViewBag.IsTrainer == true ? "true" : "" })" role="button"><i class="fas fa-plus me-2"></i>Add Batch</a>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>@AdminResources.LabelCentre</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", centreDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="CoditechCommon.LoadListByCentreCode('@controllerName','@actionName')" />
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                                @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", Model)
-                            </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", Model)
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-}
-else
-{
-    <div class="container-fluid mt-3">
-        <div class="row">
-            <div class="col-12">
-                <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                    @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_List.cshtml", Model)
-                </div>
-            </div>
-        </div>
-    </div>
-}
+</div>
