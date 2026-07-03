@@ -104,18 +104,23 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet, HttpPost]
-        public virtual ActionResult GetGeneralBatchUserList(DataTableViewModel dataTableViewModel)
+        public virtual ActionResult GetGeneralBatchUserList(DataTableViewModel dataTableViewModel, bool isIframe = false)
         {
             GeneralBatchUserListViewModel list = _generalBatchAgent.GetGeneralBatchUserList(Convert.ToInt32(dataTableViewModel.SelectedParameter1), Convert.ToString(dataTableViewModel.SelectedParameter2), dataTableViewModel);
-            if (AjaxHelper.IsAjaxRequest)
-            {
-                return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/_AssociatedBatchList.cshtml", list);
-            }
             list.SelectedParameter1 = dataTableViewModel.SelectedParameter1;
             list.SelectedParameter2 = dataTableViewModel.SelectedParameter2;
             list.Custom4 = dataTableViewModel.SelectedParameter4;
-            return View($"~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/AssociatedBatchList.cshtml", list);
+            if (AjaxHelper.IsAjaxRequest && !isIframe)
+            {
+                return PartialView("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/_AssociatedBatchList.cshtml", list);
+            }
+            if (isIframe)
+            {
+                return View("~/Views/DBTM/DBTMDashboard/_DBTMBatchUserListView.cshtml", list);
+            }
+            return View("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/AssociatedBatchList.cshtml", list);
         }
+
         [HttpGet]
         public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string custom4, string ispopup = "", string istrainer = "")
         {

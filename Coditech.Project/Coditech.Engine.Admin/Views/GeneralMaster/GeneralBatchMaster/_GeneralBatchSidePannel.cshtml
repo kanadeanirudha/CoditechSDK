@@ -5,6 +5,7 @@
     int generalBatchMasterId = Convert.ToInt32(Model?.FirstOrDefault(x => x.Key == "GeneralBatchMasterId").Value);
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string custom4 = Model.FirstOrDefault(x => x.Key == "Custom4").Value;
+    bool isIframe = !string.IsNullOrEmpty(custom4);
 }
 <div class="card sidebar-card">
     <div class="card-body">
@@ -17,11 +18,10 @@
                 </a>
 
                 <a class="nav-link"
-                   href="@Url.Action("GetGeneralBatchUserList", "DBTMGeneralBatchMaster", new { SelectedParameter1 = generalBatchMasterId, SelectedParameter4=custom4, ispopup = !string.IsNullOrEmpty(custom4) ? "true" : "", istrainer = "true" })"
+                   href="@Url.Action("GetGeneralBatchUserList", "DBTMGeneralBatchMaster", new { SelectedParameter1 = generalBatchMasterId, SelectedParameter4 = custom4, ispopup = isIframe? "true" : "", istrainer = "true", isIframe })"
                    aria-selected="true">
                     <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Batch User</h5>
                 </a>
-
             </div>
         </div>
     </div>
