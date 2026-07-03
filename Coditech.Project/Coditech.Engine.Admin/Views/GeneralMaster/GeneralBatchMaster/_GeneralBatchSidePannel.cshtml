@@ -6,13 +6,15 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string custom4 = Model.FirstOrDefault(x => x.Key == "Custom4").Value;
     bool isIframe = !string.IsNullOrEmpty(custom4);
+    UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+    bool isCentreOwner = userModel?.Custom1 == CustomConstants.DBTMCentreOwner;
 }
 <div class="card sidebar-card">
     <div class="card-body">
         <div class="files-nav">
             <div class="nav flex-column nav-pills" id="files-tab" aria-orientation="vertical">
                 <a class="nav-link"
-                   href="@Url.Action("UpdateGeneralBatch", "DBTMGeneralBatchMaster", new { generalBatchMasterId = generalBatchMasterId, custom4 = custom4, ispopup = !string.IsNullOrEmpty(custom4) ? "true" : "", istrainer = "true"})"
+                   href="@Url.Action("UpdateGeneralBatch", "DBTMGeneralBatchMaster", new { generalBatchMasterId = generalBatchMasterId, custom4 = custom4, ispopup = !string.IsNullOrEmpty(custom4) ? "true" : "", istrainer = "true" })"
                    aria-selected="true">
                     <i class="ti-menu"></i><h5 class="m-0 ps-2">Batch Details</h5>
                 </a>
@@ -22,6 +24,15 @@
                    aria-selected="true">
                     <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Batch User</h5>
                 </a>
+                @if (@generalBatchMasterId > 0 && isCentreOwner)
+                {
+                    <a class="nav-link" aria-selected="true" href="#"
+                       data-bs-toggle="modal"
+                       data-bs-target="#TransferBatchPopupId"
+                       onclick="DBTMBatch.OpenTransferBatchPopup('TransferBatchContentId', @generalBatchMasterId)">
+                        <i class="fas fa-exchange-alt"></i><h5 class="m-0 ps-2">Transfer Batch</h5>
+                    </a>
+                }
             </div>
         </div>
     </div>

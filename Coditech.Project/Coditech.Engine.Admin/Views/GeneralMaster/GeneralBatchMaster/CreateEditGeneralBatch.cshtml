@@ -1,7 +1,6 @@
 ﻿@model GeneralBatchViewModel
 @{
     UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
-    bool isCentreOwner = userModel?.Custom1 == CustomConstants.DBTMCentreOwner;
     bool isPopup = Convert.ToString(ViewBag.IsPopup).ToLower() == "true" || !string.IsNullOrEmpty(Model.Custom4);
     if (isPopup)
     {
@@ -36,18 +35,6 @@
     <div class="@(isPopup ? "mt-2 mb-3" : "")">
         @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
     </div>
-    @if (Model.GeneralBatchMasterId > 0 && isCentreOwner)
-    {
-        <div style="position:fixed; top:64px; right:275px; z-index:999;">
-            <button type="button"
-                    class="btn btn-sm btn-soft-primary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#TransferBatchPopupId"
-                    onclick="DBTMBatch.OpenTransferBatchPopup('TransferBatchContentId', @Model.GeneralBatchMasterId)">
-                <i class="fas fa-exchange-alt"></i> Transfer Batch
-            </button>
-        </div>
-    }
     <div class="container-fluid @(isPopup ? "pt-2" : "mt-5")">
         <div class="row">
             @if (Model.GeneralBatchMasterId > 0)
