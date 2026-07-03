@@ -30,39 +30,40 @@
                                     </div>
                                 }
                             </td>
-                            <td>
-                                <a href="@Url.Action(
-                                               "UpdateEmployeePersonalDetails",
-                                               "EmployeeMaster",
-                                               new { employeeId = item.EmployeeId, personId = item.PersonId })">
-                                    @item.PersonCode
+                            <td>@item.PersonCode
+                                <a href="@Url.Action("Edit", controllerName, new { generalTrainerId = item.GeneralTrainerMasterId })"
+                                   title="Update"
+                                   class="" style="float: inline-end;">
+                                    <i class="fas fa-pencil-alt"></i>
                                 </a>
                             </td>
+                            <td>
+                                @item.FirstName
 
-                            <td>@item.FirstName</td>
+                            </td>
                             <td>@item.LastName</td>
                             <td>@item.MobileNumber</td>
                             <td>
                                 <a href="@Url.Action(
-                                       "UpdateEmployeePersonalDetails",
-                                       "EmployeeMaster",
-                                       new { employeeId = item.EmployeeId, personId = item.PersonId })">
-                                    @item.EmailId
-                                </a>
-                            </td>
+                                                    "UpdateEmployeePersonalDetails",
+                                                    "EmployeeMaster",
+                                                    new { employeeId = item.EmployeeId, personId = item.PersonId })">
+                            @item.EmailId
+                        </a>
+                    </td>
 
                             <td>@item.TrainerSpecialization</td>
                             <td style="text-align: center;">
-                                @if (item.NumberOfTraineeAssociated > 0)
+                        @if (item.NumberOfTraineeAssociated > 0)
                                 {
                                     <a href="@Url.Action("List", "DBTMTraineeDetails", new
-                                        {
-                                            SelectedCentreCode = item.SelectedCentreCode,
-                                            SelectedParameter1 = item.GeneralTrainerMasterId
-                                        })">
-                                        <span class="badge badge-soft-info"> @item.NumberOfTraineeAssociated </span>
-                                    </a>
-                                }
+                                       {
+                                           SelectedCentreCode = item.SelectedCentreCode,
+                                           SelectedParameter1 = item.GeneralTrainerMasterId
+                                       })">
+                            <span class="badge badge-soft-info"> @item.NumberOfTraineeAssociated </span>
+                        </a>
+                                                }
                                 else
                                 {
                                     <span class="badge badge-soft-secondary"> @item.NumberOfTraineeAssociated </span>

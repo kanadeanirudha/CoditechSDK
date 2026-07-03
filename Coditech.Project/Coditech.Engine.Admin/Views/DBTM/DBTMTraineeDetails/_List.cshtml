@@ -36,10 +36,22 @@
                                     </div>
                                 }
                             </td>
-                            <td>@item.FirstName</td>
+                            <td>@item.FirstName
+                            <a href="@Url.Action("UpdateDBTMTraineePersonalDetails", controllerName, new {
+                                       dBTMTraineeDetailId = item.DBTMTraineeDetailId,
+                                       personId = item.PersonId,
+                                       SelectedParameter2 = Model.SelectedParameter2
+                                   })"
+                                   title="Update"
+                                   class="" style="float: inline-end;">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                            </td>
                             <td>@item.LastName</td>
                             <td>@item.DisplayName</td>
-                            <td>@item.PersonCode</td>
+                            <td>@item.PersonCode
+                                
+                            </td>
                             <td>@item.MobileNumber</td>
                             <td>@item.EmailId</td>
                             <td style="text-align: center;">
