@@ -19,5 +19,6 @@ namespace Coditech.Common.API.Model
         public decimal Height { get; set; }
         public Dictionary<string, string> ActivityDetails { get; set; }
         public Dictionary<string, DataTable> TurnList { get; set; }
+        public DateTime? DateOfBirth { get; set; }
     }
 }
