@@ -31,59 +31,52 @@
                                 }
                             </td>
                             <td>
-                                <a href="@Url.Action(
-                                               "UpdateEmployeePersonalDetails",
-                                               "EmployeeMaster",
-                                               new { employeeId = item.EmployeeId, personId = item.PersonId })">
-                                    @item.PersonCode
-                                </a>
+                                @Html.Partial("~/Views/Shared/_ActionLinkWithIcon.cshtml",
+                                new ActionViewModel(){
+                                        Action = "Edit",
+                                        Controller = controllerName,
+                                        RouteValues = new { generalTrainerId = item.GeneralTrainerMasterId },
+                                        Text = item.PersonCode,
+                                        Title="Update"
+                                    })
                             </td>
+                    <td>@item.FirstName</td>
+                    <td>@item.LastName</td>
+                    <td>@item.MobileNumber</td>
+                    <td>@item.EmailId</td>
+                    <td>@item.TrainerSpecialization</td>
+                    <td style="text-align: center;">
+                        @if (item.NumberOfTraineeAssociated > 0)
+                            {
+                                <a href="@Url.Action("List", "DBTMTraineeDetails", new
+                                   {
+                                       SelectedCentreCode = item.SelectedCentreCode,
+                                       SelectedParameter1 = item.GeneralTrainerMasterId
+                                   })">
+                            <span class="badge badge-soft-info"> @item.NumberOfTraineeAssociated </span>
+                        </a>
+                                                }
+                            else
+                            {
+                                <span class="badge badge-soft-secondary"> @item.NumberOfTraineeAssociated </span>
+                            }
+                        </td>
+                        <td>@item.UniqueCode</td>
+                        <td class="text-center">
+                            <a href="@Url.Action("Edit", controllerName, new { generalTrainerId = item.GeneralTrainerMasterId })"
+                               title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <span class="m-2">|</span>
+                            <a href="@Url.Action("UpdateEmployeePersonalDetails", "EmployeeMaster", new { employeeId = item.EmployeeId, personId = item.PersonId })"
+                               title="View" class="btn btn-sm btn-soft-warning btn-circle me-2">
+                                <i class="fas fa-eye" style="color: orange;"></i>
+                            </a>
+                        </td>
 
-                            <td>@item.FirstName</td>
-                            <td>@item.LastName</td>
-                            <td>@item.MobileNumber</td>
-                            <td>
-                                <a href="@Url.Action(
-                                       "UpdateEmployeePersonalDetails",
-                                       "EmployeeMaster",
-                                       new { employeeId = item.EmployeeId, personId = item.PersonId })">
-                                    @item.EmailId
-                                </a>
-                            </td>
-
-                            <td>@item.TrainerSpecialization</td>
-                            <td style="text-align: center;">
-                                @if (item.NumberOfTraineeAssociated > 0)
-                                {
-                                    <a href="@Url.Action("List", "DBTMTraineeDetails", new
-                                        {
-                                            SelectedCentreCode = item.SelectedCentreCode,
-                                            SelectedParameter1 = item.GeneralTrainerMasterId
-                                        })">
-                                        <span class="badge badge-soft-info"> @item.NumberOfTraineeAssociated </span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-soft-secondary"> @item.NumberOfTraineeAssociated </span>
-                                }
-                            </td>
-                            <td>@item.UniqueCode</td>
-                            <td class="text-center">
-                                <a href="@Url.Action("Edit", controllerName, new { generalTrainerId = item.GeneralTrainerMasterId })"
-                                   title="Update" class="btn btn-sm btn-soft-success btn-circle me-2">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <span class="m-2">|</span>
-                                <a href="@Url.Action("UpdateEmployeePersonalDetails", "EmployeeMaster", new { employeeId = item.EmployeeId, personId = item.PersonId })"
-                                   title="View" class="btn btn-sm btn-soft-warning btn-circle me-2">
-                                    <i class="fas fa-eye" style="color: orange;"></i>
-                                </a>
-                            </td>
-
-                        </tr>
-                    }
+                    </tr>
                 }
+                                }
             </tbody>
         </table>
     </div>
