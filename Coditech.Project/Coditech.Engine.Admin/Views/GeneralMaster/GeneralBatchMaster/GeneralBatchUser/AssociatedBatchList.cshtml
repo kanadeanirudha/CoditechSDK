@@ -1,10 +1,6 @@
 ﻿@using Coditech.Admin.Utilities;
 @model GeneralBatchUserListViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
     ViewBag.Title = " Batch User List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();

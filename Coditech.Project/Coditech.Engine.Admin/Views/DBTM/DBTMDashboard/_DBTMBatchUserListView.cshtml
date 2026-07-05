@@ -1,0 +1,73 @@
+﻿@model GeneralBatchUserListViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
+    keyValuePairs.Add("Custom4", Model.Custom4?.ToString() ?? string.Empty);
+}
+<div class="container-fluid px-2 py-2">
+    <div class="row g-2">
+        <div class="col-lg-2 col-md-3">
+            @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/_GeneralBatchSidePannel.cshtml", keyValuePairs)
+        </div>
+        <div class="col-lg-10 col-md-9">
+            <div class="card h-100">
+                <div class="card-header py-2">
+                    <span class="card-title">
+                        Batch User List : @Model.BatchName
+                    </span>
+                </div>
+                <div class="card-body p-2">
+                    <div id="DataTablesDivId">
+                        @Html.Partial("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/_AssociatedBatchList.cshtml", Model)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    html,
+    body {
+        overflow-x: hidden;
+    }
+    .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    .card {
+        margin-bottom: 0;
+    }
+    .card-body {
+        padding: 12px;
+    }
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap !important;
+    }
+    .dataTables_length select {
+        width: 70px;
+        margin: 0 5px;
+    }
+    .dataTables_length label br {
+        display: none;
+    }
+    .dataTables_filter {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+        .dataTables_filter label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            margin-bottom: 0;
+        }
+        .dataTables_filter input {
+            width: 150px;
+        }
+</style>
+<script src="~/js/coditech/General/GeneralBatchUser.js"></script>

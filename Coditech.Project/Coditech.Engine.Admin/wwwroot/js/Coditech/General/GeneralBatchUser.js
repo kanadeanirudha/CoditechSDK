@@ -5,7 +5,7 @@
     constructor: function () {
     },
 
-    GetAssociateUnAssociateBatchwiseUser: function (modelPopContentId, generalBatchUserId, generalBatchMasterId, batchName, firstName, lastName, entityId) {
+    GetAssociateUnAssociateBatchwiseUser: function (modelPopContentId, generalBatchUserId, generalBatchMasterId, batchName, firstName, lastName, entityId, custom4) {
 
         let generalBatchUserViewModel = {
             GeneralBatchUserId: generalBatchUserId,
@@ -14,7 +14,7 @@
             FirstName: firstName,
             LastName:lastName,
             EntityId:entityId,
-            Custom4: $("#Custom4").val()
+            Custom4: custom4
         };
         CoditechCommon.ShowLodder();
         $.ajax(

@@ -1,11 +1,7 @@
 ﻿@using Coditech.Admin.Utilities;
 @model GeneralBatchUserViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
-    Layout = null;
+    Layout = !string.IsNullOrEmpty(Model.Custom4) ? "~/Views/Shared/_LayoutCustomMobile.cshtml" : null;
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
 }
 <!-- Page Content-->
@@ -27,6 +23,7 @@
     @Html.HiddenFor(x => x.GeneralBatchMasterId)
     @Html.HiddenFor(x => x.EntityId) 
     @Html.HiddenFor(x => x.Custom4)
+    @Html.Hidden("SelectedParameter4", Model.Custom4)
     <div class="modal-body">
         <div class="row">
             <div class="col-lg-12">
