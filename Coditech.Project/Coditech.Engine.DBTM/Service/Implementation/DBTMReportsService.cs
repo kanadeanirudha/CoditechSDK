@@ -835,6 +835,7 @@ namespace Coditech.API.Service
             if (traineeDetails?.PersonId > 0)
                 person = GetGeneralPersonDetails(traineeDetails.PersonId);
             model.AthleteName = person != null ? $"{person.FirstName} {person.LastName}" : "N/A";
+            model.DateOfBirth = person?.DateOfBirth;
             var testData = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == deviceData.TestCode).Select(x => new { x.DBTMTestMasterId, x.TestName }).FirstOrDefault();
             if (testData == null)
                 return model;

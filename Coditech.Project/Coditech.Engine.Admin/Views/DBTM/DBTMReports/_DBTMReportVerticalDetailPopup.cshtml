@@ -38,10 +38,28 @@
             <th class="text-center">Activity Performed:</th>
             <td class="text-center">@Model.TestPerformedTime.ToString("dd/MM/yyyy hh:mm tt")</td>
         </tr>
+        <tr>
+            <th class="text-center">Date of Birth:</th>
+            <td class="text-center">
+                @(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "-")
+            </td>
 
-        @if (Model.ActivityDetails?.Count > 0)
+            @if (Model.ActivityDetails?.Count > 0)
+            {
+                var firstItem = Model.ActivityDetails.First();
+
+                <th class="text-center">@firstItem.Key:</th>
+                <td class="text-center">@firstItem.Value</td>
+            }
+            else
+            {
+                <th></th>
+                <td></td>
+            }
+        </tr>
+        @if (Model.ActivityDetails?.Count > 1)
         {
-            foreach (var item in Model.ActivityDetails)
+            foreach (var item in Model.ActivityDetails.Skip(1))
             {
                 <tr>
                     <th class="text-center"></th>

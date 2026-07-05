@@ -1,11 +1,6 @@
 ﻿@using Coditech.Admin.Utilities;
 @model GeneralBatchUserListViewModel
 @{
-    if (!string.IsNullOrEmpty(Model.Custom4))
-    {
-        Layout = "~/Views/Shared/_LayoutCustomMobile.cshtml";
-    }
-    Layout = null;
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     ModelPopUpViewModel addFollowUpModel = new ModelPopUpViewModel() { ModelPopUpId = "AssociateUnAssociateGeneralBatchUserModelPopupId", ModalContentId = "AssociateUnAssociateGeneralBatchModelPopupContentId" };
@@ -21,6 +16,7 @@
             @Html.HiddenFor(x => x.SelectedParameter1)
             @Html.HiddenFor(x => x.SelectedParameter2)
             @Html.HiddenFor(x => x.Custom4)
+            @Html.Hidden("SelectedParameter4", Model.Custom4)
             <tbody>
                 @if (Model?.GeneralBatchUserList?.Count > 0)
                 {
@@ -46,11 +42,11 @@
                             <td class="text-center">
                                 @if (item.IsAssociated)
                                 {
-                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="GeneralBatchMaster.GetAssociateUnAssociateBatchwiseUser('@addFollowUpModel.ModalContentId','@item.GeneralBatchUserId','@Model.GeneralBatchMasterId','@item.BatchName','@item.FirstName','@item.LastName','@item.EntityId')" title="UnAssociate Batch From User" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="GeneralBatchMaster.GetAssociateUnAssociateBatchwiseUser('@addFollowUpModel.ModalContentId','@item.GeneralBatchUserId','@Model.GeneralBatchMasterId','@item.BatchName','@item.FirstName','@item.LastName','@item.EntityId','@Model.Custom4')" title="UnAssociate Batch From User" class="btn btn-sm btn-soft-danger btn-circle"><i class="fas fa-redo"></i></a>
                                 }
                                 else if (item.IsBatchActive)
                                 {
-                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="GeneralBatchMaster.GetAssociateUnAssociateBatchwiseUser('@addFollowUpModel.ModalContentId','@item.GeneralBatchUserId','@Model.GeneralBatchMasterId','@item.BatchName','@item.FirstName','@item.LastName','@item.EntityId')" title="Associate Batch To User" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#@addFollowUpModel.ModelPopUpId" href="void javascritp(0)" onclick="GeneralBatchMaster.GetAssociateUnAssociateBatchwiseUser('@addFollowUpModel.ModalContentId','@item.GeneralBatchUserId','@Model.GeneralBatchMasterId','@item.BatchName','@item.FirstName','@item.LastName','@item.EntityId','@Model.Custom4')" title="Associate Batch To User" class="btn btn-sm btn-soft-success btn-circle"><i class="fas fa-check"></i></a>
                                 }
                                 else
                                 {
@@ -66,6 +62,3 @@
 </div>
 @Html.Partial("~/Views/Shared/Datatable/_DatatablePagination.cshtml", Model.PageListViewModel)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", addFollowUpModel)
-@section scripts {
-    <script src="~/js/coditech/General/GeneralBatchUser.js"></script>
-}

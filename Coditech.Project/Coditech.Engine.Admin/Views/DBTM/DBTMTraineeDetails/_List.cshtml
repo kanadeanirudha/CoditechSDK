@@ -36,10 +36,19 @@
                                     </div>
                                 }
                             </td>
+                            <td>
+                                 @Html.Partial("~/Views/Shared/_ActionLinkWithIcon.cshtml",
+                                 new ActionViewModel(){
+                                        Action = "UpdateDBTMTraineePersonalDetails",
+                                        Controller = controllerName,
+                                        RouteValues = new {  dBTMTraineeDetailId = item.DBTMTraineeDetailId, personId = item.PersonId, SelectedParameter2 = Model.SelectedParameter2 },
+                                        Text = item.PersonCode,
+                                        Title="Update"
+                                    })
+                            </td>
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
                             <td>@item.DisplayName</td>
-                            <td>@item.PersonCode</td>
                             <td>@item.MobileNumber</td>
                             <td>@item.EmailId</td>
                             <td style="text-align: center;">
