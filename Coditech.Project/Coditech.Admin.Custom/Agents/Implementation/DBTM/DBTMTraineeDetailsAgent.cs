@@ -529,6 +529,9 @@ namespace Coditech.Admin.Agents
                 ErrorMessage = response.ErrorMessage
             };
         }
+
+        #endregion
+
         #region protected
         protected virtual List<DatatableColumns> BindColumns()
         {
@@ -537,6 +540,12 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Image",
                 ColumnCode = "Image",
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Person Code",
+                ColumnCode = "PersonCode",
+                IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
             {
@@ -554,12 +563,6 @@ namespace Coditech.Admin.Agents
             {
                 ColumnName = "Display Name",
                 ColumnCode = "DisplayName",
-                IsSortable = true,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Person Code",
-                ColumnCode = "PersonCode",
                 IsSortable = true,
             });
             datatableColumnList.Add(new DatatableColumns()
@@ -668,4 +671,3 @@ namespace Coditech.Admin.Agents
         #endregion
     }
 }
-#endregion

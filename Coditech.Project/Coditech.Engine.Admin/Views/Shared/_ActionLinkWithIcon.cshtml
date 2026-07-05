@@ -1,0 +1,9 @@
+@model ActionViewModel
+@{
+    var title = Model.Title != null ? Model.Title : "Update";
+    var iconClass = Model.IconClass != null ? Model.IconClass : "fas fa-pencil-alt";
+}
+<a href="@Url.Action(Model.Action, Model.Controller, Model.RouteValues)" title="@title">
+    <i class="@iconClass"></i>
+    @Model.Text
+</a>
