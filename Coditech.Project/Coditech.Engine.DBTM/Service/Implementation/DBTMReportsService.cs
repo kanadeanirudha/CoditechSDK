@@ -985,8 +985,8 @@ namespace Coditech.API.Service
             if (dBTMReportsList?.Count > 0)
             {
                 List<string> displayColumnList = isMobileRequest
-                    ? new List<string> { "View", "Activity Time", "Person Name" }
-                    : new List<string> { "View", "Activity Time", "Person Name", "Weight(kg)", "Height(cm)" };
+                    ? new List<string> { "View", "Activity Time", "Trainee Name" }
+                    : new List<string> { "View", "Activity Time", "Trainee Name", "Weight(kg)", "Height(cm)" };
 
                 if (isDownloadReport)
                 {
@@ -1013,8 +1013,8 @@ namespace Coditech.API.Service
                             case "Activity Name":
                                 newRow["Activity Name"] = firstInGroup?.TestName;
                                 break;
-                            case "Person Name":
-                                newRow["Person Name"] = !isDownloadReport ? $"{firstInGroup?.FirstName} {firstInGroup?.LastName}~False~~{firstInGroup?.DBTMTraineeDetailId}" : $"{firstInGroup?.FirstName} {firstInGroup?.LastName}";
+                            case "Trainee Name":
+                                newRow["Trainee Name"] = !isDownloadReport ? $"{firstInGroup?.FirstName} {firstInGroup?.LastName}~False~~{firstInGroup?.DBTMTraineeDetailId}" : $"{firstInGroup?.FirstName} {firstInGroup?.LastName}";
                                 break;
                             //case "Activity Status":
                             //    newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";

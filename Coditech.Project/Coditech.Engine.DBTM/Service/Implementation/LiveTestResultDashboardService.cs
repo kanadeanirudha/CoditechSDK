@@ -61,7 +61,7 @@ namespace Coditech.API.Service
                 //{
                 //    DataTable dataTable = new DataTable();
                 //    dataTable.Columns.Add("Activity Name", typeof(String));
-                //    dataTable.Columns.Add("Person Name", typeof(String));
+                //    dataTable.Columns.Add("Trainee Name", typeof(String));
                 //    dataTable.Columns.Add("Activity Performed Time", typeof(String));
                 //    var testColumnList = (from a in _dBTMParametersAssociatedToTestRepository.Table
                 //                          join b in _dBTMTestParameterRepository.Table
@@ -88,7 +88,7 @@ namespace Coditech.API.Service
                 //        {
                 //            newRow = dataTable.NewRow();
                 //            newRow["Activity Name"] = item.TestName;
-                //            newRow["Person Name"] = item.PersonName;
+                //            newRow["Trainee Name"] = item.PersonName;
                 //            newRow["Activity Performed Time"] = item.TestPerformedTime;
                 //        }
 

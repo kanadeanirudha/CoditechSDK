@@ -543,7 +543,7 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Person Code",
+                ColumnName = "Trainee Code",
                 ColumnCode = "PersonCode",
                 IsSortable = true,
             });
