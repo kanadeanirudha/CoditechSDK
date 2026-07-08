@@ -33,14 +33,28 @@
                     @Html.ValidationMessageFor(m => m.ErrorMessage, null)
                 </div>
                 <div class="form-group mb-2">
-                    @Html.LabelFor(x => x.DeviceSerialCode, new { @class = "form-label" })
-                    <div class="input-group password-input-wraper">
-                        @Html.TextBoxFor(x => x.DeviceSerialCode, new { @class = "form-control password-input", type = "DeviceSerialCode", placeholder = "Device Code here..." })
+                    @Html.LabelFor(x => x.FromDate, new { @class = "form-label" })
+                    <div class="input-group">
+                        @Html.TextBoxFor(x => x.FromDate, "{0:yyyy-MM-dd}", new
+                            {
+                                @class = "form-control",
+                                type = "date"
+                            })
                     </div>
-                    @Html.ValidationMessageFor(m => m.DeviceSerialCode, null)
-                    @Html.ValidationMessageFor(m => m.ErrorMessage, null)
+                    @Html.ValidationMessageFor(x => x.FromDate)
                 </div>
                 <div class="form-group mb-2">
+                    @Html.LabelFor(x => x.ToDate, new { @class = "form-label" })
+                    <div class="input-group">
+                        @Html.TextBoxFor(x => x.ToDate, "{0:yyyy-MM-dd}", new
+                            {
+                                @class = "form-control",
+                                type = "date"
+                            })
+                    </div>
+                    @Html.ValidationMessageFor(x => x.ToDate)
+                </div>
+               @*  <div class="form-group mb-2">
                     @Html.LabelFor(x => x.TestName, new { @class = "form-label" })
                     <div class="input-group password-input-wraper">
                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
@@ -54,7 +68,7 @@
                     </div>
                     @Html.ValidationMessageFor(m => m.DBTMTestMasterId, null)
                     @Html.ValidationMessageFor(m => m.ErrorMessage, null)
-                </div>
+                </div> *@
                 <div class="form-group row my-3">
                 </div>
                 <div class="form-group mb-0 row">

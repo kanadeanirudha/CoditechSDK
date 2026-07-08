@@ -50,39 +50,49 @@
                     {
                         @foreach (DataTable dataTable in Model?.DataTableList)
                         {
-                            <div class="col-md-6 col-lg-12">
-                                <div class="card shadow">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-center card-title-black">
-                                            @{
-                                                string activityName = dataTable.AsEnumerable().Select(row => row.Field<string>("Activity Name")).Distinct().FirstOrDefault();
-                                            }
-                                            @activityName
-                                        </h5>
-                                        <table class="table table-bordered table-striped text-center">
-                                            <thead class="table-header-light">
-                                                <tr>
-                                                    @foreach (DataColumn datatableColumn in dataTable.Columns)
-                                                    {
-                                                        <th>@datatableColumn</th>
+                            @foreach (DataRow row in dataTable.Rows)
+                            {
+                                <div class="col-xl-3 col-lg-3 col-md-6 mb-4">
+                                    <div class="card shadow h-100">
+                                        <div class="card-body">
+
+                                            @foreach (DataColumn col in dataTable.Columns)
+                                            {
+                                                <div class="mb-2">
+
+                                                    <strong>@col.ColumnName :</strong>
+
+                                                    @{
+                                                        var value = row[col]?.ToString()?.Split('~');
+                                                        var performanceGrade = value.Length > 3 ? value[3] : "";
                                                     }
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (DataRow row in dataTable.Rows)
-                                                {
-                                                    <tr>
-                                                        @foreach (DataColumn col in dataTable.Columns)
-                                                        {
-                                                            <td>@row[col]</td>
-                                                        }
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
+
+                                                    @value[0]
+
+                                                    @if (performanceGrade == "5")
+                                                    {
+                                                        <span>🥇🥇🥇🥇🥇</span>
+                                                    }
+                                                    else if (performanceGrade == "4")
+                                                    {
+                                                        <span>🥈🥈🥈🥈</span>
+                                                    }
+                                                    else if (performanceGrade == "3")
+                                                    {
+                                                        <span>🥉🥉🥉</span>
+                                                    }
+                                                    else if (performanceGrade == "1")
+                                                    {
+                                                        <span>🏅</span>
+                                                    }
+
+                                                </div>
+                                            }
+
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }                          
                         }
                     }
                 </div>

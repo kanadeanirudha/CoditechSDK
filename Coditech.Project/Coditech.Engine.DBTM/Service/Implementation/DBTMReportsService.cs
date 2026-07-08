@@ -1555,6 +1555,85 @@ namespace Coditech.API.Service
             }
         }
 
+        public DataTable GetLiveResultDataTable(int dBTMTestMasterId, string centreCode, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
+        {
+            ReportsListDecryption(dBTMReportsList);
+            List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre( dBTMTestMasterId, centreCode, false, false);
+            listviewSequenceColumns = listviewSequenceColumns.Where(x => x.IsDisplayPerformanceStandard).ToList();
+            return BindLiveResultDataDetailsV2( dBTMTestMasterId, false,dBTMReportsList, fromDate, toDate, listviewSequenceColumns, false, centreCode);
+        }
+        private DataTable BindLiveResultDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport, string centreCode)
+        {
+            DataTable dataTable = new DataTable();
+            bool isDisplayPerformanceStandard = _dBTMCentreWiseSettingRepository.Table.Where(x => x.CentreCode == centreCode).Select(x => x.IsDisplayPerformanceStandard).FirstOrDefault();
+            List<DBTMTestWisePerformanceStandard> performanceStandardList = new List<DBTMTestWisePerformanceStandard>();
+            bool isHigherBetter = false;
+            if (isDisplayPerformanceStandard)
+            {
+                performanceStandardList = _dBTMTestWisePerformanceStandardRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).ToList();
+                if (performanceStandardList?.Count > 0)
+                    isHigherBetter = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestOutputHigher).FirstOrDefault() == "HO"; //HO =HigherOutput
+            }
+            if (dBTMReportsList?.Count > 0)
+            {
+                List<string> displayColumnList = new List<string>
+                {
+                    "Activity Name",
+                    "Trainee Name"
+                };
+                if (isDownloadReport)
+                {
+                    displayColumnList.Remove("View");
+                }
+                foreach (var paramColumn in displayColumnList)
+                {
+                    dataTable.Columns.Add(paramColumn, typeof(String));
+                }
+                List<DBTMTestParameterListViewSequence> listviewSequenceColumnsOriginal = new List<DBTMTestParameterListViewSequence>(listviewSequenceColumns);
+                List<string> listviewSequenceColumnList = BindReportColumns(dBTMTestMasterId, isMobileRequest, dataTable, listviewSequenceColumns);
+                DataRow newRow = null;
+                foreach (var group in dBTMReportsList.GroupBy(x => x.CreatedDate))
+                {
+                    newRow = dataTable.NewRow();
+                    var firstInGroup = group.FirstOrDefault();
+                    var singleDateLookup = group.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
+
+                    //Bind Activity Person Details
+                    foreach (string displayColumnName in displayColumnList)
+                    {
+                        switch (displayColumnName)
+                        {
+                            case "Activity Name":
+                                newRow["Activity Name"] = firstInGroup?.TestName;
+                                break;
+                            case "Trainee Name":
+                                newRow["Trainee Name"] = !isDownloadReport ? $"{firstInGroup?.FirstName} {firstInGroup?.LastName}~False~~{firstInGroup?.DBTMTraineeDetailId}" : $"{firstInGroup?.FirstName} {firstInGroup?.LastName}";
+                                break;
+                            case "Weight(kg)":
+                                newRow["Weight(kg)"] = $"{firstInGroup?.Weight}";
+                                break;
+                            case "Height(cm)":
+                                newRow["Height(cm)"] = $"{firstInGroup?.Height}";
+                                break;
+                            case "Activity Time":
+                                newRow["Activity Time"] = isMobileRequest && fromDate.Date == toDate.Date
+                                    ? firstInGroup?.TestPerformedTime.ToString("hh:mm:ss tt")
+                                    : firstInGroup?.TestPerformedTime;
+                                break;
+                            case "View":
+                                if (!isDownloadReport)
+                                    newRow["View"] = firstInGroup?.DBTMDeviceDataId.ToString();
+                                break;
+                        }
+                    }
+                    BindParameterValue(listviewSequenceColumnList, performanceStandardList, singleDateLookup, listviewSequenceColumnsOriginal, newRow, isMobileRequest, isDownloadReport, isHigherBetter);
+                    dataTable.Rows.Add(newRow);
+                }
+                //Updated Column Name
+                UpdateDatatableColumnName(dBTMReportsList, dataTable, listviewSequenceColumnsOriginal, isMobileRequest);
+            }
+            return dataTable;
+        }
         #endregion
     }
 }
