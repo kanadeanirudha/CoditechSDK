@@ -95,7 +95,7 @@ namespace Coditech.Admin.Controllers
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.RecordAddedSuccessMessage));
                     if (string.Equals(organisationCentrewiseJoiningCodeViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("Create", new { CentreCode = organisationCentrewiseJoiningCodeViewModel.CentreCode });
+                        return RedirectToAction("Create", new { CentreCode = organisationCentrewiseJoiningCodeViewModel.CentreCode, JoiningCodeTypeEnumId = organisationCentrewiseJoiningCodeViewModel.JoiningCodeTypeEnumId });
                     }
                     else if (string.Equals(organisationCentrewiseJoiningCodeViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                     {
