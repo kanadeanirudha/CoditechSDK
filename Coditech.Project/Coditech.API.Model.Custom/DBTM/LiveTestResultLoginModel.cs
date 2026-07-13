@@ -7,5 +7,7 @@
         public string DeviceSerialCode { get; set; }
         public int DBTMTestMasterId { get; set; }
         public string TestName { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }

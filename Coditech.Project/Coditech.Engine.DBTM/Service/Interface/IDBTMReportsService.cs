@@ -1,4 +1,5 @@
 ﻿using Coditech.Common.API.Model;
+using System.Data;
 
 namespace Coditech.API.Service
 {
@@ -21,5 +22,6 @@ namespace Coditech.API.Service
         DBTMReportsListModel CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, bool isMobileRequest);
         DBTMReportsListModel CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType);
         List<DateTime> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId);
+        DataTable GetLiveResultDataTable(int dBTMTestMasterId, string centreCode, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate);
     }
 }

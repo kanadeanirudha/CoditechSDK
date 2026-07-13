@@ -58,7 +58,7 @@
                             <td><span class="badge badge-soft-info">@item.TestName</span></td>
                             <td>@item.AssignedBy</td>
                             <td>@item.AssignmentDate.ToCoditechDateFormat()</td>
-                            <td>@item.AssignmentTime</td>
+                            <td>@item.AssignmentTime.ToCoditechTimeFormat()</td>
                             <td class="text-center">
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableStatusData.cshtml", new DataTableStatusViewModel() { Key = item.TestStatus, Value = item.TestStatus })
                             </td>
