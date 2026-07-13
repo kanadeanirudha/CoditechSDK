@@ -23,20 +23,18 @@
     },
 
     ToggleTrainerDropdown: function () {
-        var selectedText = ($("#JoiningCodeTypeEnumId option:selected").text() || "").trim().toLowerCase();
-
-        if (selectedText.indexOf("trainee") !== -1) {
+        if ($("#JoiningCodeTypeEnumId").val() == "324") {
             $("#custom1Div").show();
-        } else {
+            $("#custom3Div").show();
+        }
+        else {
             $("#custom1Div").hide();
-            $("#Custom1").val("").trigger("change");
+            $("#custom3Div").hide();
         }
     },
 
     ValidateForm: function () {
-        var selectedText = ($("#JoiningCodeTypeEnumId option:selected").text() || "").trim().toLowerCase();
-
-        if (selectedText.indexOf("trainee") !== -1) {
+        if ($("#JoiningCodeTypeEnumId").val() == "324") {
             var trainerVal = $("#Custom1").val();
             if (!trainerVal) {
                 // error message dikhado

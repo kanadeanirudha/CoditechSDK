@@ -14,13 +14,17 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Password")]
         public string Password { get; set; }      
         [MaxLength(100)]
-        [Required]
         [Display(Name = "Device Serial Code")]
         public string DeviceSerialCode { get; set; }
-        [Required]
         [Display(Name = "Activity")]
         public int DBTMTestMasterId { get; set; }     
         [Display(Name = "Activity")]
         public string TestName { get; set; }
+        [Required(ErrorMessage = "Date is required.")]
+        [Display(Name = "From Date")]
+        public DateTime? FromDate { get; set; }
+
+        [Display(Name = "To Date")]
+        public DateTime? ToDate { get; set; }
     }
 }
