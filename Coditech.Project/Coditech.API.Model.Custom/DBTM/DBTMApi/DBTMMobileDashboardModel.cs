@@ -16,6 +16,7 @@
     {
         public short DBTMActivityCategoryId { get; set; }
         public string CategoryName { get; set; }
+        public string AppIcon { get; set; }
     }
 
     public class DBTMMobileTraineeDashboardModel

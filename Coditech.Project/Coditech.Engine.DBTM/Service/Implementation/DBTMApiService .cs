@@ -387,8 +387,8 @@ namespace Coditech.API.Service
                                                         .Select(x => new DBTMMobileActivityCategoryModel
                                                         {
                                                             DBTMActivityCategoryId = x.DBTMActivityCategoryId,
-                                                            CategoryName = x.ActivityCategoryName
-                                                        })
+                                                            CategoryName = x.ActivityCategoryName,
+                                                            AppIcon = x.AppIcon                                            })
                                                         .ToList();
             return dBTMDashboardModel;
         }
