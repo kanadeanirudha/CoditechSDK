@@ -9,6 +9,7 @@ using Coditech.Common.Service;
 using Coditech.Resources;
 using Newtonsoft.Json;
 using System.Data;
+using System.Diagnostics;
 using System.Transactions;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
@@ -84,6 +85,7 @@ namespace Coditech.API.Service
 
             try
             {
+                _coditechLogging.LogMessage(JsonConvert.SerializeObject(dBTMDeviceDataModelList), "InsertDeviceData", TraceLevel.Warning);
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
                 {
                     // Cache trainee details to avoid duplicate DB hits
