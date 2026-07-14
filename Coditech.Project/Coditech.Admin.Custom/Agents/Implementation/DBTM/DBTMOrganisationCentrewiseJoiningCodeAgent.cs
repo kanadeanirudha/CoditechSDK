@@ -66,7 +66,7 @@ namespace Coditech.Admin.Agents
             OrganisationCentrewiseJoiningCodeListViewModel listViewModel = new OrganisationCentrewiseJoiningCodeListViewModel();
             listViewModel.OrganisationCentrewiseJoiningCodeList = organisationCentrewiseJoiningCodeList?.OrganisationCentrewiseJoiningCodeList?.ToViewModel<OrganisationCentrewiseJoiningCodeViewModel>().ToList();
 
-            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.OrganisationCentrewiseJoiningCodeList.Count, BindColumns());
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.OrganisationCentrewiseJoiningCodeList.Count, BindColumns(dataTableModel.SelectedParameter1));
             return listViewModel;
         }
 
@@ -154,7 +154,7 @@ namespace Coditech.Admin.Agents
         #endregion
 
         #region Protected Methods
-        protected virtual List<DatatableColumns> BindColumns()
+        protected virtual List<DatatableColumns> BindColumns(string joiningCodeType)
         {
             List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
             datatableColumnList.Add(new DatatableColumns()
@@ -163,24 +163,21 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "JoiningCode",
                 IsSortable = false,
             });
-            datatableColumnList.Add(new DatatableColumns()
+            if (joiningCodeType == "324")
             {
-                ColumnName = "Joining Code Type ",
-                ColumnCode = "JoiningCodeType",
-                IsSortable = false,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Created For",
-                ColumnCode = "Custom2",
-                IsSortable = false,
-            });
-            datatableColumnList.Add(new DatatableColumns()
-            {
-                ColumnName = "Batch",
-                ColumnCode = "Custom3",
-                IsSortable = false,
-            });
+                datatableColumnList.Add(new DatatableColumns()
+                {
+                    ColumnName = "Created For",
+                    ColumnCode = "Custom2",
+                    IsSortable = false,
+                });
+                datatableColumnList.Add(new DatatableColumns()
+                {
+                    ColumnName = "Batch",
+                    ColumnCode = "Custom3",
+                    IsSortable = false,
+                });
+            }
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "Active Joining Code",
