@@ -7,6 +7,11 @@
     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
     keyValuePairs.Add("GeneralBatchMasterId", Model.GeneralBatchMasterId.ToString());
     keyValuePairs.Add("Custom4", Model.Custom4?.ToString() ?? string.Empty);
+    ModelPopUpViewModel transferBatchPopup = new ModelPopUpViewModel()
+    {
+        ModelPopUpId = "TransferBatchPopupId",
+        ModalContentId = "TransferBatchContentId"
+    };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -32,3 +37,5 @@
 </div>
 <!-- end page content -->
 <script src="~/js/coditech/General/GeneralBatchUser.js"></script>
+<script src="~/js/coditech/DBTM/DBTMBatch.js"></script>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", transferBatchPopup)

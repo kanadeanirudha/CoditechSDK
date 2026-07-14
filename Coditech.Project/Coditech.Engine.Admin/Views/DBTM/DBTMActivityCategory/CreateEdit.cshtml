@@ -50,6 +50,13 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-3">
+                                        @Html.LabelFor(x => x.AppIcon, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.AppIcon, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.AppIcon)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
                                         @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
                                         <div class="form-check">
                                             @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
