@@ -4,22 +4,22 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel()
-    {
-        DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
-        DropdownName = "SelectedCentreCode",
-        DropdownSelectedValue = Model.SelectedCentreCode,
-        ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
-    };
+            {
+                DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(),
+                DropdownName = "SelectedCentreCode",
+                DropdownSelectedValue = Model.SelectedCentreCode,
+                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+            };
 
     DropdownViewModel joiningCodeStatus = new DropdownViewModel()
-    {
-        DropdownType = DropdownTypeEnum.JoiningCodeStatus.ToString(),
-        DropdownName = "SelectedParameter2",
-        DropdownSelectedValue = string.IsNullOrEmpty(Model.SelectedParameter2) ? "1" : Model.SelectedParameter2,
-        SelectedText = "Available",
-        SelectedValue = "1",
-        ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
-    };
+            {
+                DropdownType = DropdownTypeEnum.JoiningCodeStatus.ToString(),
+                DropdownName = "SelectedParameter2",
+                DropdownSelectedValue = string.IsNullOrEmpty(Model.SelectedParameter2) ? "1" : Model.SelectedParameter2,
+                SelectedText = "Available",
+                SelectedValue = "1",
+                ChangeEvent = "OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()"
+            };
     UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
 }
 <!-- Hidden field to pass user type to JS -->
@@ -31,7 +31,14 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">Joining Code List</span>
+                        @if (Model.SelectedParameter1 == "323")
+                        {
+                            <span class="card-title">Trainer Joining Code List</span>
+                        }
+                        else
+                        {
+                            <span class="card-title">Trainee Joining Code List</span>
+                        }
                         @if (userModel.Custom1 == CustomConstants.DBTMCentreOwner || userModel.Custom1 == CustomConstants.DBTMTrainer)
                         {
                             <div class="d-flex gap-2">
@@ -69,14 +76,14 @@
                             <div class="col-md-2">
                                 <label>Joining Code Status</label>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", joiningCodeStatus)
                             </div>
                             <div class="col-md-2">
                                 <input type="button" class="btn btn-success" value="Show" id="ShowDataId"
                                        onclick="OrganisationCentrewiseJoiningCode.JoiningCodeListByCentreCodeList()" />
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <label class="fw-bold">
 
                                     Total Joining Code:  <span class="badge badge-soft-primary me-2 "><span id="TotalCodeCount"></span> </span>

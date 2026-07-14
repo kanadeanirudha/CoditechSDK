@@ -26,9 +26,11 @@
                     {
                         <tr>
                             <td>@item.JoiningCode</td>
-                            <td>@item.JoiningCodeType</td>
-                            <td>@item.Custom2</td>
-                            <td>@item.Custom3</td>
+                            @if (Model.SelectedParameter1 == "324")
+                            {
+                                <td>@item.Custom2</td>
+                                <td>@item.Custom3</td>
+                            }
                             <td>
                                 @Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", !item.IsExpired)
                             </td>
