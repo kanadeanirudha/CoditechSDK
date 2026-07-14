@@ -378,7 +378,8 @@ namespace Coditech.API.Service
                                                      select new
                                                      {
                                                          a.DBTMActivityCategoryId,
-                                                         a.ActivityCategoryName
+                                                         a.ActivityCategoryName,
+                                                         a.AppIcon
                                                      })
                                                         .Distinct()
                                                         .Select(x => new DBTMMobileActivityCategoryModel

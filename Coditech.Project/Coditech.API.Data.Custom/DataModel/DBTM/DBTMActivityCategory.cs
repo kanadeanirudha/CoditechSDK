@@ -9,6 +9,7 @@ namespace Coditech.API.Data
         public int DBTMParentActivityCategoryId { get; set; }
         public string ActivityCategoryCode { get; set; }
         public string ActivityCategoryName { get; set; }
+        public string AppIcon { get; set; }
         public bool IsActive { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
