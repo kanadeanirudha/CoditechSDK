@@ -15,7 +15,7 @@ namespace Coditech.Common.API.Model
         [MaxLength(200)]
         [Required]
         public string ActivityCategoryName { get; set; }
-
+        public string AppIcon { get; set; }
         public bool IsActive { get; set; }
     }
 }

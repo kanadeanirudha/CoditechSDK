@@ -19,6 +19,8 @@ namespace Coditech.Admin.ViewModel
         [Required]
         [Display(Name = "Activity Category Name")]
         public string ActivityCategoryName { get; set; }
+        [Display(Name = "App Icon")]
+        public string AppIcon { get; set; }
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; }

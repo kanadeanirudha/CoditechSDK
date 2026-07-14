@@ -599,6 +599,7 @@ a.dashboard-menu-list span {
     padding: 0 0.75rem;
     line-height: 52px;
     max-height: 52px;
+    color: #ffffff;
 }
 
 .brand.logo-background .logo-small-wrapper {
@@ -655,6 +656,7 @@ a.dashboard-menu-list span {
     .center-name {
         margin-left: 55px !important;
         font-size: 16px;
+        color: #ffffff;
     }
     .saveandclose {
         position: fixed;
