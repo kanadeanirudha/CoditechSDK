@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Coditech.Admin.ViewModel;
+using Coditech.API.Model.Custom.DBTM.DBTMApplicationVersion;
 using Coditech.Common.API.Model;
 
 namespace Coditech.Admin.Custom
@@ -17,6 +18,8 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMTraineeDetailsCreateEditViewModel, GeneralPersonModel>().ReverseMap();
             CreateMap<DBTMActivityCategoryModel, DBTMActivityCategoryViewModel>().ReverseMap();
             CreateMap<DBTMActivityCategoryListModel, DBTMActivityCategoryListViewModel>().ReverseMap();
+            CreateMap<DBTMApplicationVersionModel, DBTMApplicationVersionViewModel>().ReverseMap();
+            CreateMap<DBTMApplicationVersionListModel, DBTMApplicationVersionListViewModel>().ReverseMap();
             CreateMap<DBTMTestModel, DBTMTestViewModel>().ReverseMap();
             CreateMap<DBTMTestListModel, DBTMTestListViewModel>().ReverseMap();
             CreateMap<DBTMDeviceRegistrationDetailsModel, DBTMDeviceRegistrationDetailsViewModel>().ReverseMap();

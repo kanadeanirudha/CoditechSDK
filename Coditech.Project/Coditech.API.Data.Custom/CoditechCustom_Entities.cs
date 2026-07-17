@@ -38,6 +38,7 @@ namespace Coditech.API.Data
         public DbSet<DBTMCentreWiseTest> DBTMCentreWiseTest { get; set; }
         public DbSet<DBTMCampActivity> DBTMCampActivity { get; set; }
         public DbSet<DBTMTestWisePerformanceStandard> DBTMTestWisePerformanceStandard { get; set; }
+        public DbSet<DBTMApplicationVersion> DBTMApplicationVersion { get; set; }
         #endregion
     }
 }

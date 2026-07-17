@@ -44,6 +44,8 @@ namespace Coditech.API.Mapper
             CreateMap<DBTMCampActivity, DBTMCampActivityModel>().ReverseMap();
             CreateMap<DBTMTestWisePerformanceStandard, DBTMTestWisePerformanceStandardModel>().ReverseMap();
             CreateMap<OrganisationCentrewiseJoiningCode, OrganisationCentrewiseJoiningCodeModel>().ReverseMap();
+            CreateMap<DBTMApplicationVersion, DBTMApplicationVersionModel>().ReverseMap();
+            CreateMap<DBTMApplicationVersion, DBTMApplicationVersionModel>().ReverseMap();
         }
     }
 }
