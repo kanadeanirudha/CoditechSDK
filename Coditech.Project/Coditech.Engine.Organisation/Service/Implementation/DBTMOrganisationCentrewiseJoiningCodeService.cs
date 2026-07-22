@@ -64,6 +64,21 @@ namespace Coditech.API.Service
             OrganisationCentrewiseJoiningCodeListModel listModel = new OrganisationCentrewiseJoiningCodeListModel();
 
             listModel.OrganisationCentrewiseJoiningCodeList = OrganisationCentrewiseJoiningCodeList?.Count > 0 ? OrganisationCentrewiseJoiningCodeList : new List<OrganisationCentrewiseJoiningCodeModel>();
+            foreach (var item in OrganisationCentrewiseJoiningCodeList)
+            {
+                if (!string.IsNullOrWhiteSpace(item.Custom2))
+                {
+                    var parts = item.Custom2.Split(new[] { ' ' }, 2);
+                    if (parts.Length == 2)
+                    {
+                        item.Custom2 = $"{HelperUtility.DecodeBase64(parts[0])} {HelperUtility.DecodeBase64(parts[1])}";
+                    }
+                    else
+                    {
+                        item.Custom2 = HelperUtility.DecodeBase64(item.Custom2);
+                    }
+                }
+            }
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
@@ -90,7 +105,7 @@ namespace Coditech.API.Service
             if (organisationCentrewiseJoiningCodeModel.IsReserved)
             {
                 string hours = _generalEnumaratorMasterRepository.Table.Where(x => x.GeneralEnumaratorId == Convert.ToInt32(organisationCentrewiseJoiningCodeModel.ValidTillHours)).Select(x => x.EnumName).FirstOrDefault();
-                organisationCentrewiseJoiningCodeModel.QueueValidTill =  DateTime.Now.AddHours(Convert.ToDouble(hours));
+                organisationCentrewiseJoiningCodeModel.QueueValidTill = DateTime.Now.AddHours(Convert.ToDouble(hours));
             }
             List<OrganisationCentrewiseJoiningCode> insertList = new List<OrganisationCentrewiseJoiningCode>();
             for (int i = 1; i <= organisationCentrewiseJoiningCodeModel.Quantity; i++)

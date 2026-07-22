@@ -108,12 +108,12 @@
             <div class="col-lg-5">
                 @Html.LabelFor(x => x.CallingCode, new { @class = "form-label required" })
                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
-                {
-                    DropdownType = DropdownTypeEnum.CallingCode.ToString(),
-                                DropdownName = "CallingCode",
-                                DropdownSelectedValue = Model.CallingCode,
-                                IsRequired = true
-                                })
+           {
+               DropdownType = DropdownTypeEnum.CallingCode.ToString(),
+               DropdownName = "CallingCode",
+               DropdownSelectedValue = Model.CallingCode,
+               IsRequired = true
+           })
                 @Html.ValidationMessageFor(x => x.CallingCode)
             </div>
             <div class="col-lg-7">
@@ -226,6 +226,14 @@
             @Html.LabelFor(x => x.IsActive, new { @class = "form-label" })
             <div class="form-check">
                 @Html.CheckBoxFor(x => x.IsActive, new { @class = "form-check-input" })
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="mb-3">
+            @Html.LabelFor(x => x.IsMinor, new { @class = "form-label" })
+            <div class="form-check">
+                @Html.CheckBoxFor(x => x.IsMinor, new { @class = "form-check-input" })
             </div>
         </div>
     </div>

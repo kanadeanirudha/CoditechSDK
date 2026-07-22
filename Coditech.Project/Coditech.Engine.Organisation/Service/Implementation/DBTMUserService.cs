@@ -3,6 +3,7 @@ using Coditech.API.Data;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
@@ -116,7 +117,7 @@ namespace Coditech.API.Service
                 DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonId == generalPersonModel.PersonId);
                 if (traineeDetails != null)
                 {
-                    int calculatedAgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
+                    int calculatedAgeGroupEnumId = GetAgeGroupEnumIdByDOB(DateTime.Parse(HelperUtility.DecodeBase64(generalPersonModel.DateOfBirth)));
                     traineeDetails.AgeGroupEnumId = calculatedAgeGroupEnumId;
                     _dBTMTraineeDetailsRepository.Update(traineeDetails);
                 }
@@ -184,7 +185,7 @@ namespace Coditech.API.Service
             generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
             if (dBTMCustomNewRegistrationModel.AgeGroupEnumId <= 0)
             {
-                dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
+                dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(DateTime.Parse( HelperUtility.DecodeBase64(generalPersonModel.DateOfBirth)));
             }
             DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails()
             {
@@ -815,7 +816,7 @@ namespace Coditech.API.Service
                 MobileNumber = GetValue(row, ExcelTemplateColumns.MobileNumber),
                 CallingCode = rawCallingCode,
                 GenderEnumId = GetEnumIdByEnumCode(GetValue(row, ExcelTemplateColumns.Gender), DropdownTypeEnum.Gender.ToString()),
-                DateOfBirth = Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)),
+                DateOfBirth = HelperUtility.EncodeBase64(Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)).ToString("yyyy-MM-dd")),
                 Custom1 = JsonConvert.SerializeObject(customModel)
             };
             DBTMRegisterTrainee(model);

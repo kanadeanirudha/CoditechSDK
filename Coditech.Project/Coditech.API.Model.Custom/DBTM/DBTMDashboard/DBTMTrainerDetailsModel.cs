@@ -19,7 +19,7 @@
         public string PhotoMediaPath { get; set; }
         public string PhotoMediaFileName { get; set; }
         public long PersonId { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string EmailId { get; set; }
         public string PhoneNumber { get; set; }
         public string CallingCode { get; set; }

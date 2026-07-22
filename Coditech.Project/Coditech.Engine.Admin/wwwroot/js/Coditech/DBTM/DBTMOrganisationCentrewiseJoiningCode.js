@@ -65,7 +65,7 @@
                         $("#Custom1").val(selectedTrainer).trigger("change");
                     }
                     CoditechCommon.HideLodder();
-                    $(document).trigger("DBTMTrainerListLoaded");                  
+                    $(document).trigger("DBTMTrainerListLoaded");
                 },
                 error: function (xhr) {
                     if (xhr.status == 401 || xhr.status == 403) {

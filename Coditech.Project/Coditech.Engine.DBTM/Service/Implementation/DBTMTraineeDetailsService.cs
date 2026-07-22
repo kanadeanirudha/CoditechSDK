@@ -75,8 +75,17 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsList @CentreCode,@GeneralTrainerMasterId,@listType,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
-            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
+            foreach (var item in dBTMTraineeDetailsList)
+            {
+                item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
+                item.LastName = HelperUtility.DecodeBase64(item.LastName);
+                item.EmailId = HelperUtility.DecodeBase64(item.EmailId);
+                item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
 
+                item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
+                item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+            }
+            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;
@@ -338,7 +347,20 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
             List<DBTMTraineeProfileModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsListByIds @DBTMTraineeDetailIds")?.ToList();
-
+            if (list?.Count > 0)
+            {
+                foreach (var item in list)
+                {
+                    item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
+                    item.MiddleName = HelperUtility.DecodeBase64(item.MiddleName);
+                    item.LastName = HelperUtility.DecodeBase64(item.LastName);
+                    item.EmailId = HelperUtility.DecodeBase64(item.EmailId);
+                    item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
+                    item.PhoneNumber = HelperUtility.DecodeBase64(item.PhoneNumber);
+                    item.EmergencyContact = HelperUtility.DecodeBase64(item.EmergencyContact);
+                    item.DateOfBirth = HelperUtility.DecodeBase64(item.DateOfBirth);
+                }
+            }
             if (list?.Count > 0)
             {
                 var trainerList = from gtat in _generalTraineeAssociatedToTrainerRepository.Table
@@ -353,7 +375,7 @@ namespace Coditech.API.Service
                                   select new
                                   {
                                       DBTMTraineeDetailId = gtat.EntityId,
-                                      TrainerName = um.FirstName + " " + um.LastName
+                                      TrainerName = $"{HelperUtility.DecodeBase64(um.FirstName)} {HelperUtility.DecodeBase64(um.LastName)}"
                                   };
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
@@ -544,7 +566,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#Graph#", radarImage, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
-            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, !string.IsNullOrWhiteSpace(profile.DateOfBirth) ? Convert.ToDateTime(profile.DateOfBirth).ToString("dd-MMM-yyyy"): string.Empty,html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight, profile.Weight.ToString(), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Height, profile.Height.ToString(), html);

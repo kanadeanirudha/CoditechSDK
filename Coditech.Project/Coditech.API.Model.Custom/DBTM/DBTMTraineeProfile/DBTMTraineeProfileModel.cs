@@ -21,7 +21,7 @@ namespace Coditech.Common.API.Model
         public string Score { get; set; }
         public string Rank { get; set; }
         public DateTime? DateOfJoining { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string TotalDuration { get; set; }
         public DateTime? WeekelyHours { get; set; }
         public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; }
@@ -36,5 +36,10 @@ namespace Coditech.Common.API.Model
         public string Session { get; set; }
         public int TotalParticipants { get; set; }
         public int GenderEnumId { get; set; }
+        public string MiddleName { get; set; }
+        public string EmailId { get; set; }
+        public string MobileNumber { get; set; }
+        public string PhoneNumber { get; set; }
+        public string EmergencyContact { get; set; }
     }
 }

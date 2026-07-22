@@ -10,7 +10,7 @@
         public long EntityId { get; set; }
         public string PersonTitle { get; set; }
         public string UserType { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string Gender { get; set; }
         public string PhoneNumber { get; set; }
         public string MobileNumber { get; set; }

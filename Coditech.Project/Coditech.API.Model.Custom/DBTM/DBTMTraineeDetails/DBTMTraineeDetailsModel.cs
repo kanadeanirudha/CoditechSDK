@@ -32,7 +32,7 @@
         public string TypeOfCentre { get; set; }
         public bool IsBatchUser { get; set; }
         public bool IsCampUser { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string PersonTitle { get; set; }
     }
 }

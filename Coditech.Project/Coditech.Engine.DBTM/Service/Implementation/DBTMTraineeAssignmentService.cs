@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using DocumentFormat.OpenXml.Drawing;
 using System.Collections.Specialized;
 using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
@@ -278,7 +279,13 @@ namespace Coditech.API.Service
                                        select new GeneralTrainerModel()
                                        {
                                            GeneralTrainerMasterId = a.GeneralTrainerMasterId,
-                                           FirstName = b.EmployeeId == entityId ? c.FirstName + " " + c.LastName + " (Self)" : c.FirstName + " " + c.LastName,
+
+                                           FirstName = b.EmployeeId == entityId
+                                                         ? HelperUtility.DecodeBase64(c.FirstName) + " " +
+                                                           HelperUtility.DecodeBase64(c.LastName) + " (Self)"
+                                                         : HelperUtility.DecodeBase64(c.FirstName) + " " +
+                                                           HelperUtility.DecodeBase64(c.LastName),
+
                                            LastName = ""
                                        })
                                       .ToList().OrderBy(x => x.FirstName, StringComparer.OrdinalIgnoreCase).ToList();
@@ -293,8 +300,18 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGetTraineeDetailListByCentreCodeAndgeneralTrainerId @CentreCode,@GeneralTrainerMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
-            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
+            foreach (var item in dBTMTraineeDetailsList)
+            {
+                item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
+                item.LastName = HelperUtility.DecodeBase64(item.LastName);
+                item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
+                item.EmailId = HelperUtility.DecodeBase64(item.EmailId);
 
+                item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+                item.EmailId = HelperUtility.MaskData(item.MobileNumber, MaskType.Email);
+            }
+
+            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;

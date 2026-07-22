@@ -68,6 +68,14 @@ namespace Coditech.Admin.Agents
             DBTMTraineeDetailsListModel dBTMTraineeDetailsList = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             DBTMTraineeDetailsListViewModel listViewModel = new DBTMTraineeDetailsListViewModel();
             listViewModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.DBTMTraineeDetailsList?.ToViewModel<DBTMTraineeDetailsViewModel>().ToList();
+            if (listViewModel.DBTMTraineeDetailsList != null)
+            {
+                foreach (var item in listViewModel.DBTMTraineeDetailsList)
+                {
+                    item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
+                    item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+                }
+            }
 
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeDetailsList.Count, BindColumns());
             return listViewModel;
@@ -224,6 +232,15 @@ namespace Coditech.Admin.Agents
             listViewModel.AssociatedTrainerList = associatedTrainerList?.AssociatedTrainerList?.ToViewModel<GeneralTraineeAssociatedToTrainerViewModel>().ToList();
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             bool isTrainerLogin = userModel?.Custom1 == CustomConstants.DBTMTrainer;
+
+            if (listViewModel.AssociatedTrainerList != null)
+            {
+                foreach (var item in listViewModel.AssociatedTrainerList)
+                {
+                    item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
+                    item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+                }
+            }
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.AssociatedTrainerList.Count, BindAssociatedTraineeColumns(), isTrainerLogin ? false : true);
             listViewModel.DBTMTraineeDetailId = dBTMTraineeDetailId;
             listViewModel.EntityId = dBTMTraineeDetailId;
