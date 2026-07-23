@@ -12,7 +12,7 @@ namespace Coditech.API.Endpoint
             return endpoint;
         }
         public string GetDBTMApplicationVersionAsync(long dBTMApplicationVersionId) =>
-          $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApplicationVersion/GetDBTMApplicationVersion?dBTMActivityCategoryId={dBTMApplicationVersionId}";
+          $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApplicationVersion/GetDBTMApplicationVersion?dBTMApplicationVersionId={dBTMApplicationVersionId}";
         public string CreateDBTMApplicationVersionAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApplicationVersion/CreateDBTMApplicationVersion";
         public string UpdateDBTMApplicationVersionAsync() =>

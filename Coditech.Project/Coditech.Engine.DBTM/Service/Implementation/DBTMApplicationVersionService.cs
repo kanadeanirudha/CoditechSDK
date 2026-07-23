@@ -31,8 +31,8 @@ namespace Coditech.API.Service
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<DBTMApplicationVersionModel> objStoredProc = new CoditechViewRepository<DBTMApplicationVersionModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@Rows", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@PageNo", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMApplicationVersionModel> dBTMApplicationVersionList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMApplicationVersionList @WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
@@ -64,7 +64,7 @@ namespace Coditech.API.Service
         }
 
         //Get DBTMApplicationVersion by DBTMApplicationVersion id.
-        public virtual DBTMApplicationVersionModel GetDBTMApplicationVersion(short dBTMApplicationVersionId)
+        public virtual DBTMApplicationVersionModel GetDBTMApplicationVersion(long dBTMApplicationVersionId)
         {
             if (dBTMApplicationVersionId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMApplicationVersionId"));

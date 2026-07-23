@@ -41,7 +41,7 @@ namespace Coditech.Admin.Agents
                 filters.Add("Version", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
 
-            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "ApplicationVersionName" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "ApplicationType" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
             DBTMApplicationVersionListResponse response = _dBTMApplicationVersionClient.List(null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMApplicationVersionListModel dBTMApplicationVersionList = new DBTMApplicationVersionListModel { DBTMApplicationVersionList = response?.DBTMApplicationVersionList };
@@ -154,8 +154,8 @@ namespace Coditech.Admin.Agents
             });
             datatableColumnList.Add(new DatatableColumns()
             {
-                ColumnName = "Version Details",
-                ColumnCode = "VersionDetails",
+                ColumnName = "Latest Version",
+                ColumnCode = "IsLatestVersion",
                 IsSortable = true,
             });
             return datatableColumnList;

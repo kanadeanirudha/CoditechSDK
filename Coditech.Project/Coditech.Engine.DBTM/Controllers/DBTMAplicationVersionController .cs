@@ -75,7 +75,7 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApplicationVersion/GetDBTMApplicationVersion")]
         [HttpGet]
         [Produces(typeof(DBTMApplicationVersionResponse))]
-        public virtual IActionResult GetDBTMApplicationVersion(short dBTMApplicationVersionId)
+        public virtual IActionResult GetDBTMApplicationVersion(long dBTMApplicationVersionId)
         {
             try
             {

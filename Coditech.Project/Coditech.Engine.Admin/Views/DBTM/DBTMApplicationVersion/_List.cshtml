@@ -19,7 +19,7 @@
                     {
                         <tr>
                             <td>@item.ApplicationType</td>
-                            <td>@item.ApplicationType</td>
+                            <td>@item.Version</td>
                             <td>@Html.Partial("~/Views/Shared/Datatable/_DatatableTrueFalse.cshtml", item.IsLatestVersion)</td>
                             <td class="text-center">
                                 <a href="@Url.Action("Edit", controllerName, new { dBTMApplicationVersionId = item.DBTMApplicationVersionId })"

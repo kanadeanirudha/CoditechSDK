@@ -10,7 +10,7 @@ namespace Coditech.API.Service
     {
         DBTMApplicationVersionListModel GetDBTMApplicationVersionList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
         DBTMApplicationVersionModel CreateDBTMApplicationVersion(DBTMApplicationVersionModel model);
-        DBTMApplicationVersionModel GetDBTMApplicationVersion(short dBTMApplicationVersionId);
+        DBTMApplicationVersionModel GetDBTMApplicationVersion(long dBTMApplicationVersionId);
         bool UpdateDBTMApplicationVersion(DBTMApplicationVersionModel model);
         bool DeleteDBTMApplicationVersion(ParameterModel parameterModel);
     }
