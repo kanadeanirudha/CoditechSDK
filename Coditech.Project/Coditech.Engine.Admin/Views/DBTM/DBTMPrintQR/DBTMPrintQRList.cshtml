@@ -1,0 +1,47 @@
+﻿@using Coditech.Admin.Utilities
+@model DBTMPrintQRListViewModel
+@{
+    ViewBag.Title = "Print QR";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+}
+
+<div class="page-content mt-5">
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Print QR</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+
+                        @Html.Label("Batch")
+
+                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
+                                 new DropdownViewModel()
+                        {
+                            DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
+                            DropdownName = "SelectedParameter1",
+                            DropdownSelectedValue = Model.SelectedParameter1,
+                            Parameter = Model.SelectedCentreCode,
+                            IsRequired = true
+                        })
+
+                    </div>
+                </div>
+
+                <div id="PrintQRUserListDiv">
+                    @Html.Partial("~/Views/DBTM/DBTMPrintQR/_DBTMPrintQRList.cshtml", Model)
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="~/js/coditech/DBTM/DBTMPrintQR.js"></script>

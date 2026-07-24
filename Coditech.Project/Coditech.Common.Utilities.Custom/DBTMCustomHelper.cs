@@ -1,5 +1,6 @@
 ﻿using Coditech.Common.API.Model;
 using System.Data;
+using QRCoder;
 namespace Coditech.Common.Helper.Utilities
 {
     public static class DBTMCustomHelper
@@ -509,6 +510,28 @@ namespace Coditech.Common.Helper.Utilities
                 }
             }
             return ageGroups.LastOrDefault().EnumId;
+        }
+
+        public static string GenerateQRCode(string textdData,string imageType)
+        {
+            if (string.IsNullOrEmpty(textdData))
+                return string.Empty;
+
+            // Generate PNG bytes for the QR code using QRCoder and return a data URI.
+            try
+            {
+                using (var qrGenerator = new QRCodeGenerator())
+                using (var qrData = qrGenerator.CreateQrCode(textdData, QRCodeGenerator.ECCLevel.Q))
+                {
+                    var png = new PngByteQRCode(qrData).GetGraphic(20);
+                    string base64 = Convert.ToBase64String(png);
+                    return $"data:image/png;base64,{base64}";
+                }
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }
