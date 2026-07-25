@@ -36,19 +36,35 @@ namespace Coditech.API.Service
             List<DBTMTraineeDetails> traineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => personIds.Contains(x.PersonId)).ToList();
             DBTMPrintQRListModel listModel = new DBTMPrintQRListModel();
             listModel.DBTMPrintQRList = new List<DBTMPrintQRModel>();
+            string templateCode = EmailTemplateCodeCustomEnum.DBTMAutoActivityQRCodeFormatVertical.ToString();
+            string finalHtml = "";
+            var emailTemplate = GetEmailTemplateByCode("SVTDKSZO", templateCode);
+            if (emailTemplate == null || string.IsNullOrWhiteSpace(emailTemplate.EmailTemplate))
+                throw new CoditechException(ErrorCodes.NullModel, "QR Template not found.");
+
             foreach (GeneralPerson person in persons)
             {
                 DBTMTraineeDetails trainee = traineeDetails.FirstOrDefault(x => x.PersonId == person.PersonId);
                 string personCode = trainee?.PersonCode;
+                string qrImage = DBTMCustomHelper.GenerateQRCode(personCode, string.Empty);
+                string printableHtml = ReplacePrintableHTMLQRTemplate(emailTemplate.EmailTemplate, person, personCode, qrImage);
+                finalHtml += printableHtml;
+                finalHtml += "<div style='height:20px;'></div>";
                 listModel.DBTMPrintQRList.Add(new DBTMPrintQRModel
                 {
                     PersonId = person.PersonId,
                     FirstName = person.FirstName,
+                    MiddleName = person.MiddleName,
                     LastName = person.LastName,
                     PersonCode = personCode,
-                    QRCode = DBTMCustomHelper.GenerateQRCode(personCode, string.Empty)
+                    QRCode = qrImage,
+                    PrintableHTML = printableHtml
                 });
             }
+            listModel.DBTMPrintQRList.Add(new DBTMPrintQRModel
+            {
+                PrintableHTML = finalHtml
+            });
             return listModel;
         }
 
@@ -70,5 +86,26 @@ namespace Coditech.API.Service
             model.BindPageListModel(pageListModel);
             return model;
         }
+
+        #region private
+        private string ReplacePrintableHTMLQRTemplate(string html, GeneralPerson person, string personCode, string qrImage)
+        {
+            html = ReplaceTokenWithMessageText("#FirstName#", person.FirstName ?? "", html);
+            html = ReplaceTokenWithMessageText("#MiddleName#", person.MiddleName ?? "", html);
+            html = ReplaceTokenWithMessageText("#LastName#", person.LastName ?? "", html);
+            html = ReplaceTokenWithMessageText("#PersonCode#", personCode ?? "", html);
+            html = ReplaceTokenWithMessageText("#MobileNumber#", person.MobileNumber ?? "", html);
+            html = ReplaceTokenWithMessageText("#QRImage#", qrImage ?? "", html);
+
+            html = ReplaceTokenWithMessageText("#htmlopen#", "<html>", html);
+            html = ReplaceTokenWithMessageText("#headopen#", "<head>", html);
+            html = ReplaceTokenWithMessageText("#headclose#", "</head>", html);
+            html = ReplaceTokenWithMessageText("#bodyopen#", "<body>", html);
+            html = ReplaceTokenWithMessageText("#bodyclose#", "</body>", html);
+            html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
+
+            return html;
+        }
+        #endregion
     }
 }
