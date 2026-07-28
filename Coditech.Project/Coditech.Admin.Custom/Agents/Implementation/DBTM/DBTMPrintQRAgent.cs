@@ -31,43 +31,6 @@ namespace Coditech.Admin.Agents
 
         #region Public Methods
 
-        //DBTM PrintQR.
-        public virtual DBTMPrintQRViewModel DBTMPrintQR(DBTMPrintQRViewModel dBTMPrintQRViewModel)
-        {
-            try
-            {
-                DBTMPrintQRResponse response = _dBTMPrintQRClient.DBTMPrintQR(dBTMPrintQRViewModel.ToModel<DBTMPrintQRModel>());
-                DBTMPrintQRModel dBTMPrintQRModel = response?.DBTMPrintQRModel;
-                return IsNotNull(dBTMPrintQRModel) ? dBTMPrintQRModel.ToViewModel<DBTMPrintQRViewModel>() : new DBTMPrintQRViewModel();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Warning);
-                switch (ex.ErrorCode)
-                {
-                    case ErrorCodes.AlreadyExist:
-                        return (DBTMPrintQRViewModel)GetViewModelWithErrorMessage(dBTMPrintQRViewModel, ex.ErrorMessage);
-                    default:
-                        return (DBTMPrintQRViewModel)GetViewModelWithErrorMessage(dBTMPrintQRViewModel, GeneralResources.ErrorFailedToCreate);
-                }
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Error);
-                return (DBTMPrintQRViewModel)GetViewModelWithErrorMessage(dBTMPrintQRViewModel, GeneralResources.ErrorFailedToCreate);
-            }
-        }
-
-        //Get DBTM PrintQR by DBTM PrintQR master id.
-        public virtual DBTMPrintQRListViewModel GetDBTMPrintQR(string personIds)
-        {
-            DBTMPrintQRListResponse response = _dBTMPrintQRClient.GetDBTMPrintQR(personIds);
-            DBTMPrintQRListViewModel listViewModel = new DBTMPrintQRListViewModel();
-            listViewModel.DBTMPrintQRList = response?.DBTMPrintQRList?.ToViewModel<DBTMPrintQRViewModel>().ToList() ?? new List<DBTMPrintQRViewModel>();
-            return listViewModel;
-        }
-
-
         #region DBTMPrintQRTrainee
         public virtual DBTMPrintQRListViewModel GetDBTMPrintQRTraineeList(int generalBatchMasterId, DataTableViewModel dataTableModel)
         {
@@ -81,12 +44,49 @@ namespace Coditech.Admin.Agents
             }
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
-            DBTMPrintQRListResponse response = _dBTMPrintQRClient.GetDBTMPrintQRTraineeList(generalBatchMasterId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+
+            string userType = null;
+
+            if (userModel.Custom1 == CustomConstants.DBTMTrainer)
+            {
+                userType = CustomConstants.DBTMTrainer;
+            }
+            else if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
+            {
+                userType = CustomConstants.DBTMCentreOwner;
+            }
+            DBTMPrintQRListResponse response = _dBTMPrintQRClient.GetDBTMPrintQRTraineeList(generalBatchMasterId, userType,null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMPrintQRListModel DBTMPrintQRList = new DBTMPrintQRListModel { DBTMPrintQRList = response?.DBTMPrintQRList };
             DBTMPrintQRListViewModel listViewModel = new DBTMPrintQRListViewModel();
             listViewModel.DBTMPrintQRList = DBTMPrintQRList?.DBTMPrintQRList?.ToViewModel<DBTMPrintQRViewModel>().ToList();
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMPrintQRList.Count, BindAssociatedBatchTraineeColumns());
             return listViewModel;
+        }
+
+        // Download Print QR by personIds.
+        public virtual DBTMPrintQRListViewModel DownloadPrintQR(string personIds)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("DownloadPrintQR started.", "DBTMPrintQR", TraceLevel.Info);
+                DBTMPrintQRListResponse response = _dBTMPrintQRClient.DownloadPrintQR(personIds);
+                if (response == null)
+                {
+                    return new DBTMPrintQRListViewModel { HasError = true, ErrorMessage = "QR PDF generation failed." };
+                }
+                return new DBTMPrintQRListViewModel
+                {
+                    DBTMPrintQRList = response.DBTMPrintQRList?.ToViewModel<DBTMPrintQRViewModel>().ToList(),
+                    FileName = response.FileName,
+                    FilePath = response.FilePath
+                };
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Error);
+                return new DBTMPrintQRListViewModel { HasError = true, ErrorMessage = "Error while generating QR PDF." };
+            }
         }
         #endregion  
         #region protected      
@@ -111,12 +111,12 @@ namespace Coditech.Admin.Agents
                 ColumnCode = "LastName",
                 IsSortable = true,
             });
-            //datatableColumnList.Add(new DatatableColumns()
-            //{
-            //    ColumnName = "Contact",
-            //    ColumnCode = "MobileNumber",
-            //    IsSortable = true,
-            //});
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Contact",
+                ColumnCode = "MobileNumber",
+                IsSortable = true,
+            });
             datatableColumnList.Add(new DatatableColumns()
             {
                 ColumnName = "QR",

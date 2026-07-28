@@ -1,8 +1,11 @@
 ﻿using Coditech.Admin.Agents;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
+using Coditech.Common.API.Model;
+using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMPrintQRController : BaseController
@@ -19,11 +22,17 @@ namespace Coditech.Admin.Controllers
         public ActionResult List(DataTableViewModel dataTableModel)
         {
             GetListOnlyIfSingleCentre(dataTableModel);
-
-            DBTMPrintQRListViewModel model = new DBTMPrintQRListViewModel
+            UserModel user = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
+            DBTMPrintQRListViewModel model = new DBTMPrintQRListViewModel();
+            model.SelectedCentreCode = user.SelectedCentreCode;
+            if (!string.IsNullOrWhiteSpace(user.Custom3))
             {
-                SelectedCentreCode = "SVTDKSZO"
-            };
+                DBTMCustomUserModel customUser = JsonConvert.DeserializeObject<DBTMCustomUserModel>(user.Custom3);
+                if (customUser != null)
+                {
+                    model.GeneralTrainerMasterId = customUser.GeneralTrainerMasterId ?? 0;
+                }
+            }
             return View("~/Views/DBTM/DBTMPrintQR/DBTMPrintQRList.cshtml", model);
         }
 
@@ -41,11 +50,12 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMPrintQR/DBTMPrintQRList.cshtml", list);
         }
 
-        [HttpPost]
-        public ActionResult GetDBTMPrintQR(string personIds)
+        public ActionResult DownloadPrintQR(string personIds)
         {
-            DBTMPrintQRListViewModel model = _dBTMPrintQRAgent.GetDBTMPrintQR(personIds);
-            return Json(model);
+            DBTMPrintQRListViewModel model =  _dBTMPrintQRAgent.DownloadPrintQR(personIds);
+            byte[] bytes = System.IO.File.ReadAllBytes(model.FilePath);
+            System.IO.File.Delete(model.FilePath);
+            return File(bytes, "application/pdf", model.FileName);
         }
 
         #region Protected

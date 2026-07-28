@@ -1,47 +1,52 @@
 ﻿@using Coditech.Admin.Utilities
 @model DBTMPrintQRListViewModel
 @{
-    ViewBag.Title = "Print QR";
+    ViewBag.Title = "Printable QR";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    DropdownViewModel batchDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
+                DropdownName = "SelectedParameter1",
+                DropdownSelectedValue = Convert.ToString(Model.Custom3),
+                Parameter = $"{Model.SelectedCentreCode}~324~{Model.GeneralTrainerMasterId}",
+                IsCustomDropdown = true,
+                ChangeEvent = "DBTMPrintQR.LoadTraineeList()"
+            };
 }
-
 <div class="page-content mt-5">
     <div class="container-fluid">
-
-        <div class="card">
-            <div class="card-header">
-                <h5>Print QR</h5>
-            </div>
-
-            <div class="card-body">
-
-                <div class="row mb-3">
-                    <div class="col-md-4">
-
-                        @Html.Label("Batch")
-
-                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml",
-                                 new DropdownViewModel()
-                        {
-                            DropdownType = DropdownCustomTypeEnum.DBTMCentrAndTrainerewiseBatch.ToString(),
-                            DropdownName = "SelectedParameter1",
-                            DropdownSelectedValue = Model.SelectedParameter1,
-                            Parameter = Model.SelectedCentreCode,
-                            IsRequired = true
-                        })
-
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Printable QR</span>                      
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-1">
+                                @Html.Label("Batch")
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMPrintQR.LoadTraineeList()" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="PrintQRUserListDiv" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/DBTM/DBTMPrintQR/_DBTMPrintQRList.cshtml", Model)
+                        </div>
                     </div>
                 </div>
-
-                <div id="PrintQRUserListDiv">
-                    @Html.Partial("~/Views/DBTM/DBTMPrintQR/_DBTMPrintQRList.cshtml", Model)
-                </div>
-
             </div>
-
         </div>
-
     </div>
 </div>
-
-<script src="~/js/coditech/DBTM/DBTMPrintQR.js"></script>
+<iframe id="hiddenDownloader" style="display:none;" frameborder="0"></iframe>
+@section scripts
+{
+    <script src="~/js/coditech/DBTM/DBTMPrintQR.js"></script>
+}

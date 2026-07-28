@@ -13,5 +13,9 @@ namespace Coditech.Admin.ViewModel
         }
         public string SelectedCentreCode { get; set; }
         public string SelectedParameter1 { get; set; }
+        public long GeneralTrainerMasterId { get; set; }
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public string PrintableHTML { get; set; }
     }
 }

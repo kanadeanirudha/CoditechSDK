@@ -5,7 +5,7 @@ namespace Coditech.API.Service
 {
     public interface IDBTMPrintQRService
     {
-        DBTMPrintQRListModel GetDBTMPrintQR(ParameterModel parameterModel);
+        DBTMPrintQRListModel DownloadPrintQR(ParameterModel parameterModel);
         DBTMPrintQRListModel GetDBTMPrintQRTraineeList(int generalBatchMasterId, string userType, FilterCollection filter, NameValueCollection nameValueCollection1, NameValueCollection nameValueCollection2, int pageIndex, int pageSize);
     }
 }

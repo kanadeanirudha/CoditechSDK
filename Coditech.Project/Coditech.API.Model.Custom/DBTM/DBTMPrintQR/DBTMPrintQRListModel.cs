@@ -9,5 +9,9 @@ namespace Coditech.Common.API.Model
         {
             DBTMPrintQRList = new List<DBTMPrintQRModel>();
         }
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public string PrintableHTML { get; set; }
+
     }
 }

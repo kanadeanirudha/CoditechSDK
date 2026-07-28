@@ -1,101 +1,53 @@
-﻿<table class="table table-bordered">
-
+﻿<button type="button"
+        class="btn btn-warning warning-bg mb-2"
+        onclick="DBTMPrintQR.PrintQR(0)">
+    Download All
+</button>
+<table class="table table-bordered">
     <thead>
-
         <tr>
-
             <th>
-                <input type="checkbox" id="chkSelectAll" />
+                <input type="checkbox" id="chkSelectAll" /> All
             </th>
-
             <th>First Name</th>
             <th>Middle Name</th>
             <th>Last Name</th>
+            <th>Contact</th>
             <th>QR</th>
             <th>Action</th>
-
         </tr>
-
     </thead>
-
     <tbody>
+        @foreach (var item in Model.DBTMPrintQRList)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" name="chkPerson"
+                           class="person-checkbox"
+                           value="@item.PersonId" />
+                </td>
+                <td>@item.FirstName</td>
+                <td>@item.MiddleName</td>
+                <td>@item.LastName</td>
+                <td>@item.MobileNumber</td>
 
-        <tr>
+                <td><i class="fas fa-qrcode"></i></td>
 
-            <td><input type="checkbox" value="1" /></td>
-            <td>Yamini</td>
-            <td>R</td>
-            <td>Verma</td>
-            <td><i class="fas fa-qrcode"></i></td>
-
-            <td>
-
-                <button class="btn btn-success btn-sm"
-                        onclick="DBTMPrintQR.PrintQR()">
-                    Print
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td><input type="checkbox" value="2" /></td>
-            <td>Amit</td>
-            <td>K</td>
-            <td>Patil</td>
-            <td><i class="fas fa-qrcode"></i></td>
-
-            <td>
-
-                <button class="btn btn-success btn-sm"
-                        onclick="DBTMPrintQR.PrintQR(2)">
-                    Print
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td><input type="checkbox" value="3" /></td>
-            <td>Rahul</td>
-            <td>S</td>
-            <td>Sharma</td>
-            <td><i class="fas fa-qrcode"></i></td>
-
-            <td>
-
-                <button class="btn btn-success btn-sm"
-                        onclick="DBTMPrintQR.PrintQR(3)">
-                    Print
-                </button>
-
-            </td>
-
-        </tr>
-
-        <tr>
-
-            <td><input type="checkbox" value="4" /></td>
-            <td>Priya</td>
-            <td>M</td>
-            <td>Joshi</td>
-            <td><i class="fas fa-qrcode"></i></td>
-
-            <td>
-
-                <button class="btn btn-success btn-sm"
-                        onclick="DBTMPrintQR.PrintQR(4)">
-                    Print
-                </button>
-
-            </td>
-
-        </tr>
-
+                <td>
+                    <button type="button"
+                            class="btn btn-warning btn-sm warning-bg"
+                            onclick="DBTMPrintQR.PrintQR(@item.PersonId)">
+                        Download
+                    </button>
+                </td>
+            </tr>
+        }
     </tbody>
-
 </table>
+<style>
+    .warning-bg {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #fff !important;
+    }
+</style>

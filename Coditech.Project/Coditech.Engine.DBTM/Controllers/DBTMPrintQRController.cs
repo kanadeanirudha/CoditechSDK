@@ -23,29 +23,6 @@ namespace Coditech.API.Controllers
             _coditechLogging = coditechLogging;
         }
 
-        [Route("/DBTMPrintQR/GetDBTMPrintQR")]
-        [HttpPost, ValidateModel]
-        [Produces(typeof(DBTMPrintQRListResponse))]
-        public IActionResult GetDBTMPrintQR([FromBody] ParameterModel model)
-        {
-            try
-            {
-                DBTMPrintQRListModel list = _dBTMPrintQRService.GetDBTMPrintQR(model);
-                string data = ApiHelper.ToJson(list);
-                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMPrintQRListResponse>(data) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new DBTMPrintQRListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMPrintQRListResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
-   
         [HttpGet]
         [Route("/DBTMPrintQR/GetDBTMPrintQRTraineeList")]
         [Produces(typeof(DBTMPrintQRListResponse))]
@@ -68,6 +45,29 @@ namespace Coditech.API.Controllers
                 _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMPrintQRListResponse { HasError = true, ErrorMessage = ex.Message });
             }
-        }    
+        }
+
+        [Route("/DBTMPrintQR/DownloadPrintQR")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMPrintQRListResponse))]
+        public IActionResult DownloadPrintQR([FromBody] ParameterModel model)
+        {
+            try
+            {
+                DBTMPrintQRListModel list = _dBTMPrintQRService.DownloadPrintQR(model);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMPrintQRListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMPrintQRListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMPrintQR", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMPrintQRListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }
