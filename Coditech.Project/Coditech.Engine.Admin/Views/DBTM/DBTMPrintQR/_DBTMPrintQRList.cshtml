@@ -1,0 +1,53 @@
+﻿<button type="button"
+        class="btn btn-warning warning-bg mb-2"
+        onclick="DBTMPrintQR.PrintQR(0)">
+    Download All
+</button>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>
+                <input type="checkbox" id="chkSelectAll" /> All
+            </th>
+            <th>First Name</th>
+            <th>Middle Name</th>
+            <th>Last Name</th>
+            <th>Contact</th>
+            <th>QR</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.DBTMPrintQRList)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" name="chkPerson"
+                           class="person-checkbox"
+                           value="@item.PersonId" />
+                </td>
+                <td>@item.FirstName</td>
+                <td>@item.MiddleName</td>
+                <td>@item.LastName</td>
+                <td>@item.MobileNumber</td>
+
+                <td><i class="fas fa-qrcode"></i></td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-warning btn-sm warning-bg"
+                            onclick="DBTMPrintQR.PrintQR(@item.PersonId)">
+                        Download
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<style>
+    .warning-bg {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #fff !important;
+    }
+</style>
