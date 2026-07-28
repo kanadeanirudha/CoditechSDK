@@ -59,6 +59,7 @@
         public const string TotalLaps = "TotalLaps";
         public const string ModeOfStart = "ModeOfStart";
         public const string NA = "NA";
+        public const string AverageCumulativeVelocity = "AverageCumulativeVelocity";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";

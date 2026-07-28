@@ -35,6 +35,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
         private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
         private readonly ICoditechRepository<DBTMCampActivity> _dBTMCampActivityRepository;
+        private readonly ICoditechRepository<DBTMDeviceDataInsertionUniqueCheck> _dBTMDeviceDataInsertionUniqueCheckRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
 
 
@@ -59,6 +60,7 @@ namespace Coditech.API.Service
             _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCampMasterRepository = new CoditechRepository<DBTMCampMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCampActivityRepository = new CoditechRepository<DBTMCampActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMDeviceDataInsertionUniqueCheckRepository = new CoditechRepository<DBTMDeviceDataInsertionUniqueCheck>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
         #region InsertDeviceData
@@ -91,13 +93,18 @@ namespace Coditech.API.Service
                     // Cache trainee details to avoid duplicate DB hits
                     var traineeCache = new Dictionary<string, DBTMTraineeDetails>(StringComparer.OrdinalIgnoreCase);
 
+                    var DataUniqueIds = new List<DBTMDeviceDataInsertionUniqueCheck>();
                     foreach (var dBTMDeviceDataModel in dBTMDeviceDataModelList)
                     {
                         if (string.Equals(dBTMDeviceDataModel.PersonCode, "DryRun", StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
-
+                        // Skip if a record with the same DataUniqueId already exists
+                        if (_dBTMDeviceDataInsertionUniqueCheckRepository.Table.Any(x => x.DataUniqueId == dBTMDeviceDataModel.DataUniqueId))
+                        {
+                            continue;
+                        }
                         // Get trainee details from cache or DB
                         if (!traineeCache.TryGetValue(dBTMDeviceDataModel.PersonCode, out DBTMTraineeDetails traineeDetails))
                         {
@@ -164,14 +171,19 @@ namespace Coditech.API.Service
                             }
 
                             var insertedDetails = _dBTMDeviceDataDetailsRepository.Insert(detailList, dBTMDeviceDataModel.CreatedBy);
-
                             if (insertedDetails == null)
                             {
                                 throw new CoditechException(ErrorCodes.InvalidData, "Failed to insert device data details.");
                             }
+                            DataUniqueIds.Add(new DBTMDeviceDataInsertionUniqueCheck
+                            {
+                                DataUniqueId = dBTMDeviceDataModel.DataUniqueId,
+                                ExpiryDate = DateTime.Now.AddHours(ApiCustomSettings.DBTMDeviceDataInsertionUniqueCheckExipiryTimeInHour)
+                            });
                         }
                     }
-
+                    if (DataUniqueIds.Any())
+                        _dBTMDeviceDataInsertionUniqueCheckRepository.Insert(DataUniqueIds);
                     scope.Complete();
                     return true;
                 }
@@ -388,7 +400,8 @@ namespace Coditech.API.Service
                                                         {
                                                             DBTMActivityCategoryId = x.DBTMActivityCategoryId,
                                                             CategoryName = x.ActivityCategoryName,
-                                                            AppIcon = x.AppIcon                                            })
+                                                            AppIcon = x.AppIcon
+                                                        })
                                                         .ToList();
             return dBTMDashboardModel;
         }
