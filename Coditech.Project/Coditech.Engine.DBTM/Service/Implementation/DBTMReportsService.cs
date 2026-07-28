@@ -1200,7 +1200,7 @@ namespace Coditech.API.Service
 
                 if (performanceStandardList?.Count > 0 && dBTMTestParameterListviewSequence.IsDisplayPerformanceStandard && rowValue != CustomConstants.InvalidData && decimal.TryParse(rowValue, out decimal score))
                 {
-                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDouble(score), performanceStandardList, isHigherBetter);
+                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDecimal(score), performanceStandardList, isHigherBetter);
                 }
                 newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{performanceGrade}";
             }
@@ -1309,11 +1309,20 @@ namespace Coditech.API.Service
             "Zero","Ten","Twenty","Thirty","Forty","Fifty",
             "Sixty","Seventy","Eighty","Ninety"
         };
-        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, double score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
+        private static string GetPerformanceGrade(
+    int ageGroupEnumId,
+    int genderEnumId,
+    decimal score,
+    List<DBTMTestWisePerformanceStandard> grades,
+    bool isHigherBetter)
         {
-            DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
+            DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x =>
+                x.AgeGroupEnumId == ageGroupEnumId &&
+                x.GenderEnumId == genderEnumId);
+
             if (record == null)
                 return "0";
+
             if (isHigherBetter)
             {
                 if (score >= record.ExcellentValue)
@@ -1558,9 +1567,9 @@ namespace Coditech.API.Service
         public DataTable GetLiveResultDataTable(int dBTMTestMasterId, string centreCode, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate)
         {
             ReportsListDecryption(dBTMReportsList);
-            List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre( dBTMTestMasterId, centreCode, false, false);
+            List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, false, false);
             listviewSequenceColumns = listviewSequenceColumns.Where(x => x.IsDisplayPerformanceStandard).ToList();
-            return BindLiveResultDataDetailsV2( dBTMTestMasterId, false,dBTMReportsList, fromDate, toDate, listviewSequenceColumns, false, centreCode);
+            return BindLiveResultDataDetailsV2(dBTMTestMasterId, false, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, false, centreCode);
         }
         private DataTable BindLiveResultDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport, string centreCode)
         {

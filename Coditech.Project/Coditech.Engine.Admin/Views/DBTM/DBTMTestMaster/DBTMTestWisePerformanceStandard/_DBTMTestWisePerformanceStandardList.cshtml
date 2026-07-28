@@ -1,68 +1,200 @@
 ﻿@using Coditech.Admin.Utilities;
 @model DBTMTestWisePerformanceStandardListViewModel
-<div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Age Group</th>
-                <th>Gender</th>
-                <th>Excellent</th>
-                <th>Good</th>
-                <th>Average</th>
-                <th>Poor</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model?.DBTMTestWisePerformanceStandardList?.Count > 0)
-            {
-                foreach (var item in Model.DBTMTestWisePerformanceStandardList)
+
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table class="table table-bordered table-striped align-middle nowrap"
+               style="border-collapse: collapse; border-spacing: 0; width: 100%; min-width: 2000px;">
+            <thead>
+                <tr>
+                    <th>Age Group</th>
+                    <th>Gender</th>
+                    <th>Excellent Value</th>
+                    <th>Excellent Score</th>
+                    <th>Very Good Value</th>
+                    <th>Very Good Score</th>
+                    <th>Good Value</th>
+                    <th>Good Score</th>
+                    <th>Average Value</th>
+                    <th>Average Score</th>
+                    <th>Low Value</th>
+                    <th>Low Score</th>
+                    <th>Poor Value</th>
+                    <th>Poor Score</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model?.DBTMTestWisePerformanceStandardList?.Count > 0)
                 {
-                    <tr id="row_@(item.AgeGroupEnumId)_@(item.GenderEnumId)">
-                        <td>
-                            @item.AgeGroupDisplayText
-                        </td>
-                        <td>
-                            @item.GenderDisplayText
-                        </td>
-                        <td>
-                            <span class="view-mode">
-                                @item.ExcellentValue
-                            </span>
-                            <input type="number" class="form-control form-control-sm edit-mode excellent-input" value="@item.ExcellentValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
-                        </td>
-                        <td>
-                            <span class="view-mode">
-                                @item.GoodValue
-                            </span>
-                            <input type="number" class="form-control form-control-sm edit-mode good-input" value="@item.GoodValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
-                        </td>
-                        <td>
-                            <span class="view-mode">
-                                @item.AverageValue
-                            </span>
-                            <input type="number" class="form-control form-control-sm edit-mode average-input" value="@item.AverageValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
-                        </td>
-                        <td>
-                            <span class="view-mode">
-                                @item.PoorValue
-                            </span>
-                            <input type="number" class="form-control form-control-sm edit-mode poor-input" value="@item.PoorValue" min="0" max="999" oninput="if(this.value > 999) this.value = 999;" style="display:none;" />
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-soft-success edit-btn" onclick="DBTMTestWisePerformanceStandard.EditRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-soft-primary save-btn" style="display:none;" onclick="DBTMTestWisePerformanceStandard.SaveRow(@item.DBTMTestWisePerformanceStandardId, @Model.DBTMTestMasterId, @item.AgeGroupEnumId, @item.GenderEnumId)">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-soft-danger cancel-btn" style="display:none;" onclick="DBTMTestWisePerformanceStandard.CancelRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    foreach (var item in Model.DBTMTestWisePerformanceStandardList)
+                    {
+                        <tr id="row_@(item.AgeGroupEnumId)_@(item.GenderEnumId)">
+
+                            <td>@item.AgeGroupDisplayText</td>
+
+                            <td>@item.GenderDisplayText</td>
+
+                            <!-- Excellent Value -->
+                            <td>
+                                <span class="view-mode">@item.ExcellentValue</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode excellent-value-input"
+                                       value="@item.ExcellentValue"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Excellent Score -->
+                            <td>
+                                <span class="view-mode">@item.ExcellentScore</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode excellent-score-input"
+                                       value="@item.ExcellentScore"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Very Good Value -->
+                            <td>
+                                <span class="view-mode">@item.VeryGoodValue</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode verygood-value-input"
+                                       value="@item.VeryGoodValue"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Very Good Score -->
+                            <td>
+                                <span class="view-mode">@item.VeryGoodScore</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode verygood-score-input"
+                                       value="@item.VeryGoodScore"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Good Value -->
+                            <td>
+                                <span class="view-mode">@item.GoodValue</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode good-value-input"
+                                       value="@item.GoodValue"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Good Score -->
+                            <td>
+                                <span class="view-mode">@item.GoodScore</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode good-score-input"
+                                       value="@item.GoodScore"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Average Value -->
+                            <td>
+                                <span class="view-mode">@item.AverageValue</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode average-value-input"
+                                       value="@item.AverageValue"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Average Score -->
+                            <td>
+                                <span class="view-mode">@item.AverageScore</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode average-score-input"
+                                       value="@item.AverageScore"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Low Value -->
+                            <td>
+                                <span class="view-mode">@item.LowValue</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode low-value-input"
+                                       value="@item.LowValue"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Low Score -->
+                            <td>
+                                <span class="view-mode">@item.LowScore</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode low-score-input"
+                                       value="@item.LowScore"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Poor Value -->
+                            <td>
+                                <span class="view-mode">@item.PoorValue</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode poor-value-input"
+                                       value="@item.PoorValue"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Poor Score -->
+                            <td>
+                                <span class="view-mode">@item.PoorScore</span>
+                                <input type="number"
+                                       class="form-control form-control-sm edit-mode poor-score-input"
+                                       value="@item.PoorScore"
+                                       min="0"
+                                       max="999"
+                                       style="display:none;" />
+                            </td>
+
+                            <!-- Action -->
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-sm btn-soft-success edit-btn"
+                                        onclick="DBTMTestWisePerformanceStandard.EditRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-soft-primary save-btn"
+                                        style="display:none;"
+                                        onclick="DBTMTestWisePerformanceStandard.SaveRow(@item.DBTMTestWisePerformanceStandardId,@Model.DBTMTestMasterId,@item.AgeGroupEnumId,@item.GenderEnumId)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-soft-danger cancel-btn"
+                                        style="display:none;"
+                                        onclick="DBTMTestWisePerformanceStandard.CancelRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
-</div>                
+            </tbody>
+        </table>
+    </div>
+</div>

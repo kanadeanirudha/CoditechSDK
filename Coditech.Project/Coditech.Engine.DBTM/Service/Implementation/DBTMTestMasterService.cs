@@ -26,6 +26,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestWisePerformanceStandard> _dBTMTestWisePerformanceStandardRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
+        private readonly ICoditechRepository<DBTMTestwisePerformanceStandardCategory> _dBTMTestwisePerformanceStandardCategoryRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -41,6 +42,7 @@ namespace Coditech.API.Service
             _dBTMTestWisePerformanceStandardRepository = new CoditechRepository<DBTMTestWisePerformanceStandard>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestwisePerformanceStandardCategoryRepository = new CoditechRepository<DBTMTestwisePerformanceStandardCategory>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -627,11 +629,12 @@ namespace Coditech.API.Service
             return status == 1 ? true : false;
         }
 
-        public virtual DBTMTestWisePerformanceStandardListModel GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId)
+        public virtual DBTMTestWisePerformanceStandardListModel GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
             CoditechViewRepository<DBTMTestWisePerformanceStandardModel> objStoredProc = new CoditechViewRepository<DBTMTestWisePerformanceStandardModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
-            List<DBTMTestWisePerformanceStandardModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestwisePerformanceStandard @DBTMTestMasterId")?.ToList();
+            objStoredProc.SetParameter("@DBTMTestwisePerformanceStandardCategoryId", dBTMTestwisePerformanceStandardCategoryId, ParameterDirection.Input, DbType.UInt16);
+            List<DBTMTestWisePerformanceStandardModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestwisePerformanceStandard @DBTMTestMasterId, @DBTMTestwisePerformanceStandardCategoryId")?.ToList();
             DBTMTestWisePerformanceStandardListModel dBTMTestWisePerformanceStandardList = new DBTMTestWisePerformanceStandardListModel
             {
                 DBTMTestWisePerformanceStandardList = list,
@@ -673,6 +676,22 @@ namespace Coditech.API.Service
                 dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
             }
             return isdBTMTestWisePerformanceStandardUpdated;
+        }
+        public virtual DBTMTestwisePerformanceStandardCategoryListModel GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            var list = _dBTMTestwisePerformanceStandardCategoryRepository.Table
+                .Where(x => x.DBTMTestwisePerformanceStandardCategoryId == dBTMTestwisePerformanceStandardCategoryId)
+                .Select(x => new DBTMTestwisePerformanceStandardCategoryModel
+                {
+                    DBTMTestwisePerformanceStandardCategoryId = x.DBTMTestwisePerformanceStandardCategoryId,
+                    Name = x.Name,
+                })
+                .ToList();
+
+            return new DBTMTestwisePerformanceStandardCategoryListModel
+            {
+                DBTMTestwisePerformanceStandardCategoryList = list
+            };
         }
         #region Protected Method
         // Check if Test Name is already present or not.

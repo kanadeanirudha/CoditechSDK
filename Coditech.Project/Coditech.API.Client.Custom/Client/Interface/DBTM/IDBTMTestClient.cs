@@ -126,7 +126,7 @@ namespace Coditech.API.Client
         /// <returns>Returns DBTMActivityVerticalViewSequenceResponse.</returns>
         DBTMActivityVerticalViewSequenceResponse CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel body);
         DBTMCentreWiseTestListResponse GetTestsByCentreCode(string centreCode);
-        DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId);
+        DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
         DBTMTestWisePerformanceStandardResponse CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body);
         DBTMTestWisePerformanceStandardResponse UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body);
     }

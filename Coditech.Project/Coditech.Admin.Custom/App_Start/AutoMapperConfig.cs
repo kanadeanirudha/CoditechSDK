@@ -68,6 +68,8 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMCampActivityListModel, DBTMCampActivityListViewModel>().ReverseMap();
             CreateMap<DBTMCampActivityModel, DBTMCampActivityViewModel>().ReverseMap();
             CreateMap<DBTMTestWisePerformanceStandardModel, DBTMTestWisePerformanceStandardViewModel>().ReverseMap();
+            CreateMap<DBTMTestwisePerformanceStandardCategoryModel, DBTMTestwisePerformanceStandardCategoryViewModel>().ReverseMap();
+            CreateMap<DBTMTestwisePerformanceStandardCategoryListModel, DBTMTestwisePerformanceStandardCategoryListViewModel>().ReverseMap();
             #endregion
         }
     }

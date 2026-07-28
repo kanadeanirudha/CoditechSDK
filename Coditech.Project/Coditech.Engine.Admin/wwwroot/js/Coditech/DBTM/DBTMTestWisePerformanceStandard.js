@@ -58,5 +58,46 @@
                 CoditechNotification.DisplayNotificationMessage("Error occured while saving record.", "error");
             }
         });
-    }
+    },
+   DBTMTestwisePerformanceStandardCategoryList = function () {
+
+        var dBTMTestwisePerformanceStandardCategoryId = $("#DBTMTestwisePerformanceStandardCategoryId").val();
+        // var dBTMTestMasterId = $("#DBTMTestMasterId").val();
+
+        if (dBTMTestwisePerformanceStandardCategoryId) {
+
+            CoditechCommon.ShowLodder();
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMTestMaster/DBTMTestWisePerformanceStandardList",
+                data: {
+                    dBTMTestMasterId: dBTMTestMasterId,
+                    dBTMTestwisePerformanceStandardCategoryId: dBTMTestwisePerformanceStandardCategoryId
+                },
+                success: function (data) {
+
+                    $("#DataTablesDivId").html(data);
+
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr) {
+
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
+
+                    CoditechNotification.DisplayNotificationMessage(
+                        "Failed to retrieve Performance Standard List",
+                        "error"
+                    );
+
+                    CoditechCommon.HideLodder();
+                }
+            });
+
+        }
+    },
 };

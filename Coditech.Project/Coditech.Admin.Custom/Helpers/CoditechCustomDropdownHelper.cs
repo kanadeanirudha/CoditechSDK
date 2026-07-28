@@ -127,6 +127,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMTrainerwiseBatchList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTestwisePerformanceStandardCategory.ToString()))
+            {
+                DBTMTestwisePerformanceStandardCategoryList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -825,6 +829,29 @@ namespace Coditech.Admin.Helpers
                     Value = item.GeneralDepartmentMasterId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralDepartmentMasterId)
                 });
+            }
+        }
+        private static void DBTMTestwisePerformanceStandardCategoryList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem() { Value = "", Text = GeneralResources.SelectLabel });
+            else
+                dropdownList.Add(new SelectListItem() { Value = "0", Text = GeneralResources.SelectLabel });
+
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter))
+            {
+                short dBTMTestwisePerformanceStandardCategoryId = Convert.ToInt16(dropdownViewModel.Parameter);
+                DBTMTestwisePerformanceStandardCategoryListResponse response = new DBTMTestClient().GetDBTMTestwisePerformanceStandardCategoryList(dBTMTestwisePerformanceStandardCategoryId);
+                DBTMTestwisePerformanceStandardCategoryListModel list = new DBTMTestwisePerformanceStandardCategoryListModel() { DBTMTestwisePerformanceStandardCategoryList = response.DBTMTestwisePerformanceStandardCategoryList };
+                foreach (var item in list?.DBTMTestwisePerformanceStandardCategoryList.OrderBy(x => x.Name))
+                {
+                    dropdownList.Add(new SelectListItem()
+                    {
+                        Text = item.Name,
+                        Value = item.DBTMTestwisePerformanceStandardCategoryId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.DBTMTestwisePerformanceStandardCategoryId)
+                    });
+                }
             }
         }
     }
