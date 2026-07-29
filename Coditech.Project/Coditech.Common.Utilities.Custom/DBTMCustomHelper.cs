@@ -1,5 +1,6 @@
 ﻿using Coditech.Common.API.Model;
 using System.Data;
+using QRCoder;
 namespace Coditech.Common.Helper.Utilities
 {
     public static class DBTMCustomHelper
@@ -63,12 +64,12 @@ namespace Coditech.Common.Helper.Utilities
                         result = $"{Math.Round(completionTime / recurtion, CustomConstants.GraphListRoundUpValue)}";
                         break;
                     case CustomConstants.AverageVelocity:
-                        decimal totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                        decimal totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).Sum(x => Convert.ToDecimal(x.ParameterValue));
                         decimal totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => Convert.ToDecimal(x.ParameterValue));
                         result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
                         break;
                     case CustomConstants.AverageTotalVelocity:
-                        totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                        totalDistance = group.Where(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).Sum(x => Convert.ToDecimal(x.ParameterValue));
                         totalTime = group.Where(x => x.ParameterCode == CustomConstants.Time).Sum(x => Convert.ToDecimal(x.ParameterValue));
                         totalTime = totalTime != 0 ? (totalTime / recurtion) : totalTime;
                         result = totalTime != 0 && totalDistance != 0 ? $"{Math.Round(totalDistance / totalTime, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
@@ -448,6 +449,7 @@ namespace Coditech.Common.Helper.Utilities
                 case CustomConstants.ChangeOfDirection:
                 case CustomConstants.ChangeOfDirectionDeficit:
                 case CustomConstants.AverageTime:
+                case CustomConstants.AverageTotalCompletionTime:
                     data = "sec";
                     break;
                 case CustomConstants.TotalDistanceCovered:
@@ -464,6 +466,8 @@ namespace Coditech.Common.Helper.Utilities
                 case CustomConstants.CumulativeVelocityWithChangeDistance:
                 case CustomConstants.Velocity:
                 case CustomConstants.VelocityByRowWithFirstDistance:
+                case CustomConstants.AverageTotalVelocity:
+                case CustomConstants.AverageCumulativeVelocity:
                     data = "m/s";
                     break;
                 case CustomConstants.Power:
@@ -509,6 +513,28 @@ namespace Coditech.Common.Helper.Utilities
                 }
             }
             return ageGroups.LastOrDefault().EnumId;
+        }
+
+        public static string GenerateQRCode(string textdData,string imageType)
+        {
+            if (string.IsNullOrEmpty(textdData))
+                return string.Empty;
+
+            // Generate PNG bytes for the QR code using QRCoder and return a data URI.
+            try
+            {
+                using (var qrGenerator = new QRCodeGenerator())
+                using (var qrData = qrGenerator.CreateQrCode(textdData, QRCodeGenerator.ECCLevel.Q))
+                {
+                    var png = new PngByteQRCode(qrData).GetGraphic(20);
+                    string base64 = Convert.ToBase64String(png);
+                    return $"data:image/png;base64,{base64}";
+                }
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

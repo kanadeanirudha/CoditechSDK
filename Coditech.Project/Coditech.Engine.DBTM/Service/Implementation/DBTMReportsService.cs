@@ -82,37 +82,8 @@ namespace Coditech.API.Service
                 DBTMTestMaster dbtmTestMaster = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).FirstOrDefault();
                 graphMaster.TestCode = dbtmTestMaster.TestCode;
                 string[] XValuesList = null;
-                List<string> segments = null;
 
-                if (graphMaster.XParameter == "Split")
-                {
-                    if (dbtmTestMaster.TestCode == CustomConstants.ThreeHundredYardTest)
-                    {
-                        XValuesList = new string[] { "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12" };
-                    }
-                    else if (dbtmTestMaster.TestCode == CustomConstants.SixTenShuttleTest)
-                    {
-                        XValuesList = new string[] { "S0", "S1", "S2", "S3", "S4", "S5", "S6" };
-                    }
-                    else if (dbtmTestMaster.TestCode == CustomConstants.FourTenShuttleTest)
-                    {
-                        XValuesList = new string[] { "S0", "S1", "S2", "S3", "S4" };
-                    }
-                    else
-                    {
-                        List<string> xValues = new List<string>();
-                        xValues.Add("A");
-                        xValues.AddRange(dBTMReportsList
-                                    .Where(x => !string.IsNullOrEmpty(x.FromTo))
-                                    .GroupBy(x => x.FromTo)
-                                    .OrderBy(g => g.Min(x => x.Row))
-                                    .Select(g => g.Key)
-                        );
-
-                        XValuesList = xValues.ToArray();
-                    }
-                }
-                else if (graphMaster.XParameter == CustomConstants.Date)
+                if (graphMaster.XParameter == CustomConstants.Date)
                 {
                     List<string> xValues = new List<string>();
                     foreach (DateTime item in dBTMReportsList.Select(x => x.TestPerformedTime.Date).Distinct())
@@ -151,13 +122,15 @@ namespace Coditech.API.Service
                         // Fallback: derive X values from available report data
                         if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.Distance))
                         {
-                            var values = dBTMReportsList
-                                      .Where(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)
-                                      .GroupBy(x => x.FromTo)
-                                      .OrderBy(g => g.Min(x => x.Row))
-                                      .Select(g => g.Key)
-                                      .ToList();
-                            XValuesList = (new[] { "0" }).Concat(values).ToArray();
+                            var date = dBTMReportsList.Select(x => x.CreatedDate).FirstOrDefault();
+                            var values = dBTMReportsList.Where(x => (x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow) && x.CreatedDate == date)
+                                         .Distinct()
+                                         .OrderBy(g => g.Row)
+                                         .Select(x => x.ParameterValue)
+                                         .ToList();
+
+
+                            XValuesList = (new[] { "0" }).Concat(values.Select(v => v.ToString())).ToArray();
                         }
                         else if (dBTMReportsList.Any(x => x.ParameterCode == CustomConstants.DistanceMultiplyByRow))
                         {
@@ -388,6 +361,7 @@ namespace Coditech.API.Service
             {
                 var groupList = group as IList<DBTMReportsModel> ?? group.ToList();
                 var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
+                decimal distance = 0;
                 if (graphMaster.IsYParameterCalculated)
                 {
                     short count = Convert.ToInt16(groupList.Select(x => x.CreatedDate).Distinct().Count());
@@ -395,37 +369,192 @@ namespace Coditech.API.Service
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, singleDateLookup, count, false, true)));
                     }
-                    else if (graphMaster.GraphCode == "AverageTotalTimeVsSplitDatewise")
+                    else if (graphMaster.GraphCode == "AverageTotalTimeVsDistanceDatewise")
                     {
                         yValuesList = new List<decimal>();
-                        if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        yValuesList.Add(0);
+                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        //{
+                        short rowCount = groupList.Max(y => y.Row);
+                        for (short index = 1; index <= rowCount; index++)
                         {
-                            for (short index = 1; index <= 12; index++)
-                            {
-                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                            }
+                            yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                         }
-                        else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 6; index++)
+                        //    {
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 4; index++)
+                        //    {
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
+                        //{
+                        //    for (int index = 1; index <= 3; index++)
+                        //    {
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
+                        //    }
+                        //}
+                        graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
-                            for (int index = 1; index <= 6; index++)
-                            {
-                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                            }
-                        }
-                        else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                            Color = colorPalette[colorIndex % colorPalette.Length],
+                            Label = $"{groupList.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
+                            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                        });
+                        colorIndex++;
+                    }
+                    else if (graphMaster.GraphCode == "AverageCumulativeTimeVsDistance")
+                    {
+                        yValuesList = new List<decimal>();
+                        yValuesList.Add(0);
+                        decimal cumulativeTime = 0;
+                        short rowCount = groupList.Max(y => y.Row);
+                        for (short index = 1; index <= rowCount; index++)
                         {
-                            for (int index = 1; index <= 4; index++)
-                            {
-                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                            }
+                            cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
+                            yValuesList.Add(cumulativeTime);
                         }
-                        else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
+                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        //{
+                        //    for (short index = 1; index <= 12; index++)
+                        //    {
+                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
+                        //        yValuesList.Add(cumulativeTime);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 6; index++)
+                        //    {
+                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
+                        //        yValuesList.Add(cumulativeTime);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 4; index++)
+                        //    {
+                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
+                        //        yValuesList.Add(cumulativeTime);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
+                        //{
+                        //    for (int index = 1; index <= 3; index++)
+                        //    {
+                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
+                        //        yValuesList.Add(cumulativeTime);
+                        //    }
+                        //}
+                        graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
-                            for (int index = 1; index <= 3; index++)
-                            {
-                                yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                            }
+                            Color = colorPalette[colorIndex % colorPalette.Length],
+                            Label = $"{groupList.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
+                            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                        });
+                        colorIndex++;
+                    }
+                    else if (graphMaster.GraphCode == "AverageVelocityVsDistanceDatewise")
+                    {
+                        yValuesList = new List<decimal>();
+                        yValuesList.Add(0);
+                        distance = Convert.ToDecimal(groupList.FirstOrDefault(y => (y.ParameterCode == CustomConstants.Distance || y.ParameterCode == CustomConstants.DistanceMultiplyByRow)).ParameterValue);
+                        short rowCount = groupList.Max(y => y.Row);
+                        for (short index = 1; index <= rowCount; index++)
+                        {
+                            yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
                         }
+
+                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        //{
+                        //    short rowCount = groupList.Max(y => y.Row);
+                        //    for (short index = 1; index <= rowCount; index++)
+                        //    {
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 6; index++)
+                        //    {
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 4; index++)
+                        //    {
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
+                        //{
+                        //    for (int index = 1; index <= 3; index++)
+                        //    {
+                        //        distance = Convert.ToDecimal(groupList.FirstOrDefault(y => (y.ParameterCode == CustomConstants.Distance || y.ParameterCode == CustomConstants.DistanceMultiplyByRow) && y.Row == index).ParameterValue);
+                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
+                        //    }
+                        //}
+                        graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
+                        {
+                            Color = colorPalette[colorIndex % colorPalette.Length],
+                            Label = $"{groupList.FirstOrDefault().TestPerformedTime.ToString(CustomConstants.GraphDateFormat)}",
+                            Data = JsonConvert.SerializeObject(yValuesList.ToArray()),
+                        });
+                        colorIndex++;
+                    }
+                    else if (graphMaster.GraphCode == "AverageCumulativeVelocityVsDistance")
+                    {
+                        yValuesList = new List<decimal>();
+                        yValuesList.Add(0);
+                        decimal cumulativeVelocity = 0;
+                        distance = Convert.ToDecimal(groupList.FirstOrDefault(y => (y.ParameterCode == CustomConstants.Distance || y.ParameterCode == CustomConstants.DistanceMultiplyByRow)).ParameterValue);
+                        short rowCount = groupList.Max(y => y.Row);
+                        for (short index = 1; index <= rowCount; index++)
+                        {
+                            cumulativeVelocity += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance;
+                            yValuesList.Add(cumulativeVelocity);
+                        }
+                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
+                        //{
+                        //    for (short index = 1; index <= 12; index++)
+                        //    {
+                        //        cumulativeVelocity += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance;
+                        //        yValuesList.Add(cumulativeVelocity);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 6; index++)
+                        //    {
+                        //        cumulativeVelocity += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance;
+                        //        yValuesList.Add(cumulativeVelocity);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
+                        //{
+                        //    for (int index = 1; index <= 4; index++)
+                        //    {
+                        //        cumulativeVelocity += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance;
+                        //        yValuesList.Add(cumulativeVelocity);
+                        //    }
+                        //}
+                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
+                        //{
+                        //    for (int index = 1; index <= 3; index++)
+                        //    {
+                        //        distance = Convert.ToDecimal(groupList.FirstOrDefault(y => (y.ParameterCode == CustomConstants.Distance || y.ParameterCode == CustomConstants.DistanceMultiplyByRow) && y.Row == index).ParameterValue);
+                        //        cumulativeVelocity += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance; ;
+                        //        yValuesList.Add(cumulativeVelocity);
+                        //    }
+                        //}
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
                             Color = colorPalette[colorIndex % colorPalette.Length],
@@ -440,7 +569,8 @@ namespace Coditech.API.Service
                     }
                 }
             }
-            if (graphMaster.GraphCode != "AverageTotalTimeVsSplitDatewise")
+            if (graphMaster.GraphCode != "AverageTotalTimeVsDistanceDatewise" && graphMaster.GraphCode != "AverageCumulativeTimeVsDistance"
+                && graphMaster.GraphCode != "AverageVelocityVsDistanceDatewise" && graphMaster.GraphCode != "AverageCumulativeVelocityVsDistance")
             {
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
