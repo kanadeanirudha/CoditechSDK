@@ -50,9 +50,19 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMPrintQR/DBTMPrintQRList.cshtml", list);
         }
 
+        [HttpGet]
+        public JsonResult CheckPrintQRAvailability(string personIds)
+        {
+            if (string.IsNullOrWhiteSpace(personIds))
+            {
+                return Json(new { success = false, message = "No trainee selected." });
+            }
+            return Json(new { success = true });
+        }
+
         public ActionResult DownloadPrintQR(string personIds)
         {
-            DBTMPrintQRListViewModel model =  _dBTMPrintQRAgent.DownloadPrintQR(personIds);
+            DBTMPrintQRListViewModel model = _dBTMPrintQRAgent.DownloadPrintQR(personIds);
             byte[] bytes = System.IO.File.ReadAllBytes(model.FilePath);
             System.IO.File.Delete(model.FilePath);
             return File(bytes, "application/pdf", model.FileName);
