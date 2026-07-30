@@ -18,7 +18,7 @@
         public string ExcellentScore { get; set; }
         public string VeryGoodScore { get; set; }
         public string GoodScore { get; set; }
-        public string AverageScore { get; set; }
+        public string AverageValueScore { get; set; }
         public string LowScore { get; set; }
         public string PoorScore { get; set; }
     }

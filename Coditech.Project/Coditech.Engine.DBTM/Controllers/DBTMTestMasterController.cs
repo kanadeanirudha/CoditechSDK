@@ -578,7 +578,7 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
         [HttpGet]
-        [Route("/DBTMTestMaster/GetDBTMTestWisePerformanceStandardList")]
+        [Route("/DBTMTestMaster/GetDBTMTestwisePerformanceStandardCategoryList")]
         [Produces(typeof(DBTMTestwisePerformanceStandardCategoryListResponse))]
         public virtual IActionResult GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId)
         {

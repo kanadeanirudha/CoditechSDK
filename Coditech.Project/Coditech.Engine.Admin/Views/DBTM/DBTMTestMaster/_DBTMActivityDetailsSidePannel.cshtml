@@ -3,6 +3,7 @@
 @{
     Layout = null;
     int dBTMTestMasterId = Convert.ToInt16(Model?.FirstOrDefault(x => x.Key == "DBTMTestMasterId").Value);
+    short dBTMTestwisePerformanceStandardCategoryId = Convert.ToInt16(Model?.FirstOrDefault(x => x.Key == "DBTMTestwisePerformanceStandardCategoryId").Value);
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 <div class="card sidebar-card">
@@ -32,10 +33,10 @@
                 </a>
                 <a class="nav-link"
                    href="@Url.Action("DBTMTestWisePerformanceStandardList", "DBTMTestMaster", new {
-                           SelectedParameter1 = dBTMTestMasterId
-                       })"
+                            dBTMTestMasterId = dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId
+                        })"
                    aria-selected="true">
-                    <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">DBTM TestWise Performance Standard</h5>
+                    <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">TestWise Performance Standard</h5>
                 </a>
             </div>
         </div>

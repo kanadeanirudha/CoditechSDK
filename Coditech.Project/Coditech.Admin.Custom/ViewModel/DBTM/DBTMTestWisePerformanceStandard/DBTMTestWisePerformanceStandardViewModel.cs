@@ -8,6 +8,7 @@ namespace Coditech.Admin.ViewModel
     {
         public int DBTMTestWisePerformanceStandardId { get; set; }
         public int DBTMTestMasterId { get; set; }
+        public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
         public int AgeGroupEnumId { get; set; }
         public int GenderEnumId { get; set; }
         [Display(Name = "Excellent Value")]
@@ -25,7 +26,7 @@ namespace Coditech.Admin.ViewModel
         public string ExcellentScore { get; set; }
         public string VeryGoodScore { get; set; }
         public string GoodScore { get; set; }
-        public string AverageScore { get; set; }
+        public string AverageValueScore { get; set; }
         public string LowScore { get; set; }
         public string PoorScore { get; set; }
     }

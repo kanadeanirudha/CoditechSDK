@@ -415,6 +415,7 @@ namespace Coditech.Admin.Agents
             DBTMTestWisePerformanceStandardListViewModel listViewModel = new DBTMTestWisePerformanceStandardListViewModel();
             listViewModel.DBTMTestWisePerformanceStandardList = listModel?.DBTMTestWisePerformanceStandardList ?.ToViewModel<DBTMTestWisePerformanceStandardViewModel>().ToList();
             listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            listViewModel.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
             listViewModel.TestName = response.TestName;
             return listViewModel;
         }

@@ -50,11 +50,9 @@
                             <!-- Excellent Score -->
                             <td>
                                 <span class="view-mode">@item.ExcellentScore</span>
-                                <input type="number"
+                                <input type="text"
                                        class="form-control form-control-sm edit-mode excellent-score-input"
                                        value="@item.ExcellentScore"
-                                       min="0"
-                                       max="999"
                                        style="display:none;" />
                             </td>
 
@@ -72,7 +70,7 @@
                             <!-- Very Good Score -->
                             <td>
                                 <span class="view-mode">@item.VeryGoodScore</span>
-                                <input type="number"
+                                <input type="text"
                                        class="form-control form-control-sm edit-mode verygood-score-input"
                                        value="@item.VeryGoodScore"
                                        min="0"
@@ -94,7 +92,7 @@
                             <!-- Good Score -->
                             <td>
                                 <span class="view-mode">@item.GoodScore</span>
-                                <input type="number"
+                                <input type="text"
                                        class="form-control form-control-sm edit-mode good-score-input"
                                        value="@item.GoodScore"
                                        min="0"
@@ -115,10 +113,10 @@
 
                             <!-- Average Score -->
                             <td>
-                                <span class="view-mode">@item.AverageScore</span>
-                                <input type="number"
+                                <span class="view-mode">@item.AverageValueScore</span>
+                                <input type="text"
                                        class="form-control form-control-sm edit-mode average-score-input"
-                                       value="@item.AverageScore"
+                                       value="@item.AverageValueScore"
                                        min="0"
                                        max="999"
                                        style="display:none;" />
@@ -138,7 +136,7 @@
                             <!-- Low Score -->
                             <td>
                                 <span class="view-mode">@item.LowScore</span>
-                                <input type="number"
+                                <input type="text"
                                        class="form-control form-control-sm edit-mode low-score-input"
                                        value="@item.LowScore"
                                        min="0"
@@ -160,7 +158,7 @@
                             <!-- Poor Score -->
                             <td>
                                 <span class="view-mode">@item.PoorScore</span>
-                                <input type="number"
+                                <input type="text"
                                        class="form-control form-control-sm edit-mode poor-score-input"
                                        value="@item.PoorScore"
                                        min="0"
@@ -179,7 +177,12 @@
                                 <button type="button"
                                         class="btn btn-sm btn-soft-primary save-btn"
                                         style="display:none;"
-                                        onclick="DBTMTestWisePerformanceStandard.SaveRow(@item.DBTMTestWisePerformanceStandardId,@Model.DBTMTestMasterId,@item.AgeGroupEnumId,@item.GenderEnumId)">
+                                        onclick="DBTMTestWisePerformanceStandard.SaveRow(
+                                        @item.DBTMTestWisePerformanceStandardId,
+                                        @Model.DBTMTestMasterId,
+                                        @Model.DBTMTestwisePerformanceStandardCategoryId,
+                                        @item.AgeGroupEnumId,
+                                        @item.GenderEnumId)">
                                     <i class="fas fa-check"></i>
                                 </button>
 
