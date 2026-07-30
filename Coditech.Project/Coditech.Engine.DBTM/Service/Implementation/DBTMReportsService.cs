@@ -162,6 +162,7 @@ namespace Coditech.API.Service
                 {
                     List<string> xValues = new List<string>();
                     xValues.AddRange(dBTMReportsList
+                                    .Where(x => x.FromTo != null)
                                     .GroupBy(x => x.FromTo)
                                     .OrderBy(g => g.Min(x => x.Row))
                                     .Select(g => g.Key)
@@ -281,8 +282,11 @@ namespace Coditech.API.Service
                 var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                 var firstOfGroup = groupList.FirstOrDefault();
                 short j = 1;
-                var yValuesList = new List<decimal> { 0 };
-
+                var yValuesList = new List<decimal>();
+                if (graphMaster.XParameter != CustomConstants.Position && graphMaster.XParameter != CustomConstants.NumberOfTurns)
+                {
+                    yValuesList.Add(0);
+                }
                 if (graphMaster.XParameter == CustomConstants.Turns && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
                 {
                     yValuesList.RemoveAt(0);
