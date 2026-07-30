@@ -1439,39 +1439,38 @@ namespace Coditech.API.Service
             "Zero","Ten","Twenty","Thirty","Forty","Fifty",
             "Sixty","Seventy","Eighty","Ninety"
         };
-        private static string GetPerformanceGrade(
-    int ageGroupEnumId,
-    int genderEnumId,
-    decimal score,
-    List<DBTMTestWisePerformanceStandard> grades,
-    bool isHigherBetter)
+        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
         {
-            DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x =>
-                x.AgeGroupEnumId == ageGroupEnumId &&
-                x.GenderEnumId == genderEnumId);
-
+            DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
             if (record == null)
                 return "0";
-
             if (isHigherBetter)
             {
                 if (score >= record.ExcellentValue)
                     return "5";
-                if (score >= record.GoodValue)
+                if (score >= record.VeryGoodValue)
                     return "4";
-                if (score >= record.AverageValue)
+                if (score >= record.GoodValue)
                     return "3";
-                return "1";
+                if (score >= record.AverageValue)
+                    return "2";
+                if (score >= record.LowValue)
+                    return "1";
+                return "0";
             }
             else
             {
                 if (score <= record.ExcellentValue)
                     return "5";
-                if (score <= record.GoodValue)
+                if (score <= record.VeryGoodValue)
                     return "4";
-                if (score <= record.AverageValue)
+                if (score <= record.GoodValue)
                     return "3";
-                return "1";
+                if (score <= record.AverageValue)
+                    return "2";
+                if (score <= record.LowValue)
+                    return "1";
+                return "0";
             }
         }
         private List<DBTMTestModel> GetTestList(string dBTMTestMasterIds)
