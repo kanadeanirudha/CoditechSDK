@@ -36,7 +36,6 @@
             }
         });
     },
-
     PrintQR: function (personId) {
         var personIds = [];
         if (personId && personId > 0) {
@@ -52,12 +51,31 @@
             return;
         }
         CoditechCommon.ShowLodder();
-        var downloadUrl = "/DBTMPrintQR/DownloadPrintQR?personIds="
-            + encodeURIComponent(personIds.join(','));
-        $("#hiddenDownloader").off("load").on("load", function ()
-        {
-            CoditechCommon.HideLodder();
-        }).attr("src", downloadUrl);
+        $.ajax({
+            url: "/DBTMPrintQR/CheckPrintQRAvailability",
+            type: "GET",
+            data: { personIds: personIds.join(',') },
+            success: function (response) {
+                if (response.success) {
+                    var downloadUrl =
+                        "/DBTMPrintQR/DownloadPrintQR?personIds="
+                        + encodeURIComponent(personIds.join(','));
+                    CoditechCommon.HideLodder();
+                    $("#hiddenDownloader").attr("src", downloadUrl);
+                }
+                else {
+                    CoditechNotification.DisplayNotificationMessage(response.message, "error");
+                    CoditechCommon.HideLodder();
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Error while downloading QR.", "error" );
+                CoditechCommon.HideLodder();
+            }
+        });
     }
 };
 $(document).ready(function () {
