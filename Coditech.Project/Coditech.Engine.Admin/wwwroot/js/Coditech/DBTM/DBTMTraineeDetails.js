@@ -214,7 +214,9 @@
             return;
         }
         $("#ErrorHeader").show();
-        var cols = Object.keys(rows[0]);
+        var cols = Object.keys(rows[0]).filter(function (c) {
+            return c !== "ErrorMessage";
+        });
         var html = `<hr/><table class="table table-bordered"><thead><tr>`;
         cols.forEach(function (c) {
             html += `<th>${c}</th>`;
@@ -224,10 +226,12 @@
             html += `<tr>`;
             cols.forEach(function (c) {
                 var val = r[c] == null ? "" : r[c];
-                if (c.toLowerCase().includes("error"))
-                    html += `<td style="color:red">${val}</td>`;
-                else
-                    html += `<td>${val}</td>`;
+                if (val !== "") {
+                    html += `<td style="color:red;">${val}</td>`;
+                }
+                else {
+                    html += `<td></td>`;
+                }
             });
             html += `</tr>`;
         });
