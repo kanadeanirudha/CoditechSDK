@@ -205,7 +205,8 @@ namespace Coditech.API.Service
                             LineBarChartId = dBTMTestMasterId.ToString(),
                             XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
                             XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
+                            //YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
+                            YAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.YParameter)) ? graphMaster.YAxixLabel : $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
                             Datasets = new List<LineBarGraphsDatasetModel>()
                         };
 
