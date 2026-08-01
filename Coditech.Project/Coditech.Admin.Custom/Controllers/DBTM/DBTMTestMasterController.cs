@@ -144,7 +144,7 @@ namespace Coditech.Admin.Controllers
                 }
                 else if (string.Equals(dBTMTestViewModel.ActionMode, AdminConstants.ActionModeSaveAndClose, StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMTestViewModel.DBTMTestMasterId)});
+                    return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = Convert.ToString(dBTMTestViewModel.DBTMTestMasterId) });
                 }
             }
             if (string.IsNullOrEmpty(dBTMTestViewModel.DisplayOn))
@@ -208,7 +208,7 @@ namespace Coditech.Admin.Controllers
             var newViewModel = new DBTMActivityListViewSequenceViewModel
             {
                 DBTMTestMasterId = dBTMTestMasterId,
-                SequenceNumber = (short)(maxSequence + 1), 
+                SequenceNumber = (short)(maxSequence + 1),
             };
             if (string.IsNullOrEmpty(newViewModel.DisplayOn))
             {
@@ -257,7 +257,7 @@ namespace Coditech.Admin.Controllers
                 return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = SelectedParameter1 });
             }
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
-            return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel(){ SelectedParameter1 = SelectedParameter1 });
+            return RedirectToAction("ActivityListViewSequenceList", new DataTableViewModel() { SelectedParameter1 = SelectedParameter1 });
         }
 
         #region Activity Vertical View Sequence
@@ -406,15 +406,27 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1 });
         }
-        public virtual ActionResult DBTMTestWisePerformanceStandardList(DataTableViewModel dataTableViewModel)
+
+        public ActionResult DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
-            DBTMTestWisePerformanceStandardListViewModel list = _dBTMTestAgent.DBTMTestWisePerformanceStandardList( Convert.ToInt32(dataTableViewModel.SelectedParameter1));
+            DBTMTestWisePerformanceStandardListViewModel list = new DBTMTestWisePerformanceStandardListViewModel();
+            list.DBTMTestMasterId = dBTMTestMasterId;
+            list.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
+            if (dBTMTestMasterId > 0)
+            {
+                list.TestName = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId).TestName;
+                if (dBTMTestwisePerformanceStandardCategoryId > 0)
+                {
+                    list = _dBTMTestAgent.DBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                }
+            }
             if (AjaxHelper.IsAjaxRequest)
             {
-                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml",list);
+                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml", list);
             }
-            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml",list);
+            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml", list);
         }
+
         [HttpPost]
         public virtual ActionResult SaveDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
         {
@@ -422,11 +434,11 @@ namespace Coditech.Admin.Controllers
             {
                 if (dBTMTestWisePerformanceStandardViewModel.DBTMTestWisePerformanceStandardId > 0)
                 {
-                    dBTMTestWisePerformanceStandardViewModel =_dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
+                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
                 }
                 else
                 {
-                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.CreateDBTMTestWisePerformanceStandard( dBTMTestWisePerformanceStandardViewModel);
+                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.CreateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
                 }
                 if (!dBTMTestWisePerformanceStandardViewModel.HasError)
                 {
@@ -439,7 +451,6 @@ namespace Coditech.Admin.Controllers
         }
         #endregion
         #region Protected
-
         protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)
         {
             dBTMTestViewModel.DBTMGraphMasterList = dBTMTestViewModel.DBTMGraphMasterList ?? new List<SelectListItem>();
@@ -474,7 +485,6 @@ namespace Coditech.Admin.Controllers
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", dBTMGraphByDBTMTestMaster);
         }
-
         #endregion
     }
 }

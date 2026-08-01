@@ -1049,13 +1049,13 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId)
+        public virtual DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         { 
-            return Task.Run(async () => await GetDBTMTestWisePerformanceStandardListAsync( dBTMTestMasterId, CancellationToken.None)).GetAwaiter().GetResult(); 
+            return Task.Run(async () => await GetDBTMTestWisePerformanceStandardListAsync( dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId, CancellationToken.None)).GetAwaiter().GetResult(); 
         }
-        public virtual async Task<DBTMTestWisePerformanceStandardListResponse> GetDBTMTestWisePerformanceStandardListAsync( int dBTMTestMasterId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWisePerformanceStandardListResponse> GetDBTMTestWisePerformanceStandardListAsync( int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTestEndpoint.GetDBTMTestWisePerformanceStandardListAsync(dBTMTestMasterId);
+            string endpoint = dBTMTestEndpoint.GetDBTMTestWisePerformanceStandardListAsync(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
@@ -1182,6 +1182,48 @@ namespace Coditech.API.Client
                     DBTMTestWisePerformanceStandardResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException( status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTestwisePerformanceStandardCategoryListResponse GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            return Task.Run(async () => await GetDBTMTestwisePerformanceStandardCategoryListAsync(dBTMTestwisePerformanceStandardCategoryId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestwisePerformanceStandardCategoryListResponse> GetDBTMTestwisePerformanceStandardCategoryListAsync(short dBTMTestwisePerformanceStandardCategoryId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.GetDBTMTestwisePerformanceStandardCategoryListAsync(dBTMTestwisePerformanceStandardCategoryId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestwisePerformanceStandardCategoryListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTestwisePerformanceStandardCategoryListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTestwisePerformanceStandardCategoryListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestwisePerformanceStandardCategoryListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
             }
             finally

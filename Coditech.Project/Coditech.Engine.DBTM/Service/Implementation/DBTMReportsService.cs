@@ -162,6 +162,7 @@ namespace Coditech.API.Service
                 {
                     List<string> xValues = new List<string>();
                     xValues.AddRange(dBTMReportsList
+                                    .Where(x => x.FromTo != null)
                                     .GroupBy(x => x.FromTo)
                                     .OrderBy(g => g.Min(x => x.Row))
                                     .Select(g => g.Key)
@@ -204,7 +205,8 @@ namespace Coditech.API.Service
                             LineBarChartId = dBTMTestMasterId.ToString(),
                             XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
                             XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
+                            //YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
+                            YAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.YParameter)) ? graphMaster.YAxixLabel : $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
                             Datasets = new List<LineBarGraphsDatasetModel>()
                         };
 
@@ -281,8 +283,11 @@ namespace Coditech.API.Service
                 var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                 var firstOfGroup = groupList.FirstOrDefault();
                 short j = 1;
-                var yValuesList = new List<decimal> { 0 };
-
+                var yValuesList = new List<decimal>();
+                if (graphMaster.XParameter != CustomConstants.Position && graphMaster.XParameter != CustomConstants.NumberOfTurns)
+                {
+                    yValuesList.Add(0);
+                }
                 if (graphMaster.XParameter == CustomConstants.Turns && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
                 {
                     yValuesList.RemoveAt(0);
@@ -1330,7 +1335,7 @@ namespace Coditech.API.Service
 
                 if (performanceStandardList?.Count > 0 && dBTMTestParameterListviewSequence.IsDisplayPerformanceStandard && rowValue != CustomConstants.InvalidData && decimal.TryParse(rowValue, out decimal score))
                 {
-                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDouble(score), performanceStandardList, isHigherBetter);
+                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDecimal(score), performanceStandardList, isHigherBetter);
                 }
                 newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{performanceGrade}";
             }
@@ -1439,7 +1444,7 @@ namespace Coditech.API.Service
             "Zero","Ten","Twenty","Thirty","Forty","Fifty",
             "Sixty","Seventy","Eighty","Ninety"
         };
-        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, double score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
+        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
         {
             DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
             if (record == null)
@@ -1448,21 +1453,29 @@ namespace Coditech.API.Service
             {
                 if (score >= record.ExcellentValue)
                     return "5";
-                if (score >= record.GoodValue)
+                if (score >= record.VeryGoodValue)
                     return "4";
-                if (score >= record.AverageValue)
+                if (score >= record.GoodValue)
                     return "3";
-                return "1";
+                if (score >= record.AverageValue)
+                    return "2";
+                if (score >= record.LowValue)
+                    return "1";
+                return "0";
             }
             else
             {
                 if (score <= record.ExcellentValue)
                     return "5";
-                if (score <= record.GoodValue)
+                if (score <= record.VeryGoodValue)
                     return "4";
-                if (score <= record.AverageValue)
+                if (score <= record.GoodValue)
                     return "3";
-                return "1";
+                if (score <= record.AverageValue)
+                    return "2";
+                if (score <= record.LowValue)
+                    return "1";
+                return "0";
             }
         }
         private List<DBTMTestModel> GetTestList(string dBTMTestMasterIds)

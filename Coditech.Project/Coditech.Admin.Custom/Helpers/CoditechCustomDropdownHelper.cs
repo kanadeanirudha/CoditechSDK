@@ -127,6 +127,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMTrainerwiseBatchList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTestwisePerformanceStandardCategory.ToString()))
+            {
+                DBTMTestwisePerformanceStandardCategoryList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -824,6 +828,20 @@ namespace Coditech.Admin.Helpers
                     Text = item.DepartmentName,
                     Value = item.GeneralDepartmentMasterId.ToString(),
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralDepartmentMasterId)
+                });
+            }
+        }
+        private static void DBTMTestwisePerformanceStandardCategoryList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-----Select Category-----", Value = "0" });
+            DBTMTestwisePerformanceStandardCategoryListResponse response = new DBTMTestClient().GetDBTMTestwisePerformanceStandardCategoryList(0);
+            foreach (var item in response.DBTMTestwisePerformanceStandardCategoryList)
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = item.Name,
+                    Value = item.DBTMTestwisePerformanceStandardCategoryId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == item.DBTMTestwisePerformanceStandardCategoryId.ToString()
                 });
             }
         }
