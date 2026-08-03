@@ -7,6 +7,7 @@ namespace Coditech.API.Data
         [Key]
         public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
         public string Name { get; set; }
+        public bool IsDefault { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }
