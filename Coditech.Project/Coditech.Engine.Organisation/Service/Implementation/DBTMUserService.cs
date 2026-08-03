@@ -7,7 +7,10 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -443,7 +446,8 @@ namespace Coditech.API.Service
                     HeaderType = x.HeaderType,
                     CentreCode = x.CentreCode,
                     OrderBy = x.OrderBy,
-                    DropdownEnumGroupCode = x.DropdownEnumGroupCode
+                    DropdownEnumGroupCode = x.DropdownEnumGroupCode,
+                    IsRequired = x.IsRequired
                 }).ToList();
             string currentDir = Directory.GetCurrentDirectory();
             string dataFolder = Path.Combine(currentDir, "data", "TraineeUploadTemplate");
@@ -493,6 +497,7 @@ namespace Coditech.API.Service
                 SuccessCount = result.SuccessCount,
                 FailedCount = result.FailedCount,
                 FailedRows = result.FailedRows,
+                Headers = result.Headers,
                 DataTable = result.DataTable
             };
         }
@@ -539,13 +544,20 @@ namespace Coditech.API.Service
             // Insert
             foreach (DataRow row in dt.Rows)
             {
-                if (!InsertTrainee(row, joiningTrainerMap, out string err))
+                try
                 {
-                    row[ExcelTemplateColumns.ErrorMessage] = err;
+                    if (!InsertTrainee(row, joiningTrainerMap, out string err))
+                    {
+                        row["ErrorMessage"] = err;
+                    }
+                    else
+                    {
+                        success++;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    success++;
+                    row["ErrorMessage"] = ex.Message;
                 }
             }
             if (success != dt.Rows.Count)
@@ -565,7 +577,14 @@ namespace Coditech.API.Service
                 SuccessCount = success,
                 FailedCount = failedTable?.Rows.Count ?? 0,
                 FailedRows = failedTable != null ? ToList(failedTable) : null,
-                Data = failedTable == null ? ToList(dt) : null
+                Data = failedTable == null ? ToList(dt) : null,
+                Headers = GetTraineeHeaders(string.Empty)
+                    .Select(x => new GeneralTemplateHeaderConfigurationModel
+                    {
+                        HeaderCode = x.HeaderCode,
+                        HeaderName = x.HeaderName,
+                        IsRequired = x.IsRequired
+                    }).ToList()
             };
         }
 
@@ -577,7 +596,6 @@ namespace Coditech.API.Service
         // Validation 
         private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, HashSet<string> callingCodeSet, out string errorMessage)
         {
-            List<string> errors = new List<string>();
             string joiningCode = row.Table.Columns.Contains(ExcelTemplateColumns.JoiningCode) ? row[ExcelTemplateColumns.JoiningCode]?.ToString() : null;
             string title = GetValue(row, ExcelTemplateColumns.TraineeTitle);
             string firstName = GetValue(row, ExcelTemplateColumns.FirstName);
@@ -594,36 +612,59 @@ namespace Coditech.API.Service
             string school = GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub);
             string ageGroup = GetValue(row, ExcelTemplateColumns.AgeGroup);
             string batchName = GetValue(row, ExcelTemplateColumns.BatchName);
+            bool hasError = false;
             if (!ValidateJoiningCode(joiningCode, joiningCodeList, out string joiningCodeError))
-                errors.Add(joiningCodeError);
+            {
+                row[ExcelTemplateColumns.JoiningCode] = joiningCodeError;
+                hasError = true;
+            }
             if (string.IsNullOrWhiteSpace(title))
             {
-                errors.Add("Trainee Title is empty");
+                row[ExcelTemplateColumns.TraineeTitle] = "Trainee Title is empty";
+                hasError = true;
             }
             else
             {
                 int titleEnumId = GetEnumIdByEnumCode(title, DropdownTypeEnum.Title.ToString());
                 if (titleEnumId <= 0)
                 {
-                    errors.Add("Trainee Title is invalid");
+                    row[ExcelTemplateColumns.TraineeTitle] = "Trainee Title is invalid";
+                    hasError = true;
                 }
             }
             if (string.IsNullOrWhiteSpace(firstName))
-                errors.Add("First Name is empty");
+            {
+                row[ExcelTemplateColumns.FirstName] = "First Name is empty";
+                hasError = true;
+            }
             else if (!Regex.IsMatch(firstName, @"^[a-zA-Z\s\-\(\)]+$"))
-                errors.Add("First Name contains invalid characters");
+            {
+                row[ExcelTemplateColumns.FirstName] = "First Name contains invalid characters";
+                hasError = true;
+            }
             if (!string.IsNullOrWhiteSpace(middleName))
             {
                 if (!Regex.IsMatch(middleName, @"^[a-zA-Z\s\-\(\)]+$"))
-                    errors.Add("Middle Name contains invalid characters");
+                {
+                    row[ExcelTemplateColumns.MiddleName] = "Middle Name contains invalid characters";
+                    hasError = true;
+                }
             }
             if (string.IsNullOrWhiteSpace(lastName))
-                errors.Add("Last Name is empty");
+            {
+                row[ExcelTemplateColumns.LastName] = "Last Name is empty";
+                hasError = true;
+            }
             else if (!Regex.IsMatch(lastName, @"^[a-zA-Z\s\-\(\)]+$"))
-                errors.Add("Last Name contains invalid characters");
+            {
+                row[ExcelTemplateColumns.LastName] = "Last Name contains invalid characters";
+                hasError = true;
+            }
+
             if (string.IsNullOrWhiteSpace(callingCode))
             {
-                errors.Add("Calling Code is empty");
+                row[ExcelTemplateColumns.CallingCode] = "Calling Code is empty";
+                hasError = true;
             }
             else
             {
@@ -634,51 +675,72 @@ namespace Coditech.API.Service
                 }
                 if (!Regex.IsMatch(callingCode, @"^\+\d{1,4}$") || !callingCodeSet.Contains(callingCode))
                 {
-                    errors.Add("Calling Code is invalid");
+                    row[ExcelTemplateColumns.CallingCode] = "Calling Code is invalid";
+                    hasError = true;
                 }
             }
             if (string.IsNullOrWhiteSpace(mobile))
             {
-                errors.Add("Mobile Number is empty");
+                row[ExcelTemplateColumns.MobileNumber] = "Mobile Number is empty";
+                hasError = true;
             }
             else
             {
                 if (!mobile.All(char.IsDigit))
-                    errors.Add("Mobile Number must contain only digits");
+                {
+                    row[ExcelTemplateColumns.MobileNumber] = "Mobile Number must contain only digits";
+                    hasError = true;
+                }
                 if (mobile.Length != 10)
-                    errors.Add("Mobile Number must be 10 digits");
+                {
+                    row[ExcelTemplateColumns.MobileNumber] = "Mobile Number must be 10 digits";
+                    hasError = true;
+                }
             }
             if (string.IsNullOrWhiteSpace(height))
             {
-                errors.Add("Height is empty");
+                row[ExcelTemplateColumns.HeightCm] = "Height is empty";
+                hasError = true;
             }
             else if (!decimal.TryParse(height, out decimal heightValue))
             {
-                errors.Add("Height must be numeric");
+                row[ExcelTemplateColumns.HeightCm] = "Height must be numeric";
+                hasError = true;
             }
             else if (heightValue <= 0)
             {
-                errors.Add("Height must be greater than 0");
+                row[ExcelTemplateColumns.HeightCm] = "Height must be greater than 0";
+                hasError = true;
             }
             if (string.IsNullOrWhiteSpace(weight))
             {
-                errors.Add("Weight is empty");
+                row[ExcelTemplateColumns.WeightKg] = "Weight is empty";
+                hasError = true;
             }
             else if (!decimal.TryParse(weight, out decimal weightValue))
             {
-                errors.Add("Weight must be numeric");
+                row[ExcelTemplateColumns.WeightKg] = "Weight must be numeric";
+                hasError = true;
             }
             else if (weightValue <= 0)
             {
-                errors.Add("Weight must be greater than 0");
+                row[ExcelTemplateColumns.WeightKg] = "Weight must be greater than 0";
+                hasError = true;
             }
             if (string.IsNullOrWhiteSpace(dob))
-                errors.Add("Date Of Birth is empty");
+            {
+                row[ExcelTemplateColumns.DateOfBirth] = "Date Of Birth is empty";
+                hasError = true;
+            }
             else if (!DateTime.TryParse(dob, out _))
-                errors.Add("Date Of Birth is invalid");
+            {
+                row[ExcelTemplateColumns.DateOfBirth] = "Date Of Birth is invalid";
+                hasError = true;
+            }
             if (string.IsNullOrWhiteSpace(email))
             {
-                errors.Add("Email Address is empty");
+                row[ExcelTemplateColumns.EmailAddress] = "Email Address is empty";
+                hasError = true;
             }
             else
             {
@@ -686,30 +748,37 @@ namespace Coditech.API.Service
                 {
                     var addr = new System.Net.Mail.MailAddress(email);
                     if (addr.Address != email)
-                        errors.Add("Email Address format is invalid");
+                    {
+                        row[ExcelTemplateColumns.EmailAddress] = "Email Address format is invalid";
+                        hasError = true;
+                    }
                 }
                 catch
                 {
-                    errors.Add("Email Address format is invalid");
+                    row[ExcelTemplateColumns.EmailAddress] = "Email Address format is invalid";
+                    hasError = true;
                 }
             }
             if (string.IsNullOrWhiteSpace(gender))
             {
-                errors.Add("Gender is empty");
+                row[ExcelTemplateColumns.Gender] = "Gender is empty";
+                hasError = true;
             }
             else
             {
                 int genderEnumId = GetEnumIdByEnumCode(gender, DropdownTypeEnum.Gender.ToString());
                 if (genderEnumId <= 0)
                 {
-                    errors.Add("Gender is invalid");
+                    row[ExcelTemplateColumns.Gender] = "Gender is invalid";
+                    hasError = true;
                 }
             }
             //if (string.IsNullOrWhiteSpace(GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub)))
-            //    errors.Add("School Or College Or Club  is empty");
+            //    row[ExcelTemplateColumns.SchoolOrCollegeOrClub] ="School Or College Or Club  is empty";
             if (string.IsNullOrWhiteSpace(batchName))
             {
-                errors.Add("Batch is required");
+                row[ExcelTemplateColumns.BatchName] = "Batch is required";
+                hasError = true;
             }
             if (!string.IsNullOrWhiteSpace(ageGroup))
             {
@@ -717,14 +786,16 @@ namespace Coditech.API.Service
                 int ageGroupEnumId = GetEnumIdByEnumCode(ageGroup.Replace(" ", ""), DropdownCustomTypeEnum.AgeGroup.ToString());
                 if (ageGroupEnumId <= 0)
                 {
-                    errors.Add("Age Group is invalid");
+                    row[ExcelTemplateColumns.AgeGroup] = "Age Group is invalid";
+                    hasError = true;
                 }
                 else if (DateTime.TryParse(dob, out DateTime dobDate))
                 {
                     int actualAgeGroupEnumId = GetAgeGroupEnumIdByDOB(dobDate);
                     if (ageGroupEnumId != actualAgeGroupEnumId)
                     {
-                        errors.Add("Age Group does not match Date Of Birth");
+                        row[ExcelTemplateColumns.AgeGroup] = "Age Group does not match Date Of Birth";
+                        hasError = true;
                     }
                 }
             }
@@ -743,11 +814,14 @@ namespace Coditech.API.Service
                         SelectedCentreCode = organisationCentrewiseJoiningCode.CentreCode
                     };
                     if (!ValidatedGeneralPersonData(person, out string baseError))
-                        errors.Add(baseError);
+                    {
+                        row[ExcelTemplateColumns.EmailAddress] = baseError;
+                        hasError = true;
+                    }
                 }
             }
-            errorMessage = errors.Count > 0 ? string.Join(", ", errors) : null;
-            return errors.Count == 0;
+            errorMessage = hasError ? "Validation Failed" : null;
+            return !hasError;
         }
 
         //Insert Trainee 
@@ -866,6 +940,7 @@ namespace Coditech.API.Service
             using var stream = file.OpenReadStream();
             using var workbook = new XLWorkbook(stream);
             var sheet = workbook.Worksheet(1);
+            var headers = GetTraineeHeaders(string.Empty);
             bool isHeader = true;
             int excelRowNo = 1;
             foreach (var row in sheet.RowsUsed())
@@ -875,9 +950,10 @@ namespace Coditech.API.Service
                 {
                     foreach (var cell in row.Cells())
                     {
-                        var header = cell.GetString().Trim();
-                        if (!string.IsNullOrEmpty(header))
-                            table.Columns.Add(header);
+                        var header = cell.GetString().Replace("*", "").Trim();
+                        var mappedHeader = headers.FirstOrDefault(x => x.HeaderName == header)?.HeaderCode ?? header;
+                        if (!string.IsNullOrEmpty(mappedHeader))
+                            table.Columns.Add(mappedHeader);
                     }
                     isHeader = false;
                     continue;
@@ -920,7 +996,19 @@ namespace Coditech.API.Service
             int lookupCol = 1;
             foreach (var header in template.HeaderConfigurationList.OrderBy(x => x.OrderBy))
             {
-                sheet.Cell(1, col).Value = header.HeaderCode;
+                string headerText = header.HeaderName;
+                var cell = sheet.Cell(1, col);
+                var rich = cell.GetRichText();
+                rich.ClearText();
+                rich.AddText(header.HeaderName + " ").SetFontColor(XLColor.White);
+                if (header.IsRequired)
+                {
+                    rich.AddText("*").SetFontColor(XLColor.Red).SetBold();
+                }
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.DarkBlue;
+                cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                 sheet.Cell(1, col).Style.Font.Bold = true;
                 if (header.HeaderCode == ExcelTemplateColumns.BatchName && batchList.Any())
                 {
@@ -952,7 +1040,7 @@ namespace Coditech.API.Service
                 {
                     for (int row = 2; row <= joiningCodes.Count + 1; row++)
                     {
-                        var cell = sheet.Cell(row, col);
+                        var dateCell = sheet.Cell(row, col);
                         cell.Style.DateFormat.Format = "yyyy-MM-dd";
                         var dv = cell.CreateDataValidation();
                         dv.IgnoreBlanks = true;

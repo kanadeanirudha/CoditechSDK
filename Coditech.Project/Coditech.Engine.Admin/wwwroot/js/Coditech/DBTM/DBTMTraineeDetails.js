@@ -207,30 +207,55 @@
             }
         });
     },
-    RenderFailedTable: function (rows) {
+    RenderFailedTable: function (rows, headers) {
         if (!rows || rows.length === 0) {
             $("#UploadErrorTableContainer").html("");
             $("#ErrorHeader").hide();
             return;
         }
         $("#ErrorHeader").show();
-        var cols = Object.keys(rows[0]);
+        var cols = Object.keys(rows[0]).filter(function (c) {
+            return c !== "ErrorMessage";
+        });
+        var headerMap = {};
+        headers.forEach(function (h) {
+            headerMap[h.HeaderCode] = h;
+        });
         var html = `<hr/><table class="table table-bordered"><thead><tr>`;
         cols.forEach(function (c) {
-            html += `<th>${c}</th>`;
+            var header = headerMap[c];
+            var title = header ? header.HeaderName : c;
+            if (header && header.IsRequired) {
+                title += ' <span class="text-danger">*</span>';
+            }
+            html += `<th>${title}</th>`;
         });
         html += `</tr></thead><tbody>`;
         rows.forEach(function (r) {
             html += `<tr>`;
             cols.forEach(function (c) {
                 var val = r[c] == null ? "" : r[c];
-                if (c.toLowerCase().includes("error"))
-                    html += `<td style="color:red">${val}</td>`;
-                else
+                var isError =
+                    typeof val === "string" &&
+                    (
+                        val.includes("required") ||
+                        val.includes("empty") ||
+                        val.includes("invalid") ||
+                        val.includes("exists") ||
+                        val.includes("contains") ||
+                        val.includes("expired")
+                    );
+
+                if (isError) {
+                    html += `<td><span class="text-danger">${val}</span></td>`;
+                }
+                else {
                     html += `<td>${val}</td>`;
+                }
             });
             html += `</tr>`;
         });
+
         html += `</tbody></table>`;
         $("#UploadErrorTableContainer").html(html);
     },
@@ -262,7 +287,7 @@
                 }
                 CoditechCommon.HideLodder();
                 if (res.failedRows && res.failedRows.length > 0) {
-                    DBTMTraineeDetails.RenderFailedTable(res.failedRows);
+                    DBTMTraineeDetails.RenderFailedTable(res.failedRows, res.headers);
                 }
                 else {
                     CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
@@ -281,7 +306,7 @@
     DownloadTemplatePopup: function () {
         var $openModal = $(".modal.show").first();
         if ($openModal.length > 0) {
-            $openModal.addClass("stack-blur"); 
+            $openModal.addClass("stack-blur");
         }
         CoditechCommon.ShowLodder();
         $.ajax({
@@ -308,7 +333,7 @@
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
                 }
-                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup", "error" );
+                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup", "error");
                 CoditechCommon.HideLodder();
             }
         });

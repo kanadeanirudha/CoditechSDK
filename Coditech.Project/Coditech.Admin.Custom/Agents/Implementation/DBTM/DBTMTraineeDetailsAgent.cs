@@ -498,6 +498,7 @@ namespace Coditech.Admin.Agents
                     SuccessCount = result.SuccessCount,
                     FailedCount = result.FailedCount,
                     FailedRows = result.FailedRows,
+                    Headers = result.Headers,
                     Data = result.Data,
                     HasError = false,
                     ErrorMessage = null
