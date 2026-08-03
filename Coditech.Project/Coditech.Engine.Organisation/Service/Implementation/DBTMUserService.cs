@@ -446,7 +446,8 @@ namespace Coditech.API.Service
                     HeaderType = x.HeaderType,
                     CentreCode = x.CentreCode,
                     OrderBy = x.OrderBy,
-                    DropdownEnumGroupCode = x.DropdownEnumGroupCode
+                    DropdownEnumGroupCode = x.DropdownEnumGroupCode,
+                    IsRequired = x.IsRequired
                 }).ToList();
             string currentDir = Directory.GetCurrentDirectory();
             string dataFolder = Path.Combine(currentDir, "data", "TraineeUploadTemplate");
@@ -496,6 +497,7 @@ namespace Coditech.API.Service
                 SuccessCount = result.SuccessCount,
                 FailedCount = result.FailedCount,
                 FailedRows = result.FailedRows,
+                Headers = result.Headers,
                 DataTable = result.DataTable
             };
         }
@@ -542,13 +544,20 @@ namespace Coditech.API.Service
             // Insert
             foreach (DataRow row in dt.Rows)
             {
-                if (!InsertTrainee(row, joiningTrainerMap, out string err))
+                try
                 {
-                    row[ExcelTemplateColumns.ErrorMessage] = err;
+                    if (!InsertTrainee(row, joiningTrainerMap, out string err))
+                    {
+                        row["ErrorMessage"] = err;
+                    }
+                    else
+                    {
+                        success++;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    success++;
+                    row["ErrorMessage"] = ex.Message;
                 }
             }
             if (success != dt.Rows.Count)
@@ -568,7 +577,14 @@ namespace Coditech.API.Service
                 SuccessCount = success,
                 FailedCount = failedTable?.Rows.Count ?? 0,
                 FailedRows = failedTable != null ? ToList(failedTable) : null,
-                Data = failedTable == null ? ToList(dt) : null
+                Data = failedTable == null ? ToList(dt) : null,
+                Headers = GetTraineeHeaders(string.Empty)
+                    .Select(x => new GeneralTemplateHeaderConfigurationModel
+                    {
+                        HeaderCode = x.HeaderCode,
+                        HeaderName = x.HeaderName,
+                        IsRequired = x.IsRequired
+                    }).ToList()
             };
         }
 
@@ -924,6 +940,7 @@ namespace Coditech.API.Service
             using var stream = file.OpenReadStream();
             using var workbook = new XLWorkbook(stream);
             var sheet = workbook.Worksheet(1);
+            var headers = GetTraineeHeaders(string.Empty);
             bool isHeader = true;
             int excelRowNo = 1;
             foreach (var row in sheet.RowsUsed())
@@ -933,9 +950,10 @@ namespace Coditech.API.Service
                 {
                     foreach (var cell in row.Cells())
                     {
-                        var header = cell.GetString().Trim();
-                        if (!string.IsNullOrEmpty(header))
-                            table.Columns.Add(header);
+                        var header = cell.GetString().Replace("*", "").Trim();
+                        var mappedHeader = headers.FirstOrDefault(x => x.HeaderName == header)?.HeaderCode ?? header;
+                        if (!string.IsNullOrEmpty(mappedHeader))
+                            table.Columns.Add(mappedHeader);
                     }
                     isHeader = false;
                     continue;
@@ -978,7 +996,19 @@ namespace Coditech.API.Service
             int lookupCol = 1;
             foreach (var header in template.HeaderConfigurationList.OrderBy(x => x.OrderBy))
             {
-                sheet.Cell(1, col).Value = header.HeaderCode;
+                string headerText = header.HeaderName;
+                var cell = sheet.Cell(1, col);
+                var rich = cell.GetRichText();
+                rich.ClearText();
+                rich.AddText(header.HeaderName + " ").SetFontColor(XLColor.White);
+                if (header.IsRequired)
+                {
+                    rich.AddText("*").SetFontColor(XLColor.Red).SetBold();
+                }
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.DarkBlue;
+                cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                 sheet.Cell(1, col).Style.Font.Bold = true;
                 if (header.HeaderCode == ExcelTemplateColumns.BatchName && batchList.Any())
                 {
@@ -1010,7 +1040,7 @@ namespace Coditech.API.Service
                 {
                     for (int row = 2; row <= joiningCodes.Count + 1; row++)
                     {
-                        var cell = sheet.Cell(row, col);
+                        var dateCell = sheet.Cell(row, col);
                         cell.Style.DateFormat.Format = "yyyy-MM-dd";
                         var dv = cell.CreateDataValidation();
                         dv.IgnoreBlanks = true;

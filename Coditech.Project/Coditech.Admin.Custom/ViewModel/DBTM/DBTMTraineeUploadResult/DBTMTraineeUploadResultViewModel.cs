@@ -10,6 +10,7 @@ namespace Coditech.Admin.ViewModel
         public int FailedCount { get; set; }
         public List<Dictionary<string, object>> FailedRows { get; set; }
         public List<Dictionary<string, object>> Data { get; set; }
+        public List<GeneralTemplateHeaderConfigurationModel> Headers { get; set; }
         public string FilePath { get; set; }
         public string FileName { get; set; }
     }
