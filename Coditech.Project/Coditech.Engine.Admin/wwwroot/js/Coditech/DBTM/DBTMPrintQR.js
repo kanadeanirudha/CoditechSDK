@@ -57,11 +57,18 @@
             data: { personIds: personIds.join(',') },
             success: function (response) {
                 if (response.success) {
+                    document.cookie = "PrintQRDownload=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                     var downloadUrl =
                         "/DBTMPrintQR/DownloadPrintQR?personIds="
                         + encodeURIComponent(personIds.join(','));
-                    CoditechCommon.HideLodder();
                     $("#hiddenDownloader").attr("src", downloadUrl);
+                    var checkDownload = setInterval(function () {
+                        if (document.cookie.indexOf("PrintQRDownload=Completed") !== -1) {
+                            clearInterval(checkDownload);
+                            CoditechCommon.HideLodder();
+                            document.cookie = "PrintQRDownload=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        }
+                    }, 300);
                 }
                 else {
                     CoditechNotification.DisplayNotificationMessage(response.message, "error");

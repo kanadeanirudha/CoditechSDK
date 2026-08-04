@@ -4,6 +4,7 @@ using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 namespace Coditech.Admin.Controllers
@@ -65,6 +66,7 @@ namespace Coditech.Admin.Controllers
             DBTMPrintQRListViewModel model = _dBTMPrintQRAgent.DownloadPrintQR(personIds);
             byte[] bytes = System.IO.File.ReadAllBytes(model.FilePath);
             System.IO.File.Delete(model.FilePath);
+            Response.Cookies.Append("PrintQRDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/pdf", model.FileName);
         }
 
