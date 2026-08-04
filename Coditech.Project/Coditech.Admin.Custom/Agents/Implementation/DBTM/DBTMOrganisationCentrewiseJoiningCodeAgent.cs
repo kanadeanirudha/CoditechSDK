@@ -174,7 +174,7 @@ namespace Coditech.Admin.Agents
                 datatableColumnList.Add(new DatatableColumns()
                 {
                     ColumnName = "Batch",
-                    ColumnCode = "Custom3",
+                    ColumnCode = "Custom4",
                     IsSortable = false,
                 });
             }

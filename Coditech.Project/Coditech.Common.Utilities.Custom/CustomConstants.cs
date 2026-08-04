@@ -50,8 +50,6 @@
         public const string Position = "Position";
         public const int GraphListRoundUpValue = 3;
         public const string School = "School";
-        public const string StaticValue = "StaticValue";
-        public const string InstantaneousChart = "InstantaneousChart";
         public const string ProgressChart = "ProgressChart";
         public const string Dropdown = "Dropdown";
         public const string Trainee = "Trainee";
@@ -59,7 +57,6 @@
         public const string TotalLaps = "TotalLaps";
         public const string ModeOfStart = "ModeOfStart";
         public const string NA = "NA";
-        public const string AverageCumulativeVelocity = "AverageCumulativeVelocity";
 
         #region Activity Code
         public const string ThreeHundredYardTest = "ThreeHundredYardTest";
@@ -94,6 +91,16 @@
             public const string SrNo = "SrNo";
             public const string ErrorMessage = "ErrorMessage";
         }
+        #endregion
+
+        #region Graph
+        public const string AverageCumulativeVelocity = "AverageCumulativeVelocity";
+        public const string StaticValue = "StaticValue";
+        public const string InstantaneousChart = "InstantaneousChart";
+        public const string AverageTotalTimeVsDistanceDatewise = "AverageTotalTimeVsDistanceDatewise";
+        public const string AverageCumulativeTimeVsDistance = "AverageCumulativeTimeVsDistance";
+        public const string AverageVelocityVsDistanceDatewise = "AverageVelocityVsDistanceDatewise";
+        public const string AverageCumulativeVelocityVsDistance = "AverageCumulativeVelocityVsDistance";
         #endregion
     }
 }

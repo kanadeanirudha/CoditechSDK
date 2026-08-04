@@ -162,6 +162,7 @@ namespace Coditech.API.Service
                 {
                     List<string> xValues = new List<string>();
                     xValues.AddRange(dBTMReportsList
+                                    .Where(x => x.FromTo != null)
                                     .GroupBy(x => x.FromTo)
                                     .OrderBy(g => g.Min(x => x.Row))
                                     .Select(g => g.Key)
@@ -204,7 +205,7 @@ namespace Coditech.API.Service
                             LineBarChartId = dBTMTestMasterId.ToString(),
                             XAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.XParameter)) ? graphMaster.XAxixLabel : $"{graphMaster.XAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.XParameter)})",
                             XValues = JsonConvert.SerializeObject(XValuesList),
-                            YAxisLabel = $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
+                            YAxisLabel = string.IsNullOrEmpty(DBTMCustomHelper.Unit(graphMaster.YParameter)) ? graphMaster.YAxixLabel : $"{graphMaster.YAxixLabel} ({DBTMCustomHelper.Unit(graphMaster.YParameter)})",
                             Datasets = new List<LineBarGraphsDatasetModel>()
                         };
 
@@ -281,11 +282,15 @@ namespace Coditech.API.Service
                 var singleDateLookup = groupList.ToLookup(x => x.CreatedDate.ToString()).FirstOrDefault();
                 var firstOfGroup = groupList.FirstOrDefault();
                 short j = 1;
-                var yValuesList = new List<decimal> { 0 };
-
-                if (graphMaster.XParameter == CustomConstants.Turns && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength))
+                var yValuesList = new List<decimal>();
+                if (graphMaster.XParameter != CustomConstants.Position && graphMaster.XParameter != CustomConstants.NumberOfTurns)
                 {
-                    yValuesList.RemoveAt(0);
+                    yValuesList.Add(0);
+                }
+                if ((graphMaster.XParameter == CustomConstants.Turns || graphMaster.XParameter == CustomConstants.NumberOfTurns) && (graphMaster.YParameter == CustomConstants.JumpHeight || graphMaster.YParameter == CustomConstants.JumpLength || graphMaster.YParameter == CustomConstants.TotalCount))
+                {
+                    if (yValuesList.Any())
+                        yValuesList.RemoveAt(0);
                     for (int index = 1; index <= groupedReportsList.Count; index++)
                     {
                         if (index == i)
@@ -369,39 +374,15 @@ namespace Coditech.API.Service
                     {
                         yValuesList.Add(Convert.ToDecimal(DBTMCustomHelper.Calculation(graphMaster.YParameter, string.Empty, singleDateLookup, count, false, true)));
                     }
-                    else if (graphMaster.GraphCode == "AverageTotalTimeVsDistanceDatewise")
+                    else if (graphMaster.GraphCode == CustomConstants.AverageTotalTimeVsDistanceDatewise)
                     {
                         yValuesList = new List<decimal>();
                         yValuesList.Add(0);
-                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
-                        //{
                         short rowCount = groupList.Max(y => y.Row);
                         for (short index = 1; index <= rowCount; index++)
                         {
                             yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
                         }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
-                        //{
-                        //    for (int index = 1; index <= 6; index++)
-                        //    {
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
-                        //{
-                        //    for (int index = 1; index <= 4; index++)
-                        //    {
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
-                        //{
-                        //    for (int index = 1; index <= 3; index++)
-                        //    {
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count));
-                        //    }
-                        //}
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
                             Color = colorPalette[colorIndex % colorPalette.Length],
@@ -410,7 +391,7 @@ namespace Coditech.API.Service
                         });
                         colorIndex++;
                     }
-                    else if (graphMaster.GraphCode == "AverageCumulativeTimeVsDistance")
+                    else if (graphMaster.GraphCode == CustomConstants.AverageCumulativeTimeVsDistance)
                     {
                         yValuesList = new List<decimal>();
                         yValuesList.Add(0);
@@ -421,38 +402,6 @@ namespace Coditech.API.Service
                             cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
                             yValuesList.Add(cumulativeTime);
                         }
-                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
-                        //{
-                        //    for (short index = 1; index <= 12; index++)
-                        //    {
-                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
-                        //        yValuesList.Add(cumulativeTime);
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
-                        //{
-                        //    for (int index = 1; index <= 6; index++)
-                        //    {
-                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
-                        //        yValuesList.Add(cumulativeTime);
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
-                        //{
-                        //    for (int index = 1; index <= 4; index++)
-                        //    {
-                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
-                        //        yValuesList.Add(cumulativeTime);
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
-                        //{
-                        //    for (int index = 1; index <= 3; index++)
-                        //    {
-                        //        cumulativeTime += groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count);
-                        //        yValuesList.Add(cumulativeTime);
-                        //    }
-                        //}
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
                             Color = colorPalette[colorIndex % colorPalette.Length],
@@ -461,7 +410,7 @@ namespace Coditech.API.Service
                         });
                         colorIndex++;
                     }
-                    else if (graphMaster.GraphCode == "AverageVelocityVsDistanceDatewise")
+                    else if (graphMaster.GraphCode == CustomConstants.AverageVelocityVsDistanceDatewise)
                     {
                         yValuesList = new List<decimal>();
                         yValuesList.Add(0);
@@ -472,36 +421,6 @@ namespace Coditech.API.Service
                             yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
                         }
 
-                        //if (graphMaster.TestCode == CustomConstants.ThreeHundredYardTest)
-                        //{
-                        //    short rowCount = groupList.Max(y => y.Row);
-                        //    for (short index = 1; index <= rowCount; index++)
-                        //    {
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.SixTenShuttleTest)
-                        //{
-                        //    for (int index = 1; index <= 6; index++)
-                        //    {
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.FourTenShuttleTest)
-                        //{
-                        //    for (int index = 1; index <= 4; index++)
-                        //    {
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
-                        //    }
-                        //}
-                        //else if (graphMaster.TestCode == CustomConstants.FiveZeroFiveAgilityTest || graphMaster.TestCode == CustomConstants.ProAgilityTest)
-                        //{
-                        //    for (int index = 1; index <= 3; index++)
-                        //    {
-                        //        distance = Convert.ToDecimal(groupList.FirstOrDefault(y => (y.ParameterCode == CustomConstants.Distance || y.ParameterCode == CustomConstants.DistanceMultiplyByRow) && y.Row == index).ParameterValue);
-                        //        yValuesList.Add(groupList.Where(y => y.ParameterCode == CustomConstants.Time && y.Row == index).Sum(x => Convert.ToDecimal(x.ParameterValue) / count) / distance);
-                        //    }
-                        //}
                         graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                         {
                             Color = colorPalette[colorIndex % colorPalette.Length],
@@ -510,7 +429,7 @@ namespace Coditech.API.Service
                         });
                         colorIndex++;
                     }
-                    else if (graphMaster.GraphCode == "AverageCumulativeVelocityVsDistance")
+                    else if (graphMaster.GraphCode == CustomConstants.AverageCumulativeVelocityVsDistance)
                     {
                         yValuesList = new List<decimal>();
                         yValuesList.Add(0);
@@ -569,8 +488,8 @@ namespace Coditech.API.Service
                     }
                 }
             }
-            if (graphMaster.GraphCode != "AverageTotalTimeVsDistanceDatewise" && graphMaster.GraphCode != "AverageCumulativeTimeVsDistance"
-                && graphMaster.GraphCode != "AverageVelocityVsDistanceDatewise" && graphMaster.GraphCode != "AverageCumulativeVelocityVsDistance")
+            if (graphMaster.GraphCode != CustomConstants.AverageTotalTimeVsDistanceDatewise && graphMaster.GraphCode != CustomConstants.AverageCumulativeTimeVsDistance
+                && graphMaster.GraphCode != CustomConstants.AverageVelocityVsDistanceDatewise && graphMaster.GraphCode != CustomConstants.AverageCumulativeVelocityVsDistance)
             {
                 graphModel.LineChartModel.Datasets.Add(new LineBarGraphsDatasetModel()
                 {
@@ -1330,7 +1249,7 @@ namespace Coditech.API.Service
 
                 if (performanceStandardList?.Count > 0 && dBTMTestParameterListviewSequence.IsDisplayPerformanceStandard && rowValue != CustomConstants.InvalidData && decimal.TryParse(rowValue, out decimal score))
                 {
-                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDouble(score), performanceStandardList, isHigherBetter);
+                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDecimal(score), performanceStandardList, isHigherBetter);
                 }
                 newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{performanceGrade}";
             }
@@ -1439,7 +1358,7 @@ namespace Coditech.API.Service
             "Zero","Ten","Twenty","Thirty","Forty","Fifty",
             "Sixty","Seventy","Eighty","Ninety"
         };
-        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, double score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
+        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
         {
             DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
             if (record == null)
@@ -1448,21 +1367,29 @@ namespace Coditech.API.Service
             {
                 if (score >= record.ExcellentValue)
                     return "5";
-                if (score >= record.GoodValue)
+                if (score >= record.VeryGoodValue)
                     return "4";
-                if (score >= record.AverageValue)
+                if (score >= record.GoodValue)
                     return "3";
-                return "1";
+                if (score >= record.AverageValue)
+                    return "2";
+                if (score >= record.LowValue)
+                    return "1";
+                return "0";
             }
             else
             {
                 if (score <= record.ExcellentValue)
                     return "5";
-                if (score <= record.GoodValue)
+                if (score <= record.VeryGoodValue)
                     return "4";
-                if (score <= record.AverageValue)
+                if (score <= record.GoodValue)
                     return "3";
-                return "1";
+                if (score <= record.AverageValue)
+                    return "2";
+                if (score <= record.LowValue)
+                    return "1";
+                return "0";
             }
         }
         private List<DBTMTestModel> GetTestList(string dBTMTestMasterIds)

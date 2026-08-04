@@ -666,7 +666,7 @@ namespace Coditech.Admin.Controllers
             }
             if (result.FailedRows != null && result.FailedRows.Count > 0)
             {
-                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows });
+                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows, headers = result.Headers });
             }
             SetNotificationMessage(GetSuccessNotificationMessage("Trainee uploaded successfully."));
             return Json(new { success = true });

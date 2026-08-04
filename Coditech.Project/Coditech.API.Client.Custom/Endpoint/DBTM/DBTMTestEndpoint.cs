@@ -72,9 +72,9 @@ namespace Coditech.API.Endpoint
         public string GetTestsByCentreCode(string centreCode) =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetTestsByCentreCode?centreCode={centreCode}";
        
-        public string GetDBTMTestWisePerformanceStandardListAsync(int dBTMTestMasterId)
+        public string GetDBTMTestWisePerformanceStandardListAsync(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
-            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestWisePerformanceStandardList?dBTMTestMasterId={dBTMTestMasterId}";
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestWisePerformanceStandardList?dBTMTestMasterId={dBTMTestMasterId}&dBTMTestwisePerformanceStandardCategoryId={dBTMTestwisePerformanceStandardCategoryId}";
         }
         
         public string CreateDBTMTestWisePerformanceStandardAsync() =>
@@ -82,5 +82,9 @@ namespace Coditech.API.Endpoint
         
         public string UpdateDBTMTestWisePerformanceStandardAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateDBTMTestWisePerformanceStandard";
+        public string GetDBTMTestwisePerformanceStandardCategoryListAsync(short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestwisePerformanceStandardCategoryList?dBTMTestwisePerformanceStandardCategoryId={dBTMTestwisePerformanceStandardCategoryId}";
+        }
     }
 }

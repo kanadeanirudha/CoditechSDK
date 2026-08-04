@@ -39,6 +39,7 @@ namespace Coditech.API.Data
         public DbSet<DBTMCampActivity> DBTMCampActivity { get; set; }
         public DbSet<DBTMTestWisePerformanceStandard> DBTMTestWisePerformanceStandard { get; set; }
         public DbSet<DBTMDeviceDataInsertionUniqueCheck> DBTMDeviceDataInsertionUniqueCheck { get; set; }
+        public virtual DbSet<DBTMTestwisePerformanceStandardCategory> DBTMTestwisePerformanceStandardCategory { get; set; }
         #endregion
     }
 }

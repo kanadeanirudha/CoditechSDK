@@ -408,13 +408,14 @@ namespace Coditech.Admin.Agents
             }
         }
         #endregion
-        public virtual DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId)
+        public virtual DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
-            DBTMTestWisePerformanceStandardListResponse response = _dBTMTestClient.GetDBTMTestWisePerformanceStandardList(dBTMTestMasterId);
+            DBTMTestWisePerformanceStandardListResponse response = _dBTMTestClient.GetDBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
             DBTMTestWisePerformanceStandardListModel listModel = new DBTMTestWisePerformanceStandardListModel { DBTMTestWisePerformanceStandardList = response?.DBTMTestWisePerformanceStandardList };
             DBTMTestWisePerformanceStandardListViewModel listViewModel = new DBTMTestWisePerformanceStandardListViewModel();
             listViewModel.DBTMTestWisePerformanceStandardList = listModel?.DBTMTestWisePerformanceStandardList ?.ToViewModel<DBTMTestWisePerformanceStandardViewModel>().ToList();
             listViewModel.DBTMTestMasterId = dBTMTestMasterId;
+            listViewModel.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
             listViewModel.TestName = response.TestName;
             return listViewModel;
         }
