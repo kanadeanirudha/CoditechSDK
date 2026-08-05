@@ -2,6 +2,20 @@
     Initialize: function () {
         DBTMPrintQR.BindDropdownEvents();
     },
+    InitializePrintQRTable: function () {
+        if ($.fn.DataTable.isDataTable("#datatable-printqr")) {
+            $("#datatable-printqr").DataTable().destroy();
+        }
+        $("#datatable-printqr").DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+        });
+    },
     constructor: function () {
         DBTMPrintQR.BindDropdownEvents();
     },
@@ -23,6 +37,7 @@
             },
             success: function (result) {
                 $("#PrintQRUserListDiv").html(result);
+                DBTMPrintQR.InitializePrintQRTable();
                 CoditechCommon.HideLodder();
             },
             error: function (xhr) {
@@ -79,6 +94,7 @@
 };
 $(document).ready(function () {
     DBTMPrintQR.Initialize();
+    DBTMPrintQR.InitializePrintQRTable();
     $(document).on("change", "#chkSelectAll", function () {
         $(".person-checkbox").prop("checked", $(this).is(":checked"));
     });
