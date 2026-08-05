@@ -126,12 +126,8 @@
             CoditechNotification.DisplayNotificationMessage("Please select Centre.", "error");
             return;
         }
-        CoditechCommon.ShowLodder();
         var downloadUrl = "/DBTMOrganisationCentrewiseJoiningCode/DownloadTraineeJoiningCode"
             + "?centreCode=" + encodeURIComponent(centreCode);
-        $("#hiddenDownloader").attr("src", downloadUrl);
-        setTimeout(function () {
-            CoditechCommon.HideLodder();
-        }, 1500);
+        CoditechCommon.DownloadFile(downloadUrl);
     },
 };

@@ -382,5 +382,18 @@
             return true;
         }
         return false;
-    }
+    },
+
+    DownloadFile : function (downloadUrl) {
+        document.cookie = "FileDownload=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        CoditechCommon.ShowLodder();
+        $("#hiddenDownloader").attr("src", downloadUrl);
+        var checkDownload = setInterval(function () {
+            if (document.cookie.indexOf("FileDownload=Completed") !== -1) {
+                clearInterval(checkDownload);
+                CoditechCommon.HideLodder();
+                document.cookie = "FileDownload=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+        }, 300);
+    },
 }
