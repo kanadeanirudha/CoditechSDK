@@ -1,8 +1,36 @@
 ﻿var DBTMCentreWiseTest = {
     Initialize: function () {
-        DBTMCentreWiseTest.constructor();     
+        DBTMCentreWiseTest.constructor();  
+        DBTMCentreWiseTest.InitializeDataTable();
     },
     constructor: function () {
+    },
+    InitializeDataTable: function () {
+        if ($.fn.DataTable.isDataTable('#datatable')) {
+            $('#datatable').DataTable().destroy();
+        }
+        $('#datatable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            lengthChange: true,
+            pageLength: 10,
+            responsive: true,
+            autoWidth: false,
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 2,
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
     },
     GetAssociateUnAssociateCentreTest: function ( modelPopContentId, dBTMCentreWiseTestId, dBTMTestMasterId, organisationCentreMasterId, centreCode, testName) {
         let viewModel = {
@@ -105,6 +133,7 @@
 var selectedActivities = [];
 var currentActionType = "";
 $(document).ready(function () {
+    DBTMCentreWiseTest.Initialize();
     $(document).on("change", "#chkSelectAll", function () {
         var isChecked = $(this).is(":checked");
         $(".activity-checkbox").prop("checked", isChecked);

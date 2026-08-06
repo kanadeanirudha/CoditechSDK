@@ -11,9 +11,22 @@
             searching: true,
             ordering: true,
             info: true,
-            responsive: true,
+            lengthChange: true,
             pageLength: 10,
-            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+            responsive: true,
+            autoWidth: false,
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 2,
+                    orderable: false,
+                    searchable: false
+                }
+            ]
         });
     },
     constructor: function () {
@@ -62,7 +75,7 @@
             });
         }
         if (personIds.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Please select at least one trainee.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select at least one Batch.", "error");
             return;
         }
         CoditechCommon.ShowLodder();
