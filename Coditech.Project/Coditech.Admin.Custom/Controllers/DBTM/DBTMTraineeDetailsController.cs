@@ -700,6 +700,7 @@ namespace Coditech.Admin.Controllers
             }
             var bytes = System.IO.File.ReadAllBytes(result.FilePath);
             var fileName = result.FileName;
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -721,6 +722,7 @@ namespace Coditech.Admin.Controllers
                     System.IO.File.Delete(report.FilePath);
                 }
             }
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/pdf", report.FileName);
         }
         #endregion

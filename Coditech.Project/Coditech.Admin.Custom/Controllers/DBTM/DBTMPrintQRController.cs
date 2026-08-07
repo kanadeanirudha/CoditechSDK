@@ -66,7 +66,7 @@ namespace Coditech.Admin.Controllers
             DBTMPrintQRListViewModel model = _dBTMPrintQRAgent.DownloadPrintQR(personIds);
             byte[] bytes = System.IO.File.ReadAllBytes(model.FilePath);
             System.IO.File.Delete(model.FilePath);
-            Response.Cookies.Append("PrintQRDownload", "Completed", new CookieOptions { Path = "/" });
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/pdf", model.FileName);
         }
 

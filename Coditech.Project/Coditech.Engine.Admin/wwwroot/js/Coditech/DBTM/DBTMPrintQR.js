@@ -2,6 +2,33 @@
     Initialize: function () {
         DBTMPrintQR.BindDropdownEvents();
     },
+    InitializePrintQRTable: function () {
+        if ($.fn.DataTable.isDataTable("#datatable-printqr")) {
+            $("#datatable-printqr").DataTable().destroy();
+        }
+        $("#datatable-printqr").DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            lengthChange: true,
+            pageLength: 10,
+            responsive: true,
+            autoWidth: false,
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 2,
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+    },
     constructor: function () {
         DBTMPrintQR.BindDropdownEvents();
     },
@@ -23,6 +50,7 @@
             },
             success: function (result) {
                 $("#PrintQRUserListDiv").html(result);
+                DBTMPrintQR.InitializePrintQRTable();
                 CoditechCommon.HideLodder();
             },
             error: function (xhr) {
@@ -47,7 +75,7 @@
             });
         }
         if (personIds.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Please select at least one trainee.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select at least one Batch.", "error");
             return;
         }
         CoditechCommon.ShowLodder();
@@ -57,18 +85,10 @@
             data: { personIds: personIds.join(',') },
             success: function (response) {
                 if (response.success) {
-                    document.cookie = "PrintQRDownload=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                     var downloadUrl =
                         "/DBTMPrintQR/DownloadPrintQR?personIds="
                         + encodeURIComponent(personIds.join(','));
-                    $("#hiddenDownloader").attr("src", downloadUrl);
-                    var checkDownload = setInterval(function () {
-                        if (document.cookie.indexOf("PrintQRDownload=Completed") !== -1) {
-                            clearInterval(checkDownload);
-                            CoditechCommon.HideLodder();
-                            document.cookie = "PrintQRDownload=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                        }
-                    }, 300);
+                    CoditechCommon.DownloadFile(downloadUrl);
                 }
                 else {
                     CoditechNotification.DisplayNotificationMessage(response.message, "error");
@@ -87,6 +107,7 @@
 };
 $(document).ready(function () {
     DBTMPrintQR.Initialize();
+    DBTMPrintQR.InitializePrintQRTable();
     $(document).on("change", "#chkSelectAll", function () {
         $(".person-checkbox").prop("checked", $(this).is(":checked"));
     });

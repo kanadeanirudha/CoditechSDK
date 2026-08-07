@@ -139,10 +139,7 @@
                         "/DBTMTraineeDetails/DownloadAthleteReportPdf"
                         + "?dBTMTraineeDetailId=" + encodeURIComponent(traineeId)
                         + "&remarks=" + encodeURIComponent(remarks);
-
-                    CoditechCommon.HideLodder();
-
-                    $("#hiddenDownloader").attr("src", downloadUrl);
+                    CoditechCommon.DownloadFile(downloadUrl);
                 }
                 else {
                     CoditechNotification.DisplayNotificationMessage(response.message, "error");
@@ -372,9 +369,7 @@
                         + "&trainerId=" + encodeURIComponent(trainerId)
                         + "&userType=" + encodeURIComponent(userType || "")
                         + "&count=" + encodeURIComponent(count);
-                    CoditechCommon.HideLodder();
-                    $("#hiddenDownloader").attr("src", downloadUrl);
-
+                    CoditechCommon.DownloadFile(downloadUrl);
                 } else {
                     showFieldError("TraineeCount", response.message);
                     CoditechCommon.HideLodder();
