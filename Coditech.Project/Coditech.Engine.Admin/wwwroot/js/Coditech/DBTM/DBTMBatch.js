@@ -1,6 +1,8 @@
-﻿var DBTMBatch = {
+﻿var isDirty = false;
+var pendingNavigationUrl = "";
+var DBTMBatch = {
     Initialize: function () {
-        DBTMBatch.constructor();
+        DBTMBatch.constructor();   
     },
     constructor: function () {
     },
@@ -94,4 +96,26 @@ $(document).ready(function () {
     if ($("#GeneralBatchMasterId").val() == 0) {
         DBTMBatch.OnCentreChange();
     }
+    $("form")
+        .find(":input")
+        .not(":button,:submit,:hidden")
+        .on("change keyup", function () {
+            isDirty = true;
+            $("#IsDirty").val("true");
+            console.log("Dirty :", isDirty);
+        });
+});
+$(document).on("click", ".dirty-link", function (e) {
+    if (!isDirty) {
+        return;
+    }
+    e.preventDefault();
+    var url = $(this).attr("href");
+    pendingNavigationUrl = url;
+    $("#PendingNavigationUrl").val(url);
+    CoditechCommon.ShowDirtyPopup(function () {
+        isDirty = false;
+        $("#IsDirty").val("false");
+        $("form").submit();
+    });
 });
