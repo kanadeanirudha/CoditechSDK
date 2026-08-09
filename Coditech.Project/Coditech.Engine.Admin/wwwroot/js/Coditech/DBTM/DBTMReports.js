@@ -439,7 +439,6 @@ var DBTMReports = {
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         var reportType = $("#ReportType").val() || "excel";
-
         if (dBTMTestMasterId !== "" && dBTMTraineeDetailId && dBTMTraineeDetailId.trim() !== "") {
             CoditechCommon.ShowLodder();
             $.ajax({
@@ -459,8 +458,7 @@ var DBTMReports = {
                             + "&fromDate=" + encodeURIComponent(fromdate)
                             + "&toDate=" + encodeURIComponent(todate)
                             + "&reportType=" + encodeURIComponent(reportType);
-                        CoditechCommon.HideLodder();
-                        $("#hiddenDownloader").attr("src", downloadUrl);
+                        CoditechCommon.DownloadFile(downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
                         CoditechCommon.HideLodder();
@@ -486,7 +484,6 @@ var DBTMReports = {
         var fromdate = $("#FromDate").val();
         var todate = $("#ToDate").val();
         var reportType = $("#ReportType").val() || "excel";
-
         if (dBTMTestMasterId !== "" && generalBatchMasterId && generalBatchMasterId.trim() !== "") {
             CoditechCommon.ShowLodder();
             $.ajax({
@@ -500,14 +497,13 @@ var DBTMReports = {
                 },
                 success: function (response) {
                     if (response.success) {
-                        var downloadUrl = "/DBTMReports/DownloadBatchReport"
-                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
-                            + "&generalBatchMasterId=" + encodeURIComponent(generalBatchMasterId)
-                            + "&fromDate=" + encodeURIComponent(fromdate)
-                            + "&toDate=" + encodeURIComponent(todate)
-                            + "&reportType=" + encodeURIComponent(reportType);
-                        CoditechCommon.HideLodder();
-                        $("#hiddenDownloader").attr("src", downloadUrl);
+            var downloadUrl = "/DBTMReports/DownloadBatchReport"
+                + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                + "&generalBatchMasterId=" + encodeURIComponent(generalBatchMasterId)
+                + "&fromDate=" + encodeURIComponent(fromdate)
+                + "&toDate=" + encodeURIComponent(todate)
+                + "&reportType=" + encodeURIComponent(reportType);
+            CoditechCommon.DownloadFile(downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
                         CoditechCommon.HideLodder();
@@ -747,15 +743,13 @@ var DBTMReports = {
                 },
                 success: function (response) {
                     if (response.success) {
-                        var downloadUrl = "/DBTMReports/DownloadCampReport"
-                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
-                            + "&dBTMCampMasterId=" + encodeURIComponent(campId)
-                            + "&fromDate=" + encodeURIComponent(fromdate)
-                            + "&toDate=" + encodeURIComponent(todate)
-                            + "&reportType=" + encodeURIComponent(reportType);
-                        CoditechCommon.HideLodder();
-                        $("#hiddenDownloader").attr("src", downloadUrl);
-
+            var downloadUrl = "/DBTMReports/DownloadCampReport"
+                + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                + "&dBTMCampMasterId=" + encodeURIComponent(campId)
+                + "&fromDate=" + encodeURIComponent(fromdate)
+                + "&toDate=" + encodeURIComponent(todate)
+                + "&reportType=" + encodeURIComponent(reportType);
+            CoditechCommon.DownloadFile(downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available.", "error");
                         CoditechCommon.HideLodder();
@@ -766,7 +760,7 @@ var DBTMReports = {
                     CoditechCommon.HideLodder();
                 }
             });
-        } else {
+                    } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },

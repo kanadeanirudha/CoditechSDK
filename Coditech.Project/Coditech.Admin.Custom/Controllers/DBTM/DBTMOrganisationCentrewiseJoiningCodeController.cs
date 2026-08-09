@@ -2,6 +2,7 @@
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 namespace Coditech.Admin.Controllers
 {
@@ -27,6 +28,7 @@ namespace Coditech.Admin.Controllers
             var bytes = System.IO.File.ReadAllBytes(result.FilePath);
             var fileName = result.FileName;
             _dBTMOrganisationCentrewiseJoiningCodeAgent.DeleteJoiningCodeFile(fileName);
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 

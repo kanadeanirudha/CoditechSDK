@@ -133,16 +133,21 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel, string ispopup = "", string istrainer = "")
+        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel, string pendingNavigationUrl, string ispopup = "", string istrainer = "")
         {
             if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0)
             {
                 if (ModelState.IsValid)
                 {
                     BindDuration(generalBatchViewModel);
+                    bool hasError = _generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError;
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    if (!hasError && !string.IsNullOrEmpty(pendingNavigationUrl))
+                    {
+                        return Redirect(pendingNavigationUrl);
+                    }
                     if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
                         return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, custom4 = generalBatchViewModel.Custom4, ispopup = ispopup, istrainer = istrainer });

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Coditech.Admin.Utilities;
 using Coditech.Admin.Helpers;
+using Microsoft.AspNetCore.Http;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMReportsController : BaseController
@@ -72,6 +73,7 @@ namespace Coditech.Admin.Controllers
             var fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             var fileName = reportData.FileName;
             _dBTMReportsAgent.DeleteReportsFile(fileName);
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -137,6 +139,7 @@ namespace Coditech.Admin.Controllers
             byte[] fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             string fileName = reportData.FileName;
             _dBTMReportsAgent.DeleteReportsFile(fileName);
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -264,6 +267,7 @@ namespace Coditech.Admin.Controllers
             byte[] fileBytes = System.IO.File.ReadAllBytes(reportData.FilePath);
             string fileName = reportData.FileName;
             _dBTMReportsAgent.DeleteReportsFile(fileName);
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
