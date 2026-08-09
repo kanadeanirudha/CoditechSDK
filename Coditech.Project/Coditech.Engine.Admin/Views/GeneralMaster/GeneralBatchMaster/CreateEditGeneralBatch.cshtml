@@ -29,6 +29,11 @@
                 FormId = AdminConstants.FormId + controllerName,
             };
     ModelPopUpViewModel transferBatchPopup = new ModelPopUpViewModel() { ModelPopUpId = "TransferBatchPopupId", ModalContentId = "TransferBatchContentId" };
+    ModelPopUpViewModel dirtyPopup = new ModelPopUpViewModel()
+    {
+        ModelPopUpId = "DirtyPopup",
+        ModalContentId = "DirtyPopupContent"
+    };
 }
 <!-- Page Content-->
 <div class="@(isPopup ? "" : "page-content")">
@@ -48,12 +53,14 @@
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
+                            @Html.Hidden("IsDirty", "false")
                             @Html.HiddenFor(m => m.GeneralBatchMasterId)
                             @Html.HiddenFor(x => x.WeekDays)
                             @Html.HiddenFor(x => x.Custom4)
                             @Html.HiddenFor(x => x.Custom5)
                             <input type="hidden" name="ispopup" value="@Convert.ToString(ViewBag.IsPopup)" />
                             <input type="hidden" name="istrainer" value="@Convert.ToString(ViewBag.IsTrainer)" />
+                            <input type="hidden" id="PendingNavigationUrl" name="PendingNavigationUrl" />
                             @if (Model.GeneralBatchMasterId > 0)
                             {
                                 @Html.HiddenFor(x => x.CentreCode)
@@ -177,6 +184,7 @@
     }
 </style>
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", transferBatchPopup)
+@Html.Partial("~/Views/Shared/_DirtyPopUp.cshtml", dirtyPopup)
 @section scripts {
     <script src="~/js/coditech/Common/CoditechCommon.js"></script>
     <script src="~/js/coditech/DBTM/DBTMBatch.js"></script>

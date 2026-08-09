@@ -396,4 +396,19 @@
             }
         }, 300);
     },
+
+    ShowDirtyPopup: function (yesCallback) {
+        $("#DirtyPopup").modal("show");
+        $("#DirtyPopup-yes")
+            .off("click")
+            .on("click", function () {
+                $("#DirtyPopup").modal("hide");
+                if (yesCallback) {
+                    yesCallback();
+                }
+            });
+    },  
 }
+$(document).on("click", "#DirtyPopup-no", function () {
+    window.location.href = pendingNavigationUrl;
+});
