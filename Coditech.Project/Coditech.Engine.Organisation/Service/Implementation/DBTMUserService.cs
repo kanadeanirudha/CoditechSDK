@@ -274,6 +274,8 @@ namespace Coditech.API.Service
                 generalPersonModel.SelectedCentreCode = ApiCustomSettings.DBTMIndividualCentre;
             }
             generalPersonModel.UserType = UserTypeEnum.Trainee.ToString();
+            generalPersonModel.FirstName = generalPersonModel.FirstName?.ToLower().ToFirstLetterCapital();
+            generalPersonModel.LastName = generalPersonModel.LastName?.ToLower().ToFirstLetterCapital();
             if (string.IsNullOrWhiteSpace(generalPersonModel.Custom2))
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName.ToFirstLetterCapital()} {generalPersonModel.LastName.ToFirstLetterCapital()}";
