@@ -2,6 +2,7 @@
 {
     public class DBTMGeneralBatchUserModel
     {
+        public long DBTMTraineeAssignmentId { get; set; }
         public long EntityId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

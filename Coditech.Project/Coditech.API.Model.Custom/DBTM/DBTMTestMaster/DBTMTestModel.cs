@@ -31,5 +31,8 @@ namespace Coditech.Common.API.Model
         public string PerformanceMatrix { get; set; }
         public string TestOutputHigher { get; set; }
         public string TestResultBasedon { get; set; }
+        public long ActivityProtocolImage { get; set; }
+        public string ActivityProtocolImagePath { get; set; }
+        public string ActivityProtocolImageFileName { get; set; }
     }
 }
