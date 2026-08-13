@@ -8,8 +8,6 @@ namespace Coditech.API.Service
         bool InsertDeviceDataV2(string rawJson);
         List<DBTMBatchModel> GetBatchList(long entityId, string userType, bool isCheckTestPerformed);
         DBTMBatchModel GetBatchDetails(int generalBatchMasterId);
-        List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType);
-        DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId);
         DBTMMobileDashboardModel GetTrainerDashboard(long userMasterId);
         DBTMMobileTraineeDashboardModel GetTraineeDashboard(long userMasterId);
         OrganisationCentrewiseJoiningCodeModel GetJoiningCode(string generalTrainerMasterId);
@@ -25,5 +23,7 @@ namespace Coditech.API.Service
         DBTMBatchListModel GetDBTMTrainerwiseBatchList(string centreCode, long generalTrainerMasterId);
         DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId);
         bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel model);
+        DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long trainerId, DateTime assignmentDate);
+        List<DBTMGeneralBatchUserModel> GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate);
     }
 }
