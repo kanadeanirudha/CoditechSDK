@@ -44,13 +44,11 @@
         public const string Weight = "Weight";
         public const string Height = "Height";
         public const string Date = "Date";
-        public const string GraphDateFormat = "yyyy-MM-dd";
         public const string Turns = "Turns";
         public const string NumberOfTurns = "NumberOfTurns";
         public const string Position = "Position";
         public const int GraphListRoundUpValue = 3;
         public const string School = "School";
-        public const string ProgressChart = "ProgressChart";
         public const string Dropdown = "Dropdown";
         public const string Trainee = "Trainee";
         public const string InvalidData = "Invalid Data";
@@ -94,13 +92,15 @@
         #endregion
 
         #region Graph
+        public const string GraphDateFormat = "yyyy-MM-dd";
+        public const string ProgressChart = "ProgressChart";
         public const string AverageCumulativeVelocity = "AverageCumulativeVelocity";
         public const string StaticValue = "StaticValue";
         public const string InstantaneousChart = "InstantaneousChart";
-        public const string AverageTotalTimeVsDistanceDatewise = "AverageTotalTimeVsDistanceDatewise";
-        public const string AverageCumulativeTimeVsDistance = "AverageCumulativeTimeVsDistance";
-        public const string AverageVelocityVsDistanceDatewise = "AverageVelocityVsDistanceDatewise";
-        public const string AverageCumulativeVelocityVsDistance = "AverageCumulativeVelocityVsDistance";
+        public const string BestTotalTimeVsDistanceDatewise = "BestTotalTimeVsDistanceDatewise";
+        public const string BestCumulativeTimeVsDistanceDatewise = "BestCumulativeTimeVsDistanceDatewise";
+        public const string BestVelocityVsDistanceDatewise = "BestVelocityVsDistanceDatewise";
+        public const string BestCumulativeVelocityVsDistance = "BestCumulativeVelocityVsDistance";
         #endregion
     }
 }
