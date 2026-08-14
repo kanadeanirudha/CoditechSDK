@@ -94,7 +94,7 @@ namespace Coditech.API.Service
                     var traineeCache = new Dictionary<string, DBTMTraineeDetails>(StringComparer.OrdinalIgnoreCase);
 
                     var DataUniqueIds = new List<DBTMDeviceDataInsertionUniqueCheck>();
-                    List<long> traineeAssignmentIds = new List<long>();
+                    List<long> traineeAssignmentUserIds = new List<long>();
                     foreach (var dBTMDeviceDataModel in dBTMDeviceDataModelList)
                     {
                         if (string.Equals(dBTMDeviceDataModel.PersonCode, "DryRun", StringComparison.OrdinalIgnoreCase))
@@ -183,16 +183,16 @@ namespace Coditech.API.Service
                             });
                             if (dBTMDeviceDataModel.TypeOfRecord == "Assignment")
                             {
-                                traineeAssignmentIds.Add(dBTMDeviceDataModel.TablePrimaryColumnId);
+                                traineeAssignmentUserIds.Add(dBTMDeviceDataModel.TablePrimaryColumnId);
                             }
                         }
                     }
                     if (DataUniqueIds.Any())
                         _dBTMDeviceDataInsertionUniqueCheckRepository.Insert(DataUniqueIds);
-                    if (traineeAssignmentIds.Any())
+                    if (traineeAssignmentUserIds.Any())
                     {
                         List<DBTMTraineeAssignmentToUser> dBTMTraineeAssignmentToUserList = _dBTMTraineeAssignmentToUserRepository.Table
-                            .Where(x => traineeAssignmentIds.Contains(x.DBTMTraineeAssignmentId))
+                            .Where(x => traineeAssignmentUserIds.Contains(x.DBTMTraineeAssignmentUserId))
                             .ToList();
                         foreach (var item in dBTMTraineeAssignmentToUserList)
                         {
