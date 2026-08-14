@@ -56,5 +56,9 @@ namespace Coditech.Admin.ViewModel
         [Display(Name = "Activity Result Basedon")]
         [Required]
         public string TestResultBasedon { get; set; }
+        [Display(Name = "Activity Protocol Image")]
+        public long ActivityProtocolImage { get; set; }
+        public string ActivityProtocolImagePath { get; set; }
+        public string ActivityProtocolImageFileName { get; set; }
     }
 }

@@ -190,6 +190,10 @@ namespace Coditech.Common.Helper.Utilities
                         time = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue);
                         result = time != 0 && count != 0 ? $"{Math.Round(count / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
                         break;
+                    case CustomConstants.AirTime:
+                        decimal totalAirTime = group.Where(x => x.ParameterCode == CustomConstants.AirTime).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                        result = totalAirTime > 0 ? $"{Math.Round(totalAirTime / recurtion, CustomConstants.GraphListRoundUpValue)}" : "0";
+                        break;
                 }
                 return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
             }

@@ -363,8 +363,8 @@ namespace Coditech.API.Service
             GeneralPersonModel generalPersonModel = new GeneralPersonModel()
             {
                 PersonTitle = dBTMNewRegistrationModel.PersonTitle,
-                FirstName = dBTMNewRegistrationModel.FirstName,
-                LastName = dBTMNewRegistrationModel.LastName,
+                FirstName = dBTMNewRegistrationModel.FirstName?.ToLower().ToFirstLetterCapital(),
+                LastName = dBTMNewRegistrationModel.LastName?.ToLower().ToFirstLetterCapital(),
                 GenderEnumId = dBTMNewRegistrationModel.GenderEnumId,
                 EmailId = dBTMNewRegistrationModel.EmailId,
                 PhoneNumber = dBTMNewRegistrationModel.MobileNumber,

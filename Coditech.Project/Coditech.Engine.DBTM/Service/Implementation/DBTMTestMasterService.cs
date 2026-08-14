@@ -206,6 +206,15 @@ namespace Coditech.API.Service
                     dBTMTestModel.TestMediaFileName = mediaDetail.FileName;
                 }
             }
+            if (dBTMTestModel.ActivityProtocolImage > 0)
+            {
+                var mediaDetail = _mediaDetailRepository.Table.Where(x => x.MediaId == dBTMTestModel.ActivityProtocolImage).FirstOrDefault();
+                if (mediaDetail != null)
+                {
+                    dBTMTestModel.ActivityProtocolImagePath = $"{GetMediaUrl()}{mediaDetail.Path}";
+                    dBTMTestModel.ActivityProtocolImageFileName = mediaDetail.FileName;
+                }
+            }
             return dBTMTestModel;
         }
 

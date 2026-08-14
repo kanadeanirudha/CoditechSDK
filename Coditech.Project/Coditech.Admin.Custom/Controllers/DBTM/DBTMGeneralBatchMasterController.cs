@@ -121,6 +121,24 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/AssociatedBatchList.cshtml", list);
         }
 
+        [HttpPost]
+        public virtual ActionResult AssociateUnAssociateBatchwiseUser(GeneralBatchUserViewModel generalBatchUserViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                GeneralBatchUserViewModel response = _generalBatchAgent.AssociateUnAssociateBatchwiseUser(generalBatchUserViewModel);
+                if (!response.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    return Json(new { success = true });
+                }
+                SetNotificationMessage(GetErrorNotificationMessage(response.ErrorMessage));
+                return Json(new { success = false });
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
+            return Json(new { success = false });
+        }
+
         [HttpGet]
         public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string custom4, string ispopup = "", string istrainer = "")
         {

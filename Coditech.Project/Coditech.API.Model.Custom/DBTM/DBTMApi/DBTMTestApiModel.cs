@@ -2,9 +2,6 @@
 {
     public class DBTMTestApiModel
     {
-        public long DBTMTraineeAssignmentId { get; set; }
-        public DateTime AssignmentDate { get; set; }
-        public TimeSpan? AssignmentTime { get; set; }
         public int DBTMTestMasterId { get; set; }
         public string TestName { get; set; }
         public string TestCode { get; set; }
@@ -16,7 +13,6 @@
         public string TestInstructions { get; set; }
         public int ActivityCode { get; set; }
         public bool IsStartDirection { get; set; }
-        public List<DBTMTraineeAssignmentToUserApiModel> DBTMTraineeAssignmentToUserApiModel { get; set; }
     }
 }
 
