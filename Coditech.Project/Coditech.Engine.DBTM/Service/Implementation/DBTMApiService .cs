@@ -94,6 +94,7 @@ namespace Coditech.API.Service
                     var traineeCache = new Dictionary<string, DBTMTraineeDetails>(StringComparer.OrdinalIgnoreCase);
 
                     var DataUniqueIds = new List<DBTMDeviceDataInsertionUniqueCheck>();
+                    List<long> traineeAssignmentUserIds = new List<long>();
                     foreach (var dBTMDeviceDataModel in dBTMDeviceDataModelList)
                     {
                         if (string.Equals(dBTMDeviceDataModel.PersonCode, "DryRun", StringComparison.OrdinalIgnoreCase))
@@ -180,10 +181,25 @@ namespace Coditech.API.Service
                                 DataUniqueId = dBTMDeviceDataModel.DataUniqueId,
                                 ExpiryDate = DateTime.Now.AddHours(ApiCustomSettings.DBTMDeviceDataInsertionUniqueCheckExipiryTimeInHour)
                             });
+                            if (dBTMDeviceDataModel.TypeOfRecord == "Assignment")
+                            {
+                                traineeAssignmentUserIds.Add(dBTMDeviceDataModel.TablePrimaryColumnId);
+                            }
                         }
                     }
                     if (DataUniqueIds.Any())
                         _dBTMDeviceDataInsertionUniqueCheckRepository.Insert(DataUniqueIds);
+                    if (traineeAssignmentUserIds.Any())
+                    {
+                        List<DBTMTraineeAssignmentToUser> dBTMTraineeAssignmentToUserList = _dBTMTraineeAssignmentToUserRepository.Table
+                            .Where(x => traineeAssignmentUserIds.Contains(x.DBTMTraineeAssignmentUserId))
+                            .ToList();
+                        foreach (var item in dBTMTraineeAssignmentToUserList)
+                        {
+                            item.DBTMTestStatusEnumId = 95;
+                        }
+                        _dBTMTraineeAssignmentToUserRepository.BatchUpdate(dBTMTraineeAssignmentToUserList);
+                    }
                     scope.Complete();
                     return true;
                 }
@@ -324,48 +340,6 @@ namespace Coditech.API.Service
             List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserListForAPI_V2 @GeneralBatchMasterId,@DBTMTestMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
             generalBatchUserList = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
             return generalBatchUserList;
-        }
-        #endregion
-        #region Assignment
-        public List<DBTMTestApiModel> GetAssignmentList(long entityId, string userType)
-        {
-            long entityIds = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == userType).FirstOrDefault().UserMasterId;
-            //GetGeneralAssignmentList
-            List<DBTMTestApiModel> assignmentList = new List<DBTMTestApiModel>();
-            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
-            CoditechViewRepository<DBTMTestApiModel> objStoredProc = new CoditechViewRepository<DBTMTestApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@EntityId", entityIds, ParameterDirection.Input, DbType.Int64);
-            objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTestApiModel> generalAssignmentList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralAssignmentList @EntityId,@UserType,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
-            return generalAssignmentList;
-        }
-
-        public DBTMTestApiModel GetAssignmentDetails(long dBTMTraineeAssignmentId)
-        {
-            DBTMTestApiModel dBTMTestApiModel = new DBTMTestApiModel();
-            int dbtmTestMasterId = _dBTMTraineeAssignmentRepository.Table.Where(x => x.DBTMTraineeAssignmentId == dBTMTraineeAssignmentId).Select(x => x.DBTMTestMasterId).FirstOrDefault();
-            if (dbtmTestMasterId > 0)
-            {
-                DBTMTestMaster testDetails = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dbtmTestMasterId).FirstOrDefault();
-                dbtmTestMasterId = testDetails.DBTMTestMasterId;
-                dBTMTestApiModel.TestName = testDetails.TestName;
-                dBTMTestApiModel.TestCode = testDetails.TestCode;
-                dBTMTestApiModel.MinimunPairedDevice = testDetails.MinimunPairedDevice;
-                dBTMTestApiModel.LapDistance = testDetails.LapDistance;
-                dBTMTestApiModel.IsLapDistanceChange = testDetails.IsLapDistanceChange;
-                dBTMTestApiModel.IsMultiTest = testDetails.IsMultiTest;
-                dBTMTestApiModel.IsActive = testDetails.IsActive;
-
-                PageListModel pageListModel = new PageListModel(null, null, 0, 0);
-                CoditechViewRepository<DBTMTraineeAssignmentToUserApiModel> objStoredProc = new CoditechViewRepository<DBTMTraineeAssignmentToUserApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-                objStoredProc.SetParameter("@DBTMTraineeAssignmentId", dBTMTraineeAssignmentId, ParameterDirection.Input, DbType.Int64);
-                objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-                List<DBTMTraineeAssignmentToUserApiModel> generalTraineeAssignmentToUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralAssignmentToUserList @DBTMTraineeAssignmentId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
-
-                dBTMTestApiModel.DBTMTraineeAssignmentToUserApiModel = generalTraineeAssignmentToUserList ?? new List<DBTMTraineeAssignmentToUserApiModel>();
-            }
-            return dBTMTestApiModel;
         }
         #endregion
         #region TrainerDashboard
@@ -780,7 +754,60 @@ namespace Coditech.API.Service
             }
             return true;
         }
+        #region Assignment
+        public DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long trainerId, DateTime assignmentDate)
+        {
+            var testList = (
+                from assignment in _dBTMTraineeAssignmentRepository.Table
+                join test in _dBTMTestMasterRepository.Table
+                    on assignment.DBTMTestMasterId equals test.DBTMTestMasterId
+                where assignment.GeneralTrainerMasterId == trainerId
+                      && assignment.AssignmentDate.Date == assignmentDate.Date
+                      && test.IsActive
+                select new DBTMTestApiModel
+                {
+                    DBTMTestMasterId = test.DBTMTestMasterId,
+                    TestName = test.TestName,
+                    TestCode = test.TestCode,
+                    MinimunPairedDevice = test.MinimunPairedDevice,
+                    LapDistance = test.LapDistance,
+                    IsLapDistanceChange = test.IsLapDistanceChange,
+                    IsMultiTest = test.IsMultiTest,
+                    IsActive = test.IsActive,
+                    TestInstructions = test.TestInstructions,
+                    IsStartDirection = test.IsStartDirection,
+                    ActivityCode = test.DBTMTestMasterId
+                }
+            )?.ToList();
 
+            if (testList.Count > 0)
+            {
+                testList = testList
+                    .GroupBy(x => x.DBTMTestMasterId)
+                    .Select(g => g.First())
+                    .OrderBy(x => x.TestName)
+                    .ToList();
+            }
+
+            return new DBTMBatchModel
+            {
+                DBTMBatchTestList = testList ?? new List<DBTMTestApiModel>()
+            };
+        }
+        public List<DBTMGeneralBatchUserModel> GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate)
+        {
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMGeneralBatchUserModel> objStoredProc = new CoditechViewRepository<DBTMGeneralBatchUserModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@AssignmentDate", assignmentDate, ParameterDirection.Input, DbType.DateTime);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMGeneralBatchUserModel> assignmentUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetUserDetailsForAssignmentWiseTesting @GeneralTrainerMasterId,@DBTMTestMasterId,@AssignmentDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            assignmentUserList = assignmentUserList ?? new List<DBTMGeneralBatchUserModel>();
+            return assignmentUserList;
+        }
+
+        #endregion
         protected virtual int CalculateAge(DateTime dateOfBirth)
         {
             DateTime today = DateTime.Today;
