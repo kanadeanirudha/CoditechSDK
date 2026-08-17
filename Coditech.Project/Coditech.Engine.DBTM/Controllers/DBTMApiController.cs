@@ -535,11 +535,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/GetTestListForAssignmentWiseTestingCreatedByTrainer")]
         [HttpGet]
         [Produces(typeof(DBTMBatchResponse))]
-        public IActionResult GetTestListForAssignmentWiseTestingCreatedByTrainer(long trainerId, DateTime assignmentDate)
+        public IActionResult GetTestListForAssignmentWiseTestingCreatedByTrainer(long generalTrainerMasterId, DateTime assignmentDate, string centreCode)
         {
             try
             {
-                DBTMBatchModel model = _dBTMApiService.GetTestListForAssignmentWiseTestingCreatedByTrainer(trainerId, assignmentDate);
+                DBTMBatchModel model = _dBTMApiService.GetTestListForAssignmentWiseTestingCreatedByTrainer(generalTrainerMasterId, assignmentDate, centreCode);
                 return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
