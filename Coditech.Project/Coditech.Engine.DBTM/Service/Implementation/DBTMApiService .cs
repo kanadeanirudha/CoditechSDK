@@ -755,43 +755,19 @@ namespace Coditech.API.Service
             return true;
         }
         #region Assignment
-        public DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long trainerId, DateTime assignmentDate)
+        public DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long generalTrainerMasterId, DateTime assignmentDate, string centreCode)
         {
-            var testList = (
-                from assignment in _dBTMTraineeAssignmentRepository.Table
-                join test in _dBTMTestMasterRepository.Table
-                    on assignment.DBTMTestMasterId equals test.DBTMTestMasterId
-                where assignment.GeneralTrainerMasterId == trainerId
-                      && assignment.AssignmentDate.Date == assignmentDate.Date
-                      && test.IsActive
-                select new DBTMTestApiModel
-                {
-                    DBTMTestMasterId = test.DBTMTestMasterId,
-                    TestName = test.TestName,
-                    TestCode = test.TestCode,
-                    MinimunPairedDevice = test.MinimunPairedDevice,
-                    LapDistance = test.LapDistance,
-                    IsLapDistanceChange = test.IsLapDistanceChange,
-                    IsMultiTest = test.IsMultiTest,
-                    IsActive = test.IsActive,
-                    TestInstructions = test.TestInstructions,
-                    IsStartDirection = test.IsStartDirection,
-                    ActivityCode = test.DBTMTestMasterId
-                }
-            )?.ToList();
-
-            if (testList.Count > 0)
-            {
-                testList = testList
-                    .GroupBy(x => x.DBTMTestMasterId)
-                    .Select(g => g.First())
-                    .OrderBy(x => x.TestName)
-                    .ToList();
-            }
-
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTestApiModel> objStoredProc = new CoditechViewRepository<DBTMTestApiModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@AssignmentDate", assignmentDate, ParameterDirection.Input, DbType.DateTime);
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTestApiModel> testList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTestListForAssignmentWiseTestingCreatedByTrainer @GeneralTrainerMasterId,@AssignmentDate,@CentreCode,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            testList = testList ?? new List<DBTMTestApiModel>();
             return new DBTMBatchModel
             {
-                DBTMBatchTestList = testList ?? new List<DBTMTestApiModel>()
+                DBTMBatchTestList = testList
             };
         }
         public List<DBTMGeneralBatchUserModel> GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate)

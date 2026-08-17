@@ -23,7 +23,7 @@ namespace Coditech.API.Service
         DBTMBatchListModel GetDBTMTrainerwiseBatchList(string centreCode, long generalTrainerMasterId);
         DBTMTraineeDetailsModel GetDBTMTraineeDetails(long dBTMTraineeDetailId);
         bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel model);
-        DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long trainerId, DateTime assignmentDate);
+        DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long generalTrainerMasterId, DateTime assignmentDate, string centreCode);
         List<DBTMGeneralBatchUserModel> GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate);
     }
 }
