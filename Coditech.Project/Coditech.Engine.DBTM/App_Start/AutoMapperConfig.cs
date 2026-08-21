@@ -45,6 +45,7 @@ namespace Coditech.API.Mapper
             CreateMap<DBTMTestWisePerformanceStandard, DBTMTestWisePerformanceStandardModel>().ReverseMap();
             CreateMap<OrganisationCentrewiseJoiningCode, OrganisationCentrewiseJoiningCodeModel>().ReverseMap();
             CreateMap<DBTMTestwisePerformanceStandardCategory, DBTMTestwisePerformanceStandardCategoryModel>().ReverseMap();
+            CreateMap<DBTMGraphVerticalViewSequenceModel, DBTMGraphVerticalViewSequence>().ReverseMap();
         }
     }
 }

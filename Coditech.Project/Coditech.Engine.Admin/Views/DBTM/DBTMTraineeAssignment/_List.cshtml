@@ -67,12 +67,14 @@
                                 <td class="text-center">
                                     @if (string.Equals(item.TestStatus, "Pending"))
                                     {
-                                       <a href="@Url.Action("GetDBTMTraineeAssignment", controllerName, new { 
-                                                dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId, 
+                                        <a href="@Url.Action("GetDBTMTraineeAssignment", controllerName, new {
+                                                dBTMTraineeAssignmentUserId = item.DBTMTraineeAssignmentUserId,
+                                                SelectedCentreCode = Model.SelectedCentreCode,
+                                                GeneralTrainerMasterId = Model.SelectedParameter1,
                                                 custom4 = (string.IsNullOrEmpty(isPopUpView) ? "" : Model.Custom4),
                                                 ispopup = string.IsNullOrEmpty(isPopUpView) ? "" : "true",
                                                 istrainer = isTrainer ? "true" : ""
-                                             })"
+                                            })"
                                            title="Update" 
                                            class="btn btn-sm btn-soft-success btn-circle me-2">
                                              <i class="fas fa-edit"> </i>

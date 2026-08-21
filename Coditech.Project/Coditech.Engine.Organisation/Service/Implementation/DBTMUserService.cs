@@ -42,6 +42,7 @@ namespace Coditech.API.Service
         protected readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
         private readonly ICoditechRepository<GeneralEnumaratorMaster> _generalEnumaratorMasterRepository;
         private readonly ICoditechRepository<GeneralEnumaratorGroup> _generalEnumaratorGroupRepository;
+        private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
 
         public DBTMUserService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, ICoditechEmail coditechEmail, ICoditechSMS coditechSMS, ICoditechWhatsApp coditechWhatsApp, IGeneralTemplateService generalTemplateService, IDBTMOrganisationCentrewiseJoiningCodeService joiningCodeService) : base(coditechLogging, serviceProvider, coditechEmail, coditechSMS, coditechWhatsApp)
         {
@@ -67,6 +68,7 @@ namespace Coditech.API.Service
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalEnumaratorGroupRepository = new CoditechRepository<GeneralEnumaratorGroup>(_serviceProvider.GetService<Coditech_Entities>());
+            _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public override ChangePasswordModel ChangePassword(ChangePasswordModel changePasswordModel)
@@ -524,10 +526,12 @@ namespace Coditech.API.Service
             int sr = 2;
             bool hasAnyError = false;
             var callingCodeSet = GetCallingCodeSet();
+            var duplicateEmails = dt.AsEnumerable().Select(r => GetValue(r, ExcelTemplateColumns.EmailAddress)?.Trim().ToLower()).Where(x => !string.IsNullOrWhiteSpace(x)).GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key).ToHashSet();
+            var duplicateMobiles = dt.AsEnumerable().Select(r => GetValue(r, ExcelTemplateColumns.MobileNumber)?.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key).ToHashSet();
             foreach (DataRow row in dt.Rows)
             {
                 row[ExcelTemplateColumns.SrNo] = sr++;
-                if (!ValidateRow(row, joiningCodeList, joiningTrainerMap, callingCodeSet, out string error))
+                if (!ValidateRow(row, joiningCodeList, joiningTrainerMap, callingCodeSet, duplicateEmails, duplicateMobiles, out string error))
                 {
                     row[ExcelTemplateColumns.ErrorMessage] = error;
                     hasAnyError = true;
@@ -596,7 +600,7 @@ namespace Coditech.API.Service
         }
 
         // Validation 
-        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, HashSet<string> callingCodeSet, out string errorMessage)
+        private bool ValidateRow(DataRow row, List<OrganisationCentrewiseJoiningCode> joiningCodeList, Dictionary<string, long> joiningTrainerMap, HashSet<string> callingCodeSet, HashSet<string> duplicateEmails, HashSet<string> duplicateMobiles, out string errorMessage)
         {
             string joiningCode = row.Table.Columns.Contains(ExcelTemplateColumns.JoiningCode) ? row[ExcelTemplateColumns.JoiningCode]?.ToString() : null;
             string title = GetValue(row, ExcelTemplateColumns.TraineeTitle);
@@ -699,6 +703,24 @@ namespace Coditech.API.Service
                     hasError = true;
                 }
             }
+            if (!string.IsNullOrWhiteSpace(mobile))
+            {
+                bool isMobileExists = CheckMobileAlreadyExists(mobile);
+                if (isMobileExists)
+                {
+                    row[ExcelTemplateColumns.MobileNumber] = "Mobile Number already exists";
+                    hasError = true;
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(mobile))
+            {
+                string normalizedMobile = mobile.Trim();
+                if (duplicateMobiles.Contains(normalizedMobile))
+                {
+                    row[ExcelTemplateColumns.MobileNumber] =  "Mobile Number is duplicate";
+                    hasError = true;
+                }
+            }
             if (string.IsNullOrWhiteSpace(height))
             {
                 row[ExcelTemplateColumns.HeightCm] = "Height is empty";
@@ -758,6 +780,24 @@ namespace Coditech.API.Service
                 catch
                 {
                     row[ExcelTemplateColumns.EmailAddress] = "Email Address format is invalid";
+                    hasError = true;
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                string normalizedEmail = email.Trim().ToLower();
+                if (duplicateEmails.Contains(normalizedEmail))
+                {
+                    row[ExcelTemplateColumns.EmailAddress] =  "Email Address is duplicate";
+                    hasError = true;
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                bool isEmailExists = CheckEmailAlreadyExists(email);
+                if (isEmailExists)
+                {
+                    row[ExcelTemplateColumns.EmailAddress] = "Email Address already exists";
                     hasError = true;
                 }
             }
@@ -1043,13 +1083,14 @@ namespace Coditech.API.Service
                     for (int row = 2; row <= joiningCodes.Count + 1; row++)
                     {
                         var dateCell = sheet.Cell(row, col);
-                        cell.Style.DateFormat.Format = "yyyy-MM-dd";
-                        var dv = cell.CreateDataValidation();
+                        dateCell.Style.DateFormat.Format = "yyyy-MM-dd";
+                        var dv = dateCell.CreateDataValidation();
                         dv.IgnoreBlanks = true;
                         dv.AllowedValues = XLAllowedValues.Date;
                         dv.Operator = XLOperator.Between;
                         dv.InputTitle = "Date Format";
                         dv.InputMessage = "yyyy-MM-dd";
+                        dv.ShowInputMessage = true;
                     }
                 }
                 if (header.HeaderCode == ExcelTemplateColumns.CallingCode)
@@ -1209,6 +1250,21 @@ namespace Coditech.API.Service
                 }
             ).ToList();
             return DBTMCustomHelper.GetAgeGroupEnumIdByDOB(dob, ageGroups.Select(x => (x.EnumId, x.EnumValue)).ToList());
+        }
+
+        private bool CheckEmailAlreadyExists(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+            email = email.Trim();
+            return _generalPersonRepository.Table.Any(x => x.EmailId != null && x.EmailId.ToLower() == email.ToLower());
+        }
+        private bool CheckMobileAlreadyExists(string mobile)
+        {
+            if (string.IsNullOrWhiteSpace(mobile))
+                return false;
+            mobile = mobile.Trim();
+            return _generalPersonRepository.Table.Any(x => x.MobileNumber != null && x.MobileNumber == mobile);
         }
         #endregion
 

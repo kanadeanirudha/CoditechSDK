@@ -239,6 +239,7 @@
                         val.includes("empty") ||
                         val.includes("invalid") ||
                         val.includes("exists") ||
+                        val.includes("duplicate") ||
                         val.includes("contains") ||
                         val.includes("expired")
                     );

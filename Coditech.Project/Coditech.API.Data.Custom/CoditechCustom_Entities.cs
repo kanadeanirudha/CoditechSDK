@@ -34,12 +34,13 @@ namespace Coditech.API.Data
         public DbSet<DBTMCampUser> DBTMCampUser { get; set; }
         public DbSet<DBTMCentrewiseTestParameterListView> DBTMCentrewiseTestParameterListView { get; set; }
         public DbSet<DBTMCentreWiseSetting> DBTMCentreWiseSetting { get; set; }
-        public DbSet<DBTMTestParameterVerticalViewSequence> DBTMTestParameterVerticalViewSequence { get; set; }
+        public DbSet<DBTMTestParameterVerticalViewSequence> DBTMTestParameterVerticalViewSequence { get; set; }  
         public DbSet<DBTMCentreWiseTest> DBTMCentreWiseTest { get; set; }
         public DbSet<DBTMCampActivity> DBTMCampActivity { get; set; }
         public DbSet<DBTMTestWisePerformanceStandard> DBTMTestWisePerformanceStandard { get; set; }
         public DbSet<DBTMDeviceDataInsertionUniqueCheck> DBTMDeviceDataInsertionUniqueCheck { get; set; }
         public virtual DbSet<DBTMTestwisePerformanceStandardCategory> DBTMTestwisePerformanceStandardCategory { get; set; }
+        public DbSet<DBTMGraphVerticalViewSequence> DBTMGraphVerticalViewSequence { get; set; }
         #endregion
     }
 }

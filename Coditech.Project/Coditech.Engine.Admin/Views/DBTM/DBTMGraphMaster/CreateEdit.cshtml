@@ -4,6 +4,9 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string css = Model.DBTMGraphMasterId > 0 ? "col-lg-10" : "col-lg-12";
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMGraphMasterId", Model.DBTMGraphMasterId.ToString());
+    keyValuePairs.Add("GraphCode", Model.GraphCode );
     DropdownViewModel graphTypeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.GraphType.ToString(), DropdownName = "GraphType", DropdownSelectedValue = Model.GraphType, IsCustomDropdown = true };
     DropdownViewModel graphModeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.GraphMode.ToString(), DropdownName = "GraphMode", DropdownSelectedValue = Model.GraphMode, IsCustomDropdown = true };
     PageHeaderViewModel headerModel = new PageHeaderViewModel
@@ -21,13 +24,20 @@
 <div class="page-content">
     <div class="container-fluid mt-5">
         <div class="row">
-            <div class="col-lg-12">
+            @if (Model.DBTMGraphMasterId > 0)
+            {
+                <div class="col-lg-2">
+                    @Html.Partial("~/Views/DBTM/DBTMGraphMaster/_DBTMGraphDetailsSidePannel.cshtml", keyValuePairs)
+                </div>
+            }
+            <div class="@css">
                 <div class="card">
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
                             @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
                             @Html.HiddenFor(m => m.DBTMGraphMasterId)
+                            @Html.HiddenFor(m => m.GraphCode)
                             <div class="row">
                                 <div class="col-lg-3">
                                     <div class="mb-4">

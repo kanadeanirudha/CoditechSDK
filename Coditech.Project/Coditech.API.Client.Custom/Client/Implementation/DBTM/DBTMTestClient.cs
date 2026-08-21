@@ -754,7 +754,6 @@ namespace Coditech.API.Client
         {
             return Task.Run(async () => await UpdateVerticalSequenceNumberAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
-
         public virtual async Task<DBTMActivityVerticalViewSequenceResponse> UpdateVerticalSequenceNumberAsync(DBTMActivityVerticalViewSequenceModel body, CancellationToken cancellationToken)
         {
             string endpoint = dBTMTestEndpoint.UpdateVerticalSequenceNumberAsync();
