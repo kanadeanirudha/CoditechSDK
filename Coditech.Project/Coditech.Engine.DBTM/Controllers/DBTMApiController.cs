@@ -553,5 +553,28 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("/DBTMApi/GetTraineeListForAssignmentWiseTesting")]
+        [Produces(typeof(DBTMTraineeDetailsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetTraineeListForAssignmentWiseTesting(long generalTrainerMasterId, string dBTMTestMasterId, string centreCode, DateTime assignmentDate)
+        {
+            try
+            {
+                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineeListForAssignmentWiseTesting(generalTrainerMasterId, dBTMTestMasterId, centreCode, assignmentDate);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

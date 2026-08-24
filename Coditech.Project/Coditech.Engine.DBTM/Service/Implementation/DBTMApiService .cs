@@ -782,6 +782,22 @@ namespace Coditech.API.Service
             assignmentUserList = assignmentUserList ?? new List<DBTMGeneralBatchUserModel>();
             return assignmentUserList;
         }
+        public DBTMTraineeDetailsListModel GetTraineeListForAssignmentWiseTesting(long generalTrainerMasterId, string dBTMTestMasterId, string centreCode, DateTime assignmentDate)
+        {
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@AssignmentDate", assignmentDate, ParameterDirection.Input, DbType.DateTime);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMTraineeDetailsModel> traineeList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListForAssignmentWiseTesting @GeneralTrainerMasterId,@DBTMTestMasterId,@CentreCode,@AssignmentDate,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            traineeList = traineeList ?? new List<DBTMTraineeDetailsModel>();
+            return new DBTMTraineeDetailsListModel
+            {
+                DBTMTraineeDetailsList = traineeList
+            };
+        }
 
         #endregion
         protected virtual int CalculateAge(DateTime dateOfBirth)
