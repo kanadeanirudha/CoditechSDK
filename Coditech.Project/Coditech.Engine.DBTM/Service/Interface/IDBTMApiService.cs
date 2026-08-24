@@ -25,5 +25,6 @@ namespace Coditech.API.Service
         bool UpdateDBTMTraineeDetails(DBTMTraineeDetailsModel model);
         DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long generalTrainerMasterId, DateTime assignmentDate, string centreCode);
         List<DBTMGeneralBatchUserModel> GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate);
+        DBTMTraineeDetailsListModel GetTraineeListForAssignmentWiseTesting(long generalTrainerMasterId, string dBTMTestMasterId, string centreCode, DateTime assignmentDate);
     }
 }
