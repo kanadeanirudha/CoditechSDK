@@ -779,7 +779,7 @@ namespace Coditech.API.Service
             }
             return dBTMReportsListModel;
         }
-      
+
         public DBTMReportsListModel CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, string reportType)
         {
             if (dBTMCampMasterId <= 0 || string.IsNullOrWhiteSpace(dBTMTestMasterIds))
@@ -878,6 +878,60 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetAssignmentWiseReportsList @DBTMTestMasterId,@FromDate,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            if (dBTMReportsList?.Count > 0)
+            {
+                dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
+            }
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, centreCode, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
+            return dBTMReportsListModel;
+        }
+        public DBTMReportsListModel AssignmentWiseMultipleReportsV2(string dBTMTestMasterIds, string dBTMTraineeDetailIds, long generalTrainerMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
+        {
+            if (generalTrainerMasterId <= 0 || string.IsNullOrWhiteSpace(dBTMTestMasterIds) || string.IsNullOrWhiteSpace(dBTMTraineeDetailIds))
+            {
+                return new DBTMReportsListModel();
+            }
+
+            DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
+            var testList = GetTestList(dBTMTestMasterIds);
+            dBTMReportsListModel.DataTableList ??= new List<KeyValuePair<string, DataTable>>();
+            var dataTableList = new List<KeyValuePair<string, DataTable>>();
+            var dataTableTestPerformedList = new List<KeyValuePair<string, DateTime>>();
+            foreach (var test in testList)
+            {
+                DBTMReportsListModel list = AssignmentWiseReportsV2(test.DBTMTestMasterId, dBTMTraineeDetailIds, generalTrainerMasterId, FromDate, ToDate, isMobileRequest, false);
+                if (!string.IsNullOrEmpty(list?.TestPerformedTime.ToString()))
+                {
+                    dataTableTestPerformedList.Add(new KeyValuePair<string, DateTime>(test.TestName, Convert.ToDateTime(list.TestPerformedTime)));
+                    dataTableList.Add(new KeyValuePair<string, DataTable>(test.TestName, list.DataTable));
+                }
+            }
+            foreach (var test in dataTableTestPerformedList.OrderByDescending(x => x.Value))
+            {
+                var dataTable = dataTableList.Where(x => x.Key == test.Key).FirstOrDefault().Value;
+                dBTMReportsListModel.DataTableList.Add(new KeyValuePair<string, DataTable>(test.Key, dataTable));
+            }
+            return dBTMReportsListModel;
+        }
+        private DBTMReportsListModel AssignmentWiseReportsV2(int dBTMTestMasterId, string dBTMTraineeDetailIds, long generalTrainerMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest, bool isDownloadReport)
+        {
+            if (dBTMTestMasterId <= 0)
+            {
+                return new DBTMReportsListModel();
+            }
+            string centreCode = (from trainer in _generalTrainerMasterRepository.Table
+                                 join employee in _employeeMasterRepository.Table on trainer.EmployeeId equals employee.EmployeeId
+                                 where trainer.GeneralTrainerMasterId == generalTrainerMasterId
+                                 select employee.CentreCode).FirstOrDefault();
+            //Bind the Filter, sorts & Paging details.
+            PageListModel pageListModel = new PageListModel(null, null, 0, 0);
+            CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetAssignmentWiseReportsListV2 @DBTMTestMasterId,@DBTMTraineeDetailIds,@FromDate,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
             if (dBTMReportsList?.Count > 0)
             {
