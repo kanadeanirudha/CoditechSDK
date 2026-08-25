@@ -929,9 +929,10 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMReportsModel> objStoredProc = new CoditechViewRepository<DBTMReportsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetAssignmentWiseReportsListV2 @DBTMTestMasterId,@DBTMTraineeDetailIds,@FromDate,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMReportsModel> dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetAssignmentWiseReportsListV2 @DBTMTestMasterId,@DBTMTraineeDetailIds,@GeneralTrainerMasterId,@FromDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
             DBTMReportsListModel dBTMReportsListModel = new DBTMReportsListModel();
             if (dBTMReportsList?.Count > 0)
             {
