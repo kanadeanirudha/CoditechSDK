@@ -938,7 +938,7 @@ namespace Coditech.API.Service
             {
                 dBTMReportsListModel.TestPerformedTime = dBTMReportsList.Max(x => x.TestPerformedTime);
             }
-            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, centreCode, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport);
+            dBTMReportsListModel.DataTable = BindDBTMDataDetails(dBTMTestMasterId, centreCode, isMobileRequest, dBTMReportsList, FromDate, ToDate, isDownloadReport, "Assignment");
             return dBTMReportsListModel;
         }
         #endregion
@@ -1102,7 +1102,7 @@ namespace Coditech.API.Service
             });
         }
 
-        private DataTable BindDBTMDataDetails(int dBTMTestMasterId, string centreCode, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport)
+        private DataTable BindDBTMDataDetails(int dBTMTestMasterId, string centreCode, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, bool isDownloadReport, string typeOfRecord = null)
         {
             DataTable dataTable = new DataTable();
             if (dBTMReportsList?.Any() == true)
@@ -1112,13 +1112,13 @@ namespace Coditech.API.Service
                 List<DBTMTestParameterListViewSequence> listviewSequenceColumns = GetListViewSequenceByCentre(dBTMTestMasterId, centreCode, isMobileRequest, isDownloadReport);
                 if (listviewSequenceColumns != null && listviewSequenceColumns.Any())
                 {
-                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport, centreCode);
+                    return BindDBTMDataDetailsV2(dBTMTestMasterId, isMobileRequest, dBTMReportsList, fromDate, toDate, listviewSequenceColumns, isDownloadReport, centreCode, typeOfRecord);
                 }
             }
             return dataTable;
         }
 
-        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport, string centreCode)
+        private DataTable BindDBTMDataDetailsV2(int dBTMTestMasterId, bool isMobileRequest, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate, List<DBTMTestParameterListViewSequence> listviewSequenceColumns, bool isDownloadReport, string centreCode, string typeOfRecord = null)
         {
             DataTable dataTable = new DataTable();
             bool isDisplayPerformanceStandard = _dBTMCentreWiseSettingRepository.Table.Where(x => x.CentreCode == centreCode).Select(x => x.IsDisplayPerformanceStandard).FirstOrDefault();
@@ -1135,7 +1135,10 @@ namespace Coditech.API.Service
                 List<string> displayColumnList = isMobileRequest
                     ? new List<string> { "View", "Activity Time", "Trainee Name" }
                     : new List<string> { "View", "Activity Time", "Trainee Name", "Weight(kg)", "Height(cm)" };
-
+                if (typeOfRecord == "Assignment")
+                {
+                    displayColumnList.Add("Activity Status");
+                }
                 if (isDownloadReport)
                 {
                     displayColumnList.Remove("View");
@@ -1164,9 +1167,9 @@ namespace Coditech.API.Service
                             case "Trainee Name":
                                 newRow["Trainee Name"] = !isDownloadReport ? $"{firstInGroup?.FirstName} {firstInGroup?.LastName}~False~~{firstInGroup?.DBTMTraineeDetailId}" : $"{firstInGroup?.FirstName} {firstInGroup?.LastName}";
                                 break;
-                            //case "Activity Status":
-                            //    newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
-                            //    break;
+                            case "Activity Status":
+                                newRow["Activity Status"] = group.FirstOrDefault().ActivityStatus;//$"<span class=\"badge badge-soft-info\">{item.ActivityStatus}</span>";
+                                break;
                             case "Weight(kg)":
                                 newRow["Weight(kg)"] = $"{firstInGroup?.Weight}";
                                 break;
