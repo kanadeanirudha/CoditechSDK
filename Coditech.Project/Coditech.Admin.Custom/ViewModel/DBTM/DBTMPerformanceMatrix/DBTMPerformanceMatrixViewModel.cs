@@ -5,6 +5,6 @@ namespace Coditech.Admin.ViewModel
     {
         public byte DBTMPerformanceMatrixId { get; set; }
         public string PerformanceMatrix { get; set; }
-
+        public short? Preference { get; set; }
     }
 }
