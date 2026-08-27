@@ -150,19 +150,14 @@ namespace Coditech.API.Service
         {
             if (IsNull(dBTMTestModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
-
             if (IsDBTMTestNameAlreadyExist(dBTMTestModel.TestCode, dBTMTestModel.DBTMTestMasterId))
                 throw new CoditechException(ErrorCodes.AlreadyExist, string.Format(GeneralResources.ErrorCodeExists, "Test Code"));
-
-
             DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
-
             //Create new DBTMTest and return it.
             DBTMTestMaster dBTMTestData = _dBTMTestMasterRepository.Insert(dBTMTestMaster);
             if (dBTMTestData?.DBTMTestMasterId > 0)
             {
                 dBTMTestModel.DBTMTestMasterId = dBTMTestData.DBTMTestMasterId;
-
                 List<DBTMTestGraph> dBTMTestGraphlist = new List<DBTMTestGraph>();
                 foreach (string dBTMGraphMasterId in dBTMTestModel.DBTMSelectedGraph)
                 {
@@ -229,16 +224,14 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestMasterID"));
 
             DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
-
+         
             //Update DBTMTest
             bool isdBTMTestUpdated = _dBTMTestMasterRepository.Update(dBTMTestMaster);
             if (isdBTMTestUpdated)
             {
                 List<DBTMTestGraph> deleteDBTMTestGraphList = null;
                 List<DBTMTestGraph> insertDBTMTestGraphList = null;
-
-                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();
-
+                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();    
                 foreach (string graphId in dBTMTestModel.DBTMSelectedGraph)
                 {
                     if (!existingTestGraphList.Any(x => x.DBTMGraphMasterId.ToString() == graphId))
@@ -247,7 +240,6 @@ namespace Coditech.API.Service
                         {
                             insertDBTMTestGraphList = new List<DBTMTestGraph>();
                         }
-
                         insertDBTMTestGraphList.Add(new DBTMTestGraph()
                         {
                             DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
@@ -255,7 +247,6 @@ namespace Coditech.API.Service
                         });
                     }
                 }
-
                 foreach (DBTMTestGraph item in existingTestGraphList)
                 {
                     if (!dBTMTestModel.DBTMSelectedGraph.Any(x => x == item.DBTMGraphMasterId.ToString()))

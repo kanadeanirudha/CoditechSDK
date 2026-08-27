@@ -36,5 +36,6 @@ namespace Coditech.Common.API.Model
         public string Session { get; set; }
         public int TotalParticipants { get; set; }
         public int GenderEnumId { get; set; }
+        public List<GraphModel> GraphList { get; set; }
     }
 }

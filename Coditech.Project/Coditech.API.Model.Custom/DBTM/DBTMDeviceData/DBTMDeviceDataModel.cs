@@ -129,5 +129,6 @@ namespace Coditech.Common.API.Model
 
         [JsonPropertyName("C3")]
         public string Comment3 { get; set; }
+        public string ActivityPerformedLocation { get; set; }
     }
 }

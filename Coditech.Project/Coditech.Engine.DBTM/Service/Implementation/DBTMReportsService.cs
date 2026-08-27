@@ -30,6 +30,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestWisePerformanceStandard> _dBTMTestWisePerformanceStandardRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
+        private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -49,6 +50,7 @@ namespace Coditech.API.Service
             _dBTMTestWisePerformanceStandardRepository = new CoditechRepository<DBTMTestWisePerformanceStandard>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph

@@ -8,5 +8,7 @@ namespace Coditech.Admin.ViewModel
         public string Name { get; set; }
         [Display(Name = "Default")]
         public bool IsDefault { get; set; }
+        [Display(Name = "Priority")]
+        public short Priority { get; set; }
     }
 }
