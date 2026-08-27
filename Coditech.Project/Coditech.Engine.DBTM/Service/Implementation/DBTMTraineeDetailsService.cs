@@ -130,8 +130,16 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.GroupEnumId = dBTMTraineeDetailsModel.GroupEnumId;
             dBTMTraineeDetails.SourceEnumId = dBTMTraineeDetailsModel.SourceEnumId;
             dBTMTraineeDetails.OtherInformation = dBTMTraineeDetailsModel.OtherInformation;
-            dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
-            dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
+            if (dBTMTraineeDetails.Weight != dBTMTraineeDetailsModel.Weight)
+            {
+                dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
+                dBTMTraineeDetails.UpdatedWeightDate = DateTime.Now;
+            }
+            if (dBTMTraineeDetails.Height != dBTMTraineeDetailsModel.Height)
+            {
+                dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
+                dBTMTraineeDetails.UpdatedHeightDate = DateTime.Now;
+            }
             dBTMTraineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
             dBTMTraineeDetails.SchoolName = dBTMTraineeDetailsModel.SchoolName;
             dBTMTraineeDetails.Section = dBTMTraineeDetailsModel.Section;
