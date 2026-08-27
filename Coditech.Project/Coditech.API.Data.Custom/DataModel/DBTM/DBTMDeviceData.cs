@@ -17,6 +17,8 @@ namespace Coditech.API.Data
         public DateTime TestPerformedTime { get; set; }
         public byte NumberOfTurn { get; set; }
         public bool IsValidRecord { get; set; }
+        public string BatchLocation { get; set; }
+        public string CampLocation { get; set; }
         public Nullable<int> AgeGroupEnumId { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
