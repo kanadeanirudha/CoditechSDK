@@ -165,7 +165,6 @@ namespace Coditech.API.Service
                     {
                         DBTMGraphMasterId = Convert.ToInt32(dBTMGraphMasterId),
                         DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
-                        IsDisplayOnReport = dBTMTestModel.DBTMSelectedGraphForReport.Contains(dBTMGraphMasterId)
                     });
                 }
 
@@ -192,7 +191,6 @@ namespace Coditech.API.Service
             if (IsNotNull(dBTMTestMaster))
             {
                 dBTMTestModel.DBTMSelectedGraph = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMGraphMasterId.ToString())?.ToList();
-                dBTMTestModel.DBTMSelectedGraphForReport = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId && x.IsDisplayOnReport).Select(y => y.DBTMGraphMasterId.ToString()).ToList();
             }
             if (dBTMTestModel.TestMediaId > 0)
             {
@@ -233,12 +231,7 @@ namespace Coditech.API.Service
             {
                 List<DBTMTestGraph> deleteDBTMTestGraphList = null;
                 List<DBTMTestGraph> insertDBTMTestGraphList = null;
-                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();
-                foreach (DBTMTestGraph item in existingTestGraphList)
-                {
-                    item.IsDisplayOnReport =    dBTMTestModel.DBTMSelectedGraphForReport.Contains(item.DBTMGraphMasterId.ToString());
-                    _dBTMTestGraphRepository.Update(item);
-                }
+                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();    
                 foreach (string graphId in dBTMTestModel.DBTMSelectedGraph)
                 {
                     if (!existingTestGraphList.Any(x => x.DBTMGraphMasterId.ToString() == graphId))
@@ -251,7 +244,6 @@ namespace Coditech.API.Service
                         {
                             DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
                             DBTMGraphMasterId = Convert.ToInt32(graphId),
-                            IsDisplayOnReport = dBTMTestModel.DBTMSelectedGraphForReport.Contains(graphId)
                         });
                     }
                 }
