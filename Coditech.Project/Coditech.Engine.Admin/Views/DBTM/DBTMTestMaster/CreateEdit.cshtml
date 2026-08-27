@@ -115,6 +115,13 @@
                                                 @Html.ValidationMessageFor(x => x.DBTMSelectedGraph)
                                             </div>
                                         </div>
+                                        <div class="col-lg-12">
+                                            <div class="mb-3 multiselect-dropdown">
+                                                <label class="form-label required">  Display Graph on Report </label>
+                                                @Html.ListBoxFor(x => x.DBTMSelectedGraphForReport, new SelectList(Model.DBTMGraphMasterList, "Value", "Text"), new { @class = "selectpicker form-control", multiple = "multiple", data_live_search = "true" })
+                                                @Html.ValidationMessageFor(x => x.DBTMSelectedGraphForReport)
+                                            </div>
+                                        </div>
                                     }
                                 </div>
                                 <div class="col-lg-4">

@@ -31,5 +31,6 @@ namespace Coditech.Admin.ViewModel
         public string TrainerName { get; set; }
         public RadarChartModel RadarChart { get; set; }
         public bool IsListView { get; set; }
+        public List<GraphModel> GraphList { get; set; }
     }
 }

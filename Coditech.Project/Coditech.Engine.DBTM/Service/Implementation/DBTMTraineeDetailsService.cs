@@ -33,6 +33,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMBatchActivity> _dbtmBatchActivityRepository;
         private readonly IConverter _converter;
         private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
+        private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
+        private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
 
         #region public
         public DBTMTraineeDetailsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider, IDBTMReportsService dBTMReportsService, IConverter converter) : base(serviceProvider)
@@ -52,6 +54,8 @@ namespace Coditech.API.Service
             _dbtmBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public DBTMTraineeDetailsListModel GetDBTMTraineeDetailsList(string SelectedCentreCode, long generalTrainerMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -358,6 +362,7 @@ namespace Coditech.API.Service
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
                 string[] testName = null;
+                var displayGraphList = (from tg in _dBTMTestGraphRepository.Table join gm in _dBTMGraphMasterRepository.Table on tg.DBTMGraphMasterId equals gm.DBTMGraphMasterId where tg.IsDisplayOnReport && gm.IsActive select new { tg.DBTMTestMasterId, tg.DBTMGraphMasterId, gm.GraphMode }).ToList();
                 if (dt?.Rows?.Count > 0)
                 {
                     string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" && c.ColumnName.Contains("Score")).Select(c => c.ColumnName.Replace("Score", "")).ToArray();
@@ -372,6 +377,7 @@ namespace Coditech.API.Service
 
                     dBTMTraineeProfileModel.TrainerName = string.Join(", ", trainerList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId).Select(x => x.TrainerName).Distinct()) ?? "N/A";
                     dBTMTraineeProfileModel.TraineeProfilePerformanceList = traineeProfilePerformanceList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId)?.ToList();
+                    dBTMTraineeProfileModel.GraphList = new List<GraphModel>();
                     if (dt?.Rows?.Count > 0)
                     {
                         DataRow dataRow = dt.Rows.Find(dBTMTraineeProfileModel.DBTMTraineeDetailId);
