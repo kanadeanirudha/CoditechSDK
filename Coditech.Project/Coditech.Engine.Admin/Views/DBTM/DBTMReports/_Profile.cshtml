@@ -442,10 +442,10 @@
                                 <div class="report-border">
                                     <div class="header">
                                         <div class="brand"><img style="height:45px" src="~/assets/images/dbtm/applicationlogo.png" /></div>
-                                        <div class="center-name-report">Center Name:</div>
+                                        <div class="center-name-report">Center Name: @Model.CentreName</div>
                                         <div class="brand right"> <img style="height:45px" src="~/assets/images/dbtm/applicationlogo.png" /></div>
-                                        <div class="report-title">Fitness Report</div>
-                                        <div class="assessment-date"><b>Assessment Date:</b> DDMMYYYY</div>
+                                        <div class="report-title">Performance Assessment Report</div>
+                                        <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToCoditechDateFormat()</div>
                                     </div>
 
                                     <div class="top-grid">
@@ -454,22 +454,22 @@
                                         </div>
 
                                         <div class="info-box">
-                                            <div class="info-row"><b>Report Title:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Program<br>Name / Batch:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Assessment<br>Location:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Athlete /<br>Student Name:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Gender:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>DOB:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Age Group:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Academy<br>Name:</b><div class="line"></div></div>
-                                            <div class="info-row"><b>Coach Name:</b><div class="line"></div></div>
+                                            <div class="info-row"><b>Report Title:</b><div class="line">Athlete Progress Report</div></div>
+                                            <div class="info-row"><b>Program<br>Name / Batch:</b><div class="line">@Model.BatchName</div></div>
+                                            <div class="info-row"><b>Assessment<br>Location:</b><div class="line"> @Model.AssessmentLocation</div></div>
+                                            <div class="info-row"><b>Athlete /<br>Student Name:</b><div class="line"> @Model.FirstName @Model.LastName</div></div>
+                                            <div class="info-row"><b>Gender:</b><div class="line"> @Model.Gender</div></div>
+                                            <div class="info-row"><b>DOB:</b><div class="line"> @Model.DateOfBirth.ToCoditechDateFormat()</div></div>
+                                            <div class="info-row"><b>Age Group:</b><div class="line"> @Model.AgeGroup</div></div>
+                                            <div class="info-row"><b>Academy<br>Name:</b><div class="line"> @Model.AcademyName</div></div>
+                                            <div class="info-row"><b>Coach Name:</b><div class="line"> @Model.TrainerName</div></div>
                                         </div>
 
                                         <div class="sport-box">
                                             <img class="ball" src="~/assets/images/dbtm/ball.jpg" />
-                                            <div class="sport-row"><b>Sport and Position / Role:</b><div class="sport-line"></div></div>
-                                            <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"></div></div>
-                                            <div class="sport-row"><b>Batch Name:</b><div class="sport-line"></div></div>
+                                            <div class="sport-row"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
+                                            <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
+                                            <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
                                         </div>
                                     </div>
 
