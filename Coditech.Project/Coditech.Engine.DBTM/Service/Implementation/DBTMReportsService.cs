@@ -31,6 +31,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
+        private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
+
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -51,6 +53,7 @@ namespace Coditech.API.Service
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
         }
 
         #region Graph
@@ -834,6 +837,7 @@ namespace Coditech.API.Service
 
 
         #endregion
+
         #region Assignment Wise Reports
         public DBTMReportsListModel AssignmentWiseMultipleReports(string dBTMTestMasterIds, long generalTrainerMasterId, DateTime FromDate, DateTime ToDate, bool isMobileRequest)
         {
@@ -1030,6 +1034,292 @@ namespace Coditech.API.Service
                             && testCodes.Contains(f.TestCode)).Select(f => (f.CreatedDate ?? f.TestPerformedTime).Date).Distinct().OrderBy(d => d).ToList();
             return dates;
         }
+
+        #region ProfileDetails
+        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMReportTraineeProfileListModel();
+            CoditechViewRepository<DBTMReportTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMReportTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
+            List<DBTMReportTraineeProfileModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsListByIds @DBTMTraineeDetailIds")?.ToList();
+
+            if (list?.Count > 0)
+            {
+                // Parse trainee ids once and use numeric containment (more efficient than string.Contains in LINQ-to-Entities)
+                var traineeIds = string.IsNullOrWhiteSpace(dBTMTraineeDetailIds)
+                    ? new List<long>()
+                    : dBTMTraineeDetailIds.Split(',').Select(s => { long.TryParse(s, out var v); return v; }).Where(v => v > 0).ToList();
+
+                // Materialize trainer info into a lookup to avoid repeated queries during iteration
+                var trainerList = (from gtat in _generalTraineeAssociatedToTrainerRepository.Table
+                                   join gtm in _generalTrainerMasterRepository.Table on gtat.GeneralTrainerMasterId equals gtm.GeneralTrainerMasterId
+                                   join um in _userMasterRepository.Table on gtm.EmployeeId equals um.EntityId
+                                   where traineeIds.Contains(gtat.EntityId)
+                                         && gtat.UserType == UserTypeEnum.Trainee.ToString()
+                                         && gtat.IsCurrentTrainer
+                                         && um.UserType == UserTypeEnum.Employee.ToString()
+                                   select new
+                                   {
+                                       DBTMTraineeDetailId = gtat.EntityId,
+                                       TrainerName = um.FirstName + " " + um.LastName
+                                   }).ToList();
+
+                var trainerLookup = trainerList
+                    .GroupBy(t => t.DBTMTraineeDetailId)
+                    .ToDictionary(g => g.Key, g => string.Join(", ", g.Select(x => x.TrainerName).Distinct()));
+
+                List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
+                DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
+                string[] testName = null;
+                if (dt?.Rows?.Count > 0)
+                {
+                    string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" && c.ColumnName.Contains("Score")).Select(c => c.ColumnName.Replace("Score", "")).ToArray();
+                    testName = _dBTMTestMasterRepository.Table.Where(x => testCode.Contains(x.TestCode)).Select(x => x.TestName).ToArray();
+                }
+                foreach (var dBTMTraineeProfileModel in list)
+                {
+                    dBTMTraineeProfileModel.IsListView = true;
+
+                    if (!trainerLookup.TryGetValue(dBTMTraineeProfileModel.DBTMTraineeDetailId, out var trainerNames) || string.IsNullOrWhiteSpace(trainerNames))
+                        dBTMTraineeProfileModel.TrainerName = "N/A";
+                    else
+                        dBTMTraineeProfileModel.TrainerName = trainerNames;
+                    dBTMTraineeProfileModel.TraineeProfilePerformanceList = traineeProfilePerformanceList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId)?.ToList();
+                    if (dt?.Rows?.Count > 0)
+                    {
+                        DataRow dataRow = dt.Rows.Find(dBTMTraineeProfileModel.DBTMTraineeDetailId);
+                        if (dataRow != null)
+                        {
+                            dBTMTraineeProfileModel.Rank = dataRow["Rank"].ToString();
+                            if (testName?.Count() > 2)
+                                dBTMTraineeProfileModel.RadarChart = BindRadarChartDetails(dt, dataRow, testName);
+                        }
+                    }
+                }
+            }
+            if (list?.Count > 0)
+            {
+                if (orderBy == "Rank")
+                    list = list.OrderBy(x => Convert.ToInt32(x.Rank) == 0).ThenBy(x => Convert.ToInt32(x.Rank)).ToList();
+                else if (orderBy == "FirstName")
+                    list = list.OrderBy(x => x.FirstName).ToList();
+                else if (orderBy == "LastName")
+                    list = list.OrderBy(x => x.LastName).ToList();
+            }
+            dBTMTraineeProfileListModel.DBTMTraineeProfileList = list;
+            return dBTMTraineeProfileListModel;
+        }
+        private DataTable GetTraineePerformanceRankingDetails(long generalBatchMasterId, DateTime FromDate, DateTime ToDate, out List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList)
+        {
+            DataTable dt = new DataTable();
+            traineeProfilePerformanceList = new List<DBTMTraineeProfilePerformanceModel>();
+            if (generalBatchMasterId <= 0)
+                return dt;
+
+            CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@FromDate", FromDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", ToDate, ParameterDirection.Input, DbType.Date);
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId,@FromDate, @ToDate")?.ToList();
+            if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
+            {
+                traineeProfilePerformanceRankDataList.ForEach(x =>
+                {
+                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                });
+
+                var testList = traineeProfilePerformanceRankDataList
+                               .Select(x => new
+                               {
+                                   x.TestName,
+                                   x.TestCode,
+                                   x.PerformanceMatrix,
+                                   x.TestOutputHigher,
+                                   x.TestResultBasedon,
+                                   x.PerformanceMatrixColor
+                               })
+                               .Distinct()
+                               .ToList();
+
+                dt = new DataTable();
+                List<string> excludeColumnNames = new List<string> { "DBTMTraineeDetailId", "Name", "FinalScore" };
+                dt.Columns.Add("DBTMTraineeDetailId", typeof(long));
+                dt.PrimaryKey = new DataColumn[] { dt.Columns["DBTMTraineeDetailId"] };
+                dt.Columns.Add("Name", typeof(string));
+                foreach (var test in testList)
+                {
+                    dt.Columns.Add(test.TestCode, typeof(double));
+                    dt.Columns.Add($"{test.TestCode}Score", typeof(double));
+                    excludeColumnNames.Add($"{test.TestCode}Score");
+                }
+                dt.Columns.Add("FinalScore", typeof(double));
+                dt.Columns.Add("Rank", typeof(int));
+
+                List<long> dbtmTraineeDetailIdList = traineeProfilePerformanceRankDataList
+                    .Select(x => x.DBTMTraineeDetailId)
+                    .Distinct()
+                    .ToList();
+
+                foreach (long traineeId in dbtmTraineeDetailIdList)
+                {
+                    var traineeProfile = traineeProfilePerformanceRankDataList.First(x => x.DBTMTraineeDetailId == traineeId);
+
+                    DataRow dr = dt.NewRow();
+                    dr["DBTMTraineeDetailId"] = traineeProfile.DBTMTraineeDetailId;
+                    dr["Name"] = traineeProfile.Name;
+
+                    var traineeProfileList = traineeProfilePerformanceRankDataList.Where(x => x.DBTMTraineeDetailId == traineeId);
+
+                    foreach (var test in testList)
+                    {
+                        var testResultData = traineeProfileList
+                            .Where(x => x.TestCode == test.TestCode)
+                            .Select(x => new { x.TestResultBasedon, x.TestOutputHigher })
+                            .FirstOrDefault();
+
+                        if (testResultData == null)
+                        {
+                            dr[test.TestCode] = 0d;
+                            continue;
+                        }
+
+                        var groupedData = traineeProfileList.Where(x => x.TestCode == test.TestCode && x.ParameterCode == testResultData.TestResultBasedon)
+                                        .GroupBy(x => x.CreatedDate)
+                                        .Select(g => new
+                                        {
+                                            CreatedDate = g.Key,
+                                            ParameterValueSum = g.Sum(x =>
+                                                string.IsNullOrEmpty(x.ParameterValue) ? 0 : Convert.ToDouble(x.ParameterValue))
+                                        }).ToList();
+
+                        if (!groupedData.Any())
+                        {
+                            dr[test.TestCode] = 0d;
+                            continue;
+                        }
+
+                        double value = 0;
+
+                        if (testResultData.TestOutputHigher == "LO")
+                            value = groupedData.Min(x => x.ParameterValueSum);
+                        else if (testResultData.TestOutputHigher == "HO")
+                            value = groupedData.Max(x => x.ParameterValueSum);
+
+                        value = Math.Round(value, CustomConstants.GraphListRoundUpValue);
+                        dr[test.TestCode] = value;
+                        DBTMTraineeProfilePerformanceModel dBTMTraineeProfilePerformanceModel = new DBTMTraineeProfilePerformanceModel
+                        {
+                            DBTMTraineeDetailId = traineeProfile.DBTMTraineeDetailId,
+                            TestCode = test.TestCode,
+                            TestName = testList.First(x => x.TestCode == test.TestCode).TestName,
+                            PerformanceMatrix = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrix,
+                            BestValue = $"{value}",
+                            Unit = $"{DBTMCustomHelper.Unit(testList.First(x => x.TestCode == test.TestCode).TestResultBasedon)}",
+                            PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor
+                        };
+
+                        traineeProfilePerformanceList.Add(dBTMTraineeProfilePerformanceModel);
+                    }
+
+                    dt.Rows.Add(dr);
+                }
+
+                /*
+                    Define Weights for the Final Score				
+                    All activities are equally weighted by default.				
+                    Each activity weight = 1 ÷ total number of activities.				
+                    Total of all weights equals 1.				
+                    Weight can be changed as per required (sepcific requirement of sport) based on the final score and rank will be updated				
+                 */
+                foreach (DataColumn column in dt.Columns.Cast<DataColumn>().Where(c => !excludeColumnNames.Contains(c.ColumnName)))
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        foreach (var test in testList.Where(x => x.TestCode == column.ColumnName))
+                        {
+                            if (dr[column] != DBNull.Value)
+                            {
+                                double testValue = Convert.ToDouble(dr[column]);
+                                double score = 0;
+                                if (testValue > 0)
+                                {
+                                    /*
+                                        Score Calculation: 
+                                        If the test output is higher the better (HO), then Score = (Test Value - Minimum Value) ÷ (Maximum Value - Minimum Value) × 100. 
+                                        If the test output is lower the better (LO), then Score = ((Maximum Value - Test Value) ÷ (Maximum Value - Minimum Value)) × 100. 
+                                     */
+                                    double maxValue = Convert.ToDouble(dt.Compute($"MAX([{column.ColumnName}])", ""));
+                                    double minValue = Convert.ToDouble(dt.Compute($"MIN([{column.ColumnName}])", ""));
+                                    if (test.TestOutputHigher == "HO")
+                                    {
+                                        score = (testValue - minValue) / (maxValue - minValue) * 100;
+                                    }
+                                    else if (test.TestOutputHigher == "LO")
+                                    {
+                                        score = ((maxValue - testValue) / (maxValue - minValue)) * 100;
+                                    }
+                                }
+                                dr[$"{test.TestCode}Score"] = Math.Round(score, CustomConstants.GraphListRoundUpValue);
+                            }
+                        }
+                    }
+                }
+                double weights = 100 / testList.Count;
+                //Calculate Final Score
+                foreach (DataRow dr in dt.Rows)
+                {
+                    double finalScore = 0;
+
+                    foreach (var test in testList)
+                    {
+                        double value = dr.Field<double?>($"{test.TestCode}Score") ?? 0;
+                        finalScore += (value * weights) / 100;
+                    }
+
+                    dr["FinalScore"] = Math.Round(finalScore, CustomConstants.GraphListRoundUpValue);
+                }
+                //Calculate Rank
+                var rankedList = dt.AsEnumerable()
+                                   .OrderByDescending(r => r.Field<double>("FinalScore"))
+                                   .Select((r, index) => new
+                                   {
+
+                                       DBTMTraineeDetailId = r.Field<long>("DBTMTraineeDetailId"),
+                                       Name = r.Field<string>("Name"),
+                                       FinalScore = r.Field<double>("FinalScore"),
+                                       Rank = index + 1
+                                   }).ToList();
+                foreach (var item in rankedList)
+                {
+                    DataRow dr = dt.Rows.Find(item.DBTMTraineeDetailId);
+                    if (dr != null)
+                    {
+                        dr["Rank"] = item.Rank;
+                    }
+                }
+            }
+            return dt;
+        }
+        private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow, string[] testName)
+        {
+            return new RadarChartModel()
+            {
+                RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
+                Title = "Score",
+                Labels = string.Join(",", testName),
+                Datasets = new List<RadarGraphsDatasetModel>()
+                            {
+                                new RadarGraphsDatasetModel()
+                                {
+                                    Label = dataRow["Name"].ToString(),
+                                    Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" &&  c.ColumnName.Contains("Score")).Select(c => dataRow[c].ToString())),
+                                    Color = "rgba(255, 99, 132, 0.2)"
+                                }
+                            }
+            };
+        }
+        #endregion ProfileDetails
+
         #region Private Methods
         private DBTMReportsListModel GetTestWiseReports(int dBTMTestMasterId, long dBTMTraineeDetailId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, bool isMobileRequest, bool isDownloadReport)
         {
@@ -1414,7 +1704,7 @@ namespace Coditech.API.Service
             return listviewSequenceColumnList;
         }
 
-        private static string NumberToWords(int number)
+        private string NumberToWords(int number)
         {
             if (number == 0)
                 return "Zero";
@@ -1449,7 +1739,7 @@ namespace Coditech.API.Service
             return words.Trim();
         }
 
-        private static readonly string[] _unitsMap =
+        private readonly string[] _unitsMap =
         {
             "Zero","One","Two","Three","Four","Five","Six",
             "Seven","Eight","Nine","Ten","Eleven","Twelve",
@@ -1457,12 +1747,12 @@ namespace Coditech.API.Service
             "Eighteen","Nineteen"
         };
 
-        private static readonly string[] _tensMap =
+        private readonly string[] _tensMap =
         {
             "Zero","Ten","Twenty","Thirty","Forty","Fifty",
             "Sixty","Seventy","Eighty","Ninety"
         };
-        private static string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
+        private string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
         {
             DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
             if (record == null)

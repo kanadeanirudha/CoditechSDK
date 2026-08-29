@@ -471,5 +471,28 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMReports/GetProfileDetailsList")]
+        [Produces(typeof(DBTMReportTraineeProfileListResponse))]
+        public virtual IActionResult GetProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, string FromDate, string ToDate)
+        {
+            try
+            {
+                DBTMReportTraineeProfileListModel list = _dBTMReportsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate));
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMReportTraineeProfileListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ProfileDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMReportTraineeProfileListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ProfileDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeProfileListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

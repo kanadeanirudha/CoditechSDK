@@ -21,5 +21,6 @@ namespace Coditech.Admin.Agents
         DBTMReportsListViewModel CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate, string ReportType);
         List<DateTime> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId);
         List<DateTime> GetTraineeListActivityDates(string dbtmTraineeDetailIds, int generalBatchMasterId);
+        DBTMReportTraineeProfileListModel GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate);
     }
 }
