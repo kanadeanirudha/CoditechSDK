@@ -1076,8 +1076,12 @@ namespace Coditech.API.Service
                     string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" && c.ColumnName.Contains("Score")).Select(c => c.ColumnName.Replace("Score", "")).ToArray();
                     testName = _dBTMTestMasterRepository.Table.Where(x => testCode.Contains(x.TestCode)).Select(x => x.TestName).ToArray();
                 }
+
+                string batchName = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(y => y.BatchName).FirstOrDefault();
                 foreach (var dBTMTraineeProfileModel in list)
                 {
+                    dBTMTraineeProfileModel.BatchName = batchName;
+                    dBTMTraineeProfileModel.AssessmentDate = FromDate;
                     dBTMTraineeProfileModel.IsListView = true;
 
                     if (!trainerLookup.TryGetValue(dBTMTraineeProfileModel.DBTMTraineeDetailId, out var trainerNames) || string.IsNullOrWhiteSpace(trainerNames))

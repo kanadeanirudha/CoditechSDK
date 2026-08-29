@@ -24,12 +24,14 @@ namespace Coditech.Common.API.Model
         public decimal BMI { get; set; }
         public string CentreName { get; set; }
         public RadarChartModel RadarChart { get; set; }
-        public bool IsListView { get; set; }
+        public bool IsListView { get; set; } = false;
         public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; }
         public string SelectedCentreCode { get; set; }
         public string SelectedParameter1 { get; set; }
         public string SelectedParameter2 { get; set; }
         public string Remarks { get; set; }
+        public string SchoolName { get; set; }
+        public DateTime AssessmentDate { get; set; }
         //public string PerformanceMatrix { get; set; }
         //public string TestName { get; set; }
         //public string Score { get; set; }
