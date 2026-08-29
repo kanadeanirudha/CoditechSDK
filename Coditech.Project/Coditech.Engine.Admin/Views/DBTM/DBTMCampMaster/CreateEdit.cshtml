@@ -57,6 +57,13 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        @Html.LabelFor(x => x.CampLocation, new { @class = "form-label" })
+                                        @Html.TextBoxFor(x => x.CampLocation, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.CampLocation)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.CampFrequency, new { @class = "form-label required" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", frequencyDropdown)
