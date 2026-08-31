@@ -1645,10 +1645,10 @@ namespace Coditech.API.Service
                 }
                 string performanceGrade = "";
 
-                if (performanceStandardList?.Count > 0 && dBTMTestParameterListviewSequence.IsDisplayPerformanceStandard && rowValue != CustomConstants.InvalidData && decimal.TryParse(rowValue, out decimal score))
-                {
-                    performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDecimal(score), performanceStandardList, isHigherBetter);
-                }
+                //if (performanceStandardList?.Count > 0 && dBTMTestParameterListviewSequence.IsDisplayPerformanceStandard && rowValue != CustomConstants.InvalidData && decimal.TryParse(rowValue, out decimal score))
+                //{
+                //    //performanceGrade = GetPerformanceGrade(ageGroupEnumId, genderEnumId, Convert.ToDecimal(score), performanceStandardList, isHigherBetter);
+                //}
                 newRow[displayColumn] = isDownloadReport ? rowValue : $"{rowValue}~{dBTMTestParameterListviewSequence.IsColumnCellBold}~{dBTMTestParameterListviewSequence.ColumnCellColor}~{performanceGrade}";
             }
         }
@@ -1756,40 +1756,40 @@ namespace Coditech.API.Service
             "Zero","Ten","Twenty","Thirty","Forty","Fifty",
             "Sixty","Seventy","Eighty","Ninety"
         };
-        private string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
-        {
-            DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
-            if (record == null)
-                return "0";
-            if (isHigherBetter)
-            {
-                if (score >= record.ExcellentValue)
-                    return "5";
-                if (score >= record.VeryGoodValue)
-                    return "4";
-                if (score >= record.GoodValue)
-                    return "3";
-                if (score >= record.AverageValue)
-                    return "2";
-                if (score >= record.LowValue)
-                    return "1";
-                return "0";
-            }
-            else
-            {
-                if (score <= record.ExcellentValue)
-                    return "5";
-                if (score <= record.VeryGoodValue)
-                    return "4";
-                if (score <= record.GoodValue)
-                    return "3";
-                if (score <= record.AverageValue)
-                    return "2";
-                if (score <= record.LowValue)
-                    return "1";
-                return "0";
-            }
-        }
+        //private string GetPerformanceGrade(int ageGroupEnumId, int genderEnumId, decimal score, List<DBTMTestWisePerformanceStandard> grades, bool isHigherBetter)
+        //{
+        //    DBTMTestWisePerformanceStandard record = grades.FirstOrDefault(x => x.AgeGroupEnumId == ageGroupEnumId && x.GenderEnumId == genderEnumId);
+        //    if (record == null)
+        //        return "0";
+        //    if (isHigherBetter)
+        //    {
+        //        if (score >= record.ExcellentValue)
+        //            return "5";
+        //        if (score >= record.VeryGoodValue)
+        //            return "4";
+        //        if (score >= record.GoodValue)
+        //            return "3";
+        //        if (score >= record.AverageValue)
+        //            return "2";
+        //        if (score >= record.LowValue)
+        //            return "1";
+        //        return "0";
+        //    }
+        //    else
+        //    {
+        //        if (score <= record.ExcellentValue)
+        //            return "5";
+        //        if (score <= record.VeryGoodValue)
+        //            return "4";
+        //        if (score <= record.GoodValue)
+        //            return "3";
+        //        if (score <= record.AverageValue)
+        //            return "2";
+        //        if (score <= record.LowValue)
+        //            return "1";
+        //        return "0";
+        //    }
+        //}
         private List<DBTMTestModel> GetTestList(string dBTMTestMasterIds)
         {
             List<int> dBTMTestMasterIdList = dBTMTestMasterIds.Split(',').Select(int.Parse).ToList();
