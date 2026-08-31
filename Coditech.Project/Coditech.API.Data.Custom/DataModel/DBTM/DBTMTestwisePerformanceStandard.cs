@@ -6,11 +6,9 @@ namespace Coditech.API.Data
     {
         [Key]
         public long DBTMTestWisePerformanceStandardId { get; set; }
-        public int DBTMTestMasterId { get; set; }
-        public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
+        public int DBTMTestWisePerformanceStandardConfigurationId { get; set; }
         public int AgeGroupEnumId { get; set; }
         public int GenderEnumId { get; set; }
-        public int DBTMTestWisePerformanceStandardTypeId { get; set; }
         public string PerformanceStandardTypeValue { get; set; }
         public string PerformanceStandardTypeScore { get; set; }
         public Nullable<long> CreatedBy { get; set; }
