@@ -1422,9 +1422,9 @@ namespace Coditech.API.Service
             bool isHigherBetter = false;
             if (isDisplayPerformanceStandard)
             {
-                performanceStandardList = _dBTMTestWisePerformanceStandardRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).ToList();
-                if (performanceStandardList?.Count > 0)
-                    isHigherBetter = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestOutputHigher).FirstOrDefault() == "HO"; //HO =HigherOutput
+                //performanceStandardList = _dBTMTestWisePerformanceStandardRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).ToList();
+                //if (performanceStandardList?.Count > 0)
+                //    isHigherBetter = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestOutputHigher).FirstOrDefault() == "HO"; //HO =HigherOutput
             }
             if (dBTMReportsList?.Count > 0)
             {
@@ -2025,9 +2025,9 @@ namespace Coditech.API.Service
             bool isHigherBetter = false;
             if (isDisplayPerformanceStandard)
             {
-                performanceStandardList = _dBTMTestWisePerformanceStandardRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).ToList();
-                if (performanceStandardList?.Count > 0)
-                    isHigherBetter = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestOutputHigher).FirstOrDefault() == "HO"; //HO =HigherOutput
+                //performanceStandardList = _dBTMTestWisePerformanceStandardRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).ToList();
+                //if (performanceStandardList?.Count > 0)
+                //    isHigherBetter = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestOutputHigher).FirstOrDefault() == "HO"; //HO =HigherOutput
             }
             if (dBTMReportsList?.Count > 0)
             {
