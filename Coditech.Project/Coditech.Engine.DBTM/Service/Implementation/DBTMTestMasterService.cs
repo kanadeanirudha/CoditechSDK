@@ -651,23 +651,23 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
             DBTMTestWisePerformanceStandard entity = dBTMTestWisePerformanceStandardModel.FromModelToEntity<DBTMTestWisePerformanceStandard>();
             DBTMTestWisePerformanceStandard dBTMTestWisePerformanceStandard = _dBTMTestWisePerformanceStandardRepository.Insert(entity);
-            if (dBTMTestWisePerformanceStandard?.DBTMTestWisePerformanceStandardId > 0)
-            {
-                dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId = dBTMTestWisePerformanceStandard.DBTMTestWisePerformanceStandardId;
-            }
-            else
-            {
-                dBTMTestWisePerformanceStandardModel.HasError = true;
-                dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
-            }
+            //if (dBTMTestWisePerformanceStandard?.DBTMTestWisePerformanceStandardId > 0)
+            //{
+            //    dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId = dBTMTestWisePerformanceStandard.DBTMTestWisePerformanceStandardId;
+            //}
+            //else
+            //{
+            //    dBTMTestWisePerformanceStandardModel.HasError = true;
+            //    dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            //}
             return dBTMTestWisePerformanceStandardModel;
         }
         public virtual bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel dBTMTestWisePerformanceStandardModel)
         {
             if (IsNull(dBTMTestWisePerformanceStandardModel))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
-            if (dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId < 1)
-                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestWisePerformanceStandardId"));
+            //if (dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId < 1)
+            //    throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestWisePerformanceStandardId"));
             DBTMTestWisePerformanceStandard dBTMTestWisePerformanceStandard = dBTMTestWisePerformanceStandardModel.FromModelToEntity<DBTMTestWisePerformanceStandard>();
             //Update DBTMTestWisePerformanceStandard
             bool isdBTMTestWisePerformanceStandardUpdated = _dBTMTestWisePerformanceStandardRepository.Update(dBTMTestWisePerformanceStandard);

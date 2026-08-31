@@ -2,17 +2,15 @@
 
 namespace Coditech.API.Data
 {
-    public partial class DBTMTestWisePerformanceStandard
+    public partial class DBTMTestWisePerformanceStandardConfiguration
     {
         [Key]
-        public long DBTMTestWisePerformanceStandardId { get; set; }
+        public int DBTMTestWisePerformanceStandardConfigurationId { get; set; }
         public int DBTMTestMasterId { get; set; }
         public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
-        public int AgeGroupEnumId { get; set; }
-        public int GenderEnumId { get; set; }
-        public int DBTMTestWisePerformanceStandardTypeId { get; set; }
-        public string PerformanceStandardTypeValue { get; set; }
-        public string PerformanceStandardTypeScore { get; set; }
+        public short DBTMTestWisePerformanceStandardTypeId { get; set; }
+        public short Priority { get; set; }
+        public bool IsConfigured { get; set; }
         public Nullable<long> CreatedBy { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> ModifiedBy { get; set; }

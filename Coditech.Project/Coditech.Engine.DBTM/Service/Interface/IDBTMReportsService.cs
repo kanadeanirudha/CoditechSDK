@@ -25,6 +25,7 @@ namespace Coditech.API.Service
         DataTable GetLiveResultDataTable(int dBTMTestMasterId, string centreCode, List<DBTMReportsModel> dBTMReportsList, DateTime fromDate, DateTime toDate);
         DBTMReportsListModel AssignmentWiseMultipleReports(string dBTMTestMasterIds, long generalTrainerMasterId, DateTime fromDate, DateTime toDate, bool isMobileRequest);
         DBTMReportsListModel AssignmentWiseMultipleReportsV2(string dBTMTestMasterIds, string dBTMTraineeDetailIds, long generalTrainerMasterId, DateTime fromDate, DateTime toDate, bool isMobileRequest);
+        DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate);
 
     }
 }
