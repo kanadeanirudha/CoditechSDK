@@ -41,6 +41,8 @@ namespace Coditech.API.Data
         public DbSet<DBTMDeviceDataInsertionUniqueCheck> DBTMDeviceDataInsertionUniqueCheck { get; set; }
         public virtual DbSet<DBTMTestwisePerformanceStandardCategory> DBTMTestwisePerformanceStandardCategory { get; set; }
         public DbSet<DBTMGraphVerticalViewSequence> DBTMGraphVerticalViewSequence { get; set; }
+        public DbSet<DBTMTestWisePerformanceStandardConfiguration> DBTMTestWisePerformanceStandardConfiguration { get; set; }
+        public DbSet<DBTMTestWisePerformanceStandardType> DBTMTestWisePerformanceStandardType { get; set; }
         #endregion
     }
 }

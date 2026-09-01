@@ -1,0 +1,95 @@
+﻿@model DBTMTestWisePerformanceStandardConfigurationListViewModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap dataTable no-footer" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>
+                        Performance Standard Type
+                    </th>
+                    <th>
+                        Priority
+                    </th>
+                    <th>
+                        Configured
+                    </th>
+                    <th class="text-center">
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model?.DBTMTestWisePerformanceStandardConfigurationList?.Count > 0)
+                {
+                    foreach (var item in Model.DBTMTestWisePerformanceStandardConfigurationList)
+                    {
+                        <tr id="row_@item.DBTMTestWisePerformanceStandardTypeId">
+                            <!-- Performance Standard Type -->
+                            <td>
+                                @item.PerformanceStandardType
+                            </td>
+                            <!-- Priority -->
+                            <td>
+                                <span class="view-mode priority-text">
+                                    @if (item.IsConfigured)
+                                    {
+                                        @item.Priority
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">--</span>
+                                    }
+                                </span>
+                                <input type="number" class="form-control form-control-sm edit-mode priority-input" value="@(item.Priority)" min="1" max="999" style="display:none; width:80px; text-align:center;" />
+                            </td>
+                            <!-- Configured -->
+                            <td>
+                                <span class="view-mode configuration-text">
+                                    @(item.IsConfigured ? "Yes" : "No")
+                                </span>
+                                <select class="form-select form-select-sm edit-mode configuration-dropdown" style="display:none; width:100px;">
+                                    @if (item.IsConfigured)
+                                    {
+                                        <option value="true" selected>Yes</option>
+                                        <option value="false">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="true">Yes</option>
+                                        <option value="false" selected>No</option>
+                                    }
+                                </select>
+                            </td>
+                            <!-- Action -->
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-sm btn-soft-success btn-circle edit-btn"
+                                        onclick="DBTMTestWisePerformanceStandardConfiguration.EditConfigurationRow('@item.DBTMTestWisePerformanceStandardTypeId')"
+                                        title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-sm btn-soft-primary btn-circle save-btn"
+                                        onclick="DBTMTestWisePerformanceStandardConfiguration.SaveConfigurationRow('@item.DBTMTestWisePerformanceStandardTypeId', '@item.DBTMTestWisePerformanceStandardConfigurationId')"
+                                        style="display:none;"
+                                        title="Save">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-sm btn-soft-danger btn-circle cancel-btn"
+                                        onclick="DBTMTestWisePerformanceStandardConfiguration.CancelConfigurationRow('@item.DBTMTestWisePerformanceStandardTypeId')"
+                                        style="display:none;"
+                                        title="Cancel">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
