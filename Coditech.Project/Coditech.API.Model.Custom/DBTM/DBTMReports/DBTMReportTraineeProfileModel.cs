@@ -14,6 +14,7 @@ namespace Coditech.Common.API.Model
         public int GenderEnumId { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string AgeGroup { get; set; }
+        public int AgeGroupEnumId { get; set; }
         public string AcademyName { get; set; }
         public string TrainerName { get; set; }
         public string Specialization { get; set; }
