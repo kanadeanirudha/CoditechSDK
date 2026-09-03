@@ -1356,7 +1356,7 @@ namespace Coditech.API.Service
             if (standards == null || standards.Count == 0)
                 return 0;
 
-            var standard = standards.FirstOrDefault(x => value >= x.MinValue && value <= x.MaxValue);
+            var standard = standards.FirstOrDefault(x => value >= Math.Min(x.MinValue, x.MaxValue) && value <= Math.Max(x.MinValue, x.MaxValue));
 
             if (standard == null)
                 return 0;
