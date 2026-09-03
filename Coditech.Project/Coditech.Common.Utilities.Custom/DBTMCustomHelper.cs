@@ -540,5 +540,19 @@ namespace Coditech.Common.Helper.Utilities
                 return string.Empty;
             }
         }
+
+        public static string HexToRgba(string hex, double alpha = 1.0)
+        {
+            hex = hex.TrimStart('#');
+
+            if (hex.Length != 6)
+                throw new ArgumentException("HEX color must be 6 characters.");
+
+            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+            return $"rgba({r}, {g}, {b}, {alpha})";
+        }
     }
 }

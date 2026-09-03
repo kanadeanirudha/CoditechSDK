@@ -9,6 +9,7 @@ using Coditech.Common.Service;
 using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Globalization;
 namespace Coditech.API.Service
 {
     public class DBTMReportsService : BaseService, IDBTMReportsService
@@ -1114,7 +1115,9 @@ namespace Coditech.API.Service
 
                 foreach (var item in list)
                 {
-                    foreach (var item2 in item.TraineeProfilePerformanceList ?? Enumerable.Empty<DBTMTraineeProfilePerformanceModel>())
+                    // Ensure we have a materialized list to iterate and build chart data
+                    var traineePerfList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
+                    foreach (var item2 in traineePerfList)
                     {
                         double bestValue;
                         if (!double.TryParse(item2.BestValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out bestValue))
@@ -1129,6 +1132,20 @@ namespace Coditech.API.Service
                         double calculatedScore = CalculatePerformanceStandardScore(bestValue, standardsForItem, item2.TestOutputHigher);
                         item2.Score = Math.Round(calculatedScore, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
                     }
+
+                    // Build arrays for chart: test names and their numeric scores
+                    string[] testNames = traineePerfList.Select(p => p.TestCode ?? string.Empty).ToArray();
+                    decimal[] scores = traineePerfList.Select(p =>
+                    {
+                        if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
+                            return sc;
+                        return 0m;
+                    }).ToArray();
+                    if(scores?.Length > 0)
+                    {
+                        item.OverallActivityScore = scores.Sum() / scores.Length;
+                    }
+                    item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores);
                 }
             }
             if (list?.Count > 0)
@@ -1252,7 +1269,6 @@ namespace Coditech.API.Service
                         else if (testResultData.TestOutputHigher == "HO")
                             value = groupedData.Max(x => x.ParameterValueSum);
 
-                        CalculatePerformanceStandardScore(value, new List<DBTMReportPerformanceStandardModel>(), testResultData.TestOutputHigher);
                         value = Math.Round(value, CustomConstants.GraphListRoundUpValue);
                         dr[test.TestCode] = value;
                         DBTMTraineeProfilePerformanceModel dBTMTraineeProfilePerformanceModel = new DBTMTraineeProfilePerformanceModel
@@ -1356,7 +1372,8 @@ namespace Coditech.API.Service
             if (standards == null || standards.Count == 0)
                 return 0;
 
-            var standard = standards.FirstOrDefault(x => value >= Math.Min(x.MinValue, x.MaxValue) && value <= Math.Max(x.MinValue, x.MaxValue));
+            //var standard = standards.FirstOrDefault(x => value >= Math.Min(x.MinValue, x.MaxValue) && value <= Math.Max(x.MinValue, x.MaxValue));
+            var standard = standards.FirstOrDefault(x => value >= x.MinValue && value <= x.MaxValue);
 
             if (standard == null)
                 return 0;
@@ -1401,6 +1418,29 @@ namespace Coditech.API.Service
                                     Label = dataRow["Name"].ToString(),
                                     Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalRankScore" &&  c.ColumnName.Contains("RankScore")).Select(c => dataRow[c].ToString())),
                                     Color = "rgba(255, 99, 132, 0.2)"
+                                }
+                            }
+            };
+        }
+
+        private LineBarChartModel BindBarChartDetails(long DBTMTraineeDetailId, string[] testName, decimal[] scores)
+        {
+            return new LineBarChartModel()
+            {
+                LineBarChartId = $"{DBTMTraineeDetailId}",
+                Title = "Score Chart",
+                XAxisLabel = "Activities",
+                YAxisLabel = "Score out of 100",
+                // Serialize the arrays directly so the consumer receives proper JSON arrays
+                XValues = JsonConvert.SerializeObject(testName),
+                GraphType = "bar",
+                Datasets = new List<LineBarGraphsDatasetModel>()
+                            {
+                                new LineBarGraphsDatasetModel()
+                                {
+                                    Label = "Score",
+                                    Data = JsonConvert.SerializeObject(scores),
+                                    Color = "rgba(255, 99, 132, 1)"
                                 }
                             }
             };

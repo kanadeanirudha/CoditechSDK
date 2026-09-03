@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 
 namespace Coditech.Common.API.Model
 {
@@ -25,6 +26,7 @@ namespace Coditech.Common.API.Model
         public DateTime? UpdatedHeightDate { get; set; }
         public decimal BMI { get; set; }
         public string CentreName { get; set; }
+        public LineBarChartModel LineBarChart { get; set; }
         public RadarChartModel RadarChart { get; set; }
         public bool IsListView { get; set; } = false;
         public List<DBTMTraineeProfilePerformanceModel> TraineeProfilePerformanceList { get; set; }
@@ -33,6 +35,8 @@ namespace Coditech.Common.API.Model
         public string SelectedParameter2 { get; set; }
         public string Remarks { get; set; }
         public string SchoolName { get; set; }
+
+        public decimal OverallActivityScore { get; set; }
         public DateTime AssessmentDate { get; set; }
         //public string PerformanceMatrix { get; set; }
         //public string TestName { get; set; }
