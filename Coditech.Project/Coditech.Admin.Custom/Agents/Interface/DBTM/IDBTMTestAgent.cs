@@ -123,8 +123,10 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns created model.</returns>
         DBTMActivityVerticalViewSequenceViewModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel);
         DBTMCentreWiseTestListViewModel GetTestsByCentreCode(string centreCode);
-        DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId,short dBTMTestwisePerformanceStandardCategoryId);
+        DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
         DBTMTestWisePerformanceStandardViewModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel);
         DBTMTestWisePerformanceStandardViewModel UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel);
+        DBTMTestWisePerformanceStandardConfigurationListViewModel DBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
+        DBTMTestWisePerformanceStandardConfigurationViewModel UpdateDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationViewModel model);
     }
 }

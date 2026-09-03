@@ -4,6 +4,7 @@
     {
         public long DBTMTraineeDetailId { get; set; }
         public string Name { get; set; }
+        public int DBTMTestMasterId { get; set; }
         public string TestCode { get; set; }
         public string TestName { get; set; }
         public string ParameterCode { get; set; }

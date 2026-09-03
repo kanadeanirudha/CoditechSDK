@@ -449,6 +449,41 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
             return Json(new { success = false });
         }
+
+        public ActionResult DBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            DBTMTestWisePerformanceStandardConfigurationListViewModel list = new DBTMTestWisePerformanceStandardConfigurationListViewModel();
+            list.DBTMTestMasterId = dBTMTestMasterId;
+            list.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
+            if (dBTMTestMasterId > 0)
+            {
+                list.TestName = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId).TestName;
+                if (dBTMTestwisePerformanceStandardCategoryId > 0)
+                {
+                    list = _dBTMTestAgent.DBTMTestWisePerformanceStandardConfigurationList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                }
+            }
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandardConfiguration/_DBTMTestWisePerformanceStandardConfigurationList.cshtml", list);
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandardConfiguration/DBTMTestWisePerformanceStandardConfigurationList.cshtml", list);
+        }
+        [HttpPost]
+        public virtual ActionResult SaveDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandardConfiguration(model);
+                if (!model.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    return Json(new { success = true });
+                }
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
+            return Json(new { success = false });
+        }
         #endregion
         #region Protected
         protected virtual void BindDBTMGraph(DBTMTestViewModel dBTMTestViewModel)

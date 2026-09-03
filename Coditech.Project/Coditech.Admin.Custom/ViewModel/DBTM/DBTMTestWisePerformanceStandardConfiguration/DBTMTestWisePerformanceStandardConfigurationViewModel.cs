@@ -1,6 +1,10 @@
-﻿namespace Coditech.Common.API.Model
+﻿using Coditech.Common.Helper;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
+
+namespace Coditech.Admin.ViewModel
 {
-    public class DBTMTestWisePerformanceStandardConfigurationModel : BaseModel
+    public class DBTMTestWisePerformanceStandardConfigurationViewModel : BaseViewModel
     {
         public int DBTMTestWisePerformanceStandardConfigurationId { get; set; }
         public int DBTMTestMasterId { get; set; }

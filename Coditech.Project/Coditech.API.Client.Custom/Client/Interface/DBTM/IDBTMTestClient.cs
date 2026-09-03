@@ -129,5 +129,7 @@ namespace Coditech.API.Client
         DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
         DBTMTestWisePerformanceStandardResponse CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body);
         DBTMTestWisePerformanceStandardResponse UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body);
+        DBTMTestWisePerformanceStandardConfigurationListResponse GetDBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
+        DBTMTestWisePerformanceStandardConfigurationResponse UpdateDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationModel body);
     }
 }

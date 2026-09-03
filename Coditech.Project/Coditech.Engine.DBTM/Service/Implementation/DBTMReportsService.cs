@@ -9,6 +9,7 @@ using Coditech.Common.Service;
 using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Globalization;
 namespace Coditech.API.Service
 {
     public class DBTMReportsService : BaseService, IDBTMReportsService
@@ -1068,12 +1069,13 @@ namespace Coditech.API.Service
                     .GroupBy(t => t.DBTMTraineeDetailId)
                     .ToDictionary(g => g.Key, g => string.Join(", ", g.Select(x => x.TrainerName).Distinct()));
 
+
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
                 string[] testName = null;
                 if (dt?.Rows?.Count > 0)
                 {
-                    string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" && c.ColumnName.Contains("Score")).Select(c => c.ColumnName.Replace("Score", "")).ToArray();
+                    string[] testCode = dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalRankScore" && c.ColumnName.Contains("RankScore")).Select(c => c.ColumnName.Replace("RankScore", "")).ToArray();
                     testName = _dBTMTestMasterRepository.Table.Where(x => testCode.Contains(x.TestCode)).Select(x => x.TestName).ToArray();
                 }
 
@@ -1100,6 +1102,51 @@ namespace Coditech.API.Service
                         }
                     }
                 }
+                // Build comma separated unique lists from the materialized `list` variable
+                string ageGroupEnumIds = string.Join(",", list.Select(x => x.AgeGroupEnumId).Where(v => v > 0).Distinct());
+                string genderEnumIds = string.Join(",", list.Select(x => x.GenderEnumId).Where(v => v > 0).Distinct());
+                // Collect unique DBTMTestMasterIds from all trainee profile performance entries
+                string dBTMTestMasterIds = string.Join(",", list
+                    .SelectMany(x => x.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
+                    .Select(p => p.DBTMTestMasterId)
+                    .Where(id => id > 0)
+                    .Distinct());
+                List<DBTMReportPerformanceStandardModel> dbtmReportPerformanceStandardList = GetReportPerformanceStandardList(ageGroupEnumIds, genderEnumIds, dBTMTestMasterIds, 0);
+
+                foreach (var item in list)
+                {
+                    // Ensure we have a materialized list to iterate and build chart data
+                    var traineePerfList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
+                    foreach (var item2 in traineePerfList)
+                    {
+                        double bestValue;
+                        if (!double.TryParse(item2.BestValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out bestValue))
+                        {
+                            bestValue = 0;
+                        }
+
+                        var standardsForItem = dbtmReportPerformanceStandardList
+                            .Where(x => x.AgeGroupEnumId == item.AgeGroupEnumId && x.GenderEnumId == item.GenderEnumId && x.DBTMTestMasterId == item2.DBTMTestMasterId)
+                            .ToList();
+
+                        double calculatedScore = CalculatePerformanceStandardScore(bestValue, standardsForItem, item2.TestOutputHigher);
+                        item2.Score = Math.Round(calculatedScore, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    }
+
+                    // Build arrays for chart: test names and their numeric scores
+                    string[] testNames = traineePerfList.Select(p => p.TestCode ?? string.Empty).ToArray();
+                    decimal[] scores = traineePerfList.Select(p =>
+                    {
+                        if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
+                            return sc;
+                        return 0m;
+                    }).ToArray();
+                    if(scores?.Length > 0)
+                    {
+                        item.OverallActivityScore = scores.Sum() / scores.Length;
+                    }
+                    item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores);
+                }
             }
             if (list?.Count > 0)
             {
@@ -1111,7 +1158,19 @@ namespace Coditech.API.Service
                     list = list.OrderBy(x => x.LastName).ToList();
             }
             dBTMTraineeProfileListModel.DBTMTraineeProfileList = list;
+
             return dBTMTraineeProfileListModel;
+        }
+
+        private List<DBTMReportPerformanceStandardModel> GetReportPerformanceStandardList(string ageGroupEnumIds, string genderEnumIds, string dBTMTestMasterIds, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            CoditechViewRepository<DBTMReportPerformanceStandardModel> objStoredProc = new CoditechViewRepository<DBTMReportPerformanceStandardModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@AgeGroupEnumIds", ageGroupEnumIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@GenderEnumIds", genderEnumIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@DBTMTestMasterIds", dBTMTestMasterIds, ParameterDirection.Input, DbType.String);
+            objStoredProc.SetParameter("@DBTMTestwisePerformanceStandardCategoryId", dBTMTestwisePerformanceStandardCategoryId, ParameterDirection.Input, DbType.Int16);
+            List<DBTMReportPerformanceStandardModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMReportPerformanceStandard @AgeGroupEnumIds,@GenderEnumIds,@DBTMTestMasterIds,@DBTMTestwisePerformanceStandardCategoryId")?.ToList();
+            return list;
         }
         private DataTable GetTraineePerformanceRankingDetails(long generalBatchMasterId, DateTime FromDate, DateTime ToDate, out List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList)
         {
@@ -1135,6 +1194,7 @@ namespace Coditech.API.Service
                 var testList = traineeProfilePerformanceRankDataList
                                .Select(x => new
                                {
+                                   x.DBTMTestMasterId,
                                    x.TestName,
                                    x.TestCode,
                                    x.PerformanceMatrix,
@@ -1146,17 +1206,17 @@ namespace Coditech.API.Service
                                .ToList();
 
                 dt = new DataTable();
-                List<string> excludeColumnNames = new List<string> { "DBTMTraineeDetailId", "Name", "FinalScore" };
+                List<string> excludeColumnNames = new List<string> { "DBTMTraineeDetailId", "Name", "FinalRankScore" };
                 dt.Columns.Add("DBTMTraineeDetailId", typeof(long));
                 dt.PrimaryKey = new DataColumn[] { dt.Columns["DBTMTraineeDetailId"] };
                 dt.Columns.Add("Name", typeof(string));
                 foreach (var test in testList)
                 {
                     dt.Columns.Add(test.TestCode, typeof(double));
-                    dt.Columns.Add($"{test.TestCode}Score", typeof(double));
-                    excludeColumnNames.Add($"{test.TestCode}Score");
+                    dt.Columns.Add($"{test.TestCode}RankScore", typeof(double));
+                    excludeColumnNames.Add($"{test.TestCode}RankScore");
                 }
-                dt.Columns.Add("FinalScore", typeof(double));
+                dt.Columns.Add("FinalRankScore", typeof(double));
                 dt.Columns.Add("Rank", typeof(int));
 
                 List<long> dbtmTraineeDetailIdList = traineeProfilePerformanceRankDataList
@@ -1214,7 +1274,9 @@ namespace Coditech.API.Service
                         DBTMTraineeProfilePerformanceModel dBTMTraineeProfilePerformanceModel = new DBTMTraineeProfilePerformanceModel
                         {
                             DBTMTraineeDetailId = traineeProfile.DBTMTraineeDetailId,
+                            DBTMTestMasterId = test.DBTMTestMasterId,
                             TestCode = test.TestCode,
+                            TestOutputHigher = test.TestOutputHigher,
                             TestName = testList.First(x => x.TestCode == test.TestCode).TestName,
                             PerformanceMatrix = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrix,
                             BestValue = $"{value}",
@@ -1229,7 +1291,7 @@ namespace Coditech.API.Service
                 }
 
                 /*
-                    Define Weights for the Final Score				
+                    Define Weights for the Final Rank Score				
                     All activities are equally weighted by default.				
                     Each activity weight = 1 ÷ total number of activities.				
                     Total of all weights equals 1.				
@@ -1248,9 +1310,9 @@ namespace Coditech.API.Service
                                 if (testValue > 0)
                                 {
                                     /*
-                                        Score Calculation: 
-                                        If the test output is higher the better (HO), then Score = (Test Value - Minimum Value) ÷ (Maximum Value - Minimum Value) × 100. 
-                                        If the test output is lower the better (LO), then Score = ((Maximum Value - Test Value) ÷ (Maximum Value - Minimum Value)) × 100. 
+                                        Rank Score Calculation: 
+                                        If the test output is higher the better (HO), then Rank Score = (Test Value - Minimum Value) ÷ (Maximum Value - Minimum Value) × 100. 
+                                        If the test output is lower the better (LO), then Rank Score = ((Maximum Value - Test Value) ÷ (Maximum Value - Minimum Value)) × 100. 
                                      */
                                     double maxValue = Convert.ToDouble(dt.Compute($"MAX([{column.ColumnName}])", ""));
                                     double minValue = Convert.ToDouble(dt.Compute($"MIN([{column.ColumnName}])", ""));
@@ -1263,34 +1325,34 @@ namespace Coditech.API.Service
                                         score = ((maxValue - testValue) / (maxValue - minValue)) * 100;
                                     }
                                 }
-                                dr[$"{test.TestCode}Score"] = Math.Round(score, CustomConstants.GraphListRoundUpValue);
+                                dr[$"{test.TestCode}RankScore"] = Math.Round(score, CustomConstants.GraphListRoundUpValue);
                             }
                         }
                     }
                 }
                 double weights = 100 / testList.Count;
-                //Calculate Final Score
+                //Calculate Final Rank Score
                 foreach (DataRow dr in dt.Rows)
                 {
                     double finalScore = 0;
 
                     foreach (var test in testList)
                     {
-                        double value = dr.Field<double?>($"{test.TestCode}Score") ?? 0;
+                        double value = dr.Field<double?>($"{test.TestCode}RankScore") ?? 0;
                         finalScore += (value * weights) / 100;
                     }
 
-                    dr["FinalScore"] = Math.Round(finalScore, CustomConstants.GraphListRoundUpValue);
+                    dr["FinalRankScore"] = Math.Round(finalScore, CustomConstants.GraphListRoundUpValue);
                 }
                 //Calculate Rank
                 var rankedList = dt.AsEnumerable()
-                                   .OrderByDescending(r => r.Field<double>("FinalScore"))
+                                   .OrderByDescending(r => r.Field<double>("FinalRankScore"))
                                    .Select((r, index) => new
                                    {
 
                                        DBTMTraineeDetailId = r.Field<long>("DBTMTraineeDetailId"),
                                        Name = r.Field<string>("Name"),
-                                       FinalScore = r.Field<double>("FinalScore"),
+                                       FinalScore = r.Field<double>("FinalRankScore"),
                                        Rank = index + 1
                                    }).ToList();
                 foreach (var item in rankedList)
@@ -1304,20 +1366,81 @@ namespace Coditech.API.Service
             }
             return dt;
         }
+
+        private double CalculatePerformanceStandardScore(double value, List<DBTMReportPerformanceStandardModel> standards, string testOutputHigher)
+        {
+            if (standards == null || standards.Count == 0)
+                return 0;
+
+            //var standard = standards.FirstOrDefault(x => value >= Math.Min(x.MinValue, x.MaxValue) && value <= Math.Max(x.MinValue, x.MaxValue));
+            var standard = standards.FirstOrDefault(x => value >= x.MinValue && value <= x.MaxValue);
+
+            if (standard == null)
+                return 0;
+
+            double score;
+
+            if (standard.MaxValue == standard.MinValue)
+            {
+                score = standard.MaxScore;
+            }
+            else
+            {
+                if (testOutputHigher == "HO")
+                {
+                    // Higher value = Better score
+                    score = standard.MinScore + ((value - standard.MinValue) / (standard.MaxValue - standard.MinValue)) * (standard.MaxScore - standard.MinScore);
+                }
+                else
+                {
+                    // Lower value = Better score
+                    score = standard.MaxScore - ((value - standard.MinValue) / (standard.MaxValue - standard.MinValue)) * (standard.MaxScore - standard.MinScore);
+                }
+            }
+
+            // Keep score within MinScore and MaxScore
+            score = Math.Max(standard.MinScore, Math.Min(standard.MaxScore, score));
+
+            return Math.Round(score, CustomConstants.GraphListRoundUpValue);
+        }
+
         private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow, string[] testName)
         {
             return new RadarChartModel()
             {
                 RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
-                Title = "Score",
+                Title = "Rank Score",
                 Labels = string.Join(",", testName),
                 Datasets = new List<RadarGraphsDatasetModel>()
                             {
                                 new RadarGraphsDatasetModel()
                                 {
                                     Label = dataRow["Name"].ToString(),
-                                    Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalScore" &&  c.ColumnName.Contains("Score")).Select(c => dataRow[c].ToString())),
+                                    Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalRankScore" &&  c.ColumnName.Contains("RankScore")).Select(c => dataRow[c].ToString())),
                                     Color = "rgba(255, 99, 132, 0.2)"
+                                }
+                            }
+            };
+        }
+
+        private LineBarChartModel BindBarChartDetails(long DBTMTraineeDetailId, string[] testName, decimal[] scores)
+        {
+            return new LineBarChartModel()
+            {
+                LineBarChartId = $"{DBTMTraineeDetailId}",
+                Title = "Score Chart",
+                XAxisLabel = "Activities",
+                YAxisLabel = "Score out of 100",
+                // Serialize the arrays directly so the consumer receives proper JSON arrays
+                XValues = JsonConvert.SerializeObject(testName),
+                GraphType = "bar",
+                Datasets = new List<LineBarGraphsDatasetModel>()
+                            {
+                                new LineBarGraphsDatasetModel()
+                                {
+                                    Label = "Score",
+                                    Data = JsonConvert.SerializeObject(scores),
+                                    Color = "rgba(255, 99, 132, 1)"
                                 }
                             }
             };

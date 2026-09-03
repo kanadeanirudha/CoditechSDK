@@ -27,6 +27,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<DBTMDeviceData> _dBTMDeviceDataRepository;
         private readonly ICoditechRepository<DBTMTestwisePerformanceStandardCategory> _dBTMTestwisePerformanceStandardCategoryRepository;
+        private readonly ICoditechRepository<DBTMTestWisePerformanceStandardConfiguration> _dBTMTestWisePerformanceStandardConfigurationRepository;
         public DBTMTestMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -43,6 +44,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestwisePerformanceStandardCategoryRepository = new CoditechRepository<DBTMTestwisePerformanceStandardCategory>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestWisePerformanceStandardConfigurationRepository = new CoditechRepository<DBTMTestWisePerformanceStandardConfiguration>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public virtual DBTMTestListModel GetDBTMTestList(FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -224,14 +226,14 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestMasterID"));
 
             DBTMTestMaster dBTMTestMaster = dBTMTestModel.FromModelToEntity<DBTMTestMaster>();
-         
+
             //Update DBTMTest
             bool isdBTMTestUpdated = _dBTMTestMasterRepository.Update(dBTMTestMaster);
             if (isdBTMTestUpdated)
             {
                 List<DBTMTestGraph> deleteDBTMTestGraphList = null;
                 List<DBTMTestGraph> insertDBTMTestGraphList = null;
-                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();    
+                List<DBTMTestGraph> existingTestGraphList = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();
                 foreach (string graphId in dBTMTestModel.DBTMSelectedGraph)
                 {
                     if (!existingTestGraphList.Any(x => x.DBTMGraphMasterId.ToString() == graphId))
@@ -706,6 +708,58 @@ namespace Coditech.API.Service
             return model;
         }
 
+        public virtual DBTMTestWisePerformanceStandardConfigurationListModel GetDBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            CoditechViewRepository<DBTMTestWisePerformanceStandardConfigurationModel> objStoredProc = new CoditechViewRepository<DBTMTestWisePerformanceStandardConfigurationModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@DBTMTestwisePerformanceStandardCategoryId", dBTMTestwisePerformanceStandardCategoryId, ParameterDirection.Input, DbType.Int16);
+            List<DBTMTestWisePerformanceStandardConfigurationModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWisePerformanceStandardConfiguration @DBTMTestMasterId, @DBTMTestwisePerformanceStandardCategoryId")?.ToList();
+            return new DBTMTestWisePerformanceStandardConfigurationListModel
+            {
+                DBTMTestWisePerformanceStandardConfigurationList = list,
+                DBTMTestMasterId = dBTMTestMasterId,
+                DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId,
+                TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault()
+            };
+        }
+        public virtual DBTMTestWisePerformanceStandardConfigurationModel SaveDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationModel model)
+        {
+            if (IsNull(model))
+                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
+            if (model.DBTMTestWisePerformanceStandardConfigurationId > 0)
+            {
+                DBTMTestWisePerformanceStandardConfiguration existing = _dBTMTestWisePerformanceStandardConfigurationRepository.Table.FirstOrDefault(x => x.DBTMTestWisePerformanceStandardConfigurationId == model.DBTMTestWisePerformanceStandardConfigurationId);
+                if (existing == null)
+                {
+                    model.HasError = true;
+                    model.ErrorMessage = GeneralResources.UpdateErrorMessage;
+                    return model;
+                }
+                existing.Priority = model.Priority;
+                existing.IsConfigured = model.IsConfigured;
+                existing.ModifiedDate = DateTime.Now;
+                bool isUpdated = _dBTMTestWisePerformanceStandardConfigurationRepository.Update(existing);
+                if (!isUpdated)
+                {
+                    model.HasError = true;
+                    model.ErrorMessage = GeneralResources.UpdateErrorMessage;
+                }
+                return model;
+            }
+            DBTMTestWisePerformanceStandardConfiguration entity = model.FromModelToEntity<DBTMTestWisePerformanceStandardConfiguration>();
+            DBTMTestWisePerformanceStandardConfiguration inserted = _dBTMTestWisePerformanceStandardConfigurationRepository.Insert(entity);
+            if (inserted?.DBTMTestWisePerformanceStandardConfigurationId > 0)
+            {
+                model.DBTMTestWisePerformanceStandardConfigurationId =
+                    inserted.DBTMTestWisePerformanceStandardConfigurationId;
+            }
+            else
+            {
+                model.HasError = true;
+                model.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+            }
+            return model;
+        }
         #region Protected Method
         // Check if Test Name is already present or not.
         protected virtual bool IsDBTMTestNameAlreadyExist(string testCode, int dBTMTestMasterId = 0)

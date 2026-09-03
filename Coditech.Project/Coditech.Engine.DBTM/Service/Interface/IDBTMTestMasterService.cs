@@ -32,5 +32,7 @@ namespace Coditech.API.Service
         DBTMTestWisePerformanceStandardModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model);
         bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model);
         DBTMTestwisePerformanceStandardCategoryListModel GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId);
+        DBTMTestWisePerformanceStandardConfigurationListModel GetDBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
+        DBTMTestWisePerformanceStandardConfigurationModel SaveDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationModel model);
     }
 }

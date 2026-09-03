@@ -7,5 +7,8 @@
         {
             DBTMTestWisePerformanceStandardConfigurationList = new List<DBTMTestWisePerformanceStandardConfigurationModel>();
         }
+        public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
+        public int DBTMTestMasterId { get; set; }
+        public string TestName { get; set; }
     }
 }

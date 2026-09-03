@@ -8,8 +8,8 @@
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
     {
-        ModelPopUpId = "RemarkPopupId_" + Model.DBTMTraineeDetailId,
-        ModalContentId = "RemarkContentId_" + Model.DBTMTraineeDetailId
+        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
     };
 }
 <style>
@@ -189,6 +189,7 @@
         gap: 8px;
         margin-top: 18px;
         align-items: start;
+        height: 500px;
     }
 
     .anthro-area {
@@ -407,6 +408,15 @@
         white-space: nowrap;
     }
 
+    .performance-pair {
+        width: 100%;
+        margin-top: 12px;
+        margin-bottom: 18px;
+    }
+
+        .performance-pair table {
+            width: 100%;
+        }
 </style>
 <div class="page-content">
     <div class="container-fluid">
@@ -441,16 +451,16 @@
                             <div class="page" id="report">
                                 <div class="report-border">
                                     <div class="header">
-                                        <div class="brand"><img style="height:45px" src="~/assets/images/dbtm/applicationlogo.png" /></div>
+                                        <div class="brand"><img style="height:45px" src="@Url.Content("~/assets/images/dbtm/applicationlogo.png")" /></div>
                                         <div class="center-name-report">Center Name: @Model.CentreName</div>
-                                        <div class="brand right"> <img style="height:45px" src="~/assets/images/dbtm/applicationlogo.png" /></div>
+                                        <div class="brand right"> <img style="height:45px" src="@Url.Content("~/assets/images/dbtm/applicationlogo.png")" /></div>
                                         <div class="report-title">Performance Assessment Report</div>
                                         <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToCoditechDateFormat()</div>
                                     </div>
 
                                     <div class="top-grid">
                                         <div class="photo-box">
-                                            <img style="height: 115px;" src="~/assets/images/dbtm/maleavatar.png" />
+                                            <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
                                         </div>
 
                                         <div class="info-box">
@@ -466,7 +476,7 @@
                                         </div>
 
                                         <div class="sport-box">
-                                            <img class="ball" src="~/assets/images/dbtm/ball.jpg" />
+                                            <img class="ball" src="@Url.Content("~/assets/images/dbtm/ball.jpg")" />
                                             <div class="sport-row"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
                                             <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
                                             <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
@@ -475,13 +485,13 @@
 
                                     <div class="middle">
                                         <div class="anthro-area">
-                                            <img class="body-svg" src="~/assets/images/dbtm/heightweightmale.png" />
+                                            <img class="body-svg" src="@Url.Content("~/assets/images/dbtm/heightweightmale.png")" />
                                             <!-- <div class="measure-line"></div> -->
 
                                             <table class="small-table anthro-table">
                                                 <tr><th>Anthropometry</th><th></th><th>Data<br>recorded<br>date</th></tr>
-                                                <tr><th>Height (cm)</th><td>177.8</td><td>DDMMYYYY</td></tr>
-                                                <tr><th>Weight (kg)</th><td>72.57</td><td>DDMMYYYY</td></tr>
+                                                <tr><th>Height (cm)</th><td>@Model.Height</td><td>@Model.UpdatedHeightDate.ToCoditechDateFormat()</td></tr>
+                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td>@Model.UpdatedWeightDate.ToCoditechDateFormat()</td></tr>
                                                 <tr><th>BMI</th><td>22.96</td><td></td></tr>
                                             </table>
                                         </div>
@@ -490,20 +500,23 @@
                                             <table class="score-summary">
                                                 <tr>
                                                     <td><b>Today's Overall<br>Activity Score:</td>
-                                                    <td class="dark">31.033</td>
-                                                    <td>6.10% <span class="up">↑</span></td>
-                                                    <td>Improved</td>
+                                                    <td class="dark">@Model.OverallActivityScore</td>
+                                                    <td>@* 6.10% <span class="up">↑</span> *@</td>
+                                                    <td>@* Improved *@</td>
                                                 </tr>
                                                 <tr>
                                                     <td><b>Past score:</td>
-                                                    <td>29.25</td>
-                                                    <td colspan="2">DDMMYYYY</td>
+                                                    <td>@* 29.25 *@</td>
+                                                    <td colspan="2">@* DDMMYYYY *@</td>
                                                 </tr>
                                             </table>
 
-                                            <div class="chart-title">Score Chart</div>
-                                            <div class="bar-wrap"><canvas id="scoreChart"></canvas></div>
-                                            <div class="activities">Activities</div>
+                                            <div class="bar-wrap">
+                                                @if (Model.LineBarChart != null)
+                                                {
+                                                    @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", Model.LineBarChart)
+                                                }
+                                            </div>
                                         </div>
 
                                         <div>
@@ -511,73 +524,126 @@
                                             <div class="radar-wrap"><canvas id="radarChart"></canvas></div>
                                         </div>
                                     </div>
-
-                                    <table class="section-table">
-                                        <tr>
-                                            <th colspan="5" class="cat-speed">Speed</th>
-                                            <th colspan="5" class="cat-agility">Agility</th>
-                                        </tr>
-                                        <tr>
-                                            <th>Test</th>
-                                            <th class="unit">Unit</th>
-                                            <th>Value</th>
-                                            <th class="score-head">Score</th>
-                                            <th>% Improvement</th>
-                                            <th>Test</th>
-                                            <th class="unit">Unit</th>
-                                            <th>Value</th>
-                                            <th class="score-head">Score</th>
-                                            <th>% Improvement</th>
-                                        </tr>
-                                        <tr>
-                                            <td><b>10M sprint</b></td>
-                                            <td>sec</td>
-                                            <td class="value-green">1.972</td>
-                                            <td class="score"></td>
-                                            <td></td>
-                                            <td><b>Illinois Agility</b></td>
-                                            <td>sec</td>
-                                            <td class="value-green">16.813</td>
-                                            <td class="score">59.300</td>
-                                            <td>xx.xx <span class="up">↑</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>20M sprint</b></td>
-                                            <td>sec</td>
-                                            <td class="value-green">3.376</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td><b>Arrow headed L-R</b></td>
-                                            <td>sec</td>
-                                            <td class="value-green">17.775</td>
-                                            <td></td>
-                                            <td>xx.xx <span class="up">↑</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>30M sprint</b></td>
-                                            <td>sec</td>
-                                            <td>4.727</td>
-                                            <td class="score">10.000</td>
-                                            <td>xx.xx <span class="up">↑</span></td>
-                                            <td><b>Arrow headed L</b></td>
-                                            <td>sec</td>
-                                            <td class="value-green">8.918</td>
-                                            <td class="score">14.500</td>
-                                            <td>xx.xx <span class="up">↑</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>RSA 30M</b></td>
-                                            <td>sec</td>
-                                            <td class="value-red">4.805</td>
-                                            <td class="score">49.500</td>
-                                            <td>xx.xx <span class="down">↓</span></td>
-                                            <td><b>Arrow headed R</b></td>
-                                            <td>sec</td>
-                                            <td class="value-green">8.857</td>
-                                            <td></td>
-                                            <td>xx.xx <span class="up">↑</span></td>
-                                        </tr>
-                                    </table>
+                                    @{
+                                        var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
+                                        var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
+                                    }
+                                    @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
+                                    {
+                                        var firstGroup = performanceGroups[groupIndex];
+                                        var secondGroup = groupIndex + 1 < performanceGroups.Count ? performanceGroups[groupIndex + 1] : null;
+                                        var firstItems = firstGroup.ToList();
+                                        var secondItems = secondGroup != null ? secondGroup.ToList() : new List<DBTMTraineeProfilePerformanceModel>();
+                                        var maxRows = Math.Max(firstItems.Count, secondItems.Count);
+                                        <div class="performance-pair">
+                                            <table class="section-table">
+                                                <tr>
+                                                    <th colspan="5" style="background-color:@firstItems.FirstOrDefault().PerformanceMatrixColor">
+                                                        @firstGroup.Key
+                                                    </th>
+                                                    @if (secondGroup != null)
+                                                    {
+                                                        <th colspan="5" style="background-color:@secondGroup.FirstOrDefault().PerformanceMatrixColor">
+                                                            @secondGroup.Key
+                                                        </th>
+                                                    }
+                                                   @*  else
+                                                    {
+                                                        <th colspan="5"></th>
+                                                    } *@
+                                                </tr>
+                                                <tr>
+                                                    <th>Activity</th>
+                                                    <th class="unit">Unit</th>
+                                                    <th>Value</th>
+                                                    <th class="score-head">Score</th>
+                                                    <th>% Improvement</th>
+                                                    @if (secondGroup != null)
+                                                    {
+                                                        <th>Activity</th>
+                                                        <th class="unit">Unit</th>
+                                                        <th>Value</th>
+                                                        <th class="score-head">Score</th>
+                                                        <th>% Improvement</th>
+                                                    }
+                                                   @*  else
+                                                    {
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    } *@
+                                                </tr>
+                                                @for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
+                                                {
+                                                    var firstItem = rowIndex < firstItems.Count ? firstItems[rowIndex] : null;
+                                                    var secondItem = rowIndex < secondItems.Count ? secondItems[rowIndex] : null;
+                                                    <tr>
+                                                        @if (firstItem != null)
+                                                        {
+                                                            <td>
+                                                                <b>@firstItem.TestName</b>
+                                                            </td>
+                                                            <td>
+                                                                @firstItem.Unit
+                                                            </td>
+                                                            <td>
+                                                                @firstItem.BestValue
+                                                            </td>
+                                                            <td class="score">
+                                                                @firstItem.Score
+                                                            </td>
+                                                            <td></td>
+                                                        }
+                                                       @*  else
+                                                        {
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        } *@
+                                                        @if (secondGroup != null)
+                                                        {
+                                                            if (secondItem != null)
+                                                            {
+                                                                <td>
+                                                                    <b>@secondItem.TestName</b>
+                                                                </td>
+                                                                <td>
+                                                                    @secondItem.Unit
+                                                                </td>
+                                                                <td>
+                                                                    @secondItem.BestValue
+                                                                </td>
+                                                                <td class="score">
+                                                                    @secondItem.Score
+                                                                </td>
+                                                                <td></td>
+                                                            }
+                                                           @*  else
+                                                            {
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            } *@
+                                                        }
+                                                      @*   else
+                                                        {
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        } *@
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </div>
+                                    }
                                     <div class="notes"><b>Notes:</b></div>
                                 </div>
                             </div>
@@ -587,7 +653,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 @section Scripts {
     <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>

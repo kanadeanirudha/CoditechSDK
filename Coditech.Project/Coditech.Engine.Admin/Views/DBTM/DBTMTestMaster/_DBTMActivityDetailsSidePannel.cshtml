@@ -4,6 +4,7 @@
     Layout = null;
     int dBTMTestMasterId = Convert.ToInt16(Model?.FirstOrDefault(x => x.Key == "DBTMTestMasterId").Value);
     short dBTMTestwisePerformanceStandardCategoryId = Convert.ToInt16(Model?.FirstOrDefault(x => x.Key == "DBTMTestwisePerformanceStandardCategoryId").Value);
+    int dBTMTestwisePerformanceStandardConfigurationId = Convert.ToInt16(Model?.FirstOrDefault(x => x.Key == "DBTMTestWisePerformanceStandardConfigurationId").Value);
     string actionName = ViewContext.RouteData.Values["action"].ToString();
 }
 <div class="card sidebar-card">
@@ -31,13 +32,20 @@
                    aria-selected="true">
                     <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Activity Vertical View Sequence</h5>
                 </a>
-                @* <a class="nav-link"
+                <a class="nav-link"
+                   href="@Url.Action("DBTMTestWisePerformanceStandardConfigurationList", "DBTMTestMaster", new {
+                            dBTMTestMasterId = dBTMTestMasterId, dBTMTestwisePerformanceStandardConfigurationId = dBTMTestwisePerformanceStandardConfigurationId
+                        })"
+                   aria-selected="true">
+                    <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">Activitywise Performance Standard Configuration</h5>
+                </a>
+                <a class="nav-link"
                    href="@Url.Action("DBTMTestWisePerformanceStandardList", "DBTMTestMaster", new {
                             dBTMTestMasterId = dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId
                         })"
                    aria-selected="true">
                     <i class="fas fa-id-card-alt"></i><h5 class="m-0 ps-2">ActivityWise Performance Standard</h5>
-                </a> *@
+                </a>
             </div>
         </div>
     </div>
