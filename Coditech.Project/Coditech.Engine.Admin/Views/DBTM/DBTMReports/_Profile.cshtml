@@ -512,7 +512,11 @@
                                             </table>
 
                                             <div class="bar-wrap">
-                                                @if (Model.LineBarChart != null)
+                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <span>@Model.TraineeProfilePerformanceMessage</span>
+                                                }
+                                                else if (Model.LineBarChart != null)
                                                 {
                                                     @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", Model.LineBarChart)
                                                 }
@@ -521,7 +525,16 @@
 
                                         <div>
                                             <div class="radar-title">Performance Matrix</div>
-                                            <div class="radar-wrap"><canvas id="radarChart"></canvas></div>
+                                            <div class="radar-wrap">
+                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <span>@Model.TraineeProfilePerformanceMessage</span>
+                                                }
+                                                else if (Model.RadarChart != null)
+                                                {
+                                                    @Html.Partial("~/Views/Shared/Charts/_RadarChart.cshtml", Model.RadarChart)
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                     @{
@@ -547,7 +560,7 @@
                                                             @secondGroup.Key
                                                         </th>
                                                     }
-                                                   @*  else
+                                                    @*  else
                                                     {
                                                         <th colspan="5"></th>
                                                     } *@
@@ -566,7 +579,7 @@
                                                         <th class="score-head">Score</th>
                                                         <th>% Improvement</th>
                                                     }
-                                                   @*  else
+                                                    @*  else
                                                     {
                                                         <th></th>
                                                         <th></th>
@@ -592,11 +605,18 @@
                                                                 @firstItem.BestValue
                                                             </td>
                                                             <td class="score">
-                                                                @firstItem.Score
+                                                                @if (string.IsNullOrEmpty(firstItem.Score))
+                                                                {
+                                                                    <span>NA</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @firstItem.Score
+                                                                }
                                                             </td>
                                                             <td></td>
                                                         }
-                                                       @*  else
+                                                        @*  else
                                                         {
                                                             <td></td>
                                                             <td></td>
@@ -618,11 +638,18 @@
                                                                     @secondItem.BestValue
                                                                 </td>
                                                                 <td class="score">
-                                                                    @secondItem.Score
+                                                                    @if (string.IsNullOrEmpty(secondItem.Score))
+                                                                    {
+                                                                        <span>NA</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @secondItem.Score
+                                                                    }
                                                                 </td>
                                                                 <td></td>
                                                             }
-                                                           @*  else
+                                                            @*  else
                                                             {
                                                                 <td></td>
                                                                 <td></td>
@@ -631,7 +658,7 @@
                                                                 <td></td>
                                                             } *@
                                                         }
-                                                      @*   else
+                                                        @*   else
                                                         {
                                                             <td></td>
                                                             <td></td>

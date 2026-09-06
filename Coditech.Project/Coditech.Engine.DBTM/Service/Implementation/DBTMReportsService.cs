@@ -1042,9 +1042,9 @@ namespace Coditech.API.Service
             DBTMReportTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMReportTraineeProfileListModel();
             CoditechViewRepository<DBTMReportTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMReportTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
-            List<DBTMReportTraineeProfileModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsListByIds @DBTMTraineeDetailIds")?.ToList();
+            List<DBTMReportTraineeProfileModel> traineeDetaillist = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsListByIds @DBTMTraineeDetailIds")?.ToList();
 
-            if (list?.Count > 0)
+            if (traineeDetaillist?.Count > 0)
             {
                 // Parse trainee ids once and use numeric containment (more efficient than string.Contains in LINQ-to-Entities)
                 var traineeIds = string.IsNullOrWhiteSpace(dBTMTraineeDetailIds)
@@ -1080,7 +1080,7 @@ namespace Coditech.API.Service
                 }
 
                 string batchName = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(y => y.BatchName).FirstOrDefault();
-                foreach (var dBTMTraineeProfileModel in list)
+                foreach (var dBTMTraineeProfileModel in traineeDetaillist)
                 {
                     dBTMTraineeProfileModel.BatchName = batchName;
                     dBTMTraineeProfileModel.AssessmentDate = FromDate;
@@ -1097,27 +1097,25 @@ namespace Coditech.API.Service
                         if (dataRow != null)
                         {
                             dBTMTraineeProfileModel.Rank = dataRow["Rank"].ToString();
-                            if (testName?.Count() > 2)
-                                dBTMTraineeProfileModel.RadarChart = BindRadarChartDetails(dt, dataRow, testName);
                         }
                     }
                 }
                 // Build comma separated unique lists from the materialized `list` variable
-                string ageGroupEnumIds = string.Join(",", list.Select(x => x.AgeGroupEnumId).Where(v => v > 0).Distinct());
-                string genderEnumIds = string.Join(",", list.Select(x => x.GenderEnumId).Where(v => v > 0).Distinct());
+                string ageGroupEnumIds = string.Join(",", traineeDetaillist.Select(x => x.AgeGroupEnumId).Where(v => v > 0).Distinct());
+                string genderEnumIds = string.Join(",", traineeDetaillist.Select(x => x.GenderEnumId).Where(v => v > 0).Distinct());
                 // Collect unique DBTMTestMasterIds from all trainee profile performance entries
-                string dBTMTestMasterIds = string.Join(",", list
+                string dBTMTestMasterIds = string.Join(",", traineeDetaillist
                     .SelectMany(x => x.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>())
                     .Select(p => p.DBTMTestMasterId)
                     .Where(id => id > 0)
                     .Distinct());
                 List<DBTMReportPerformanceStandardModel> dbtmReportPerformanceStandardList = GetReportPerformanceStandardList(ageGroupEnumIds, genderEnumIds, dBTMTestMasterIds, 0);
-
-                foreach (var item in list)
+                Dictionary<string, double> performunceMatrixScore = null;
+                foreach (var item in traineeDetaillist)
                 {
                     // Ensure we have a materialized list to iterate and build chart data
-                    var traineePerfList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
-                    foreach (var item2 in traineePerfList)
+                    var traineePerformunceList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
+                    foreach (var item2 in traineePerformunceList)
                     {
                         double bestValue;
                         if (!double.TryParse(item2.BestValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out bestValue))
@@ -1129,37 +1127,80 @@ namespace Coditech.API.Service
                             .Where(x => x.AgeGroupEnumId == item.AgeGroupEnumId && x.GenderEnumId == item.GenderEnumId && x.DBTMTestMasterId == item2.DBTMTestMasterId)
                             .ToList();
 
-                        double calculatedScore = CalculatePerformanceStandardScore(bestValue, standardsForItem, item2.TestOutputHigher);
-                        item2.Score = Math.Round(calculatedScore, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        if (standardsForItem == null || standardsForItem.Count == 0)
+                        {
+                            item.IsTraineeProfilePerformanceAvailable = false;
+                            if (string.IsNullOrEmpty(item.TraineeProfilePerformanceMessage))
+                                item.TraineeProfilePerformanceMessage = $"Performunce Standards not configure for {item.AgeGroup} Age Group, {item.Gender} Gender and {item2.TestName}";
+                            else
+                                item.TraineeProfilePerformanceMessage = item.TraineeProfilePerformanceMessage + $", {item2.TestName}";
+                        }
+                        else if (item.IsTraineeProfilePerformanceAvailable)
+                        {
+                            double calculatedScore = CalculatePerformanceStandardScore(bestValue, standardsForItem, item2.TestOutputHigher);
+                            item2.Score = Math.Round(calculatedScore, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        }
                     }
-
-                    // Build arrays for chart: test names and their numeric scores
-                    string[] testNames = traineePerfList.Select(p => p.TestCode ?? string.Empty).ToArray();
-                    decimal[] scores = traineePerfList.Select(p =>
-                    {
-                        if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
-                            return sc;
-                        return 0m;
-                    }).ToArray();
-                    if(scores?.Length > 0)
-                    {
-                        item.OverallActivityScore = scores.Sum() / scores.Length;
-                    }
-                    item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores);
+                    if (item.IsTraineeProfilePerformanceAvailable)
+                        BindBarAndRadarChart(testName, performunceMatrixScore, item, traineePerformunceList);
                 }
             }
-            if (list?.Count > 0)
+            if (traineeDetaillist?.Count > 0)
             {
                 if (orderBy == "Rank")
-                    list = list.OrderBy(x => Convert.ToInt32(x.Rank) == 0).ThenBy(x => Convert.ToInt32(x.Rank)).ToList();
+                    traineeDetaillist = traineeDetaillist.OrderBy(x => Convert.ToInt32(x.Rank) == 0).ThenBy(x => Convert.ToInt32(x.Rank)).ToList();
                 else if (orderBy == "FirstName")
-                    list = list.OrderBy(x => x.FirstName).ToList();
+                    traineeDetaillist = traineeDetaillist.OrderBy(x => x.FirstName).ToList();
                 else if (orderBy == "LastName")
-                    list = list.OrderBy(x => x.LastName).ToList();
+                    traineeDetaillist = traineeDetaillist.OrderBy(x => x.LastName).ToList();
             }
-            dBTMTraineeProfileListModel.DBTMTraineeProfileList = list;
+            dBTMTraineeProfileListModel.DBTMTraineeProfileList = traineeDetaillist;
 
             return dBTMTraineeProfileListModel;
+        }
+
+        private void BindBarAndRadarChart(string[] testName, Dictionary<string, double> performunceMatrixScore, DBTMReportTraineeProfileModel item, List<DBTMTraineeProfilePerformanceModel> traineePerformunceList)
+        {
+            // Build arrays for chart: test names and their numeric scores
+            string[] testNames = traineePerformunceList.Select(p => p.TestCode ?? string.Empty).ToArray();
+            decimal[] scores = traineePerformunceList.Select(p =>
+            {
+                if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
+                    return sc;
+                return 0m;
+            }).ToArray();
+
+            string[] colors = new string[testNames.Length];
+            for (int i = 0; i < testNames.Length; i++)
+            {
+                var testCode = testNames[i];
+                var perf = traineePerformunceList.FirstOrDefault(x => x.TestCode == testCode);
+                colors[i] = DBTMCustomHelper.HexToRgba(perf?.PerformanceMatrixColor) ?? "'rgba(255, 99, 132, 0.2)'";
+            }
+            if (scores?.Length > 0)
+            {
+                item.OverallActivityScore = scores.Sum() / scores.Length;
+            }
+            item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores, colors);
+
+            if (testName.Length > 2)
+            {
+                performunceMatrixScore = new Dictionary<string, double>();
+                // Build a dictionary of PerformanceMatrix -> average score (mean of scores in that group)
+                performunceMatrixScore = traineePerformunceList
+                    .GroupBy(x => x.PerformanceMatrix)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Average(p =>
+                        {
+                            if (double.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v))
+                                return v;
+                            return 0d;
+                        })
+                    );
+
+                item.RadarChart = BindRadarChartDetails(performunceMatrixScore, item.DBTMTraineeDetailId);
+            }
         }
 
         private List<DBTMReportPerformanceStandardModel> GetReportPerformanceStandardList(string ageGroupEnumIds, string genderEnumIds, string dBTMTestMasterIds, short dBTMTestwisePerformanceStandardCategoryId)
@@ -1372,7 +1413,6 @@ namespace Coditech.API.Service
             if (standards == null || standards.Count == 0)
                 return 0;
 
-            //var standard = standards.FirstOrDefault(x => value >= Math.Min(x.MinValue, x.MaxValue) && value <= Math.Max(x.MinValue, x.MaxValue));
             var standard = standards.FirstOrDefault(x => value >= x.MinValue && value <= x.MaxValue);
 
             if (standard == null)
@@ -1404,26 +1444,26 @@ namespace Coditech.API.Service
             return Math.Round(score, CustomConstants.GraphListRoundUpValue);
         }
 
-        private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow, string[] testName)
+        private RadarChartModel BindRadarChartDetails(Dictionary<string, double> keyValuePairs, long dBTMTraineeDetailId)
         {
             return new RadarChartModel()
             {
-                RadarChartId = dataRow["DBTMTraineeDetailId"].ToString(),
+                RadarChartId = dBTMTraineeDetailId.ToString(),
                 Title = "Rank Score",
-                Labels = string.Join(",", testName),
+                Labels = string.Join(",", keyValuePairs.Select(y => y.Key)),
                 Datasets = new List<RadarGraphsDatasetModel>()
                             {
                                 new RadarGraphsDatasetModel()
                                 {
-                                    Label = dataRow["Name"].ToString(),
-                                    Data = string.Join(",", dt.Columns.Cast<DataColumn>().Where(c => c.ColumnName != "FinalRankScore" &&  c.ColumnName.Contains("RankScore")).Select(c => dataRow[c].ToString())),
+                                    Label = string.Join(",", keyValuePairs.Select(y=>y.Key)),
+                                    Data = string.Join(",", keyValuePairs.Select(y=>y.Value)),
                                     Color = "rgba(255, 99, 132, 0.2)"
                                 }
                             }
             };
         }
 
-        private LineBarChartModel BindBarChartDetails(long DBTMTraineeDetailId, string[] testName, decimal[] scores)
+        private LineBarChartModel BindBarChartDetails(long DBTMTraineeDetailId, string[] testName, decimal[] scores, string[] color)
         {
             return new LineBarChartModel()
             {
