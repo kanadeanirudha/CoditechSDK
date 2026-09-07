@@ -1131,7 +1131,7 @@ namespace Coditech.API.Service
                         {
                             item.IsTraineeProfilePerformanceAvailable = false;
                             if (string.IsNullOrEmpty(item.TraineeProfilePerformanceMessage))
-                                item.TraineeProfilePerformanceMessage = $"Performunce Standards not configure for {item.AgeGroup} Age Group, {item.Gender} Gender and {item2.TestName}";
+                                item.TraineeProfilePerformanceMessage = $"Performance Standards are not configured for {item.AgeGroup} Age Group, {item.Gender} Gender and {item2.TestName}";
                             else
                                 item.TraineeProfilePerformanceMessage = item.TraineeProfilePerformanceMessage + $", {item2.TestName}";
                         }
@@ -1468,7 +1468,7 @@ namespace Coditech.API.Service
             return new LineBarChartModel()
             {
                 LineBarChartId = $"{DBTMTraineeDetailId}",
-                Title = "Score Chart",
+                //Title = "Score Chart",
                 XAxisLabel = "Activities",
                 YAxisLabel = "Score out of 100",
                 // Serialize the arrays directly so the consumer receives proper JSON arrays
