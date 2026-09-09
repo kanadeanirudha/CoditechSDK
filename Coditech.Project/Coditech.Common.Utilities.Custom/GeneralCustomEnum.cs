@@ -38,6 +38,7 @@
         JoiningCodeExpiryTime,
         DBTMTrainerwiseBatch,
         DBTMTestwisePerformanceStandardCategory,
+        DBTMQRPrintingTemplateCode,
     }
     public enum DashboardFormCustomEnum
     {
@@ -60,6 +61,7 @@
         DBTMSendPendingAssignmentReminder,
         TraineeReportTemplate,
         DBTMAutoActivityQRCodeFormatVertical,
+        DBTMAutoActivityQRCodeFormatHorizontal,
     }
 
     public enum LogComponentCustomEnum

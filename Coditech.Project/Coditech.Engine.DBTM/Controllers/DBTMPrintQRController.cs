@@ -47,14 +47,14 @@ namespace Coditech.API.Controllers
             }
         }
 
+        [HttpGet]
         [Route("/DBTMPrintQR/DownloadPrintQR")]
-        [HttpPost, ValidateModel]
         [Produces(typeof(DBTMPrintQRListResponse))]
-        public IActionResult DownloadPrintQR([FromBody] ParameterModel model)
+        public IActionResult DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode)
         {
             try
             {
-                DBTMPrintQRListModel list = _dBTMPrintQRService.DownloadPrintQR(model);
+                DBTMPrintQRListModel list = _dBTMPrintQRService.DownloadPrintQR(personIds, generalBatchMasterId, templateCode);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMPrintQRListResponse>(data) : CreateNoContentResponse();
             }
