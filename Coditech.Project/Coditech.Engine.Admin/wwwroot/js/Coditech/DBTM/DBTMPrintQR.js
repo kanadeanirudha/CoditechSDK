@@ -71,8 +71,12 @@
                 personIds.push($(this).val());
             });
         }
+        if ($("#SelectedParameter1").val() == "") {
+            CoditechNotification.DisplayNotificationMessage("Please select batch.", "error");
+            return;
+        }
         if (personIds.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Please select at least one Batch.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select at least one athlet.", "error");
             return;
         }
         CoditechCommon.ShowLodder();
@@ -82,9 +86,9 @@
             data: { personIds: personIds.join(',') },
             success: function (response) {
                 if (response.success) {
-                    var downloadUrl =
-                        "/DBTMPrintQR/DownloadPrintQR?personIds="
-                        + encodeURIComponent(personIds.join(','));
+                    var downloadUrl = "/DBTMPrintQR/DownloadPrintQR?personIds=" + encodeURIComponent(personIds.join(','))
+                        + "&generalBatchMasterId=" + $("#SelectedParameter1").val()
+                        + "&templateCode=" + $("#QRPrintingTemplateCode").val();
                     CoditechCommon.DownloadFile(downloadUrl);
                 }
                 else {
@@ -96,7 +100,7 @@
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
                 }
-                CoditechNotification.DisplayNotificationMessage("Error while downloading QR.", "error" );
+                CoditechNotification.DisplayNotificationMessage("Error while downloading QR.", "error");
                 CoditechCommon.HideLodder();
             }
         });
