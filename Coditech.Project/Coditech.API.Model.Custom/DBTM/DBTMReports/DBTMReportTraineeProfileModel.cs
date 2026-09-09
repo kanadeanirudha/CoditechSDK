@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Diagnostics;
-
-namespace Coditech.Common.API.Model
+﻿namespace Coditech.Common.API.Model
 {
     public class DBTMReportTraineeProfileModel : BaseModel
     {
@@ -35,20 +32,9 @@ namespace Coditech.Common.API.Model
         public string SelectedParameter2 { get; set; }
         public string Remarks { get; set; }
         public string SchoolName { get; set; }
-
         public decimal OverallActivityScore { get; set; }
         public DateTime AssessmentDate { get; set; }
-        //public string PerformanceMatrix { get; set; }
-        //public string TestName { get; set; }
-        //public string Score { get; set; }
-        //public DateTime? DateOfJoining { get; set; }
-        //public string TotalDuration { get; set; }
-        //public DateTime? WeekelyHours { get; set; }
-        //public string Remarks { get; set; }
-        //public string CentreCode { get; set; }
-        //public DataTable RankingScoreDataTable { get; set; }
-        //public long GeneralBatchMasterId { get; set; }
-        //public string Session { get; set; }
-        //public int TotalParticipants { get; set; }
+        public bool IsTraineeProfilePerformanceAvailable { get; set; } = true;
+        public string TraineeProfilePerformanceMessage { get; set; } = string.Empty;
     }
 }

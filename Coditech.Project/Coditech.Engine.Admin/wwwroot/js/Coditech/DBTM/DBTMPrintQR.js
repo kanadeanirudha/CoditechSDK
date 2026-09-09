@@ -34,8 +34,7 @@
     },
     BindDropdownEvents: function () {
         $(document).on("change", "#SelectedParameter1", function () {
-            var batchId = $(this).val();
-            CoditechDataTable.prototype.GetData(batchId, "DBTMPrintQR", "GetDBTMPrintQRTraineeList", "PrintQRUserListDiv");
+            DBTMPrintQR.LoadTraineeList();
         });
     },
 
@@ -54,11 +53,9 @@
                 CoditechCommon.HideLodder();
             },
             error: function (xhr) {
-
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
                 }
-
                 CoditechNotification.DisplayNotificationMessage("Failed to load trainee list.", "error");
                 CoditechCommon.HideLodder();
             }
@@ -107,7 +104,7 @@
 };
 $(document).ready(function () {
     DBTMPrintQR.Initialize();
-    DBTMPrintQR.InitializePrintQRTable();
+    DBTMPrintQR.LoadTraineeList();
     $(document).on("change", "#chkSelectAll", function () {
         $(".person-checkbox").prop("checked", $(this).is(":checked"));
     });

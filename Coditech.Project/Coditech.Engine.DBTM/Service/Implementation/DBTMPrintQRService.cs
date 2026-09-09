@@ -35,11 +35,9 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@WhereClause", pageListModel.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMPrintQRModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMPrintQRTraineeList @GeneralBatchMasterId,@UserType,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMPrintQRModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMPrintQRTraineeList @GeneralBatchMasterId,@UserType,@WhereClause,@Order_BY,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
             DBTMPrintQRListModel model = new DBTMPrintQRListModel();
             model.DBTMPrintQRList = list ?? new List<DBTMPrintQRModel>();
             model.BindPageListModel(pageListModel);
