@@ -61,9 +61,9 @@ namespace Coditech.Admin.Controllers
             return Json(new { success = true });
         }
 
-        public ActionResult DownloadPrintQR(string personIds)
+        public ActionResult DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode)
         {
-            DBTMPrintQRListViewModel model = _dBTMPrintQRAgent.DownloadPrintQR(personIds);
+            DBTMPrintQRListViewModel model = _dBTMPrintQRAgent.DownloadPrintQR(personIds, generalBatchMasterId, templateCode);
             byte[] bytes = System.IO.File.ReadAllBytes(model.FilePath);
             System.IO.File.Delete(model.FilePath);
             Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });

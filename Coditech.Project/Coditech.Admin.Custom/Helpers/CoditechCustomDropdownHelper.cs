@@ -131,6 +131,10 @@ namespace Coditech.Admin.Helpers
             {
                 DBTMTestwisePerformanceStandardCategoryList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMQRPrintingTemplateCode.ToString()))
+            {
+                GetDBTMQRPrintingTemplateCode(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -616,7 +620,22 @@ namespace Coditech.Admin.Helpers
             });
         }
 
+        private static void GetDBTMQRPrintingTemplateCode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Auto Activity QR Code Format Vertical",
+                Value = "DBTMAutoActivityQRCodeFormatVertical",
+                //Selected = CustomConstants.InstantaneousChart == dropdownViewModel.DropdownSelectedValue
+            });
 
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "Auto Activity QR Code Format Horizontal",
+                Value = "DBTMAutoActivityQRCodeFormatHorizontal",
+                //Selected = CustomConstants.ProgressChart == dropdownViewModel.DropdownSelectedValue
+            });
+        }
         //private static void GetDBTMMultiBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         //{
         //    if (dropdownViewModel.DropdownType == DropdownCustomTypeEnum.BatchWiseMultiReports.ToString())

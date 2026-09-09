@@ -6,11 +6,11 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using PuppeteerSharp.Media;
+using DocumentFormat.OpenXml.Wordprocessing;
 using PuppeteerSharp;
+using PuppeteerSharp.Media;
 using System.Collections.Specialized;
 using System.Data;
-
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
@@ -20,12 +20,14 @@ namespace Coditech.API.Service
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<GeneralPerson> _generalPersonRepository;
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
+        private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         public DBTMPrintQRService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
             _generalPersonRepository = new CoditechRepository<GeneralPerson>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         public virtual DBTMPrintQRListModel GetDBTMPrintQRTraineeList(int generalBatchMasterId, string userType, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
@@ -44,9 +46,9 @@ namespace Coditech.API.Service
             return model;
         }
 
-        public virtual DBTMPrintQRListModel DownloadPrintQR(ParameterModel parameterModel)
+        public virtual DBTMPrintQRListModel DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode)
         {
-            DBTMPrintQRListModel qrModel = GeneratePrintQRHTMLTemplate(parameterModel);
+            DBTMPrintQRListModel qrModel = GeneratePrintQRHTMLTemplate(personIds, generalBatchMasterId, templateCode);
             string html = qrModel.PrintableHTML;
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "PrintQRPdf");
             if (!Directory.Exists(folderPath))
@@ -72,32 +74,32 @@ namespace Coditech.API.Service
             qrModel.FilePath = filePath;
             return qrModel;
         }
-        private DBTMPrintQRListModel GeneratePrintQRHTMLTemplate(ParameterModel parameterModel)
+        private DBTMPrintQRListModel GeneratePrintQRHTMLTemplate(string personIds, int generalBatchMasterId, string templateCode)
         {
-            if (parameterModel == null || string.IsNullOrEmpty(parameterModel.Ids))
-                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
-            List<long> personIds = parameterModel.Ids.Split(',').Select(x => Convert.ToInt64(x)).ToList();
-            List<GeneralPerson> persons = _generalPersonRepository.Table.Where(x => personIds.Contains(x.PersonId)).ToList();
-            List<DBTMTraineeDetails> traineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => personIds.Contains(x.PersonId)).ToList();
+            if (string.IsNullOrEmpty(personIds))
+                throw new CoditechException(ErrorCodes.InvalidData, "personIds are empty");
+            List<long> personIdList = personIds.Split(',').Select(x => Convert.ToInt64(x)).ToList();
+            List<GeneralPerson> persons = _generalPersonRepository.Table.Where(x => personIdList.Contains(x.PersonId)).ToList();
+            List<DBTMTraineeDetails> traineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => personIdList.Contains(x.PersonId)).ToList();
             DBTMPrintQRListModel listModel = new DBTMPrintQRListModel();
             listModel.DBTMPrintQRList = new List<DBTMPrintQRModel>();
-            // string templateCode = EmailTemplateCodeCustomEnum.DBTMAutoActivityQRCodeFormatVertical.ToString();
-            string templateCode = EmailTemplateCodeCustomEnum.DBTMAutoActivityQRCodeFormatHorizontal.ToString();
             string finalHtml = "";
             var centreCode = traineeDetails.FirstOrDefault()?.CentreCode;
             var emailTemplate = GetEmailTemplateByCode(centreCode, templateCode);
             if (emailTemplate == null || string.IsNullOrWhiteSpace(emailTemplate.EmailTemplate))
                 throw new CoditechException(ErrorCodes.NullModel, "QR Template not found.");
+
+            string batchName = _generalBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchMasterId).BatchName;
             foreach (GeneralPerson person in persons)
             {
                 DBTMTraineeDetails trainee = traineeDetails.FirstOrDefault(x => x.PersonId == person.PersonId);
                 string personCode = trainee?.PersonCode;
                 string qrImage = DBTMCustomHelper.GenerateQRCode(personCode, string.Empty);
-                string printableHtml = ReplacePrintableHTMLQRTemplate(emailTemplate.EmailTemplate, person, personCode, qrImage);
+                string printableHtml = ReplacePrintableHTMLQRTemplate(emailTemplate.EmailTemplate, person, personCode, qrImage, batchName);
                 finalHtml += $@"
                 <div style='page-break-inside: avoid;
                             break-inside: avoid;
-                            margin-bottom: 20px;'>
+                            margin-bottom: 2px;'>
                     {printableHtml}
                 </div>";
                 listModel.DBTMPrintQRList.Add(new DBTMPrintQRModel
@@ -115,7 +117,7 @@ namespace Coditech.API.Service
             return listModel;
         }
         #region private
-        private string ReplacePrintableHTMLQRTemplate(string html, GeneralPerson person, string personCode, string qrImage)
+        private string ReplacePrintableHTMLQRTemplate(string html, GeneralPerson person, string personCode, string qrImage, string batchName)
         {
             html = ReplaceTokenWithMessageText("#FirstName#", person.FirstName ?? "", html);
             html = ReplaceTokenWithMessageText("#MiddleName#", person.MiddleName ?? "", html);
@@ -123,6 +125,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#PersonCode#", personCode ?? "", html);
             html = ReplaceTokenWithMessageText("#MobileNumber#", person.MobileNumber ?? "", html);
             html = ReplaceTokenWithMessageText("#DisplayName#", person.Custom2 ?? "", html);
+            html = ReplaceTokenWithMessageText("#BatchName#", batchName, html);
             html = ReplaceTokenWithMessageText("#QRImage#", qrImage ?? "", html);
 
             html = ReplaceTokenWithMessageText("#htmlopen#", "<html>", html);

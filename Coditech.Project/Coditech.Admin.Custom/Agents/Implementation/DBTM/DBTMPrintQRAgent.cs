@@ -3,14 +3,10 @@ using Coditech.Admin.ViewModel;
 using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
-using Coditech.Common.API.Model.Responses;
-using Coditech.Common.Exceptions;
 using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
-using Coditech.Resources;
 using System.Diagnostics;
-using static Coditech.Common.Helper.HelperUtility;
 
 namespace Coditech.Admin.Agents
 {
@@ -56,7 +52,7 @@ namespace Coditech.Admin.Agents
             {
                 userType = CustomConstants.DBTMCentreOwner;
             }
-            DBTMPrintQRListResponse response = _dBTMPrintQRClient.GetDBTMPrintQRTraineeList(generalBatchMasterId, userType,null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            DBTMPrintQRListResponse response = _dBTMPrintQRClient.GetDBTMPrintQRTraineeList(generalBatchMasterId, userType, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             DBTMPrintQRListModel DBTMPrintQRList = new DBTMPrintQRListModel { DBTMPrintQRList = response?.DBTMPrintQRList };
             DBTMPrintQRListViewModel listViewModel = new DBTMPrintQRListViewModel();
             listViewModel.DBTMPrintQRList = DBTMPrintQRList?.DBTMPrintQRList?.ToViewModel<DBTMPrintQRViewModel>().ToList();
@@ -65,12 +61,12 @@ namespace Coditech.Admin.Agents
         }
 
         // Download Print QR by personIds.
-        public virtual DBTMPrintQRListViewModel DownloadPrintQR(string personIds)
+        public virtual DBTMPrintQRListViewModel DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode)
         {
             try
             {
                 _coditechLogging.LogMessage("DownloadPrintQR started.", "DBTMPrintQR", TraceLevel.Info);
-                DBTMPrintQRListResponse response = _dBTMPrintQRClient.DownloadPrintQR(personIds);
+                DBTMPrintQRListResponse response = _dBTMPrintQRClient.DownloadPrintQR(personIds, generalBatchMasterId, templateCode);
                 if (response == null)
                 {
                     return new DBTMPrintQRListViewModel { HasError = true, ErrorMessage = "QR PDF generation failed." };

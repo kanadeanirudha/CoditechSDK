@@ -38,6 +38,7 @@
         JoiningCodeExpiryTime,
         DBTMTrainerwiseBatch,
         DBTMTestwisePerformanceStandardCategory,
+        DBTMQRPrintingTemplateCode,
     }
     public enum DashboardFormCustomEnum
     {
