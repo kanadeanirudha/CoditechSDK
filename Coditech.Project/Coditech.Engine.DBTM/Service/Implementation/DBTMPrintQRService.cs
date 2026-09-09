@@ -81,13 +81,13 @@ namespace Coditech.API.Service
             List<DBTMTraineeDetails> traineeDetails = _dBTMTraineeDetailsRepository.Table.Where(x => personIds.Contains(x.PersonId)).ToList();
             DBTMPrintQRListModel listModel = new DBTMPrintQRListModel();
             listModel.DBTMPrintQRList = new List<DBTMPrintQRModel>();
-            string templateCode = EmailTemplateCodeCustomEnum.DBTMAutoActivityQRCodeFormatVertical.ToString();
+            // string templateCode = EmailTemplateCodeCustomEnum.DBTMAutoActivityQRCodeFormatVertical.ToString();
+            string templateCode = EmailTemplateCodeCustomEnum.DBTMAutoActivityQRCodeFormatHorizontal.ToString();
             string finalHtml = "";
             var centreCode = traineeDetails.FirstOrDefault()?.CentreCode;
             var emailTemplate = GetEmailTemplateByCode(centreCode, templateCode);
             if (emailTemplate == null || string.IsNullOrWhiteSpace(emailTemplate.EmailTemplate))
                 throw new CoditechException(ErrorCodes.NullModel, "QR Template not found.");
-
             foreach (GeneralPerson person in persons)
             {
                 DBTMTraineeDetails trainee = traineeDetails.FirstOrDefault(x => x.PersonId == person.PersonId);
@@ -114,7 +114,6 @@ namespace Coditech.API.Service
             listModel.PrintableHTML = finalHtml;
             return listModel;
         }
-
         #region private
         private string ReplacePrintableHTMLQRTemplate(string html, GeneralPerson person, string personCode, string qrImage)
         {
@@ -123,6 +122,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#LastName#", person.LastName ?? "", html);
             html = ReplaceTokenWithMessageText("#PersonCode#", personCode ?? "", html);
             html = ReplaceTokenWithMessageText("#MobileNumber#", person.MobileNumber ?? "", html);
+            html = ReplaceTokenWithMessageText("#DisplayName#", person.Custom2 ?? "", html);
             html = ReplaceTokenWithMessageText("#QRImage#", qrImage ?? "", html);
 
             html = ReplaceTokenWithMessageText("#htmlopen#", "<html>", html);

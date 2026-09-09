@@ -60,6 +60,7 @@
         DBTMSendPendingAssignmentReminder,
         TraineeReportTemplate,
         DBTMAutoActivityQRCodeFormatVertical,
+        DBTMAutoActivityQRCodeFormatHorizontal,
     }
 
     public enum LogComponentCustomEnum
