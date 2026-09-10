@@ -1684,7 +1684,8 @@ namespace Coditech.API.Service
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CumulativeVelocityWithChangeDistance ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.AccelerationByRow ||
                                     dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.ForceByRow ||
-                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.PowerByRow
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.PowerByRow ||
+                                    dBTMTestParameterListviewSequence.ParameterCode == CustomConstants.CountByTime
                                     )
                                 {
                                     fromTo = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == Convert.ToInt16(spilt[1]))?.FromTo;
