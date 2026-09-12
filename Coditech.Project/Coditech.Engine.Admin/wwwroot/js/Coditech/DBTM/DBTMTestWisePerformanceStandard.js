@@ -2,7 +2,7 @@
     Initialize: function () {
         DBTMTestWisePerformanceStandard.constructor();
     },
-    constructor: function () {
+    constructor: function () {  
     },
     EditRow: function (ageGroupEnumId, genderEnumId) {
         var row = $("#row_" + ageGroupEnumId + "_" + genderEnumId);
@@ -20,50 +20,81 @@
         row.find(".save-btn").hide();
         row.find(".cancel-btn").hide();
     },
-    SaveRow: function (
-        dBTMTestWisePerformanceStandardId,
-        dBTMTestMasterId,
-        dBTMTestwisePerformanceStandardCategoryId,
-        ageGroupEnumId,
-        genderEnumId) {
+    SaveRow: function (ageGroupEnumId, genderEnumId) {
         var row = $("#row_" + ageGroupEnumId + "_" + genderEnumId);
-        var excellentValue = row.find(".excellent-value-input").val();
-        var excellentScore = row.find(".excellent-score-input").val();
-        var veryGoodValue = row.find(".verygood-value-input").val();
-        var veryGoodScore = row.find(".verygood-score-input").val();
-        var goodValue = row.find(".good-value-input").val();
-        var goodScore = row.find(".good-score-input").val();
-        var averageValue = row.find(".average-value-input").val();
-        var averageScore = row.find(".average-score-input").val();
-        var lowValue = row.find(".low-value-input").val();
-        var lowScore = row.find(".low-score-input").val();
-        var poorValue = row.find(".poor-value-input").val();
-        var poorScore = row.find(".poor-score-input").val();
-        CoditechCommon.ShowLodder();   
+        var testMasterId = $("#DBTMTestMasterId").val();
+        var categoryId = $("#DBTMTestwisePerformanceStandardCategoryId").val();
+        var performanceStandards = [];
+        var groupedInputs = {};
+        row.find(".performance-input").each(function () {
+            var input = $(this);
+            var performanceType = input.data("performance-type");
+            var fieldType = input.data("field-type");
+            if (!groupedInputs[performanceType]) {
+                groupedInputs[performanceType] = {
+                    DBTMTestWisePerformanceStandardConfigurationId: input.data("configuration-id"),
+                    AgeGroupEnumId: ageGroupEnumId,
+                    GenderEnumId: genderEnumId,
+                    PerformanceStandardType: performanceType,
+                    PerformanceStandardTypeValue: "",
+                    PerformanceStandardTypeScore: ""
+                };
+            }
+            var rangeType = input.data("range-type");
+            if (fieldType === "value") {
+                if (rangeType === "min") {
+                    groupedInputs[performanceType].ValueMin = input.val();
+                }
+                else if (rangeType === "max") {
+                    groupedInputs[performanceType].ValueMax = input.val();
+                }
+            }
+            if (fieldType === "score") {
+                if (rangeType === "min") {
+                    groupedInputs[performanceType].ScoreMin = input.val();
+                }
+                else if (rangeType === "max") {
+                    groupedInputs[performanceType].ScoreMax = input.val();
+                }
+            }
+        });
+        $.each(groupedInputs, function (key, item) {
+            var valueMin = item.ValueMin || "";
+            var valueMax = item.ValueMax || "";
+            var scoreMin = item.ScoreMin || "";
+            var scoreMax = item.ScoreMax || "";
+            if (valueMin === "" && valueMax === "" && scoreMin === "" && scoreMax === "") {
+                return;
+            }
+            performanceStandards.push({
+                DBTMTestWisePerformanceStandardConfigurationId: item.DBTMTestWisePerformanceStandardConfigurationId,
+                AgeGroupEnumId: item.AgeGroupEnumId,
+                GenderEnumId: item.GenderEnumId,
+                PerformanceStandardType: item.PerformanceStandardType,
+                PerformanceStandardTypeValue: valueMin + "-" + valueMax,
+                PerformanceStandardTypeScore: scoreMin + "-" + scoreMax
+            });
+        });
+        var formData = {
+            DBTMTestMasterId: parseInt(testMasterId),
+            DBTMTestwisePerformanceStandardCategoryId: parseInt(categoryId),
+            AgeGroupEnumId: parseInt(ageGroupEnumId),
+            GenderEnumId: parseInt(genderEnumId)
+        };
+        $.each(performanceStandards, function (index, item) {
+            formData["PerformanceStandards[" + index + "].DBTMTestWisePerformanceStandardConfigurationId"] = item.DBTMTestWisePerformanceStandardConfigurationId;
+            formData["PerformanceStandards[" + index + "].AgeGroupEnumId"] = item.AgeGroupEnumId;
+            formData["PerformanceStandards[" + index + "].GenderEnumId"] = item.GenderEnumId;
+            formData["PerformanceStandards[" + index + "].PerformanceStandardType"] = item.PerformanceStandardType;
+            formData["PerformanceStandards[" + index + "].PerformanceStandardTypeValue"] = item.PerformanceStandardTypeValue;
+            formData["PerformanceStandards[" + index + "].PerformanceStandardTypeScore"] = item.PerformanceStandardTypeScore;
+        });
+        CoditechCommon.ShowLodder();
         $.ajax({
             type: "POST",
             url: "/DBTMTestMaster/SaveDBTMTestWisePerformanceStandard",
-            data: {
-                DBTMTestWisePerformanceStandardId: dBTMTestWisePerformanceStandardId,
-                DBTMTestMasterId: dBTMTestMasterId,
-                DBTMTestwisePerformanceStandardCategoryId: dBTMTestwisePerformanceStandardCategoryId,
-                AgeGroupEnumId: ageGroupEnumId,
-                GenderEnumId: genderEnumId,
-                ExcellentValue: excellentValue,
-                ExcellentScore: excellentScore,
-                VeryGoodValue: veryGoodValue,
-                VeryGoodScore: veryGoodScore,
-                GoodValue: goodValue,
-                GoodScore: goodScore,
-                AverageValue: averageValue,
-                AverageValueScore: averageScore,
-                LowValue: lowValue,
-                LowScore: lowScore,
-                PoorValue: poorValue,
-                PoorScore: poorScore
-            },
+            data: formData,
             success: function (response) {
-                CoditechCommon.HideLodder();
                 if (response.success) {
                     var categoryId = $("#DBTMTestwisePerformanceStandardCategoryId").val();
                     var testId = $("#DBTMTestMasterId").val();
@@ -71,11 +102,17 @@
                         "/DBTMTestMaster/DBTMTestWisePerformanceStandardList" +
                         "?dBTMTestMasterId=" + testId +
                         "&dBTMTestwisePerformanceStandardCategoryId=" + categoryId;
+                    DBTMTestWisePerformanceStandard.DBTMTestwisePerformanceStandardCategoryList();
                 }
-            },
+            }, 
             error: function (xhr) {
-                CoditechCommon.HideLodder();
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
                 CoditechNotification.DisplayNotificationMessage("Error occured while saving record.", "error");
+            },
+            complete: function () {
+                CoditechCommon.HideLodder();
             }
         });
     },
@@ -94,19 +131,14 @@
                     dBTMTestwisePerformanceStandardCategoryId: dBTMTestwisePerformanceStandardCategoryId
                 },
                 success: function (data) {
-
                     $("#DataTablesDivId").html(data);
-
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr) {
                     if (xhr.status == 401 || xhr.status == 403) {
                         location.reload();
                     }
-                    CoditechNotification.DisplayNotificationMessage(
-                        "Failed to retrieve Performance Standard List",
-                        "error"
-                    );
+                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Performance Standard List", "error");
                     CoditechCommon.HideLodder();
                 }
             });

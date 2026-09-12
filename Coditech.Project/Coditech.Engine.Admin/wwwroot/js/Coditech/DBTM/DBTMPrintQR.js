@@ -72,11 +72,11 @@
             });
         }
         if ($("#SelectedParameter1").val() == "") {
-            CoditechNotification.DisplayNotificationMessage("Please select batch.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select Batch.", "error");
             return;
         }
         if (personIds.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Please select at least one athlet.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select at least one Athlete.", "error");
             return;
         }
         CoditechCommon.ShowLodder();

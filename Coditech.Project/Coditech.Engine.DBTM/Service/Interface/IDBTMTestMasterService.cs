@@ -2,6 +2,7 @@
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
 using System.Collections.Specialized;
+using System.Data;
 namespace Coditech.API.Service
 {
     public interface IDBTMTestMasterService
@@ -28,7 +29,7 @@ namespace Coditech.API.Service
         DBTMActivityVerticalViewSequenceModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceModel model);
         DBTMCentreWiseTestListModel GetTestsByCentreCode(string centreCode);
         DBTMCentreWiseTestListModel GetTestsByCentreCodeV2(string centreCode, long? entityId, string userType);
-        DBTMTestWisePerformanceStandardListModel GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
+        DataTable GetDBTMTestWisePerformanceStandardDataTable(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
         DBTMTestWisePerformanceStandardModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model);
         bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model);
         DBTMTestwisePerformanceStandardCategoryListModel GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId);

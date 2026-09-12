@@ -7,6 +7,7 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
@@ -519,8 +520,9 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMTestWisePerformanceStandardListModel list = _dBTMTestMasterService.GetDBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
-                string data = ApiHelper.ToJson(list);
+                DataTable dataTable = _dBTMTestMasterService.GetDBTMTestWisePerformanceStandardDataTable(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                DBTMTestWisePerformanceStandardListResponse response = new DBTMTestWisePerformanceStandardListResponse { DataTable = dataTable };
+                string data = ApiHelper.ToJson(response);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWisePerformanceStandardListResponse>(data) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
