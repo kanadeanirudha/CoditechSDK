@@ -1,4 +1,5 @@
 ﻿using Coditech.Admin.ViewModel;
+using System.Data;
 namespace Coditech.Admin.Agents
 {
     public interface IDBTMTestAgent
@@ -123,7 +124,7 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns created model.</returns>
         DBTMActivityVerticalViewSequenceViewModel CreateActivityVerticalViewSequence(DBTMActivityVerticalViewSequenceViewModel dBTMActivityVerticalViewSequenceViewModel);
         DBTMCentreWiseTestListViewModel GetTestsByCentreCode(string centreCode);
-        DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
+        DataTable DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);
         DBTMTestWisePerformanceStandardViewModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel);
         DBTMTestWisePerformanceStandardViewModel UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel);
         DBTMTestWisePerformanceStandardConfigurationListViewModel DBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId);

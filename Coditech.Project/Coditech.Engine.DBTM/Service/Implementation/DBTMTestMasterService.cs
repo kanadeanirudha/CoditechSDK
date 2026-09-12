@@ -631,20 +631,22 @@ namespace Coditech.API.Service
             return status == 1 ? true : false;
         }
 
-        public virtual DBTMTestWisePerformanceStandardListModel GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        public virtual DataTable GetDBTMTestWisePerformanceStandardDataTable(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
-            CoditechViewRepository<DBTMTestWisePerformanceStandardModel> objStoredProc = new CoditechViewRepository<DBTMTestWisePerformanceStandardModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            objStoredProc.SetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@DBTMTestwisePerformanceStandardCategoryId", dBTMTestwisePerformanceStandardCategoryId, ParameterDirection.Input, DbType.Int16);
-            List<DBTMTestWisePerformanceStandardModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestwisePerformanceStandard @DBTMTestMasterId, @DBTMTestwisePerformanceStandardCategoryId")?.ToList();
-            DBTMTestWisePerformanceStandardListModel dBTMTestWisePerformanceStandardList = new DBTMTestWisePerformanceStandardListModel
+            DataTable dataTable = new DataTable();
+            if (dBTMTestMasterId <= 0 || dBTMTestwisePerformanceStandardCategoryId <= 0)
             {
-                DBTMTestWisePerformanceStandardList = list,
-                DBTMTestMasterId = dBTMTestMasterId,
-                DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId,
-                TestName = _dBTMTestMasterRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId).Select(x => x.TestName).FirstOrDefault()
-            };
-            return dBTMTestWisePerformanceStandardList;
+                return dataTable;
+            }
+            ExecuteSpHelper objStoredProc = new ExecuteSpHelper(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.GetParameter("@DBTMTestMasterId", dBTMTestMasterId, ParameterDirection.Input, SqlDbType.Int);
+            objStoredProc.GetParameter("@DBTMTestwisePerformanceStandardCategoryId", dBTMTestwisePerformanceStandardCategoryId, ParameterDirection.Input, SqlDbType.SmallInt);
+            DataSet dataSet = objStoredProc.GetSPResultInDataSet("Coditech_GetDBTMTestwisePerformanceStandard");
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                dataTable = dataSet.Tables[0];
+            }
+            return dataTable;
         }
 
         public virtual DBTMTestWisePerformanceStandardModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel dBTMTestWisePerformanceStandardModel)
@@ -653,33 +655,48 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
             DBTMTestWisePerformanceStandard entity = dBTMTestWisePerformanceStandardModel.FromModelToEntity<DBTMTestWisePerformanceStandard>();
             DBTMTestWisePerformanceStandard dBTMTestWisePerformanceStandard = _dBTMTestWisePerformanceStandardRepository.Insert(entity);
-            //if (dBTMTestWisePerformanceStandard?.DBTMTestWisePerformanceStandardId > 0)
-            //{
-            //    dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId = dBTMTestWisePerformanceStandard.DBTMTestWisePerformanceStandardId;
-            //}
-            //else
-            //{
-            //    dBTMTestWisePerformanceStandardModel.HasError = true;
-            //    dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
-            //}
-            return dBTMTestWisePerformanceStandardModel;
-        }
-        public virtual bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel dBTMTestWisePerformanceStandardModel)
-        {
-            if (IsNull(dBTMTestWisePerformanceStandardModel))
-                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
-            //if (dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId < 1)
-            //    throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMTestWisePerformanceStandardId"));
-            DBTMTestWisePerformanceStandard dBTMTestWisePerformanceStandard = dBTMTestWisePerformanceStandardModel.FromModelToEntity<DBTMTestWisePerformanceStandard>();
-            //Update DBTMTestWisePerformanceStandard
-            bool isdBTMTestWisePerformanceStandardUpdated = _dBTMTestWisePerformanceStandardRepository.Update(dBTMTestWisePerformanceStandard);
-            if (!isdBTMTestWisePerformanceStandardUpdated)
+            if (dBTMTestWisePerformanceStandard?.DBTMTestWisePerformanceStandardId > 0)
+            {
+                dBTMTestWisePerformanceStandardModel.DBTMTestWisePerformanceStandardId = dBTMTestWisePerformanceStandard.DBTMTestWisePerformanceStandardId;
+            }
+            else
             {
                 dBTMTestWisePerformanceStandardModel.HasError = true;
-                dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.UpdateErrorMessage;
+                dBTMTestWisePerformanceStandardModel.ErrorMessage = GeneralResources.ErrorFailedToCreate;
             }
-            return isdBTMTestWisePerformanceStandardUpdated;
+            return dBTMTestWisePerformanceStandardModel;
         }
+
+        public virtual bool UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel model)
+        {
+            if (IsNull(model))
+                throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
+            DBTMTestWisePerformanceStandard existing =  _dBTMTestWisePerformanceStandardRepository.Table .FirstOrDefault(x =>  x.DBTMTestWisePerformanceStandardConfigurationId ==  model.DBTMTestWisePerformanceStandardConfigurationId      && x.AgeGroupEnumId == model.AgeGroupEnumId   && x.GenderEnumId == model.GenderEnumId);
+            if (IsNull(existing))
+            {
+                DBTMTestWisePerformanceStandard entity = model.FromModelToEntity<DBTMTestWisePerformanceStandard>();
+                DBTMTestWisePerformanceStandard inserted = _dBTMTestWisePerformanceStandardRepository.Insert(entity);
+                if (inserted?.DBTMTestWisePerformanceStandardId > 0)
+                {
+                    model.DBTMTestWisePerformanceStandardId = inserted.DBTMTestWisePerformanceStandardId;
+                    return true;
+                }
+                model.HasError = true;
+                model.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+                return false;
+            }
+            existing.PerformanceStandardTypeValue = model.PerformanceStandardTypeValue;
+            existing.PerformanceStandardTypeScore = model.PerformanceStandardTypeScore;
+            existing.ModifiedDate = DateTime.Now;
+            bool isUpdated = _dBTMTestWisePerformanceStandardRepository.Update(existing);
+            if (!isUpdated)
+            {
+                model.HasError = true;
+                model.ErrorMessage = GeneralResources.UpdateErrorMessage;
+            }
+            return isUpdated;
+        }
+     
         public virtual DBTMTestwisePerformanceStandardCategoryListModel GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId)
         {
             List<DBTMTestwisePerformanceStandardCategoryModel> list;

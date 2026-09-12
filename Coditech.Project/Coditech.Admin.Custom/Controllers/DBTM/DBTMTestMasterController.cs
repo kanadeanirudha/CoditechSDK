@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTestMasterController : BaseController
@@ -406,50 +407,44 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1 });
         }
-
         public ActionResult DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
-            DBTMTestWisePerformanceStandardListViewModel list = new DBTMTestWisePerformanceStandardListViewModel();
-            list.DBTMTestMasterId = dBTMTestMasterId;
-            list.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
+            DBTMTestWisePerformanceStandardListViewModel model = new DBTMTestWisePerformanceStandardListViewModel { DBTMTestMasterId = dBTMTestMasterId, DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId };
             if (dBTMTestMasterId > 0)
             {
-                list.TestName = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId).TestName;
-                if (dBTMTestwisePerformanceStandardCategoryId > 0)
-                {
-                    list = _dBTMTestAgent.DBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
-                }
+                model.TestName = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId)?.TestName;
             }
             if (AjaxHelper.IsAjaxRequest)
             {
-                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml", list);
+                DataTable standardDataTable = _dBTMTestAgent.DBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                ViewData["StandardDataTable"] = standardDataTable;
+                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml", model);
             }
-            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml", list);
+            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml", model);
         }
 
         [HttpPost]
-        public virtual ActionResult SaveDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
+        public virtual ActionResult SaveDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel model)
         {
-            if (ModelState.IsValid)
+            if (model == null || model.PerformanceStandards == null || !model.PerformanceStandards.Any())
             {
-                if (dBTMTestWisePerformanceStandardViewModel.DBTMTestWisePerformanceStandardId > 0)
+                return Json(new { success = false, message = "No data found." });
+            }
+            foreach (DBTMTestWisePerformanceStandardViewModel item in model.PerformanceStandards)
+            {
+                item.DBTMTestMasterId = model.DBTMTestMasterId;
+                item.DBTMTestwisePerformanceStandardCategoryId = model.DBTMTestwisePerformanceStandardCategoryId;
+                DBTMTestWisePerformanceStandardViewModel result = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(item);
+                if (result == null || result.HasError)
                 {
-                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
-                }
-                else
-                {
-                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.CreateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
-                }
-                if (!dBTMTestWisePerformanceStandardViewModel.HasError)
-                {
-                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
-                    return Json(new { success = true });
+                    SetNotificationMessage(GetErrorNotificationMessage(result?.ErrorMessage ?? GeneralResources.UpdateErrorMessage));
+                    return Json(new { success = false });
                 }
             }
-            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
-            return Json(new { success = false });
+            SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+            return Json(new { success = true });
         }
-
+     
         public ActionResult DBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
             DBTMTestWisePerformanceStandardConfigurationListViewModel list = new DBTMTestWisePerformanceStandardConfigurationListViewModel();
