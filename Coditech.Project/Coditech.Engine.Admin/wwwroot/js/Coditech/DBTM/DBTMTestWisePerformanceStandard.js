@@ -2,7 +2,8 @@
     Initialize: function () {
         DBTMTestWisePerformanceStandard.constructor();
     },
-    constructor: function () {  
+    constructor: function () {
+        DBTMTestWisePerformanceStandard.DBTMTestwisePerformanceStandardCategoryList();
     },
     EditRow: function (ageGroupEnumId, genderEnumId) {
         var row = $("#row_" + ageGroupEnumId + "_" + genderEnumId);
@@ -96,15 +97,10 @@
             data: formData,
             success: function (response) {
                 if (response.success) {
-                    var categoryId = $("#DBTMTestwisePerformanceStandardCategoryId").val();
-                    var testId = $("#DBTMTestMasterId").val();
-                    window.location.href =
-                        "/DBTMTestMaster/DBTMTestWisePerformanceStandardList" +
-                        "?dBTMTestMasterId=" + testId +
-                        "&dBTMTestwisePerformanceStandardCategoryId=" + categoryId;
                     DBTMTestWisePerformanceStandard.DBTMTestwisePerformanceStandardCategoryList();
+                    CoditechNotification.DisplayNotificationMessage("Performance standard updated successfully.");
                 }
-            }, 
+            },
             error: function (xhr) {
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
