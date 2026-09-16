@@ -9,6 +9,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
 using Newtonsoft.Json;
+using System.Data;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.Admin.Agents
@@ -408,16 +409,10 @@ namespace Coditech.Admin.Agents
             }
         }
         #endregion
-        public virtual DBTMTestWisePerformanceStandardListViewModel DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        public virtual DataTable DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
             DBTMTestWisePerformanceStandardListResponse response = _dBTMTestClient.GetDBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
-            DBTMTestWisePerformanceStandardListModel listModel = new DBTMTestWisePerformanceStandardListModel { DBTMTestWisePerformanceStandardList = response?.DBTMTestWisePerformanceStandardList };
-            DBTMTestWisePerformanceStandardListViewModel listViewModel = new DBTMTestWisePerformanceStandardListViewModel();
-            listViewModel.DBTMTestWisePerformanceStandardList = listModel?.DBTMTestWisePerformanceStandardList?.ToViewModel<DBTMTestWisePerformanceStandardViewModel>().ToList();
-            listViewModel.DBTMTestMasterId = dBTMTestMasterId;
-            listViewModel.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
-            listViewModel.TestName = response.TestName;
-            return listViewModel;
+            return response?.DataTable;
         }
         public virtual DBTMTestWisePerformanceStandardViewModel CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
         {

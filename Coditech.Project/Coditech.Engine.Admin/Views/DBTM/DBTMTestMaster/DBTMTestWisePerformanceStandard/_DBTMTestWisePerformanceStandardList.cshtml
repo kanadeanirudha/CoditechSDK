@@ -1,203 +1,266 @@
-﻿@using Coditech.Admin.Utilities;
-@model DBTMTestWisePerformanceStandardListViewModel
+﻿@using System.Data
+@{
+    DataTable standardDataTable = ViewData["StandardDataTable"] as DataTable;
+    List<string> performanceTypes = new List<string>();
+    if (standardDataTable != null)
+    {
+        foreach (DataColumn column in standardDataTable.Columns)
+        {
+            string columnName = column.ColumnName;
+            if (columnName.EndsWith(" Value"))
+            {
+                string performanceType = columnName.Substring(0, columnName.Length - " Value".Length);
+                performanceTypes.Add(performanceType);
+            }
+        }
+    }
+    @functions
+    {
+        public string GetRange(string rawValue)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+                return string.Empty;
+            int separatorIndex = rawValue.IndexOf("~");
+            if (separatorIndex >= 0)
+                return rawValue.Substring(separatorIndex + 1).Trim();
+            return rawValue.Trim();
+        }
+        public string GetConfigurationId(string rawValue)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+                return string.Empty;
+            int separatorIndex = rawValue.IndexOf("~");
+            if (separatorIndex >= 0)
+                return rawValue.Substring(0, separatorIndex).Trim();
 
+            return string.Empty;
+        }
+        public string GetMinValue(string range)
+        {
+            if (string.IsNullOrWhiteSpace(range))
+                return string.Empty;
+            string[] values = range.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            return values.Length > 0 ? values[0].Trim() : string.Empty;
+        }
+        public string GetMaxValue(string range)
+        {
+            if (string.IsNullOrWhiteSpace(range))
+                return string.Empty;
+            string[] values = range.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            return values.Length > 1 ? values[1].Trim() : string.Empty;
+        }
+    }
+}
+<style>
+    #PerformanceStandardTableContainer {
+        max-height: calc(100vh - 250px);
+        overflow: auto;
+        position: relative;
+    }
+    #PerformanceStandardTable {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: max-content;
+        min-width: 1800px;
+        table-layout: fixed;
+    }
+    #PerformanceStandardTable thead tr:first-child th {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background-color: #f8f9fa;
+        color: #212529;
+        border-bottom: 1px solid #dee2e6;
+        height: 40px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    #PerformanceStandardTable thead tr:nth-child(2) th {
+        position: sticky;
+        top: 40px;
+        z-index: 29;
+        background-color: #f8f9fa;
+        color: #212529;
+        border-bottom: 1px solid #dee2e6;
+        height: 38px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    #PerformanceStandardTable thead th {
+        white-space: nowrap;
+        vertical-align: middle !important;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    #PerformanceStandardTable tbody td {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    #PerformanceStandardTable th:first-child,
+    #PerformanceStandardTable td:first-child {
+        width: 125px;
+        min-width: 125px;
+    }
+    #PerformanceStandardTable th:nth-child(2),
+    #PerformanceStandardTable td:nth-child(2) {
+        width: 100px;
+        min-width: 100px;
+    }
+    #PerformanceStandardTable thead tr:nth-child(2) th,
+    #PerformanceStandardTable tbody td:nth-child(n+3) {
+        width: 165px;
+        min-width: 165px;
+    }
+    #PerformanceStandardTable .performance-type-end {
+        border-right: 1px solid #dee2e6 !important;
+    }
+    #PerformanceStandardTable thead tr:nth-child(2) th:nth-child(4n) {
+        border-right: 1px solid #dee2e6 !important;
+    }
+    #PerformanceStandardTable th:last-child,
+    #PerformanceStandardTable td:last-child {
+        width: 90px;
+        min-width: 90px;
+    }
+    #PerformanceStandardTable thead tr:first-child th,
+    #PerformanceStandardTable thead tr:nth-child(2) th {
+       background-color: #f8f9fa !important;
+    }
+</style>
 <div class="row">
-    <div class="col-sm-12 table-responsive">
-        <table class="table table-bordered table-striped align-middle nowrap"
-               style="border-collapse: collapse; border-spacing: 0; width: 100%; min-width: 2000px;">
-            <thead>
-                <tr>
-                    <th>Age Group</th>
-                    <th>Gender</th>
-                    <th>Excellent Value</th>
-                    <th>Excellent Score</th>
-                    <th>Very Good Value</th>
-                    <th>Very Good Score</th>
-                    <th>Good Value</th>
-                    <th>Good Score</th>
-                    <th>Average Value</th>
-                    <th>Average Score</th>
-                    <th>Low Value</th>
-                    <th>Low Score</th>
-                    <th>Poor Value</th>
-                    <th>Poor Score</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @if (Model?.DBTMTestWisePerformanceStandardList?.Count > 0)
-                {
-                    foreach (var item in Model.DBTMTestWisePerformanceStandardList)
+    <div class="col-sm-12">
+        <div id="PerformanceStandardTableContainer">
+            <table id="PerformanceStandardTable"
+                   class="table table-bordered table-striped align-middle nowrap">
+                <thead>
+                    <tr>
+                        <th rowspan="2">
+                            Age Group
+                        </th>
+                        <th rowspan="2">
+                            Gender
+                        </th>
+                        @foreach (string performanceType in performanceTypes)
+                        {
+                            <th colspan="4"
+                                class="text-center performance-type-header">
+                                @performanceType
+                            </th>
+                        }
+                        <th rowspan="2">
+                            Action
+                        </th>
+                    </tr>
+                    <tr>
+                        @foreach (string performanceType in performanceTypes)
+                        {
+                            <th>Min Value</th>
+                            <th>Max Value</th>
+                            <th>Min Score</th>
+                            <th class="performance-type-end">Max Score</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (standardDataTable != null &&
+                    standardDataTable.Rows.Count > 0)
                     {
-                        <tr id="row_@(item.AgeGroupEnumId)_@(item.GenderEnumId)">
-
-                            <td>@item.AgeGroupDisplayText</td>
-
-                            <td>@item.GenderDisplayText</td>
-
-                            <!-- Excellent Value -->
-                            <td>
-                                <span class="view-mode">@item.ExcellentValue</span>
-                                <input type="number"
-                                       class="form-control form-control-sm edit-mode excellent-value-input"
-                                       value="@item.ExcellentValue"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
+                        foreach (DataRow dataRow in standardDataTable.Rows)
+                        {
+                            string ageGroupEnumId = Convert.ToString(dataRow["AgeGroupEnumId"]);
+                            string genderEnumId = Convert.ToString(dataRow["GenderEnumId"]);
+                            <tr id="row_@(ageGroupEnumId)_@(genderEnumId)">
+                                <!-- AGE GROUP -->
+                                <td>
+                                    @dataRow["AgeGroupDisplayText"]
+                                </td>
+                                <!-- GENDER -->
+                                <td>
+                                    @dataRow["GenderDisplayText"]
+                                </td>
+                                @foreach (string performanceType in performanceTypes)
+                                {
+                                    string valueColumn = performanceType + " Value";
+                                    string scoreColumn = performanceType + " Score";
+                                    string valueRaw = Convert.ToString(dataRow[valueColumn]);
+                                    string scoreRaw = Convert.ToString(dataRow[scoreColumn]);
+                                    string valueRange = GetRange(valueRaw);
+                                    string scoreRange = GetRange(scoreRaw);
+                                    string valueMin = GetMinValue(valueRange);
+                                    string valueMax = GetMaxValue(valueRange);
+                                    string scoreMin = GetMinValue(scoreRange);
+                                    string scoreMax = GetMaxValue(scoreRange);
+                                    string configurationId = GetConfigurationId(valueRaw);
+                                    <!-- VALUE MIN -->
+                                    <td>
+                                        <span class="view-mode">
+                                            @valueMin
+                                        </span>
+                                        <input type="number" step="0.001" class="form-control edit-mode performance-input" value="@valueMin" data-configuration-id="@configurationId" data-performance-type="@performanceType" data-field-type="value" data-range-type="min" style="display:none;" />
+                                    </td>
+                                    <!-- VALUE MAX -->
+                                    <td>
+                                        <span class="view-mode">
+                                            @valueMax
+                                        </span>
+                                        <input type="number" step="0.001" class="form-control edit-mode performance-input" value="@valueMax" data-configuration-id="@configurationId" data-performance-type="@performanceType" data-field-type="value" data-range-type="max" style="display:none;" />
+                                    </td>
+                                    <!-- SCORE MIN -->
+                                    <td>
+                                        <span class="view-mode">
+                                            @scoreMin
+                                        </span>
+                                        <input type="number"
+                                               step="0.001"
+                                               class="form-control edit-mode performance-input"
+                                               value="@scoreMin"
+                                               data-configuration-id="@configurationId"
+                                               data-performance-type="@performanceType"
+                                               data-field-type="score"
+                                               data-range-type="min"
+                                               style="display:none;" />
+                                    </td>
+                                    <!-- SCORE MAX -->
+                                    <td class="performance-type-end">
+                                        <span class="view-mode">
+                                            @scoreMax
+                                        </span>
+                                        <input type="number" step="0.001" class="form-control edit-mode performance-input" value="@scoreMax" data-configuration-id="@configurationId" data-performance-type="@performanceType" data-field-type="score" data-range-type="max" style="display:none;" />
+                                    </td>
+                                }
+                                <!-- ACTION -->
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-soft-success edit-btn"
+                                            onclick="DBTMTestWisePerformanceStandard.EditRow('@ageGroupEnumId', '@genderEnumId')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-soft-primary save-btn"
+                                            style="display:none;"
+                                            onclick="DBTMTestWisePerformanceStandard.SaveRow('@ageGroupEnumId', '@genderEnumId')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-soft-danger cancel-btn"
+                                            style="display:none;"
+                                            onclick="DBTMTestWisePerformanceStandard.CancelRow('@ageGroupEnumId', '@genderEnumId')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="100%" class="text-center">
+                                No performance standard found.
                             </td>
-
-                            <!-- Excellent Score -->
-                            <td>
-                                <span class="view-mode">@item.ExcellentScore</span>
-                                <input type="text"
-                                       class="form-control form-control-sm edit-mode excellent-score-input"
-                                       value="@item.ExcellentScore"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Very Good Value -->
-                            <td>
-                                <span class="view-mode">@item.VeryGoodValue</span>
-                                <input type="number"
-                                       class="form-control form-control-sm edit-mode verygood-value-input"
-                                       value="@item.VeryGoodValue"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Very Good Score -->
-                            <td>
-                                <span class="view-mode">@item.VeryGoodScore</span>
-                                <input type="text"
-                                       class="form-control form-control-sm edit-mode verygood-score-input"
-                                       value="@item.VeryGoodScore"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Good Value -->
-                            <td>
-                                <span class="view-mode">@item.GoodValue</span>
-                                <input type="number"
-                                       class="form-control form-control-sm edit-mode good-value-input"
-                                       value="@item.GoodValue"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Good Score -->
-                            <td>
-                                <span class="view-mode">@item.GoodScore</span>
-                                <input type="text"
-                                       class="form-control form-control-sm edit-mode good-score-input"
-                                       value="@item.GoodScore"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Average Value -->
-                            <td>
-                                <span class="view-mode">@item.AverageValue</span>
-                                <input type="number"
-                                       class="form-control form-control-sm edit-mode average-value-input"
-                                       value="@item.AverageValue"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Average Score -->
-                            <td>
-                                <span class="view-mode">@item.AverageValueScore</span>
-                                <input type="text"
-                                       class="form-control form-control-sm edit-mode average-score-input"
-                                       value="@item.AverageValueScore"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Low Value -->
-                            <td>
-                                <span class="view-mode">@item.LowValue</span>
-                                <input type="number"
-                                       class="form-control form-control-sm edit-mode low-value-input"
-                                       value="@item.LowValue"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Low Score -->
-                            <td>
-                                <span class="view-mode">@item.LowScore</span>
-                                <input type="text"
-                                       class="form-control form-control-sm edit-mode low-score-input"
-                                       value="@item.LowScore"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Poor Value -->
-                            <td>
-                                <span class="view-mode">@item.PoorValue</span>
-                                <input type="number"
-                                       class="form-control form-control-sm edit-mode poor-value-input"
-                                       value="@item.PoorValue"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Poor Score -->
-                            <td>
-                                <span class="view-mode">@item.PoorScore</span>
-                                <input type="text"
-                                       class="form-control form-control-sm edit-mode poor-score-input"
-                                       value="@item.PoorScore"
-                                       min="0"
-                                       max="999"
-                                       style="display:none;" />
-                            </td>
-
-                            <!-- Action -->
-                            <td class="text-center">
-                                <button type="button"
-                                        class="btn btn-sm btn-soft-success edit-btn"
-                                        onclick="DBTMTestWisePerformanceStandard.EditRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-
-                                <button type="button"
-                                        class="btn btn-sm btn-soft-primary save-btn"
-                                        style="display:none;"
-                                        onclick="DBTMTestWisePerformanceStandard.SaveRow(
-                                        @item.DBTMTestWisePerformanceStandardId,
-                                        @Model.DBTMTestMasterId,
-                                        @Model.DBTMTestwisePerformanceStandardCategoryId,
-                                        @item.AgeGroupEnumId,
-                                        @item.GenderEnumId)">
-                                    <i class="fas fa-check"></i>
-                                </button>
-
-                                <button type="button"
-                                        class="btn btn-sm btn-soft-danger cancel-btn"
-                                        style="display:none;"
-                                        onclick="DBTMTestWisePerformanceStandard.CancelRow(@item.AgeGroupEnumId,@item.GenderEnumId)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </td>
-
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

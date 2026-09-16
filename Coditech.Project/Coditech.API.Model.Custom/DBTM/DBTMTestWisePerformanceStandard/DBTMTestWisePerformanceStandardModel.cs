@@ -4,6 +4,7 @@
     {
         public long DBTMTestWisePerformanceStandardId { get; set; }
         public int DBTMTestWisePerformanceStandardConfigurationId { get; set; }
+        public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
         public int AgeGroupEnumId { get; set; }
         public int GenderEnumId { get; set; }
         public string GenderDisplayText { get; set; }
