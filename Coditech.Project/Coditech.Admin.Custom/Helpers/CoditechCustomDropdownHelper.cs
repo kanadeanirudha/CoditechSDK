@@ -624,16 +624,16 @@ namespace Coditech.Admin.Helpers
         {
             dropdownList.Add(new SelectListItem
             {
-                Text = "Auto Activity QR Code Format Vertical",
+                Text = "QR Code Format Vertical",
                 Value = "DBTMAutoActivityQRCodeFormatVertical",
-                //Selected = CustomConstants.InstantaneousChart == dropdownViewModel.DropdownSelectedValue
+                Selected = dropdownViewModel.DropdownSelectedValue == "DBTMAutoActivityQRCodeFormatVertical"
             });
 
             dropdownList.Add(new SelectListItem
             {
-                Text = "Auto Activity QR Code Format Horizontal",
+                Text = "QR Code Format Horizontal",
                 Value = "DBTMAutoActivityQRCodeFormatHorizontal",
-                //Selected = CustomConstants.ProgressChart == dropdownViewModel.DropdownSelectedValue
+                Selected = dropdownViewModel.DropdownSelectedValue == "DBTMAutoActivityQRCodeFormatHorizontal"
             });
         }
         //private static void GetDBTMMultiBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
