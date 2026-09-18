@@ -475,11 +475,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [HttpGet]
         [Route("/DBTMReports/GetProfileDetailsList")]
         [Produces(typeof(DBTMReportTraineeProfileListResponse))]
-        public virtual IActionResult GetProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, string FromDate, string ToDate)
+        public virtual IActionResult GetProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, string FromDate, string ToDate, string typeOfRecord)
         {
             try
             {
-                DBTMReportTraineeProfileListModel list = _dBTMReportsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate));
+                DBTMReportTraineeProfileListModel list = _dBTMReportsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate), typeOfRecord);
                 string data = ApiHelper.ToJson(list);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMReportTraineeProfileListResponse>(data) : CreateNoContentResponse();
             }

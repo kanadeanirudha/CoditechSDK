@@ -434,9 +434,9 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        public ActionResult GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
         {
-            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord);
             list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetailsV2.cshtml", list);
         }

@@ -1037,7 +1037,7 @@ namespace Coditech.API.Service
         }
 
         #region ProfileDetails
-        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
         {
             DBTMReportTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMReportTraineeProfileListModel();
             CoditechViewRepository<DBTMReportTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMReportTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
