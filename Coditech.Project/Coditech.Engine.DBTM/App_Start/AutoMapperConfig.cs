@@ -48,6 +48,7 @@ namespace Coditech.API.Mapper
             CreateMap<DBTMGraphVerticalViewSequenceModel, DBTMGraphVerticalViewSequence>().ReverseMap();
             CreateMap<DBTMTestWisePerformanceStandardConfiguration, DBTMTestWisePerformanceStandardConfigurationModel>().ReverseMap();
             CreateMap<DBTMTestWisePerformanceStandardType, DBTMTestWisePerformanceStandardTypeModel>().ReverseMap();
+            CreateMap<DBTMGeneralBatchMaster, DBTMGeneralBatchMasterModel>().ReverseMap();
         }
     }
 }

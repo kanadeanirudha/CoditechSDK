@@ -43,6 +43,7 @@ namespace Coditech.API.Data
         public DbSet<DBTMGraphVerticalViewSequence> DBTMGraphVerticalViewSequence { get; set; }
         public DbSet<DBTMTestWisePerformanceStandardConfiguration> DBTMTestWisePerformanceStandardConfiguration { get; set; }
         public DbSet<DBTMTestWisePerformanceStandardType> DBTMTestWisePerformanceStandardType { get; set; }
+        public DbSet<DBTMGeneralBatchMaster> DBTMGeneralBatchMaster { get; set; }
         #endregion
     }
 }
