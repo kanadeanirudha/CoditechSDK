@@ -34,5 +34,7 @@
         public bool IsCampUser { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string PersonTitle { get; set; }
+        public DateTime? UpdatedWeightDate { get; set; }
+        public DateTime? UpdatedHeightDate { get; set; }
     }
 }

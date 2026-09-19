@@ -12,5 +12,11 @@ namespace Coditech.API.Service
         bool UpdateDBTMGraph(DBTMGraphMasterModel model);
         bool DeleteDBTMGraph(ParameterModel parameterModel);
         DBTMTestListModel GetDBTMGraphTestCode();
+        DBTMGraphVerticalViewSequenceModel GetGraphVerticalViewSequence(int dBTMTestParameterVerticalViewSequenceId);
+        bool UpdateGraphVerticalViewSequence(DBTMGraphVerticalViewSequenceModel model);
+        DBTMGraphVerticalViewSequenceListModel GetGraphVerticalViewSequenceList(int dBTMTestMasterId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength);
+        DBTMGraphVerticalViewSequenceModel UpdateGraphVerticalSequenceNumber(DBTMGraphVerticalViewSequenceModel model);
+        DBTMGraphVerticalViewSequenceModel CreateGraphVerticalViewSequence(DBTMGraphVerticalViewSequenceModel model);
+        bool DeleteGraphVerticalViewSequence(ParameterModel parameterModel);
     }
 }

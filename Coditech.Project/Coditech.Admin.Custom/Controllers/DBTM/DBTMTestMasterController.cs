@@ -6,6 +6,7 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMTestMasterController : BaseController
@@ -406,10 +407,47 @@ namespace Coditech.Admin.Controllers
             SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
             return RedirectToAction("ActivityVerticalViewSequenceList", new DataTableViewModel { SelectedParameter1 = SelectedParameter1 });
         }
-
         public ActionResult DBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
-            DBTMTestWisePerformanceStandardListViewModel list = new DBTMTestWisePerformanceStandardListViewModel();
+            DBTMTestWisePerformanceStandardListViewModel model = new DBTMTestWisePerformanceStandardListViewModel { DBTMTestMasterId = dBTMTestMasterId, DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId };
+            if (dBTMTestMasterId > 0)
+            {
+                model.TestName = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId)?.TestName;
+            }
+            if (AjaxHelper.IsAjaxRequest)
+            {
+                DataTable standardDataTable = _dBTMTestAgent.DBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                ViewData["StandardDataTable"] = standardDataTable;
+                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml", model);
+            }
+            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml", model);
+        }
+
+        [HttpPost]
+        public virtual ActionResult SaveDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel model)
+        {
+            if (model == null || model.PerformanceStandards == null || !model.PerformanceStandards.Any())
+            {
+                return Json(new { success = false, message = "No data found." });
+            }
+            foreach (DBTMTestWisePerformanceStandardViewModel item in model.PerformanceStandards)
+            {
+                item.DBTMTestMasterId = model.DBTMTestMasterId;
+                item.DBTMTestwisePerformanceStandardCategoryId = model.DBTMTestwisePerformanceStandardCategoryId;
+                DBTMTestWisePerformanceStandardViewModel result = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(item);
+                if (result == null || result.HasError)
+                {
+                    SetNotificationMessage(GetErrorNotificationMessage(result?.ErrorMessage ?? GeneralResources.UpdateErrorMessage));
+                    return Json(new { success = false });
+                }
+            }
+            SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+            return Json(new { success = true });
+        }
+     
+        public ActionResult DBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            DBTMTestWisePerformanceStandardConfigurationListViewModel list = new DBTMTestWisePerformanceStandardConfigurationListViewModel();
             list.DBTMTestMasterId = dBTMTestMasterId;
             list.DBTMTestwisePerformanceStandardCategoryId = dBTMTestwisePerformanceStandardCategoryId;
             if (dBTMTestMasterId > 0)
@@ -417,30 +455,22 @@ namespace Coditech.Admin.Controllers
                 list.TestName = _dBTMTestAgent.GetDBTMTest(dBTMTestMasterId).TestName;
                 if (dBTMTestwisePerformanceStandardCategoryId > 0)
                 {
-                    list = _dBTMTestAgent.DBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                    list = _dBTMTestAgent.DBTMTestWisePerformanceStandardConfigurationList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
                 }
             }
             if (AjaxHelper.IsAjaxRequest)
             {
-                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/_DBTMTestWisePerformanceStandardList.cshtml", list);
+                return PartialView("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandardConfiguration/_DBTMTestWisePerformanceStandardConfigurationList.cshtml", list);
             }
-            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandard/DBTMTestWisePerformanceStandardList.cshtml", list);
+            return View("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandardConfiguration/DBTMTestWisePerformanceStandardConfigurationList.cshtml", list);
         }
-
         [HttpPost]
-        public virtual ActionResult SaveDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardViewModel dBTMTestWisePerformanceStandardViewModel)
+        public virtual ActionResult SaveDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationViewModel model)
         {
             if (ModelState.IsValid)
             {
-                if (dBTMTestWisePerformanceStandardViewModel.DBTMTestWisePerformanceStandardId > 0)
-                {
-                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
-                }
-                else
-                {
-                    dBTMTestWisePerformanceStandardViewModel = _dBTMTestAgent.CreateDBTMTestWisePerformanceStandard(dBTMTestWisePerformanceStandardViewModel);
-                }
-                if (!dBTMTestWisePerformanceStandardViewModel.HasError)
+                model = _dBTMTestAgent.UpdateDBTMTestWisePerformanceStandardConfiguration(model);
+                if (!model.HasError)
                 {
                     SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
                     return Json(new { success = true });

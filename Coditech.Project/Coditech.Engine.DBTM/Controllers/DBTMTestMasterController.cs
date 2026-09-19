@@ -7,6 +7,7 @@ using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
@@ -519,8 +520,9 @@ namespace Coditech.Engine.DBTM.Controllers
         {
             try
             {
-                DBTMTestWisePerformanceStandardListModel list = _dBTMTestMasterService.GetDBTMTestWisePerformanceStandardList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
-                string data = ApiHelper.ToJson(list);
+                DataTable dataTable = _dBTMTestMasterService.GetDBTMTestWisePerformanceStandardDataTable(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                DBTMTestWisePerformanceStandardListResponse response = new DBTMTestWisePerformanceStandardListResponse { DataTable = dataTable };
+                string data = ApiHelper.ToJson(response);
                 return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWisePerformanceStandardListResponse>(data) : CreateNoContentResponse();
             }
             catch (CoditechException ex)
@@ -577,6 +579,53 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMTestMaster/GetDBTMTestWisePerformanceStandardConfigurationList")]
+        [Produces(typeof(DBTMTestWisePerformanceStandardConfigurationListResponse))]
+        public virtual IActionResult GetDBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            try
+            {
+                DBTMTestWisePerformanceStandardConfigurationListModel list = _dBTMTestMasterService.GetDBTMTestWisePerformanceStandardConfigurationList(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWisePerformanceStandardConfigurationListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWisePerformanceStandardConfiguration", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardConfigurationListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWisePerformanceStandardConfiguration", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardConfigurationListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMTestMaster/UpdateDBTMTestWisePerformanceStandardConfiguration")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMTestWisePerformanceStandardConfigurationResponse))]
+        public virtual IActionResult UpdateDBTMTestWisePerformanceStandardConfiguration([FromBody] DBTMTestWisePerformanceStandardConfigurationModel model)
+        {
+            try
+            {
+                DBTMTestWisePerformanceStandardConfigurationModel result = _dBTMTestMasterService.SaveDBTMTestWisePerformanceStandardConfiguration(model);
+                return IsNotNull(result) ? CreateOKResponse(new DBTMTestWisePerformanceStandardConfigurationResponse { DBTMTestWisePerformanceStandardConfigurationModel = result }) : CreateInternalServerErrorResponse();
+
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWisePerformanceStandardConfiguration", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardConfigurationResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMTestWisePerformanceStandardConfiguration", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWisePerformanceStandardConfigurationResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route("/DBTMTestMaster/GetDBTMTestwisePerformanceStandardCategoryList")]
         [Produces(typeof(DBTMTestwisePerformanceStandardCategoryListResponse))]

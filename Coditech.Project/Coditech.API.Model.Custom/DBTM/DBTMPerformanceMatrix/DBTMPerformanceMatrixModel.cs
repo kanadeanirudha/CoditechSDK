@@ -4,5 +4,6 @@
     {
         public byte DBTMPerformanceMatrixId { get; set; }
         public string PerformanceMatrix { get; set; }
+        public byte? Preference { get; set; }
     }
 }

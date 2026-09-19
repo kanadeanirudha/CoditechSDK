@@ -657,6 +657,63 @@ var DBTMReports = {
             );
         }
     },
+
+    GetBatchWiseTraineeProfileDetailsListV2: function () {
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var orderBy = $("#OrderBy").val();
+        var todate = $("#ToDate").val();
+        var fromdate = todate;
+        if (Array.isArray(dbtmTraineeDetailId)) {
+            dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
+        }
+        $("#DBTMBatchWiseTraineeProfileDetailsDivId").html("");
+        if (generalBatchMasterId && dbtmTraineeDetailId) {
+            CoditechCommon.ShowLodder();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                url: "/DBTMReports/GetBatchWiseTraineeProfileDetailsListV2",
+                data: {
+                    generalBatchMasterId: generalBatchMasterId,
+                    dbtmTraineeDetailIds: dbtmTraineeDetailId,
+                    orderBy: orderBy,
+                    FromDate: fromdate,
+                    ToDate: todate
+                },
+                success: function (data) {
+                    $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
+                    CoditechCommon.HideLodder();
+                },
+                error: function (xhr) {
+                    if (xhr.status == 401 || xhr.status == 403) {
+                        location.reload();
+                    }
+                    CoditechNotification.DisplayNotificationMessage(
+                        "Failed to retrieve Batch trainees.",
+                        "error"
+                    );
+                    CoditechCommon.HideLodder();
+                }
+            });
+
+        }
+        else if (!generalBatchMasterId || generalBatchMasterId === "0") {
+
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select a batch.",
+                "error"
+            );
+        }
+        else if (!dbtmTraineeDetailId) {
+
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select a trainee.",
+                "error"
+            );
+        }
+    },
     GetDBTMMultiTestListByDBTMCampMasterId: function () {
         var campId = $("#DBTMCampMasterId").val();
         if (campId != "") {

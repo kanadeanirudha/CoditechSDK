@@ -36,6 +36,7 @@ namespace Coditech.Admin.Custom
             builder.Services.AddScoped<IDBTMOrganisationCentrewiseJoiningCodeAgent, DBTMOrganisationCentrewiseJoiningCodeAgent>();
             builder.Services.AddScoped<IDBTMGeneralCommonAgent, DBTMGeneralCommonAgent>();
             builder.Services.AddScoped<IDBTMPrintQRAgent, DBTMPrintQRAgent>();
+            builder.Services.AddScoped<IGeneralTrainerAgent, DBTMTrainerAgent>();
             #endregion
             #endregion Agent
 

@@ -41,5 +41,47 @@ namespace Coditech.API.Client
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteDBTMGraph(ParameterModel body);
         DBTMTestListResponse GetDBTMGraphTestCode();
+
+        /// <summary>
+        /// Get GraphVerticalViewSequence by DBTMGraphParameterListViewSequenceId.
+        /// </summary>
+        /// <param name="DBTMGraphParameterVerticalViewSequenceId">DBTMGraphParameterVerticalViewSequenceId</param>
+        /// <returns>Returns DBTMGraphVerticalViewSequenceResponse.</returns>
+        DBTMGraphVerticalViewSequenceResponse GetGraphVerticalViewSequence(int dBTMGraphParameterVerticalViewSequenceId);
+
+        /// <summary>
+        /// Update GraphVerticalViewSequence.
+        /// </summary>
+        /// <param name="DBTMGraphVerticalViewSequenceModel">DBTMGraphVerticalViewSequenceModel.</param>
+        /// <returns>Returns updated DBTMGraphVerticalViewSequenceResponse</returns>
+        DBTMGraphVerticalViewSequenceResponse UpdateGraphVerticalViewSequence(DBTMGraphVerticalViewSequenceModel model);
+
+        /// <summary>
+        /// Get GraphVerticalViewSequence by dBTMGraphMasterId.
+        /// </summary>
+        /// <param name="dBTMGraphMasterId">dBTMGraphMasterId</param>
+        /// <returns>Returns DBTMGraphVerticalViewSequenceListResponse.</returns>   
+        DBTMGraphVerticalViewSequenceListResponse GetGraphVerticalViewSequenceList(int dBTMGraphMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+
+        /// <summary>
+        /// Delete DBTMGraphVerticalViewSequence.
+        /// </summary>
+        /// <param name="ParameterModel">ParameterModel.</param>
+        /// <returns>Returns true if deleted successfully else return false.</returns>
+        TrueFalseResponse DeleteGraphVerticalViewSequence(ParameterModel body);
+
+        /// <summary>
+        /// Update Vertical Sequence Number.
+        /// </summary>
+        /// <param name="DBTMGraphVerticalViewSequenceModel">DBTMGraphVerticalViewSequenceModel.</param>
+        /// <returns>Returns DBTMGraphVerticalViewSequenceResponse.</returns>
+        DBTMGraphVerticalViewSequenceResponse UpdateGraphVerticalSequenceNumber(DBTMGraphVerticalViewSequenceModel body);
+
+        /// <summary>
+        /// Create DBTMGraphVerticalViewSequence.
+        /// </summary>
+        /// <param name="DBTMGraphVerticalViewSequenceModel">DBTMGraphVerticalViewSequenceModel.</param>
+        /// <returns>Returns DBTMGraphVerticalViewSequenceResponse.</returns>
+        DBTMGraphVerticalViewSequenceResponse CreateGraphVerticalViewSequence(DBTMGraphVerticalViewSequenceModel body);
     }
 }

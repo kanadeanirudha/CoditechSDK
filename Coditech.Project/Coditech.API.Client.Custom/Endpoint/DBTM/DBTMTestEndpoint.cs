@@ -71,17 +71,24 @@ namespace Coditech.API.Endpoint
            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateActivityVerticalViewSequence";
         public string GetTestsByCentreCode(string centreCode) =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetTestsByCentreCode?centreCode={centreCode}";
-       
+
         public string GetDBTMTestWisePerformanceStandardListAsync(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
         {
             return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestWisePerformanceStandardList?dBTMTestMasterId={dBTMTestMasterId}&dBTMTestwisePerformanceStandardCategoryId={dBTMTestwisePerformanceStandardCategoryId}";
         }
-        
+
         public string CreateDBTMTestWisePerformanceStandardAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/CreateDBTMTestWisePerformanceStandard";
-        
+
         public string UpdateDBTMTestWisePerformanceStandardAsync() =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateDBTMTestWisePerformanceStandard";
+
+        public string GetDBTMTestWisePerformanceStandardConfigurationListAsync(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestWisePerformanceStandardConfigurationList?dBTMTestMasterId={dBTMTestMasterId}&dBTMTestwisePerformanceStandardCategoryId={dBTMTestwisePerformanceStandardCategoryId}";
+        }
+        public string UpdateDBTMTestWisePerformanceStandardConfigurationAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/UpdateDBTMTestWisePerformanceStandardConfiguration";
         public string GetDBTMTestwisePerformanceStandardCategoryListAsync(short dBTMTestwisePerformanceStandardCategoryId)
         {
             return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTestMaster/GetDBTMTestwisePerformanceStandardCategoryList?dBTMTestwisePerformanceStandardCategoryId={dBTMTestwisePerformanceStandardCategoryId}";

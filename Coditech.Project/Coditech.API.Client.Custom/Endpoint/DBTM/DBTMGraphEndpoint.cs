@@ -16,7 +16,7 @@ namespace Coditech.API.Endpoint
 
         public string GetDBTMGraphAsync(string graphCode) =>
             $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/GetDBTMGraph?graphCode={graphCode}";
-       
+
         public string UpdateDBTMGraphAsync() =>
                $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/UpdateDBTMGraph";
 
@@ -24,5 +24,19 @@ namespace Coditech.API.Endpoint
                   $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/DeleteDBTMGraph";
         public string GetDBTMGraphTestCodeAsync() =>
           $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/GetDBTMGraphTestCode";
+        public string GetGraphVerticalViewSequenceListAsync(int dBTMGraphMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/GetGraphVerticalViewSequenceList?dBTMGraphMasterId={dBTMGraphMasterId}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
+        }
+        public string DeleteGraphVerticalViewSequenceAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/DeleteGraphVerticalViewSequence";
+        public string GetGraphVerticalViewSequenceAsync(int dBTMGraphVerticalViewSequenceId) =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/GetGraphVerticalViewSequence?dBTMGraphVerticalViewSequenceId={dBTMGraphVerticalViewSequenceId}";
+        public string UpdateGraphVerticalViewSequenceAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/UpdateGraphVerticalViewSequence";
+        public string UpdateGraphVerticalSequenceNumberAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/UpdateGraphVerticalSequenceNumber";
+        public string CreateGraphVerticalViewSequenceAsync() =>
+            $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMGraphMaster/CreateGraphVerticalViewSequence";
     }
 }

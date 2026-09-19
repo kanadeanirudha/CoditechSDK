@@ -432,6 +432,14 @@ namespace Coditech.Admin.Controllers
             list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetails.cshtml", list);
         }
+
+        [HttpGet]
+        public ActionResult GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
+            list.OrderBy = orderBy;
+            return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetailsV2.cshtml", list);
+        }
         [HttpGet]
         public IActionResult GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
         {

@@ -248,6 +248,13 @@ namespace Coditech.Admin.Agents
             listViewModel.DBTMTraineeProfileList = dBTMTraineeProfileList?.DBTMTraineeProfileList?.ToViewModel<DBTMTraineeProfileViewModel>().ToList();
             return listViewModel;
         }
+
+        public virtual DBTMReportTraineeProfileListModel GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        {
+            DBTMReportTraineeProfileListResponse response = _dBTMReportsClient.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
+            DBTMReportTraineeProfileListModel dBTMTraineeProfileList = new DBTMReportTraineeProfileListModel { DBTMTraineeProfileList = response?.DBTMTraineeProfileList };
+            return dBTMTraineeProfileList;
+        }
         public virtual DBTMReportsListViewModel CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime FromDate, DateTime ToDate)
         {
             DBTMReportsListViewModel listViewModel = new DBTMReportsListViewModel();

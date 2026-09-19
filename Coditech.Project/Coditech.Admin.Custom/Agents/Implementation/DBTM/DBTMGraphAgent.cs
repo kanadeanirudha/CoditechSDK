@@ -8,6 +8,7 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using static Coditech.Common.Helper.HelperUtility;
 
@@ -159,6 +160,136 @@ namespace Coditech.Admin.Agents
         }
         #endregion
 
+        //Get Graph Vertical View Sequence
+        public virtual DBTMGraphVerticalViewSequenceListViewModel GetGraphVerticalViewSequenceList(int dBTMGraphMasterId, DataTableViewModel dataTableModel)
+        {
+            FilterCollection filters = new FilterCollection();
+            dataTableModel = dataTableModel ?? new DataTableViewModel();
+            DBTMGraphVerticalViewSequenceListResponse response = _dBTMGraphClient.GetGraphVerticalViewSequenceList(dBTMGraphMasterId, null, null, null, null, int.MaxValue);
+            DBTMGraphVerticalViewSequenceListModel graphVerticalViewSequenceList = new DBTMGraphVerticalViewSequenceListModel { DBTMGraphVerticalViewSequenceList = response?.DBTMGraphVerticalViewSequenceList };
+            DBTMGraphVerticalViewSequenceListViewModel listViewModel = new DBTMGraphVerticalViewSequenceListViewModel();
+            listViewModel.DBTMGraphVerticalViewSequenceList = graphVerticalViewSequenceList?.DBTMGraphVerticalViewSequenceList?.ToViewModel<DBTMGraphVerticalViewSequenceViewModel>().ToList();
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMGraphVerticalViewSequenceList.Count, BindGraphVerticalViewSequenceColumns());
+            listViewModel.DBTMGraphMasterId = dBTMGraphMasterId;
+            listViewModel.GraphName = response?.GraphName;
+            listViewModel.GraphCode = response?.GraphCode;
+            return listViewModel;
+        }
+
+        public virtual DBTMGraphVerticalViewSequenceViewModel GetGraphVerticalViewSequence(int dBTMGraphVerticalViewSequenceId)
+        {
+            DBTMGraphVerticalViewSequenceResponse response = _dBTMGraphClient.GetGraphVerticalViewSequence(dBTMGraphVerticalViewSequenceId);
+            return response?.DBTMGraphVerticalViewSequenceModel?.ToViewModel<DBTMGraphVerticalViewSequenceViewModel>();
+        }
+
+        //Update Graph Vertical View Sequence
+        public virtual DBTMGraphVerticalViewSequenceViewModel UpdateGraphVerticalViewSequence(DBTMGraphVerticalViewSequenceViewModel model)
+        {
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMGraph", TraceLevel.Info);
+                DBTMGraphVerticalViewSequenceResponse response = _dBTMGraphClient.UpdateGraphVerticalViewSequence(model.ToModel<DBTMGraphVerticalViewSequenceModel>());
+                DBTMGraphVerticalViewSequenceModel graphVerticalViewSequenceModel = response?.DBTMGraphVerticalViewSequenceModel;
+                _coditechLogging.LogMessage("Agent method execution done.", "DBTMGraph", TraceLevel.Info);
+                return IsNotNull(graphVerticalViewSequenceModel) ? graphVerticalViewSequenceModel.ToViewModel<DBTMGraphVerticalViewSequenceViewModel>() : (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(new DBTMGraphVerticalViewSequenceViewModel(), GeneralResources.UpdateErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Error);
+                return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, GeneralResources.UpdateErrorMessage);
+            }
+        }
+
+        //Update Graph Vertical Sequence Number
+        public virtual DBTMGraphVerticalViewSequenceViewModel UpdateGraphVerticalSequenceNumber(DBTMGraphVerticalViewSequenceViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(model.DBTMSequenceData))
+                {
+                    List<DBTMGraphVerticalViewSequenceModel> graphVerticalViewSequenceList = JsonConvert.DeserializeObject<List<DBTMGraphVerticalViewSequenceModel>>(model.DBTMSequenceData);
+                    model.DBTMGraphVerticalViewSequenceList = graphVerticalViewSequenceList;
+                }
+
+                DBTMGraphVerticalViewSequenceResponse response = _dBTMGraphClient.UpdateGraphVerticalSequenceNumber(model.ToModel<DBTMGraphVerticalViewSequenceModel>());
+                DBTMGraphVerticalViewSequenceModel graphVerticalViewSequenceModel = response?.DBTMGraphVerticalViewSequenceModel;
+                return IsNotNull(graphVerticalViewSequenceModel) ? graphVerticalViewSequenceModel.ToViewModel<DBTMGraphVerticalViewSequenceViewModel>() : new DBTMGraphVerticalViewSequenceViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist:
+                        return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, ex.ErrorMessage);
+                    default:
+                        return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Error);
+                return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
+        //Create Graph Vertical View Sequence
+        public virtual DBTMGraphVerticalViewSequenceViewModel CreateGraphVerticalViewSequence(DBTMGraphVerticalViewSequenceViewModel model)
+        {
+            try
+            {
+                DBTMGraphVerticalViewSequenceResponse response = _dBTMGraphClient.CreateGraphVerticalViewSequence(model.ToModel<DBTMGraphVerticalViewSequenceModel>());
+                DBTMGraphVerticalViewSequenceModel graphVerticalViewSequenceModel = response?.DBTMGraphVerticalViewSequenceModel;
+                return IsNotNull(graphVerticalViewSequenceModel) ? graphVerticalViewSequenceModel.ToViewModel<DBTMGraphVerticalViewSequenceViewModel>() : new DBTMGraphVerticalViewSequenceViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AlreadyExist: return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, ex.ErrorMessage);
+                    default:
+                        return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, GeneralResources.ErrorFailedToCreate);
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Error);
+                return (DBTMGraphVerticalViewSequenceViewModel)GetViewModelWithErrorMessage(model, GeneralResources.ErrorFailedToCreate);
+            }
+        }
+
+        //Delete Graph Vertical View Sequence
+        public virtual bool DeleteGraphVerticalViewSequence(string dBTMGraphVerticalViewSequenceIds, out string errorMessage)
+        {
+            errorMessage = GeneralResources.ErrorFailedToDelete;
+            try
+            {
+                _coditechLogging.LogMessage("Agent method execution started.", "DBTMGraph", TraceLevel.Info);
+                TrueFalseResponse trueFalseResponse = _dBTMGraphClient.DeleteGraphVerticalViewSequence(new ParameterModel { Ids = dBTMGraphVerticalViewSequenceIds });
+                return trueFalseResponse.IsSuccess;
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Warning);
+                switch (ex.ErrorCode)
+                {
+                    case ErrorCodes.AssociationDeleteError:
+                        errorMessage = AdminResources.ErrorDeleteDBTMGraphMaster;
+                        return false;
+                    default:
+                        errorMessage = GeneralResources.ErrorFailedToDelete;
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMGraph", TraceLevel.Error);
+                errorMessage = GeneralResources.ErrorFailedToDelete;
+                return false;
+            }
+        }
+
         #region protected
         protected virtual List<DatatableColumns> BindColumns()
         {
@@ -210,6 +341,42 @@ namespace Coditech.Admin.Agents
                 ColumnName = "Active",
                 ColumnCode = "IsActive",
                 IsSortable = true,
+            });
+            return datatableColumnList;
+        }
+
+        protected virtual List<DatatableColumns> BindGraphVerticalViewSequenceColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns
+            {
+                ColumnName = "Parameter Code",
+                ColumnCode = "ParameterCode"
+            });
+            datatableColumnList.Add(new DatatableColumns
+            {
+                ColumnName = "Column Name",
+                ColumnCode = "ColumnName"
+            });
+            datatableColumnList.Add(new DatatableColumns
+            {
+                ColumnName = "Display On",
+                ColumnCode = "DisplayOn"
+            });
+            datatableColumnList.Add(new DatatableColumns
+            {
+                ColumnName = "Sequence Number",
+                ColumnCode = "SequenceNumber"
+            });
+            datatableColumnList.Add(new DatatableColumns
+            {
+                ColumnName = "Recursion",
+                ColumnCode = "Recursion"
+            });
+            datatableColumnList.Add(new DatatableColumns
+            {
+                ColumnName = "Calculated Parameter",
+                ColumnCode = "IsCalculatedParameter"
             });
             return datatableColumnList;
         }

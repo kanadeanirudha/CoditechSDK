@@ -47,6 +47,8 @@ namespace Coditech.Admin.Agents
             if (!string.IsNullOrEmpty(dataTableModel.SearchBy))
             {
                 filters.Add("JoiningCode", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("Custom2", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
+                filters.Add("Custom4", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
             if (!string.IsNullOrEmpty(dataTableModel.SelectedParameter2) && dataTableModel.SelectedParameter2 != "0")
             {

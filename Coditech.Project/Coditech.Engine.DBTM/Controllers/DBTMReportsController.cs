@@ -423,5 +423,76 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMReports/AssignmentWiseMultipleReports")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult AssignmentWiseMultipleReports(string dBTMTestMasterIds, long generalTrainerMasterId, string fromDate, string toDate, bool isMobileRequest)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.AssignmentWiseMultipleReports(dBTMTestMasterIds, generalTrainerMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), isMobileRequest);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssignmentWiseMultipleReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssignmentWiseMultipleReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMReports/AssignmentWiseMultipleReportsV2")]
+        [Produces(typeof(DBTMTestWiseReportsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult AssignmentWiseMultipleReportsV2(string dBTMTestMasterIds, string dBTMTraineeDetailIds, long generalTrainerMasterId, string fromDate, string toDate, bool isMobileRequest)
+        {
+            try
+            {
+                DBTMReportsListModel list = _dBTMReportsService.AssignmentWiseMultipleReportsV2(dBTMTestMasterIds, dBTMTraineeDetailIds, generalTrainerMasterId, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate), isMobileRequest);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTestWiseReportsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssignmentWiseMultipleReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "AssignmentWiseMultipleReports", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTestWiseReportsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("/DBTMReports/GetProfileDetailsList")]
+        [Produces(typeof(DBTMReportTraineeProfileListResponse))]
+        public virtual IActionResult GetProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, string FromDate, string ToDate)
+        {
+            try
+            {
+                DBTMReportTraineeProfileListModel list = _dBTMReportsService.GetProfileDetailsList(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, Convert.ToDateTime(FromDate), Convert.ToDateTime(ToDate));
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMReportTraineeProfileListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "ProfileDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMReportTraineeProfileListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "ProfileDetails", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeProfileListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

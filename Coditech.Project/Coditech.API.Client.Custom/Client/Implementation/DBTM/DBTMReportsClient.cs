@@ -705,6 +705,62 @@ namespace Coditech.API.Client
             }
         }
 
+        public virtual DBTMReportTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        {
+            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<DBTMReportTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
+
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+
+            try
+            {
+                ApiStatus status = new ApiStatus();
+
+                response = await GetResourceFromEndpointAsync(
+                    endpoint,
+                    status,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMReportTraineeProfileListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object ?? new DBTMReportTraineeProfileListResponse();
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMReportTraineeProfileListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null
+                        ? null
+                        : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    UpdateApiStatus(null, status, response);
+
+                    throw new CoditechException(
+                        status.ErrorCode,
+                        status.ErrorMessage,
+                        status.StatusCode
+                    );
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response?.Dispose();
+            }
+        }
+
         public virtual DBTMTestWiseReportsListResponse CampWiseMultipleReports(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)
         {
             return Task.Run(async () => await CampWiseMultipleReportsAsync(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode, CancellationToken.None)).GetAwaiter().GetResult();

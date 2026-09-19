@@ -69,7 +69,7 @@ namespace Coditech.Engine.DBTM.Controllers
                 string DataUniqueIds = null;
                 if (status)
                 {
-                    DataUniqueIds = string.Join(",",model.Where(x => !string.IsNullOrEmpty(x.DataUniqueId)).Select(x => x.DataUniqueId));
+                    DataUniqueIds = string.Join(",", model.Where(x => !string.IsNullOrEmpty(x.DataUniqueId)).Select(x => x.DataUniqueId));
                 }
                 return CreateOKResponse(new CustomTrueFalseResponse { IsSuccess = status, DUI = DataUniqueIds });
             }
@@ -182,49 +182,6 @@ namespace Coditech.Engine.DBTM.Controllers
             {
                 _coditechLogging.LogMessage(ex, "DBTMBatchActivity", TraceLevel.Error);
                 return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
-        [Route("/DBTMApi/GetAssignmentList")]
-        [HttpGet]
-        [Produces(typeof(DBTMTestApiListResponse))]
-        public IActionResult GetAssignmentList(long entityId, string userType)
-        {
-            try
-            {
-                List<DBTMTestApiModel> list = _dBTMApiService.GetAssignmentList(entityId, userType);
-                return IsNotNull(list) ? CreateOKResponse(new DBTMTestApiListResponse { DBTMTestList = list }) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new DBTMTestApiListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTest", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestApiListResponse { HasError = true, ErrorMessage = ex.Message });
-            }
-        }
-
-        [Route("/DBTMApi/GetAssignmentDetails")]
-        [HttpGet]
-        [Produces(typeof(DBTMTestApiResponse))]
-        public IActionResult GetAssignmentDetails(long dBTMTraineeAssignmentId)
-        {
-            try
-            {
-                DBTMTestApiModel model = _dBTMApiService.GetAssignmentDetails(dBTMTraineeAssignmentId);
-                return IsNotNull(model) ? CreateOKResponse(new DBTMTestApiResponse { DBTMTestApiModel = model }) : CreateNoContentResponse();
-            }
-            catch (CoditechException ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTestDetails", TraceLevel.Warning);
-                return CreateInternalServerErrorResponse(new DBTMTestApiResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
-            }
-            catch (Exception ex)
-            {
-                _coditechLogging.LogMessage(ex, "DBTMTestDetails", TraceLevel.Error);
-                return CreateInternalServerErrorResponse(new DBTMTestApiResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
 
@@ -553,6 +510,71 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeDetailsResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+        [Route("/DBTMApi/GetUserDetailsForAssignmentWiseTesting")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchUserResponse))]
+        public IActionResult GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate)
+        {
+            try
+            {
+                List<DBTMGeneralBatchUserModel> model = _dBTMApiService.GetUserDetailsForAssignmentWiseTesting(generalTrainerMasterId, dbtmTestMasterId, assignmentDate);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchUserResponse { DBTMBatchUserList = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchUserResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
 
+        [Route("/DBTMApi/GetTestListForAssignmentWiseTestingCreatedByTrainer")]
+        [HttpGet]
+        [Produces(typeof(DBTMBatchResponse))]
+        public IActionResult GetTestListForAssignmentWiseTestingCreatedByTrainer(long generalTrainerMasterId, DateTime assignmentDate, string centreCode)
+        {
+            try
+            {
+                DBTMBatchModel model = _dBTMApiService.GetTestListForAssignmentWiseTestingCreatedByTrainer(generalTrainerMasterId, assignmentDate, centreCode);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMBatchResponse { BatchModel = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMBatchResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("/DBTMApi/GetTraineeListForAssignmentWiseTesting")]
+        [Produces(typeof(DBTMTraineeDetailsListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetTraineeListForAssignmentWiseTesting(long generalTrainerMasterId, string dBTMTestMasterId, string centreCode, DateTime assignmentDate)
+        {
+            try
+            {
+                DBTMTraineeDetailsListModel list = _dBTMApiService.GetTraineeListForAssignmentWiseTesting(generalTrainerMasterId, dBTMTestMasterId, centreCode, assignmentDate);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMTraineeDetailsListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMAssignmentWiseTesting", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

@@ -15,7 +15,7 @@
         Title = $"{ViewBag.Title} : {Model.FirstName} {Model.LastName} - {Model.TestName}",
         SaveButtonText = GeneralResources.SaveButtonText,
         CancelUrl = (isPopup && !isTrainer) ? "" : ((isPopup || !string.IsNullOrEmpty(Model.Custom4)) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, custom4 = string.IsNullOrEmpty(Model.Custom4) ? "Mobile View" : Model.Custom4 })
-         : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId })),
+                 : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, SelectedParameter1 = Model.GeneralTrainerMasterId })),
         CancelButtonText = GeneralResources.CancelButtonText,
         ControllerName = controllerName,
         ActionName = actionName,

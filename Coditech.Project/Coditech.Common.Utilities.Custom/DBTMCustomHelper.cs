@@ -190,6 +190,10 @@ namespace Coditech.Common.Helper.Utilities
                         time = Convert.ToDecimal(group.FirstOrDefault(x => x.ParameterCode == CustomConstants.Time && x.Row == recurtion).ParameterValue);
                         result = time != 0 && count != 0 ? $"{Math.Round(count / time, CustomConstants.GraphListRoundUpValue)}" : isGraph ? "0" : CustomConstants.InvalidData;
                         break;
+                    case CustomConstants.AirTime:
+                        decimal totalAirTime = group.Where(x => x.ParameterCode == CustomConstants.AirTime).Sum(x => Convert.ToDecimal(x.ParameterValue));
+                        result = totalAirTime > 0 ? $"{Math.Round(totalAirTime / recurtion, CustomConstants.GraphListRoundUpValue)}" : "0";
+                        break;
                 }
                 return result = isDisplayUnit ? $"{result} {Unit(calculationCode)}" : result;
             }
@@ -535,6 +539,20 @@ namespace Coditech.Common.Helper.Utilities
             {
                 return string.Empty;
             }
+        }
+
+        public static string HexToRgba(string hex, double alpha = 1.0)
+        {
+            hex = hex.TrimStart('#');
+
+            if (hex.Length != 6)
+                throw new ArgumentException("HEX color must be 6 characters.");
+
+            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+            return $"rgba({r}, {g}, {b}, {alpha})";
         }
     }
 }

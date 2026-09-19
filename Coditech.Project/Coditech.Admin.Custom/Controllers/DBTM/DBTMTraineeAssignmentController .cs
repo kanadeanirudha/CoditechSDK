@@ -129,9 +129,11 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId, string custom4, string ispopup = "", string istrainer = "")
+        public ActionResult GetDBTMTraineeAssignment(long dBTMTraineeAssignmentUserId, string SelectedCentreCode, string GeneralTrainerMasterId, string custom4, string ispopup = "", string istrainer = "")
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
+            dBTMTraineeAssignmentViewModel.SelectedCentreCode = SelectedCentreCode;
+            dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId =  Convert.ToInt64(GeneralTrainerMasterId);
             dBTMTraineeAssignmentViewModel.Custom4 = custom4;
             ViewBag.IsPopup = ispopup;
             ViewBag.IsTrainer = istrainer;

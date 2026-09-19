@@ -8,7 +8,7 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByCentreCode()" };
-    DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Convert.ToString(Model.GeneralTrainerMasterId), ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true, SelectedText = "-------Select Trainer-------", SelectedValue = "" };
+    DropdownViewModel trainerDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CentrewiseDBTMTrainer.ToString(), DropdownName = "SelectedParameter1", Parameter = Model.SelectedCentreCode, DropdownSelectedValue = Model.SelectedParameter1, ChangeEvent = "DBTMTraineeAssignment.GetDBTMTrainerListByGeneralTrainerMasterId('" + @controllerName + "','" + @actionName + "')", IsCustomDropdown = true, SelectedText = "-------Select Trainer-------", SelectedValue = "" };
     string isPopUpView = Convert.ToString(ViewBag.IsDashboardPopup);
     if (string.IsNullOrEmpty(isPopUpView))
     {
