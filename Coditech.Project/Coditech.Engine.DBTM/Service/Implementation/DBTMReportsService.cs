@@ -1179,7 +1179,7 @@ namespace Coditech.API.Service
             }
             if (scores?.Length > 0)
             {
-                item.OverallActivityScore = scores.Sum() / scores.Length;
+                item.OverallActivityScore = Math.Round(scores.Sum() / scores.Length, CustomConstants.GraphListRoundUpValue);
             }
             item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores, colors);
 
