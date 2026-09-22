@@ -418,16 +418,27 @@ namespace Coditech.API.Service
                 gbm => gbm.CreatedBy,
                 um => um.UserMasterId,
                 (gbm, um) => new { gbm, um }).Join(_generalTrainerMasterRepository.Table,
-                temp => temp.um.EntityId,
-                gtm => gtm.EmployeeId,
-                (temp, gtm) => new
+                 temp => temp.um.EntityId,
+                 gtm => gtm.EmployeeId,
+                 (temp, gtm) => new
+                 {
+                     gtm.GeneralTrainerMasterId,
+                     temp.gbm.BatchName,
+                     temp.gbm.GeneralBatchMasterId,
+                     temp.gbm.IsActive
+                 }).Where(x => trainerIds.Contains(x.GeneralTrainerMasterId) && x.BatchName != null && x.IsActive).GroupBy(x => x.GeneralTrainerMasterId)
+                 .ToDictionary(g => g.Key, g => g.Select(x => x.BatchName).Distinct().ToList());
+            if (trainerId > 0)
+            {
+                if (!batchList.ContainsKey(trainerId) || !batchList[trainerId].Any())
                 {
-                    gtm.GeneralTrainerMasterId,
-                    temp.gbm.BatchName,
-                    temp.gbm.GeneralBatchMasterId
-                })
-                .Where(x => trainerIds.Contains(x.GeneralTrainerMasterId) && x.BatchName != null).GroupBy(x => x.GeneralTrainerMasterId)
-                .ToDictionary(g => g.Key, g => g.Select(x => x.BatchName).Distinct().ToList());
+                    return new DBTMTraineeUploadModel
+                    {
+                        HasError = true,
+                        ErrorMessage = "No batch is associated with this trainer."
+                    };
+                }
+            }
             // Get template
             int templateId = GetTemplateIdByCode("Trainee");
             if (templateId <= 0)
@@ -717,7 +728,7 @@ namespace Coditech.API.Service
                 string normalizedMobile = mobile.Trim();
                 if (duplicateMobiles.Contains(normalizedMobile))
                 {
-                    row[ExcelTemplateColumns.MobileNumber] =  "Mobile Number is duplicate";
+                    row[ExcelTemplateColumns.MobileNumber] = "Mobile Number is duplicate";
                     hasError = true;
                 }
             }
@@ -788,7 +799,7 @@ namespace Coditech.API.Service
                 string normalizedEmail = email.Trim().ToLower();
                 if (duplicateEmails.Contains(normalizedEmail))
                 {
-                    row[ExcelTemplateColumns.EmailAddress] =  "Email Address is duplicate";
+                    row[ExcelTemplateColumns.EmailAddress] = "Email Address is duplicate";
                     hasError = true;
                 }
             }
@@ -821,6 +832,21 @@ namespace Coditech.API.Service
             {
                 row[ExcelTemplateColumns.BatchName] = "Batch is required";
                 hasError = true;
+            }
+            else if (!string.IsNullOrWhiteSpace(joiningCode) && joiningTrainerMap.TryGetValue(joiningCode, out long trainerMasterId))
+            {
+                bool isBatchAssociated = (from gbm in _generalBatchRepository.Table
+                                          join um in _userMasterRepository.Table
+                                              on gbm.CreatedBy equals um.UserMasterId
+                                          join gtm in _generalTrainerMasterRepository.Table
+                                              on um.EntityId equals gtm.EmployeeId
+                                          where gtm.GeneralTrainerMasterId == trainerMasterId && gbm.BatchName == batchName && gbm.IsActive
+                                          select gbm.GeneralBatchMasterId).Any();
+                if (!isBatchAssociated)
+                {
+                    row[ExcelTemplateColumns.BatchName] = $"Batch '{batchName}' is not assigned to this trainer.";
+                    hasError = true;
+                }
             }
             if (!string.IsNullOrWhiteSpace(ageGroup))
             {

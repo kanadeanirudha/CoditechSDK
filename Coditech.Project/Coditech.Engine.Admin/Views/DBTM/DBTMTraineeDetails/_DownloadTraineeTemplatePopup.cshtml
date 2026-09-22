@@ -24,6 +24,7 @@
         <div class="mb-3">
             <label class="form-label required">Trainer</label>
             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown)
+            <span class="text-danger field-validation-valid" data-valmsg-for="GeneralTrainerMasterId" data-valmsg-replace="true"> </span>
         </div>
     }
 </div>
