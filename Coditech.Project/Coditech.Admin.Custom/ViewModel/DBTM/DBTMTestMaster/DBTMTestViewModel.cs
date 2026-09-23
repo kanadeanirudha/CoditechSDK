@@ -60,5 +60,6 @@ namespace Coditech.Admin.ViewModel
         public long ActivityProtocolImage { get; set; }
         public string ActivityProtocolImagePath { get; set; }
         public string ActivityProtocolImageFileName { get; set; }
+        public List<string> DBTMSelectedGraphForReport { get; set; }
     }
 }

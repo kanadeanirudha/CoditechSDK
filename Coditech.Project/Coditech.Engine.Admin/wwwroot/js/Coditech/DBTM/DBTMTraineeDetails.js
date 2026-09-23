@@ -241,7 +241,8 @@
                         val.includes("exists") ||
                         val.includes("duplicate") ||
                         val.includes("contains") ||
-                        val.includes("expired")
+                        val.includes("expired") ||
+                        val.includes("not assigned")
                     );
 
                 if (isError) {
@@ -339,6 +340,7 @@
     ConfirmDownloadTemplate: function () {
         var count = $("#TraineeCount").val();
         clearFieldError("TraineeCount");
+        clearFieldError("GeneralTrainerMasterId");
         count = parseInt(count, 10);
         if (!count || isNaN(count) || count < 1 || count > 999) {
             showFieldError("TraineeCount", "Please enter a number between 1 and 999.");
@@ -372,7 +374,7 @@
                         + "&count=" + encodeURIComponent(count);
                     CoditechCommon.DownloadFile(downloadUrl);
                 } else {
-                    showFieldError("TraineeCount", response.message);
+                    showFieldError("GeneralTrainerMasterId", response.message);
                     CoditechCommon.HideLodder();
                 }
             },

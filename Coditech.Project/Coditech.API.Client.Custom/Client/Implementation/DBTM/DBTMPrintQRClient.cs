@@ -1,11 +1,10 @@
 ﻿using Coditech.API.Endpoint;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
-using Coditech.Common.API.Model.Responses;
 using Coditech.Common.Exceptions;
 using Coditech.Common.Helper.Utilities;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Newtonsoft.Json;
-using System.Net;
 
 namespace Coditech.API.Client
 {
@@ -17,21 +16,21 @@ namespace Coditech.API.Client
             dBTMPrintQREndpoint = new DBTMPrintQREndpoint();
         }
 
-        public virtual DBTMPrintQRListResponse DownloadPrintQR(string personIds)
+        public virtual DBTMPrintQRListResponse DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode)
         {
-            return Task.Run(async () => await DownloadPrintQRAsync(personIds, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await DownloadPrintQRAsync(personIds, generalBatchMasterId, templateCode, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMPrintQRListResponse> DownloadPrintQRAsync(string personIds, System.Threading.CancellationToken cancellationToken)
+        public virtual async Task<DBTMPrintQRListResponse> DownloadPrintQRAsync(string personIds, int generalBatchMasterId, string templateCode, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMPrintQREndpoint.DownloadPrintQRAsync();
+            string endpoint = dBTMPrintQREndpoint.DownloadPrintQRAsync(personIds, generalBatchMasterId, templateCode);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try
             {
                 ApiStatus status = new ApiStatus();
-                ParameterModel model = new ParameterModel{ Ids = personIds };
-                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(model), status, cancellationToken);
+
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
                 Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
@@ -43,8 +42,7 @@ namespace Coditech.API.Client
                     }
                     return objectResponse.Object;
                 }
-                else
-                if (status_ == 204)
+                else if (status_ == 204)
                 {
                     return new DBTMPrintQRListResponse();
                 }
@@ -65,7 +63,7 @@ namespace Coditech.API.Client
 
         public virtual DBTMPrintQRListResponse GetDBTMPrintQRTraineeList(int generalBatchMasterId, string userType, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
-            return Task.Run(async () => await GetDBTMPrintQRTraineeListAsync(generalBatchMasterId,userType, expand, filter, sort, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetDBTMPrintQRTraineeListAsync(generalBatchMasterId, userType, expand, filter, sort, pageIndex, pageSize, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
         public virtual async Task<DBTMPrintQRListResponse> GetDBTMPrintQRTraineeListAsync(int generalBatchMasterId, string userType, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize, CancellationToken cancellationToken)

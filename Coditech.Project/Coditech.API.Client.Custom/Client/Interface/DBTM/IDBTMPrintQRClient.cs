@@ -1,18 +1,16 @@
-﻿using Coditech.Common.API.Model;
-using Coditech.Common.API.Model.Response;
-using Coditech.Common.API.Model.Responses;
+﻿using Coditech.Common.API.Model.Response;
 using Coditech.Common.Helper.Utilities;
 
 namespace Coditech.API.Client
 {
     public interface IDBTMPrintQRClient : IBaseClient
-    {    
+    {
         /// <summary>
         /// Get DBTMPrintQRMaster by PersonId.
         /// </summary>
         /// <param name="PrintQRCode">PrintQRCode</param>
         /// <returns>Returns DBTMPrintQRMasterResponse.</returns>
-        DBTMPrintQRListResponse DownloadPrintQR(string personIds);
+        DBTMPrintQRListResponse DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode);
 
         /// <summary>
         /// Get list of DBTMPrintQRUser.

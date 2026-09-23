@@ -1022,10 +1022,10 @@ namespace Coditech.API.Client
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMCentreWiseTestListResponse> (response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<DBTMCentreWiseTestListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
-                        throw new CoditechException(objectResponse.Object.ErrorCode,objectResponse.Object.ErrorMessage);
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
                     }
                     return objectResponse.Object;
                 }
@@ -1035,7 +1035,7 @@ namespace Coditech.API.Client
                 }
                 else
                 {
-                    string responseData = response.Content == null ? null: await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMCentreWiseTestListResponse typedBody = JsonConvert.DeserializeObject<DBTMCentreWiseTestListResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
@@ -1049,10 +1049,10 @@ namespace Coditech.API.Client
         }
 
         public virtual DBTMTestWisePerformanceStandardListResponse GetDBTMTestWisePerformanceStandardList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
-        { 
-            return Task.Run(async () => await GetDBTMTestWisePerformanceStandardListAsync( dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId, CancellationToken.None)).GetAwaiter().GetResult(); 
+        {
+            return Task.Run(async () => await GetDBTMTestWisePerformanceStandardListAsync(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMTestWisePerformanceStandardListResponse> GetDBTMTestWisePerformanceStandardListAsync( int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWisePerformanceStandardListResponse> GetDBTMTestWisePerformanceStandardListAsync(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId, CancellationToken cancellationToken)
         {
             string endpoint = dBTMTestEndpoint.GetDBTMTestWisePerformanceStandardListAsync(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
             HttpResponseMessage response = null;
@@ -1060,15 +1060,15 @@ namespace Coditech.API.Client
             try
             {
                 ApiStatus status = new ApiStatus();
-                response = await GetResourceFromEndpointAsync( endpoint, status, cancellationToken).ConfigureAwait(false);
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
                 Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardListResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
-                        throw new CoditechException( objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
                     }
                     return objectResponse.Object;
                 }
@@ -1092,9 +1092,9 @@ namespace Coditech.API.Client
         }
         public virtual DBTMTestWisePerformanceStandardResponse CreateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body)
         {
-            return Task.Run(async () => await CreateDBTMTestWisePerformanceStandardAsync( body, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await CreateDBTMTestWisePerformanceStandardAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMTestWisePerformanceStandardResponse> CreateDBTMTestWisePerformanceStandardAsync( DBTMTestWisePerformanceStandardModel body, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWisePerformanceStandardResponse> CreateDBTMTestWisePerformanceStandardAsync(DBTMTestWisePerformanceStandardModel body, CancellationToken cancellationToken)
         {
             string endpoint = dBTMTestEndpoint.CreateDBTMTestWisePerformanceStandardAsync();
             HttpResponseMessage response = null;
@@ -1102,16 +1102,16 @@ namespace Coditech.API.Client
             try
             {
                 ApiStatus status = new ApiStatus();
-                response = await PostResourceToEndpointAsync( endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
+                response = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
                 Dictionary<string, IEnumerable<string>> dictionary = BindHeaders(response);
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
                         {
-                            ObjectResponseResult<DBTMTestWisePerformanceStandardResponse> objectResponseResult2 = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>( response, BindHeaders(response), cancellationToken).ConfigureAwait(false);
+                            ObjectResponseResult<DBTMTestWisePerformanceStandardResponse> objectResponseResult2 = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>(response, BindHeaders(response), cancellationToken).ConfigureAwait(false);
                             if (objectResponseResult2.Object == null)
                             {
-                                throw new CoditechException(objectResponseResult2.Object.ErrorCode,  objectResponseResult2.Object.ErrorMessage);
+                                throw new CoditechException(objectResponseResult2.Object.ErrorCode, objectResponseResult2.Object.ErrorMessage);
                             }
                             return objectResponseResult2.Object;
                         }
@@ -1120,7 +1120,7 @@ namespace Coditech.API.Client
                             ObjectResponseResult<DBTMTestWisePerformanceStandardResponse> objectResponseResult = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>(response, dictionary, cancellationToken).ConfigureAwait(false);
                             if (objectResponseResult.Object == null)
                             {
-                                throw new CoditechException( objectResponseResult.Object.ErrorCode, objectResponseResult.Object.ErrorMessage);
+                                throw new CoditechException(objectResponseResult.Object.ErrorCode, objectResponseResult.Object.ErrorMessage);
                             }
                             return objectResponseResult.Object;
                         }
@@ -1144,9 +1144,9 @@ namespace Coditech.API.Client
 
         public virtual DBTMTestWisePerformanceStandardResponse UpdateDBTMTestWisePerformanceStandard(DBTMTestWisePerformanceStandardModel body)
         {
-            return Task.Run(async () => await UpdateDBTMTestWisePerformanceStandardAsync( body, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await UpdateDBTMTestWisePerformanceStandardAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMTestWisePerformanceStandardResponse> UpdateDBTMTestWisePerformanceStandardAsync( DBTMTestWisePerformanceStandardModel body, CancellationToken cancellationToken)
+        public virtual async Task<DBTMTestWisePerformanceStandardResponse> UpdateDBTMTestWisePerformanceStandardAsync(DBTMTestWisePerformanceStandardModel body, CancellationToken cancellationToken)
         {
             string endpoint = dBTMTestEndpoint.UpdateDBTMTestWisePerformanceStandardAsync();
             HttpResponseMessage response = null;
@@ -1154,33 +1154,33 @@ namespace Coditech.API.Client
             try
             {
                 ApiStatus status = new ApiStatus();
-                response = await PutResourceToEndpointAsync( endpoint, JsonConvert.SerializeObject(body), status,cancellationToken).ConfigureAwait(false);
+                response = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
                 var headers_ = BindHeaders(response);
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse =  await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
-                        throw new CoditechException( objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
                     }
                     return objectResponse.Object;
                 }
                 else if (status_ == 201)
                 {
-                    var objectResponse =  await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>( response, headers_, cancellationToken).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
-                        throw new CoditechException( objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
                     }
                     return objectResponse.Object;
                 }
                 else
                 {
-                    string responseData =  response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMTestWisePerformanceStandardResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
-                    throw new CoditechException( status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
             }
             finally
@@ -1221,6 +1221,95 @@ namespace Coditech.API.Client
                 {
                     string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     DBTMTestwisePerformanceStandardCategoryListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestwisePerformanceStandardCategoryListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTestWisePerformanceStandardConfigurationListResponse GetDBTMTestWisePerformanceStandardConfigurationList(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId)
+        {
+            return Task.Run(async () => await GetDBTMTestWisePerformanceStandardConfigurationListAsync(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestWisePerformanceStandardConfigurationListResponse> GetDBTMTestWisePerformanceStandardConfigurationListAsync(int dBTMTestMasterId, short dBTMTestwisePerformanceStandardCategoryId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.GetDBTMTestWisePerformanceStandardConfigurationListAsync(dBTMTestMasterId, dBTMTestwisePerformanceStandardCategoryId);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardConfigurationListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTestWisePerformanceStandardConfigurationListResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTestWisePerformanceStandardConfigurationListResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardConfigurationListResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTestWisePerformanceStandardConfigurationResponse UpdateDBTMTestWisePerformanceStandardConfiguration(DBTMTestWisePerformanceStandardConfigurationModel body)
+        {
+            return Task.Run(async () => await UpdateDBTMTestWisePerformanceStandardConfigurationAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTestWisePerformanceStandardConfigurationResponse> UpdateDBTMTestWisePerformanceStandardConfigurationAsync(DBTMTestWisePerformanceStandardConfigurationModel body, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTestEndpoint.UpdateDBTMTestWisePerformanceStandardConfigurationAsync();
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardConfigurationResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 201)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTestWisePerformanceStandardConfigurationResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTestWisePerformanceStandardConfigurationResponse typedBody = JsonConvert.DeserializeObject<DBTMTestWisePerformanceStandardConfigurationResponse>(responseData);
                     UpdateApiStatus(typedBody, status, response);
                     throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }

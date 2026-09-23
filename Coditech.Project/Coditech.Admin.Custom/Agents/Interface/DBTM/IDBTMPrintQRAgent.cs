@@ -10,7 +10,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="PrintQRCode">PrintQRCode</param>
         /// <returns>Returns DBTMPrintQRMasterViewModel.</returns>
-        DBTMPrintQRListViewModel DownloadPrintQR(string personIds);
+        DBTMPrintQRListViewModel DownloadPrintQR(string personIds, int generalBatchMasterId, string templateCode);
 
         /// <summary>
         /// Get list of Associated PrintQR.

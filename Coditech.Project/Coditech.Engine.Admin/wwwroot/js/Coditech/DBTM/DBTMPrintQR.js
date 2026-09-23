@@ -22,7 +22,12 @@
                     searchable: false
                 },
                 {
-                    targets: 2,
+                    targets: 5,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 6,
                     orderable: false,
                     searchable: false
                 }
@@ -33,14 +38,45 @@
         DBTMPrintQR.BindDropdownEvents();
     },
     BindDropdownEvents: function () {
-        $(document).on("change", "#SelectedParameter1", function () {
-            var batchId = $(this).val();
-            CoditechDataTable.prototype.GetData(batchId, "DBTMPrintQR", "GetDBTMPrintQRTraineeList", "PrintQRUserListDiv");
+        $(document).on("change", "#QRPrintingTemplateCode", function () {
+            var batchId = $("#SelectedParameter1").val();
+            var templateCode = $(this).val();
+            if (!batchId || batchId === "0") {
+                CoditechNotification.DisplayNotificationMessage("Please select Batch.", "error");
+                $(this).val("");
+                return;
+            }
+            if (!templateCode || templateCode === "0") {
+                $("#PrintQRUserListContainer").hide();
+                $("#PrintQRUserListDiv").empty();
+                return;
+            }
+            DBTMPrintQR.LoadTraineeList();
         });
     },
-
+    ShowPrintQR: function () {
+        var batchId = $("#SelectedParameter1").val();
+        if (!batchId || batchId === "0") {
+            CoditechNotification.DisplayNotificationMessage("Please select Batch.", "error");
+            return;
+        }
+        $("#QRFormatDiv").show();
+        var templateCode = $("#QRPrintingTemplateCode").val();
+        if (!templateCode || templateCode === "0") {
+            $("#QRPrintingTemplateCode").val("DBTMAutoActivityQRCodeFormatVertical");
+        }
+        DBTMPrintQR.LoadTraineeList();
+    },
     LoadTraineeList: function () {
         var batchId = $("#SelectedParameter1").val();
+        var templateCode = $("#QRPrintingTemplateCode").val();
+        if (!batchId || batchId === "0") {
+            CoditechNotification.DisplayNotificationMessage("Please select Batch.", "error");
+            return;
+        }
+        if (!templateCode || templateCode === "0") {
+            return;
+        }
         CoditechCommon.ShowLodder();
         $.ajax({
             url: "/DBTMPrintQR/GetDBTMPrintQRTraineeList",
@@ -50,15 +86,15 @@
             },
             success: function (result) {
                 $("#PrintQRUserListDiv").html(result);
+                $("#PrintQRUserListContainer").show();
                 DBTMPrintQR.InitializePrintQRTable();
                 CoditechCommon.HideLodder();
             },
             error: function (xhr) {
-
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
+                    return;
                 }
-
                 CoditechNotification.DisplayNotificationMessage("Failed to load trainee list.", "error");
                 CoditechCommon.HideLodder();
             }
@@ -74,20 +110,34 @@
                 personIds.push($(this).val());
             });
         }
+        if (!$("#SelectedParameter1").val()) {
+            CoditechNotification.DisplayNotificationMessage("Please select Batch.", "error");
+            return;
+        }
+        if (!$("#QRPrintingTemplateCode").val()) {
+            CoditechNotification.DisplayNotificationMessage("Please select QR format.", "error");
+            return;
+        }
         if (personIds.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Please select at least one Batch.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select at least one Athlete.", "error");
             return;
         }
         CoditechCommon.ShowLodder();
         $.ajax({
             url: "/DBTMPrintQR/CheckPrintQRAvailability",
             type: "GET",
-            data: { personIds: personIds.join(',') },
+            data: {
+                personIds: personIds.join(',')
+            },
             success: function (response) {
                 if (response.success) {
                     var downloadUrl =
                         "/DBTMPrintQR/DownloadPrintQR?personIds="
-                        + encodeURIComponent(personIds.join(','));
+                        + encodeURIComponent(personIds.join(','))
+                        + "&generalBatchMasterId="
+                        + $("#SelectedParameter1").val()
+                        + "&templateCode="
+                        + $("#QRPrintingTemplateCode").val();
                     CoditechCommon.DownloadFile(downloadUrl);
                 }
                 else {
@@ -98,23 +148,33 @@
             error: function (xhr) {
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
+                    return;
                 }
-                CoditechNotification.DisplayNotificationMessage("Error while downloading QR.", "error" );
+                CoditechNotification.DisplayNotificationMessage("Error while downloading QR.", "error");
                 CoditechCommon.HideLodder();
             }
         });
-    }
+    },
+    OnBatchChange: function () {
+        var batchId = $("#SelectedParameter1").val();
+        $("#PrintQRUserListContainer").hide();
+        $("#PrintQRUserListDiv").empty();
+        $("#chkSelectAll").prop("checked", false);
+        if (!batchId || batchId === "0") {
+            $("#QRFormatDiv").hide();
+            return;
+        }
+        $("#QRFormatDiv").show();
+        $("#QRPrintingTemplateCode").val("DBTMAutoActivityQRCodeFormatVertical").trigger("change.select2");
+        DBTMPrintQR.LoadTraineeList();
+    },
 };
 $(document).ready(function () {
     DBTMPrintQR.Initialize();
-    DBTMPrintQR.InitializePrintQRTable();
     $(document).on("change", "#chkSelectAll", function () {
         $(".person-checkbox").prop("checked", $(this).is(":checked"));
     });
     $(document).on("change", ".person-checkbox", function () {
-        $("#chkSelectAll").prop(
-            "checked",
-            $(".person-checkbox").length === $(".person-checkbox:checked").length
-        );
+        $("#chkSelectAll").prop("checked", $(".person-checkbox").length === $(".person-checkbox:checked").length);
     });
 });

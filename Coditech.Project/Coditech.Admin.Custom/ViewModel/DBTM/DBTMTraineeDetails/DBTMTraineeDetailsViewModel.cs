@@ -58,5 +58,7 @@ namespace Coditech.Admin.ViewModel
         public string Remarks { get; set; }
         public bool IsBatchUser { get; set; }
         public bool IsCampUser { get; set; }
+        public DateTime? UpdatedWeightDate { get; set; }
+        public DateTime? UpdatedHeightDate { get; set; }
     }
 }
