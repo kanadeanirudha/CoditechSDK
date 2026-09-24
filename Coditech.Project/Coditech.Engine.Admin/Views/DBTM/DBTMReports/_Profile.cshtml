@@ -7,10 +7,10 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
-    {
-        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
-        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
-    };
+            {
+                ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+                ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
+            };
 }
 <style>
     * {
@@ -460,7 +460,14 @@
 
                                     <div class="top-grid">
                                         <div class="photo-box">
-                                            <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
+                                            @if (!string.IsNullOrEmpty(Model.PhotoMediaPath))
+                                            {
+                                                <img src="@Model.PhotoMediaPath" style="height: 115px; width: 100%; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
+                                            }
                                         </div>
 
                                         <div class="info-box">
