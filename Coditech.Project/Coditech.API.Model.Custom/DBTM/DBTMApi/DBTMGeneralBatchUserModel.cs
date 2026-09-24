@@ -11,6 +11,7 @@
         public string DisplayName { get; set; }
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
+        public int LastNumberOfTurn { get; set; }
     }
 }
 

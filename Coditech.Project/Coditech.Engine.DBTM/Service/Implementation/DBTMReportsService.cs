@@ -33,6 +33,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<EmployeeMaster> _employeeMasterRepository;
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
+        private readonly ICoditechRepository<DBTMGeneralBatchMaster> _dBTMGeneralBatchMasterRepository;
 
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -55,6 +56,7 @@ namespace Coditech.API.Service
             _employeeMasterRepository = new CoditechRepository<EmployeeMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
+            _dBTMGeneralBatchMasterRepository = new CoditechRepository<DBTMGeneralBatchMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         #region Graph
@@ -1070,7 +1072,7 @@ namespace Coditech.API.Service
         }
 
         #region ProfileDetails
-        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
         {
             DBTMReportTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMReportTraineeProfileListModel();
             CoditechViewRepository<DBTMReportTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMReportTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -1113,9 +1115,11 @@ namespace Coditech.API.Service
                 }
 
                 string batchName = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(y => y.BatchName).FirstOrDefault();
+                string batchLocation = _dBTMGeneralBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(y => y.BatchLocation).FirstOrDefault();
                 foreach (var dBTMTraineeProfileModel in traineeDetaillist)
                 {
                     dBTMTraineeProfileModel.BatchName = batchName;
+                    dBTMTraineeProfileModel.AssessmentLocation = batchLocation;
                     dBTMTraineeProfileModel.AssessmentDate = FromDate;
                     dBTMTraineeProfileModel.IsListView = true;
 
@@ -1212,7 +1216,7 @@ namespace Coditech.API.Service
             }
             if (scores?.Length > 0)
             {
-                item.OverallActivityScore = scores.Sum() / scores.Length;
+                item.OverallActivityScore = Math.Round(scores.Sum() / scores.Length, CustomConstants.GraphListRoundUpValue);
             }
             item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores, colors);
 

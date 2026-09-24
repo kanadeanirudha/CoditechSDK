@@ -22,11 +22,11 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTraineeDetails> _dBTMTraineeDetailsRepository;
         private readonly ICoditechRepository<UserMaster> _userMasterRepository;
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
+        private readonly ICoditechRepository<DBTMGeneralBatchMaster> _dBTMGeneralBatchMasterRepository;
         public DBTMGeneralBatchMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(coditechLogging, serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
-            _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
@@ -35,6 +35,7 @@ namespace Coditech.API.Service
             _dBTMTraineeDetailsRepository = new CoditechRepository<DBTMTraineeDetails>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            _dBTMGeneralBatchMasterRepository = new CoditechRepository<DBTMGeneralBatchMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
 
         public GeneralBatchListModel GetCalendarBatches(string centreCode, long userId, DateTime startDate, DateTime endDate)
@@ -67,6 +68,13 @@ namespace Coditech.API.Service
             generalBatchModel = base.CreateGeneralBatch(generalBatchModel);
             if (generalBatchModel.GeneralBatchMasterId > 0)
             {
+                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = new DBTMGeneralBatchMaster
+                {
+                    GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                    BatchLocation = generalBatchModel.Custom1,
+                    CreatedDate = DateTime.Now
+                };
+                _dBTMGeneralBatchMasterRepository.Insert(dbtmGeneralBatchMaster);
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
                     List<DBTMBatchActivity> activityList = new List<DBTMBatchActivity>();
@@ -109,6 +117,11 @@ namespace Coditech.API.Service
             generalBatchModel.CustomDropdownSelectedValue1 = _dBTMBatchActivityRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
             generalBatchModel.CustomDropdownSelectedValue2 = _generalBatchUserRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.EntityId.ToString()).ToList();
             generalBatchModel.Duration = _generalBatchMasterRepository.Table.Where(x => x.GeneralBatchMasterId == generalBatchMasterId).Select(x => x.Duration).FirstOrDefault();
+            DBTMGeneralBatchMaster dbtmGeneralBatchMaster = _dBTMGeneralBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchMasterId);
+            if (dbtmGeneralBatchMaster != null)
+            {
+                generalBatchModel.Custom1 = dbtmGeneralBatchMaster.BatchLocation;
+            }
             string trainerName = _userMasterRepository.Table.Where(x => x.UserMasterId == generalBatchModel.CreatedBy).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
             generalBatchModel.AssignedBy = trainerName;
             return generalBatchModel;
@@ -125,6 +138,23 @@ namespace Coditech.API.Service
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
             if (isGeneralBatchUpdated)
             {
+                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = _dBTMGeneralBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId);
+                if (dbtmGeneralBatchMaster != null)
+                {
+                    dbtmGeneralBatchMaster.BatchLocation = generalBatchModel.Custom1;
+                    dbtmGeneralBatchMaster.ModifiedDate = DateTime.Now;
+                    _dBTMGeneralBatchMasterRepository.Update(dbtmGeneralBatchMaster);
+                }
+                else
+                {
+                    dbtmGeneralBatchMaster = new DBTMGeneralBatchMaster
+                    {
+                        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                        BatchLocation = generalBatchModel.Custom1,
+                        CreatedDate = DateTime.Now
+                    };
+                    _dBTMGeneralBatchMasterRepository.Insert(dbtmGeneralBatchMaster);
+                }
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
                     // Get current and new test master IDs
@@ -299,7 +329,7 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "GeneralBatchMasterId"));
             if (trainerId <= 0)
                 throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "TrainerId"));
-           
+
             CoditechViewRepository<View_ReturnBoolean> objStoredProc = new CoditechViewRepository<View_ReturnBoolean>();
             objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@TrainerId", trainerId, ParameterDirection.Input, DbType.Int64);

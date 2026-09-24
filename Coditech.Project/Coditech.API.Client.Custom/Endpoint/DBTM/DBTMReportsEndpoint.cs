@@ -69,9 +69,9 @@ namespace Coditech.API.Endpoint
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}&orderBy={orderBy}&FromDate={FromDate}&ToDate={ToDate}";
             return endpoint;
         }
-        public string GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        public string GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}&orderBy={orderBy}&FromDate={FromDate}&ToDate={ToDate}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMReports/GetProfileDetailsList?generalBatchMasterId={generalBatchMasterId}&dbtmTraineeDetailIds={dbtmTraineeDetailIds}&orderBy={orderBy}&FromDate={FromDate}&ToDate={ToDate}&typeOfRecord={typeOfRecord}";
             return endpoint;
         }
         public string CampWiseMultipleReportsAsync(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode)

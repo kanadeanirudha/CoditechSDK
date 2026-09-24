@@ -7,10 +7,10 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
-    {
-        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
-        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
-    };
+            {
+                ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+                ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
+            };
 }
 <style>
     * {
@@ -460,7 +460,14 @@
 
                                     <div class="top-grid">
                                         <div class="photo-box">
-                                            <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
+                                            @if (!string.IsNullOrEmpty(Model.PhotoMediaPath))
+                                            {
+                                                <img src="@Model.PhotoMediaPath" style="height: 115px; width: 100%; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
+                                            }
                                         </div>
 
                                         <div class="info-box">
@@ -490,8 +497,8 @@
 
                                             <table class="small-table anthro-table">
                                                 <tr><th>Anthropometry</th><th></th><th>Data<br>recorded<br>date</th></tr>
-                                                <tr><th>Height (cm)</th><td>@Model.Height</td><td>@Model.UpdatedHeightDate.ToCoditechDateFormat()</td></tr>
-                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td>@Model.UpdatedWeightDate.ToCoditechDateFormat()</td></tr>
+                                                <tr><th>Height (m)</th><td>@((Model.Height / 100m).ToString("0.00"))</td><td> @((Model.UpdatedHeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td> @((Model.UpdatedWeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
                                                 <tr><th>BMI</th><td>22.96</td><td></td></tr>
                                             </table>
                                         </div>

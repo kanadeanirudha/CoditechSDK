@@ -11,6 +11,14 @@
                 DropdownSelectedValue = Convert.ToString(Model.Custom3),
                 Parameter = $"{Model.SelectedCentreCode}~324~{Model.GeneralTrainerMasterId}",
                 IsCustomDropdown = true,
+                ChangeEvent = "DBTMPrintQR.OnBatchChange()"
+            };
+    DropdownViewModel templateCodeDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMQRPrintingTemplateCode.ToString(),
+                DropdownName = "QRPrintingTemplateCode",
+                DropdownSelectedValue = "DBTMAutoActivityQRCodeFormatVertical",
+                IsCustomDropdown = true,
                 ChangeEvent = "DBTMPrintQR.LoadTraineeList()"
             };
 }
@@ -20,7 +28,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">Printable QR</span>                      
+                        <span class="card-title">Printable QR</span>
                     </div>
                     <div class="card-header">
                         <div class="row">
@@ -31,13 +39,26 @@
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
                             </div>
                             <div class="col-md-1">
-                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMPrintQR.LoadTraineeList()" />
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMPrintQR.ShowPrintQR()" />
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div id="PrintQRUserListDiv" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                            @Html.Partial("~/Views/DBTM/DBTMPrintQR/_DBTMPrintQRList.cshtml", Model)
+                    <div id="QRFormatDiv" class="card-body pb-0" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-1">
+                                @Html.Label("QR Format")
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", templateCodeDropdown)
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-warning warning-bg mb-2" onclick="DBTMPrintQR.PrintQR(0)"> Download All </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="PrintQRUserListContainer" class="card-body" style="display:none;">
+                        <div id="PrintQRUserListDiv"
+                             class="dataTables_wrapper dt-bootstrap5 no-footer">
                         </div>
                     </div>
                 </div>
@@ -45,6 +66,13 @@
         </div>
     </div>
 </div>
+<style>
+    .warning-bg {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #fff !important;
+    }
+</style>
 <iframe id="hiddenDownloader" style="display:none;" frameborder="0"></iframe>
 @section scripts
 {

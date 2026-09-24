@@ -705,14 +705,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMReportTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
+        public virtual DBTMReportTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
         {
-            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMReportTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, CancellationToken cancellationToken)
+        public virtual async Task<DBTMReportTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord,CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate);
+            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord);
 
             HttpResponseMessage response = null;
             var disposeResponse = true;
