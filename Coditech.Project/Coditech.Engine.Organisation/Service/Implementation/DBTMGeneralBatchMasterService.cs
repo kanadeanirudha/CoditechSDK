@@ -68,13 +68,16 @@ namespace Coditech.API.Service
             generalBatchModel = base.CreateGeneralBatch(generalBatchModel);
             if (generalBatchModel.GeneralBatchMasterId > 0)
             {
-                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = new DBTMGeneralBatchMaster
+                if (!string.IsNullOrWhiteSpace(generalBatchModel.Custom1))
                 {
-                    GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
-                    BatchLocation = generalBatchModel.Custom1,
-                    CreatedDate = DateTime.Now
-                };
-                _dBTMGeneralBatchMasterRepository.Insert(dbtmGeneralBatchMaster);
+                    DBTMGeneralBatchMaster dbtmGeneralBatchMaster = new DBTMGeneralBatchMaster
+                    {
+                        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                        BatchLocation = generalBatchModel.Custom1,
+                        CreatedDate = DateTime.Now
+                    };
+                    _dBTMGeneralBatchMasterRepository.Insert(dbtmGeneralBatchMaster);
+                }
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
                     List<DBTMBatchActivity> activityList = new List<DBTMBatchActivity>();
@@ -138,22 +141,32 @@ namespace Coditech.API.Service
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
             if (isGeneralBatchUpdated)
             {
-                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = _dBTMGeneralBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId);
-                if (dbtmGeneralBatchMaster != null)
+                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = _dBTMGeneralBatchMasterRepository.Table .FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId);
+                if (!string.IsNullOrWhiteSpace(generalBatchModel.Custom1))
                 {
-                    dbtmGeneralBatchMaster.BatchLocation = generalBatchModel.Custom1;
-                    dbtmGeneralBatchMaster.ModifiedDate = DateTime.Now;
-                    _dBTMGeneralBatchMasterRepository.Update(dbtmGeneralBatchMaster);
+                    if (dbtmGeneralBatchMaster != null)
+                    {
+                        dbtmGeneralBatchMaster.BatchLocation = generalBatchModel.Custom1;
+                        dbtmGeneralBatchMaster.ModifiedDate = DateTime.Now;
+                        _dBTMGeneralBatchMasterRepository.Update(dbtmGeneralBatchMaster);
+                    }
+                    else
+                    {
+                        dbtmGeneralBatchMaster = new DBTMGeneralBatchMaster
+                        {
+                            GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
+                            BatchLocation = generalBatchModel.Custom1,
+                            CreatedDate = DateTime.Now
+                        };
+                        _dBTMGeneralBatchMasterRepository.Insert(dbtmGeneralBatchMaster);
+                    }
                 }
                 else
                 {
-                    dbtmGeneralBatchMaster = new DBTMGeneralBatchMaster
+                    if (dbtmGeneralBatchMaster != null)
                     {
-                        GeneralBatchMasterId = generalBatchModel.GeneralBatchMasterId,
-                        BatchLocation = generalBatchModel.Custom1,
-                        CreatedDate = DateTime.Now
-                    };
-                    _dBTMGeneralBatchMasterRepository.Insert(dbtmGeneralBatchMaster);
+                        _dBTMGeneralBatchMasterRepository.Delete(dbtmGeneralBatchMaster);
+                    }
                 }
                 if (generalBatchModel.CustomDropdownSelectedValue1?.Count > 0)
                 {
