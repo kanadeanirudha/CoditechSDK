@@ -497,13 +497,13 @@ var DBTMReports = {
                 },
                 success: function (response) {
                     if (response.success) {
-            var downloadUrl = "/DBTMReports/DownloadBatchReport"
-                + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
-                + "&generalBatchMasterId=" + encodeURIComponent(generalBatchMasterId)
-                + "&fromDate=" + encodeURIComponent(fromdate)
-                + "&toDate=" + encodeURIComponent(todate)
-                + "&reportType=" + encodeURIComponent(reportType);
-            CoditechCommon.DownloadFile(downloadUrl);
+                        var downloadUrl = "/DBTMReports/DownloadBatchReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&generalBatchMasterId=" + encodeURIComponent(generalBatchMasterId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.DownloadFile(downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available for download.", "error");
                         CoditechCommon.HideLodder();
@@ -687,13 +687,17 @@ var DBTMReports = {
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr) {
+                    CoditechCommon.HideLodder();
                     if (xhr.status == 401 || xhr.status == 403) {
                         location.reload();
+                        return;
                     }
                     CoditechNotification.DisplayNotificationMessage(
                         "Failed to retrieve Batch trainees.",
                         "error"
                     );
+                },
+                complete: function () {
                     CoditechCommon.HideLodder();
                 }
             });
@@ -800,13 +804,13 @@ var DBTMReports = {
                 },
                 success: function (response) {
                     if (response.success) {
-            var downloadUrl = "/DBTMReports/DownloadCampReport"
-                + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
-                + "&dBTMCampMasterId=" + encodeURIComponent(campId)
-                + "&fromDate=" + encodeURIComponent(fromdate)
-                + "&toDate=" + encodeURIComponent(todate)
-                + "&reportType=" + encodeURIComponent(reportType);
-            CoditechCommon.DownloadFile(downloadUrl);
+                        var downloadUrl = "/DBTMReports/DownloadCampReport"
+                            + "?dBTMTestMasterIds=" + encodeURIComponent(dBTMTestMasterId)
+                            + "&dBTMCampMasterId=" + encodeURIComponent(campId)
+                            + "&fromDate=" + encodeURIComponent(fromdate)
+                            + "&toDate=" + encodeURIComponent(todate)
+                            + "&reportType=" + encodeURIComponent(reportType);
+                        CoditechCommon.DownloadFile(downloadUrl);
                     } else {
                         CoditechNotification.DisplayNotificationMessage(response.message || "No data available.", "error");
                         CoditechCommon.HideLodder();
@@ -817,7 +821,7 @@ var DBTMReports = {
                     CoditechCommon.HideLodder();
                 }
             });
-                    } else {
+        } else {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },
@@ -910,5 +914,20 @@ var DBTMReports = {
                 CoditechCommon.HideLodder();
             }
         });
+    },
+    PrintTraineeProfile: function (button) {
+        var $button = $(button);
+        var $accordionItem = $button.closest(".accordion-item");
+        var $report = $accordionItem.find(".page").first();
+        if ($report.length === 0) {
+            CoditechNotification.DisplayNotificationMessage("Trainee profile report not found.", "error");
+            return;
+        }
+        $(".print-selected-report").removeClass("print-selected-report");
+        $report.addClass("print-selected-report");
+        window.print();
+        setTimeout(function () {
+            $report.removeClass("print-selected-report");
+        }, 1000);
     },
 };
