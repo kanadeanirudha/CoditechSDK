@@ -12,6 +12,7 @@
         public bool? IsUp { get; set; }
         public string UpDownValue { get; set; }
         public string Score { get; set; }
+        public string LastScore { get; set; }
         public string BestValue { get; set; }
         public string Unit { get; set; }
     }

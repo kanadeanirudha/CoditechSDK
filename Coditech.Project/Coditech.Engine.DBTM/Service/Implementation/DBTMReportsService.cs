@@ -6,10 +6,10 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
-using System.Globalization;
 namespace Coditech.API.Service
 {
     public class DBTMReportsService : BaseService, IDBTMReportsService
@@ -1041,6 +1041,9 @@ namespace Coditech.API.Service
         #region ProfileDetails
         public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
         {
+            if (generalBatchMasterId <= 0)
+                return null;
+
             DBTMReportTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMReportTraineeProfileListModel();
             CoditechViewRepository<DBTMReportTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMReportTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
@@ -1114,9 +1117,11 @@ namespace Coditech.API.Service
                     .Where(id => id > 0)
                     .Distinct());
                 List<DBTMReportPerformanceStandardModel> dbtmReportPerformanceStandardList = GetReportPerformanceStandardList(ageGroupEnumIds, genderEnumIds, dBTMTestMasterIds, 0);
-                Dictionary<string, double> performunceMatrixScore = null;
+                DateTime? overallLastActivityDate = null;
+                List<DBTMTraineeProfilePerformanceModel> traineeLastPerformanceList = GetTraineeLastPerformanceDetails(generalBatchMasterId, out overallLastActivityDate);
                 foreach (var item in traineeDetaillist)
                 {
+                    item.OverallLastActivityDate = overallLastActivityDate;
                     // Ensure we have a materialized list to iterate and build chart data
                     var traineePerformunceList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
                     foreach (var item2 in traineePerformunceList)
@@ -1143,10 +1148,36 @@ namespace Coditech.API.Service
                         {
                             double calculatedScore = CalculatePerformanceStandardScore(bestValue, standardsForItem, item2.TestOutputHigher);
                             item2.Score = Math.Round(calculatedScore, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+                            //Calculate Last Score
+                            if (traineeLastPerformanceList?.Count > 0)
+                            {
+                                string bestLastValue = traineeLastPerformanceList.FirstOrDefault(x => x.TestCode == item2.TestCode && x.DBTMTraineeDetailId == item.DBTMTraineeDetailId).BestValue;
+                                if (!string.IsNullOrEmpty(bestLastValue))
+                                {
+                                    double calculatedLastScore = CalculatePerformanceStandardScore(Convert.ToDouble(bestLastValue), standardsForItem, item2.TestOutputHigher);
+                                    item2.LastScore = Math.Round(calculatedLastScore, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                    if (calculatedScore > calculatedLastScore)
+                                    {
+                                        item2.IsUp = true;
+                                        item2.UpDownValue = Math.Round((calculatedScore - calculatedLastScore) / calculatedLastScore * 100, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                    }
+                                    else if (calculatedScore < calculatedLastScore)
+                                    {
+                                        item2.IsUp = false;
+                                        item2.UpDownValue = Math.Round((calculatedLastScore - calculatedScore) / calculatedScore * 100, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                    }
+                                    else
+                                    {
+                                        item2.IsUp = null;
+                                        item2.UpDownValue = string.Empty;
+                                    }
+                                }
+                            }
                         }
                     }
                     if (item.IsTraineeProfilePerformanceAvailable)
-                        BindBarAndRadarChart(testName, performunceMatrixScore, item, traineePerformunceList);
+                        BindBarAndRadarChart(testName, item, traineePerformunceList);
                 }
             }
             if (traineeDetaillist?.Count > 0)
@@ -1163,13 +1194,21 @@ namespace Coditech.API.Service
             return dBTMTraineeProfileListModel;
         }
 
-        private void BindBarAndRadarChart(string[] testName, Dictionary<string, double> performunceMatrixScore, DBTMReportTraineeProfileModel item, List<DBTMTraineeProfilePerformanceModel> traineePerformunceList)
+        private void BindBarAndRadarChart(string[] testName, DBTMReportTraineeProfileModel item, List<DBTMTraineeProfilePerformanceModel> traineePerformunceList)
         {
+            Dictionary<string, double> performunceMatrixScore = new Dictionary<string, double>();
             // Build arrays for chart: test names and their numeric scores
             string[] testNames = traineePerformunceList.Select(p => p.TestCode ?? string.Empty).ToArray();
             decimal[] scores = traineePerformunceList.Select(p =>
             {
                 if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
+                    return sc;
+                return 0m;
+            }).ToArray();
+
+            decimal[] lastScores = traineePerformunceList.Select(p =>
+            {
+                if (decimal.TryParse(p.LastScore, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
                     return sc;
                 return 0m;
             }).ToArray();
@@ -1184,6 +1223,25 @@ namespace Coditech.API.Service
             if (scores?.Length > 0)
             {
                 item.OverallActivityScore = Math.Round(scores.Sum() / scores.Length, CustomConstants.GraphListRoundUpValue);
+                item.OverallLastActivityScore = Math.Round(lastScores.Sum() / lastScores.Length, CustomConstants.GraphListRoundUpValue);
+                if (item.OverallLastActivityScore != 0)
+                {
+                    if (item.OverallActivityScore > item.OverallLastActivityScore)
+                    {
+                        item.OverallActivityScoreIsUp = true;
+                        item.OverallActivityScoreUPDownValue = Math.Round((item.OverallActivityScore - item.OverallLastActivityScore) / item.OverallLastActivityScore * 100, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    else if (item.OverallActivityScore < item.OverallLastActivityScore)
+                    {
+                        item.OverallActivityScoreIsUp = false;
+                        item.OverallActivityScoreUPDownValue = Math.Round((item.OverallLastActivityScore - item.OverallActivityScore) / item.OverallActivityScore * 100, CustomConstants.GraphListRoundUpValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        item.OverallActivityScoreIsUp = null;
+                        item.OverallActivityScoreUPDownValue = string.Empty;
+                    }
+                }
             }
             item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores, colors);
 
@@ -1221,8 +1279,6 @@ namespace Coditech.API.Service
         {
             DataTable dt = new DataTable();
             traineeProfilePerformanceList = new List<DBTMTraineeProfilePerformanceModel>();
-            if (generalBatchMasterId <= 0)
-                return dt;
 
             CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
@@ -1410,6 +1466,116 @@ namespace Coditech.API.Service
                 }
             }
             return dt;
+        }
+        private List<DBTMTraineeProfilePerformanceModel> GetTraineeLastPerformanceDetails(long generalBatchMasterId, out DateTime? overallLastActivityDate)
+        {
+            overallLastActivityDate = _dBTMDeviceDataRepository.Table
+                                 .Where(x => x.TablePrimaryColumnId == generalBatchMasterId)
+                                 .Select(x => x.TestPerformedTime.Date)
+                                 .Distinct()
+                                 .OrderByDescending(x => x)
+                                 .Skip(1)
+                                 .Select(x => (DateTime?)x)
+                                 .FirstOrDefault();
+            if (!overallLastActivityDate.HasValue)
+            {
+                return new List<DBTMTraineeProfilePerformanceModel>();
+            }
+
+            List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = new List<DBTMTraineeProfilePerformanceModel>();
+
+            CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfilePerformanceRankingModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralBranchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@FromDate", overallLastActivityDate, ParameterDirection.Input, DbType.Date);
+            objStoredProc.SetParameter("@ToDate", overallLastActivityDate, ParameterDirection.Input, DbType.Date);
+            List<DBTMTraineeProfilePerformanceRankingModel> traineeProfilePerformanceRankDataList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeRanking @GeneralBranchMasterId,@FromDate, @ToDate")?.ToList();
+            if (traineeProfilePerformanceRankDataList != null && traineeProfilePerformanceRankDataList.Count > 0)
+            {
+                traineeProfilePerformanceRankDataList.ForEach(x =>
+                {
+                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                });
+
+                var testList = traineeProfilePerformanceRankDataList
+                               .Select(x => new
+                               {
+                                   x.DBTMTestMasterId,
+                                   x.TestName,
+                                   x.TestCode,
+                                   x.PerformanceMatrix,
+                                   x.TestOutputHigher,
+                                   x.TestResultBasedon,
+                                   x.PerformanceMatrixColor
+                               })
+                               .Distinct()
+                               .ToList();
+
+
+
+                List<long> dbtmTraineeDetailIdList = traineeProfilePerformanceRankDataList
+                    .Select(x => x.DBTMTraineeDetailId)
+                    .Distinct()
+                    .ToList();
+
+                foreach (long traineeId in dbtmTraineeDetailIdList)
+                {
+                    var traineeProfile = traineeProfilePerformanceRankDataList.First(x => x.DBTMTraineeDetailId == traineeId);
+
+                    var traineeProfileList = traineeProfilePerformanceRankDataList.Where(x => x.DBTMTraineeDetailId == traineeId);
+
+                    foreach (var test in testList)
+                    {
+                        var testResultData = traineeProfileList
+                            .Where(x => x.TestCode == test.TestCode)
+                            .Select(x => new { x.TestResultBasedon, x.TestOutputHigher })
+                            .FirstOrDefault();
+
+                        if (testResultData == null)
+                        {
+                            continue;
+                        }
+
+                        var groupedData = traineeProfileList.Where(x => x.TestCode == test.TestCode && x.ParameterCode == testResultData.TestResultBasedon)
+                                        .GroupBy(x => x.CreatedDate)
+                                        .Select(g => new
+                                        {
+                                            CreatedDate = g.Key,
+                                            ParameterValueSum = g.Sum(x =>
+                                                string.IsNullOrEmpty(x.ParameterValue) ? 0 : Convert.ToDouble(x.ParameterValue))
+                                        }).ToList();
+
+                        if (!groupedData.Any())
+                        {
+                            continue;
+                        }
+
+                        double value = 0;
+
+                        if (testResultData.TestOutputHigher == "LO")
+                            value = groupedData.Min(x => x.ParameterValueSum);
+                        else if (testResultData.TestOutputHigher == "HO")
+                            value = groupedData.Max(x => x.ParameterValueSum);
+
+                        value = Math.Round(value, CustomConstants.GraphListRoundUpValue);
+                        DBTMTraineeProfilePerformanceModel dBTMTraineeProfilePerformanceModel = new DBTMTraineeProfilePerformanceModel
+                        {
+                            DBTMTraineeDetailId = traineeProfile.DBTMTraineeDetailId,
+                            DBTMTestMasterId = test.DBTMTestMasterId,
+                            TestCode = test.TestCode,
+                            TestOutputHigher = test.TestOutputHigher,
+                            TestName = testList.First(x => x.TestCode == test.TestCode).TestName,
+                            PerformanceMatrix = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrix,
+                            BestValue = $"{value}",
+                            Unit = $"{DBTMCustomHelper.Unit(testList.First(x => x.TestCode == test.TestCode).TestResultBasedon)}",
+                            PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor
+                        };
+
+                        traineeProfilePerformanceList.Add(dBTMTraineeProfilePerformanceModel);
+                    }
+                }
+            }
+
+            return traineeProfilePerformanceList;
         }
 
         private double CalculatePerformanceStandardScore(double value, List<DBTMReportPerformanceStandardModel> standards, string testOutputHigher)

@@ -1,4 +1,5 @@
 ﻿@using Coditech.Admin.Utilities;
+@using System.Text.RegularExpressions;
 @using Coditech.Common.API.Model;
 @model DBTMReportTraineeProfileModel
 @{
@@ -6,11 +7,18 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+    // precompute sanitized printable name and common URLs
+    var logoUrl = Url.Content("~/assets/images/dbtm/applicationlogo.png");
+    string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
-            {
-                ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
-                ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
-            };
+    {
+        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
+    };
+    var fnameSafe = SanitizeForFilename(Model.FirstName ?? "Trainee");
+    var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
+    var assessment = Model.AssessmentDate;
+    string profilePrintName = $"PerformanceReport_{fnameSafe}{(string.IsNullOrEmpty(lnameSafe) ? string.Empty : "_" + lnameSafe)}";
 }
 <style>
     * {
@@ -45,8 +53,8 @@
         }
 
     .page {
-        /* width: 210mm; */
-        /* min-height: 297mm; */
+        /* width: 210mm;
+                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -387,11 +395,16 @@
 
     .notes {
         border: 1.5px solid #111;
-        height: 45px;
-        margin: 0 -7px;
-        margin-top: 12px;
-        padding: 4px;
+        /* allow notes to expand if content is larger than one line */
+        min-height: 45px;
+        height: auto;
+        /* avoid negative margins which can cause clipping when printing */
+        margin: 12px 0 25px 0;
+        padding: 8px;
         font-size: 8px;
+        box-sizing: border-box;
+        white-space: pre-wrap;
+        word-wrap: break-word;
     }
 
     .footer-bar {
@@ -417,6 +430,111 @@
         .performance-pair table {
             width: 100%;
         }
+
+    @@media print {
+        html,
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm !important;
+            min-height: 297mm !important;
+            background: #fff !important;
+        }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+        .print-selected-report,
+        .print-selected-report * {
+            visibility: visible !important;
+        }
+
+        .print-selected-report {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 10mm 9mm 8mm !important;
+            background: #fff !important;
+            box-shadow: none !important;
+            /* allow overflowing content to be visible when printing (charts/tables may exceed fixed heights) */
+            overflow: visible !important;
+            box-sizing: border-box !important;
+        }
+            /* Ensure background colors and element colors are preserved when printing */
+            .print-selected-report,
+            .print-selected-report * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            .print-selected-report .report-border {
+                width: 100% !important;
+                /* allow report content to grow across pages when needed */
+                height: auto !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                overflow: visible !important;
+            }
+
+            .print-selected-report .top-grid,
+            .print-selected-report .middle {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                grid-template-columns: 25fr 39fr 36fr !important;
+                gap: 0 !important;
+                /* remove fixed heights so charts and tables can expand for print */
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+            }
+
+            .print-selected-report table {
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                /* allow table rows to break across pages */
+                page-break-inside: auto !important;
+            }
+
+            /* ensure chart containers expand for printing */
+            .print-selected-report .bar-wrap,
+            .print-selected-report .radar-wrap {
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+            }
+
+            /* ensure canvases and svgs render and scale properly in print */
+            .print-selected-report canvas,
+            .print-selected-report svg {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            /* avoid breaking performance-pair blocks awkwardly */
+            .print-selected-report .performance-pair,
+            .print-selected-report .section-table {
+                page-break-inside: avoid !important;
+            }
+
+        .card-header,
+        .toolbar,
+        button,
+        a {
+            display: none !important;
+        }
+    }
+
+    @@page {
+        size: A4 portrait;
+        margin: 0;
+    }
 </style>
 <div class="page-content">
     <div class="container-fluid">
@@ -431,10 +549,8 @@
                             </a>
                             <button type="button"
                                     class="btn btn-success"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
-                                    onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId_@Model.DBTMTraineeDetailId', @Model.DBTMTraineeDetailId,'@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Remarks ?? ""))')">
-                                <i class="fa fa-download me-1"></i> Download Report
+                                    onclick="DBTMReports.PrintTraineeProfile(this,'@profilePrintName')">
+                                <i class="fa fa-print me-1"></i> Print Report
                             </button>
                             @if (!Model.IsListView)
                             {
@@ -447,15 +563,14 @@
                     </div>
                     <div class="card-body">
                         <div class="dastone-profile">
-
-                            <div class="page" id="report">
+                            <div class="page" id="report" data-printable-name="@profilePrintName">
                                 <div class="report-border">
                                     <div class="header">
-                                        <div class="brand"><img style="height:45px" src="@Url.Content("~/assets/images/dbtm/applicationlogo.png")" /></div>
+                                        <div class="brand"><img style="height:45px" src="@logoUrl" /></div>
                                         <div class="center-name-report">Center Name: @Model.CentreName</div>
-                                        <div class="brand right"> <img style="height:45px" src="@Url.Content("~/assets/images/dbtm/applicationlogo.png")" /></div>
+                                        <div class="brand right"> <img style="height:45px" src="@logoUrl" /></div>
                                         <div class="report-title">Performance Assessment Report</div>
-                                        <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToCoditechDateFormat()</div>
+                                        <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToString("dd'/'MM'/'yyyy")</div>
                                     </div>
 
                                     <div class="top-grid">
@@ -506,15 +621,31 @@
                                         <div>
                                             <table class="score-summary">
                                                 <tr>
-                                                    <td><b>Today's Overall<br>Activity Score:</td>
+                                                    <td><b>Today's Overall<br>Activity Score:</b></td>
                                                     <td class="dark">@Model.OverallActivityScore</td>
-                                                    <td>@* 6.10% <span class="up">↑</span> *@</td>
-                                                    <td>@* Improved *@</td>
+                                                    @if (Model.OverallActivityScoreIsUp != null)
+                                                    {
+                                                        if (Model.OverallActivityScoreIsUp == true)
+                                                        {
+                                                            <td>@Model.OverallActivityScoreUPDownValue <span class="up">↑</span></td>
+                                                            <td>Improved</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>@Model.OverallActivityScoreUPDownValue <span class="down">↓</span></td>
+                                                            <td>Down</td>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                        <td></td>
+                                                    }
                                                 </tr>
                                                 <tr>
-                                                    <td><b>Past score:</td>
-                                                    <td>@* 29.25 *@</td>
-                                                    <td colspan="2">@* DDMMYYYY *@</td>
+                                                    <td><b>Past score:</b></td>
+                                                    <td>@Model.OverallLastActivityScore</td>
+                                                    <td colspan="2">@Model.OverallLastActivityDate</td>
                                                 </tr>
                                             </table>
 
@@ -555,127 +686,113 @@
                                         var secondGroup = groupIndex + 1 < performanceGroups.Count ? performanceGroups[groupIndex + 1] : null;
                                         var firstItems = firstGroup.ToList();
                                         var secondItems = secondGroup != null ? secondGroup.ToList() : new List<DBTMTraineeProfilePerformanceModel>();
-                                        var maxRows = Math.Max(firstItems.Count, secondItems.Count);
                                         <div class="performance-pair">
-                                            <table class="section-table">
+                                            <table style="width:100%; border-collapse:collapse;">
                                                 <tr>
-                                                    <th colspan="5" style="background-color:@firstItems.FirstOrDefault().PerformanceMatrixColor">
-                                                        @firstGroup.Key
-                                                    </th>
-                                                    @if (secondGroup != null)
-                                                    {
-                                                        <th colspan="5" style="background-color:@secondGroup.FirstOrDefault().PerformanceMatrixColor">
-                                                            @secondGroup.Key
-                                                        </th>
-                                                    }
-                                                    @*  else
-                                                    {
-                                                        <th colspan="5"></th>
-                                                    } *@
-                                                </tr>
-                                                <tr>
-                                                    <th>Activity</th>
-                                                    <th class="unit">Unit</th>
-                                                    <th>Value</th>
-                                                    <th class="score-head">Score</th>
-                                                    <th>% Improvement</th>
-                                                    @if (secondGroup != null)
-                                                    {
-                                                        <th>Activity</th>
-                                                        <th class="unit">Unit</th>
-                                                        <th>Value</th>
-                                                        <th class="score-head">Score</th>
-                                                        <th>% Improvement</th>
-                                                    }
-                                                    @*  else
-                                                    {
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                    } *@
-                                                </tr>
-                                                @for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
-                                                {
-                                                    var firstItem = rowIndex < firstItems.Count ? firstItems[rowIndex] : null;
-                                                    var secondItem = rowIndex < secondItems.Count ? secondItems[rowIndex] : null;
-                                                    <tr>
-                                                        @if (firstItem != null)
-                                                        {
-                                                            <td>
-                                                                <b>@firstItem.TestName</b>
-                                                            </td>
-                                                            <td>
-                                                                @firstItem.Unit
-                                                            </td>
-                                                            <td>
-                                                                @firstItem.BestValue
-                                                            </td>
-                                                            <td class="score">
-                                                                @if (string.IsNullOrEmpty(firstItem.Score))
-                                                                {
-                                                                    <span>NA</span>
-                                                                }
-                                                                else
-                                                                {
-                                                                    @firstItem.Score
-                                                                }
-                                                            </td>
-                                                            <td></td>
-                                                        }
-                                                        @*  else
-                                                        {
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        } *@
+                                                    <td style="width:50%; vertical-align:top; padding-right:8px;">
+                                                        <table class="section-table" style="width:100%;">
+                                                            <tr>
+                                                                <th colspan="5" style="background-color:@(firstItems.FirstOrDefault()?.PerformanceMatrixColor)">
+                                                                    @firstGroup.Key
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Activity</th>
+                                                                <th class="unit">Unit</th>
+                                                                <th>Value</th>
+                                                                <th class="score-head">Score</th>
+                                                                <th>% Improvement</th>
+                                                            </tr>
+                                                            @foreach (var item in firstItems)
+                                                            {
+                                                                <tr>
+                                                                    <td><b>@item.TestName</b></td>
+                                                                    <td>@item.Unit</td>
+                                                                    <td>@item.BestValue</td>
+                                                                    <td class="score">
+                                                                        @if (string.IsNullOrEmpty(item.Score))
+                                                                        {
+                                                                            <span>NA</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @item.Score
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (item.IsUp != null)
+                                                                        {
+                                                                            if (item.IsUp == true)
+                                                                            {
+                                                                                <span>@item.UpDownValue ↑</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <span>@item.UpDownValue ↓</span>
+                                                                            }
+                                                                        }
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </table>
+                                                    </td>
+                                                    <td style="width:50%; vertical-align:top; padding-left:8px;">
                                                         @if (secondGroup != null)
                                                         {
-                                                            if (secondItem != null)
-                                                            {
-                                                                <td>
-                                                                    <b>@secondItem.TestName</b>
-                                                                </td>
-                                                                <td>
-                                                                    @secondItem.Unit
-                                                                </td>
-                                                                <td>
-                                                                    @secondItem.BestValue
-                                                                </td>
-                                                                <td class="score">
-                                                                    @if (string.IsNullOrEmpty(secondItem.Score))
-                                                                    {
-                                                                        <span>NA</span>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        @secondItem.Score
-                                                                    }
-                                                                </td>
-                                                                <td></td>
-                                                            }
-                                                            @*  else
-                                                            {
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                            } *@
+                                                            <table class="section-table" style="width:100%;">
+                                                                <tr>
+                                                                    <th colspan="5" style="background-color:@(secondItems.FirstOrDefault()?.PerformanceMatrixColor)">
+                                                                        @secondGroup.Key
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Activity</th>
+                                                                    <th class="unit">Unit</th>
+                                                                    <th>Value</th>
+                                                                    <th class="score-head">Score</th>
+                                                                    <th>% Improvement</th>
+                                                                </tr>
+                                                                @foreach (var item in secondItems)
+                                                                {
+                                                                    <tr>
+                                                                        <td><b>@item.TestName</b></td>
+                                                                        <td>@item.Unit</td>
+                                                                        <td>@item.BestValue</td>
+                                                                        <td class="score">
+                                                                            @if (string.IsNullOrEmpty(item.Score))
+                                                                            {
+                                                                                <span>NA</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @item.Score
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            @if (item.IsUp != null)
+                                                                            {
+                                                                                if (item.IsUp == true)
+                                                                                {
+                                                                                    <span>@item.UpDownValue ↑</span>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <span>@item.UpDownValue ↓</span>
+                                                                                }
+                                                                            }
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </table>
                                                         }
-                                                        @*   else
+                                                        else
                                                         {
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        } *@
-                                                    </tr>
-                                                }
+                                                            <table class="section-table" style="width:100%; display:none;">
+                                                                <tr><th colspan="5">&nbsp;</th></tr>
+                                                            </table>
+                                                        }
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                     }
@@ -689,10 +806,8 @@
         </div>
     </div>
 </div>
-@section Scripts {
-    <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
-    <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
-}
+<script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
 <iframe id="hiddenDownloader"
         style="display:none;"
         title="pdf-downloader">
