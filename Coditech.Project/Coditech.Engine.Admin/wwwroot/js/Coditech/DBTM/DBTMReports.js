@@ -915,7 +915,7 @@ var DBTMReports = {
             }
         });
     },
-    PrintTraineeProfile: function (button) {
+    PrintTraineeProfile: function (button, printableName) {
         var $button = $(button);
         var $accordionItem = $button.closest(".accordion-item");
         var $report = $accordionItem.find(".page").first();
@@ -925,7 +925,34 @@ var DBTMReports = {
         }
         $(".print-selected-report").removeClass("print-selected-report");
         $report.addClass("print-selected-report");
+
+        // Determine final printable name: prefer parameter, then data attribute, then exposed window var, then derive
+        try {
+            var finalName = printableName || $report.data('printable-name') || window.DBTMPrintableName;
+            if (!finalName) {
+                var center = ($report.find('.center-name-report').text() || '').trim();
+                var trainee = ($report.find('.info-box').find('div.info-row').filter(function () {
+                    var t = $(this).text().toLowerCase();
+                    return t.indexOf('athlete') !== -1 || t.indexOf('student') !== -1 || t.indexOf('name') !== -1;
+                }).first().text() || '').trim();
+                var dateText = ($report.find('.assessment-date').text() || '').trim();
+                function sanitize(s) { return (s || '').replace(/[^a-zA-Z0-9_\-\.]/g, '_').replace(/__+/g, '_').replace(/^_+|_+$/g, ''); }
+                var parts = [];
+                if (center) parts.push(sanitize(center));
+                if (trainee) parts.push(sanitize(trainee));
+                if (dateText) parts.push(sanitize(dateText));
+                finalName = parts.length ? ('PerformanceReport_' + parts.join('_')) : ('PerformanceReport_' + Date.now());
+            }
+            // apply name where useful
+            try { document.title = finalName; } catch (e) { }
+            try { window.name = finalName; } catch (e) { }
+            $report.attr('data-printable-name', finalName);
+        } catch (e) {
+            // ignore errors and continue to print
+        }
+
         window.print();
+
         setTimeout(function () {
             $report.removeClass("print-selected-report");
         }, 1000);
