@@ -1044,6 +1044,12 @@ namespace Coditech.API.Service
             if (generalBatchMasterId <= 0)
                 return null;
 
+            bool isAnyActivityPerformed= _dBTMDeviceDataRepository.Table
+                                       .Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate);
+
+            if (!isAnyActivityPerformed)
+                return new DBTMReportTraineeProfileListModel();
+
             DBTMReportTraineeProfileListModel dBTMTraineeProfileListModel = new DBTMReportTraineeProfileListModel();
             CoditechViewRepository<DBTMReportTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMReportTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
@@ -1176,7 +1182,7 @@ namespace Coditech.API.Service
                             }
                         }
                     }
-                    if (item.IsTraineeProfilePerformanceAvailable)
+                    if (traineePerformunceList?.Count > 0 && item.IsTraineeProfilePerformanceAvailable)
                         BindBarAndRadarChart(testName, item, traineePerformunceList);
                 }
             }
@@ -1884,18 +1890,21 @@ namespace Coditech.API.Service
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                         if (updatedColumnName.Contains("{Distance*Row}"))
                         {
-
-                            //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue * Convert.ToInt32(spilt[1]);
                             decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData?.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)?.ParameterValue ?? "0") * Convert.ToInt32(spilt[1]);
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{Distance*Row}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
                         else if (updatedColumnName.Contains("{FromToDistance}"))
                         {
-                            //decimal distance = dBTMReportsListGroupByData.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow).ParameterValue;
                             decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData?.FirstOrDefault(x => x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow)?.ParameterValue ?? "0");
                             bool isWholeNumber = distance == Math.Truncate(distance);
                             updatedColumnName = updatedColumnName.Replace("{FromToDistance}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
+                        }
+                        else if (updatedColumnName.Contains("{DistanceOnly}"))
+                        {
+                            decimal distance = Convert.ToDecimal(dBTMReportsListGroupByData?.FirstOrDefault(x => x.Row == Convert.ToInt32(spilt[1]) && (x.ParameterCode == CustomConstants.Distance || x.ParameterCode == CustomConstants.DistanceMultiplyByRow))?.ParameterValue ?? "0");
+                            bool isWholeNumber = distance == Math.Truncate(distance);
+                            updatedColumnName = updatedColumnName.Replace("{DistanceOnly}", isWholeNumber ? Convert.ToInt32(distance).ToString() : distance.ToString());
                         }
                         updatedColumnName = updatedColumnName.Replace("{Row}", spilt[1]);
                     }
