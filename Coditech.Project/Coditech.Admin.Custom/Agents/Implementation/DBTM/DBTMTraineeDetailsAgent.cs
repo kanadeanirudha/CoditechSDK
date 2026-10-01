@@ -519,7 +519,7 @@ namespace Coditech.Admin.Agents
             long entityId = userModel?.EntityId ?? 0;
             if (userModel?.Custom1?.Equals(CustomConstants.DBTMTrainer, StringComparison.OrdinalIgnoreCase) == true)
             {
-                trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty) ?.GeneralTrainerMasterId ?? 0;
+                trainerId = JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0;
             }
             DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.DownloadTraineeUploadTemplate(centreCode, trainerId, userType, count, entityId);
             return new DBTMTraineeUploadResultViewModel
@@ -531,6 +531,60 @@ namespace Coditech.Admin.Agents
             };
         }
 
+        public virtual DBTMTraineeUploadResultViewModel DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy)
+        {
+            try
+            {
+                DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.DownloadBulkUpdateTemplate(generalBatchMasterId, orderBy);
+                DBTMTraineeUploadModel model = response?.DBTMTraineeUploadModel;
+                return IsNotNull(model) ? model.ToViewModel<DBTMTraineeUploadResultViewModel>() : new DBTMTraineeUploadResultViewModel();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DownloadBulkUpdateTemplate", TraceLevel.Warning);
+                return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = ex.Message };
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DownloadBulkUpdateTemplate", TraceLevel.Error);
+                return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = ex.Message };
+            }
+        }
+
+        public virtual DBTMTraineeUploadResultViewModel UploadBulkUpdateTraineeFromFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = "Please select a file." };
+                }
+                _coditechLogging.LogMessage("Bulk trainee update started.", "Trainee", TraceLevel.Info);
+                DBTMTraineeUploadResponse response = _dBTMTraineeDetailsClient.UploadBulkUpdateTraineeFromFile(file);
+                _coditechLogging.LogMessage("Bulk trainee update completed.", "Trainee", TraceLevel.Info);
+                if (response == null || response.HasError)
+                {
+                    return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = response?.ErrorMessage ?? "Bulk update failed." };
+                }
+                DBTMTraineeUploadModel result = response.DBTMTraineeUploadModel;
+                return new DBTMTraineeUploadResultViewModel
+                {
+                    TotalRecords = result.TotalRecords,
+                    SuccessCount = result.SuccessCount,
+                    FailedCount = result.FailedCount,
+                    FailedRows = result.FailedRows,
+                    Headers = result.Headers,
+                    Data = result.Data,
+                    HasError = false,
+                    ErrorMessage = null
+                };
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "Trainee", TraceLevel.Error);
+                return new DBTMTraineeUploadResultViewModel { HasError = true, ErrorMessage = "Failed to update trainee file." };
+            }
+        }
         #endregion
 
         #region protected

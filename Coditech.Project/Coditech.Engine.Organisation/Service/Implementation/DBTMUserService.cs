@@ -585,6 +585,79 @@ namespace Coditech.API.Service
             return BuildUploadResult(dt, success);
         }
 
+
+        #region Bulk Update Trainee
+        public DBTMTraineeUploadModel DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy)
+        {
+            if (generalBatchMasterId <= 0)
+            {
+                return new DBTMTraineeUploadModel { HasError = true, ErrorMessage = "Please select batch." };
+            }
+            orderBy = string.IsNullOrEmpty(orderBy) ? "FirstName" : orderBy;
+            GeneralBatchMaster batch = _generalBatchRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchMasterId && x.IsActive);
+            if (batch == null)
+            {
+                return new DBTMTraineeUploadModel { HasError = true, ErrorMessage = "Batch not found." };
+            }
+            List<DBTMTraineeBulkUpdateModel> traineeList = GetBulkUpdateTraineeList(generalBatchMasterId, orderBy);
+            if (traineeList == null || traineeList.Count == 0)
+            {
+                return new DBTMTraineeUploadModel { HasError = true, ErrorMessage = "No trainee found in selected batch." };
+            }
+            int templateId = GetTemplateIdByCode("TraineeBulkUpdate");
+            if (templateId <= 0)
+            {
+                return new DBTMTraineeUploadModel { HasError = true, ErrorMessage = "Trainee bulk update template is not configured." };
+            }
+
+            List<GeneralTemplateHeaderConfiguration> headers = GetBulkUpdateHeaders(batch.CentreCode);
+            GeneralTemplateModel template = _generalTemplateService.GetTemplate(templateId);
+            template.HeaderConfigurationList = headers.Select(x =>
+                    new GeneralTemplateHeaderConfigurationModel
+                    {
+                        GeneralTemplateHeaderConfigurationId = x.GeneralTemplateHeaderConfigurationId,
+                        TemplateCode = x.TemplateCode,
+                        HeaderCode = x.HeaderCode,
+                        HeaderName = x.HeaderName,
+                        HeaderType = x.HeaderType,
+                        CentreCode = x.CentreCode,
+                        OrderBy = x.OrderBy,
+                        DropdownEnumGroupCode = x.DropdownEnumGroupCode,
+                        IsRequired = x.IsRequired
+                    }).ToList();
+            string currentDir = Directory.GetCurrentDirectory();
+            string dataFolder = Path.Combine(currentDir, "data", "TraineeBulkUpdateTemplate");
+            if (!Directory.Exists(dataFolder))
+            {
+                Directory.CreateDirectory(dataFolder);
+            }
+            string fileName = $"TraineeBulkUpdate_{batch.BatchName}.xlsx";
+            fileName = fileName.Replace(" ", "_");
+            string filePath = Path.Combine(dataFolder, fileName);
+            GenerateBulkUpdateTemplateExcel(template, traineeList, filePath);
+            return new DBTMTraineeUploadModel
+            {
+                FilePath = filePath,
+                FileName = fileName
+            };
+        }
+        public DBTMTraineeUploadModel UploadBulkUpdateTraineeFromFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new Exception("File is empty.");
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+                throw new Exception("Only Excel (.xlsx) file is allowed.");
+            DBTMTraineeUploadModel table = ExcelToBulkUpdateListModel(file);
+            if (table.DataTable == null || table.DataTable.Rows.Count == 0)
+            {
+                throw new Exception("File contains no data.");
+            }
+            return UpdateBulkTrainee(table);
+        }
+
+        #endregion
+
         #region Private Methods
         private DBTMTraineeUploadModel BuildUploadResult(DataTable dt, int success, DataTable failedTable = null)
         {
@@ -1198,8 +1271,7 @@ namespace Coditech.API.Service
         }
         private List<GeneralTemplateHeaderConfiguration> GetTraineeHeaders(string centreCode)
         {
-            return _generalTemplateHeaderConfigurationRepository.Table.Where(x => x.TemplateCode == "Trainee" && (x.CentreCode == centreCode || x.CentreCode == null)).AsEnumerable()
-                .GroupBy(x => x.HeaderCode).Select(g => g.OrderByDescending(x => x.CentreCode == centreCode).First()).OrderBy(x => x.OrderBy).ToList();
+            return _generalTemplateHeaderConfigurationRepository.Table.Where(x => x.TemplateCode == "Trainee" && (x.CentreCode == centreCode || x.CentreCode == null)).AsEnumerable().GroupBy(x => x.HeaderCode).Select(g => g.OrderByDescending(x => x.CentreCode == centreCode).First()).OrderBy(x => x.OrderBy).ToList();
         }
         private int GetTemplateIdByCode(string templateCode)
         {
@@ -1219,8 +1291,7 @@ namespace Coditech.API.Service
         private void ValidateCentreUserLimit(string centreCode, string registrationType)
         {
             // Get centre settings
-            DBTMCentreWiseSetting centreSetting = _dBTMCentreWiseSettingRepository.Table
-                .FirstOrDefault(x => x.CentreCode == centreCode);
+            DBTMCentreWiseSetting centreSetting = _dBTMCentreWiseSettingRepository.Table.FirstOrDefault(x => x.CentreCode == centreCode);
 
             if (centreSetting == null)
                 throw new CoditechException(ErrorCodes.InvalidData, "Centre setting not found.");
@@ -1230,11 +1301,7 @@ namespace Coditech.API.Service
 
             if (string.Equals(registrationType, "Batch", StringComparison.InvariantCultureIgnoreCase))
             {
-                usedCount = _organisationCentrewiseJoiningCodeRepository.Table
-                    .Count(x => x.CentreCode == centreCode
-                             && x.IsExpired
-                             && x.Custom2 == "Batch");
-
+                usedCount = _organisationCentrewiseJoiningCodeRepository.Table.Count(x => x.CentreCode == centreCode && x.IsExpired && x.Custom2 == "Batch");
                 if (usedCount >= centreSetting.AllowBatchUser)
                 {
                     throw new CoditechException(ErrorCodes.InvalidData,
@@ -1243,11 +1310,7 @@ namespace Coditech.API.Service
             }
             else if (string.Equals(registrationType, "Camp", StringComparison.InvariantCultureIgnoreCase))
             {
-                usedCount = _organisationCentrewiseJoiningCodeRepository.Table
-                    .Count(x => x.CentreCode == centreCode
-                             && x.IsExpired
-                             && x.Custom2 == "Camp");
-
+                usedCount = _organisationCentrewiseJoiningCodeRepository.Table.Count(x => x.CentreCode == centreCode && x.IsExpired && x.Custom2 == "Camp");
                 if (usedCount >= centreSetting.AllowCampUser)
                 {
                     throw new CoditechException(ErrorCodes.InvalidData,
@@ -1292,6 +1355,316 @@ namespace Coditech.API.Service
             mobile = mobile.Trim();
             return _generalPersonRepository.Table.Any(x => x.MobileNumber != null && x.MobileNumber == mobile);
         }
+        private List<DBTMTraineeBulkUpdateModel> GetBulkUpdateTraineeList(long generalBatchMasterId, string orderBy)
+        {
+            CoditechViewRepository<DBTMTraineeBulkUpdateModel> objStoredProc = new CoditechViewRepository<DBTMTraineeBulkUpdateModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
+            objStoredProc.SetParameter("@OrderBy", orderBy, ParameterDirection.Input, DbType.String);
+            return objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeBulkUpdateList @GeneralBatchMasterId,@OrderBy")?.ToList();
+        }
+        private void GenerateBulkUpdateTemplateExcel(GeneralTemplateModel template, List<DBTMTraineeBulkUpdateModel> traineeList, string filePath)
+        {
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Bulk Update Trainee");
+            var lookupSheet = workbook.Worksheets.Add("Lookups");
+            lookupSheet.Visibility = XLWorksheetVisibility.Hidden;
+            var headerGroupCodeMap = new Dictionary<string, string>();
+            foreach (var header in template.HeaderConfigurationList.Where(x => x.HeaderType == CustomConstants.Dropdown))
+            {
+                if (!headerGroupCodeMap.ContainsKey(header.HeaderCode))
+                {
+                    headerGroupCodeMap[header.HeaderCode] = header.DropdownEnumGroupCode;
+                }
+            }
+            List<GeneralEnumaratorModel> enumList = BindEnumarator();
+            int col = 1;
+            int lookupCol = 1;
+            var headersOrdered = template.HeaderConfigurationList.OrderBy(x => x.OrderBy).ToList();
+            foreach (var header in headersOrdered)
+            {
+                var cell = sheet.Cell(1, col);
+                var rich = cell.GetRichText();
+                rich.ClearText();
+                rich.AddText(header.HeaderName + " ").SetFontColor(XLColor.White);
+                if (header.IsRequired)
+                {
+                    rich.AddText("*").SetFontColor(XLColor.Red).SetBold();
+                }
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.DarkBlue;
+                cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                if (header.HeaderCode == ExcelTemplateColumns.DateOfBirth)
+                {
+                    for (int row = 2; row <= traineeList.Count + 1; row++)
+                    {
+                        var dateCell = sheet.Cell(row, col);
+                        dateCell.Style.DateFormat.Format = "yyyy-MM-dd";
+                        var validation = dateCell.CreateDataValidation();
+                        validation.IgnoreBlanks = true;
+                        validation.AllowedValues = XLAllowedValues.Date;
+                        validation.Operator = XLOperator.Between;
+                        validation.InputTitle = "Date Format";
+                        validation.InputMessage = "yyyy-MM-dd";
+                        validation.ShowInputMessage = true;
+                    }
+                }
+                if (headerGroupCodeMap.TryGetValue(header.HeaderCode, out string groupCode))
+                {
+                    var values = enumList.Where(x => x.EnumGroupCode == groupCode).OrderBy(x => x.SequenceNumber).Select(x => x.EnumDisplayText).ToList();
+                    if (values.Count > 0)
+                    {
+                        for (int i = 0; i < values.Count; i++)
+                        {
+                            lookupSheet.Cell(i + 1, lookupCol).Value =
+                                values[i];
+                        }
+                        var lookupRange = lookupSheet.Range(
+                            lookupSheet.Cell(1, lookupCol),
+                            lookupSheet.Cell(values.Count, lookupCol)
+                        );
+                        for (int row = 2; row <= traineeList.Count + 1; row++)
+                        {
+                            var validation =
+                                sheet.Cell(row, col).CreateDataValidation();
+
+                            validation.IgnoreBlanks = true;
+                            validation.InCellDropdown = true;
+                            validation.List(lookupRange, true);
+                        }
+                        lookupCol++;
+                    }
+                }
+                col++;
+            }
+            int dataRow = 2;
+            foreach (var trainee in traineeList)
+            {
+                col = 1;
+                foreach (var header in headersOrdered)
+                {
+                    var cell = sheet.Cell(dataRow, col);
+                    if (header.HeaderCode == ExcelTemplateColumns.PersonCode)
+                    {
+                        cell.Value = trainee.PersonCode;
+                        cell.Style.Protection.Locked = true;
+                    }
+                    else if (header.HeaderCode == ExcelTemplateColumns.DateOfBirth)
+                    {
+                        if (trainee.DateOfBirth.HasValue)
+                        {
+                            cell.Value = trainee.DateOfBirth.Value;
+                            cell.Style.DateFormat.Format = "yyyy-MM-dd";
+                        }
+                        cell.Style.Protection.Locked = false;
+                    }
+                    else
+                    {
+                        cell.Value = GetBulkUpdateHeaderValue(trainee, header.HeaderCode);
+                        cell.Style.Protection.Locked = false;
+                    }
+                    col++;
+                }
+                dataRow++;
+            }
+            sheet.Protect();
+            sheet.Row(1).Height = 25;
+            sheet.Columns().AdjustToContents();
+            workbook.SaveAs(filePath);
+        }
+        private string GetBulkUpdateHeaderValue(DBTMTraineeBulkUpdateModel trainee, string headerCode)
+        {
+            return headerCode switch
+            {
+                ExcelTemplateColumns.PersonCode => trainee.PersonCode,
+                ExcelTemplateColumns.TraineeTitle => trainee.TraineeTitle,
+                ExcelTemplateColumns.FirstName => trainee.FirstName,
+                ExcelTemplateColumns.MiddleName => trainee.MiddleName,
+                ExcelTemplateColumns.LastName => trainee.LastName,
+                ExcelTemplateColumns.DisplayName => trainee.DisplayName,
+                ExcelTemplateColumns.EmailAddress => trainee.EmailAddress,
+                ExcelTemplateColumns.Gender => trainee.Gender,
+                ExcelTemplateColumns.DateOfBirth => trainee.DateOfBirth?.ToString("yyyy-MM-dd"),
+                ExcelTemplateColumns.HeightCm => trainee.HeightCm?.ToString(),
+                ExcelTemplateColumns.WeightKg => trainee.WeightKg?.ToString(),
+                ExcelTemplateColumns.Specialization => trainee.Specialization,
+                ExcelTemplateColumns.SchoolOrCollegeOrClub => trainee.SchoolOrCollegeOrClub,
+                ExcelTemplateColumns.AgeGroup => trainee.AgeGroup,
+                _ => string.Empty
+            };
+        }
+
+        private List<GeneralTemplateHeaderConfiguration> GetBulkUpdateHeaders(string centreCode)
+        {
+            return _generalTemplateHeaderConfigurationRepository.Table.Where(x => x.TemplateCode == "TraineeBulkUpdate" && (x.CentreCode == centreCode || x.CentreCode == null)).AsEnumerable().GroupBy(x => x.HeaderCode).Select(g => g.OrderByDescending(x => x.CentreCode == centreCode).First()).OrderBy(x => x.OrderBy).ToList();
+        }
+
+        private DBTMTraineeUploadModel ExcelToBulkUpdateListModel(IFormFile file)
+        {
+            var result = new DBTMTraineeUploadModel();
+            var table = new DataTable();
+            using var stream = file.OpenReadStream();
+            using var workbook = new XLWorkbook(stream);
+            var sheet = workbook.Worksheet(1);
+            List<GeneralTemplateHeaderConfiguration> headers = GetBulkUpdateHeaders(string.Empty);
+            bool isHeader = true;
+            foreach (var row in sheet.RowsUsed())
+            {
+                if (isHeader)
+                {
+                    foreach (var cell in row.Cells())
+                    {
+                        string headerName = cell.GetString().Replace("*", "").Trim();
+                        GeneralTemplateHeaderConfiguration header = headers.FirstOrDefault(x => x.HeaderName == headerName);
+                        if (header != null && !table.Columns.Contains(header.HeaderCode))
+                        {
+                            table.Columns.Add(header.HeaderCode);
+                        }
+                    }
+                    isHeader = false;
+                    continue;
+                }
+                DataRow dataRow = table.NewRow();
+                int columnIndex = 0;
+                foreach (var cell in row.Cells())
+                {
+                    if (columnIndex < table.Columns.Count)
+                    {
+                        dataRow[columnIndex] = cell.GetString().Trim();
+                    }
+                    columnIndex++;
+                }
+                table.Rows.Add(dataRow);
+            }
+            result.DataTable = table;
+            return result;
+        }
+
+        private DBTMTraineeUploadModel UpdateBulkTrainee(DBTMTraineeUploadModel table)
+        {
+            DataTable dt = table.DataTable;
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                return new DBTMTraineeUploadModel { HasError = true, ErrorMessage = "File contains no data." };
+            }
+            if (!dt.Columns.Contains(ExcelTemplateColumns.ErrorMessage))
+            {
+                dt.Columns.Add(ExcelTemplateColumns.ErrorMessage);
+            }
+            int success = 0;
+            foreach (DataRow row in dt.Rows)
+            {
+                try
+                {
+                    string personCode = GetValue(row, ExcelTemplateColumns.PersonCode);
+                    if (string.IsNullOrWhiteSpace(personCode))
+                    {
+                        row[ExcelTemplateColumns.ErrorMessage] = "PersonCode is required.";
+                        continue;
+                    }
+                    DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonCode == personCode);
+                    if (trainee == null)
+                    {
+                        row[ExcelTemplateColumns.ErrorMessage] = $"PersonCode '{personCode}' not found.";
+                        continue;
+                    }
+                    GeneralPerson generalPerson = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == trainee.PersonId);
+                    if (generalPerson == null)
+                    {
+                        row[ExcelTemplateColumns.ErrorMessage] = $"GeneralPerson not found for PersonCode '{personCode}'.";
+                        continue;
+                    }
+                    GeneralPersonModel model = generalPerson.FromEntityToModel<GeneralPersonModel>();
+                    model.EntityId = trainee.DBTMTraineeDetailId;
+                    model.UserType = UserTypeEnum.Trainee.ToString();
+                    model.IsActive = trainee.IsActive;
+                    string traineeTitle = GetValue(row, ExcelTemplateColumns.TraineeTitle);
+                    if (!string.IsNullOrWhiteSpace(traineeTitle))
+                    {
+                        model.PersonTitle = traineeTitle;
+                    }
+                    string firstName = GetValue(row, ExcelTemplateColumns.FirstName);
+                    if (!string.IsNullOrWhiteSpace(firstName))
+                    {
+                        model.FirstName = firstName;
+                    }
+                    string middleName = GetValue(row, ExcelTemplateColumns.MiddleName);
+                    if (!string.IsNullOrWhiteSpace(middleName))
+                    {
+                        model.MiddleName = middleName;
+                    }
+                    string lastName = GetValue(row, ExcelTemplateColumns.LastName);
+                    if (!string.IsNullOrWhiteSpace(lastName))
+                    {
+                        model.LastName = lastName;
+                    }
+                    string displayName = GetValue(row, ExcelTemplateColumns.DisplayName);
+                    if (!string.IsNullOrWhiteSpace(displayName))
+                    {
+                        model.Custom2 = displayName;
+                    }
+                    string email = GetValue(row, ExcelTemplateColumns.EmailAddress);
+                    if (!string.IsNullOrWhiteSpace(email))
+                    {
+                        model.EmailId = email;
+                    }
+                    string gender = GetValue(row, ExcelTemplateColumns.Gender);
+                    if (!string.IsNullOrWhiteSpace(gender))
+                    {
+                        model.GenderEnumId = GetEnumIdByEnumCode(gender, DropdownTypeEnum.Gender.ToString());
+                    }
+                    string dateOfBirth = GetValue(row, ExcelTemplateColumns.DateOfBirth);
+                    if (!string.IsNullOrWhiteSpace(dateOfBirth))
+                    {
+                        if (!DateTime.TryParse(dateOfBirth, out DateTime dobDate))
+                        {
+                            row[ExcelTemplateColumns.ErrorMessage] = "Date Of Birth is invalid.";
+                            continue;
+                        }
+                        model.DateOfBirth = dobDate;
+                    }
+                    bool personUpdated = UpdatePersonInformation(model);
+                    if (!personUpdated)
+                    {
+                        row[ExcelTemplateColumns.ErrorMessage] = $"Unable to update PersonCode '{personCode}'.";
+                        continue;
+                    }
+                    string height = GetValue(row, ExcelTemplateColumns.HeightCm);
+                    if (!string.IsNullOrWhiteSpace(height))
+                    {
+                        trainee.Height = Convert.ToDecimal(height);
+                        trainee.UpdatedHeightDate = DateTime.Now;
+                    }
+                    string weight = GetValue(row, ExcelTemplateColumns.WeightKg);
+                    if (!string.IsNullOrWhiteSpace(weight))
+                    {
+                        trainee.Weight = Convert.ToDecimal(weight);
+                        trainee.UpdatedWeightDate = DateTime.Now;
+                    }
+                    string specialization = GetValue(row, ExcelTemplateColumns.Specialization);
+                    if (!string.IsNullOrWhiteSpace(specialization))
+                    {
+                        string specializationName = _generalEnumaratorMasterRepository.Table.Where(x => x.EnumDisplayText == specialization).Select(x => x.EnumName).FirstOrDefault();
+                        trainee.SpecializationEnumId = GetEnumIdByEnumCode(specializationName, DropdownCustomTypeEnum.TraineeSpecialization.ToString());
+                    }
+                    trainee.SchoolName = GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub);                  
+                    trainee.ModifiedDate = DateTime.Now;
+                    _dBTMTraineeDetailsRepository.Update(trainee);
+                    success++;
+                }
+                catch (Exception ex)
+                {
+                    row[ExcelTemplateColumns.ErrorMessage] = ex.Message;
+                }
+            }
+            DataTable failedTable = BuildFailedTable(dt);
+            if (failedTable.Rows.Count > 0)
+            {
+                return BuildUploadResult(dt, success, failedTable);
+            }
+            return BuildUploadResult(dt, success);
+        }
+
         #endregion
 
         #region Protected Method

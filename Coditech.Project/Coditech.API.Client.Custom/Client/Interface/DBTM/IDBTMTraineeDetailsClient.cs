@@ -13,7 +13,7 @@ namespace Coditech.API.Client
         /// Get list of DBTMTraineeDetails.
         /// </summary>
         /// <returns>DBTMTraineeDetailsListResponse</returns>
-        DBTMTraineeDetailsListResponse List(string selectedCentreCode,long generalTrainerMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMTraineeDetailsListResponse List(string selectedCentreCode, long generalTrainerMasterId, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
 
         /// <summary>
         /// Get DBTM Trainee Other Details by dBTMTraineeDetailId.
@@ -35,12 +35,14 @@ namespace Coditech.API.Client
         /// <param name="ParameterModel">ParameterModel.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
         TrueFalseResponse DeleteDBTMTraineeDetails(ParameterModel body);
-        DBTMActivitiesListResponse GetTraineeActivitiesList(string personCode,int numberOfDaysRecord, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
+        DBTMActivitiesListResponse GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
         DBTMActivitiesDetailsListResponse GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, long entityId, string userType, string centreCode, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize);
         DBTMTraineeProfileResponse GetProfileDetails(long dBTMTraineeDetailId);
         DBTMReportsResponse GenerateAthletePdfRemark(long dBTMTraineeDetailId, string remarks);
         DBTMTraineeUploadResponse UploadTrainee(IFormFile file);
         DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId);
         GeneralTraineeAssociatedToTrainerResponse AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerModel body);
+        DBTMTraineeUploadResponse DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy);
+        DBTMTraineeUploadResponse UploadBulkUpdateTraineeFromFile(IFormFile file);
     }
 }
