@@ -36,7 +36,7 @@ namespace Coditech.API.Controllers
             }
             catch (CoditechException ex)
             {
-                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMRegisterTrainee.ToString(),TraceLevel.Warning);
+                _coditechLogging.LogMessage(ex, LogComponentCustomEnum.DBTMRegisterTrainee.ToString(), TraceLevel.Warning);
                 return CreateInternalServerErrorResponse(new GeneralPersonResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
@@ -70,6 +70,29 @@ namespace Coditech.API.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Route("/DBTMUser/DownloadBulkUpdateTemplate")]
+        [Produces(typeof(DBTMTraineeUploadResponse))]
+        public virtual IActionResult DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy)
+        {
+            try
+            {
+                DBTMTraineeUploadModel model = _dbtmUserService.DownloadBulkUpdateTemplate(generalBatchMasterId, orderBy);
+                return CreateOKResponse<DBTMTraineeUploadResponse>(ApiHelper.ToJson(new DBTMTraineeUploadResponse { DBTMTraineeUploadModel = model }));
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DownloadBulkUpdateTemplate", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DownloadBulkUpdateTemplate", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Route("/DBTMUser/UploadTrainee")]
         [Produces(typeof(DBTMTraineeUploadResponse))]
@@ -78,25 +101,34 @@ namespace Coditech.API.Controllers
             try
             {
                 var result = _dbtmUserService.UploadTraineeFromFile(file);
-                return CreateOKResponse<DBTMTraineeUploadResponse>( ApiHelper.ToJson(new DBTMTraineeUploadResponse { DBTMTraineeUploadModel = result })
-                );
+                return CreateOKResponse<DBTMTraineeUploadResponse>(ApiHelper.ToJson(new DBTMTraineeUploadResponse { DBTMTraineeUploadModel = result }));
             }
             catch (CoditechException ex)
             {
-                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse
-                {
-                    HasError = true,
-                    ErrorMessage = ex.Message,
-                    ErrorCode = ex.ErrorCode
-                });
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
-                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse
-                {
-                    HasError = true,
-                    ErrorMessage = ex.Message
-                });
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+        [HttpPost]
+        [Route("/DBTMUser/UploadBulkUpdateTraineeFromFile")]
+        [Produces(typeof(DBTMTraineeUploadResponse))]
+        public IActionResult UploadBulkUpdateTraineeFromFile([FromForm] IFormFile file)
+        {
+            try
+            {
+                var result = _dbtmUserService.UploadBulkUpdateTraineeFromFile(file);
+                return CreateOKResponse<DBTMTraineeUploadResponse>(ApiHelper.ToJson(new DBTMTraineeUploadResponse { DBTMTraineeUploadModel = result }));
+            }
+            catch (CoditechException ex)
+            {
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
     }

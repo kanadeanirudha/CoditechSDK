@@ -18,6 +18,7 @@
                 SelectedValue = "0"
             };
     ModelPopUpViewModel traineePopup = new ModelPopUpViewModel() { ModelPopUpId = "TraineePopupId", ModalContentId = "TraineeContentId", PopUpSize = PopUpSizeEnum.Large };
+    ModelPopUpViewModel traineeUpdatePopup = new ModelPopUpViewModel() { ModelPopUpId = "TraineeUpdatePopupId", ModalContentId = "TraineeUpdateContentId", PopUpSize = PopUpSizeEnum.Large };
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
     ModelPopUpViewModel downloadTemplatePopup = new ModelPopUpViewModel { ModelPopUpId = "DownloadTemplatePopupId", ModalContentId = "DownloadTemplateContentId" };
     ModelPopUpViewModel convertPopup = new ModelPopUpViewModel() { ModelPopUpId = "ConvertCampPopupId", ModalContentId = "ConvertCampContentId" };
@@ -49,6 +50,14 @@
                                onclick="DBTMTraineeDetails.GetUploadTraineePopup('TraineeContentId')">
                                 <i class="fas fa-upload me-2"></i> Upload Trainee
                             </a>
+                            <a href="javascript:void(0);"
+                               class="btn btn-sm btn-success"
+                               data-bs-toggle="modal"
+                               data-bs-target="#TraineeUpdatePopupId"
+                               onclick="DBTMTraineeDetails.GetBulkUpdateTraineePopup('TraineeUpdateContentId')">
+                                <i class="fas fa-edit me-2"></i> Bulk Update Trainee
+                            </a>
+
                             @if (userModel?.Custom1 == CustomConstants.DBTMTrainer)
                             {
                                 <a class="btn btn-soft-primary" href="@Url.Action("TraineeRegistration", "DBTMTraineeDetails",new { trainerId = Model.SelectedParameter1 })">Add Trainee</a>
@@ -107,6 +116,7 @@
     }
 </style>
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", traineePopup)
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", traineeUpdatePopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", downloadTemplatePopup)
 @Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", convertPopup)

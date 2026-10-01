@@ -93,8 +93,8 @@ namespace Coditech.Admin.Agents
         /// <returns>Returns true if deleted successfully else return false.</returns>
         bool DeleteAssociatedTrainer(string generalTraineeAssociatedToTrainerIds, out string errorMessage);
 
-        DBTMActivitiesListViewModel GetTraineeActivitiesList(string personCode,int numberOfDaysRecord,DataTableViewModel dataTableModel);
-        DBTMActivitiesDetailsListViewModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId,DataTableViewModel dataTableModel);
+        DBTMActivitiesListViewModel GetTraineeActivitiesList(string personCode, int numberOfDaysRecord, DataTableViewModel dataTableModel);
+        DBTMActivitiesDetailsListViewModel GetTraineeActivitiesDetailsList(long dBTMDeviceDataId, DataTableViewModel dataTableModel);
 
         /// <summary>
         /// Get DBTMTraineeDetails by dBTMTraineeDetailId.
@@ -106,5 +106,7 @@ namespace Coditech.Admin.Agents
         DBTMTraineeUploadResultViewModel UploadTraineeFromFile(IFormFile file);
         DBTMTraineeUploadResultViewModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count);
         GeneralTraineeAssociatedToTrainerViewModel AssociateUnAssociateTrainer(GeneralTraineeAssociatedToTrainerViewModel model);
+        DBTMTraineeUploadResultViewModel DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy);
+        DBTMTraineeUploadResultViewModel UploadBulkUpdateTraineeFromFile(IFormFile file);
     }
 }

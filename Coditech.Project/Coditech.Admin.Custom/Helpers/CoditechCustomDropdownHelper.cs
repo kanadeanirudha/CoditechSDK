@@ -135,6 +135,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMQRPrintingTemplateCode(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeBulkUpdateOrderBy.ToString()))
+            {
+                GetDBTMTraineeBulkUpdateOrderByList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -863,6 +867,34 @@ namespace Coditech.Admin.Helpers
                     Selected = dropdownViewModel.DropdownSelectedValue == item.DBTMTestwisePerformanceStandardCategoryId.ToString()
                 });
             }
+        }
+        private static void GetDBTMTraineeBulkUpdateOrderByList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            string selectedValue = string.IsNullOrEmpty(dropdownViewModel.DropdownSelectedValue) ? "FirstNameAsc" : dropdownViewModel.DropdownSelectedValue;
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "First Name Ascending",
+                Value = "FirstNameAsc",
+                Selected = selectedValue == "FirstNameAsc"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "First Name Descending",
+                Value = "FirstNameDesc",
+                Selected = selectedValue == "FirstNameDesc"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Last Name Ascending",
+                Value = "LastNameAsc",
+                Selected = selectedValue == "LastNameAsc"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Last Name Descending",
+                Value = "LastNameDesc",
+                Selected = selectedValue == "LastNameDesc"
+            });
         }
     }
 }

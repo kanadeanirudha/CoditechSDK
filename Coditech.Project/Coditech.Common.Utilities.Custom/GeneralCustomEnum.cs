@@ -39,6 +39,7 @@
         DBTMTrainerwiseBatch,
         DBTMTestwisePerformanceStandardCategory,
         DBTMQRPrintingTemplateCode,
+        DBTMTraineeBulkUpdateOrderBy,
     }
     public enum DashboardFormCustomEnum
     {
