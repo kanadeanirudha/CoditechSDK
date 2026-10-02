@@ -426,11 +426,11 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-        public virtual DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode,long trainerId, string userType, int count, long entityId)
+        public virtual DBTMTraineeUploadResponse DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId)
         {
-            return Task.Run(async () => await DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count,  entityId, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count, entityId, CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<DBTMTraineeUploadResponse> DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count, long entityId,CancellationToken cancellationToken)
+        public virtual async Task<DBTMTraineeUploadResponse> DownloadTraineeUploadTemplateAsync(string centreCode, long trainerId, string userType, int count, long entityId, CancellationToken cancellationToken)
         {
             string endpoint = dBTMTraineeDetailsEndpoint.DownloadTraineeUploadTemplateAsync(centreCode, trainerId, userType, count, entityId);
             HttpResponseMessage response = null;
@@ -474,7 +474,7 @@ namespace Coditech.API.Client
         {
             return Task.Run(async () => await AssociateUnAssociateTrainerAsync(body, System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
         }
-        public virtual async Task<GeneralTraineeAssociatedToTrainerResponse> AssociateUnAssociateTrainerAsync( GeneralTraineeAssociatedToTrainerModel body, CancellationToken cancellationToken)
+        public virtual async Task<GeneralTraineeAssociatedToTrainerResponse> AssociateUnAssociateTrainerAsync(GeneralTraineeAssociatedToTrainerModel body, CancellationToken cancellationToken)
         {
             string endpoint = dBTMTraineeDetailsEndpoint.AssociateUnAssociateTrainerAsync();
             HttpResponseMessage response = null;
@@ -482,12 +482,12 @@ namespace Coditech.API.Client
             try
             {
                 ApiStatus status = new ApiStatus();
-                response = await PutResourceToEndpointAsync( endpoint, JsonConvert.SerializeObject(body), status, cancellationToken ).ConfigureAwait(false);
+                response = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject(body), status, cancellationToken).ConfigureAwait(false);
                 var headers_ = BindHeaders(response);
                 var status_ = (int)response.StatusCode;
                 if (status_ == 200)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<GeneralTraineeAssociatedToTrainerResponse>( response, headers_, cancellationToken ).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<GeneralTraineeAssociatedToTrainerResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
                         throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
@@ -496,7 +496,7 @@ namespace Coditech.API.Client
                 }
                 else if (status_ == 201)
                 {
-                    var objectResponse = await ReadObjectResponseAsync<GeneralTraineeAssociatedToTrainerResponse>( response, headers_, cancellationToken ).ConfigureAwait(false);
+                    var objectResponse = await ReadObjectResponseAsync<GeneralTraineeAssociatedToTrainerResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
                     if (objectResponse.Object == null)
                     {
                         throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
@@ -515,6 +515,69 @@ namespace Coditech.API.Client
             {
                 if (disposeResponse)
                     response.Dispose();
+            }
+        }
+        public virtual DBTMTraineeUploadResponse DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy)
+        {
+            return Task.Run(async () => await DownloadBulkUpdateTemplateAsync(generalBatchMasterId, orderBy, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMTraineeUploadResponse> DownloadBulkUpdateTemplateAsync(long generalBatchMasterId, string orderBy, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.DownloadBulkUpdateTemplateAsync(generalBatchMasterId, orderBy);
+            HttpResponseMessage response = null;
+            var disposeResponse = true;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                Dictionary<string, IEnumerable<string>> headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMTraineeUploadResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    if (objectResponse.Object == null)
+                    {
+                        throw new CoditechException(objectResponse.Object.ErrorCode, objectResponse.Object.ErrorMessage);
+                    }
+                    return objectResponse.Object;
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMTraineeUploadResponse();
+                }
+                else
+                {
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    DBTMTraineeUploadResponse typedBody = JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(responseData);
+                    UpdateApiStatus(typedBody, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                if (disposeResponse)
+                    response.Dispose();
+            }
+        }
+        public virtual DBTMTraineeUploadResponse UploadBulkUpdateTraineeFromFile(IFormFile file)
+        {
+            string endpoint = dBTMTraineeDetailsEndpoint.UploadBulkUpdateTraineeFromFileAsync();
+            HttpResponseMessage response = null;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                var formData = new MultipartFormDataContent();
+                var fileContent = new StreamContent(file.OpenReadStream())
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue(file.ContentType) }
+                };
+                formData.Add(fileContent, "file", file.FileName);
+                response = PostResourceToEndpoint(endpoint, formData, status, CancellationToken.None);
+                return JsonConvert.DeserializeObject<DBTMTraineeUploadResponse>(response.Content.ReadAsStringAsync().Result);
+            }
+            finally
+            {
+                response?.Dispose();
             }
         }
     }
