@@ -684,6 +684,7 @@ var DBTMReports = {
                 },
                 success: function (data) {
                     $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
+                    DBTMReports.LoadTraineeProfileActivityDates();
                     CoditechCommon.HideLodder();
                 },
                 error: function (xhr) {

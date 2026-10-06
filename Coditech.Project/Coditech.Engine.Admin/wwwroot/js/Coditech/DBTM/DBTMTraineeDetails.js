@@ -490,20 +490,16 @@
             success: function (response) {
                 CoditechCommon.HideLodder();
                 if (response.success) {
-                    CoditechCommon.HideLodder();
                     $("#BulkUpdateTraineeFile").val("");
-                    $("#BulkUpdateTraineePopupId").modal("hide");
-                    CoditechNotification.DisplayNotificationMessage(response.message, "success");
-                    CoditechDataTable.LoadList("DBTMTraineeDetails", "List");
+                    $("#TraineeUpdatePopupId").modal("hide");
+                    location.reload();
                     return;
                 }
                 if (response.failedRows && response.failedRows.length > 0) {
                     DBTMTraineeDetails.RenderBulkUpdateFailedTable(response.failedRows, response.headers);
                     return;
                 }
-                $("#BulkUpdateValidationMsg").text(
-                    response.message || "Bulk update failed."
-                );
+                $("#BulkUpdateValidationMsg").text(response.message || "Bulk update failed.");
             },
             error: function (xhr) {
                 CoditechCommon.HideLodder();
