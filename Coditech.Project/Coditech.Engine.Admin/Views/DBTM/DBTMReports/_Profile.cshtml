@@ -54,7 +54,7 @@
 
     .page {
         /* width: 210mm;
-                                min-height: 297mm; */
+                                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -159,6 +159,12 @@
 
         .info-row b {
             font-size: 8px;
+            font-weight: 700;
+        }
+
+        .info-row .line {
+            font-size: 8px;
+            font-weight: 400;
         }
 
     .line {
@@ -265,16 +271,63 @@
             font-size: 8px;
         }
 
+        .score-summary .overall-score-label {
+            font-size: 9px;
+            font-weight: 700;
+            line-height: 11px;
+            vertical-align: middle;
+        }
+
         .score-summary .dark {
             background: #273a61;
             color: #fff;
             text-align: center;
-            font-weight: 700;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
         }
+
+        .score-summary .improvement-status {
+            font-size: 8px;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .score-summary .up {
+            color: #62bd3b;
+            font-size: 19px;
+            font-weight: 900;
+            line-height: 12px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 3px;
+            font-family: Arial Black, Arial, sans-serif;
+        }
+
+        .score-summary .improvement-value {
+            font-size: 8px;
+            font-weight: 400;
+            text-align: center;
+            white-space: nowrap;
+        }
+
 
         .score-summary .green {
             color: #62bd3b;
             font-weight: 700;
+        }
+
+        .score-summary .down {
+            color: #e33b3b;
+            font-size: 19px;
+            font-weight: 900;
+            line-height: 12px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 3px;
+            font-family: Arial Black, Arial, sans-serif;
         }
 
     .chart-title {
@@ -380,18 +433,6 @@
         .section-table .score {
             text-align: center;
         }
-
-    .up {
-        color: #7abd42;
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-    .down {
-        color: #e33b3b;
-        font-size: 15px;
-        font-weight: bold;
-    }
 
     .notes {
         border: 1.5px solid #111;
@@ -647,19 +688,25 @@
                                         <div>
                                             <table class="score-summary">
                                                 <tr>
-                                                    <td><b>Today's Overall<br>Activity Score:</b></td>
+                                                    <td class="overall-score-label">Today's Overall<br>Activity Score:</td>
                                                     <td class="dark">@Model.OverallActivityScore</td>
                                                     @if (Model.OverallActivityScoreIsUp != null)
                                                     {
                                                         if (Model.OverallActivityScoreIsUp == true)
                                                         {
-                                                            <td>@Model.OverallActivityScoreUPDownValue <span class="up">↑</span></td>
-                                                            <td>Improved</td>
+                                                            <td class="improvement-value">
+                                                                @Model.OverallActivityScoreUPDownValue%
+                                                                <span class="up">⬆</span>
+                                                            </td>
+                                                            <td class="improvement-status"> Improved </td>
                                                         }
                                                         else
                                                         {
-                                                            <td>@Model.OverallActivityScoreUPDownValue <span class="down">↓</span></td>
-                                                            <td>Down</td>
+                                                            <td class="improvement-value">
+                                                                @Model.OverallActivityScoreUPDownValue%
+                                                                <span class="down">⬇</span>
+                                                            </td>
+                                                            <td class="improvement-status">Down</td>
                                                         }
                                                     }
                                                     else
