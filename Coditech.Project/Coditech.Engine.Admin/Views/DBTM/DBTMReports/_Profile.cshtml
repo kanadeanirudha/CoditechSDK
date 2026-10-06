@@ -54,7 +54,7 @@
 
     .page {
         /* width: 210mm;
-                            min-height: 297mm; */
+                                min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -595,7 +595,29 @@
                                         </div>
 
                                         <div class="sport-box">
-                                            <img class="ball" src="@Url.Content("~/assets/images/dbtm/ball.jpg")" />
+                                            @{
+                                                string sportImage = "~/assets/images/dbtm/football.jpg";
+                                                if (!string.IsNullOrEmpty(Model.Specialization))
+                                                {
+                                                    if (Model.Specialization.StartsWith("Cricket"))
+                                                        sportImage = "~/assets/images/dbtm/cricket.jpg";
+                                                    else if (Model.Specialization.StartsWith("Badminton"))
+                                                        sportImage = "~/assets/images/dbtm/badminton.jpg";
+                                                    else if (Model.Specialization.StartsWith("Basketball"))
+                                                        sportImage = "~/assets/images/dbtm/basketball.jpg";
+                                                    else if (Model.Specialization.StartsWith("Hockey"))
+                                                        sportImage = "~/assets/images/dbtm/hockey.jpg";
+                                                    else if (Model.Specialization.StartsWith("Kabaddi"))
+                                                        sportImage = "~/assets/images/dbtm/kabaddi.jpg";
+                                                    else if (Model.Specialization.StartsWith("Swimming"))
+                                                        sportImage = "~/assets/images/dbtm/swimming.jpg";
+                                                    else if (Model.Specialization.StartsWith("Tennis"))
+                                                        sportImage = "~/assets/images/dbtm/tennis.jpg";
+                                                    else if (Model.Specialization.StartsWith("Athletics"))
+                                                        sportImage = "~/assets/images/dbtm/athletics.jpg";
+                                                }
+                                            }
+                                            <img class="ball" src="@Url.Content(sportImage)" />
                                             <div class="sport-row"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
                                             <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
                                             <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
@@ -604,7 +626,14 @@
 
                                     <div class="middle">
                                         <div class="anthro-area">
-                                            <img class="body-svg" src="@Url.Content("~/assets/images/dbtm/heightweightmale.png")" />
+                                            @{
+                                                string bodyImage = "~/assets/images/dbtm/HeightWeightMale.png";
+                                                if (!string.IsNullOrWhiteSpace(Model.Gender) && Model.Gender.Trim().Equals("Female", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    bodyImage = "~/assets/images/dbtm/HeightWeightFemale.png";
+                                                }
+                                            }
+                                            <img class="body-svg" src="@Url.Content(bodyImage)" />
                                             <!-- <div class="measure-line"></div> -->
 
                                             <table class="small-table anthro-table">
