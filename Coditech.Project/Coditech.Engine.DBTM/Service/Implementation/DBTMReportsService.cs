@@ -1251,7 +1251,7 @@ namespace Coditech.API.Service
             }
             item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores, colors);
 
-            if (testName.Length > 2)
+            if (traineePerformunceList.Count > 2)
             {
                 performunceMatrixScore = new Dictionary<string, double>();
                 // Build a dictionary of PerformanceMatrix -> average score (mean of scores in that group)
