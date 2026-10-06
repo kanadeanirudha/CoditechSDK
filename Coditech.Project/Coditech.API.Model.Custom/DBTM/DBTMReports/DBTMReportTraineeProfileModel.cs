@@ -33,7 +33,11 @@
         public string Remarks { get; set; }
         public string SchoolName { get; set; }
         public decimal OverallActivityScore { get; set; }
+        public decimal OverallLastActivityScore { get; set; }
+        public bool? OverallActivityScoreIsUp { get; set; }
+        public string OverallActivityScoreUPDownValue { get; set; }
         public DateTime AssessmentDate { get; set; }
+        public DateTime? OverallLastActivityDate { get; set; }
         public bool IsTraineeProfilePerformanceAvailable { get; set; } = true;
         public string TraineeProfilePerformanceMessage { get; set; } = string.Empty;
     }

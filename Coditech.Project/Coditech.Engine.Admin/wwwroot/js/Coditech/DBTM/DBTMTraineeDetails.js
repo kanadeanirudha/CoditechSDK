@@ -429,6 +429,143 @@
             }
         });
     },
+    GetBulkUpdateTraineePopup: function (contentId) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetBulkUpdateTraineePopup",
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load upload popup.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+    DownloadBulkUpdateTemplate: function () {
+        var batchId = $("#GeneralBatchMasterId").val();
+        var orderBy = $("#OrderBy").val() || "FirstName";
+        $("#BulkUpdateValidationMsg").text("");
+        if (!batchId || batchId === "0") {
+            $("#BulkUpdateValidationMsg").text("Please select batch.");
+            return;
+        }
+        CoditechCommon.ShowLodder();
+        var downloadUrl =
+            "/DBTMTraineeDetails/DownloadBulkUpdateTemplate"
+            + "?generalBatchMasterId=" + encodeURIComponent(batchId)
+            + "&orderBy=" + encodeURIComponent(orderBy);
+        CoditechCommon.DownloadFile(downloadUrl);
+    },
+    UploadBulkUpdateTraineeFile: function () {
+        $("#BulkUpdateValidationMsg").text("");
+        $("#BulkUpdateErrorTableContainer").html("");
+        var fileInput = $("#BulkUpdateTraineeFile")[0];
+        if (!fileInput || fileInput.files.length === 0) {
+            $("#BulkUpdateValidationMsg").text("Please select file.");
+            return;
+        }
+        var file = fileInput.files[0];
+        if (!file.name.toLowerCase().endsWith(".xlsx")) {
+            $("#BulkUpdateValidationMsg").text("Only Excel (.xlsx) file is allowed.");
+            return;
+        }
+        var formData = new FormData();
+        formData.append("file", file);
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            url: "/DBTMTraineeDetails/UploadBulkUpdateTraineeFile",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                CoditechCommon.HideLodder();
+                if (response.success) {
+                    $("#BulkUpdateTraineeFile").val("");
+                    $("#TraineeUpdatePopupId").modal("hide");
+                    location.reload();
+                    return;
+                }
+                if (response.failedRows && response.failedRows.length > 0) {
+                    DBTMTraineeDetails.RenderBulkUpdateFailedTable(response.failedRows, response.headers);
+                    return;
+                }
+                $("#BulkUpdateValidationMsg").text(response.message || "Bulk update failed.");
+            },
+            error: function (xhr) {
+                CoditechCommon.HideLodder();
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                    return;
+                }
+                CoditechNotification.DisplayNotificationMessage("Bulk update failed.", "error");
+            }
+        });
+    },
+    RenderBulkUpdateFailedTable: function (rows, headers) {
+        if (!rows || rows.length === 0) {
+            $("#BulkUpdateErrorTableContainer").html("");
+            return;
+        }
+        var cols = Object.keys(rows[0]).filter(function (c) {
+            return c !== "ErrorMessage";
+        });
+        var headerMap = {};
+        if (headers) {
+            headers.forEach(function (h) {
+                headerMap[h.HeaderCode] = h;
+            });
+        }
+        var html = `
+        <hr/>
+        <h6 class="text-danger mb-2">Data Correction Required</h6>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+    `;
+        cols.forEach(function (c) {
+            var header = headerMap[c];
+            var title = header ? header.HeaderName : c;
+
+            if (header && header.IsRequired) {
+                title += ' <span class="text-danger">*</span>';
+            }
+            html += `<th>${title}</th>`;
+        });
+        html += `<th>Error Message</th>`;
+        html += `</tr></thead><tbody>`;
+        rows.forEach(function (r) {
+            html += `<tr>`;
+            cols.forEach(function (c) {
+                var val = r[c] == null ? "" : r[c];
+
+                html += `<td>${val}</td>`;
+            });
+            var errorMessage = r["ErrorMessage"] || "";
+            html += `
+            <td>
+                <span class="text-danger">
+                    ${errorMessage}
+                </span>
+            </td>
+        `;
+            html += `</tr>`;
+        });
+        html += `
+            </tbody>
+        </table>
+    `;
+        $("#BulkUpdateErrorTableContainer").html(html);
+    },
 };
 function showFieldError(fieldName, message) {
     const span = $('[data-valmsg-for="' + fieldName + '"]');

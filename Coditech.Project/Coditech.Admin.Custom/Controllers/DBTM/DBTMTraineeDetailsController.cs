@@ -725,6 +725,61 @@ namespace Coditech.Admin.Controllers
             Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/pdf", report.FileName);
         }
+
+        #region Bulk Update Trainee
+        [HttpGet]
+        public ActionResult GetBulkUpdateTraineePopup()
+        {
+            return PartialView("~/Views/DBTM/DBTMTraineeDetails/_BulkUpdateTraineePopUp.cshtml");
+        }
+
+        [HttpGet]
+        public IActionResult DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy)
+        {
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.DownloadBulkUpdateTemplate(generalBatchMasterId, orderBy);
+            if (result == null || string.IsNullOrEmpty(result.FilePath) || !System.IO.File.Exists(result.FilePath))
+                return Content("File not found.");
+            if (result.HasError)
+                return Content(result.ErrorMessage ?? "Unable to generate template.");
+            var bytes = System.IO.File.ReadAllBytes(result.FilePath);
+            var fileName = result.FileName;
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        [HttpPost]
+        public JsonResult UploadBulkUpdateTraineeFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "File not selected."
+                });
+            }
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Only Excel (.xlsx) file is allowed."
+                });
+            }
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadBulkUpdateTraineeFromFile(file);
+            if (result.HasError)
+            {
+                return Json(new { success = false, message = result.ErrorMessage });
+            }
+            if (result.FailedRows != null && result.FailedRows.Count > 0)
+            {
+                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows, headers = result.Headers });
+            }
+            SetNotificationMessage(GetSuccessNotificationMessage("Trainee updated successfully."));
+            return Json(new { success = true });
+        }
+        #endregion
         #endregion
     }
 }

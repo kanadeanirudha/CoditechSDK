@@ -69,6 +69,7 @@
         public static class ExcelTemplateColumns
         {
             public const string JoiningCode = "JoiningCode";
+            public const string PersonCode = "PersonCode";
             public const string TraineeTitle = "TraineeTitle";
             public const string FirstName = "FirstName";
             public const string MiddleName = "MiddleName";
