@@ -28,36 +28,37 @@
 
     @if (Model.GraphType.Equals("Bar", StringComparison.OrdinalIgnoreCase))
     {
-            @foreach (var dataset in Model.Datasets)
-            {
-                    <text>
-                                    datasets.push({
-                                        label: "@dataset.Label",
-                                        data: @Html.Raw(dataset.Data),
-                                        backgroundColor: "@dataset.Color",
-                                        borderColor: "@dataset.Color",
-                                        borderWidth: 2,
-                                        tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
-                                    });
-                    </text>
-            }
+        @foreach (var dataset in Model.Datasets)
+        {
+            <text>
+                        var datasetColors = @Html.Raw(dataset.Color);
+                        datasets.push({
+                            label: "@dataset.Label",
+                            data: @Html.Raw(dataset.Data),
+                            backgroundColor: datasetColors,
+                            borderColor: datasetColors,
+                            borderWidth: 2,
+                            tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
+                        });
+            </text>
+        }
     }
     else
     {
-            @foreach (var dataset in Model.Datasets)
-            {
-                    <text>
-                                    datasets.push({
-                                        label: "@dataset.Label",
-                                        data: @Html.Raw(dataset.Data),
-                                        fill: false,
-                                        borderColor: "@dataset.Color",
-                                        borderWidth: 2,
-                                        tension: 0.4,
-                                        tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
-                                    });
-                    </text>
-            }
+        @foreach (var dataset in Model.Datasets)
+        {
+            <text>
+                                            datasets.push({
+                                                label: "@dataset.Label",
+                                                data: @Html.Raw(dataset.Data),
+                                                fill: false,
+                                                borderColor: "@dataset.Color",
+                                                borderWidth: 2,
+                                                tension: 0.4,
+                                                tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
+                                            });
+            </text>
+        }
     }
     var textColor = getComputedStyle(document.body).color;
                 new Chart(ctx, {
@@ -100,9 +101,11 @@
                         scales: {
                             xAxes: [{
                                 display: true,
-                                ticks: {
+                                   ticks: {
                                     fontColor: textColor,
-                                   
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 45
                                 },
                                 scaleLabel: {
                                     display: true,

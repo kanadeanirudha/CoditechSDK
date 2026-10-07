@@ -543,6 +543,8 @@ namespace Coditech.Common.Helper.Utilities
 
         public static string HexToRgba(string hex, double alpha = 1.0)
         {
+            if (string.IsNullOrWhiteSpace(hex))
+                return string.Empty;
             hex = hex.TrimStart('#');
 
             if (hex.Length != 6)

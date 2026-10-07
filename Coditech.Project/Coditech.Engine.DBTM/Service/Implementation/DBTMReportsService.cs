@@ -1044,8 +1044,7 @@ namespace Coditech.API.Service
             if (generalBatchMasterId <= 0)
                 return null;
 
-            bool isAnyActivityPerformed= _dBTMDeviceDataRepository.Table
-                                       .Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate);
+            bool isAnyActivityPerformed = _dBTMDeviceDataRepository.Table.Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate);
 
             if (!isAnyActivityPerformed)
                 return new DBTMReportTraineeProfileListModel();
@@ -1204,7 +1203,7 @@ namespace Coditech.API.Service
         {
             Dictionary<string, double> performunceMatrixScore = new Dictionary<string, double>();
             // Build arrays for chart: test names and their numeric scores
-            string[] testNames = traineePerformunceList.Select(p => p.TestCode ?? string.Empty).ToArray();
+            string[] testNames = traineePerformunceList.Select(p => p.TestName ?? string.Empty).ToArray();
             decimal[] scores = traineePerformunceList.Select(p =>
             {
                 if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
@@ -1219,13 +1218,14 @@ namespace Coditech.API.Service
                 return 0m;
             }).ToArray();
 
-            string[] colors = new string[testNames.Length];
-            for (int i = 0; i < testNames.Length; i++)
-            {
-                var testCode = testNames[i];
-                var perf = traineePerformunceList.FirstOrDefault(x => x.TestCode == testCode);
-                colors[i] = DBTMCustomHelper.HexToRgba(perf?.PerformanceMatrixColor) ?? "'rgba(255, 99, 132, 0.2)'";
-            }
+            var testMasterIds = traineePerformunceList.Select(x => x.DBTMTestMasterId).Distinct().ToList();
+            var testNameDictionary = _dBTMTestMasterRepository.Table.Where(x => testMasterIds.Contains(x.DBTMTestMasterId)).ToDictionary(x => x.DBTMTestMasterId, x => x.TestName);
+            string[] colors = traineePerformunceList.Select(p =>
+                {
+                    if (string.IsNullOrWhiteSpace(p.PerformanceMatrixColor))
+                        return "rgba(255, 99, 132, 1)";
+                    return DBTMCustomHelper.HexToRgba(p.PerformanceMatrixColor, 1.0);
+                }).ToArray();
             if (scores?.Length > 0)
             {
                 item.OverallActivityScore = Math.Round(scores.Sum() / scores.Length, CustomConstants.GraphListRoundUpValue);
@@ -1656,7 +1656,7 @@ namespace Coditech.API.Service
                                 {
                                     Label = "Score",
                                     Data = JsonConvert.SerializeObject(scores),
-                                    Color = "rgba(255, 99, 132, 1)"
+                                    Color = JsonConvert.SerializeObject(color)
                                 }
                             }
             };
