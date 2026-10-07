@@ -91,19 +91,16 @@
             changeYear: true,
             dateFormat: dateFormat,
             maxDate: new Date(),
-            beforeShowDay: function (date) {
-                if (!activityPerformedDates || activityPerformedDates.length === 0) {
-                    return [false, "", ""];
-                }
-                var d = date.getFullYear() + "-" +
-                    String(date.getMonth() + 1).padStart(2, "0") + "-" +
-                    String(date.getDate()).padStart(2, "0");
+                   beforeShowDay: function (date) {
+            var d = date.getFullYear() + "-" +
+                String(date.getMonth() + 1).padStart(2, "0") + "-" +
+                String(date.getDate()).padStart(2, "0");
 
-                if (activityPerformedDates.includes(d)) {
-                    return [true, "activity-date", "Trainee Performed"];
-                }
-                   return [true, "", ""];
+            if (activityPerformedDates && activityPerformedDates.includes(d)) {
+                return [true, "activity-date", "Trainee Performed"];
             }
+            return [true, "", ""];
+        }
             });
         });
     </script>
