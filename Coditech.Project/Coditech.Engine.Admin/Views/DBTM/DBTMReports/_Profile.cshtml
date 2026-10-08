@@ -496,7 +496,6 @@
             left: 0 !important;
             top: 0 !important;
             width: 210mm !important;
-            height: 297mm !important;
             margin: 0 !important;
             padding: 10mm 9mm 8mm !important;
             background: #fff !important;
@@ -523,42 +522,63 @@
                     overflow: visible !important;
                 }
 
-                .print-selected-report .top-grid,
-                .print-selected-report .middle {
+                .print-selected-report .top-grid {
                     width: 100% !important;
                     max-width: 100% !important;
                     box-sizing: border-box !important;
                     grid-template-columns: 25fr 39fr 36fr !important;
                     gap: 0 !important;
-                    /* remove fixed heights so charts and tables can expand for print */
                     height: auto !important;
                     min-height: 0 !important;
+                    overflow: visible !important;
+                }
+
+                .print-selected-report .middle {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    grid-template-columns: 25fr 35fr 40fr !important;
+                    gap: 0 !important;
+                    height: 500px !important;
+                    min-height: 500px !important;
+                    margin-top: 5px !important;
+                    margin-bottom: 0 !important;
+                    overflow: visible !important;
+                }
+
+                .print-selected-report .bar-wrap {
+                    height: 155px !important;
+                }
+
+                .print-selected-report .radar-wrap {
+                    height: 200px !important;
                     overflow: visible !important;
                 }
 
                 .print-selected-report table {
                     max-width: 100% !important;
                     box-sizing: border-box !important;
-                    /* allow table rows to break across pages */
                     page-break-inside: auto !important;
-                }
-                /* ensure chart containers expand for printing */
-                .print-selected-report .bar-wrap,
-                .print-selected-report .radar-wrap {
-                    height: auto !important;
-                    min-height: 0 !important;
-                    overflow: visible !important;
-                }
-                /* ensure canvases and svgs render and scale properly in print */
-                .print-selected-report canvas,
-                .print-selected-report svg {
-                    max-width: 100% !important;
-                    height: auto !important;
                 }
                 /* avoid breaking performance-pair blocks awkwardly */
                 .print-selected-report .performance-pair,
                 .print-selected-report .section-table {
                     page-break-inside: avoid !important;
+                }
+
+                .print-selected-report .line-bar-chart-container {
+                    height: 175px !important;
+                    width: 100% !important;
+                }
+
+                .print-selected-report .radar-chart-container {
+                    height: 220px !important;
+                    width: 100% !important;
+                }
+
+                .print-selected-report .bar-wrap,
+                .print-selected-report .radar-wrap {
+                    overflow: visible !important;
                 }
 
         .card-header,
