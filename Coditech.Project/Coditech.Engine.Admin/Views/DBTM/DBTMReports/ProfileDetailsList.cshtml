@@ -42,6 +42,19 @@
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label">Report Type</label>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="ReportType" id="RankReport" value="Rank" checked />
+                                    <label class="form-check-label" for="RankReport"> Rank Report </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="ReportType" id="IndividualReport" value="Individual" />
+                                    <label class="form-check-label" for="IndividualReport"> Performance Report </label>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
                                 <label class="form-label">Order By</label>
                             </div>
                             <div class="col-md-2">
@@ -69,6 +82,7 @@
         color: #fff !important;
         font-weight: 600;
     }
+
     #ui-datepicker-div {
         z-index: 99999 !important;
     }

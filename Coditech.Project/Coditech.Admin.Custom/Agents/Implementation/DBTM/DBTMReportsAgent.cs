@@ -249,9 +249,9 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
 
-        public virtual DBTMReportTraineeProfileListModel GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
+        public virtual DBTMReportTraineeProfileListModel GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
-            DBTMReportTraineeProfileListResponse response = _dBTMReportsClient.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord);
+            DBTMReportTraineeProfileListResponse response = _dBTMReportsClient.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord, reportType);
             DBTMReportTraineeProfileListModel dBTMTraineeProfileList = new DBTMReportTraineeProfileListModel { DBTMTraineeProfileList = response?.DBTMTraineeProfileList };
             return dBTMTraineeProfileList;
         }

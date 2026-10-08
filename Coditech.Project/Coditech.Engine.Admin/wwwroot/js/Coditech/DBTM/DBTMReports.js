@@ -661,6 +661,7 @@ var DBTMReports = {
     GetBatchWiseTraineeProfileDetailsListV2: function () {
         var generalBatchMasterId = $("#GeneralBatchMasterId").val();
         var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
+        var reportType = $('input[name="ReportType"]:checked').val();
         var orderBy = $("#OrderBy").val();
         var todate = $("#ToDate").val();
         var fromdate = todate;
@@ -680,7 +681,8 @@ var DBTMReports = {
                     dbtmTraineeDetailIds: dbtmTraineeDetailId,
                     orderBy: orderBy,
                     FromDate: fromdate,
-                    ToDate: todate
+                    ToDate: todate,
+                    reportType: reportType
                 },
                 success: function (data) {
                     $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);

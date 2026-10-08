@@ -1039,7 +1039,7 @@ namespace Coditech.API.Service
         }
 
         #region ProfileDetails
-        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
+        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
             if (generalBatchMasterId <= 0)
                 return null;
