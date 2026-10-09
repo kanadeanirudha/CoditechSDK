@@ -54,7 +54,7 @@
 
     .page {
         /* width: 210mm;
-                                        min-height: 297mm; */
+                                                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -295,40 +295,39 @@
             white-space: nowrap;
         }
 
-        .score-summary .up {
-            color: #62bd3b;
-            font-size: 19px;
-            font-weight: 900;
-            line-height: 12px;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 3px;
-            font-family: Arial Black, Arial, sans-serif;
-        }
+    .up {
+        color: #62bd3b;
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 12px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 3px;
+        font-family: Arial Black, Arial, sans-serif;
+    }
 
-        .score-summary .improvement-value {
-            font-size: 8px;
-            font-weight: 400;
-            text-align: center;
-            white-space: nowrap;
-        }
+    .down {
+        color: #e33b3b;
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 12px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 3px;
+        font-family: Arial Black, Arial, sans-serif;
+    }
 
+    .score-summary .improvement-value {
+        font-size: 8px;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+    }
 
-        .score-summary .green {
-            color: #62bd3b;
-            font-weight: 700;
-        }
-
-        .score-summary .down {
-            color: #e33b3b;
-            font-size: 19px;
-            font-weight: 900;
-            line-height: 12px;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 3px;
-            font-family: Arial Black, Arial, sans-serif;
-        }
+    .score-summary .green {
+        color: #62bd3b;
+        font-weight: 700;
+    }
 
     .chart-title {
         text-align: center;
@@ -815,13 +814,15 @@
                                                                     <td>
                                                                         @if (item.IsUp != null)
                                                                         {
-                                                                            if (item.IsUp == true)
+                                                                            @if (item.IsUp == true)
                                                                             {
-                                                                                <span>@item.UpDownValue ↑</span>
+                                                                                @item.UpDownValue
+                                                                                <span class="up">⬆</span>
                                                                             }
                                                                             else
                                                                             {
-                                                                                <span>@item.UpDownValue ↓</span>
+                                                                                @item.UpDownValue
+                                                                                <span class="down">⬇</span>
                                                                             }
                                                                         }
                                                                     </td>
@@ -864,13 +865,15 @@
                                                                         <td>
                                                                             @if (item.IsUp != null)
                                                                             {
-                                                                                if (item.IsUp == true)
+                                                                                @if (item.IsUp == true)
                                                                                 {
-                                                                                    <span>@item.UpDownValue ↑</span>
+                                                                                    @item.UpDownValue
+                                                                                    <span class="up">⬆</span>
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <span>@item.UpDownValue ↓</span>
+                                                                                    @item.UpDownValue
+                                                                                    <span class="down">⬇</span>
                                                                                 }
                                                                             }
                                                                         </td>
