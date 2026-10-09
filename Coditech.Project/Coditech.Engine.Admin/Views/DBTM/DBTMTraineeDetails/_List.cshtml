@@ -37,14 +37,15 @@
                                 }
                             </td>
                             <td>
-                                 @Html.Partial("~/Views/Shared/_ActionLinkWithIcon.cshtml",
-                                 new ActionViewModel(){
-                                        Action = "UpdateDBTMTraineePersonalDetails",
-                                        Controller = controllerName,
-                                        RouteValues = new {  dBTMTraineeDetailId = item.DBTMTraineeDetailId, personId = item.PersonId, SelectedParameter2 = Model.SelectedParameter2 },
-                                        Text = item.PersonCode,
-                                        Title="Update"
-                                    })
+                                @Html.Partial("~/Views/Shared/_ActionLinkWithIcon.cshtml",
+                                new ActionViewModel()
+                            {
+                                Action = "UpdateDBTMTraineePersonalDetails",
+                                Controller = controllerName,
+                                RouteValues = new { dBTMTraineeDetailId = item.DBTMTraineeDetailId, personId = item.PersonId, SelectedParameter2 = Model.SelectedParameter2 },
+                                Text = item.PersonCode,
+                                Title = "Update"
+                            })
                             </td>
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
@@ -88,8 +89,9 @@
                                 <span class="m-2">|</span>
 
                                 <a href="@Url.Action("Profile", controllerName, new {
-                                       dBTMTraineeDetailId = item.DBTMTraineeDetailId
-                                   })"
+                                        dBTMTraineeDetailId = item.DBTMTraineeDetailId,
+                                        reportType = "Trainee"
+                                    })"
                                    title="Profile"
                                    class="btn btn-sm btn-soft-warning btn-circle">
                                     <i class="fas fa-eye"></i>

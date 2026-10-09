@@ -18,6 +18,7 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IDBTMTraineeDetailsAgent _dBTMTraineeDetailsAgent;
         private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
+        private readonly IDBTMReportsAgent _dBTMReportsAgent;
         private readonly IDBTMOrganisationCentrewiseJoiningCodeAgent _dBTMOrganisationCentrewiseJoiningCodeAgent;
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
@@ -25,10 +26,11 @@ namespace Coditech.Admin.Controllers
 
         private const string createEditTraineeDetails = "~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeDetails.cshtml";
         private const string createEditAssociatedTrainer = "~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/CreateEditAssociatedTrainer.cshtml";
-        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
+        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMReportsAgent dBTMReportsAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             _dBTMTraineeDetailsAgent = dBTMTraineeDetailsAgent;
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
+            _dBTMReportsAgent = dBTMReportsAgent;
             _dBTMOrganisationCentrewiseJoiningCodeAgent = dBTMOrganisationCentrewiseJoiningCodeAgent;
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
@@ -613,10 +615,16 @@ namespace Coditech.Admin.Controllers
         }
         #region Profilee
         [HttpGet]
-        public virtual ActionResult Profile(long dBTMTraineeDetailId)
+        public virtual ActionResult Profile(long dBTMTraineeDetailId, string reportType = "Trainee")
         {
-            DBTMTraineeProfileViewModel dBTMTraineeProfileViewModel = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
-            return View("~/Views/DBTM/DBTMTraineeDetails/Profile.cshtml", dBTMTraineeProfileViewModel);
+            DateTime performanceDate = new DateTime(2026, 9, 30);
+            DBTMReportTraineeProfileListModel list =  _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(  3463,  dBTMTraineeDetailId.ToString(),  "FirstName",  performanceDate,   performanceDate,   "",  reportType);
+            DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault();
+            if (traineeProfile == null)
+            {
+                return Content("No trainee profile data found.");
+            }
+            return View("~/Views/DBTM/DBTMReports/_Profile.cshtml", traineeProfile);
         }
 
         [HttpGet]
