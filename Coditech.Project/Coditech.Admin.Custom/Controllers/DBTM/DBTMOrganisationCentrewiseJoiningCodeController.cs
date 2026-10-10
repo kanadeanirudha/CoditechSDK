@@ -36,6 +36,10 @@ namespace Coditech.Admin.Controllers
         {
             OrganisationCentrewiseJoiningCodeListViewModel list = new OrganisationCentrewiseJoiningCodeListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
+            if (string.IsNullOrEmpty(dataTableModel.SelectedParameter2))
+            {
+                dataTableModel.SelectedParameter2 = "1";
+            }
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
                 dataTableModel.SelectedParameter1 = "323";
@@ -56,6 +60,10 @@ namespace Coditech.Admin.Controllers
         {
             OrganisationCentrewiseJoiningCodeListViewModel list = new OrganisationCentrewiseJoiningCodeListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
+            if (string.IsNullOrEmpty(dataTableModel.SelectedParameter2))
+            {
+                dataTableModel.SelectedParameter2 = "1";
+            }
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
                 dataTableModel.SelectedParameter1 = "324";
