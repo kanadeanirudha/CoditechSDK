@@ -1041,8 +1041,16 @@ namespace Coditech.API.Service
         #region ProfileDetails
         public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
+            if (reportType == "Individual")
+            {
+                string personCode = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == Convert.ToInt64(dBTMTraineeDetailIds)).FirstOrDefault().PersonCode;
+                generalBatchMasterId = Convert.ToInt64( _dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode && x.TestPerformedTime.Date == FromDate.Date).FirstOrDefault()?.TablePrimaryColumnId);
+            }
+
             if (generalBatchMasterId <= 0)
+            {
                 return null;
+            }
 
             bool isAnyActivityPerformed = _dBTMDeviceDataRepository.Table.Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate);
 
