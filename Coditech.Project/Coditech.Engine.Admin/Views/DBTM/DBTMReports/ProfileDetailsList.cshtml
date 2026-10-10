@@ -4,6 +4,7 @@
     DropdownViewModel batchDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseReports.ToString(), DropdownName = "GeneralBatchMasterId", DropdownSelectedValue = Model.GeneralBatchMasterId.ToString(), ChangeEvent = "DBTMReports.GetBatchUserListByBatchId()", IsCustomDropdown = true };
     DropdownViewModel traineeDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseUser.ToString(), DropdownName = "DBTMTraineeDetailId", DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(), IsCustomDropdown = true, ChangeEvent = "DBTMReports.GetBatchWiseTraineeProfileDetailsList('" + Model.GeneralBatchMasterId + "')" };
     DropdownViewModel orderByDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.OrderBy.ToString(), DropdownName = "OrderBy", DropdownSelectedValue = Model.OrderBy, IsCustomDropdown = true };
+    DropdownViewModel individualTraineeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(), DropdownName = "IndividualDBTMTraineeDetailId", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -11,29 +12,36 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="card-title">Trainee Profile Details</h4>
-                            </div><!--end col-->
-                        </div>  <!--end row-->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title">Trainee Profile Reports</span>
+                        <div class="switch-field">
+                            <input type="radio" id="IndividualProfileReport" name="ProfileReportMode" value="Individual" checked />
+                            <label for="IndividualProfileReport">Individual</label>
+                            <input type="radio" id="RankwiseReport" name="ProfileReportMode" value="Rankwise" />
+                            <label for="RankwiseReport">RankWise</label>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-1">
+                            <div class="col-md-1" id="BatchListLabel">
                                 <label class="required">Batch List</label>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" id="BatchListWrapper">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
                             </div>
-
-                            <div class="col-md-1">
-                                <label class="form-label required" for="CustomDropdownSelectedValue1">Trainee List</label>
+                            <div class="col-md-1" id="TraineeListLabel">
+                                <label class="required">Trainee List</label>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="TraineeListWrapper">
                                 <div class="mb-3 multiselect-dropdown">
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTraineeDetailId", multiple = "multiple", data_live_search = "true" })
                                 </div>
+                            </div>
+                            <div class="col-md-1" id="IndividualTraineeListLabel" style="display:none;">
+                                <label class="required">Trainee List</label>
+                            </div>
+                            <div class="col-md-6" id="IndividualTraineeListWrapper" style="display:none;">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", individualTraineeDropdown)
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label">Date</label>
@@ -41,31 +49,14 @@
                             <div class="col-md-2">
                                 @Html.TextBoxFor(x => x.ToDate, AdminGeneralHelper.DateFormatForTextBox(), new { @class = "form-control", @readonly = "readonly" })
                             </div>
-                            <div class="col-md-1">
-                                <label class="form-label">Report Type</label>
+                            <div class="col-md-1" id="OrderByLabel">
+                                <label>Order By</label>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="ReportType" id="RankReport" value="Rank" checked />
-                                    <label class="form-check-label" for="RankReport"> Rank Report </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="ReportType" id="IndividualReport" value="Individual" />
-                                    <label class="form-check-label" for="IndividualReport"> Performance Report </label>
-                                </div>
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">Order By</label>
-                            </div>
-                            <div class="col-md-2">
+                            <div class="col-md-2" id="OrderByWrapper">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", orderByDropdown)
                             </div>
                             <div class="col-md-1">
-                                <input type="button"
-                                       class="btn btn-success"
-                                       value="Show"
-                                       id="ShowDataId"
-                                       onclick="DBTMReports.GetBatchWiseTraineeProfileDetailsListV2()" />
+                                <input type="button" class="btn btn-success" value="Show" id="ShowDataId" onclick="DBTMReports.GetBatchWiseTraineeProfileDetailsListV2()" />
                             </div>
                             <div id="DBTMBatchWiseTraineeProfileDetailsDivId" class="mt-3">
                             </div>
@@ -86,6 +77,43 @@
     #ui-datepicker-div {
         z-index: 99999 !important;
     }
+
+    .switch-field {
+        display: inline-flex;
+        overflow: hidden;
+        border-radius: 5px;
+    }
+
+        .switch-field input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        .switch-field label {
+            padding: 7px 12px;
+            margin: 0;
+            background: #e4e4e4;
+            color: #333;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s ease;
+        }
+
+        .switch-field input:checked + label {
+            background: #ffb822;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .switch-field label:first-of-type {
+            border-radius: 5px 0 0 5px;
+        }
+
+        .switch-field label:last-of-type {
+            border-radius: 0 5px 5px 0;
+        }
 </style>
 <script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
 <script src="~/js/coditech/DBTM/DBTMReports.js"></script>
@@ -153,6 +181,32 @@
                 $select.selectpicker('refresh');
             });
 
+        });
+
+        function ApplyProfileReportMode() {
+            var reportMode = $('input[name="ProfileReportMode"]:checked').val();
+            var isIndividual = reportMode === "Individual";
+            $("#BatchListLabel, #BatchListWrapper, #TraineeListLabel, #TraineeListWrapper") .toggle(!isIndividual);
+            $("#IndividualTraineeListLabel, #IndividualTraineeListWrapper").toggle(isIndividual);
+            $("#OrderByLabel, #OrderByWrapper").toggle(!isIndividual);
+            var $individualTrainee = $("#IndividualDBTMTraineeDetailId");
+            if ($individualTrainee.length) {
+                $individualTrainee.selectpicker();
+                $individualTrainee.prop("disabled", false);
+                $individualTrainee.selectpicker("refresh");
+            }
+            $("#DBTMBatchWiseTraineeProfileDetailsDivId").empty();
+            activityPerformedDates = [];
+            if ($("#ToDate").hasClass("hasDatepicker")) {
+                $("#ToDate").datepicker("refresh");
+            }
+            DBTMReports.LoadTraineeProfileActivityDates();
+        }
+        $(document).ready(function () {
+            $('input[name="ProfileReportMode"]').on("change", function () {
+                ApplyProfileReportMode();
+            });
+            ApplyProfileReportMode();
         });
     </script>
 }

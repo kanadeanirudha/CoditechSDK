@@ -659,67 +659,63 @@ var DBTMReports = {
     },
 
     GetBatchWiseTraineeProfileDetailsListV2: function () {
-        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
-        var dbtmTraineeDetailId = $("#DBTMTraineeDetailId").val();
-        var reportType = $('input[name="ReportType"]:checked').val();
-        var orderBy = $("#OrderBy").val();
+        var reportMode = $('input[name="ProfileReportMode"]:checked').val();
+        var isIndividual = reportMode === "Individual";
+        var generalBatchMasterId = isIndividual ? 0 : $("#GeneralBatchMasterId").val();
+        var traineeSelector = isIndividual ? "#IndividualDBTMTraineeDetailId" : "#DBTMTraineeDetailId";
+        var dbtmTraineeDetailId = $(traineeSelector).val();
+        var orderBy = isIndividual ? "" : $("#OrderBy").val();
         var todate = $("#ToDate").val();
-        var fromdate = todate;
         if (Array.isArray(dbtmTraineeDetailId)) {
             dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
         }
-        $("#DBTMBatchWiseTraineeProfileDetailsDivId").html("");
-        if (generalBatchMasterId && dbtmTraineeDetailId) {
-            CoditechCommon.ShowLodder();
-            $.ajax({
-                cache: false,
-                type: "GET",
-                dataType: "html",
-                url: "/DBTMReports/GetBatchWiseTraineeProfileDetailsListV2",
-                data: {
-                    generalBatchMasterId: generalBatchMasterId,
-                    dbtmTraineeDetailIds: dbtmTraineeDetailId,
-                    orderBy: orderBy,
-                    FromDate: fromdate,
-                    ToDate: todate,
-                    reportType: reportType
-                },
-                success: function (data) {
-                    $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
-                    DBTMReports.LoadTraineeProfileActivityDates();
-                    CoditechCommon.HideLodder();
-                },
-                error: function (xhr) {
-                    CoditechCommon.HideLodder();
-                    if (xhr.status == 401 || xhr.status == 403) {
-                        location.reload();
-                        return;
-                    }
-                    CoditechNotification.DisplayNotificationMessage(
-                        "Failed to retrieve Batch trainees.",
-                        "error"
-                    );
-                },
-                complete: function () {
-                    CoditechCommon.HideLodder();
+        $("#DBTMBatchWiseTraineeProfileDetailsDivId").empty();
+        if (!todate) {
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select date.", "error");
+            return;
+        }
+        if (!dbtmTraineeDetailId) {
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select trainee.", "error");
+            return;
+        }
+        if (!isIndividual &&
+            (!generalBatchMasterId || generalBatchMasterId === "0")) {
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select batch.", "error");
+            return;
+        }
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMReports/GetBatchWiseTraineeProfileDetailsListV2",
+            data: {
+                generalBatchMasterId: generalBatchMasterId,
+                dbtmTraineeDetailIds: dbtmTraineeDetailId,
+                orderBy: orderBy,
+                FromDate: todate,
+                ToDate: todate,
+                reportType: isIndividual ? "Individual" : "Rank"
+            },
+            success: function (data) {
+                $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
+                DBTMReports.LoadTraineeProfileActivityDates();
+                CoditechCommon.HideLodder();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401 || xhr.status === 403) {
+                    location.reload();
+                    return;
                 }
-            });
-
-        }
-        else if (!generalBatchMasterId || generalBatchMasterId === "0") {
-
-            CoditechNotification.DisplayNotificationMessage(
-                "Please select a batch.",
-                "error"
-            );
-        }
-        else if (!dbtmTraineeDetailId) {
-
-            CoditechNotification.DisplayNotificationMessage(
-                "Please select a trainee.",
-                "error"
-            );
-        }
+                CoditechNotification.DisplayNotificationMessage("Failed to retrieve trainee profile report.", "error");
+            },
+            complete: function () {
+                CoditechCommon.HideLodder();
+            }
+        });
     },
     GetDBTMMultiTestListByDBTMCampMasterId: function () {
         var campId = $("#DBTMCampMasterId").val();
@@ -861,8 +857,10 @@ var DBTMReports = {
         });
     },
     LoadTraineeProfileActivityDates: function () {
-        var traineeIds = $("#DBTMTraineeDetailId").val();
-        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var isIndividual = $('input[name="ProfileReportMode"]:checked').val() === "Individual";
+        var traineeSelector = isIndividual ? "#IndividualDBTMTraineeDetailId" : "#DBTMTraineeDetailId";
+        var traineeIds = $(traineeSelector).val();
+        var generalBatchMasterId = isIndividual ? 0 : $("#GeneralBatchMasterId").val();
         if (!traineeIds || traineeIds.length === 0) {
             activityPerformedDates = [];
             $("#ToDate").datepicker("refresh");
