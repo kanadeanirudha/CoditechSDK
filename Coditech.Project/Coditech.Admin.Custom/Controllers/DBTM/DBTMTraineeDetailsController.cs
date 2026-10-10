@@ -615,10 +615,10 @@ namespace Coditech.Admin.Controllers
         }
         #region Profilee
         [HttpGet]
-        public virtual ActionResult Profile(long dBTMTraineeDetailId, string reportType = "Trainee")
+        public virtual ActionResult Profile(long dBTMTraineeDetailId)
         {
             DateTime performanceDate = new DateTime(2026, 9, 30);
-            DBTMReportTraineeProfileListModel list =  _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(  3463,  dBTMTraineeDetailId.ToString(),  "FirstName",  performanceDate,   performanceDate,   "",  reportType);
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(0, dBTMTraineeDetailId.ToString(), "FirstName", performanceDate, performanceDate, "batch", "Trainee");
             DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault();
             if (traineeProfile == null)
             {

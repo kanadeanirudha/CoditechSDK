@@ -1041,10 +1041,14 @@ namespace Coditech.API.Service
         #region ProfileDetails
         public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
-            if (reportType == "Individual")
+            if (reportType == "Individual" || reportType == "Trainee")
             {
                 string personCode = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == Convert.ToInt64(dBTMTraineeDetailIds)).FirstOrDefault().PersonCode;
-                generalBatchMasterId = Convert.ToInt64( _dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode && x.TestPerformedTime.Date == FromDate.Date).FirstOrDefault()?.TablePrimaryColumnId);
+                if (reportType == "Trainee")
+                {
+                    FromDate = _dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode).OrderByDescending(x => x.TestPerformedTime).Select(x => x.TestPerformedTime).FirstOrDefault();
+                }
+                generalBatchMasterId = Convert.ToInt64(_dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode && x.TestPerformedTime.Date == FromDate.Date).FirstOrDefault()?.TablePrimaryColumnId);
             }
 
             if (generalBatchMasterId <= 0)
@@ -1052,7 +1056,7 @@ namespace Coditech.API.Service
                 return null;
             }
 
-            bool isAnyActivityPerformed = _dBTMDeviceDataRepository.Table.Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate);
+            bool isAnyActivityPerformed = _dBTMDeviceDataRepository.Table.Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate.Date);
 
             if (!isAnyActivityPerformed)
                 return new DBTMReportTraineeProfileListModel();
