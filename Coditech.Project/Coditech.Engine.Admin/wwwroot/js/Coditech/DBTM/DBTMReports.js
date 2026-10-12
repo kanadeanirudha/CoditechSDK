@@ -926,13 +926,11 @@ var DBTMReports = {
             $report = $button.closest(".page");
         }
         if ($report.length === 0) {
-            CoditechNotification.DisplayNotificationMessage(
-                "Trainee profile report not found.",
-                "error"
-            );
+            CoditechNotification.DisplayNotificationMessage("Trainee profile report not found.", "error");
             return;
         }
         var isAccordionReport = $button.closest(".accordion-item").length > 0;
+        var isTraineeDetailsReport = $button.closest("#traineeDetailsAccordion").length > 0;
         $(".print-selected-report").removeClass("print-selected-report print-normal-report");
         $report.addClass("print-selected-report");
         if (!isAccordionReport) {
@@ -963,5 +961,22 @@ var DBTMReports = {
         setTimeout(function () {
             $report.removeClass("print-selected-report print-normal-report");
         }, 1000);
+    },
+    ConfirmPrintReport: function (traineeId, modalId) {
+        var remarks = $("#RemarksText").val() || "";
+        $("#printRemarksText").text(remarks);
+        $("#" + modalId).modal("hide");
+        setTimeout(function () {
+            var $report = $("#report");
+            var $button = $(".card-header button[data-bs-target='#RemarkPopupId']").first();
+            if ($button.length && typeof DBTMReports !== "undefined") {
+                DBTMReports.PrintTraineeProfile(
+                    $button[0],
+                    $report.data("printable-name")
+                );
+            } else {
+                window.print();
+            }
+        }, 300);
     },
 };
