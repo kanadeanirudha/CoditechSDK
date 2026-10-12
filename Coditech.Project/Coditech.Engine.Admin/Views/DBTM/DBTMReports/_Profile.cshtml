@@ -10,11 +10,7 @@
     // precompute sanitized printable name and common URLs
     var logoUrl = Url.Content("~/assets/images/dbtm/applicationlogo.png");
     string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
-    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
-            {
-                ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
-                ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
-            };
+    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
     var fnameSafe = SanitizeForFilename(Model.FirstName ?? "Trainee");
     var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
     var assessment = Model.AssessmentDate;
@@ -54,7 +50,7 @@
 
     .page {
         /* width: 210mm;
-                                                        min-height: 297mm; */
+        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -580,6 +576,17 @@
                     overflow: visible !important;
                 }
 
+                .print-selected-report.print-normal-report {
+                    position: fixed !important;
+                    left: 0 !important;
+                    top: 0 !important;
+                    width: 210mm !important;
+                    max-width: 210mm !important;
+                    margin: 0 !important;
+                    box-sizing: border-box !important;
+                    overflow: visible !important;
+                }
+
         .card-header,
         .toolbar,
         button,
@@ -606,7 +613,11 @@
                             </a>
                             <button type="button"
                                     class="btn btn-success"
-                                    onclick="DBTMReports.PrintTraineeProfile(this,'@profilePrintName')">
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#RemarkPopupId"
+                                    onclick="DBTMTraineeDetails.GetRemarks(
+                                    'RemarkContentId',
+                                    @Model.DBTMTraineeDetailId)">
                                 <i class="fa fa-print me-1"></i> Print Report
                             </button>
                             @if (!Model.IsListView)
@@ -892,7 +903,7 @@
                                             </table>
                                         </div>
                                     }
-                                    <div class="notes"><b>Notes:</b></div>
+                                    <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
                                 </div>
                             </div>
                         </div>
