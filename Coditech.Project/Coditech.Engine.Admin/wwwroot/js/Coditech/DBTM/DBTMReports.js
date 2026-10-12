@@ -918,16 +918,26 @@ var DBTMReports = {
     },
     PrintTraineeProfile: function (button, printableName) {
         var $button = $(button);
-        var $accordionItem = $button.closest(".accordion-item");
-        var $report = $accordionItem.find(".page").first();
+        var $report = $button.closest(".accordion-item").find(".page").first();
         if ($report.length === 0) {
-            CoditechNotification.DisplayNotificationMessage("Trainee profile report not found.", "error");
+            $report = $button.closest(".card").find(".page").first();
+        }
+        if ($report.length === 0) {
+            $report = $button.closest(".page");
+        }
+        if ($report.length === 0) {
+            CoditechNotification.DisplayNotificationMessage(
+                "Trainee profile report not found.",
+                "error"
+            );
             return;
         }
-        $(".print-selected-report").removeClass("print-selected-report");
+        var isAccordionReport = $button.closest(".accordion-item").length > 0;
+        $(".print-selected-report").removeClass("print-selected-report print-normal-report");
         $report.addClass("print-selected-report");
-
-        // Determine final printable name: prefer parameter, then data attribute, then exposed window var, then derive
+        if (!isAccordionReport) {
+            $report.addClass("print-normal-report");
+        }
         try {
             var finalName = printableName || $report.data('printable-name') || window.DBTMPrintableName;
             if (!finalName) {
@@ -944,18 +954,14 @@ var DBTMReports = {
                 if (dateText) parts.push(sanitize(dateText));
                 finalName = parts.length ? ('PerformanceReport_' + parts.join('_')) : ('PerformanceReport_' + Date.now());
             }
-            // apply name where useful
             try { document.title = finalName; } catch (e) { }
             try { window.name = finalName; } catch (e) { }
             $report.attr('data-printable-name', finalName);
         } catch (e) {
-            // ignore errors and continue to print
         }
-
         window.print();
-
         setTimeout(function () {
-            $report.removeClass("print-selected-report");
+            $report.removeClass("print-selected-report print-normal-report");
         }, 1000);
     },
 };
