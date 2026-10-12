@@ -1072,13 +1072,24 @@ namespace Coditech.API.Service
         }
 
         #region ProfileDetails
-        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
+        public DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
-            if (generalBatchMasterId <= 0)
-                return null;
+            if (reportType == "Individual" || reportType == "Trainee")
+            {
+                string personCode = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == Convert.ToInt64(dBTMTraineeDetailIds)).FirstOrDefault().PersonCode;
+                if (reportType == "Trainee")
+                {
+                    FromDate = _dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode).OrderByDescending(x => x.TestPerformedTime).Select(x => x.TestPerformedTime).FirstOrDefault();
+                }
+                generalBatchMasterId = Convert.ToInt64(_dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode && x.TestPerformedTime.Date == FromDate.Date).FirstOrDefault()?.TablePrimaryColumnId);
+            }
 
-            bool isAnyActivityPerformed= _dBTMDeviceDataRepository.Table
-                                       .Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate);
+            if (generalBatchMasterId <= 0)
+            {
+                return null;
+            }
+
+            bool isAnyActivityPerformed = _dBTMDeviceDataRepository.Table.Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate.Date);
 
             if (!isAnyActivityPerformed)
                 return new DBTMReportTraineeProfileListModel();
@@ -1237,7 +1248,7 @@ namespace Coditech.API.Service
         {
             Dictionary<string, double> performunceMatrixScore = new Dictionary<string, double>();
             // Build arrays for chart: test names and their numeric scores
-            string[] testNames = traineePerformunceList.Select(p => p.TestCode ?? string.Empty).ToArray();
+            string[] testNames = traineePerformunceList.Select(p => p.TestName ?? string.Empty).ToArray();
             decimal[] scores = traineePerformunceList.Select(p =>
             {
                 if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))
@@ -1252,13 +1263,14 @@ namespace Coditech.API.Service
                 return 0m;
             }).ToArray();
 
-            string[] colors = new string[testNames.Length];
-            for (int i = 0; i < testNames.Length; i++)
-            {
-                var testCode = testNames[i];
-                var perf = traineePerformunceList.FirstOrDefault(x => x.TestCode == testCode);
-                colors[i] = DBTMCustomHelper.HexToRgba(perf?.PerformanceMatrixColor) ?? "'rgba(255, 99, 132, 0.2)'";
-            }
+            var testMasterIds = traineePerformunceList.Select(x => x.DBTMTestMasterId).Distinct().ToList();
+            var testNameDictionary = _dBTMTestMasterRepository.Table.Where(x => testMasterIds.Contains(x.DBTMTestMasterId)).ToDictionary(x => x.DBTMTestMasterId, x => x.TestName);
+            string[] colors = traineePerformunceList.Select(p =>
+                {
+                    if (string.IsNullOrWhiteSpace(p.PerformanceMatrixColor))
+                        return "rgba(255, 99, 132, 1)";
+                    return DBTMCustomHelper.HexToRgba(p.PerformanceMatrixColor, 1.0);
+                }).ToArray();
             if (scores?.Length > 0)
             {
                 item.OverallActivityScore = Math.Round(scores.Sum() / scores.Length, CustomConstants.GraphListRoundUpValue);
@@ -1284,7 +1296,7 @@ namespace Coditech.API.Service
             }
             item.LineBarChart = BindBarChartDetails(item.DBTMTraineeDetailId, testNames, scores, colors);
 
-            if (testName.Length > 2)
+            if (traineePerformunceList.Count > 2)
             {
                 performunceMatrixScore = new Dictionary<string, double>();
                 // Build a dictionary of PerformanceMatrix -> average score (mean of scores in that group)
@@ -1689,7 +1701,7 @@ namespace Coditech.API.Service
                                 {
                                     Label = "Score",
                                     Data = JsonConvert.SerializeObject(scores),
-                                    Color = "rgba(255, 99, 132, 1)"
+                                    Color = JsonConvert.SerializeObject(color)
                                 }
                             }
             };
@@ -2222,7 +2234,12 @@ namespace Coditech.API.Service
                 }
                 var reportsLookup = dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).GroupBy(x => $"{x.ParameterCode}-{x.Row}").ToDictionary(g => g.Key, g => g.First());
 
-                short maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
+                short maxRecursion = 0;
+                if (DBTMTestMasterId == 68)
+                    maxRecursion = dBTMReportsList.Max(x => x.Row);
+                else
+                    maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
+
                 DataTable dataTable = new DataTable();
                 foreach (DBTMTestParameterVerticalViewSequence col in listviewSequenceColumns)
                 {

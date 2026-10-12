@@ -705,14 +705,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual DBTMReportTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord)
+        public virtual DBTMReportTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
-            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord, reportType, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMReportTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord,CancellationToken cancellationToken)
+        public virtual async Task<DBTMReportTraineeProfileListResponse> GetBatchWiseTraineeProfileDetailsAsyncV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord);
+            string endpoint = dBTMReportsEndpoint.GetBatchWiseTraineeProfileDetailsAsyncV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord, reportType);
 
             HttpResponseMessage response = null;
             var disposeResponse = true;
