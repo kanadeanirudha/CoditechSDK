@@ -2201,7 +2201,12 @@ namespace Coditech.API.Service
                 }
                 var reportsLookup = dBTMReportsList.Where(x => x.DBTMDeviceDataId == item1.DBTMDeviceDataId).GroupBy(x => $"{x.ParameterCode}-{x.Row}").ToDictionary(g => g.Key, g => g.First());
 
-                short maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
+                short maxRecursion = 0;
+                if (DBTMTestMasterId == 68)
+                    maxRecursion = dBTMReportsList.Max(x => x.Row);
+                else
+                    maxRecursion = listviewSequenceColumns.Max(x => x.Recursion);
+
                 DataTable dataTable = new DataTable();
                 foreach (DBTMTestParameterVerticalViewSequence col in listviewSequenceColumns)
                 {
