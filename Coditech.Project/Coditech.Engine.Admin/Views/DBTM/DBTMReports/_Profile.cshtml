@@ -50,7 +50,7 @@
 
     .page {
         /* width: 210mm;
-                                        min-height: 297mm; */
+         min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -476,9 +476,31 @@
         box-sizing: border-box;
     }
 
-        .performance-pair table {
-            width: 100%;
-        }
+    .activity-graph-title {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .profile-activity-graphs {
+        width: 100%;
+    }
+    .performance-matrix-group {
+        width: 100%;
+        margin-bottom: 24px;
+        page-break-inside: auto;
+    }
+
+    .performance-matrix-heading {
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        padding: 8px;
+        border-top: 1px solid #111;
+    }
+    .performance-pair table {
+        width: 100%;
+    }
 
     @@media print {
         html,
@@ -614,6 +636,11 @@
         object-fit: contain;
         margin: 0 auto;
     }
+
+    .activity-graph-chart canvas {
+        max-width: 100%;
+    }
+
     @@page {
         size: A4 portrait;
         margin: 0;
@@ -923,36 +950,37 @@
                                         </div>
                                     }
                                     <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
+
                                     @* Activity-wise Graphs *@
-                                    @if (Model.DaywiseReportGraphList != null &&
-                                    Model.DaywiseReportGraphList.Any(x => x.IsRecordFound))
+                                    @{
+                                        var activityGraphs = Model.DaywiseReportGraphList?.Where(x => x.IsRecordFound).ToList() ?? new List<GraphModel>();
+                                        var performanceMatrixGroups = activityGraphs.GroupBy(x => x.Custom2).OrderBy(g => g.Key).ToList();
+                                    }
+                                    @if (performanceMatrixGroups.Any())
                                     {
                                         <div class="profile-activity-graphs mt-3">
-                                            <h5 class="fw-bold text-center mb-3">
-                                                Performance Matrix
-                                            </h5>
-                                            @foreach (var graph in Model.DaywiseReportGraphList.Where(x => x.IsRecordFound))
+                                            @foreach (var matrixGroup in performanceMatrixGroups)
                                             {
-                                                <div class="activity-graph-item mb-4">
-                                                    <h6 class="fw-bold text-center">
-                                                        @graph.Custom1 (@graph.Custom2)
-                                                    </h6>
-                                                    <div class="activity-graph-row">
-                                                        <div class="activity-graph-chart">
-                                                            @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
+                                                <div class="performance-matrix-group">
+                                                    <h5 class="performance-matrix-heading">@matrixGroup.Key</h5>
+                                                    @foreach (var graph in matrixGroup)
+                                                    {
+                                                        <div class="activity-graph-item">
+                                                            <h6 class="activity-graph-title">@graph.Custom1</h6>
+                                                            <div class="activity-graph-row">
+                                                                <div class="activity-graph-chart">
+                                                                    @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
+                                                                </div>
+                                                                <div class="activity-graph-image">
+                                                                    @if (!string.IsNullOrWhiteSpace(graph.Custom3))
+                                                                    {
+                                                                        <div class="activity-protocol-title">  Test protocol </div>
+                                                                        <img src="@graph.Custom3" alt="Activity Protocol" class="activity-protocol-img" />
+                                                                    }
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="activity-graph-image">
-                                                            @if (!string.IsNullOrWhiteSpace(graph.Custom3))
-                                                            {
-                                                            // <div class="activity-protocol-title">
-                                                                //     Test protocol
-                                                                // </div>
-                                                                <img src="@graph.Custom3"
-                                                                     alt="Activity Protocol"
-                                                                     class="activity-protocol-img" />
-                                                            }
-                                                        </div>
-                                                    </div>
+                                                    }
                                                 </div>
                                             }
                                         </div>
