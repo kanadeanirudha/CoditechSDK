@@ -1195,6 +1195,21 @@ namespace Coditech.API.Service
                     }
                     if (traineePerformunceList?.Count > 0 && item.IsTraineeProfilePerformanceAvailable)
                         BindBarAndRadarChart(testName, item, traineePerformunceList);
+
+                    // Bind Graph
+                    //List<GraphModel> graphModels = new List<GraphModel>();
+                    //var aaa = traineePerformunceList.Select(x => new { x.DBTMTestMasterId, x.TestName, x.PerformanceMatrix, x.ActivityProtocolImage });
+                    //foreach (var testDetails in aaa)
+                    //{
+                    //    var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, "DaywiseReportGraphMasterID", "Instanctenius", FromDate, FromDate, 0, string.Empty, item.SelectedCentreCode, false, typeOfRecord);
+                    //    foreach (var graphModel in graphList)
+                    //    {
+                    //        graphModel.Custom1 = testDetails.TestName;
+                    //        graphModel.Custom2 = testDetails.PerformanceMatrix;
+                    //        graphModels.Add(graphModel);
+                    //    }
+                    //}
+                    //item.DaywiseReportGraphList = graphModels;
                 }
             }
             if (traineeDetaillist?.Count > 0)
@@ -1319,7 +1334,8 @@ namespace Coditech.API.Service
                                    x.PerformanceMatrix,
                                    x.TestOutputHigher,
                                    x.TestResultBasedon,
-                                   x.PerformanceMatrixColor
+                                   x.PerformanceMatrixColor,
+                                   x.ActivityProtocolImage
                                })
                                .Distinct()
                                .ToList();
@@ -1400,7 +1416,8 @@ namespace Coditech.API.Service
                             PerformanceMatrix = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrix,
                             BestValue = $"{value}",
                             Unit = $"{DBTMCustomHelper.Unit(testList.First(x => x.TestCode == test.TestCode).TestResultBasedon)}",
-                            PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor
+                            PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor,
+                            ActivityProtocolImage = Convert.ToInt64(testList.First(x => x.TestCode == test.TestCode)?.ActivityProtocolImage)
                         };
 
                         traineeProfilePerformanceList.Add(dBTMTraineeProfilePerformanceModel);

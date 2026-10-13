@@ -15,5 +15,6 @@
         public string LastScore { get; set; }
         public string BestValue { get; set; }
         public string Unit { get; set; }
+        public long ActivityProtocolImage { get; set; }
     }
 }

@@ -18,5 +18,6 @@
         public string PerformanceMatrix { get; set; }
         public string PerformanceMatrixColor { get; set; }
         public bool IsEncrypted { get; set; }
+        public long ActivityProtocolImage { get; set; }
     }
 }
