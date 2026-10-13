@@ -1140,7 +1140,6 @@ namespace Coditech.API.Service
                 List<DBTMTraineeProfilePerformanceModel> traineeLastPerformanceList = GetTraineeLastPerformanceDetails(generalBatchMasterId, out overallLastActivityDate);
                 foreach (var item in traineeDetaillist)
                 {
-                    item.SelectedCentreCode = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == item.DBTMTraineeDetailId).Select(x => x.CentreCode).FirstOrDefault();
                     item.OverallLastActivityDate = overallLastActivityDate;
                     // Ensure we have a materialized list to iterate and build chart data
                     var traineePerformunceList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
@@ -1201,7 +1200,7 @@ namespace Coditech.API.Service
 
                     // Bind Graph
                     List<GraphModel> graphModels = new List<GraphModel>();
-                    var testDetailsList = traineePerformunceList.GroupBy(x => x.DBTMTestMasterId).Select(g => new { g.First().DBTMTestMasterId, g.First().TestName, g.First().PerformanceMatrix, g.First().ActivityProtocolImage });
+                    var testDetailsList = traineePerformunceList.GroupBy(x => x.DBTMTestMasterId).Select(g => new { g.First().DBTMTestMasterId, g.First().TestName, g.First().PerformanceMatrix, g.First().ActivityProtocolImagePath });
                     foreach (var testDetails in testDetailsList)
                     {
                         var graphMasterIds = (
@@ -1217,21 +1216,13 @@ namespace Coditech.API.Service
                         if (graphMasterIds.Count == 0)
                             continue;
                         string dBTMGraphMasterIds = string.Join(",", graphMasterIds);
-                        string activityProtocolImagePath = string.Empty;
-                        if (testDetails.ActivityProtocolImage > 0)
-                        {
-                            var mediaDetail = _mediaDetailRepository.Table.FirstOrDefault(x => x.MediaId == testDetails.ActivityProtocolImage);
-                            if (mediaDetail != null)
-                            {
-                                activityProtocolImagePath = $"{GetMediaUrl()}{mediaDetail.Path}";
-                            }
-                        }
+                      
                         var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty, item.SelectedCentreCode, false, typeOfRecord);
                         foreach (var graphModel in graphList)
                         {
                             graphModel.Custom1 = testDetails.TestName;
                             graphModel.Custom2 = testDetails.PerformanceMatrix;
-                            graphModel.Custom3 = activityProtocolImagePath;
+                            graphModel.Custom3 = testDetails.ActivityProtocolImagePath;
                             graphModels.Add(graphModel);
                         }
                     }
@@ -1361,7 +1352,7 @@ namespace Coditech.API.Service
                                    x.TestOutputHigher,
                                    x.TestResultBasedon,
                                    x.PerformanceMatrixColor,
-                                   x.ActivityProtocolImage
+                                   x.ActivityProtocolImagePath
                                })
                                .Distinct()
                                .ToList();
@@ -1443,7 +1434,7 @@ namespace Coditech.API.Service
                             BestValue = $"{value}",
                             Unit = $"{DBTMCustomHelper.Unit(testList.First(x => x.TestCode == test.TestCode).TestResultBasedon)}",
                             PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor,
-                            ActivityProtocolImage = Convert.ToInt64(testList.First(x => x.TestCode == test.TestCode)?.ActivityProtocolImage)
+                            ActivityProtocolImagePath = testList.First(x => x.TestCode == test.TestCode)?.ActivityProtocolImagePath
                         };
 
                         traineeProfilePerformanceList.Add(dBTMTraineeProfilePerformanceModel);
