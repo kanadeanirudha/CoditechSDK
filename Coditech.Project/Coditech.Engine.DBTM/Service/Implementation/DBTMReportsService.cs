@@ -34,6 +34,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         private readonly ICoditechRepository<DBTMGeneralBatchMaster> _dBTMGeneralBatchMasterRepository;
+        private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
 
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -57,6 +58,7 @@ namespace Coditech.API.Service
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
             _dBTMGeneralBatchMasterRepository = new CoditechRepository<DBTMGeneralBatchMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Graph
@@ -1138,6 +1140,7 @@ namespace Coditech.API.Service
                 List<DBTMTraineeProfilePerformanceModel> traineeLastPerformanceList = GetTraineeLastPerformanceDetails(generalBatchMasterId, out overallLastActivityDate);
                 foreach (var item in traineeDetaillist)
                 {
+                    item.SelectedCentreCode = _dBTMTraineeDetailsRepository.Table.Where(x => x.DBTMTraineeDetailId == item.DBTMTraineeDetailId).Select(x => x.CentreCode).FirstOrDefault();
                     item.OverallLastActivityDate = overallLastActivityDate;
                     // Ensure we have a materialized list to iterate and build chart data
                     var traineePerformunceList = (item.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>()).ToList();
@@ -1197,19 +1200,42 @@ namespace Coditech.API.Service
                         BindBarAndRadarChart(testName, item, traineePerformunceList);
 
                     // Bind Graph
-                    //List<GraphModel> graphModels = new List<GraphModel>();
-                    //var aaa = traineePerformunceList.Select(x => new { x.DBTMTestMasterId, x.TestName, x.PerformanceMatrix, x.ActivityProtocolImage });
-                    //foreach (var testDetails in aaa)
-                    //{
-                    //    var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, "DaywiseReportGraphMasterID", "Instanctenius", FromDate, FromDate, 0, string.Empty, item.SelectedCentreCode, false, typeOfRecord);
-                    //    foreach (var graphModel in graphList)
-                    //    {
-                    //        graphModel.Custom1 = testDetails.TestName;
-                    //        graphModel.Custom2 = testDetails.PerformanceMatrix;
-                    //        graphModels.Add(graphModel);
-                    //    }
-                    //}
-                    //item.DaywiseReportGraphList = graphModels;
+                    List<GraphModel> graphModels = new List<GraphModel>();
+                    var testDetailsList = traineePerformunceList.GroupBy(x => x.DBTMTestMasterId).Select(g => new { g.First().DBTMTestMasterId, g.First().TestName, g.First().PerformanceMatrix, g.First().ActivityProtocolImage });
+                    foreach (var testDetails in testDetailsList)
+                    {
+                        var graphMasterIds = (
+                            from testGraph in _dBTMTestGraphRepository.Table
+                            join graphMaster in _dBTMGraphMasterRepository.Table
+                                on testGraph.DBTMGraphMasterId equals graphMaster.DBTMGraphMasterId
+                            where testGraph.DBTMTestMasterId == testDetails.DBTMTestMasterId
+                                  && graphMaster.IsActive
+                                  && graphMaster.GraphMode == CustomConstants.InstantaneousChart
+                            orderby graphMaster.OrderBy
+                            select graphMaster.DBTMGraphMasterId
+                        ).Distinct().ToList();
+                        if (graphMasterIds.Count == 0)
+                            continue;
+                        string dBTMGraphMasterIds = string.Join(",", graphMasterIds);
+                        string activityProtocolImagePath = string.Empty;
+                        if (testDetails.ActivityProtocolImage > 0)
+                        {
+                            var mediaDetail = _mediaDetailRepository.Table.FirstOrDefault(x => x.MediaId == testDetails.ActivityProtocolImage);
+                            if (mediaDetail != null)
+                            {
+                                activityProtocolImagePath = $"{GetMediaUrl()}{mediaDetail.Path}";
+                            }
+                        }
+                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty, item.SelectedCentreCode, false, typeOfRecord);
+                        foreach (var graphModel in graphList)
+                        {
+                            graphModel.Custom1 = testDetails.TestName;
+                            graphModel.Custom2 = testDetails.PerformanceMatrix;
+                            graphModel.Custom3 = activityProtocolImagePath;
+                            graphModels.Add(graphModel);
+                        }
+                    }
+                    item.DaywiseReportGraphList = graphModels;
                 }
             }
             if (traineeDetaillist?.Count > 0)

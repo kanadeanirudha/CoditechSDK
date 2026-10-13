@@ -50,7 +50,7 @@
 
     .page {
         /* width: 210mm;
-        min-height: 297mm; */
+                                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -463,6 +463,19 @@
         margin-bottom: 18px;
     }
 
+    .activity-graph-row {
+        position: relative;
+    }
+
+    .activity-graph-image {
+        position: absolute;
+        top: 0;
+        left: 52%;
+        width: 48%;
+        padding-left: 8px;
+        box-sizing: border-box;
+    }
+
         .performance-pair table {
             width: 100%;
         }
@@ -587,14 +600,20 @@
                     overflow: visible !important;
                 }
 
-        .card-header,
-        .toolbar,
-        button,
-        a {
+        .card-header, .toolbar, button, a {
             display: none !important;
         }
     }
 
+    .activity-protocol-img {
+        display: block;
+        max-width: 100%;
+        max-height: 220px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
     @@page {
         size: A4 portrait;
         margin: 0;
@@ -904,6 +923,40 @@
                                         </div>
                                     }
                                     <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
+                                    @* Activity-wise Graphs *@
+                                    @if (Model.DaywiseReportGraphList != null &&
+                                    Model.DaywiseReportGraphList.Any(x => x.IsRecordFound))
+                                    {
+                                        <div class="profile-activity-graphs mt-3">
+                                            <h5 class="fw-bold text-center mb-3">
+                                                Performance Matrix
+                                            </h5>
+                                            @foreach (var graph in Model.DaywiseReportGraphList.Where(x => x.IsRecordFound))
+                                            {
+                                                <div class="activity-graph-item mb-4">
+                                                    <h6 class="fw-bold text-center">
+                                                        @graph.Custom1 (@graph.Custom2)
+                                                    </h6>
+                                                    <div class="activity-graph-row">
+                                                        <div class="activity-graph-chart">
+                                                            @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
+                                                        </div>
+                                                        <div class="activity-graph-image">
+                                                            @if (!string.IsNullOrWhiteSpace(graph.Custom3))
+                                                            {
+                                                            // <div class="activity-protocol-title">
+                                                                //     Test protocol
+                                                                // </div>
+                                                                <img src="@graph.Custom3"
+                                                                     alt="Activity Protocol"
+                                                                     class="activity-protocol-img" />
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
