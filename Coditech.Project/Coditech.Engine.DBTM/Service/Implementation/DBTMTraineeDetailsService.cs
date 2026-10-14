@@ -423,7 +423,12 @@ namespace Coditech.API.Service
             }
             if (!personCodes.Any())
                 return new List<DateTime>();
-            var dates = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode) && x.TypeOfRecord == "Batch" && x.TablePrimaryColumnId == generalBatchMasterId).Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
+            var deviceDataQuery = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode));
+            if (generalBatchMasterId > 0)
+            {
+                deviceDataQuery = deviceDataQuery.Where(x => x.TypeOfRecord == "Batch" && x.TablePrimaryColumnId == generalBatchMasterId);
+            }
+            var dates = deviceDataQuery.Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
             return dates;
         }
         #endregion

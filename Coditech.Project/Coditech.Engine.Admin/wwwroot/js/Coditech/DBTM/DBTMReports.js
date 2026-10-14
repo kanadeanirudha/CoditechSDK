@@ -1,4 +1,6 @@
 ﻿var activityPerformedDates = [];
+var traineeActivityDatesRequest = null;
+var traineeActivityDatesRequestId = 0;
 var DBTMReports = {
     Initialize: function () {
         DBTMReports.constructor();
@@ -861,29 +863,48 @@ var DBTMReports = {
         var traineeSelector = isIndividual ? "#IndividualDBTMTraineeDetailId" : "#DBTMTraineeDetailId";
         var traineeIds = $(traineeSelector).val();
         var generalBatchMasterId = isIndividual ? 0 : $("#GeneralBatchMasterId").val();
-        if (!traineeIds || traineeIds.length === 0) {
-            activityPerformedDates = [];
-            $("#ToDate").datepicker("refresh");
+        var requestId = ++traineeActivityDatesRequestId;
+        if (traineeActivityDatesRequest) {
+            traineeActivityDatesRequest.abort();
+            traineeActivityDatesRequest = null;
+        }
+        activityPerformedDates = [];
+        $("#ToDate").datepicker("refresh");
+        if (!traineeIds ||
+            (Array.isArray(traineeIds) && traineeIds.length === 0)) {
             return;
         }
         if (Array.isArray(traineeIds)) {
             traineeIds = traineeIds.join(",");
         }
-        $.ajax({
+        traineeActivityDatesRequest = $.ajax({
             type: "GET",
+            cache: false,
             url: "/DBTMReports/GetTraineeListActivityDates",
             data: {
                 traineeIds: traineeIds,
                 generalBatchMasterId: generalBatchMasterId
             },
             success: function (data) {
-                activityPerformedDates = (data || []).map(d =>
-                    d.split("T")[0]
-                );
+                if (requestId !== traineeActivityDatesRequestId) {
+                    return;
+                }
+                activityPerformedDates = (data || []).map(function (d) {
+                    return d.split("T")[0];
+                });
                 $("#ToDate").datepicker("refresh");
             },
-            error: function () {
-                activityPerformedDates = [];
+            error: function (xhr, status) {
+                if (status !== "abort" &&
+                    requestId === traineeActivityDatesRequestId) {
+                    activityPerformedDates = [];
+                    $("#ToDate").datepicker("refresh");
+                }
+            },
+            complete: function () {
+                if (requestId === traineeActivityDatesRequestId) {
+                    traineeActivityDatesRequest = null;
+                }
             }
         });
     },
