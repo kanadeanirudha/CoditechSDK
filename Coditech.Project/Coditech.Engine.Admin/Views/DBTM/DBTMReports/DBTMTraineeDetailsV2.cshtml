@@ -1,0 +1,59 @@
+﻿@model DBTMReportTraineeProfileModel
+@{
+    ViewBag.Title = "Trainee Profile";
+    string traineeName = $"{Model.FirstName} {Model.LastName}".Trim();
+}
+<style>
+    #traineeDetailsAccordion {
+        margin: 0;
+        padding: 0;
+    }
+
+        #traineeDetailsAccordion .accordion-item {
+            margin: 0;
+            border-radius: 0;
+        }
+
+        #traineeDetailsAccordion .accordion-button {
+            padding: 8px 12px;
+        }
+
+        #traineeDetailsAccordion .accordion-body {
+            padding: 10px;
+        }
+</style>
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">           
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="accordion" id="traineeDetailsAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="traineeDetailsHeading">
+                                        <button class="accordion-button fw-bold"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#traineeDetailsCollapse"
+                                                aria-expanded="true"
+                                                aria-controls="traineeDetailsCollapse">
+                                            @traineeName
+                                        </button>
+                                    </h2>
+                                    <div id="traineeDetailsCollapse"
+                                         class="accordion-collapse collapse show"
+                                         aria-labelledby="traineeDetailsHeading">
+                                        <div class="accordion-body">
+                                            @Html.Partial("~/Views/DBTM/DBTMReports/_Profile.cshtml", Model)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,6 @@
 ﻿var activityPerformedDates = [];
+var traineeActivityDatesRequest = null;
+var traineeActivityDatesRequestId = 0;
 var DBTMReports = {
     Initialize: function () {
         DBTMReports.constructor();
@@ -861,29 +863,48 @@ var DBTMReports = {
         var traineeSelector = isIndividual ? "#IndividualDBTMTraineeDetailId" : "#DBTMTraineeDetailId";
         var traineeIds = $(traineeSelector).val();
         var generalBatchMasterId = isIndividual ? 0 : $("#GeneralBatchMasterId").val();
-        if (!traineeIds || traineeIds.length === 0) {
-            activityPerformedDates = [];
-            $("#ToDate").datepicker("refresh");
+        var requestId = ++traineeActivityDatesRequestId;
+        if (traineeActivityDatesRequest) {
+            traineeActivityDatesRequest.abort();
+            traineeActivityDatesRequest = null;
+        }
+        activityPerformedDates = [];
+        $("#ToDate").datepicker("refresh");
+        if (!traineeIds ||
+            (Array.isArray(traineeIds) && traineeIds.length === 0)) {
             return;
         }
         if (Array.isArray(traineeIds)) {
             traineeIds = traineeIds.join(",");
         }
-        $.ajax({
+        traineeActivityDatesRequest = $.ajax({
             type: "GET",
+            cache: false,
             url: "/DBTMReports/GetTraineeListActivityDates",
             data: {
                 traineeIds: traineeIds,
                 generalBatchMasterId: generalBatchMasterId
             },
             success: function (data) {
-                activityPerformedDates = (data || []).map(d =>
-                    d.split("T")[0]
-                );
+                if (requestId !== traineeActivityDatesRequestId) {
+                    return;
+                }
+                activityPerformedDates = (data || []).map(function (d) {
+                    return d.split("T")[0];
+                });
                 $("#ToDate").datepicker("refresh");
             },
-            error: function () {
-                activityPerformedDates = [];
+            error: function (xhr, status) {
+                if (status !== "abort" &&
+                    requestId === traineeActivityDatesRequestId) {
+                    activityPerformedDates = [];
+                    $("#ToDate").datepicker("refresh");
+                }
+            },
+            complete: function () {
+                if (requestId === traineeActivityDatesRequestId) {
+                    traineeActivityDatesRequest = null;
+                }
             }
         });
     },
@@ -918,16 +939,24 @@ var DBTMReports = {
     },
     PrintTraineeProfile: function (button, printableName) {
         var $button = $(button);
-        var $accordionItem = $button.closest(".accordion-item");
-        var $report = $accordionItem.find(".page").first();
+        var $report = $button.closest(".accordion-item").find(".page").first();
+        if ($report.length === 0) {
+            $report = $button.closest(".card").find(".page").first();
+        }
+        if ($report.length === 0) {
+            $report = $button.closest(".page");
+        }
         if ($report.length === 0) {
             CoditechNotification.DisplayNotificationMessage("Trainee profile report not found.", "error");
             return;
         }
-        $(".print-selected-report").removeClass("print-selected-report");
+        var isAccordionReport = $button.closest(".accordion-item").length > 0;
+        var isTraineeDetailsReport = $button.closest("#traineeDetailsAccordion").length > 0;
+        $(".print-selected-report").removeClass("print-selected-report print-normal-report");
         $report.addClass("print-selected-report");
-
-        // Determine final printable name: prefer parameter, then data attribute, then exposed window var, then derive
+        if (!isAccordionReport) {
+            $report.addClass("print-normal-report");
+        }
         try {
             var finalName = printableName || $report.data('printable-name') || window.DBTMPrintableName;
             if (!finalName) {
@@ -944,18 +973,31 @@ var DBTMReports = {
                 if (dateText) parts.push(sanitize(dateText));
                 finalName = parts.length ? ('PerformanceReport_' + parts.join('_')) : ('PerformanceReport_' + Date.now());
             }
-            // apply name where useful
             try { document.title = finalName; } catch (e) { }
             try { window.name = finalName; } catch (e) { }
             $report.attr('data-printable-name', finalName);
         } catch (e) {
-            // ignore errors and continue to print
         }
-
         window.print();
-
         setTimeout(function () {
-            $report.removeClass("print-selected-report");
+            $report.removeClass("print-selected-report print-normal-report");
         }, 1000);
+    },
+    ConfirmPrintReport: function (traineeId, modalId) {
+        var remarks = $("#RemarksText").val() || "";
+        $("#printRemarksText").text(remarks);
+        $("#" + modalId).modal("hide");
+        setTimeout(function () {
+            var $report = $("#report");
+            var $button = $(".card-header button[data-bs-target='#RemarkPopupId']").first();
+            if ($button.length && typeof DBTMReports !== "undefined") {
+                DBTMReports.PrintTraineeProfile(
+                    $button[0],
+                    $report.data("printable-name")
+                );
+            } else {
+                window.print();
+            }
+        }, 300);
     },
 };

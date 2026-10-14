@@ -95,7 +95,7 @@
                                    class="btn btn-sm btn-soft-warning btn-circle">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <span class="m-2">|</span>
+                               @*  <span class="m-2">|</span>
                                 <a href="javascript:void(0);"
                                    title="Download Report"
                                    data-bs-toggle="modal"
@@ -103,7 +103,7 @@
                                    onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId', @item.DBTMTraineeDetailId, '@Html.Raw(HttpUtility.JavaScriptStringEncode(item.Remarks ?? ""))')"
                                    class="text-primary fs-5">
                                     <i class="fa fa-download"></i>
-                                </a>
+                                </a> *@
                                 @if (item.IsCampUser && !item.IsBatchUser)
                                 {
                                     <span class="m-2">|</span>

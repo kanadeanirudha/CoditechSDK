@@ -624,7 +624,7 @@ namespace Coditech.Admin.Controllers
             {
                 return Content("No trainee profile data found.");
             }
-            return View("~/Views/DBTM/DBTMReports/_Profile.cshtml", traineeProfile);
+            return View("~/Views/DBTM/DBTMReports/DBTMTraineeDetailsV2.cshtml", traineeProfile);
         }
 
         [HttpGet]

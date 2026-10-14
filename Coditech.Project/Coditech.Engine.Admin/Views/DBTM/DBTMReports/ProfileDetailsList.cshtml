@@ -161,6 +161,11 @@
                     .prop("disabled", !batchId)
                     .selectpicker('refresh');
             });
+             $("#IndividualDBTMTraineeDetailId")
+            .off("changed.bs.select.profileActivityDates")
+            .on("changed.bs.select.profileActivityDates", function () {
+                DBTMReports.LoadTraineeProfileActivityDates();
+            });
             $('#DBTMTraineeDetailId').on('changed.bs.select',
                 function (e, clickedIndex, isSelected) {
                 var $select = $(this);
