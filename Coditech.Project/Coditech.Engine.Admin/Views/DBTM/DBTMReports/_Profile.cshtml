@@ -50,7 +50,7 @@
 
     .page {
         /* width: 210mm;
-         min-height: 297mm; */
+                         min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -344,6 +344,13 @@
         margin: 10px 0 3px;
     }
 
+    .performance-report-summary-title {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        margin: 10px 0 3px;
+    }
+
     .radar-wrap {
         height: 180px;
     }
@@ -485,6 +492,7 @@
     .profile-activity-graphs {
         width: 100%;
     }
+
     .performance-matrix-group {
         width: 100%;
         margin-bottom: 24px;
@@ -498,6 +506,7 @@
         padding: 8px;
         border-top: 1px solid #111;
     }
+
     .performance-pair table {
         width: 100%;
     }
@@ -829,6 +838,7 @@
                                         var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
                                         var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
                                     }
+                                    <div class="performance-report-summary-title"> Performance Report Summary</div>
                                     @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
                                     {
                                         var firstGroup = performanceGroups[groupIndex];
