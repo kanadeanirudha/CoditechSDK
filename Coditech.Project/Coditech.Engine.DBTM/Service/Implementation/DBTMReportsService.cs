@@ -34,6 +34,7 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
         private readonly ICoditechRepository<GeneralTraineeAssociatedToTrainer> _generalTraineeAssociatedToTrainerRepository;
         private readonly ICoditechRepository<DBTMGeneralBatchMaster> _dBTMGeneralBatchMasterRepository;
+        private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
 
         public DBTMReportsService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -57,6 +58,7 @@ namespace Coditech.API.Service
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
             _dBTMGeneralBatchMasterRepository = new CoditechRepository<DBTMGeneralBatchMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
         }
 
         #region Graph
@@ -1195,6 +1197,36 @@ namespace Coditech.API.Service
                     }
                     if (traineePerformunceList?.Count > 0 && item.IsTraineeProfilePerformanceAvailable)
                         BindBarAndRadarChart(testName, item, traineePerformunceList);
+
+                    // Bind Graph
+                    List<GraphModel> graphModels = new List<GraphModel>();
+                    var testDetailsList = traineePerformunceList.GroupBy(x => x.DBTMTestMasterId).Select(g => new { g.First().DBTMTestMasterId, g.First().TestName, g.First().PerformanceMatrix, g.First().ActivityProtocolImagePath });
+                    foreach (var testDetails in testDetailsList)
+                    {
+                        var graphMasterIds = (
+                            from testGraph in _dBTMTestGraphRepository.Table
+                            join graphMaster in _dBTMGraphMasterRepository.Table
+                                on testGraph.DBTMGraphMasterId equals graphMaster.DBTMGraphMasterId
+                            where testGraph.DBTMTestMasterId == testDetails.DBTMTestMasterId
+                                  && graphMaster.IsActive
+                                  && graphMaster.GraphMode == CustomConstants.InstantaneousChart
+                            orderby graphMaster.OrderBy
+                            select graphMaster.DBTMGraphMasterId
+                        ).Distinct().ToList();
+                        if (graphMasterIds.Count == 0)
+                            continue;
+                        string dBTMGraphMasterIds = string.Join(",", graphMasterIds);
+                      
+                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty,item.CentreCode, false, typeOfRecord);
+                        foreach (var graphModel in graphList)
+                        {
+                            graphModel.Custom1 = testDetails.TestName;
+                            graphModel.Custom2 = testDetails.PerformanceMatrix;
+                            graphModel.Custom3 = testDetails.ActivityProtocolImagePath;
+                            graphModels.Add(graphModel);
+                        }
+                    }
+                    item.DaywiseReportGraphList = graphModels;
                 }
             }
             if (traineeDetaillist?.Count > 0)
@@ -1319,7 +1351,8 @@ namespace Coditech.API.Service
                                    x.PerformanceMatrix,
                                    x.TestOutputHigher,
                                    x.TestResultBasedon,
-                                   x.PerformanceMatrixColor
+                                   x.PerformanceMatrixColor,
+                                   x.ActivityProtocolImagePath
                                })
                                .Distinct()
                                .ToList();
@@ -1400,7 +1433,8 @@ namespace Coditech.API.Service
                             PerformanceMatrix = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrix,
                             BestValue = $"{value}",
                             Unit = $"{DBTMCustomHelper.Unit(testList.First(x => x.TestCode == test.TestCode).TestResultBasedon)}",
-                            PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor
+                            PerformanceMatrixColor = testList.First(x => x.TestCode == test.TestCode).PerformanceMatrixColor,
+                            ActivityProtocolImagePath = testList.First(x => x.TestCode == test.TestCode)?.ActivityProtocolImagePath
                         };
 
                         traineeProfilePerformanceList.Add(dBTMTraineeProfilePerformanceModel);
