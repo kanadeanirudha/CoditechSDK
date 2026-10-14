@@ -50,7 +50,7 @@
 
     .page {
         /* width: 210mm;
-        min-height: 297mm; */
+                         min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -344,6 +344,13 @@
         margin: 10px 0 3px;
     }
 
+    .performance-report-summary-title {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        margin: 10px 0 3px;
+    }
+
     .radar-wrap {
         height: 180px;
     }
@@ -463,9 +470,46 @@
         margin-bottom: 18px;
     }
 
-        .performance-pair table {
-            width: 100%;
-        }
+    .activity-graph-row {
+        position: relative;
+    }
+
+    .activity-graph-image {
+        position: absolute;
+        top: 0;
+        left: 52%;
+        width: 48%;
+        padding-left: 8px;
+        box-sizing: border-box;
+    }
+
+    .activity-graph-title {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .profile-activity-graphs {
+        width: 100%;
+    }
+
+    .performance-matrix-group {
+        width: 100%;
+        margin-bottom: 24px;
+        page-break-inside: auto;
+    }
+
+    .performance-matrix-heading {
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        padding: 8px;
+        border-top: 1px solid #111;
+    }
+
+    .performance-pair table {
+        width: 100%;
+    }
 
     @@media print {
         html,
@@ -587,12 +631,23 @@
                     overflow: visible !important;
                 }
 
-        .card-header,
-        .toolbar,
-        button,
-        a {
+        .card-header, .toolbar, button, a {
             display: none !important;
         }
+    }
+
+    .activity-protocol-img {
+        display: block;
+        max-width: 100%;
+        max-height: 220px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+    .activity-graph-chart canvas {
+        max-width: 100%;
     }
 
     @@page {
@@ -783,6 +838,7 @@
                                         var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
                                         var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
                                     }
+                                    <div class="performance-report-summary-title"> Performance Report Summary</div>
                                     @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
                                     {
                                         var firstGroup = performanceGroups[groupIndex];
@@ -904,6 +960,41 @@
                                         </div>
                                     }
                                     <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
+
+                                    @* Activity-wise Graphs *@
+                                    @{
+                                        var activityGraphs = Model.DaywiseReportGraphList?.Where(x => x.IsRecordFound).ToList() ?? new List<GraphModel>();
+                                        var performanceMatrixGroups = activityGraphs.GroupBy(x => x.Custom2).OrderBy(g => g.Key).ToList();
+                                    }
+                                    @if (performanceMatrixGroups.Any())
+                                    {
+                                        <div class="profile-activity-graphs mt-3">
+                                            @foreach (var matrixGroup in performanceMatrixGroups)
+                                            {
+                                                <div class="performance-matrix-group">
+                                                    <h5 class="performance-matrix-heading">@matrixGroup.Key</h5>
+                                                    @foreach (var graph in matrixGroup)
+                                                    {
+                                                        <div class="activity-graph-item">
+                                                            <h6 class="activity-graph-title">@graph.Custom1</h6>
+                                                            <div class="activity-graph-row">
+                                                                <div class="activity-graph-chart">
+                                                                    @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
+                                                                </div>
+                                                                <div class="activity-graph-image">
+                                                                    @if (!string.IsNullOrWhiteSpace(graph.Custom3))
+                                                                    {
+                                                                        <div class="activity-protocol-title">  Test protocol </div>
+                                                                        <img src="@graph.Custom3" alt="Activity Protocol" class="activity-protocol-img" />
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
