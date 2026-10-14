@@ -1217,7 +1217,7 @@ namespace Coditech.API.Service
                             continue;
                         string dBTMGraphMasterIds = string.Join(",", graphMasterIds);
                       
-                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty, item.SelectedCentreCode, false, typeOfRecord);
+                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty,item.CentreCode, false, typeOfRecord);
                         foreach (var graphModel in graphList)
                         {
                             graphModel.Custom1 = testDetails.TestName;
