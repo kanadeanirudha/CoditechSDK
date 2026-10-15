@@ -92,6 +92,14 @@ namespace Coditech.Common.API
                 return Convert.ToInt16(settings["IsValidRecordButtonExpireTimeOnMobile"]);
             }
         }
+        public static int DBTMDeviceDataInsertionUniqueCheckExipiryTimeInHour
+        {
+            get
+            {
+                return Convert.ToInt16(settings["DBTMDeviceDataInsertionUniqueCheckExipiryTimeInHour"]);
+            }
+        }
+
         public static int JoiningCodeQueueTimeInMinutes
         {
             get

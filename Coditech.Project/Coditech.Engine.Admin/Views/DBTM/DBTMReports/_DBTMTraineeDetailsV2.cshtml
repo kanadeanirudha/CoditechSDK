@@ -1,0 +1,65 @@
+﻿@using System.Data
+@model DBTMReportTraineeProfileListModel
+@{
+    var index = 1;
+    var orderBy = Model.OrderBy;
+}
+<style>
+    /* Remove unwanted gap */
+    #traineeAccordion {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+        #traineeAccordion .accordion-item {
+            margin: 0 !important;
+            border-radius: 0 !important;
+        }
+        #traineeAccordion .accordion-button {
+            padding: 8px 12px !important;
+            margin: 0 !important;
+        }
+        #traineeAccordion .accordion-body {
+            padding: 10px !important;
+        }
+</style>
+<div class="accordion" id="traineeAccordion">
+
+    @if (Model?.DBTMTraineeProfileList != null && Model.DBTMTraineeProfileList.Any())
+    {
+        foreach (var trainee in Model.DBTMTraineeProfileList)
+        {
+            var collapseId = $"traineeCollapse{index}";
+            var headingId = $"traineeHeading{index}";
+            var traineeName = orderBy == "LastName" ? $"{trainee.LastName} {trainee.FirstName}" : $"{trainee.FirstName} {trainee.LastName}";
+            <div class="accordion-item">
+                <!-- Accordion Header -->
+                <h2 class="accordion-header m-0" id="@headingId">
+                    <button class="accordion-button fw-bold @(index > 1 ? "collapsed" : "")"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#@collapseId"
+                            aria-expanded="@(index == 1 ? "true" : "false")"
+                            aria-controls="@collapseId">
+                        @traineeName
+                    </button>
+                </h2>
+                <!-- Accordion Body -->
+                <div id="@collapseId"
+                     class="accordion-collapse collapse @(index == 1 ? "show" : "")"
+                     aria-labelledby="@headingId"
+                     data-bs-parent="#traineeAccordion">
+                    <div class="accordion-body p-2">
+                        @Html.Partial("~/Views/DBTM/DBTMReports/_Profile.cshtml", trainee)
+                    </div>
+                </div>
+            </div>
+            index++;
+        }
+    }
+    else
+    {
+        <div class="text-danger fw-bold text-center p-2">
+            No trainee data found.
+        </div>
+    }
+</div>

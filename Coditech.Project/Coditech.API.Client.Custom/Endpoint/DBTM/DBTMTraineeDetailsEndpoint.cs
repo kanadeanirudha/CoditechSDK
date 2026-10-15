@@ -49,5 +49,14 @@ namespace Coditech.API.Endpoint
         }
         public string AssociateUnAssociateTrainerAsync() =>
           $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMGeneralTrainerMaster/AssociateUnAssociateTrainer";
+        public string DownloadBulkUpdateTemplateAsync(long generalBatchMasterId, string orderBy)
+        {
+            string endpoint =   $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/DownloadBulkUpdateTemplate?generalBatchMasterId={generalBatchMasterId}&orderBy={orderBy}";
+            return endpoint;
+        }
+        public string UploadBulkUpdateTraineeFromFileAsync()
+        {
+            return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/UploadBulkUpdateTraineeFromFile";
+        }
     }
 }

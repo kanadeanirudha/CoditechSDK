@@ -139,10 +139,7 @@
                         "/DBTMTraineeDetails/DownloadAthleteReportPdf"
                         + "?dBTMTraineeDetailId=" + encodeURIComponent(traineeId)
                         + "&remarks=" + encodeURIComponent(remarks);
-
-                    CoditechCommon.HideLodder();
-
-                    $("#hiddenDownloader").attr("src", downloadUrl);
+                    CoditechCommon.DownloadFile(downloadUrl);
                 }
                 else {
                     CoditechNotification.DisplayNotificationMessage(response.message, "error");
@@ -207,30 +204,57 @@
             }
         });
     },
-    RenderFailedTable: function (rows) {
+    RenderFailedTable: function (rows, headers) {
         if (!rows || rows.length === 0) {
             $("#UploadErrorTableContainer").html("");
             $("#ErrorHeader").hide();
             return;
         }
         $("#ErrorHeader").show();
-        var cols = Object.keys(rows[0]);
+        var cols = Object.keys(rows[0]).filter(function (c) {
+            return c !== "ErrorMessage";
+        });
+        var headerMap = {};
+        headers.forEach(function (h) {
+            headerMap[h.HeaderCode] = h;
+        });
         var html = `<hr/><table class="table table-bordered"><thead><tr>`;
         cols.forEach(function (c) {
-            html += `<th>${c}</th>`;
+            var header = headerMap[c];
+            var title = header ? header.HeaderName : c;
+            if (header && header.IsRequired) {
+                title += ' <span class="text-danger">*</span>';
+            }
+            html += `<th>${title}</th>`;
         });
         html += `</tr></thead><tbody>`;
         rows.forEach(function (r) {
             html += `<tr>`;
             cols.forEach(function (c) {
                 var val = r[c] == null ? "" : r[c];
-                if (c.toLowerCase().includes("error"))
-                    html += `<td style="color:red">${val}</td>`;
-                else
+                var isError =
+                    typeof val === "string" &&
+                    (
+                        val.includes("required") ||
+                        val.includes("empty") ||
+                        val.includes("invalid") ||
+                        val.includes("exists") ||
+                        val.includes("duplicate") ||
+                        val.includes("contains") ||
+                        val.includes("expired") ||
+                        val.includes("not assigned")
+                    );
+
+                if (isError) {
+                    html += `<td><span class="text-danger">${val}</span></td>`;
+                }
+                else {
                     html += `<td>${val}</td>`;
+                }
             });
             html += `</tr>`;
         });
+
         html += `</tbody></table>`;
         $("#UploadErrorTableContainer").html(html);
     },
@@ -262,7 +286,7 @@
                 }
                 CoditechCommon.HideLodder();
                 if (res.failedRows && res.failedRows.length > 0) {
-                    DBTMTraineeDetails.RenderFailedTable(res.failedRows);
+                    DBTMTraineeDetails.RenderFailedTable(res.failedRows, res.headers);
                 }
                 else {
                     CoditechNotification.DisplayNotificationMessage("Upload failed.", "error");
@@ -281,7 +305,7 @@
     DownloadTemplatePopup: function () {
         var $openModal = $(".modal.show").first();
         if ($openModal.length > 0) {
-            $openModal.addClass("stack-blur"); 
+            $openModal.addClass("stack-blur");
         }
         CoditechCommon.ShowLodder();
         $.ajax({
@@ -308,7 +332,7 @@
                 if (xhr.status == 401 || xhr.status == 403) {
                     location.reload();
                 }
-                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup", "error" );
+                CoditechNotification.DisplayNotificationMessage("Failed to load download template popup", "error");
                 CoditechCommon.HideLodder();
             }
         });
@@ -316,6 +340,7 @@
     ConfirmDownloadTemplate: function () {
         var count = $("#TraineeCount").val();
         clearFieldError("TraineeCount");
+        clearFieldError("GeneralTrainerMasterId");
         count = parseInt(count, 10);
         if (!count || isNaN(count) || count < 1 || count > 999) {
             showFieldError("TraineeCount", "Please enter a number between 1 and 999.");
@@ -347,11 +372,9 @@
                         + "&trainerId=" + encodeURIComponent(trainerId)
                         + "&userType=" + encodeURIComponent(userType || "")
                         + "&count=" + encodeURIComponent(count);
-                    CoditechCommon.HideLodder();
-                    $("#hiddenDownloader").attr("src", downloadUrl);
-
+                    CoditechCommon.DownloadFile(downloadUrl);
                 } else {
-                    showFieldError("TraineeCount", response.message);
+                    showFieldError("GeneralTrainerMasterId", response.message);
                     CoditechCommon.HideLodder();
                 }
             },
@@ -405,6 +428,143 @@
                 CoditechCommon.HideLodder();
             }
         });
+    },
+    GetBulkUpdateTraineePopup: function (contentId) {
+        $("#" + contentId).html("");
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            url: "/DBTMTraineeDetails/GetBulkUpdateTraineePopup",
+            success: function (result) {
+                $("#" + contentId).html(result);
+                CoditechCommon.HideLodder();
+            },
+            error: function (xhr) {
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load upload popup.", "error");
+                CoditechCommon.HideLodder();
+            }
+        });
+    },
+    DownloadBulkUpdateTemplate: function () {
+        var batchId = $("#GeneralBatchMasterId").val();
+        var orderBy = $("#OrderBy").val() || "FirstName";
+        $("#BulkUpdateValidationMsg").text("");
+        if (!batchId || batchId === "0") {
+            $("#BulkUpdateValidationMsg").text("Please select batch.");
+            return;
+        }
+        CoditechCommon.ShowLodder();
+        var downloadUrl =
+            "/DBTMTraineeDetails/DownloadBulkUpdateTemplate"
+            + "?generalBatchMasterId=" + encodeURIComponent(batchId)
+            + "&orderBy=" + encodeURIComponent(orderBy);
+        CoditechCommon.DownloadFile(downloadUrl);
+    },
+    UploadBulkUpdateTraineeFile: function () {
+        $("#BulkUpdateValidationMsg").text("");
+        $("#BulkUpdateErrorTableContainer").html("");
+        var fileInput = $("#BulkUpdateTraineeFile")[0];
+        if (!fileInput || fileInput.files.length === 0) {
+            $("#BulkUpdateValidationMsg").text("Please select file.");
+            return;
+        }
+        var file = fileInput.files[0];
+        if (!file.name.toLowerCase().endsWith(".xlsx")) {
+            $("#BulkUpdateValidationMsg").text("Only Excel (.xlsx) file is allowed.");
+            return;
+        }
+        var formData = new FormData();
+        formData.append("file", file);
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            url: "/DBTMTraineeDetails/UploadBulkUpdateTraineeFile",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                CoditechCommon.HideLodder();
+                if (response.success) {
+                    $("#BulkUpdateTraineeFile").val("");
+                    $("#TraineeUpdatePopupId").modal("hide");
+                    location.reload();
+                    return;
+                }
+                if (response.failedRows && response.failedRows.length > 0) {
+                    DBTMTraineeDetails.RenderBulkUpdateFailedTable(response.failedRows, response.headers);
+                    return;
+                }
+                $("#BulkUpdateValidationMsg").text(response.message || "Bulk update failed.");
+            },
+            error: function (xhr) {
+                CoditechCommon.HideLodder();
+                if (xhr.status == 401 || xhr.status == 403) {
+                    location.reload();
+                    return;
+                }
+                CoditechNotification.DisplayNotificationMessage("Bulk update failed.", "error");
+            }
+        });
+    },
+    RenderBulkUpdateFailedTable: function (rows, headers) {
+        if (!rows || rows.length === 0) {
+            $("#BulkUpdateErrorTableContainer").html("");
+            return;
+        }
+        var cols = Object.keys(rows[0]).filter(function (c) {
+            return c !== "ErrorMessage";
+        });
+        var headerMap = {};
+        if (headers) {
+            headers.forEach(function (h) {
+                headerMap[h.HeaderCode] = h;
+            });
+        }
+        var html = `
+        <hr/>
+        <h6 class="text-danger mb-2">Data Correction Required</h6>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+    `;
+        cols.forEach(function (c) {
+            var header = headerMap[c];
+            var title = header ? header.HeaderName : c;
+
+            if (header && header.IsRequired) {
+                title += ' <span class="text-danger">*</span>';
+            }
+            html += `<th>${title}</th>`;
+        });
+        html += `<th>Error Message</th>`;
+        html += `</tr></thead><tbody>`;
+        rows.forEach(function (r) {
+            html += `<tr>`;
+            cols.forEach(function (c) {
+                var val = r[c] == null ? "" : r[c];
+
+                html += `<td>${val}</td>`;
+            });
+            var errorMessage = r["ErrorMessage"] || "";
+            html += `
+            <td>
+                <span class="text-danger">
+                    ${errorMessage}
+                </span>
+            </td>
+        `;
+            html += `</tr>`;
+        });
+        html += `
+            </tbody>
+        </table>
+    `;
+        $("#BulkUpdateErrorTableContainer").html(html);
     },
 };
 function showFieldError(fieldName, message) {

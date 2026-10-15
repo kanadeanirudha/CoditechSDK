@@ -4,19 +4,19 @@
     var chartId = $"{Model.RadarChartId}_{Guid.NewGuid().ToString("N")}";
 }
 
-<div class="chart-container" style="position:relative; height:400px; width:100%;">
+<div class="chart-container radar-chart-container" style="position:relative; height:400px; width:100%;">
     <canvas id="@chartId"></canvas>
 </div>
 
 <script>
     (function () {
-
         var ctx = document.getElementById('@chartId').getContext('2d');
-
         var labels = "@Model.Labels".split(',');
-
         var datasets = [];
-
+        var maxLabelLength = labels.reduce(function (max, label) {
+            return Math.max(max, label.trim().length);
+        }, 0);
+        var radarRightPadding = Math.max(35, Math.min(75, maxLabelLength * 4));
     @foreach (var dataset in Model.Datasets)
     {
         <text>
@@ -37,17 +37,64 @@
                 labels: labels,
                 datasets: datasets
             },
-            options: {
+           options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 5,
+                        right: radarRightPadding,
+                        top: 5,
+                        bottom: 5
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        boxWidth: 15,
+                        fontSize: 8,
+                        padding: 5
+                    }
+                },
                 title: {
                     display: true,
-                    text: '@Model.Title'
+                    text: '@Model.Title',
+                    fontSize: 10
                 },
-                scale: {
+                        scale: {
                     ticks: {
                         beginAtZero: true,
-                        max: 100
+                        max: 100,
+                        fontSize: 7
+                    },
+                    pointLabels: {
+                        fontSize: 8,
+                        callback: function (label) {
+                            if (!label) {
+                                return label;
+                            }
+                            var words = label.split(/\s+/);
+                            if (words.length <= 1) {
+                                return label;
+                            }
+                            var lines = [];
+                            var currentLine = "";
+                            words.forEach(function (word) {
+                                if (currentLine === "") {
+                                    currentLine = word;
+                                } else {
+                                    lines.push(currentLine);
+                                    currentLine = word;
+                                }
+                            });
+
+                            if (currentLine !== "") {
+                                lines.push(currentLine);
+                            }
+
+                            return lines;
+                        }
                     }
                 }
             }

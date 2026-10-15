@@ -2,6 +2,7 @@
 {
     public class DBTMGeneralBatchUserModel
     {
+        public long DBTMTraineeAssignmentUserId { get; set; }
         public long EntityId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -10,6 +11,7 @@
         public string DisplayName { get; set; }
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
+        public int LastNumberOfTurn { get; set; }
     }
 }
 

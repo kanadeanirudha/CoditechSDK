@@ -2,6 +2,7 @@
 using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Resources;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 namespace Coditech.Admin.Controllers
 {
@@ -27,6 +28,7 @@ namespace Coditech.Admin.Controllers
             var bytes = System.IO.File.ReadAllBytes(result.FilePath);
             var fileName = result.FileName;
             _dBTMOrganisationCentrewiseJoiningCodeAgent.DeleteJoiningCodeFile(fileName);
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -34,6 +36,10 @@ namespace Coditech.Admin.Controllers
         {
             OrganisationCentrewiseJoiningCodeListViewModel list = new OrganisationCentrewiseJoiningCodeListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
+            if (string.IsNullOrEmpty(dataTableModel.SelectedParameter2))
+            {
+                dataTableModel.SelectedParameter2 = "1";
+            }
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
                 dataTableModel.SelectedParameter1 = "323";
@@ -54,6 +60,10 @@ namespace Coditech.Admin.Controllers
         {
             OrganisationCentrewiseJoiningCodeListViewModel list = new OrganisationCentrewiseJoiningCodeListViewModel();
             GetListOnlyIfSingleCentre(dataTableModel);
+            if (string.IsNullOrEmpty(dataTableModel.SelectedParameter2))
+            {
+                dataTableModel.SelectedParameter2 = "1";
+            }
             if (!string.IsNullOrEmpty(dataTableModel.SelectedCentreCode))
             {
                 dataTableModel.SelectedParameter1 = "324";

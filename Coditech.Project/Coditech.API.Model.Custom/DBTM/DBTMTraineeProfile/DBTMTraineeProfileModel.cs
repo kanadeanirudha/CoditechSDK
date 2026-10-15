@@ -41,5 +41,6 @@ namespace Coditech.Common.API.Model
         public string MobileNumber { get; set; }
         public string PhoneNumber { get; set; }
         public string EmergencyContact { get; set; }
+        public List<GraphModel> GraphList { get; set; }
     }
 }

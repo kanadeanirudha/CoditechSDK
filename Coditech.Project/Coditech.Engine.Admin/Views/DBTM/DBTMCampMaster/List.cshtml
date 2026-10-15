@@ -1,6 +1,6 @@
 ﻿@model DBTMCampListViewModel
 @{
-    ViewBag.Title = "All Camp Details List";
+    ViewBag.Title = "Camp List";
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     DropdownViewModel centreDropdown = new DropdownViewModel() { DropdownType = DropdownTypeEnum.AccessibleCentre.ToString(), DropdownName = "SelectedCentreCode", DropdownSelectedValue = Model.SelectedCentreCode, ChangeEvent = "CoditechCommon.LoadListByCentreCode('" + @controllerName + "','" + @actionName + "')" };
@@ -12,7 +12,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">All Camp Details List</span>
+                        <span class="card-title">Camp List</span>
                         <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create" role="button"><i class="fas fa-plus me-2"></i>Add Camp</a>
                     </div>
                     <div class="card-header">

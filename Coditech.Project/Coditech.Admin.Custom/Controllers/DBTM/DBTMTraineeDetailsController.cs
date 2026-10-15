@@ -18,6 +18,7 @@ namespace Coditech.Admin.Controllers
     {
         private readonly IDBTMTraineeDetailsAgent _dBTMTraineeDetailsAgent;
         private readonly IDBTMNewRegistrationAgent _dBTMNewRegistrationAgent;
+        private readonly IDBTMReportsAgent _dBTMReportsAgent;
         private readonly IDBTMOrganisationCentrewiseJoiningCodeAgent _dBTMOrganisationCentrewiseJoiningCodeAgent;
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
@@ -25,10 +26,11 @@ namespace Coditech.Admin.Controllers
 
         private const string createEditTraineeDetails = "~/Views/DBTM/DBTMTraineeDetails/DBTMTraineeDetails.cshtml";
         private const string createEditAssociatedTrainer = "~/Views/GeneralMaster/GeneralTrainerMaster/GeneralTraineeAssociatedToTrainer/CreateEditAssociatedTrainer.cshtml";
-        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
+        public DBTMTraineeDetailsController(IDBTMTraineeDetailsAgent dBTMTraineeDetailsAgent, IDBTMNewRegistrationAgent dBTMNewRegistrationAgent, IDBTMReportsAgent dBTMReportsAgent, IDBTMOrganisationCentrewiseJoiningCodeAgent dBTMOrganisationCentrewiseJoiningCodeAgent, IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             _dBTMTraineeDetailsAgent = dBTMTraineeDetailsAgent;
             _dBTMNewRegistrationAgent = dBTMNewRegistrationAgent;
+            _dBTMReportsAgent = dBTMReportsAgent;
             _dBTMOrganisationCentrewiseJoiningCodeAgent = dBTMOrganisationCentrewiseJoiningCodeAgent;
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
@@ -615,8 +617,14 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public virtual ActionResult Profile(long dBTMTraineeDetailId)
         {
-            DBTMTraineeProfileViewModel dBTMTraineeProfileViewModel = _dBTMTraineeDetailsAgent.GetProfileDetails(dBTMTraineeDetailId);
-            return View("~/Views/DBTM/DBTMTraineeDetails/Profile.cshtml", dBTMTraineeProfileViewModel);
+            DateTime performanceDate = new DateTime(2026, 9, 30);
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(0, dBTMTraineeDetailId.ToString(), "FirstName", performanceDate, performanceDate, "batch", "Trainee");
+            DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault();
+            if (traineeProfile == null)
+            {
+                return Content("No trainee profile data found.");
+            }
+            return View("~/Views/DBTM/DBTMReports/DBTMTraineeDetailsV2.cshtml", traineeProfile);
         }
 
         [HttpGet]
@@ -666,7 +674,7 @@ namespace Coditech.Admin.Controllers
             }
             if (result.FailedRows != null && result.FailedRows.Count > 0)
             {
-                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows });
+                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows, headers = result.Headers });
             }
             SetNotificationMessage(GetSuccessNotificationMessage("Trainee uploaded successfully."));
             return Json(new { success = true });
@@ -700,6 +708,7 @@ namespace Coditech.Admin.Controllers
             }
             var bytes = System.IO.File.ReadAllBytes(result.FilePath);
             var fileName = result.FileName;
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -721,8 +730,64 @@ namespace Coditech.Admin.Controllers
                     System.IO.File.Delete(report.FilePath);
                 }
             }
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
             return File(bytes, "application/pdf", report.FileName);
         }
+
+        #region Bulk Update Trainee
+        [HttpGet]
+        public ActionResult GetBulkUpdateTraineePopup()
+        {
+            return PartialView("~/Views/DBTM/DBTMTraineeDetails/_BulkUpdateTraineePopUp.cshtml");
+        }
+
+        [HttpGet]
+        public IActionResult DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy)
+        {
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.DownloadBulkUpdateTemplate(generalBatchMasterId, orderBy);
+            if (result == null || string.IsNullOrEmpty(result.FilePath) || !System.IO.File.Exists(result.FilePath))
+                return Content("File not found.");
+            if (result.HasError)
+                return Content(result.ErrorMessage ?? "Unable to generate template.");
+            var bytes = System.IO.File.ReadAllBytes(result.FilePath);
+            var fileName = result.FileName;
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/" });
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        [HttpPost]
+        public JsonResult UploadBulkUpdateTraineeFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "File not selected."
+                });
+            }
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Only Excel (.xlsx) file is allowed."
+                });
+            }
+            DBTMTraineeUploadResultViewModel result = _dBTMTraineeDetailsAgent.UploadBulkUpdateTraineeFromFile(file);
+            if (result.HasError)
+            {
+                return Json(new { success = false, message = result.ErrorMessage });
+            }
+            if (result.FailedRows != null && result.FailedRows.Count > 0)
+            {
+                return Json(new { success = false, message = "Data correction required.", failedRows = result.FailedRows, headers = result.Headers });
+            }
+            SetNotificationMessage(GetSuccessNotificationMessage("Trainee updated successfully."));
+            return Json(new { success = true });
+        }
+        #endregion
         #endregion
     }
 }

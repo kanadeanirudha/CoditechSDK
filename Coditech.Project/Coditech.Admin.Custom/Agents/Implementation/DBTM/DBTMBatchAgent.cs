@@ -4,6 +4,7 @@ using Coditech.API.Client;
 using Coditech.Common.API.Model;
 using Coditech.Common.API.Model.Response;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Resources;
@@ -62,7 +63,7 @@ namespace Coditech.Admin.Agents
             return listViewModel;
         }
         #region GeneralBatchUserList
-        public override GeneralBatchUserListViewModel GetGeneralBatchUserList( int generalBatchMasterId, string userType, DataTableViewModel dataTableModel)
+        public override GeneralBatchUserListViewModel GetGeneralBatchUserList(int generalBatchMasterId, string userType, DataTableViewModel dataTableModel)
         {
             FilterCollection filters = new FilterCollection();
             dataTableModel = dataTableModel ?? new DataTableViewModel();
@@ -73,22 +74,22 @@ namespace Coditech.Admin.Agents
                 filters.Add("EmailId", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
                 filters.Add("MobileNumber", ProcedureFilterOperators.Like, dataTableModel.SearchBy);
             }
-            SortCollection sortlist = SortingData( dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy );
-            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession); 
+            SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty( dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
+            UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             if (userModel.Custom1 == CustomConstants.DBTMTrainer)
             {
-                userType = CustomConstants.DBTMTrainer; 
+                userType = CustomConstants.DBTMTrainer;
             }
             else if (userModel.Custom1 == CustomConstants.DBTMCentreOwner)
             {
-                userType = CustomConstants.DBTMCentreOwner; 
+                userType = CustomConstants.DBTMCentreOwner;
             }
 
-            GeneralBatchUserListResponse response = _generalBatchClient.GetGeneralBatchUserList( generalBatchMasterId, userType, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
-            GeneralBatchUserListModel generalBatchUserList = new GeneralBatchUserListModel{ GeneralBatchUserList = response?.GeneralBatchUserList };
+            GeneralBatchUserListResponse response = _generalBatchClient.GetGeneralBatchUserList(generalBatchMasterId, userType, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
+            GeneralBatchUserListModel generalBatchUserList = new GeneralBatchUserListModel { GeneralBatchUserList = response?.GeneralBatchUserList };
             GeneralBatchUserListViewModel listViewModel = new GeneralBatchUserListViewModel();
             listViewModel.GeneralBatchUserList = generalBatchUserList?.GeneralBatchUserList?.ToViewModel<GeneralBatchUserViewModel>().ToList();
-            SetListPagingData( listViewModel.PageListViewModel, response, dataTableModel, listViewModel.GeneralBatchUserList.Count, BindAssociatedBatchColumns());
+            SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.GeneralBatchUserList.Count, BindAssociatedBatchColumns());
             listViewModel.GeneralBatchMasterId = generalBatchMasterId;
             listViewModel.BatchName = response.BatchName;
             listViewModel.Custom4 = dataTableModel.SelectedParameter4;
@@ -153,6 +154,42 @@ namespace Coditech.Admin.Agents
                 message = GeneralResources.UpdateErrorMessage;
                 return false;
             }
+        }
+        #endregion
+        #region
+        protected override List<DatatableColumns> BindAssociatedBatchColumns()
+        {
+            List<DatatableColumns> datatableColumnList = new List<DatatableColumns>();
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Image",
+                ColumnCode = "Image"
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "First Name",
+                ColumnCode = "FirstName",
+                IsSortable = true
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Last Name",
+                ColumnCode = "LastName",
+                IsSortable = true
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Contact",
+                ColumnCode = "MobileNumber",
+                IsSortable = true
+            });
+            datatableColumnList.Add(new DatatableColumns()
+            {
+                ColumnName = "Associated",
+                ColumnCode = "GeneralBatchUserId",
+                IsSortable = true
+            });
+            return datatableColumnList;
         }
         #endregion
     }

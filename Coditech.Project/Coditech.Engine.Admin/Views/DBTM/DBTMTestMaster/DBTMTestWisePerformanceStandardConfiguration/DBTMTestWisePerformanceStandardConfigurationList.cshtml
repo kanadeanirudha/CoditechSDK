@@ -1,0 +1,63 @@
+﻿@model DBTMTestWisePerformanceStandardConfigurationListViewModel
+@{
+    ViewBag.Title = "DBTM TestWise Performance Standard Configuration";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMTestMasterId", Model.DBTMTestMasterId.ToString());
+    keyValuePairs.Add("DBTMTestwisePerformanceStandardCategoryId", Model.DBTMTestwisePerformanceStandardCategoryId.ToString());
+    DropdownViewModel categoryDropdown = new DropdownViewModel()
+            {
+                DropdownType = DropdownCustomTypeEnum.DBTMTestwisePerformanceStandardCategory.ToString(),
+                DropdownName = "DBTMTestwisePerformanceStandardCategoryId",
+                DropdownSelectedValue = Convert.ToString(Model.DBTMTestwisePerformanceStandardCategoryId),
+                IsCustomDropdown = true,
+                ChangeEvent = "DBTMTestWisePerformanceStandardConfiguration.DBTMTestwisePerformanceStandardCategoryList();"
+            };
+}
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Side Panel -->
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/DBTM/DBTMTestMaster/_DBTMActivityDetailsSidePannel.cshtml", keyValuePairs)
+            </div>
+            <!-- Main Content -->
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">
+                            Activitywise Performance Standard Configuration :
+                            @Model.TestName
+                        </span>
+                    </div>
+                    @Html.HiddenFor(x => x.DBTMTestMasterId)
+                    <!-- Category -->
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <label>Category</label>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", categoryDropdown)
+                            </div>
+                            <div class="col-md-2">
+                                <input type="button" class="btn btn-success" value="Show" onclick="DBTMTestWisePerformanceStandardConfiguration.DBTMTestwisePerformanceStandardCategoryList();" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Configuration List -->
+                    <div class="card-body">
+                        <div id="DataTablesDivId"
+                             class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/DBTM/DBTMTestMaster/DBTMTestWisePerformanceStandardConfiguration/_DBTMTestWisePerformanceStandardConfigurationList.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script src="~/js/coditech/DBTM/DBTMTestWisePerformanceStandardConfiguration.js"></script>
+}

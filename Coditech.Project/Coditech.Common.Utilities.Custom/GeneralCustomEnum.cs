@@ -37,6 +37,9 @@
         CentrewiseDepartment,
         JoiningCodeExpiryTime,
         DBTMTrainerwiseBatch,
+        DBTMTestwisePerformanceStandardCategory,
+        DBTMQRPrintingTemplateCode,
+        DBTMTraineeBulkUpdateOrderBy,
     }
     public enum DashboardFormCustomEnum
     {
@@ -58,6 +61,8 @@
         SendAssignmentReminder,
         DBTMSendPendingAssignmentReminder,
         TraineeReportTemplate,
+        DBTMAutoActivityQRCodeFormatVertical,
+        DBTMAutoActivityQRCodeFormatHorizontal,
     }
 
     public enum LogComponentCustomEnum

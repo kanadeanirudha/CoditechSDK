@@ -135,8 +135,16 @@ namespace Coditech.API.Service
             dBTMTraineeDetails.GroupEnumId = dBTMTraineeDetailsModel.GroupEnumId;
             dBTMTraineeDetails.SourceEnumId = dBTMTraineeDetailsModel.SourceEnumId;
             dBTMTraineeDetails.OtherInformation = dBTMTraineeDetailsModel.OtherInformation;
-            dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
-            dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
+            if (dBTMTraineeDetails.Weight != dBTMTraineeDetailsModel.Weight)
+            {
+                dBTMTraineeDetails.Weight = dBTMTraineeDetailsModel.Weight;
+                dBTMTraineeDetails.UpdatedWeightDate = DateTime.Now;
+            }
+            if (dBTMTraineeDetails.Height != dBTMTraineeDetailsModel.Height)
+            {
+                dBTMTraineeDetails.Height = dBTMTraineeDetailsModel.Height;
+                dBTMTraineeDetails.UpdatedHeightDate = DateTime.Now;
+            }
             dBTMTraineeDetails.SpecializationEnumId = dBTMTraineeDetailsModel.SpecializationEnumId;
             dBTMTraineeDetails.SchoolName = dBTMTraineeDetailsModel.SchoolName;
             dBTMTraineeDetails.Section = dBTMTraineeDetailsModel.Section;
@@ -394,6 +402,7 @@ namespace Coditech.API.Service
 
                     dBTMTraineeProfileModel.TrainerName = string.Join(", ", trainerList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId).Select(x => x.TrainerName).Distinct()) ?? "N/A";
                     dBTMTraineeProfileModel.TraineeProfilePerformanceList = traineeProfilePerformanceList.Where(x => x.DBTMTraineeDetailId == dBTMTraineeProfileModel.DBTMTraineeDetailId)?.ToList();
+                    dBTMTraineeProfileModel.GraphList = new List<GraphModel>();
                     if (dt?.Rows?.Count > 0)
                     {
                         DataRow dataRow = dt.Rows.Find(dBTMTraineeProfileModel.DBTMTraineeDetailId);
@@ -436,7 +445,12 @@ namespace Coditech.API.Service
             }
             if (!personCodes.Any())
                 return new List<DateTime>();
-            var dates = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode) && x.TypeOfRecord == "Batch" && x.TablePrimaryColumnId == generalBatchMasterId).Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
+            var deviceDataQuery = _dBTMDeviceDataRepository.Table.Where(x => personCodes.Contains(x.PersonCode));
+            if (generalBatchMasterId > 0)
+            {
+                deviceDataQuery = deviceDataQuery.Where(x => x.TypeOfRecord == "Batch" && x.TablePrimaryColumnId == generalBatchMasterId);
+            }
+            var dates = deviceDataQuery.Select(x => (x.CreatedDate ?? x.TestPerformedTime).Date).Distinct().OrderBy(x => x).ToList();
             return dates;
         }
         #endregion

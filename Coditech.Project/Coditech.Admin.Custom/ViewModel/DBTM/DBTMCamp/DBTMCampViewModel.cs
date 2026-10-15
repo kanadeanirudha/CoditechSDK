@@ -38,5 +38,7 @@ namespace Coditech.Admin.ViewModel
         public string DurationHours { get; set; }
         [Required(ErrorMessage = "Duration Minutes is required.")]
         public string DurationMinutes { get; set; }
+        [Display(Name = "Camp Location")]
+        public string CampLocation { get; set; }
     }
 }

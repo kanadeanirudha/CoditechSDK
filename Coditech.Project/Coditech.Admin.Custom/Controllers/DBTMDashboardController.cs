@@ -60,9 +60,11 @@ namespace Coditech.Admin.Controllers
             {
                 dataTableModel = new DataTableViewModel();
             }
-            GeneralBatchListViewModel list = GetBatchListData(dataTableModel);        
+            GeneralBatchListViewModel list = GetBatchListData(dataTableModel);
+            ViewBag.SelectedParameter1 = dataTableModel.SelectedParameter1;
+            ViewBag.SelectedParameter2 = dataTableModel.SelectedParameter2;
             ViewBag.IsDashboardPopup = "true";
-          
+
             // Check if this is the ReadOnly Dashboard (Modal/Owner)
             bool isReadOnlyContext = isReadOnly || (ViewBag.IsReadOnlyDashboard != null && Convert.ToString(ViewBag.IsReadOnlyDashboard).ToLower() == "true") || (!string.IsNullOrEmpty(dataTableModel?.SelectedParameter4) && dataTableModel.SelectedParameter4.ToLower() == "true");
             bool isTrainer = IsTrainer(isReadOnlyContext);
@@ -81,7 +83,7 @@ namespace Coditech.Admin.Controllers
                 dataTableModel = new DataTableViewModel();
             }
             DBTMTraineeAssignmentListViewModel assignmentList = GetAssignmentListData(dataTableModel);
-            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
+            DBTMDashboardViewModel dBTMDashboardViewModel = TempData["DBTMModel"] != null ? JsonConvert.DeserializeObject<DBTMDashboardViewModel>(TempData["DBTMModel"].ToString()) : new DBTMDashboardViewModel();
 
             TempData["DBTMModel"] = JsonConvert.SerializeObject(dBTMDashboardViewModel);
             dBTMDashboardViewModel.DBTMTraineeAssignmentList ??= new List<DBTMTraineeAssignmentListViewModel>();
@@ -307,7 +309,7 @@ namespace Coditech.Admin.Controllers
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", trainerDropdown);
         }
-        public ActionResult GetDBTMBatchListByCentreCodeAndTrainer(string centreCode,long generalTrainerMasterId,int joiningCodeTypeEnumId  )
+        public ActionResult GetDBTMBatchListByCentreCodeAndTrainer(string centreCode, long generalTrainerMasterId, int joiningCodeTypeEnumId)
         {
             DropdownViewModel trainerDropdown = new DropdownViewModel()
             {

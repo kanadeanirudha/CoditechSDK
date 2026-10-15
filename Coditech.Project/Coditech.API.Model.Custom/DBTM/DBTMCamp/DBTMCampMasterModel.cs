@@ -4,7 +4,8 @@
     {
         public int DBTMCampMasterId { get; set; }    
         public string CentreCode { get; set; }       
-        public string CampName { get; set; }         
+        public string CampName { get; set; }
+        public string CampLocation { get; set; }
         public TimeSpan CampStartTime { get; set; }       
         public DateTime CampStartDate { get; set; }   
         public DateTime? CampEndDate { get; set; }

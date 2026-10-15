@@ -109,31 +109,39 @@
     },
     JoiningCodeListByCentreCodeList: function () {
         var selectedCentreCode = $("#SelectedCentreCode").val();
-        var selectedParameter1 = $("#JoiningCodeTypeEnumId").val();
-        $("#SelectedParameter1").val(selectedParameter1);
         var selectedParameter2 = $('[name="SelectedParameter2"]').val();
-        if (selectedCentreCode !== "" && selectedParameter1 !== "") {
+        if (selectedCentreCode !== "") {
+            var currentPath = window.location.pathname.toLowerCase();
+            var url = "";
+            if (currentPath.includes("traineelist")) {
+                url = "/DBTMOrganisationCentrewiseJoiningCode/TraineeList";
+            }
+            else if (currentPath.includes("trainerlist")) {
+                url = "/DBTMOrganisationCentrewiseJoiningCode/TrainerList";
+            }
+            if (url === "") {
+                CoditechNotification.DisplayNotificationMessage("Unable to determine joining code list.", "error" );
+                return;
+            }
             CoditechCommon.ShowLodder();
             $.ajax({
                 cache: false,
                 type: "GET",
                 dataType: "html",
-                url: "/OrganisationCentrewiseJoiningCode/List",
+                url: url,
                 data: {
                     SelectedCentreCode: selectedCentreCode,
-                    SelectedParameter1: selectedParameter1,
                     SelectedParameter2: selectedParameter2
                 },
-                contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("#DataTablesDivId").html("").html(data);
+                    $("#DataTablesDivId").html(data);
                     CoditechCommon.HideLodder();
                 },
-                error: function (xhr, ajaxOptions, thrownError) {
+                error: function (xhr) {
                     if (xhr.status === 401 || xhr.status === 403) {
                         location.reload();
                     }
-                    CoditechNotification.DisplayNotificationMessage("Failed to retrieve Joining Code list.", "error");
+                    CoditechNotification.DisplayNotificationMessage( "Failed to retrieve Joining Code list.", "error" );
                     CoditechCommon.HideLodder();
                 }
             });

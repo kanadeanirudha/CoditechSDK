@@ -1,0 +1,24 @@
+﻿@model ModelPopUpViewModel
+@{
+    Layout = null;
+}
+<div class="modal fade" id="@Model.ModelPopUpId" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DirtyPopup-title"> Unsaved Changes </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <span id="DirtyPopup-message">
+                    Your changes will be lost if you don't save them.<br />
+                    Do you want to save the changes you made?
+                </span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="@Model.ModelPopUpId-yes" class="btn btn-success"> Yes </button>
+                <button type="button" id="DirtyPopup-no" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal"> No </button>
+            </div>
+        </div>
+    </div>
+</div>

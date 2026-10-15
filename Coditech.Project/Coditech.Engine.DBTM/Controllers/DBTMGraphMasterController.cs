@@ -157,5 +157,139 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTestListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("/DBTMGraphMaster/GetGraphVerticalViewSequenceList")]
+        [Produces(typeof(DBTMGraphVerticalViewSequenceListResponse))]
+        [TypeFilter(typeof(BindQueryFilter))]
+        public virtual IActionResult GetGraphVerticalViewSequenceList(int dBTMGraphMasterId, FilterCollection filter, ExpandCollection expand, SortCollection sort, int pageIndex, int pageSize)
+        {
+            try
+            {
+                DBTMGraphVerticalViewSequenceListModel list = _dBTMGraphMasterService.GetGraphVerticalViewSequenceList(dBTMGraphMasterId, filter, sort.ToNameValueCollectionSort(), expand.ToNameValueCollectionExpands(), pageIndex, pageSize);
+                string data = ApiHelper.ToJson(list);
+                return !string.IsNullOrEmpty(data) ? CreateOKResponse<DBTMGraphVerticalViewSequenceListResponse>(data) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMGraphVerticalViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMGraphVerticalViewSequenceListResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMGraphMaster/GetGraphVerticalViewSequence")]
+        [HttpGet]
+        [Produces(typeof(DBTMGraphVerticalViewSequenceResponse))]
+        public virtual IActionResult GetGraphVerticalViewSequence(int dBTMGraphVerticalViewSequenceId)
+        {
+            try
+            {
+                DBTMGraphVerticalViewSequenceModel model = _dBTMGraphMasterService.GetGraphVerticalViewSequence(dBTMGraphVerticalViewSequenceId);
+                return IsNotNull(model) ? CreateOKResponse(new DBTMGraphVerticalViewSequenceResponse { DBTMGraphVerticalViewSequenceModel = model }) : CreateNoContentResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new DBTMGraphVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new DBTMGraphVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMGraphMaster/UpdateGraphVerticalViewSequence")]
+        [HttpPut, ValidateModel]
+        [Produces(typeof(DBTMGraphVerticalViewSequenceResponse))]
+        public virtual IActionResult UpdateGraphVerticalViewSequence( [FromBody] DBTMGraphVerticalViewSequenceModel model)
+        {
+            try
+            {
+                bool isUpdated =  _dBTMGraphMasterService.UpdateGraphVerticalViewSequence(model);
+                return isUpdated ? CreateOKResponse( new DBTMGraphVerticalViewSequenceResponse { DBTMGraphVerticalViewSequenceModel = model }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage( ex, "GraphVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse( new DBTMGraphVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new DBTMGraphVerticalViewSequenceResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMGraphMaster/DeleteGraphVerticalViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult DeleteGraphVerticalViewSequence([FromBody] ParameterModel graphVerticalViewSequenceIds)
+        {
+            try
+            {
+                bool deleted = _dBTMGraphMasterService.DeleteGraphVerticalViewSequence(graphVerticalViewSequenceIds);
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = deleted });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse( new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage( ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse( new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMGraphMaster/UpdateGraphVerticalSequenceNumber")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMGraphVerticalViewSequenceResponse))]
+        public virtual IActionResult UpdateGraphVerticalSequenceNumber([FromBody] DBTMGraphVerticalViewSequenceModel model)
+        {
+            try
+            {
+                DBTMGraphVerticalViewSequenceModel result = _dBTMGraphMasterService.UpdateGraphVerticalSequenceNumber(model);
+                return IsNotNull(result) ? CreateCreatedResponse( new DBTMGraphVerticalViewSequenceResponse { DBTMGraphVerticalViewSequenceModel = result }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
+
+        [Route("/DBTMGraphMaster/CreateGraphVerticalViewSequence")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(DBTMGraphVerticalViewSequenceResponse))]
+        public virtual IActionResult CreateGraphVerticalViewSequence([FromBody] DBTMGraphVerticalViewSequenceModel model)
+        {
+            try
+            {
+                DBTMGraphVerticalViewSequenceModel result = _dBTMGraphMasterService.CreateGraphVerticalViewSequence(model);
+                return IsNotNull(result) ? CreateCreatedResponse( new DBTMGraphVerticalViewSequenceResponse { DBTMGraphVerticalViewSequenceModel = result }) : CreateInternalServerErrorResponse();
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "GraphVerticalViewSequence", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

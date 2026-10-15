@@ -127,6 +127,18 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMTrainerwiseBatchList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTestwisePerformanceStandardCategory.ToString()))
+            {
+                DBTMTestwisePerformanceStandardCategoryList(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMQRPrintingTemplateCode.ToString()))
+            {
+                GetDBTMQRPrintingTemplateCode(dropdownViewModel, dropdownList);
+            }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.DBTMTraineeBulkUpdateOrderBy.ToString()))
+            {
+                GetDBTMTraineeBulkUpdateOrderByList(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -612,7 +624,22 @@ namespace Coditech.Admin.Helpers
             });
         }
 
+        private static void GetDBTMQRPrintingTemplateCode(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "QR Code Format Vertical",
+                Value = "DBTMAutoActivityQRCodeFormatVertical",
+                Selected = dropdownViewModel.DropdownSelectedValue == "DBTMAutoActivityQRCodeFormatVertical"
+            });
 
+            dropdownList.Add(new SelectListItem
+            {
+                Text = "QR Code Format Horizontal",
+                Value = "DBTMAutoActivityQRCodeFormatHorizontal",
+                Selected = dropdownViewModel.DropdownSelectedValue == "DBTMAutoActivityQRCodeFormatHorizontal"
+            });
+        }
         //private static void GetDBTMMultiBatchActivityList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
         //{
         //    if (dropdownViewModel.DropdownType == DropdownCustomTypeEnum.BatchWiseMultiReports.ToString())
@@ -826,6 +853,48 @@ namespace Coditech.Admin.Helpers
                     Selected = dropdownViewModel.DropdownSelectedValue == Convert.ToString(item.GeneralDepartmentMasterId)
                 });
             }
+        }
+        private static void DBTMTestwisePerformanceStandardCategoryList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            dropdownList.Add(new SelectListItem() { Text = "-----Select Category-----", Value = "0" });
+            DBTMTestwisePerformanceStandardCategoryListResponse response = new DBTMTestClient().GetDBTMTestwisePerformanceStandardCategoryList(0);
+            foreach (var item in response.DBTMTestwisePerformanceStandardCategoryList)
+            {
+                dropdownList.Add(new SelectListItem()
+                {
+                    Text = item.Name,
+                    Value = item.DBTMTestwisePerformanceStandardCategoryId.ToString(),
+                    Selected = dropdownViewModel.DropdownSelectedValue == item.DBTMTestwisePerformanceStandardCategoryId.ToString()
+                });
+            }
+        }
+        private static void GetDBTMTraineeBulkUpdateOrderByList(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            string selectedValue = string.IsNullOrEmpty(dropdownViewModel.DropdownSelectedValue) ? "FirstNameAsc" : dropdownViewModel.DropdownSelectedValue;
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "First Name Ascending",
+                Value = "FirstNameAsc",
+                Selected = selectedValue == "FirstNameAsc"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "First Name Descending",
+                Value = "FirstNameDesc",
+                Selected = selectedValue == "FirstNameDesc"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Last Name Ascending",
+                Value = "LastNameAsc",
+                Selected = selectedValue == "LastNameAsc"
+            });
+            dropdownList.Add(new SelectListItem()
+            {
+                Text = "Last Name Descending",
+                Value = "LastNameDesc",
+                Selected = selectedValue == "LastNameDesc"
+            });
         }
     }
 }

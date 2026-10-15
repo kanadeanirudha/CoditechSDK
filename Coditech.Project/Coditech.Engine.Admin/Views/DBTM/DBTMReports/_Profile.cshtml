@@ -1,0 +1,1013 @@
+﻿@using Coditech.Admin.Utilities;
+@using System.Text.RegularExpressions;
+@using Coditech.Common.API.Model;
+@model DBTMReportTraineeProfileModel
+@{
+    ViewBag.Title = "User Profile";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string dashboardUrl = CoditechAdminSettings.DashboardUrl;
+    // precompute sanitized printable name and common URLs
+    var logoUrl = Url.Content("~/assets/images/dbtm/applicationlogo.png");
+    string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
+    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
+    var fnameSafe = SanitizeForFilename(Model.FirstName ?? "Trainee");
+    var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
+    var assessment = Model.AssessmentDate;
+    string profilePrintName = $"PerformanceReport_{fnameSafe}{(string.IsNullOrEmpty(lnameSafe) ? string.Empty : "_" + lnameSafe)}";
+}
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #e9e9e9;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #111;
+        font-size: 9px;
+    }
+
+    .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: 10px;
+        background: #222;
+        text-align: center;
+    }
+
+        .toolbar button {
+            border: 0;
+            padding: 8px 14px;
+            margin: 0 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+            font-weight: 700;
+        }
+
+    .page {
+        /* width: 210mm;
+                         min-height: 297mm; */
+        margin: 12px auto;
+        background: #fff;
+        padding: 10mm 9mm 8mm;
+        box-shadow: 0 0 8px rgba(0,0,0,.25);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-border {
+        border: 1.5px solid #111;
+        min-height: 279mm;
+        padding: 3mm 7mm 0;
+        position: relative;
+    }
+
+    .header {
+        height: 65px;
+        position: relative;
+        border-bottom: 0;
+    }
+
+    .brand {
+        font-size: 18px;
+        font-weight: 900;
+        color: #24395f;
+        letter-spacing: -1px;
+        line-height: 15px;
+    }
+
+        .brand span {
+            display: block;
+            color: #ee3f59;
+            font-size: 6px;
+            letter-spacing: 2px;
+            margin-left: 4px;
+        }
+
+        .brand.right {
+            position: absolute;
+            right: 0;
+            top: 0;
+            text-align: right;
+        }
+
+    .center-name-report {
+        position: absolute;
+        top: 1px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: 700;
+        font-size: 12px;
+        color: #000 !important;
+    }
+
+    .report-title {
+        position: absolute;
+        top: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .assessment-date {
+        position: absolute;
+        right: 0;
+        top: 46px;
+        font-size: 8px;
+    }
+
+    .top-grid {
+        display: grid;
+        grid-template-columns: 25% 39% 36%;
+        gap: 8px;
+        align-items: start;
+    }
+
+    .photo-box {
+        height: 138px;
+        width: 140px;
+        border: 1.5px solid #222;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-left: 0;
+    }
+
+    .info-box {
+        border: 1.5px solid #222;
+        padding: 5px 6px;
+        height: 200px;
+        font-size: 8px;
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: 68px 1fr;
+        margin: 2px 0;
+        align-items: end;
+    }
+
+        .info-row b {
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        .info-row .line {
+            font-size: 8px;
+            font-weight: 400;
+        }
+
+    .line {
+        border-bottom: 1px solid #555;
+        min-height: 11px;
+    }
+
+    .sport-box {
+        border: 1.5px solid #222;
+        height: 165px;
+        padding: 5px;
+        position: relative;
+    }
+
+    .ball {
+        width: 75px;
+        height: 75px;
+        margin: 3px auto 3px;
+        display: block;
+    }
+
+    .sport-row {
+        display: grid;
+        grid-template-columns: 68px 1fr;
+        margin: 3px 0;
+        font-size: 8px;
+    }
+
+    .sport-line {
+        border-bottom: 1px solid #555;
+    }
+
+    .middle {
+        display: grid;
+        grid-template-columns: 25% 39% 36%;
+        gap: 8px;
+        margin-top: 18px;
+        align-items: start;
+        height: 500px;
+    }
+
+    .anthro-area {
+        min-height: 260px;
+        position: relative;
+    }
+
+    .body-svg {
+        width: 100px;
+        height: 190px;
+        /* display:block; */
+        margin: 0 auto;
+    }
+
+    .measure-line {
+        position: absolute;
+        right: 22px;
+        top: 4px;
+        height: 190px;
+        border-right: 1px solid #888;
+    }
+
+        .measure-line:before, .measure-line:after {
+            content: "";
+            position: absolute;
+            width: 28px;
+            border-top: 1px solid #888;
+            right: -1px;
+        }
+
+        .measure-line:before {
+            top: 0;
+        }
+
+        .measure-line:after {
+            bottom: 0;
+        }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .small-table td, .small-table th {
+        border: 1px solid #777;
+        padding: 3px 4px;
+        font-size: 8px;
+    }
+
+    .small-table th {
+        font-weight: 700;
+    }
+    /* .anthro-table { margin-top:3px; } */
+
+    .score-summary {
+        border: 1px solid #777;
+        margin-top: 0;
+        width: 100%;
+    }
+
+        .score-summary td {
+            border: 1px solid #777;
+            padding: 4px;
+            height: 24px;
+            font-size: 8px;
+        }
+
+        .score-summary .overall-score-label {
+            font-size: 9px;
+            font-weight: 700;
+            line-height: 11px;
+            vertical-align: middle;
+        }
+
+        .score-summary .dark {
+            background: #273a61;
+            color: #fff;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .score-summary .improvement-status {
+            font-size: 8px;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+    .up {
+        color: #62bd3b;
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 12px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 3px;
+        font-family: Arial Black, Arial, sans-serif;
+    }
+
+    .down {
+        color: #e33b3b;
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 12px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 3px;
+        font-family: Arial Black, Arial, sans-serif;
+    }
+
+    .score-summary .improvement-value {
+        font-size: 8px;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .score-summary .green {
+        color: #62bd3b;
+        font-weight: 700;
+    }
+
+    .chart-title {
+        text-align: center;
+        font-size: 12px;
+        color: #777;
+        font-weight: 700;
+        margin: 10px 0;
+    }
+
+    .bar-wrap {
+        height: 155px;
+    }
+
+    .radar-title {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        margin: 10px 0 3px;
+    }
+
+    .performance-report-summary-title {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        margin: 10px 0 3px;
+    }
+
+    .radar-wrap {
+        height: 180px;
+    }
+
+    .activities {
+        text-align: center;
+        font-weight: 700;
+        color: #1f3155;
+        font-size: 9px;
+        margin-top: 3px;
+    }
+
+    .section-table {
+        margin-top: 12px;
+        font-size: 8px;
+    }
+
+        .section-table th,
+        .section-table td {
+            border: 1px solid #777;
+            padding: 4px 5px;
+            height: 19px;
+        }
+
+        .section-table th {
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .section-table .cat-speed {
+            background: #ef3e55;
+        }
+
+        .section-table .cat-power {
+            background: #f36d22;
+        }
+
+        .section-table .cat-reaction {
+            background: #ef3e55;
+        }
+
+        .section-table .cat-balance {
+            background: #f36d22;
+        }
+
+        .section-table .cat-agility {
+            background: #91c83e;
+        }
+
+        .section-table .cat-endurance {
+            background: #91c83e;
+        }
+
+        .section-table .cat-strength {
+            background: #91c83e;
+        }
+
+        .section-table .unit {
+            background: #25a9d3;
+            font-weight: 700;
+        }
+
+        .section-table .score-head {
+            background: #273a61;
+            color: #fff;
+            text-align: center;
+        }
+
+        .section-table .value-green {
+            background: #a9d8a0;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .section-table .value-red {
+            background: #ef1717;
+            color: #111;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .section-table .score {
+            text-align: center;
+        }
+
+    .notes {
+        border: 1.5px solid #111;
+        /* allow notes to expand if content is larger than one line */
+        min-height: 45px;
+        height: auto;
+        /* avoid negative margins which can cause clipping when printing */
+        margin: 12px 0 25px 0;
+        padding: 8px;
+        font-size: 8px;
+        box-sizing: border-box;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .footer-bar {
+        height: 9px;
+        background: #050505;
+        margin: 0 -7px;
+    }
+
+    .muted-line {
+        color: #777;
+    }
+
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    .performance-pair {
+        width: 100%;
+        margin-top: 12px;
+        margin-bottom: 18px;
+    }
+
+    .activity-graph-row {
+        position: relative;
+    }
+
+    .activity-graph-image {
+        position: absolute;
+        top: 0;
+        left: 52%;
+        width: 48%;
+        padding-left: 8px;
+        box-sizing: border-box;
+    }
+
+    .activity-graph-title {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .profile-activity-graphs {
+        width: 100%;
+    }
+
+    .performance-matrix-group {
+        width: 100%;
+        margin-bottom: 24px;
+        page-break-inside: auto;
+    }
+
+    .performance-matrix-heading {
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        padding: 8px;
+        border-top: 1px solid #111;
+    }
+
+    .performance-pair table {
+        width: 100%;
+    }
+
+    @@media print {
+        html,
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm !important;
+            min-height: 297mm !important;
+            background: #fff !important;
+        }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+        .print-selected-report,
+        .print-selected-report * {
+            visibility: visible !important;
+        }
+
+        .print-selected-report {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            margin: 0 !important;
+            padding: 10mm 9mm 8mm !important;
+            background: #fff !important;
+            box-shadow: none !important;
+            /* allow overflowing content to be visible when printing (charts/tables may exceed fixed heights) */
+            overflow: visible !important;
+            box-sizing: border-box !important;
+        }
+            /* Ensure background colors and element colors are preserved when printing */
+            .print-selected-report,
+            .print-selected-report * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+                .print-selected-report .report-border {
+                    width: 100% !important;
+                    /* allow report content to grow across pages when needed */
+                    height: auto !important;
+                    min-height: 0 !important;
+                    margin: 0 !important;
+                    box-sizing: border-box !important;
+                    overflow: visible !important;
+                }
+
+                .print-selected-report .top-grid {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    grid-template-columns: 25fr 39fr 36fr !important;
+                    gap: 0 !important;
+                    height: auto !important;
+                    min-height: 0 !important;
+                    overflow: visible !important;
+                }
+
+                .print-selected-report .middle {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    grid-template-columns: 25fr 35fr 40fr !important;
+                    gap: 0 !important;
+                    height: 500px !important;
+                    min-height: 500px !important;
+                    margin-top: 5px !important;
+                    margin-bottom: 0 !important;
+                    overflow: visible !important;
+                }
+
+                .print-selected-report .bar-wrap {
+                    height: 155px !important;
+                }
+
+                .print-selected-report .radar-wrap {
+                    height: 200px !important;
+                    overflow: visible !important;
+                }
+
+                .print-selected-report table {
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    page-break-inside: auto !important;
+                }
+                /* avoid breaking performance-pair blocks awkwardly */
+                .print-selected-report .performance-pair,
+                .print-selected-report .section-table {
+                    page-break-inside: avoid !important;
+                }
+
+                .print-selected-report .line-bar-chart-container {
+                    height: 175px !important;
+                    width: 100% !important;
+                }
+
+                .print-selected-report .radar-chart-container {
+                    height: 220px !important;
+                    width: 100% !important;
+                }
+
+                .print-selected-report .bar-wrap,
+                .print-selected-report .radar-wrap {
+                    overflow: visible !important;
+                }
+
+                .print-selected-report.print-normal-report {
+                    position: fixed !important;
+                    left: 0 !important;
+                    top: 0 !important;
+                    width: 210mm !important;
+                    max-width: 210mm !important;
+                    margin: 0 !important;
+                    box-sizing: border-box !important;
+                    overflow: visible !important;
+                }
+
+        .card-header, .toolbar, button, a {
+            display: none !important;
+        }
+    }
+
+    .activity-protocol-img {
+        display: block;
+        max-width: 100%;
+        max-height: 220px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+    .activity-graph-chart canvas {
+        max-width: 100%;
+    }
+
+    @@page {
+        size: A4 portrait;
+        margin: 0;
+    }
+</style>
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Trainee Profile</h4>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-soft-primary float-end" href="/DBTMTraineeDetails/Cancel?selectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="button"
+                                    class="btn btn-success"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#RemarkPopupId"
+                                    onclick="DBTMTraineeDetails.GetRemarks(
+                                    'RemarkContentId',
+                                    @Model.DBTMTraineeDetailId)">
+                                <i class="fa fa-print me-1"></i> Print Report
+                            </button>
+                            @if (!Model.IsListView)
+                            {
+                                <!-- BACK BUTTON  -->
+                                <a class="btn btn-sm btn-soft-primary" href="@Url.Action("List", controllerName, new DataTableViewModel { SelectedCentreCode = Model.SelectedCentreCode, SelectedParameter1 = Model.SelectedParameter1 })">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="dastone-profile">
+                            <div class="page" id="report" data-printable-name="@profilePrintName">
+                                <div class="report-border">
+                                    <div class="header">
+                                        <div class="brand"><img style="height:45px" src="@logoUrl" /></div>
+                                        <div class="center-name-report">Center Name: @Model.CentreName</div>
+                                        <div class="brand right"> <img style="height:45px" src="@logoUrl" /></div>
+                                        <div class="report-title">Performance Assessment Report</div>
+                                        <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToString("dd'/'MM'/'yyyy")</div>
+                                    </div>
+
+                                    <div class="top-grid">
+                                        <div class="photo-box">
+                                            @if (!string.IsNullOrEmpty(Model.PhotoMediaPath))
+                                            {
+                                                <img src="@Model.PhotoMediaPath" style="height: 115px; width: 100%; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
+                                            }
+                                        </div>
+
+                                        <div class="info-box">
+                                            <div class="info-row"><b>Report Title:</b><div class="line">Athlete Progress Report</div></div>
+                                            <div class="info-row"><b>Program<br>Name / Batch:</b><div class="line">@Model.BatchName</div></div>
+                                            <div class="info-row"><b>Assessment<br>Location:</b><div class="line"> @Model.AssessmentLocation</div></div>
+                                            <div class="info-row"><b>Athlete /<br>Student Name:</b><div class="line"> @Model.FirstName @Model.LastName</div></div>
+                                            <div class="info-row"><b>Gender:</b><div class="line"> @Model.Gender</div></div>
+                                            <div class="info-row"><b>DOB:</b><div class="line"> @Model.DateOfBirth.ToCoditechDateFormat()</div></div>
+                                            <div class="info-row"><b>Age Group:</b><div class="line"> @Model.AgeGroup</div></div>
+                                            <div class="info-row"><b>Academy<br>Name:</b><div class="line"> @Model.AcademyName</div></div>
+                                            <div class="info-row"><b>Coach Name:</b><div class="line"> @Model.TrainerName</div></div>
+                                        </div>
+
+                                        <div class="sport-box">
+                                            @{
+                                                string sportImage = "~/assets/images/dbtm/football.jpg";
+                                                if (!string.IsNullOrEmpty(Model.Specialization))
+                                                {
+                                                    if (Model.Specialization.StartsWith("Cricket"))
+                                                        sportImage = "~/assets/images/dbtm/cricket.jpg";
+                                                    else if (Model.Specialization.StartsWith("Badminton"))
+                                                        sportImage = "~/assets/images/dbtm/badminton.jpg";
+                                                    else if (Model.Specialization.StartsWith("Basketball"))
+                                                        sportImage = "~/assets/images/dbtm/basketball.jpg";
+                                                    else if (Model.Specialization.StartsWith("Hockey"))
+                                                        sportImage = "~/assets/images/dbtm/hockey.jpg";
+                                                    else if (Model.Specialization.StartsWith("Kabaddi"))
+                                                        sportImage = "~/assets/images/dbtm/kabaddi.jpg";
+                                                    else if (Model.Specialization.StartsWith("Swimming"))
+                                                        sportImage = "~/assets/images/dbtm/swimming.jpg";
+                                                    else if (Model.Specialization.StartsWith("Tennis"))
+                                                        sportImage = "~/assets/images/dbtm/tennis.jpg";
+                                                    else if (Model.Specialization.StartsWith("Athletics"))
+                                                        sportImage = "~/assets/images/dbtm/athletics.jpg";
+                                                }
+                                            }
+                                            <img class="ball" src="@Url.Content(sportImage)" />
+                                            <div class="sport-row"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
+                                            <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
+                                            <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="middle">
+                                        <div class="anthro-area">
+                                            @{
+                                                string bodyImage = "~/assets/images/dbtm/HeightWeightMale.png";
+                                                if (!string.IsNullOrWhiteSpace(Model.Gender) && Model.Gender.Trim().Equals("Female", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    bodyImage = "~/assets/images/dbtm/HeightWeightFemale.png";
+                                                }
+                                            }
+                                            <img class="body-svg" src="@Url.Content(bodyImage)" />
+                                            <!-- <div class="measure-line"></div> -->
+
+                                            <table class="small-table anthro-table">
+                                                <tr><th>Anthropometry</th><th></th><th>Data<br>recorded<br>date</th></tr>
+                                                <tr><th>Height (m)</th><td>@((Model.Height / 100m).ToString("0.00"))</td><td> @((Model.UpdatedHeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td> @((Model.UpdatedWeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                <tr><th>BMI</th><td>@Convert.ToDecimal(Model.BMI).ToString("0.000")</td><td></td></tr>
+                                            </table>
+                                        </div>
+
+                                        <div>
+                                            <table class="score-summary">
+                                                <tr>
+                                                    <td class="overall-score-label">Today's Overall<br>Activity Score:</td>
+                                                    <td class="dark">@Model.OverallActivityScore</td>
+                                                    @if (Model.OverallActivityScoreIsUp != null)
+                                                    {
+                                                        if (Model.OverallActivityScoreIsUp == true)
+                                                        {
+                                                            <td class="improvement-value">
+                                                                @Model.OverallActivityScoreUPDownValue%
+                                                                <span class="up">⬆</span>
+                                                            </td>
+                                                            <td class="improvement-status"> Improved </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="improvement-value">
+                                                                @Model.OverallActivityScoreUPDownValue%
+                                                                <span class="down">⬇</span>
+                                                            </td>
+                                                            <td class="improvement-status">Down</td>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                        <td></td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Past score:</b></td>
+                                                    <td>@Model.OverallLastActivityScore</td>
+                                                    <td colspan="2">@Model.OverallLastActivityDate.ToCoditechDateFormat()</td>
+                                                </tr>
+                                            </table>
+
+                                            <div class="chart-title">Score Chart</div>
+                                            <div class="bar-wrap">
+                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <span>@Model.TraineeProfilePerformanceMessage</span>
+                                                }
+                                                else if (Model.LineBarChart != null)
+                                                {
+                                                    @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", Model.LineBarChart)
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="radar-title">Performance Matrix</div>
+                                            <div class="radar-wrap">
+                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <span>@Model.TraineeProfilePerformanceMessage</span>
+                                                }
+                                                else if (Model.RadarChart != null)
+                                                {
+                                                    @Html.Partial("~/Views/Shared/Charts/_RadarChart.cshtml", Model.RadarChart)
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @{
+                                        var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
+                                        var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
+                                    }
+                                    <div class="performance-report-summary-title"> Performance Report Summary</div>
+                                    @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
+                                    {
+                                        var firstGroup = performanceGroups[groupIndex];
+                                        var secondGroup = groupIndex + 1 < performanceGroups.Count ? performanceGroups[groupIndex + 1] : null;
+                                        var firstItems = firstGroup.ToList();
+                                        var secondItems = secondGroup != null ? secondGroup.ToList() : new List<DBTMTraineeProfilePerformanceModel>();
+                                        <div class="performance-pair">
+                                            <table style="width:100%; border-collapse:collapse;">
+                                                <tr>
+                                                    <td style="width:50%; vertical-align:top; padding-right:8px;">
+                                                        <table class="section-table" style="width:100%;">
+                                                            <tr>
+                                                                <th colspan="5" style="background-color:@(firstItems.FirstOrDefault()?.PerformanceMatrixColor)">
+                                                                    @firstGroup.Key
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Activity</th>
+                                                                <th class="unit">Unit</th>
+                                                                <th>Value</th>
+                                                                <th class="score-head">Score</th>
+                                                                <th>% Improvement</th>
+                                                            </tr>
+                                                            @foreach (var item in firstItems)
+                                                            {
+                                                                <tr>
+                                                                    <td><b>@item.TestName</b></td>
+                                                                    <td>@item.Unit</td>
+                                                                    <td>@item.BestValue</td>
+                                                                    <td class="score">
+                                                                        @if (string.IsNullOrEmpty(item.Score))
+                                                                        {
+                                                                            <span>NA</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @item.Score
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (item.IsUp != null)
+                                                                        {
+                                                                            @if (item.IsUp == true)
+                                                                            {
+                                                                                @item.UpDownValue
+                                                                                <span class="up">⬆</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @item.UpDownValue
+                                                                                <span class="down">⬇</span>
+                                                                            }
+                                                                        }
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </table>
+                                                    </td>
+                                                    <td style="width:50%; vertical-align:top; padding-left:8px;">
+                                                        @if (secondGroup != null)
+                                                        {
+                                                            <table class="section-table" style="width:100%;">
+                                                                <tr>
+                                                                    <th colspan="5" style="background-color:@(secondItems.FirstOrDefault()?.PerformanceMatrixColor)">
+                                                                        @secondGroup.Key
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Activity</th>
+                                                                    <th class="unit">Unit</th>
+                                                                    <th>Value</th>
+                                                                    <th class="score-head">Score</th>
+                                                                    <th>% Improvement</th>
+                                                                </tr>
+                                                                @foreach (var item in secondItems)
+                                                                {
+                                                                    <tr>
+                                                                        <td><b>@item.TestName</b></td>
+                                                                        <td>@item.Unit</td>
+                                                                        <td>@item.BestValue</td>
+                                                                        <td class="score">
+                                                                            @if (string.IsNullOrEmpty(item.Score))
+                                                                            {
+                                                                                <span>NA</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @item.Score
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            @if (item.IsUp != null)
+                                                                            {
+                                                                                @if (item.IsUp == true)
+                                                                                {
+                                                                                    @item.UpDownValue
+                                                                                    <span class="up">⬆</span>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    @item.UpDownValue
+                                                                                    <span class="down">⬇</span>
+                                                                                }
+                                                                            }
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </table>
+                                                        }
+                                                        else
+                                                        {
+                                                            <table class="section-table" style="width:100%; display:none;">
+                                                                <tr><th colspan="5">&nbsp;</th></tr>
+                                                            </table>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    }
+                                    <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
+
+                                    @* Activity-wise Graphs *@
+                                    @{
+                                        var activityGraphs = Model.DaywiseReportGraphList?.Where(x => x.IsRecordFound).ToList() ?? new List<GraphModel>();
+                                        var performanceMatrixGroups = activityGraphs.GroupBy(x => x.Custom2).OrderBy(g => g.Key).ToList();
+                                    }
+                                    @if (performanceMatrixGroups.Any())
+                                    {
+                                        <div class="profile-activity-graphs mt-3">
+                                            @foreach (var matrixGroup in performanceMatrixGroups)
+                                            {
+                                                <div class="performance-matrix-group">
+                                                    <h5 class="performance-matrix-heading">@matrixGroup.Key</h5>
+                                                    @foreach (var graph in matrixGroup)
+                                                    {
+                                                        <div class="activity-graph-item">
+                                                            <h6 class="activity-graph-title">@graph.Custom1</h6>
+                                                            <div class="activity-graph-row">
+                                                                <div class="activity-graph-chart">
+                                                                    @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
+                                                                </div>
+                                                                <div class="activity-graph-image">
+                                                                    @if (!string.IsNullOrWhiteSpace(graph.Custom3))
+                                                                    {
+                                                                        <div class="activity-protocol-title">  Test protocol </div>
+                                                                        <img src="@graph.Custom3" alt="Activity Protocol" class="activity-protocol-img" />
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/coditech/DBTM/DBTMTraineeDetails.js"></script>
+<script src="~/js/coditech/DBTM/DBTMReports.js"></script>
+<iframe id="hiddenDownloader"
+        style="display:none;"
+        title="pdf-downloader">
+</iframe>
+@Html.Partial("~/Views/Shared/_ModelPopUp.cshtml", remarkPopup)

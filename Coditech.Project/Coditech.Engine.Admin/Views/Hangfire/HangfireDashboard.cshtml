@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Hangfire Dashboard";
     string hangfireDashboardUrl = $"{CoditechAdminSettings.CoditechOrganisationApiRootUri}/hangfire";
+    hangfireDashboardUrl = hangfireDashboardUrl.Replace("http://", "https://");
 }
 <div class="page-content">
     <div class="container-fluid">

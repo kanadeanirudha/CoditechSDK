@@ -1,0 +1,54 @@
+﻿@using Coditech.Admin.Utilities;
+@model DBTMGraphVerticalViewSequenceListViewModel
+@{
+    ViewBag.Title = "Graph Vertical View Sequence List";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+    keyValuePairs.Add("DBTMGraphMasterId", Model.DBTMGraphMasterId.ToString());
+    keyValuePairs.Add("GraphCode", Model.GraphCode);
+    ModelPopUpViewModel addVerticalSequenceNumber = new ModelPopUpViewModel() { ModelPopUpId = "AddGraphVerticalSequenceNumberPopupId", ModalContentId = "AddVerticalSequenceNumberContentId" };
+}
+<div class="page-content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                @Html.Partial("~/Views/DBTM/DBTMGraphMaster/_DBTMGraphDetailsSidePannel.cshtml", keyValuePairs)
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="card-title">Graph Vertical View Sequence List: @Model.GraphName</span>
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("CreateGraphVerticalViewSequence", controllerName, new {dBTMGraphMasterId=@Model.DBTMGraphMasterId})"
+                               class="btn btn-sm btn-soft-primary" role="button">
+                                <i class="fas fa-plus me-2"></i>Create Graph Vertical View Sequence
+                            </a>
+                            <a href="javascript:void(0)"
+                               class="btn btn-sm btn-soft-primary"
+                               title="Update Vertical Sequence Number"
+                               onclick="DBTMGraphListViewSequence.UpdateGraphVerticalSequenceNumber('@addVerticalSequenceNumber.ModalContentId','@Model.DBTMGraphMasterId')">
+                                <i class="fas fa-sync me-2"></i> Update Graph Vertical Sequence Number
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="DataTablesDivId" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                            @Html.Partial("~/Views/DBTM/DBTMGraphMaster/GraphVerticalViewSequence/_GraphVerticalViewSequenceList.cshtml", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal wrapper -->
+<div class="modal fade" id="@addVerticalSequenceNumber.ModelPopUpId" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="@addVerticalSequenceNumber.ModalContentId">
+            <!-- AJAX content will be loaded here -->
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script src="~/js/coditech/DBTM/DBTMGraphListViewSequence.js"></script>
+}

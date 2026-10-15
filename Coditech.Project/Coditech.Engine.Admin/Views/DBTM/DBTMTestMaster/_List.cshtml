@@ -20,10 +20,15 @@
                         <tr>
                             <td>@item.DBTMTestMasterId</td>
                             <td>
-                                <a href="@Url.Action("Edit", controllerName, new { dBTMTestMasterId = item.DBTMTestMasterId })"
-                                   title="Update">
-                                    @item.TestName
-                                </a>
+                                @Html.Partial("~/Views/Shared/_ActionLinkWithIcon.cshtml",
+                                         new ActionViewModel()
+                                {
+                                    Action = "Edit",
+                                    Controller = controllerName,
+                                    RouteValues = new { dBTMTestMasterId = item.DBTMTestMasterId },
+                                    Text = item.TestName,
+                                    Title = "Update"
+                                })
                             </td>
                             <td>@item.TestCode</td>
                             <td>@item.PerformanceMatrix</td>

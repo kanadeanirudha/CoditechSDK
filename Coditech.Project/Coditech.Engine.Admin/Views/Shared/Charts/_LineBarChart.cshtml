@@ -5,7 +5,7 @@
     var chartId = $"{Model.LineBarChartId}_{Guid.NewGuid().ToString("N")}";
 }
 
-<div class="chart-container" style="position:relative; height:400px; width:100%;">
+<div class="chart-container line-bar-chart-container" style="position:relative; height:400px; width:100%;">
     <canvas id="@chartId"></canvas>
 </div>
 
@@ -15,16 +15,33 @@
         var xValues = @Html.Raw(Model.XValues);
         var datasets = [];
 
+        // format numeric value: if effectively integer, show without decimals; otherwise show 3 decimals
+        function formatToThree(v) {
+            var n = parseFloat(v);
+            if (!isFinite(n)) return v;
+            // treat values very close to an integer as integers (tolerance for floating point errors)
+            if (Math.abs(n - Math.round(n)) < 1e-9) {
+                return String(Math.round(n));
+            }
+            return n.toFixed(3);
+        }
+
     @if (Model.GraphType.Equals("Bar", StringComparison.OrdinalIgnoreCase))
     {
         @foreach (var dataset in Model.Datasets)
         {
             <text>
+                            var datasetColorsRaw = @Html.Raw(JsonConvert.SerializeObject(dataset.Color));
+                            var datasetColors = datasetColorsRaw;
+                            if (typeof datasetColorsRaw === 'string' &&
+                                datasetColorsRaw.trim().startsWith('[')) {
+                                datasetColors = JSON.parse(datasetColorsRaw);
+                            }
                             datasets.push({
-                                label: "@dataset.Label",
+                                label: @Html.Raw(JsonConvert.SerializeObject(dataset.Label)),
                                 data: @Html.Raw(dataset.Data),
-                                backgroundColor: "@dataset.Color",
-                                borderColor: "@dataset.Color",
+                                backgroundColor: datasetColors,
+                                borderColor: datasetColors,
                                 borderWidth: 2,
                                 tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
                             });
@@ -36,15 +53,15 @@
         @foreach (var dataset in Model.Datasets)
         {
             <text>
-                            datasets.push({
-                                label: "@dataset.Label",
-                                data: @Html.Raw(dataset.Data),
-                                fill: false,
-                                borderColor: "@dataset.Color",
-                                borderWidth: 2,
-                                tension: 0.4,
-                                tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
-                            });
+                              datasets.push({
+                                  label: "@dataset.Label",
+                                  data: @Html.Raw(dataset.Data),
+                                  fill: false,
+                                  borderColor: "@dataset.Color",
+                                  borderWidth: 2,
+                                  tension: 0.4,
+                                  tooltipFields: @Html.Raw(JsonConvert.SerializeObject(dataset.TooltipFields))
+                             });
             </text>
         }
     }
@@ -63,12 +80,12 @@
                                 label: function (tooltipItem, data) {
                                     var dataset = data.datasets[tooltipItem.datasetIndex];
                                     var lines = [];
-                                    lines.push(dataset.label + ': ' + tooltipItem.yLabel);
-                                       if (dataset.tooltipFields) {
+                                    lines.push(dataset.label + ': ' + formatToThree(tooltipItem.yLabel));
+                                    if (dataset.tooltipFields) {
                                         Object.keys(dataset.tooltipFields).forEach(function (key) {
                                             var value = dataset.tooltipFields[key];
                                             if (value && value !== "NA") {
-                                                lines.push(key + ': ' + value);
+                                                lines.push(key + ': ' + formatToThree(value));
                                             }
                                         });
                                     }
@@ -89,8 +106,11 @@
                         scales: {
                             xAxes: [{
                                 display: true,
-                                ticks: {
-                                    fontColor: textColor
+                                   ticks: {
+                                    fontColor: textColor,
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 45
                                 },
                                 scaleLabel: {
                                     display: true,
@@ -101,7 +121,10 @@
                             yAxes: [{
                                 display: true,
                                 ticks: {
-                                    fontColor: textColor
+                                    fontColor: textColor,
+                                     // ensure x-axis starts at 0 when using numeric scales
+                                    beginAtZero: true,   // Always start from 0
+                                    callback: function(value) { return formatToThree(value); }
                                 },
                                 scaleLabel: {
                                     display: true,

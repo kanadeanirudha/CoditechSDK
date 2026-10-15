@@ -65,9 +65,17 @@ namespace Coditech.Admin.Custom
             CreateMap<DBTMTraineeUploadModel, DBTMTraineeUploadResultViewModel>().ReverseMap();
             CreateMap<DBTMCentreWiseTestModel, DBTMCentreWiseTestViewModel>().ReverseMap();
             CreateMap<DBTMCentreWiseTestListModel, DBTMCentreWiseTestListViewModel>().ReverseMap();
-            CreateMap<DBTMCampActivityListModel, DBTMCampActivityListViewModel>().ReverseMap();
+            CreateMap<DBTMCampActivityListModel, DBTMCampActivityListViewModel>().ReverseMap();        
             CreateMap<DBTMCampActivityModel, DBTMCampActivityViewModel>().ReverseMap();
             CreateMap<DBTMTestWisePerformanceStandardModel, DBTMTestWisePerformanceStandardViewModel>().ReverseMap();
+            CreateMap<DBTMPrintQRModel, DBTMPrintQRViewModel>().ReverseMap();
+            CreateMap<DBTMPrintQRListModel, DBTMPrintQRListViewModel>().ReverseMap();
+            CreateMap<DBTMTestwisePerformanceStandardCategoryModel, DBTMTestwisePerformanceStandardCategoryViewModel>().ReverseMap();
+            CreateMap<DBTMTestwisePerformanceStandardCategoryListModel, DBTMTestwisePerformanceStandardCategoryListViewModel>().ReverseMap();
+            CreateMap<DBTMGraphVerticalViewSequenceModel, DBTMGraphVerticalViewSequenceViewModel>().ReverseMap();
+            CreateMap<DBTMGraphVerticalViewSequenceListModel, DBTMGraphVerticalViewSequenceListViewModel>().ReverseMap();
+            CreateMap<DBTMTestWisePerformanceStandardConfigurationModel, DBTMTestWisePerformanceStandardConfigurationViewModel>().ReverseMap();
+            CreateMap<DBTMTestWisePerformanceStandardConfigurationListModel, DBTMTestWisePerformanceStandardConfigurationListViewModel>().ReverseMap();
             #endregion
         }
     }

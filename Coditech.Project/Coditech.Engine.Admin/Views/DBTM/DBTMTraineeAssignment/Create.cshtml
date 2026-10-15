@@ -18,6 +18,8 @@
     {
         Title = ViewBag.Title,
         SaveButtonText = GeneralResources.SaveButtonText,
+        IsSaveIsShow = false,        
+        IsSaveCloseIsShow = true,
         CancelUrl = (isPopup && !isTrainer) ? "" : ((isPopup || !string.IsNullOrEmpty(Model.Custom4)) ? Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId, custom4 = string.IsNullOrEmpty(Model.Custom4) ? "Mobile View" : Model.Custom4 })
          : Url.Action("Cancel", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.GeneralTrainerMasterId })),
         CancelButtonText = GeneralResources.CancelButtonText,
@@ -43,7 +45,19 @@
                     <div class="card-body">
                         @using (Html.BeginForm(actionName, controllerName, FormMethod.Post, new { id = headerModel.FormId }))
                         {
-                            @Html.Partial("~/Views/Shared/_SaveAndCloseButtonLayout.cshtml", headerModel)
+                            <div class="saveandclose">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <h4>@ViewBag.Title</h4>
+                                    <div>
+                                        @if (!string.IsNullOrEmpty(headerModel.CancelUrl))
+                                        {
+                                            <a href="@headerModel.CancelUrl" class="btn btn-secondary"> @headerModel.CancelButtonText </a>
+                                        }
+                                        <input type="hidden" name="ActionMode" value="@AdminConstants.ActionModeSaveAndClose" />
+                                        <button type="submit" class="btn btn-success">@GeneralResources.SaveAndCloseButtonText</button>
+                                    </div>
+                                </div>
+                            </div>
                             @Html.HiddenFor(m => m.DBTMTraineeAssignmentId)
                             @Html.HiddenFor(m => m.GeneralTrainerMasterId)
                             @Html.HiddenFor(x => x.SelectedCentreCode)

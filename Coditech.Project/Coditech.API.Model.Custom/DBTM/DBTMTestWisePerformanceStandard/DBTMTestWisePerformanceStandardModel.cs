@@ -2,15 +2,13 @@
 {
     public class DBTMTestWisePerformanceStandardModel : BaseModel
     {
-        public int DBTMTestWisePerformanceStandardId { get; set; }
-        public int DBTMTestMasterId { get; set; }
+        public long DBTMTestWisePerformanceStandardId { get; set; }
+        public int DBTMTestWisePerformanceStandardConfigurationId { get; set; }
+        public short DBTMTestwisePerformanceStandardCategoryId { get; set; }
         public int AgeGroupEnumId { get; set; }
-        public string AgeGroupDisplayText { get; set; }
         public int GenderEnumId { get; set; }
         public string GenderDisplayText { get; set; }
-        public short ExcellentValue { get; set; }
-        public short GoodValue { get; set; }
-        public short AverageValue { get; set; }
-        public short PoorValue { get; set; }
+        public string PerformanceStandardTypeValue { get; set; }
+        public string PerformanceStandardTypeScore { get; set; }
     }
 }

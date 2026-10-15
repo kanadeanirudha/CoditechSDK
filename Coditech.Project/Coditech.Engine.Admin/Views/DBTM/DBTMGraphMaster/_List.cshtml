@@ -18,7 +18,17 @@
                     foreach (var item in Model?.DBTMGraphMasterList)
                     {
                         <tr>
-                            <td>@item.GraphName</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/_ActionLinkWithIcon.cshtml",
+                                         new ActionViewModel()
+                                {
+                                    Action = "Edit",
+                                    Controller = controllerName,
+                                    RouteValues = new { graphCode = item.GraphCode },
+                                    Text = item.GraphName,
+                                    Title = "Update"
+                                })
+                            </td>
                             <td>@item.GraphCode</td>
                             <td>@item.GraphMode</td>
                             <td>@item.XParameter</td>

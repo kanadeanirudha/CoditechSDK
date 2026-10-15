@@ -9,5 +9,7 @@ namespace Coditech.API.Service
         DBTMTraineeUploadModel UploadTrainee(DBTMTraineeUploadModel table);
         DBTMTraineeUploadModel UploadTraineeFromFile(IFormFile file);
         DBTMTraineeUploadModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId);
+        DBTMTraineeUploadModel DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy);
+        DBTMTraineeUploadModel UploadBulkUpdateTraineeFromFile(IFormFile file);
     }
 }

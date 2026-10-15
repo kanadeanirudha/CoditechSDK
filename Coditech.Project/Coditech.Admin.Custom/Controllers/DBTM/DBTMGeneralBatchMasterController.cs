@@ -121,6 +121,24 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/GeneralMaster/GeneralBatchMaster/GeneralBatchUser/AssociatedBatchList.cshtml", list);
         }
 
+        [HttpPost]
+        public virtual ActionResult AssociateUnAssociateBatchwiseUser(GeneralBatchUserViewModel generalBatchUserViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                GeneralBatchUserViewModel response = _generalBatchAgent.AssociateUnAssociateBatchwiseUser(generalBatchUserViewModel);
+                if (!response.HasError)
+                {
+                    SetNotificationMessage(GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    return Json(new { success = true });
+                }
+                SetNotificationMessage(GetErrorNotificationMessage(response.ErrorMessage));
+                return Json(new { success = false });
+            }
+            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage));
+            return Json(new { success = false });
+        }
+
         [HttpGet]
         public ActionResult UpdateGeneralBatch(int generalBatchMasterId, string custom4, string ispopup = "", string istrainer = "")
         {
@@ -133,16 +151,21 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel, string ispopup = "", string istrainer = "")
+        public ActionResult UpdateGeneralBatch(GeneralBatchViewModel generalBatchViewModel, string pendingNavigationUrl, string ispopup = "", string istrainer = "")
         {
             if (generalBatchViewModel?.CustomDropdownSelectedValue1?.Count > 0)
             {
                 if (ModelState.IsValid)
                 {
                     BindDuration(generalBatchViewModel);
+                    bool hasError = _generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError;
                     SetNotificationMessage(_generalBatchAgent.UpdateGeneralBatch(generalBatchViewModel).HasError
                     ? GetErrorNotificationMessage(GeneralResources.UpdateErrorMessage)
                     : GetSuccessNotificationMessage(GeneralResources.UpdateMessage));
+                    if (!hasError && !string.IsNullOrEmpty(pendingNavigationUrl))
+                    {
+                        return Redirect(pendingNavigationUrl);
+                    }
                     if (string.Equals(generalBatchViewModel.ActionMode, AdminConstants.ActionModeSave, StringComparison.OrdinalIgnoreCase))
                     {
                         return RedirectToAction("UpdateGeneralBatch", new { generalBatchMasterId = generalBatchViewModel.GeneralBatchMasterId, custom4 = generalBatchViewModel.Custom4, ispopup = ispopup, istrainer = istrainer });
