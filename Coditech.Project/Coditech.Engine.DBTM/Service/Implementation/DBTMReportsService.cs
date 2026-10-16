@@ -1171,7 +1171,7 @@ namespace Coditech.API.Service
                             //Calculate Last Score
                             if (traineeLastPerformanceList?.Count > 0)
                             {
-                                string bestLastValue = traineeLastPerformanceList.FirstOrDefault(x => x.TestCode == item2.TestCode && x.DBTMTraineeDetailId == item.DBTMTraineeDetailId).BestValue;
+                                string bestLastValue = traineeLastPerformanceList.FirstOrDefault(x => x.TestCode == item2.TestCode && x.DBTMTraineeDetailId == item.DBTMTraineeDetailId)?.BestValue;
                                 if (!string.IsNullOrEmpty(bestLastValue))
                                 {
                                     double calculatedLastScore = CalculatePerformanceStandardScore(Convert.ToDouble(bestLastValue), standardsForItem, item2.TestOutputHigher);
