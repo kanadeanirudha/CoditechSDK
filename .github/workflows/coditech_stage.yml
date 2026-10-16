@@ -42,7 +42,7 @@ jobs:
     if: github.event.inputs.coditech_build == 'true'
     environment: Stage
     env:
-      ConnectionStrings_CoditechDatabase: ${{ secrets.CoditechDatabase }}
+      ConnectionStrings_CoditechDatabase: ${{ secrets.CODITECHDATABASE }}
     
     steps:
       - name: Checkout repository
@@ -64,7 +64,7 @@ jobs:
     if: github.event.inputs.admin_deploy == 'true'
     environment: Stage
     env:
-      ConnectionStrings_CoditechDatabase: ${{ secrets.CoditechDatabase }}
+      ConnectionStrings_CoditechDatabase: ${{ secrets.CODITECHDATABASE }}
     
     steps:
       - name: Stop ADMIN IIS Site and App Pool
@@ -101,7 +101,7 @@ jobs:
     if: github.event.inputs.mediamanager_api_deploy == 'true'
     environment: Stage
     env:
-      ConnectionStrings_CoditechDatabase: ${{ secrets.CoditechDatabase }}
+      ConnectionStrings_CoditechDatabase: ${{ secrets.CODITECHDATABASE }}
     
     steps:
 
@@ -161,7 +161,7 @@ jobs:
     if: github.event.inputs.dbtm_api_deploy == 'true'
     environment: Stage
     env:
-      ConnectionStrings_CoditechDatabase: ${{ secrets.CoditechDatabase }}
+      ConnectionStrings_CoditechDatabase: ${{ secrets.CODITECHDATABASE }}
     
     steps:
       - name: Stop dbtm IIS Site and App Pool
@@ -191,7 +191,7 @@ jobs:
     needs: coditech_build
     if: github.event.inputs.payment_api_deploy == 'true'
     env:
-      ConnectionStrings_CoditechDatabase: ${{ secrets.CoditechDatabase }}
+      ConnectionStrings_CoditechPaymentDatabase: ${{ secrets.CODITECHPAYMENTDATABASE }}
 
     steps:
       - name: Stop payment IIS Site and App Pool
