@@ -10,7 +10,11 @@
     // precompute sanitized printable name and common URLs
     var logoUrl = Url.Content("~/assets/images/dbtm/applicationlogo.png");
     string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
-    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel() { ModelPopUpId = "RemarkPopupId", ModalContentId = "RemarkContentId" };
+    ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
+    {
+        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
+    };
     var fnameSafe = SanitizeForFilename(Model.FirstName ?? "Trainee");
     var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
     var assessment = Model.AssessmentDate;
@@ -50,7 +54,7 @@
 
     .page {
         /* width: 210mm;
-                         min-height: 297mm; */
+                                                                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -131,7 +135,7 @@
     .photo-box {
         height: 138px;
         width: 140px;
-        border: 1.5px solid #222;
+        border: 2px solid #222;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -140,26 +144,26 @@
     }
 
     .info-box {
-        border: 1.5px solid #222;
+        border: 2px solid #222;
         padding: 5px 6px;
-        height: 200px;
+        height: 245px;
         font-size: 8px;
     }
 
     .info-row {
         display: grid;
-        grid-template-columns: 68px 1fr;
+        grid-template-columns: 80px 1fr;
         margin: 2px 0;
         align-items: end;
     }
 
         .info-row b {
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 700;
         }
 
         .info-row .line {
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 400;
         }
 
@@ -169,8 +173,8 @@
     }
 
     .sport-box {
-        border: 1.5px solid #222;
-        height: 165px;
+        border: 2px solid #222;
+        height: 245px;
         padding: 5px;
         position: relative;
     }
@@ -186,7 +190,7 @@
         display: grid;
         grid-template-columns: 68px 1fr;
         margin: 3px 0;
-        font-size: 8px;
+        font-size: 10px;
     }
 
     .sport-line {
@@ -241,12 +245,13 @@
     table {
         border-collapse: collapse;
         width: 100%;
+        text-align: center;
     }
 
     .small-table td, .small-table th {
         border: 1px solid #777;
         padding: 3px 4px;
-        font-size: 8px;
+        font-size: 10px;
     }
 
     .small-table th {
@@ -264,11 +269,11 @@
             border: 1px solid #777;
             padding: 4px;
             height: 24px;
-            font-size: 8px;
+            font-size: 10px;
         }
 
         .score-summary .overall-score-label {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
             line-height: 11px;
             vertical-align: middle;
@@ -285,7 +290,7 @@
         }
 
         .score-summary .improvement-status {
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 700;
             text-align: center;
             white-space: nowrap;
@@ -314,7 +319,7 @@
     }
 
     .score-summary .improvement-value {
-        font-size: 8px;
+        font-size: 10px;
         font-weight: 400;
         text-align: center;
         white-space: nowrap;
@@ -348,7 +353,8 @@
         text-align: center;
         font-size: 12px;
         font-weight: 700;
-        margin: 10px 0 3px;
+        /* Increase top margin so there's visible space between graphs and the summary */
+        margin: 20px 0 8px;
     }
 
     .radar-wrap {
@@ -365,7 +371,7 @@
 
     .section-table {
         margin-top: 12px;
-        font-size: 8px;
+        font-size: 10px;
     }
 
         .section-table th,
@@ -378,6 +384,7 @@
         .section-table th {
             font-weight: 700;
             text-align: left;
+            text-align: center;
         }
 
         .section-table .cat-speed {
@@ -566,20 +573,23 @@
                     max-width: 100% !important;
                     box-sizing: border-box !important;
                     grid-template-columns: 25fr 39fr 36fr !important;
-                    gap: 0 !important;
+                    gap: 8px !important; /* give space between columns when printing */
+                    column-gap: 8px !important;
                     height: auto !important;
                     min-height: 0 !important;
                     overflow: visible !important;
                 }
-
+                /* When printing allow the middle column to size naturally and avoid forcing a fixed height
+                                       which can create large gaps between top and the Performance Report Summary. */
                 .print-selected-report .middle {
                     width: 100% !important;
                     max-width: 100% !important;
                     box-sizing: border-box !important;
                     grid-template-columns: 25fr 35fr 40fr !important;
-                    gap: 0 !important;
-                    height: 500px !important;
-                    min-height: 500px !important;
+                    gap: 8px !important; /* keep consistent spacing in middle section */
+                    column-gap: 8px !important;
+                    height: auto !important;
+                    min-height: 0 !important;
                     margin-top: 5px !important;
                     margin-bottom: 0 !important;
                     overflow: visible !important;
@@ -598,6 +608,12 @@
                     max-width: 100% !important;
                     box-sizing: border-box !important;
                     page-break-inside: auto !important;
+                }
+
+                .print-selected-report canvas,
+                .print-selected-report svg {
+                    max-width: 100% !important;
+                    height: auto !important;
                 }
                 /* avoid breaking performance-pair blocks awkwardly */
                 .print-selected-report .performance-pair,
@@ -618,6 +634,11 @@
                 .print-selected-report .bar-wrap,
                 .print-selected-report .radar-wrap {
                     overflow: visible !important;
+                }
+                /* Ensure spacing is preserved when printing */
+                .print-selected-report .performance-report-summary-title {
+                    margin-top: 18px !important;
+                    margin-bottom: 8px !important;
                 }
 
                 .print-selected-report.print-normal-report {
@@ -669,9 +690,9 @@
                             <button type="button"
                                     class="btn btn-success"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#RemarkPopupId"
+                                    data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
                                     onclick="DBTMTraineeDetails.GetRemarks(
-                                    'RemarkContentId',
+                                    'RemarkContentId_@Model.DBTMTraineeDetailId',
                                     @Model.DBTMTraineeDetailId)">
                                 <i class="fa fa-print me-1"></i> Print Report
                             </button>
@@ -744,7 +765,7 @@
                                                 }
                                             }
                                             <img class="ball" src="@Url.Content(sportImage)" />
-                                            <div class="sport-row"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
+                                            <div class="sport-row"style="padding-top:10px;"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
                                             <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
                                             <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
                                         </div>
@@ -764,8 +785,8 @@
 
                                             <table class="small-table anthro-table">
                                                 <tr><th>Anthropometry</th><th></th><th>Data<br>recorded<br>date</th></tr>
-                                                <tr><th>Height (m)</th><td>@((Model.Height / 100m).ToString("0.00"))</td><td> @((Model.UpdatedHeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
-                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td> @((Model.UpdatedWeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                <tr><th>Height (m)</th><td>@((Model.Height / 100m).ToString("0.00"))</td><td style="font-weight: 700;"> @((Model.UpdatedHeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td style="font-weight: 700;"> @((Model.UpdatedWeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
                                                 <tr><th>BMI</th><td>@Convert.ToDecimal(Model.BMI).ToString("0.000")</td><td></td></tr>
                                             </table>
                                         </div>
@@ -802,8 +823,9 @@
                                                 </tr>
                                                 <tr>
                                                     <td><b>Past score:</b></td>
-                                                    <td>@Model.OverallLastActivityScore</td>
-                                                    <td colspan="2">@Model.OverallLastActivityDate.ToCoditechDateFormat()</td>
+                                                    <td style="text-align:center;">@Model.OverallLastActivityScore</td>
+                                                    <td style="">Past score Date:</td>
+                                                    <td style="text-align:center;">@Model.OverallLastActivityDate.ToCoditechDateFormat()</td>
                                                 </tr>
                                             </table>
 

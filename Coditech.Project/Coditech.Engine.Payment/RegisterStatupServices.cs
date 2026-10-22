@@ -150,7 +150,7 @@ namespace Coditech.API.Common
         /// <param name="builder"></param>
         public static void RegisterEntity(this WebApplicationBuilder builder)
         {
-            string connectionString = builder.Configuration.GetConnectionString("CoditechDatabase");
+            string connectionString = builder.Configuration.GetConnectionString("CoditechPaymentDatabase");
             // Coditech entity registration
             builder.Services.AddDbContext<Coditech_Entities>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
             builder.Services.AddDbContext<CoditechCustom_Entities>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);

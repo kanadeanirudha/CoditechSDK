@@ -984,20 +984,45 @@ var DBTMReports = {
         }, 1000);
     },
     ConfirmPrintReport: function (traineeId, modalId) {
-        var remarks = $("#RemarksText").val() || "";
-        $("#printRemarksText").text(remarks);
-        $("#" + modalId).modal("hide");
-        setTimeout(function () {
-            var $report = $("#report");
-            var $button = $(".card-header button[data-bs-target='#RemarkPopupId']").first();
-            if ($button.length && typeof DBTMReports !== "undefined") {
-                DBTMReports.PrintTraineeProfile(
-                    $button[0],
-                    $report.data("printable-name")
-                );
-            } else {
-                window.print();
+        debugger;
+        try {
+            var remarks = $("#RemarksText").val() || "";
+            $("#printRemarksText").text(remarks);
+
+            if (modalId && $("#" + modalId).length) {
+                $("#" + modalId).modal("hide");
+            } else if ($("#RemarkPopupId").length) {
+                $("#RemarkPopupId").modal("hide");
             }
-        }, 300);
+
+            setTimeout(function () {
+                // Prefer selector based on provided modalId, fall back to trainee-specific or generic remark button
+                var selector;
+                if (modalId) {
+                    selector = "button[data-bs-target='#" + modalId + "']";
+                } else {
+                    selector = "button[data-bs-target='#RemarkPopupId_" + traineeId + "'], button[data-bs-target='#RemarkPopupId']";
+                }
+                var $button = $(selector).first();
+
+                if ($button.length && typeof DBTMReports !== "undefined" && DBTMReports.PrintTraineeProfile) {
+                    // Call print using the button so PrintTraineeProfile can find the correct report context
+                    DBTMReports.PrintTraineeProfile($button[0]);
+                } else {
+                    var $report = $("#report");
+                    if ($report.length) {
+                        $report.addClass("print-selected-report print-normal-report");
+                        window.print();
+                        setTimeout(function () {
+                            $report.removeClass("print-selected-report print-normal-report");
+                        }, 1000);
+                    } else {
+                        window.print();
+                    }
+                }
+            }, 300);
+        } catch (e) {
+            console && console.error && console.error('ConfirmPrintReport error', e);
+        }
     },
 };
