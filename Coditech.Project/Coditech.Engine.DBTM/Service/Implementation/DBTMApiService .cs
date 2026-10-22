@@ -324,7 +324,18 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
                 List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserListForAPI @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
 
-                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
+                foreach (var item in generalBatchUserList?.Where(x => x.IsDataEncrypted))
+                {
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                    item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                    string fullName = $"{item.FirstName} {item.LastName}";
+                    string displayName = item.DisplayName == fullName ? string.Empty : item.DisplayName ?? fullName;
+                    item.DisplayName = displayName;
+                }
+                generalBatchUserList = generalBatchUserList.Count > 0 ? generalBatchUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMGeneralBatchUserModel>();
+
+                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList;
             }
             return dBTMBatchModel;
         }
@@ -338,7 +349,17 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserListForAPI_V2 @GeneralBatchMasterId,@DBTMTestMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
-            generalBatchUserList = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
+
+            foreach (var item in generalBatchUserList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                string fullName = $"{item.FirstName} {item.LastName}";
+                string displayName = item.DisplayName == fullName ? string.Empty : item.DisplayName ?? fullName;
+                item.DisplayName = displayName;
+            }
+            generalBatchUserList = generalBatchUserList.Count > 0 ? generalBatchUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMGeneralBatchUserModel>();
             return generalBatchUserList;
         }
         #endregion
@@ -564,7 +585,19 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI @DBTMcampMasterId,@DBTMTestMasterId,@UserType,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
-            campUserList = campUserList ?? new List<DBTMGeneralBatchUserModel>();
+            foreach (var item in campUserList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                string displayName = string.IsNullOrEmpty(item.DisplayName) ? $"{item.FirstName} {item.LastName}"
+         : item.DisplayName == $"{item.FirstName} {item.LastName}"
+                                         ? $"{item.FirstName} {item.LastName}"
+                                         : item.DisplayName;
+                item.DisplayName = displayName;
+            }
+            campUserList = campUserList.Count > 0 ? campUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMGeneralBatchUserModel>();
+
             return campUserList;
         }
         #endregion

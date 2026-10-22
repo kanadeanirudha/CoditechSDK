@@ -1216,8 +1216,8 @@ namespace Coditech.API.Service
                         if (graphMasterIds.Count == 0)
                             continue;
                         string dBTMGraphMasterIds = string.Join(",", graphMasterIds);
-                      
-                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty,item.CentreCode, false, typeOfRecord);
+
+                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty, item.CentreCode, false, typeOfRecord);
                         foreach (var graphModel in graphList)
                         {
                             graphModel.Custom1 = testDetails.TestName;
@@ -1777,9 +1777,11 @@ namespace Coditech.API.Service
 
         private void ReportsListDecryption(List<DBTMReportsModel> dBTMReportsList)
         {
-            dBTMReportsList?.ForEach(x =>
+            dBTMReportsList?.Where(x => x.IsEncrypted || x.IsDataEncrypted)?.ToList()?.ForEach(x =>
             {
                 x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
+                x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
             });
         }
 

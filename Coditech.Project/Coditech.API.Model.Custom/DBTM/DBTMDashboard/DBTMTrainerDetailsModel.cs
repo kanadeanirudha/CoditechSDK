@@ -26,5 +26,6 @@
         public string MobileNumber { get; set; }
         public int AdminRoleMasterId { get; set; }
         public long UserMasterId { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

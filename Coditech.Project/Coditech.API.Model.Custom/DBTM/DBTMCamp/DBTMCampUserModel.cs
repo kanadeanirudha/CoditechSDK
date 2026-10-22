@@ -15,5 +15,6 @@
         public bool IsCampActive { get; set; }
         public bool IsBatchUser { get; set; }
         public bool IsCampUser { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

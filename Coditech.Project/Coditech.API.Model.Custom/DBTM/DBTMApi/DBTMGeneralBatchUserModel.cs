@@ -12,6 +12,7 @@
         public decimal Weight { get; set; }
         public decimal Height { get; set; }
         public int LastNumberOfTurn { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }
 

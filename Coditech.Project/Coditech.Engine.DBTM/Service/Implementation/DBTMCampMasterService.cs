@@ -11,14 +11,14 @@ using System.Data;
 using static Coditech.Common.Helper.HelperUtility;
 namespace Coditech.API.Service
 {
-    public class DBTMCampMasterService: BaseService, IDBTMCampMasterService
+    public class DBTMCampMasterService : BaseService, IDBTMCampMasterService
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ICoditechLogging _coditechLogging;
         private readonly ICoditechRepository<DBTMCampMaster> _dBTMCampMasterRepository;
         private readonly ICoditechRepository<DBTMTestMaster> _dBTMTestMasterRepository;
         private readonly ICoditechRepository<DBTMCampUser> _dBTMCampUserRepository; private readonly ICoditechRepository<DBTMCampActivity> _dBTMCampActivityRepository;
-        public DBTMCampMasterService(ICoditechLogging coditechLogging,IServiceProvider serviceProvider) : base(serviceProvider)
+        public DBTMCampMasterService(ICoditechLogging coditechLogging, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _coditechLogging = coditechLogging;
@@ -27,7 +27,7 @@ namespace Coditech.API.Service
             _dBTMCampUserRepository = new CoditechRepository<DBTMCampUser>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCampActivityRepository = new CoditechRepository<DBTMCampActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
         }
-        public virtual DBTMCampMasterListModel GetDBTMCampList(string selectedCentreCode, long userId,FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
+        public virtual DBTMCampMasterListModel GetDBTMCampList(string selectedCentreCode, long userId, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
@@ -39,7 +39,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMCampMasterModel> dBTMCampList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampMasterList @CentreCode, @UserMasterId, @WhereClause, @Rows, @PageNo, @Order_BY, @RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();       
+            List<DBTMCampMasterModel> dBTMCampList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampMasterList @CentreCode, @UserMasterId, @WhereClause, @Rows, @PageNo, @Order_BY, @RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
             DBTMCampMasterListModel listModel = new DBTMCampMasterListModel();
             listModel.DBTMCampMasterList = dBTMCampList?.Count > 0 ? dBTMCampList : new List<DBTMCampMasterModel>();
             listModel.BindPageListModel(pageListModel);
@@ -97,7 +97,7 @@ namespace Coditech.API.Service
             DBTMCampMasterModel dBTMCampMasterModel = dBTMCampMaster?.FromEntityToModel<DBTMCampMasterModel>();
             if (IsNotNull(dBTMCampMasterModel))
             {
-                dBTMCampMasterModel.CustomDropdownSelectedValue1 =_dBTMCampActivityRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
+                dBTMCampMasterModel.CustomDropdownSelectedValue1 = _dBTMCampActivityRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(x => x.DBTMTestMasterId.ToString()).ToList();
                 dBTMCampMasterModel.CustomDropdownSelectedValue2 = _dBTMCampUserRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(x => x.EntityId.ToString()).ToList();
                 dBTMCampMasterModel.Duration = _dBTMCampMasterRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId).Select(x => x.Duration).FirstOrDefault();
             }
@@ -110,7 +110,7 @@ namespace Coditech.API.Service
             if (IsNull(dBTMCampMasterModel))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
             if (dBTMCampMasterModel.DBTMCampMasterId < 1)
-                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMCampMasterId"));      
+                throw new CoditechException(ErrorCodes.IdLessThanOne, string.Format(GeneralResources.ErrorIdLessThanOne, "DBTMCampMasterId"));
             DBTMCampMaster dBTMCampMaster = dBTMCampMasterModel.FromModelToEntity<DBTMCampMaster>();
             //Update Camp
             bool isCampUpdated = _dBTMCampMasterRepository.Update(dBTMCampMaster);
@@ -169,9 +169,9 @@ namespace Coditech.API.Service
             List<DBTMCampUserModel> CampList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserAssociatedList @DBTMCampMasterId,@UserType,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
             foreach (var item in CampList)
             {
-                item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
-                item.LastName = HelperUtility.DecodeBase64(item.LastName);
-                item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
+                item.FirstName = item.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(item.FirstName) : item.FirstName;
+                item.LastName = item.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(item.LastName) : item.LastName;
+                item.MobileNumber = item.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(item.MobileNumber) : item.MobileNumber;
 
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
@@ -231,17 +231,18 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMCampUserModel> CampList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserList @CentreCode,@GeneralTrainerMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
-            foreach (var item in CampList)
+            foreach (var item in CampList.Where(x=>x.IsDataEncrypted))
             {
-                item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
-                item.LastName = HelperUtility.DecodeBase64(item.LastName);
-                item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
 
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
 
             DBTMCampUserListModel listModel = new DBTMCampUserListModel();
-            listModel.DBTMCampUserList = CampList?.Count > 0 ? CampList : new List<DBTMCampUserModel>();
+            listModel.DBTMCampUserList = listModel.DBTMCampUserList.Count > 0 ? listModel.DBTMCampUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMCampUserModel>();
+
             return listModel;
         }
         #endregion

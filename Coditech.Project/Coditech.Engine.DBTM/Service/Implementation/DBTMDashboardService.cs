@@ -1,6 +1,7 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
@@ -58,6 +59,11 @@ namespace Coditech.API.Service
                     dBTMDashboardModel.TrainersList = dataTable.ConvertDataTable<DBTMTrainerDetailsModel>(dataset.Tables["TrainerDetails"])?.ToList();
                     foreach (var trainer in dBTMDashboardModel.TrainersList)
                     {
+                        if (trainer.IsDataEncrypted)
+                        {
+                            trainer.FirstName = DataEncryptionHelper.DataDecrypt(trainer.FirstName);
+                            trainer.LastName = DataEncryptionHelper.DataDecrypt(trainer.LastName);
+                        }
                         if (!string.IsNullOrWhiteSpace(trainer.PhotoMediaPath))
                         {
                             trainer.PhotoMediaPath = trainer.PhotoMediaPath;
@@ -67,6 +73,7 @@ namespace Coditech.API.Service
                             trainer.PhotoMediaPath = GetImagePath(trainer.PhotoMediaId);
                         }
                     }
+                    dBTMDashboardModel.TrainersList = dBTMDashboardModel.TrainersList?.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
                     dBTMDashboardModel.TrainersDetails = GetTrainerProfile(userMasterId);
                 }
                 else if (dashboardFormEnumCode.Equals(DashboardFormCustomEnum.DBTMTrainerDashboard.ToString(), StringComparison.InvariantCultureIgnoreCase))
