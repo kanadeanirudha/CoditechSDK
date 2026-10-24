@@ -1347,7 +1347,7 @@ namespace Coditech.API.Service
             mobile = mobile.Trim();
             string encodedmobile = SearchHashHelper.CreateSearchHash(mobile);
 
-            return _userMasterRepository.Table.Any(x =>(x.UserType == UserTypeEnum.Trainee.ToString()) &&
+            return _userMasterRepository.Table.Any(x => (x.UserType == UserTypeEnum.Trainee.ToString()) &&
                                                        (x.IsDataEncrypted ? x.UserNameHash == encodedmobile : x.UserName == mobile));
         }
         private List<DBTMTraineeBulkUpdateModel> GetBulkUpdateTraineeList(long generalBatchMasterId, string orderBy)
@@ -1611,27 +1611,27 @@ namespace Coditech.API.Service
                     string firstName = GetValue(row, ExcelTemplateColumns.FirstName);
                     if (!string.IsNullOrWhiteSpace(firstName))
                     {
-                        model.FirstName = firstName;
+                        model.FirstName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(firstName) : firstName;
                     }
                     string middleName = GetValue(row, ExcelTemplateColumns.MiddleName);
                     if (!string.IsNullOrWhiteSpace(middleName))
                     {
-                        model.MiddleName = middleName;
+                        model.MiddleName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(middleName) : middleName;
                     }
                     string lastName = GetValue(row, ExcelTemplateColumns.LastName);
                     if (!string.IsNullOrWhiteSpace(lastName))
                     {
-                        model.LastName = lastName;
+                        model.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(lastName) : lastName;
                     }
                     string displayName = GetValue(row, ExcelTemplateColumns.DisplayName);
                     if (!string.IsNullOrWhiteSpace(displayName))
                     {
-                        model.Custom2 = displayName;
+                        model.Custom2 = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(displayName) : displayName;
                     }
                     string email = GetValue(row, ExcelTemplateColumns.EmailAddress);
                     if (!string.IsNullOrWhiteSpace(email))
                     {
-                        model.EmailId = email;
+                        model.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(email) : email;
                     }
                     string gender = GetValue(row, ExcelTemplateColumns.Gender);
                     if (!string.IsNullOrWhiteSpace(gender))
@@ -1646,7 +1646,7 @@ namespace Coditech.API.Service
                             row[ExcelTemplateColumns.ErrorMessage] = "Date Of Birth is invalid.";
                             continue;
                         }
-                        model.DateOfBirth = Convert.ToString(dobDate);
+                        model.DateOfBirth = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(Convert.ToString(dobDate)) : Convert.ToString(dobDate);
                     }
                     bool personUpdated = UpdatePersonInformation(model);
                     if (!personUpdated)
