@@ -54,7 +54,7 @@
 
     .page {
         /* width: 210mm;
-                                                                        min-height: 297mm; */
+                                                                                min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -580,7 +580,7 @@
                     overflow: visible !important;
                 }
                 /* When printing allow the middle column to size naturally and avoid forcing a fixed height
-                                       which can create large gaps between top and the Performance Report Summary. */
+                                               which can create large gaps between top and the Performance Report Summary. */
                 .print-selected-report .middle {
                     width: 100% !important;
                     max-width: 100% !important;
@@ -684,11 +684,16 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">Trainee Profile</h4>
                         <div class="d-flex gap-2">
-                            <a class="btn btn-soft-primary float-end" href="/DBTMTraineeDetails/Cancel?selectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
-                                <i class="fas fa-arrow-left me-2"></i>Back
-                            </a>
-                            <button type="button"
-                                    class="btn btn-success"
+                            @if (Model.IsListView)
+                            {
+                                <a class="btn btn-soft-primary float-end" href="/DBTMTraineeDetails/Cancel?selectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </a>
+                            }
+                            @if (Model.DBTMTraineeDetailId > 0)
+                            {
+                                <button type="button"
+                                class="btn btn-success"
                                     data-bs-toggle="modal"
                                     data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
                                     onclick="DBTMTraineeDetails.GetRemarks(
@@ -696,6 +701,7 @@
                                     @Model.DBTMTraineeDetailId)">
                                 <i class="fa fa-print me-1"></i> Print Report
                             </button>
+                            }
                             @if (!Model.IsListView)
                             {
                                 <!-- BACK BUTTON  -->
@@ -705,227 +711,178 @@
                             }
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="dastone-profile">
-                            <div class="page" id="report" data-printable-name="@profilePrintName">
-                                <div class="report-border">
-                                    <div class="header">
-                                        <div class="brand"><img style="height:45px" src="@logoUrl" /></div>
-                                        <div class="center-name-report">Center Name: @Model.CentreName</div>
-                                        <div class="brand right"> <img style="height:45px" src="@logoUrl" /></div>
-                                        <div class="report-title">Performance Assessment Report</div>
-                                        <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToString("dd'/'MM'/'yyyy")</div>
-                                    </div>
-
-                                    <div class="top-grid">
-                                        <div class="photo-box">
-                                            @if (!string.IsNullOrEmpty(Model.PhotoMediaPath))
-                                            {
-                                                <img src="@Model.PhotoMediaPath" style="height: 115px; width: 100%; object-fit: cover;" />
-                                            }
-                                            else
-                                            {
-                                                <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
-                                            }
+                    @if (Model.DBTMTraineeDetailId > 0)
+                    {
+                        <div class="card-body">
+                            <div class="dastone-profile">
+                                <div class="page" id="report" data-printable-name="@profilePrintName">
+                                    <div class="report-border">
+                                        <div class="header">
+                                            <div class="brand"><img style="height:45px" src="@logoUrl" /></div>
+                                            <div class="center-name-report">Center Name: @Model.CentreName</div>
+                                            <div class="brand right"> <img style="height:45px" src="@logoUrl" /></div>
+                                            <div class="report-title">Performance Assessment Report</div>
+                                            <div class="assessment-date"><b>Assessment Date:</b> @Model.AssessmentDate.ToString("dd'/'MM'/'yyyy")</div>
                                         </div>
 
-                                        <div class="info-box">
-                                            <div class="info-row"><b>Report Title:</b><div class="line">Athlete Progress Report</div></div>
-                                            <div class="info-row"><b>Program<br>Name / Batch:</b><div class="line">@Model.BatchName</div></div>
-                                            <div class="info-row"><b>Assessment<br>Location:</b><div class="line"> @Model.AssessmentLocation</div></div>
-                                            <div class="info-row"><b>Athlete /<br>Student Name:</b><div class="line"> @Model.FirstName @Model.LastName</div></div>
-                                            <div class="info-row"><b>Gender:</b><div class="line"> @Model.Gender</div></div>
-                                            <div class="info-row"><b>DOB:</b><div class="line"> @Model.DateOfBirth.ToCoditechDateFormat()</div></div>
-                                            <div class="info-row"><b>Age Group:</b><div class="line"> @Model.AgeGroup</div></div>
-                                            <div class="info-row"><b>Academy<br>Name:</b><div class="line"> @Model.AcademyName</div></div>
-                                            <div class="info-row"><b>Coach Name:</b><div class="line"> @Model.TrainerName</div></div>
-                                        </div>
-
-                                        <div class="sport-box">
-                                            @{
-                                                string sportImage = "~/assets/images/dbtm/football.jpg";
-                                                if (!string.IsNullOrEmpty(Model.Specialization))
+                                        <div class="top-grid">
+                                            <div class="photo-box">
+                                                @if (!string.IsNullOrEmpty(Model.PhotoMediaPath))
                                                 {
-                                                    if (Model.Specialization.StartsWith("Cricket"))
-                                                        sportImage = "~/assets/images/dbtm/cricket.jpg";
-                                                    else if (Model.Specialization.StartsWith("Badminton"))
-                                                        sportImage = "~/assets/images/dbtm/badminton.jpg";
-                                                    else if (Model.Specialization.StartsWith("Basketball"))
-                                                        sportImage = "~/assets/images/dbtm/basketball.jpg";
-                                                    else if (Model.Specialization.StartsWith("Hockey"))
-                                                        sportImage = "~/assets/images/dbtm/hockey.jpg";
-                                                    else if (Model.Specialization.StartsWith("Kabaddi"))
-                                                        sportImage = "~/assets/images/dbtm/kabaddi.jpg";
-                                                    else if (Model.Specialization.StartsWith("Swimming"))
-                                                        sportImage = "~/assets/images/dbtm/swimming.jpg";
-                                                    else if (Model.Specialization.StartsWith("Tennis"))
-                                                        sportImage = "~/assets/images/dbtm/tennis.jpg";
-                                                    else if (Model.Specialization.StartsWith("Athletics"))
-                                                        sportImage = "~/assets/images/dbtm/athletics.jpg";
+                                                    <img src="@Model.PhotoMediaPath" style="height: 115px; width: 100%; object-fit: cover;" />
                                                 }
-                                            }
-                                            <img class="ball" src="@Url.Content(sportImage)" />
-                                            <div class="sport-row"style="padding-top:10px;"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
-                                            <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
-                                            <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="middle">
-                                        <div class="anthro-area">
-                                            @{
-                                                string bodyImage = "~/assets/images/dbtm/HeightWeightMale.png";
-                                                if (!string.IsNullOrWhiteSpace(Model.Gender) && Model.Gender.Trim().Equals("Female", StringComparison.OrdinalIgnoreCase))
+                                                else
                                                 {
-                                                    bodyImage = "~/assets/images/dbtm/HeightWeightFemale.png";
+                                                    <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
                                                 }
-                                            }
-                                            <img class="body-svg" src="@Url.Content(bodyImage)" />
-                                            <!-- <div class="measure-line"></div> -->
+                                            </div>
 
-                                            <table class="small-table anthro-table">
-                                                <tr><th>Anthropometry</th><th></th><th>Data<br>recorded<br>date</th></tr>
-                                                <tr><th>Height (m)</th><td>@((Model.Height / 100m).ToString("0.00"))</td><td style="font-weight: 700;"> @((Model.UpdatedHeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
-                                                <tr><th>Weight (kg)</th><td>@Model.Weight</td><td style="font-weight: 700;"> @((Model.UpdatedWeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
-                                                <tr><th>BMI</th><td>@Convert.ToDecimal(Model.BMI).ToString("0.000")</td><td></td></tr>
-                                            </table>
-                                        </div>
+                                            <div class="info-box">
+                                                <div class="info-row"><b>Report Title:</b><div class="line">Athlete Progress Report</div></div>
+                                                <div class="info-row"><b>Program<br>Name / Batch:</b><div class="line">@Model.BatchName</div></div>
+                                                <div class="info-row"><b>Assessment<br>Location:</b><div class="line"> @Model.AssessmentLocation</div></div>
+                                                <div class="info-row"><b>Athlete /<br>Student Name:</b><div class="line"> @Model.FirstName @Model.LastName</div></div>
+                                                <div class="info-row"><b>Gender:</b><div class="line"> @Model.Gender</div></div>
+                                                <div class="info-row"><b>DOB:</b><div class="line"> @Model.DateOfBirth.ToCoditechDateFormat()</div></div>
+                                                <div class="info-row"><b>Age Group:</b><div class="line"> @Model.AgeGroup</div></div>
+                                                <div class="info-row"><b>Academy<br>Name:</b><div class="line"> @Model.AcademyName</div></div>
+                                                <div class="info-row"><b>Coach Name:</b><div class="line"> @Model.TrainerName</div></div>
+                                            </div>
 
-                                        <div>
-                                            <table class="score-summary">
-                                                <tr>
-                                                    <td class="overall-score-label">Today's Overall<br>Activity Score:</td>
-                                                    <td class="dark">@Model.OverallActivityScore</td>
-                                                    @if (Model.OverallActivityScoreIsUp != null)
+                                            <div class="sport-box">
+                                                @{
+                                                    string sportImage = "~/assets/images/dbtm/football.jpg";
+                                                    if (!string.IsNullOrEmpty(Model.Specialization))
                                                     {
-                                                        if (Model.OverallActivityScoreIsUp == true)
+                                                        if (Model.Specialization.StartsWith("Cricket"))
+                                                            sportImage = "~/assets/images/dbtm/cricket.jpg";
+                                                        else if (Model.Specialization.StartsWith("Badminton"))
+                                                            sportImage = "~/assets/images/dbtm/badminton.jpg";
+                                                        else if (Model.Specialization.StartsWith("Basketball"))
+                                                            sportImage = "~/assets/images/dbtm/basketball.jpg";
+                                                        else if (Model.Specialization.StartsWith("Hockey"))
+                                                            sportImage = "~/assets/images/dbtm/hockey.jpg";
+                                                        else if (Model.Specialization.StartsWith("Kabaddi"))
+                                                            sportImage = "~/assets/images/dbtm/kabaddi.jpg";
+                                                        else if (Model.Specialization.StartsWith("Swimming"))
+                                                            sportImage = "~/assets/images/dbtm/swimming.jpg";
+                                                        else if (Model.Specialization.StartsWith("Tennis"))
+                                                            sportImage = "~/assets/images/dbtm/tennis.jpg";
+                                                        else if (Model.Specialization.StartsWith("Athletics"))
+                                                            sportImage = "~/assets/images/dbtm/athletics.jpg";
+                                                    }
+                                                }
+                                                <img class="ball" src="@Url.Content(sportImage)" />
+                                                <div class="sport-row" style="padding-top:10px;"><b>Sport and Position / Role:</b><div class="sport-line"> @Model.Specialization</div></div>
+                                                <div class="sport-row"><b>Batch Rank:</b><div class="sport-line"> @Model.Rank</div></div>
+                                                <div class="sport-row"><b>Batch Name:</b><div class="sport-line"> @Model.BatchName</div></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="middle">
+                                            <div class="anthro-area">
+                                                @{
+                                                    string bodyImage = "~/assets/images/dbtm/HeightWeightMale.png";
+                                                    if (!string.IsNullOrWhiteSpace(Model.Gender) && Model.Gender.Trim().Equals("Female", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        bodyImage = "~/assets/images/dbtm/HeightWeightFemale.png";
+                                                    }
+                                                }
+                                                <img class="body-svg" src="@Url.Content(bodyImage)" />
+                                                <!-- <div class="measure-line"></div> -->
+
+                                                <table class="small-table anthro-table">
+                                                    <tr><th>Anthropometry</th><th></th><th>Data<br>recorded<br>date</th></tr>
+                                                    <tr><th>Height (m)</th><td>@((Model.Height / 100m).ToString("0.00"))</td><td style="font-weight: 700;"> @((Model.UpdatedHeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                    <tr><th>Weight (kg)</th><td>@Model.Weight</td><td style="font-weight: 700;"> @((Model.UpdatedWeightDate ?? Model.CreatedDate).ToCoditechDateFormat())</td></tr>
+                                                    <tr><th>BMI</th><td>@Convert.ToDecimal(Model.BMI).ToString("0.000")</td><td></td></tr>
+                                                </table>
+                                            </div>
+
+                                            <div>
+                                                <table class="score-summary">
+                                                    <tr>
+                                                        <td class="overall-score-label">Today's Overall<br>Activity Score:</td>
+                                                        <td class="dark">@Model.OverallActivityScore</td>
+                                                        @if (Model.OverallActivityScoreIsUp != null)
                                                         {
-                                                            <td class="improvement-value">
-                                                                @Model.OverallActivityScoreUPDownValue%
-                                                                <span class="up">⬆</span>
-                                                            </td>
-                                                            <td class="improvement-status"> Improved </td>
+                                                            if (Model.OverallActivityScoreIsUp == true)
+                                                            {
+                                                                <td class="improvement-value">
+                                                                    @Model.OverallActivityScoreUPDownValue%
+                                                                    <span class="up">⬆</span>
+                                                                </td>
+                                                                <td class="improvement-status"> Improved </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td class="improvement-value">
+                                                                    @Model.OverallActivityScoreUPDownValue%
+                                                                    <span class="down">⬇</span>
+                                                                </td>
+                                                                <td class="improvement-status">Down</td>
+                                                            }
                                                         }
                                                         else
                                                         {
-                                                            <td class="improvement-value">
-                                                                @Model.OverallActivityScoreUPDownValue%
-                                                                <span class="down">⬇</span>
-                                                            </td>
-                                                            <td class="improvement-status">Down</td>
+                                                            <td></td>
+                                                            <td></td>
                                                         }
-                                                    }
-                                                    else
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Past score:</b></td>
+                                                        <td style="text-align:center;">@Model.OverallLastActivityScore</td>
+                                                        <td style="">Past score Date:</td>
+                                                        <td style="text-align:center;">@Model.OverallLastActivityDate.ToCoditechDateFormat()</td>
+                                                    </tr>
+                                                </table>
+
+                                                <div class="chart-title">Score Chart</div>
+                                                <div class="bar-wrap">
+                                                    @if (!Model.IsTraineeProfilePerformanceAvailable)
                                                     {
-                                                        <td></td>
-                                                        <td></td>
+                                                        <span>@Model.TraineeProfilePerformanceMessage</span>
                                                     }
-                                                </tr>
-                                                <tr>
-                                                    <td><b>Past score:</b></td>
-                                                    <td style="text-align:center;">@Model.OverallLastActivityScore</td>
-                                                    <td style="">Past score Date:</td>
-                                                    <td style="text-align:center;">@Model.OverallLastActivityDate.ToCoditechDateFormat()</td>
-                                                </tr>
-                                            </table>
+                                                    else if (Model.LineBarChart != null)
+                                                    {
+                                                        @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", Model.LineBarChart)
+                                                    }
+                                                </div>
+                                            </div>
 
-                                            <div class="chart-title">Score Chart</div>
-                                            <div class="bar-wrap">
-                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
-                                                {
-                                                    <span>@Model.TraineeProfilePerformanceMessage</span>
-                                                }
-                                                else if (Model.LineBarChart != null)
-                                                {
-                                                    @Html.Partial("~/Views/Shared/Charts/_LineBarChart.cshtml", Model.LineBarChart)
-                                                }
+                                            <div>
+                                                <div class="radar-title">Performance Matrix</div>
+                                                <div class="radar-wrap">
+                                                    @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                    {
+                                                        <span>@Model.TraineeProfilePerformanceMessage</span>
+                                                    }
+                                                    else if (Model.RadarChart != null)
+                                                    {
+                                                        @Html.Partial("~/Views/Shared/Charts/_RadarChart.cshtml", Model.RadarChart)
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
-
-                                        <div>
-                                            <div class="radar-title">Performance Matrix</div>
-                                            <div class="radar-wrap">
-                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
-                                                {
-                                                    <span>@Model.TraineeProfilePerformanceMessage</span>
-                                                }
-                                                else if (Model.RadarChart != null)
-                                                {
-                                                    @Html.Partial("~/Views/Shared/Charts/_RadarChart.cshtml", Model.RadarChart)
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @{
-                                        var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
-                                        var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
-                                    }
-                                    <div class="performance-report-summary-title"> Performance Report Summary</div>
-                                    @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
-                                    {
-                                        var firstGroup = performanceGroups[groupIndex];
-                                        var secondGroup = groupIndex + 1 < performanceGroups.Count ? performanceGroups[groupIndex + 1] : null;
-                                        var firstItems = firstGroup.ToList();
-                                        var secondItems = secondGroup != null ? secondGroup.ToList() : new List<DBTMTraineeProfilePerformanceModel>();
-                                        <div class="performance-pair">
-                                            <table style="width:100%; border-collapse:collapse;">
-                                                <tr>
-                                                    <td style="width:50%; vertical-align:top; padding-right:8px;">
-                                                        <table class="section-table" style="width:100%;">
-                                                            <tr>
-                                                                <th colspan="5" style="background-color:@(firstItems.FirstOrDefault()?.PerformanceMatrixColor)">
-                                                                    @firstGroup.Key
-                                                                </th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Activity</th>
-                                                                <th class="unit">Unit</th>
-                                                                <th>Value</th>
-                                                                <th class="score-head">Score</th>
-                                                                <th>% Improvement</th>
-                                                            </tr>
-                                                            @foreach (var item in firstItems)
-                                                            {
-                                                                <tr>
-                                                                    <td><b>@item.TestName</b></td>
-                                                                    <td>@item.Unit</td>
-                                                                    <td>@item.BestValue</td>
-                                                                    <td class="score">
-                                                                        @if (string.IsNullOrEmpty(item.Score))
-                                                                        {
-                                                                            <span>NA</span>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            @item.Score
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        @if (item.IsUp != null)
-                                                                        {
-                                                                            @if (item.IsUp == true)
-                                                                            {
-                                                                                @item.UpDownValue
-                                                                                <span class="up">⬆</span>
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                @item.UpDownValue
-                                                                                <span class="down">⬇</span>
-                                                                            }
-                                                                        }
-                                                                    </td>
-                                                                </tr>
-                                                            }
-                                                        </table>
-                                                    </td>
-                                                    <td style="width:50%; vertical-align:top; padding-left:8px;">
-                                                        @if (secondGroup != null)
-                                                        {
+                                        @{
+                                            var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
+                                            var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
+                                        }
+                                        <div class="performance-report-summary-title"> Performance Report Summary</div>
+                                        @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
+                                        {
+                                            var firstGroup = performanceGroups[groupIndex];
+                                            var secondGroup = groupIndex + 1 < performanceGroups.Count ? performanceGroups[groupIndex + 1] : null;
+                                            var firstItems = firstGroup.ToList();
+                                            var secondItems = secondGroup != null ? secondGroup.ToList() : new List<DBTMTraineeProfilePerformanceModel>();
+                                            <div class="performance-pair">
+                                                <table style="width:100%; border-collapse:collapse;">
+                                                    <tr>
+                                                        <td style="width:50%; vertical-align:top; padding-right:8px;">
                                                             <table class="section-table" style="width:100%;">
                                                                 <tr>
-                                                                    <th colspan="5" style="background-color:@(secondItems.FirstOrDefault()?.PerformanceMatrixColor)">
-                                                                        @secondGroup.Key
+                                                                    <th colspan="5" style="background-color:@(firstItems.FirstOrDefault()?.PerformanceMatrixColor)">
+                                                                        @firstGroup.Key
                                                                     </th>
                                                                 </tr>
                                                                 <tr>
@@ -935,7 +892,7 @@
                                                                     <th class="score-head">Score</th>
                                                                     <th>% Improvement</th>
                                                                 </tr>
-                                                                @foreach (var item in secondItems)
+                                                                @foreach (var item in firstItems)
                                                                 {
                                                                     <tr>
                                                                         <td><b>@item.TestName</b></td>
@@ -969,58 +926,114 @@
                                                                     </tr>
                                                                 }
                                                             </table>
-                                                        }
-                                                        else
-                                                        {
-                                                            <table class="section-table" style="width:100%; display:none;">
-                                                                <tr><th colspan="5">&nbsp;</th></tr>
-                                                            </table>
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    }
-                                    <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
-
-                                    @* Activity-wise Graphs *@
-                                    @{
-                                        var activityGraphs = Model.DaywiseReportGraphList?.Where(x => x.IsRecordFound).ToList() ?? new List<GraphModel>();
-                                        var performanceMatrixGroups = activityGraphs.GroupBy(x => x.Custom2).OrderBy(g => g.Key).ToList();
-                                    }
-                                    @if (performanceMatrixGroups.Any())
-                                    {
-                                        <div class="profile-activity-graphs mt-3">
-                                            @foreach (var matrixGroup in performanceMatrixGroups)
-                                            {
-                                                <div class="performance-matrix-group">
-                                                    <h5 class="performance-matrix-heading">@matrixGroup.Key</h5>
-                                                    @foreach (var graph in matrixGroup)
-                                                    {
-                                                        <div class="activity-graph-item">
-                                                            <h6 class="activity-graph-title">@graph.Custom1</h6>
-                                                            <div class="activity-graph-row">
-                                                                <div class="activity-graph-chart">
-                                                                    @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
-                                                                </div>
-                                                                <div class="activity-graph-image">
-                                                                    @if (!string.IsNullOrWhiteSpace(graph.Custom3))
+                                                        </td>
+                                                        <td style="width:50%; vertical-align:top; padding-left:8px;">
+                                                            @if (secondGroup != null)
+                                                            {
+                                                                <table class="section-table" style="width:100%;">
+                                                                    <tr>
+                                                                        <th colspan="5" style="background-color:@(secondItems.FirstOrDefault()?.PerformanceMatrixColor)">
+                                                                            @secondGroup.Key
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Activity</th>
+                                                                        <th class="unit">Unit</th>
+                                                                        <th>Value</th>
+                                                                        <th class="score-head">Score</th>
+                                                                        <th>% Improvement</th>
+                                                                    </tr>
+                                                                    @foreach (var item in secondItems)
                                                                     {
-                                                                        <div class="activity-protocol-title">  Test protocol </div>
-                                                                        <img src="@graph.Custom3" alt="Activity Protocol" class="activity-protocol-img" />
+                                                                        <tr>
+                                                                            <td><b>@item.TestName</b></td>
+                                                                            <td>@item.Unit</td>
+                                                                            <td>@item.BestValue</td>
+                                                                            <td class="score">
+                                                                                @if (string.IsNullOrEmpty(item.Score))
+                                                                                {
+                                                                                    <span>NA</span>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    @item.Score
+                                                                                }
+                                                                            </td>
+                                                                            <td>
+                                                                                @if (item.IsUp != null)
+                                                                                {
+                                                                                    @if (item.IsUp == true)
+                                                                                    {
+                                                                                        @item.UpDownValue
+                                                                                        <span class="up">⬆</span>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        @item.UpDownValue
+                                                                                        <span class="down">⬇</span>
+                                                                                    }
+                                                                                }
+                                                                            </td>
+                                                                        </tr>
                                                                     }
+                                                                </table>
+                                                            }
+                                                            else
+                                                            {
+                                                                <table class="section-table" style="width:100%; display:none;">
+                                                                    <tr><th colspan="5">&nbsp;</th></tr>
+                                                                </table>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        }
+                                        <div class="notes"><b>Notes:</b> <span id="printRemarksText">@Model.Remarks</span></div>
+
+                                        @* Activity-wise Graphs *@
+                                        @{
+                                            var activityGraphs = Model.DaywiseReportGraphList?.Where(x => x.IsRecordFound).ToList() ?? new List<GraphModel>();
+                                            var performanceMatrixGroups = activityGraphs.GroupBy(x => x.Custom2).OrderBy(g => g.Key).ToList();
+                                        }
+                                        @if (performanceMatrixGroups.Any())
+                                        {
+                                            <div class="profile-activity-graphs mt-3">
+                                                @foreach (var matrixGroup in performanceMatrixGroups)
+                                                {
+                                                    <div class="performance-matrix-group">
+                                                        <h5 class="performance-matrix-heading">@matrixGroup.Key</h5>
+                                                        @foreach (var graph in matrixGroup)
+                                                        {
+                                                            <div class="activity-graph-item">
+                                                                <h6 class="activity-graph-title">@graph.Custom1</h6>
+                                                                <div class="activity-graph-row">
+                                                                    <div class="activity-graph-chart">
+                                                                        @Html.Partial("~/Views/Shared/Charts/_MultipleGraphs.cshtml", new List<GraphModel> { graph })
+                                                                    </div>
+                                                                    <div class="activity-graph-image">
+                                                                        @if (!string.IsNullOrWhiteSpace(graph.Custom3))
+                                                                        {
+                                                                            <div class="activity-protocol-title">  Test protocol </div>
+                                                                            <img src="@graph.Custom3" alt="Activity Protocol" class="activity-protocol-img" />
+                                                                        }
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                    }
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="text-danger fw-bold text-center">No Data Found</div>
+                    }
                 </div>
             </div>
         </div>

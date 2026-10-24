@@ -30,7 +30,6 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
-        private readonly ICoditechRepository<DBTMBatchActivity> _dbtmBatchActivityRepository;
         private readonly IConverter _converter;
         private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
 
@@ -45,11 +44,10 @@ namespace Coditech.API.Service
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
-            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dbtmBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
         }
@@ -63,6 +61,7 @@ namespace Coditech.API.Service
                 filters.RemoveAll(x => x.FilterName == FilterKeys.IsActive);
                 listType = $"and IsActive={isActive}";
             }
+            BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -74,13 +73,14 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsList @CentreCode,@GeneralTrainerMasterId,@listType,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
-            foreach (var item in dBTMTraineeDetailsList)
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsList @CentreCode,@GeneralTrainerMasterId,@listType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in dBTMTraineeDetailsList?.Where(x => x.IsDataEncrypted))
             {
-                item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
-                item.LastName = HelperUtility.DecodeBase64(item.LastName);
-                item.EmailId = HelperUtility.DecodeBase64(item.EmailId);
-                item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.EmailId = DataEncryptionHelper.DataDecrypt(item.EmailId);
+                item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
 
                 item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
@@ -357,17 +357,18 @@ namespace Coditech.API.Service
             List<DBTMTraineeProfileModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsListByIds @DBTMTraineeDetailIds")?.ToList();
             if (list?.Count > 0)
             {
-                foreach (var item in list)
+                foreach (var item in list?.Where(x => x.IsDataEncrypted))
                 {
-                    item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
-                    item.MiddleName = HelperUtility.DecodeBase64(item.MiddleName);
-                    item.LastName = HelperUtility.DecodeBase64(item.LastName);
-                    item.EmailId = HelperUtility.DecodeBase64(item.EmailId);
-                    item.MobileNumber = HelperUtility.DecodeBase64(item.MobileNumber);
-                    item.PhoneNumber = HelperUtility.DecodeBase64(item.PhoneNumber);
-                    item.EmergencyContact = HelperUtility.DecodeBase64(item.EmergencyContact);
-                    item.DateOfBirth = HelperUtility.DecodeBase64(item.DateOfBirth);
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.MiddleName = DataEncryptionHelper.DataDecrypt(item.MiddleName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                    item.EmailId = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.EmailId), MaskType.Mobile);
+                    item.MobileNumber = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.MobileNumber), MaskType.Mobile);
+                    item.PhoneNumber = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.PhoneNumber), MaskType.Mobile);
+                    item.EmergencyContact = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.EmergencyContact), MaskType.Mobile);
+                    item.DateOfBirth = DataEncryptionHelper.DataDecrypt(item.DateOfBirth);
                 }
+                list.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
             }
             if (list?.Count > 0)
             {
@@ -383,7 +384,7 @@ namespace Coditech.API.Service
                                   select new
                                   {
                                       DBTMTraineeDetailId = gtat.EntityId,
-                                      TrainerName = $"{HelperUtility.DecodeBase64(um.FirstName)} {HelperUtility.DecodeBase64(um.LastName)}"
+                                      TrainerName = $"{DataEncryptionHelper.DataDecrypt(um.FirstName)} {DataEncryptionHelper.DataDecrypt(um.LastName)}"
                                   };
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
@@ -580,7 +581,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#Graph#", radarImage, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
-            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, !string.IsNullOrWhiteSpace(profile.DateOfBirth) ? Convert.ToDateTime(profile.DateOfBirth).ToString("dd-MMM-yyyy"): string.Empty,html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, !string.IsNullOrWhiteSpace(profile.DateOfBirth) ? Convert.ToDateTime(profile.DateOfBirth).ToString("dd-MMM-yyyy") : string.Empty, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight, profile.Weight.ToString(), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Height, profile.Height.ToString(), html);
@@ -714,7 +715,7 @@ namespace Coditech.API.Service
 
                     DataRow dr = dt.NewRow();
                     dr["DBTMTraineeDetailId"] = traineeProfile.DBTMTraineeDetailId;
-                    dr["Name"] = traineeProfile.Name;
+                    dr["Name"] = $"{traineeProfile.FirstName} {traineeProfile.LastName}";
 
                     var traineeProfileList = traineeProfilePerformanceRankDataList.Where(x => x.DBTMTraineeDetailId == traineeId);
 

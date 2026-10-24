@@ -3,7 +3,8 @@
     public class DBTMTraineeProfilePerformanceRankingModel : BaseModel
     {
         public long DBTMTraineeDetailId { get; set; }
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public int DBTMTestMasterId { get; set; }
         public string TestCode { get; set; }
         public string TestName { get; set; }
@@ -18,6 +19,7 @@
         public string PerformanceMatrix { get; set; }
         public string PerformanceMatrixColor { get; set; }
         public bool IsEncrypted { get; set; }
+        public bool IsDataEncrypted { get; set; }
         public string ActivityProtocolImagePath { get; set; }
     }
 }

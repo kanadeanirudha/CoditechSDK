@@ -11,5 +11,6 @@
         public string PersonCode { get; set; }
         public string QRCode { get; set; }
         public string PrintableHTML { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

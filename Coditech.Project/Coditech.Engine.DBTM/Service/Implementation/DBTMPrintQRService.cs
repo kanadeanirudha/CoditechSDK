@@ -5,8 +5,6 @@ using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
-using Coditech.Resources;
-using DocumentFormat.OpenXml.Wordprocessing;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using System.Collections.Specialized;
@@ -40,6 +38,14 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMPrintQRModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMPrintQRTraineeList @GeneralBatchMasterId,@UserType,@WhereClause,@Order_BY,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in list?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.MiddleName = DataEncryptionHelper.DataDecrypt(item.MiddleName);
+                item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
+                item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+            }
             DBTMPrintQRListModel model = new DBTMPrintQRListModel();
             model.DBTMPrintQRList = list ?? new List<DBTMPrintQRModel>();
             model.BindPageListModel(pageListModel);
@@ -105,9 +111,9 @@ namespace Coditech.API.Service
                 listModel.DBTMPrintQRList.Add(new DBTMPrintQRModel
                 {
                     PersonId = person.PersonId,
-                    FirstName = person.FirstName,
-                    MiddleName = person.MiddleName,
-                    LastName = person.LastName,
+                    FirstName = person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.FirstName) : person.FirstName,
+                    MiddleName = person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.MiddleName) : person.MiddleName,
+                    LastName = person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.LastName) : person.LastName,
                     PersonCode = personCode,
                     QRCode = qrImage,
                     PrintableHTML = printableHtml
@@ -119,12 +125,12 @@ namespace Coditech.API.Service
         #region private
         private string ReplacePrintableHTMLQRTemplate(string html, GeneralPerson person, string personCode, string qrImage, string batchName)
         {
-            html = ReplaceTokenWithMessageText("#FirstName#", person.FirstName ?? "", html);
-            html = ReplaceTokenWithMessageText("#MiddleName#", person.MiddleName ?? "", html);
-            html = ReplaceTokenWithMessageText("#LastName#", person.LastName ?? "", html);
+            html = ReplaceTokenWithMessageText("#FirstName#", person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.FirstName) : person.FirstName ?? "", html);
+            html = ReplaceTokenWithMessageText("#MiddleName#", person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.MiddleName) : person.MiddleName ?? "", html);
+            html = ReplaceTokenWithMessageText("#LastName#", person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.LastName) : person.LastName ?? "", html);
             html = ReplaceTokenWithMessageText("#PersonCode#", personCode ?? "", html);
-            html = ReplaceTokenWithMessageText("#MobileNumber#", person.MobileNumber ?? "", html);
-            html = ReplaceTokenWithMessageText("#DisplayName#", person.Custom2 ?? "", html);
+            html = ReplaceTokenWithMessageText("#MobileNumber#", HelperUtility.MaskData(person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.MobileNumber) : person.MobileNumber ?? "", MaskType.Mobile), html);
+            html = ReplaceTokenWithMessageText("#DisplayName#", person.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(person.Custom2) : person.Custom2 ?? "", html);
             html = ReplaceTokenWithMessageText("#BatchName#", batchName, html);
             html = ReplaceTokenWithMessageText("#QRImage#", qrImage ?? "", html);
 

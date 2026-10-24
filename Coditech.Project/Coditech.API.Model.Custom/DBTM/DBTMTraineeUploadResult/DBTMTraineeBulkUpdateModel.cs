@@ -16,5 +16,6 @@
         public string Specialization { get; set; }
         public string SchoolOrCollegeOrClub { get; set; }
         public string AgeGroup { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

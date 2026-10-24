@@ -42,5 +42,6 @@ namespace Coditech.Common.API.Model
         public string PhoneNumber { get; set; }
         public string EmergencyContact { get; set; }
         public List<GraphModel> GraphList { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

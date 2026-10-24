@@ -147,7 +147,7 @@ namespace Coditech.API.Service
             DBTMTrainerDetailsModel trainerProfile = new DBTMTrainerDetailsModel();
 
             // Fetch person details
-            var person = GetGeneralPersonDetails(personId);
+            var person = base.GetGeneralPersonDetails(personId);
             if (person != null)
             {
                 trainerProfile.FirstName = person.FirstName;

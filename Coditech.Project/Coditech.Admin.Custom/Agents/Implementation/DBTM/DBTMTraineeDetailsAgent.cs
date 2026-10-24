@@ -226,7 +226,7 @@ namespace Coditech.Admin.Agents
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
-            GeneralTraineeAssociatedToTrainerListResponse response = _generalTrainerClient.GetAssociatedTrainerList(null, 0, true, dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString(), personId, null, filters, sortlist, dataTableModel.PageIndex, int.MaxValue);
+            GeneralTraineeAssociatedToTrainerListResponse response = _generalTrainerClient.GetAssociatedTrainerList(null, 0, true, dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString(), personId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             GeneralTraineeAssociatedToTrainerListModel associatedTrainerList = new GeneralTraineeAssociatedToTrainerListModel { AssociatedTrainerList = response?.AssociatedTrainerList };
             GeneralTraineeAssociatedToTrainerListViewModel listViewModel = new GeneralTraineeAssociatedToTrainerListViewModel();
             listViewModel.AssociatedTrainerList = associatedTrainerList?.AssociatedTrainerList?.ToViewModel<GeneralTraineeAssociatedToTrainerViewModel>().ToList();

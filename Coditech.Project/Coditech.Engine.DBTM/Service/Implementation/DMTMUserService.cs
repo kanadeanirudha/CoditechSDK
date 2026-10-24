@@ -45,7 +45,11 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
             userLoginModel.Password = MD5Hash(userLoginModel.Password);
-            UserMaster userMasterData = _userMasterRepository.Table.Where(x => x.UserName == userLoginModel.UserName && x.Password == userLoginModel.Password && (x.UserType == UserTypeEnum.Trainee.ToString() || x.UserType == UserTypeEnum.Employee.ToString()))?.FirstOrDefault();
+            string encodedUserName = SearchHashHelper.CreateSearchHash(userLoginModel.UserName);
+
+            UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x =>
+                (x.UserType == UserTypeEnum.Admin.ToString() || x.UserType == UserTypeEnum.Employee.ToString()) &&
+                (x.IsDataEncrypted ? x.UserNameHash == encodedUserName : x.UserName == userLoginModel.UserName));
 
             if (IsNull(userMasterData))
                 throw new CoditechException(ErrorCodes.NotFound, null);
@@ -89,7 +93,7 @@ namespace Coditech.API.Service
             userModel.UserMasterId = userMasterData.UserMasterId;
             userModel.EntityId = userMasterData.EntityId;
             userModel.UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1;
-            userModel.EmailId = userMasterData.EmailId;
+            userModel.EmailId = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(userMasterData.EmailId) : userMasterData.EmailId;
             userModel.IsPasswordChange = userMasterData.IsPasswordChange;
             userModel.IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions;
             userModel.IsTestUser = false;
@@ -213,18 +217,19 @@ namespace Coditech.API.Service
                     generalPerson.MaritalStatus = dbtmUserModel.MaritalStatus;
                     generalPerson.BloodGroup = dbtmUserModel.BloodGroup;
                     generalPerson.BirthMark = dbtmUserModel.BirthMark;
-                    generalPerson.EmailId = dbtmUserModel.EmailId;
                     generalPerson.GeneralOccupationMasterId = dbtmUserModel.GeneralOccupationMasterId;
                     generalPerson.AnniversaryDate = dbtmUserModel.AnniversaryDate;
-                    generalPerson.EmergencyContact = dbtmUserModel.EmergencyContact;
-                    generalPerson.PhoneNumber = dbtmUserModel.PhoneNumber;
+                    generalPerson.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
+                    generalPerson.EmergencyContact = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmergencyContact) : dbtmUserModel.EmergencyContact;
+                    generalPerson.PhoneNumber = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.PhoneNumber) : dbtmUserModel.PhoneNumber;
                     generalPerson.ModifiedBy = dbtmUserModel.ModifiedBy;
                     status = _generalPersonRepository.Update(generalPerson);
                     if (status)
                     {
-                        if (IsNotNull(userMasterData) && userMasterData.EmailId != dbtmUserModel.EmailId)
+                        string emailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
+                        if (IsNotNull(userMasterData) && emailId != dbtmUserModel.EmailId)
                         {
-                            userMasterData.EmailId = dbtmUserModel.EmailId;
+                            userMasterData.EmailId =  generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
                             userMasterData.ModifiedBy = dbtmUserModel.ModifiedBy;
                             _userMasterRepository.Update(userMasterData);
                         }
@@ -319,11 +324,12 @@ namespace Coditech.API.Service
             List<DBTMNewRegistrationModel> dBTMNewRegistrationList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
             if (dBTMNewRegistrationList?.Any() == true)
             {
-                foreach (var item in dBTMNewRegistrationList)
+                foreach (var item in dBTMNewRegistrationList?.Where(x => x.IsDataEncrypted))
                 {
-                    item.FirstName = HelperUtility.DecodeBase64(item.FirstName);
-                    item.LastName = HelperUtility.DecodeBase64(item.LastName);
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
                 }
+                dBTMNewRegistrationList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
             }
             DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel
             {

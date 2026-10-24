@@ -619,11 +619,7 @@ namespace Coditech.Admin.Controllers
         {
             DateTime performanceDate = new DateTime(2026, 9, 30);
             DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(0, dBTMTraineeDetailId.ToString(), "FirstName", performanceDate, performanceDate, "batch", "Trainee");
-            DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault();
-            if (traineeProfile == null)
-            {
-                return Content("No trainee profile data found.");
-            }
+            DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault()?? new DBTMReportTraineeProfileModel();
             return View("~/Views/DBTM/DBTMReports/DBTMTraineeDetailsV2.cshtml", traineeProfile);
         }
 

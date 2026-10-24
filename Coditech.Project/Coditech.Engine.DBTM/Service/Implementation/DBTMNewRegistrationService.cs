@@ -2,6 +2,7 @@
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
@@ -269,7 +270,7 @@ namespace Coditech.API.Service
                     short generalDepartmentMasterId = _employeeMasterMasterRepository.Table.Where(x => x.EmployeeId == employeeId).Select(y => y.GeneralDepartmentMasterId).FirstOrDefault();
                     dBTMNewRegistrationModel.GeneralTrainerMasterId = generalTrainerMasterId;
                     dBTMNewRegistrationModel.Custom5 = generalDepartmentMasterId.ToString();
-                    
+
                     // Trainer to Batch
                     CreateTrainerBatch(dBTMNewRegistrationModel, generalTrainerMasterId, currentDate);
                     joiningCodeDetails.IsExpired = true;
@@ -306,23 +307,26 @@ namespace Coditech.API.Service
 
         private void InsertEmployeeAddress(DBTMNewRegistrationModel dBTMNewRegistrationModel, DateTime currentDate, long personId)
         {
+            bool isDataEncrypted = base.IsDataEncrypted();
             //Insert DBTM Devices
             GeneralPersonAddress generalPersonAddress = new GeneralPersonAddress()
             {
                 AddressTypeEnum = AddressTypeEnum.PermanentAddress.ToString(),
                 PersonId = personId,
-                FirstName = dBTMNewRegistrationModel.FirstName,
-                LastName = dBTMNewRegistrationModel.LastName,
-                MobileNumber = dBTMNewRegistrationModel.MobileNumber,
-                EmailAddress = dBTMNewRegistrationModel.EmailId,
-                AddressLine1 = dBTMNewRegistrationModel.AddressLine1,
-                AddressLine2 = dBTMNewRegistrationModel.AddressLine2,
+                FirstName = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.FirstName) : dBTMNewRegistrationModel.FirstName,
+                LastName = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.LastName) : dBTMNewRegistrationModel.LastName,
+                MobileNumber = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.MobileNumber) : dBTMNewRegistrationModel.MobileNumber,
+                EmailAddress = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.EmailId) : dBTMNewRegistrationModel.EmailId,
+                AddressLine1 = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.AddressLine1) : dBTMNewRegistrationModel.AddressLine1,
+                AddressLine2 = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.AddressLine2) : dBTMNewRegistrationModel.AddressLine2,
                 GeneralCountryMasterId = dBTMNewRegistrationModel.GeneralCountryMasterId,
                 GeneralRegionMasterId = dBTMNewRegistrationModel.GeneralRegionMasterId,
                 GeneralCityMasterId = dBTMNewRegistrationModel.GeneralCityMasterId,
-                Postalcode = dBTMNewRegistrationModel.Pincode,
+                Postalcode = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.Pincode) : dBTMNewRegistrationModel.Pincode,
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
+                IsDataEncrypted = isDataEncrypted,
+                IsActive = true
             };
             new CoditechRepository<GeneralPersonAddress>(_serviceProvider.GetService<Coditech_Entities>()).Insert(generalPersonAddress);
         }
@@ -375,9 +379,10 @@ namespace Coditech.API.Service
                 CreatedDate = currentDate,
                 ModifiedDate = currentDate,
                 IsPasswordChange = dBTMNewRegistrationModel.IsPasswordUserGenerated,
-                Custom1 = dBTMNewRegistrationModel.Custom1
+                Custom1 = dBTMNewRegistrationModel.Custom1,
+                IsDataEncrypted = base.IsDataEncrypted()
             };
-            GeneralPerson personData = InsertGeneralPersonData(generalPersonModel);
+            GeneralPerson personData = base.InsertGeneralPersonData(generalPersonModel);
             long employeeId = 0;
             if (personData?.PersonId > 0)
             {
@@ -582,7 +587,11 @@ namespace Coditech.API.Service
             {
                 throw new ArgumentException("Email Id cannot be null or empty");
             }
-            return _userMasterRepository.Table.Any(x => x.UserName == emailId);
+            string encodedUserName = SearchHashHelper.CreateSearchHash(emailId);
+
+            bool status = _userMasterRepository.Table.Any(x => x.IsDataEncrypted ? x.UserNameHash == encodedUserName : x.UserName == emailId);
+
+            return status;
         }
 
         //Create adminSanctionPost.
@@ -678,10 +687,6 @@ namespace Coditech.API.Service
             new CoditechRepository<AdminRoleApplicableDetails>(_serviceProvider.GetService<Coditech_Entities>()).Insert(adminRoleApplicableDetails);
             return sanctionPostCode;
         }
-        private List<DBTMTraineeAssignmentModel> GetTraineesForCentre(string centreCode)
-        {
-            return new CoditechRepository<DBTMTraineeAssignmentModel>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.SelectedCentreCode == centreCode).ToList();
-        }
 
         private void InsertGeneralTrainer(DBTMNewRegistrationModel dBTMNewRegistrationModel, long employeeId, DateTime currentDate)
         {
@@ -695,7 +700,7 @@ namespace Coditech.API.Service
             });
         }
 
-        private void CreateTrainerBatch(DBTMNewRegistrationModel model, long generalTrainerMasterId,DateTime currentDate)
+        private void CreateTrainerBatch(DBTMNewRegistrationModel model, long generalTrainerMasterId, DateTime currentDate)
         {
             if (string.IsNullOrWhiteSpace(model.Custom4))
                 return;

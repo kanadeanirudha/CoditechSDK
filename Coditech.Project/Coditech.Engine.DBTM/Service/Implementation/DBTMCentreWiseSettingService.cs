@@ -96,7 +96,7 @@ namespace Coditech.API.Service
             }
             else
             {
-                DBTMCentreWiseSetting insertedEntity =  _dBTMCentreWiseSettingRepository.Insert(entity);
+                DBTMCentreWiseSetting insertedEntity = _dBTMCentreWiseSettingRepository.Insert(entity);
                 isSuccess = insertedEntity != null;
                 if (isSuccess)
                     model.DBTMCentreWiseSettingId = insertedEntity.DBTMCentreWiseSettingId;
@@ -110,56 +110,97 @@ namespace Coditech.API.Service
         }
         public virtual DBTMCentreWiseTestModel AssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds)
         {
-            DBTMCentreWiseTestModel result = new DBTMCentreWiseTestModel
+            var result = new DBTMCentreWiseTestModel
             {
                 OrganisationCentreMasterId = organisationCentreId,
                 CentreCode = centreCode,
                 HasError = false
             };
-            if (testIds?.Count > 0)
-            {
-                foreach (var testId in testIds)
-                {
-                    var exists = _dBTMCentreWiseTestRepository.Table.Any(x => x.CentreCode == centreCode && x.DBTMTestMasterId == testId);
-                    if (!exists)
-                    {
-                        DBTMCentreWiseTest entity = new DBTMCentreWiseTest
-                        {
-                            DBTMTestMasterId = testId,
-                            CentreCode = centreCode,
-                            CreatedDate = DateTime.Now
-                        };
-                        _dBTMCentreWiseTestRepository.Insert(entity);
-                    }
-                }
-            }
-            else
+
+            if (testIds == null || testIds.Count == 0)
             {
                 result.HasError = true;
                 result.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+                return result;
             }
+
+            if (string.IsNullOrWhiteSpace(centreCode))
+            {
+                result.HasError = true;
+                result.ErrorMessage = "Centre code is required.";
+                return result;
+            }
+
+            // Remove duplicate test IDs from the input.
+            var uniqueTestIds = testIds.Distinct().ToList();
+
+            // Retrieve existing associations in one database query.
+            var existingTestIds = _dBTMCentreWiseTestRepository.Table
+                .Where(x => x.CentreCode == centreCode
+                         && uniqueTestIds.Contains(x.DBTMTestMasterId))
+                .Select(x => x.DBTMTestMasterId)
+                .Distinct()
+                .ToHashSet();
+
+            var currentDate = DateTime.Now;
+
+            // Insert only associations that do not already exist.
+            var newEntities = uniqueTestIds
+                .Where(testId => !existingTestIds.Contains(testId))
+                .Select(testId => new DBTMCentreWiseTest
+                {
+                    DBTMTestMasterId = testId,
+                    CentreCode = centreCode,
+                    CreatedDate = currentDate
+                })
+                .ToList();
+
+            if (newEntities.Count > 0)
+            {
+                _dBTMCentreWiseTestRepository.InsertAsync(newEntities);
+            }
+
             return result;
         }
 
         public virtual DBTMCentreWiseTestModel UnAssociateCentreTests(int organisationCentreId, string centreCode, List<int> testIds)
         {
-            DBTMCentreWiseTestModel result = new DBTMCentreWiseTestModel
+            var result = new DBTMCentreWiseTestModel
             {
                 OrganisationCentreMasterId = organisationCentreId,
                 CentreCode = centreCode,
                 HasError = false
             };
-            if (testIds?.Count > 0)
+
+            if (testIds == null || testIds.Count == 0)
             {
-                foreach (var testId in testIds)
-                {
-                    DBTMCentreWiseTest entity = _dBTMCentreWiseTestRepository.Table.FirstOrDefault(x => x.CentreCode == centreCode && x.DBTMTestMasterId == testId);
-                    if (entity != null)
-                    {
-                        _dBTMCentreWiseTestRepository.Delete(entity);
-                    }
-                }
+                result.HasError = true;
+                result.ErrorMessage = GeneralResources.ErrorFailedToCreate;
+                return result;
             }
+
+            if (string.IsNullOrWhiteSpace(centreCode))
+            {
+                result.HasError = true;
+                result.ErrorMessage = "Centre code is required.";
+                return result;
+            }
+
+            // Remove duplicate test IDs.
+            var uniqueTestIds = testIds.Distinct().ToList();
+
+            // Fetch all matching centre-test associations in one query.
+            var entities = _dBTMCentreWiseTestRepository.Table
+                .Where(x => x.CentreCode == centreCode
+                         && uniqueTestIds.Contains(x.DBTMTestMasterId))
+                .ToList();
+
+            // Delete matching associations.
+            foreach (var entity in entities)
+            {
+                _dBTMCentreWiseTestRepository.Delete(entity);
+            }
+
             return result;
         }
     }
