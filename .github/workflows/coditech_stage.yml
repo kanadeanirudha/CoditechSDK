@@ -48,7 +48,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: DBTMStage
+          ref: DBTMEncryptionData
 
       - name: Restore Packages
         run: | 
