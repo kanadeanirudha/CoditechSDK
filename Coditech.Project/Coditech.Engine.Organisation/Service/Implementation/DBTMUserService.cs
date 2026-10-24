@@ -470,7 +470,7 @@ namespace Coditech.API.Service
             string fileUserName = "TraineeTemplate";
             if (userType == CustomConstants.DBTMCentreOwner)
             {
-                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
+                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) + "_" + DataEncryptionHelper.DataDecrypt(x.LastName) : x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
             }
             else
             {
@@ -875,15 +875,15 @@ namespace Coditech.API.Service
                     hasError = true;
                 }
             }
-            if (!string.IsNullOrWhiteSpace(email))
-            {
-                bool isEmailExists = CheckEmailAlreadyExists(email);
-                if (isEmailExists)
-                {
-                    row[ExcelTemplateColumns.EmailAddress] = "Email Address already exists";
-                    hasError = true;
-                }
-            }
+            //if (!string.IsNullOrWhiteSpace(email))
+            //{
+            //    bool isEmailExists = CheckEmailAlreadyExists(email);
+            //    if (isEmailExists)
+            //    {
+            //        row[ExcelTemplateColumns.EmailAddress] = "Email Address already exists";
+            //        hasError = true;
+            //    }
+            //}
             if (string.IsNullOrWhiteSpace(gender))
             {
                 row[ExcelTemplateColumns.Gender] = "Gender is empty";
@@ -1029,7 +1029,7 @@ namespace Coditech.API.Service
                 MobileNumber = GetValue(row, ExcelTemplateColumns.MobileNumber),
                 CallingCode = rawCallingCode,
                 GenderEnumId = GetEnumIdByEnumCode(GetValue(row, ExcelTemplateColumns.Gender), DropdownTypeEnum.Gender.ToString()),
-                DateOfBirth = HelperUtility.EncodeBase64(Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)).ToString("yyyy-MM-dd")),
+                DateOfBirth = Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)).ToString("yyyy-MM-dd"),
                 Custom1 = JsonConvert.SerializeObject(customModel)
             };
             DBTMRegisterTrainee(model);
@@ -1333,19 +1333,22 @@ namespace Coditech.API.Service
             return DBTMCustomHelper.GetAgeGroupEnumIdByDOB(dob, ageGroups.Select(x => (x.EnumId, x.EnumValue)).ToList());
         }
 
-        private bool CheckEmailAlreadyExists(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-            email = email.Trim();
-            return _generalPersonRepository.Table.Any(x => x.EmailId != null && x.EmailId.ToLower() == email.ToLower());
-        }
+        //private bool CheckEmailAlreadyExists(string email)
+        //{
+        //    if (string.IsNullOrWhiteSpace(email))
+        //        return false;
+        //    email = email.Trim();
+        //    return _generalPersonRepository.Table.Any(x => x.EmailId != null && x.EmailId.ToLower() == email.ToLower());
+        //}
         private bool CheckMobileAlreadyExists(string mobile)
         {
             if (string.IsNullOrWhiteSpace(mobile))
                 return false;
             mobile = mobile.Trim();
-            return _generalPersonRepository.Table.Any(x => x.MobileNumber != null && x.MobileNumber == mobile);
+            string encodedmobile = SearchHashHelper.CreateSearchHash(mobile);
+
+            return _userMasterRepository.Table.Any(x =>(x.UserType == UserTypeEnum.Trainee.ToString()) &&
+                                                       (x.IsDataEncrypted ? x.UserNameHash == encodedmobile : x.UserName == mobile));
         }
         private List<DBTMTraineeBulkUpdateModel> GetBulkUpdateTraineeList(long generalBatchMasterId, string orderBy)
         {
