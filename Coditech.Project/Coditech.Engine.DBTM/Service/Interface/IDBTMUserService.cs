@@ -11,5 +11,6 @@ namespace Coditech.API.Service
         DBTMNewRegistrationListModel GetGeneralTrainerByJoiningCode(string joiningCode,long generalTrainerMasterId);
         DBTMNewRegistrationModel ValidateTraineeJoiningCode(string joiningCode);
         DBTMNewRegistrationListModel GetTrainerListByJoiningCode(string joiningCode);
+        bool DeleteUserAccount(long entityId, string userType);
     }
 }

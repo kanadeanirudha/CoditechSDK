@@ -333,5 +333,95 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator.");
             return listModel;
         }
+
+        public virtual bool DeleteUserAccount(long entityId, string userType)
+        {
+            if (entityId <= 0)
+            {
+                throw new CoditechException(ErrorCodes.IdLessThanOne, "Invalid EntityId.");
+            }
+            if (string.IsNullOrWhiteSpace(userType))
+            {
+                throw new CoditechException(ErrorCodes.NullModel, "UserType is required.");
+            }
+            bool isTrainee = userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.OrdinalIgnoreCase);
+            if (!isTrainee)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Unsupported UserType.");
+            }
+            UserMaster userMaster = _userMasterRepository.Table.FirstOrDefault(x => x.EntityId == entityId && x.UserType == userType);
+            if (IsNull(userMaster))
+            {
+                throw new CoditechException(ErrorCodes.NotFound, "User account not found.");
+            }
+            if (userMaster.IsDeleted)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "User account is already deleted.");
+            }
+            long personId = 0;
+            DBTMTraineeDetails trainee = null;
+            if (isTrainee)
+            {
+                trainee = _dbtmTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
+                if (IsNull(trainee))
+                {
+                    throw new CoditechException(ErrorCodes.NotFound, "Trainee details not found.");
+                }
+                personId = trainee.PersonId;
+            }
+            GeneralPerson generalPerson = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == personId);
+            if (IsNull(generalPerson))
+            {
+                throw new CoditechException(ErrorCodes.NotFound, "Person details not found.");
+            }
+            DateTime deletedDate = DateTime.Now;
+            generalPerson.FirstName = "Deleted";
+            generalPerson.MiddleName = null;
+            generalPerson.LastName = "User";
+            generalPerson.EmailId = "deleteduser";
+            generalPerson.MobileNumber = "0000000000";
+            generalPerson.IsDeleted = true;
+            generalPerson.FirstNameSearchTokens = null;
+            generalPerson.MiddleNameSearchTokens = null;
+            generalPerson.LastNameSearchTokens = null;
+            generalPerson.EmailIdSearchTokens = null;
+            generalPerson.MobileNumberSearchTokens = null;
+            generalPerson.Custom2 = "Deleted User";
+            generalPerson.DeletedDate = deletedDate;
+            generalPerson.ModifiedDate = deletedDate;
+
+            userMaster.IsDeleted = true;
+            userMaster.IsActive = false;
+            userMaster.FirstName = "Deleted";
+            userMaster.MiddleName = null;
+            userMaster.LastName = "User";
+            userMaster.EmailId = "deleteduser";
+            userMaster.DeletedDate = deletedDate;
+            userMaster.ModifiedDate = deletedDate;
+            if (trainee != null)
+            {
+                trainee.IsActive = false;
+                trainee.ModifiedDate = DateTime.Now;
+            }
+            bool personUpdated = _generalPersonRepository.Update(generalPerson);
+            if (!personUpdated)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Unable to update person details.");
+            }
+            bool userUpdated = _userMasterRepository.Update(userMaster);
+            if (!userUpdated)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Unable to update user account.");
+            }
+            if (trainee != null)
+            {
+                bool traineeUpdated = _dbtmTraineeDetailsRepository.Update(trainee);
+                if (!traineeUpdated)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData, "Unable to deactivate trainee details.");
+                }
+            }
+            return true;
+        }
     }
 }
