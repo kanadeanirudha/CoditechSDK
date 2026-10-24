@@ -1365,8 +1365,7 @@ namespace Coditech.API.Service
                     item.MiddleName = DataEncryptionHelper.DataDecrypt(item.MiddleName);
                     item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
                     item.EmailAddress = DataEncryptionHelper.DataDecrypt(item.EmailAddress);
-                    item.DateOfBirth = Convert.ToDateTime(DataEncryptionHelper.DataDecrypt(item.DateOfBirth.ToString()));
-                    item.EmailAddress = HelperUtility.MaskData(item.EmailAddress, MaskType.Email);
+                    item.DateOfBirth = DataEncryptionHelper.DataDecrypt(item.DateOfBirth);
                 }
                 return orderBy switch
                 {
@@ -1476,9 +1475,9 @@ namespace Coditech.API.Service
                     }
                     else if (header.HeaderCode == ExcelTemplateColumns.DateOfBirth)
                     {
-                        if (trainee.DateOfBirth.HasValue)
+                        if (!string.IsNullOrEmpty(trainee.DateOfBirth))
                         {
-                            cell.Value = trainee.DateOfBirth.Value;
+                            cell.Value = trainee.DateOfBirth;
                             cell.Style.DateFormat.Format = "yyyy-MM-dd";
                         }
                         cell.Style.Protection.Locked = false;
@@ -1509,7 +1508,7 @@ namespace Coditech.API.Service
                 ExcelTemplateColumns.DisplayName => trainee.DisplayName,
                 ExcelTemplateColumns.EmailAddress => trainee.EmailAddress,
                 ExcelTemplateColumns.Gender => trainee.Gender,
-                ExcelTemplateColumns.DateOfBirth => trainee.DateOfBirth?.ToString("yyyy-MM-dd"),
+                ExcelTemplateColumns.DateOfBirth => trainee.DateOfBirth,
                 ExcelTemplateColumns.HeightCm => trainee.HeightCm?.ToString(),
                 ExcelTemplateColumns.WeightKg => trainee.WeightKg?.ToString(),
                 ExcelTemplateColumns.Specialization => trainee.Specialization,

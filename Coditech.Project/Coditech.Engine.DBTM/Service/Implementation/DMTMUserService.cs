@@ -214,6 +214,10 @@ namespace Coditech.API.Service
                 GeneralPerson generalPerson = _generalPersonRepository.Table.Where(x => x.PersonId == personId)?.FirstOrDefault();
                 if (IsNotNull(generalPerson))
                 {
+                    generalPerson.EmailIdSearchTokens = SearchHashHelper.CreateSearchTokens(dbtmUserModel.EmailId);
+                    generalPerson.EmergencyContactSearchTokens = SearchHashHelper.CreateSearchTokens(dbtmUserModel.EmergencyContact);
+                    generalPerson.PhoneNumberSearchTokens = SearchHashHelper.CreateSearchTokens(dbtmUserModel.PhoneNumber);
+
                     generalPerson.MaritalStatus = dbtmUserModel.MaritalStatus;
                     generalPerson.BloodGroup = dbtmUserModel.BloodGroup;
                     generalPerson.BirthMark = dbtmUserModel.BirthMark;
