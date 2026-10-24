@@ -409,6 +409,7 @@ namespace Coditech.API.Service
             userMaster.IsDeleted = true;
             userMaster.IsActive = false;
             userMaster.UserName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
+            userMaster.Password = MD5Hash("deleteduser");
             userMaster.UserNameHash = null;
             userMaster.FirstName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("Deleted") : "Deleted";
             userMaster.MiddleName = null;
