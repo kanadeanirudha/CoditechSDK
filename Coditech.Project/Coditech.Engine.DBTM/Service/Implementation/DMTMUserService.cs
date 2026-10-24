@@ -229,7 +229,7 @@ namespace Coditech.API.Service
                         string emailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
                         if (IsNotNull(userMasterData) && emailId != dbtmUserModel.EmailId)
                         {
-                            userMasterData.EmailId =  generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
+                            userMasterData.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
                             userMasterData.ModifiedBy = dbtmUserModel.ModifiedBy;
                             _userMasterRepository.Update(userMasterData);
                         }
@@ -381,12 +381,22 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NotFound, "Person details not found.");
             }
             DateTime deletedDate = DateTime.Now;
-            generalPerson.FirstName = "Deleted";
+            generalPerson.FirstName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("Deleted") : "Deleted";
             generalPerson.MiddleName = null;
-            generalPerson.LastName = "User";
-            generalPerson.EmailId = "deleteduser";
-            generalPerson.MobileNumber = "0000000000";
+            generalPerson.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("User") : "User";
+            generalPerson.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
+            generalPerson.MobileNumber = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("0000000000") : "0000000000";
             generalPerson.IsDeleted = true;
+
+            generalPerson.EmergencyContact = null;
+            generalPerson.EmergencyContactSearchTokens = null;
+            generalPerson.PhoneNumber = null;
+            generalPerson.IndentificationNumber = null;
+            generalPerson.IndentificationNumberSearchTokens = null;
+            generalPerson.AttendanceIntegrationId = null;
+            generalPerson.AttendanceIntegrationIdSearchTokens = null;
+            generalPerson.DateOfBirth = null;
+            generalPerson.Custom2 = null;
             generalPerson.FirstNameSearchTokens = null;
             generalPerson.MiddleNameSearchTokens = null;
             generalPerson.LastNameSearchTokens = null;
@@ -398,10 +408,12 @@ namespace Coditech.API.Service
 
             userMaster.IsDeleted = true;
             userMaster.IsActive = false;
-            userMaster.FirstName = "Deleted";
+            userMaster.UserName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
+            userMaster.UserNameHash = null;
+            userMaster.FirstName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("Deleted") : "Deleted";
             userMaster.MiddleName = null;
-            userMaster.LastName = "User";
-            userMaster.EmailId = "deleteduser";
+            userMaster.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("User") : "User";
+            userMaster.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
             userMaster.DeletedDate = deletedDate;
             userMaster.ModifiedDate = deletedDate;
             if (trainee != null)
