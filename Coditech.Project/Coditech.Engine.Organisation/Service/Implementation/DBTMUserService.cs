@@ -266,6 +266,7 @@ namespace Coditech.API.Service
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName.ToFirstLetterCapital()} {generalPersonModel.LastName.ToFirstLetterCapital()}";
             }
+            generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
             generalPersonModel.Custom2 = IsDataEncrypted() ? DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2) : generalPersonModel.Custom2;
             generalPersonModel = base.InsertPersonInformation(generalPersonModel, customerData);
             if (!generalPersonModel.HasError)
@@ -1672,6 +1673,19 @@ namespace Coditech.API.Service
             return BuildUploadResult(dt, success);
         }
 
+        public override GeneralPersonModel GetPersonInformation(long personId)
+        {
+            GeneralPersonModel generalPersonModel = base.GetPersonInformation(personId);
+            generalPersonModel.Custom2 = DataEncryptionHelper.DataDecrypt(generalPersonModel.Custom2);
+            return generalPersonModel;
+        }
+
+        public override bool UpdatePersonInformation(GeneralPersonModel generalPersonModel)
+        {
+            generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
+            generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
+            return base.UpdatePersonInformation(generalPersonModel);
+        }
         #endregion
 
         #region Protected Method

@@ -730,13 +730,13 @@ namespace Coditech.API.Service
 
             if (personData != null)
             {
-                dBTMTraineeDetailsModel.FirstName = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.FirstName) : personData.FirstName;
-                dBTMTraineeDetailsModel.MiddleName = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.MiddleName) : personData.MiddleName;
-                dBTMTraineeDetailsModel.LastName = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.LastName) : personData.LastName;
-                dBTMTraineeDetailsModel.DisplayName = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.Custom2) : personData.Custom2;
-                dBTMTraineeDetailsModel.EmailId = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.EmailId) : personData.EmailId;
-                dBTMTraineeDetailsModel.MobileNumber = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.MobileNumber) : personData.MobileNumber;
-                dBTMTraineeDetailsModel.DateOfBirth = personData.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(personData.DateOfBirth) : personData.DateOfBirth;
+                dBTMTraineeDetailsModel.FirstName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.FirstName) : personData.FirstName;
+                dBTMTraineeDetailsModel.MiddleName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.MiddleName) : personData.MiddleName;
+                dBTMTraineeDetailsModel.LastName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.LastName) : personData.LastName;
+                dBTMTraineeDetailsModel.DisplayName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.Custom2) : personData.Custom2;
+                dBTMTraineeDetailsModel.EmailId = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.EmailId) : personData.EmailId;
+                dBTMTraineeDetailsModel.MobileNumber = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.MobileNumber) : personData.MobileNumber;
+                dBTMTraineeDetailsModel.DateOfBirth = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.DateOfBirth) : personData.DateOfBirth;
                 dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
             }
             return dBTMTraineeDetailsModel;
@@ -774,6 +774,7 @@ namespace Coditech.API.Service
                 person.MobileNumber = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.MobileNumber) : dBTMTraineeDetailsModel.MobileNumber;
                 person.DateOfBirth = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DateOfBirth) : dBTMTraineeDetailsModel.DateOfBirth;
                 person.PersonTitle = dBTMTraineeDetailsModel.PersonTitle;
+                person.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(dBTMTraineeDetailsModel.DisplayName);
                 person.Custom2 = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DisplayName) : dBTMTraineeDetailsModel.DisplayName;
                 _generalPersonRepository.Update(person);
             }
@@ -872,7 +873,47 @@ namespace Coditech.API.Service
 
         public void BulkDataEncrypt()
         {
+            List<GeneralPerson> genaralPersonList = _generalPersonRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (GeneralPerson generalPersonModel in genaralPersonList)
+            {
+                generalPersonModel.FirstNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.FirstName);
+                generalPersonModel.MiddleNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.MiddleName);
+                generalPersonModel.LastNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.LastName);
+                generalPersonModel.DateOfBirthSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.DateOfBirth);
+                generalPersonModel.EmailIdSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.EmailId);
+                generalPersonModel.PhoneNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.PhoneNumber);
+                generalPersonModel.MobileNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.MobileNumber);
+                generalPersonModel.EmergencyContactSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.EmergencyContact);
+                generalPersonModel.IndentificationNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.IndentificationNumber);
+                generalPersonModel.AttendanceIntegrationIdSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.AttendanceIntegrationId);
 
+                // Personal Details
+                generalPersonModel.FirstName = DataEncryptionHelper.DataEncrypt(generalPersonModel.FirstName);
+                generalPersonModel.MiddleName = DataEncryptionHelper.DataEncrypt(generalPersonModel.MiddleName);
+                generalPersonModel.LastName = DataEncryptionHelper.DataEncrypt(generalPersonModel.LastName);
+                generalPersonModel.EmailId = DataEncryptionHelper.DataEncrypt(generalPersonModel.EmailId);
+                generalPersonModel.PhoneNumber = DataEncryptionHelper.DataEncrypt(generalPersonModel.PhoneNumber);
+                generalPersonModel.MobileNumber = DataEncryptionHelper.DataEncrypt(generalPersonModel.MobileNumber);
+                generalPersonModel.EmergencyContact = DataEncryptionHelper.DataEncrypt(generalPersonModel.EmergencyContact);
+                generalPersonModel.IndentificationNumber = DataEncryptionHelper.DataEncrypt(generalPersonModel.IndentificationNumber);
+                generalPersonModel.AttendanceIntegrationId = DataEncryptionHelper.DataEncrypt(generalPersonModel.AttendanceIntegrationId);
+                generalPersonModel.IsMinor = HelperUtility.IsMinor(generalPersonModel.DateOfBirth);
+                generalPersonModel.DateOfBirth = DataEncryptionHelper.DataEncrypt(generalPersonModel.DateOfBirth);
+                generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
+                generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
+                generalPersonModel.IsDataEncrypted = true;
+            }
+            List<UserMaster> userMasters = _userMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (var userMaster in userMasters)
+            {
+                userMaster.UserNameHash = SearchHashHelper.CreateSearchHash(userMaster.UserName);
+
+                userMaster.UserName = DataEncryptionHelper.DataEncrypt(userMaster.UserName);
+                userMaster.EmailId = DataEncryptionHelper.DataEncrypt(userMaster.EmailId);
+                userMaster.FirstName = DataEncryptionHelper.DataEncrypt(userMaster.FirstName);
+                userMaster.MiddleName = DataEncryptionHelper.DataEncrypt(userMaster.MiddleName);
+                userMaster.LastName = DataEncryptionHelper.DataEncrypt(userMaster.LastName);
+            }
         }
     }
 
