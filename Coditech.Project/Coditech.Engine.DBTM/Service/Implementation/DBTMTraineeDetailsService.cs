@@ -81,7 +81,7 @@ namespace Coditech.API.Service
                 item.EmailId = DataEncryptionHelper.DataDecrypt(item.EmailId);
                 item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
                 item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
-
+                
                 item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
