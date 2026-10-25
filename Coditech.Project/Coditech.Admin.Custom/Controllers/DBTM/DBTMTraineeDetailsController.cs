@@ -214,22 +214,11 @@ namespace Coditech.Admin.Controllers
             return View("~/Views/DBTM/DBTMTraineeDetails/UpdateDBTMTraineeOtherDetails.cshtml", dBTMTraineeDetailsViewModel);
         }
 
-        public virtual ActionResult Delete(string dBTMTraineeDetailIds, string selectedCentreCode)
+        public virtual ActionResult DeleteUserAccount(long entityId, string selectedCentreCode)
         {
             string message = string.Empty;
-            bool status = false;
-
-            if (!string.IsNullOrEmpty(dBTMTraineeDetailIds))
-            {
-                status = _dBTMTraineeDetailsAgent.DeleteDBTMTraineeDetails(dBTMTraineeDetailIds, out message);
-
-                SetNotificationMessage(!status
-                    ? GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage)
-                    : GetSuccessNotificationMessage(GeneralResources.DeleteMessage));
-                return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
-            }
-
-            SetNotificationMessage(GetErrorNotificationMessage(GeneralResources.DeleteErrorMessage));
+            bool status = _dBTMTraineeDetailsAgent.DeleteUserAccount(entityId, out message);
+            SetNotificationMessage(status ? GetSuccessNotificationMessage(GeneralResources.DeleteMessage) : GetErrorNotificationMessage(string.IsNullOrEmpty(message) ? GeneralResources.DeleteErrorMessage : message));
             return RedirectToAction("List", new DataTableViewModel { SelectedCentreCode = selectedCentreCode });
         }
         #endregion DBTMTraineeDetails
@@ -619,7 +608,7 @@ namespace Coditech.Admin.Controllers
         {
             DateTime performanceDate = new DateTime(2026, 9, 30);
             DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(0, dBTMTraineeDetailId.ToString(), "FirstName", performanceDate, performanceDate, "batch", "Trainee");
-            DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault()?? new DBTMReportTraineeProfileModel();
+            DBTMReportTraineeProfileModel traineeProfile = list?.DBTMTraineeProfileList?.FirstOrDefault() ?? new DBTMReportTraineeProfileModel();
             return View("~/Views/DBTM/DBTMReports/DBTMTraineeDetailsV2.cshtml", traineeProfile);
         }
 

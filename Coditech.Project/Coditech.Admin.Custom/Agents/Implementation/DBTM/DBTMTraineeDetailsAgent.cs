@@ -179,15 +179,20 @@ namespace Coditech.Admin.Agents
         }
 
         //Delete DBTM Trainee Details .
-        public virtual bool DeleteDBTMTraineeDetails(string dBTMTraineeDetailIds, out string errorMessage)
+        public virtual bool DeleteUserAccount(long entityId, out string errorMessage)
         {
             errorMessage = GeneralResources.ErrorFailedToDelete;
-
+            string userType = UserTypeEnum.Trainee.ToString();
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeDetails", TraceLevel.Info);
-                TrueFalseResponse trueFalseResponse = _dBTMTraineeDetailsClient.DeleteDBTMTraineeDetails(new ParameterModel { Ids = dBTMTraineeDetailIds });
-                return trueFalseResponse.IsSuccess;
+                TrueFalseResponse response = _dBTMTraineeDetailsClient.DeleteUserAccount(new ParameterModel { Ids = $"{entityId}|{userType}" });
+                if (response == null || response.HasError)
+                {
+                    errorMessage = response?.ErrorMessage ?? GeneralResources.ErrorFailedToDelete;
+                    return false;
+                }
+                return true;
             }
             catch (CoditechException ex)
             {

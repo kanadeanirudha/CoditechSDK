@@ -169,13 +169,16 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMNewRegistrationListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
-        [HttpDelete]
+        [HttpPost, ValidateModel]
         [Route("/DBTMUser/DeleteUserAccount")]
         [Produces(typeof(DBTMUserResponse))]
-        public virtual IActionResult DeleteUserAccount(long entityId, string userType)
+        public virtual IActionResult DeleteUserAccount([FromBody] ParameterModel parameterModel)
         {
             try
             {
+                string[] values = parameterModel.Ids.Split('|');
+                long entityId = Convert.ToInt64(values[0]);
+                string userType = values[1];
                 bool isDeleted = _dbtmUserService.DeleteUserAccount(entityId, userType);
                 return isDeleted ? CreateOKResponse(new DBTMUserResponse()) : CreateInternalServerErrorResponse();
             }

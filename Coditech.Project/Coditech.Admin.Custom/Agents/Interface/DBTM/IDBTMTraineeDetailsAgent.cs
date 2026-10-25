@@ -53,7 +53,7 @@ namespace Coditech.Admin.Agents
         /// </summary>
         /// <param name="dBTMTraineeDetailIds">dBTMTraineeDetailIds.</param>
         /// <returns>Returns true if deleted successfully else return false.</returns>
-        bool DeleteDBTMTraineeDetails(string dBTMTraineeDetailIds, out string errorMessage);
+        bool DeleteUserAccount(long entityId, out string errorMessage);
 
         /// <summary>
         /// Get list of Associated Trainer.
