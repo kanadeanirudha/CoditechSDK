@@ -152,7 +152,7 @@ namespace Coditech.API.Service
                                 string paramCodeStr = Convert.ToString(item.ParameterCode);
                                 string parameterCode = int.TryParse(paramCodeStr, out int parameterCodeInt) ? ((TestParameterCode)parameterCodeInt).ToString() : paramCodeStr;
                                 string parameterValue = item.ParameterValue.ToString() ?? string.Empty;
-                                string encryptedValue = EncryptionHelper.Encrypt(parameterValue);
+                                string encryptedValue = DataEncryptionHelper.DataEncrypt(parameterValue);
 
                                 detailList.Add(new DBTMDeviceDataDetails
                                 {
@@ -871,7 +871,7 @@ namespace Coditech.API.Service
             return age;
         }
 
-        public void BulkDataEncrypt()
+        public bool BulkDataEncrypt()
         {
             List<GeneralPerson> genaralPersonList = _generalPersonRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
             foreach (GeneralPerson generalPersonModel in genaralPersonList)
@@ -886,6 +886,7 @@ namespace Coditech.API.Service
                 generalPersonModel.EmergencyContactSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.EmergencyContact);
                 generalPersonModel.IndentificationNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.IndentificationNumber);
                 generalPersonModel.AttendanceIntegrationIdSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.AttendanceIntegrationId);
+                generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
 
                 // Personal Details
                 generalPersonModel.FirstName = DataEncryptionHelper.DataEncrypt(generalPersonModel.FirstName);
@@ -899,10 +900,10 @@ namespace Coditech.API.Service
                 generalPersonModel.AttendanceIntegrationId = DataEncryptionHelper.DataEncrypt(generalPersonModel.AttendanceIntegrationId);
                 generalPersonModel.IsMinor = HelperUtility.IsMinor(generalPersonModel.DateOfBirth);
                 generalPersonModel.DateOfBirth = DataEncryptionHelper.DataEncrypt(generalPersonModel.DateOfBirth);
-                generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
                 generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
                 generalPersonModel.IsDataEncrypted = true;
             }
+            _generalPersonRepository.BatchUpdate(genaralPersonList);
             List<UserMaster> userMasters = _userMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
             foreach (var userMaster in userMasters)
             {
@@ -913,7 +914,33 @@ namespace Coditech.API.Service
                 userMaster.FirstName = DataEncryptionHelper.DataEncrypt(userMaster.FirstName);
                 userMaster.MiddleName = DataEncryptionHelper.DataEncrypt(userMaster.MiddleName);
                 userMaster.LastName = DataEncryptionHelper.DataEncrypt(userMaster.LastName);
+                userMaster.IsDataEncrypted = true;
             }
+            _userMasterRepository.BatchUpdate(userMasters);
+
+            List<EmployeeMaster> employeeMasters = _employeeMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (var employee in employeeMasters)
+            {
+                employee.PANCardNumber = DataEncryptionHelper.DataEncrypt(employee.PANCardNumber);
+                employee.UANNumber = DataEncryptionHelper.DataEncrypt(employee.UANNumber);
+                employee.PassportNumber = DataEncryptionHelper.DataEncrypt(employee.PassportNumber);
+                employee.AdharCardNumber = DataEncryptionHelper.DataEncrypt(employee.AdharCardNumber);
+                employee.BankAccountNumber = DataEncryptionHelper.DataEncrypt(employee.BankAccountNumber);
+                employee.BankName = DataEncryptionHelper.DataEncrypt(employee.BankName);
+                employee.BankIFSCCode = DataEncryptionHelper.DataEncrypt(employee.BankIFSCCode);
+                employee.IsDataEncrypted = true;
+            }
+            _employeeMasterRepository.BatchUpdate(employeeMasters);
+
+            var deviceDataDetailsList = _dBTMDeviceDataDetailsRepository.Table.ToList();
+            foreach (var item in deviceDataDetailsList)
+            {
+                string parameterValue = item.IsEncrypted ? EncryptionHelper.Decrypt(item.ParameterValue) : item.ParameterValue;
+                item.ParameterValue = DataEncryptionHelper.DataEncrypt(parameterValue);
+            }
+            _dBTMDeviceDataDetailsRepository.BatchUpdate(deviceDataDetailsList);
+
+            return true;
         }
     }
 

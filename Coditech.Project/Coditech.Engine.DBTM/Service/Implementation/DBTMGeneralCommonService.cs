@@ -1,5 +1,6 @@
 ﻿using Coditech.API.Data;
 using Coditech.Common.API.Model;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
@@ -30,11 +31,7 @@ namespace Coditech.API.Service
                 return model;
 
             // Split IDs
-            var ids = dBTMDeviceDataIds
-                .Split(',')
-                .Select(x => long.TryParse(x.Trim(), out var id) ? id : 0)
-                .Where(x => x > 0)
-                .ToList();
+            var ids = dBTMDeviceDataIds.Split(',').Select(x => long.TryParse(x.Trim(), out var id) ? id : 0).Where(x => x > 0).ToList();
 
             if (!ids.Any())
                 return model;
@@ -50,7 +47,7 @@ namespace Coditech.API.Service
                     ParameterCode = x.ParameterCode,
 
                     // Decrypt only if needed
-                    ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(Convert.ToString(x.ParameterValue)) : x.ParameterValue,
+                    ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(Convert.ToString(x.ParameterValue)) : x.ParameterValue,
 
                     FromTo = x.FromTo,
                     Row = x.Row,

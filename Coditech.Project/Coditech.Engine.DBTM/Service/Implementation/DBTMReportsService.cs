@@ -1346,7 +1346,7 @@ namespace Coditech.API.Service
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
-                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                    x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
                     x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
                     x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
                 });
@@ -1555,7 +1555,7 @@ namespace Coditech.API.Service
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
-                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                    x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
                     x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
                     x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
                 });
@@ -1759,7 +1759,7 @@ namespace Coditech.API.Service
             dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
             dBTMReportsList?.Where(x => x.IsEncrypted || x.IsDataEncrypted)?.ToList()?.ForEach(x =>
             {
-                x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
                 x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
                 x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
                 x.IsDataEncrypted = false;
@@ -1801,7 +1801,7 @@ namespace Coditech.API.Service
         {
             dBTMReportsList?.Where(x => x.IsEncrypted || x.IsDataEncrypted)?.ToList()?.ForEach(x =>
             {
-                x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
                 x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
                 x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
             });

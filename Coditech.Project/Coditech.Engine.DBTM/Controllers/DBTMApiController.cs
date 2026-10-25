@@ -576,5 +576,42 @@ namespace Coditech.Engine.DBTM.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeDetailsListResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMApi/BulkDataEncrypt")]
+        [HttpPost, ValidateModel]
+        [Produces(typeof(TrueFalseResponse))]
+        public IActionResult BulkDataEncrypt()
+        {
+            try
+            {
+                bool status = _dBTMApiService.BulkDataEncrypt();
+
+                return CreateOKResponse(new TrueFalseResponse
+                {
+                    IsSuccess = status
+                });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "BulkDataEncrypt", TraceLevel.Warning);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "BulkDataEncrypt", TraceLevel.Error);
+
+                return CreateInternalServerErrorResponse(new TrueFalseResponse
+                {
+                    HasError = true,
+                    ErrorMessage = ex.Message
+                });
+            }
+        }
     }
 }

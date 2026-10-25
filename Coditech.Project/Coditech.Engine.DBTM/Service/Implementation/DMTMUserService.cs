@@ -93,7 +93,7 @@ namespace Coditech.API.Service
             userModel.UserMasterId = userMasterData.UserMasterId;
             userModel.EntityId = userMasterData.EntityId;
             userModel.UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1;
-            userModel.EmailId = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(userMasterData.EmailId) : userMasterData.EmailId;
+            userModel.EmailId = generalPersonModel.EmailId;
             userModel.IsPasswordChange = userMasterData.IsPasswordChange;
             userModel.IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions;
             userModel.IsTestUser = false;
@@ -152,14 +152,14 @@ namespace Coditech.API.Service
             userModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
             userModel.PersonTitle = generalPersonModel.PersonTitle;
             userModel.FirstName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.FirstName) : generalPersonModel.FirstName;
-            userModel.MiddleName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MiddleName): generalPersonModel.MiddleName;
-            userModel.LastName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.LastName): generalPersonModel.LastName;
-            userModel.EmailId = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmailId): generalPersonModel.EmailId;
-            userModel.DateOfBirth = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.DateOfBirth): generalPersonModel.DateOfBirth;
+            userModel.MiddleName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MiddleName) : generalPersonModel.MiddleName;
+            userModel.LastName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.LastName) : generalPersonModel.LastName;
+            userModel.EmailId = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmailId) : generalPersonModel.EmailId;
+            userModel.DateOfBirth = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.DateOfBirth) : generalPersonModel.DateOfBirth;
             userModel.Gender = GetEnumDisplayTextByEnumId(generalPersonModel.GenderEnumId);
-            userModel.PhoneNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.PhoneNumber): generalPersonModel.PhoneNumber;
-            userModel.MobileNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MobileNumber): generalPersonModel.MobileNumber;
-            userModel.EmergencyContact = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmergencyContact): generalPersonModel.EmergencyContact;
+            userModel.PhoneNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.PhoneNumber) : generalPersonModel.PhoneNumber;
+            userModel.MobileNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MobileNumber) : generalPersonModel.MobileNumber;
+            userModel.EmergencyContact = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmergencyContact) : generalPersonModel.EmergencyContact;
             userModel.MaritalStatus = generalPersonModel.MaritalStatus;
             userModel.BirthMark = generalPersonModel.BirthMark;
             userModel.GeneralOccupationMasterId = generalPersonModel.GeneralOccupationMasterId;
@@ -390,7 +390,6 @@ namespace Coditech.API.Service
             generalPerson.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("User") : "User";
             generalPerson.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
             generalPerson.MobileNumber = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("0000000000") : "0000000000";
-            generalPerson.IsDeleted = true;
 
             generalPerson.EmergencyContact = null;
             generalPerson.EmergencyContactSearchTokens = null;
@@ -407,11 +406,10 @@ namespace Coditech.API.Service
             generalPerson.EmailIdSearchTokens = null;
             generalPerson.MobileNumberSearchTokens = null;
             generalPerson.Custom2 = "Deleted User";
-            generalPerson.DeletedDate = deletedDate;
             generalPerson.ModifiedDate = deletedDate;
+            generalPerson.DeletedDate = deletedDate;
+            generalPerson.IsDeleted = true;
 
-            userMaster.IsDeleted = true;
-            userMaster.IsActive = false;
             userMaster.UserName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
             userMaster.Password = MD5Hash("deleteduser");
             userMaster.UserNameHash = null;
@@ -419,11 +417,14 @@ namespace Coditech.API.Service
             userMaster.MiddleName = null;
             userMaster.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("User") : "User";
             userMaster.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
-            userMaster.DeletedDate = deletedDate;
+            userMaster.IsActive = false;
             userMaster.ModifiedDate = deletedDate;
+            userMaster.IsDeleted = true;
+            userMaster.DeletedDate = deletedDate;
             if (trainee != null)
             {
                 trainee.IsActive = false;
+                trainee.IsDeleted = true;
                 trainee.ModifiedDate = DateTime.Now;
             }
             bool personUpdated = _generalPersonRepository.Update(generalPerson);

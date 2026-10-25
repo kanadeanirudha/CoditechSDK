@@ -682,7 +682,7 @@ namespace Coditech.API.Service
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
-                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                    x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
                 });
 
                 var testList = traineeProfilePerformanceRankDataList
