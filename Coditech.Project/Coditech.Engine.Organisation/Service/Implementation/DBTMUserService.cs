@@ -644,6 +644,50 @@ namespace Coditech.API.Service
 
         #endregion
 
+        public virtual int UpdateTraineeAgeGroups()
+        {
+            var ageGroups =
+            (
+                from gm in _generalEnumaratorMasterRepository.Table
+                join gg in _generalEnumaratorGroupRepository.Table
+                    on gm.GeneralEnumaratorGroupId equals gg.GeneralEnumaratorGroupId
+                where gg.EnumGroupCode == "AgeGroup" && gm.IsActive
+                orderby gm.SequenceNumber
+                select new
+                {
+                    EnumId = gm.GeneralEnumaratorId,
+                    EnumValue = Convert.ToInt32(gm.EnumValue)
+                }
+            ).ToList();
+            if (ageGroups.Count == 0)
+                return 0;
+            var configuredAgeGroups = ageGroups.Select(x => (x.EnumId, x.EnumValue)).ToList();
+            var trainees = _dBTMTraineeDetailsRepository.Table.Where(x => x.IsActive).ToList();
+            if (trainees.Count == 0)
+                return 0;
+            var personIds = trainees.Select(x => x.PersonId).Distinct().ToList();
+            var persons = _generalPersonRepository.Table.Where(x => personIds.Contains(x.PersonId)).Select(x => new { x.PersonId, x.DateOfBirth }).ToList();
+            var personDOBLookup = persons.ToDictionary(x => x.PersonId, x => x.DateOfBirth);
+            var traineesToUpdate = new List<DBTMTraineeDetails>();
+            foreach (var trainee in trainees)
+            {
+                if (!personDOBLookup.TryGetValue(trainee.PersonId, out var dob) || string.IsNullOrWhiteSpace(dob) || !DateTime.TryParse(dob, out DateTime dobDate))
+                {
+                    continue;
+                }
+                int calculatedAgeGroupEnumId = DBTMCustomHelper.GetAgeGroupEnumIdByDOB(dobDate, configuredAgeGroups);
+                if (calculatedAgeGroupEnumId > 0 && trainee.AgeGroupEnumId != calculatedAgeGroupEnumId)
+                {
+                    trainee.AgeGroupEnumId = calculatedAgeGroupEnumId;
+                    traineesToUpdate.Add(trainee);
+                }
+            }
+            if (traineesToUpdate.Count > 0)
+            {
+                _dBTMTraineeDetailsRepository.BatchUpdate(traineesToUpdate);
+            }
+            return traineesToUpdate.Count;
+        }
         #region Private Methods
         private DBTMTraineeUploadModel BuildUploadResult(DataTable dt, int success, DataTable failedTable = null)
         {
