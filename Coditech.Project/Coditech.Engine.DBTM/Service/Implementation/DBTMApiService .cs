@@ -419,7 +419,40 @@ namespace Coditech.API.Service
             dataset.Tables[0].TableName = "TraineeDetails";
             ConvertDataTableToList dataTable = new ConvertDataTableToList();
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+            if (!string.IsNullOrEmpty(dBTMDashboardModel.TrainerNames))
+            {
+                string trainerNames = string.Empty;
 
+                if (!string.IsNullOrWhiteSpace(dBTMDashboardModel.TrainerNames))
+                {
+                    var trainerList = dBTMDashboardModel.TrainerNames.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                    var decryptedNames = new List<string>();
+
+                    foreach (string item in trainerList)
+                    {
+                        string[] name = item.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                        if (name.Length == 0)
+                            continue;
+
+                        string firstName = name[0];
+                        string lastName = name.Length > 1 ? string.Join(" ", name.Skip(1)) : string.Empty;
+
+                        // Decrypt only if the names are encrypted.
+                        firstName = DataEncryptionHelper.DataDecrypt(firstName);
+
+                        if (!string.IsNullOrWhiteSpace(lastName))
+                        {
+                            lastName = DataEncryptionHelper.DataDecrypt(lastName);
+                        }
+
+                        decryptedNames.Add($"{firstName} {lastName}".Trim());
+                    }
+
+                    trainerNames = string.Join(", ", decryptedNames);
+                }
+            }
             return dBTMDashboardModel;
         }
         #endregion
@@ -938,6 +971,22 @@ namespace Coditech.API.Service
             if (employeeMasters.Count > 0)
                 _employeeMasterRepository.BatchUpdate(employeeMasters);
 
+            List<OrganisationCentreMaster> organisationCentreMasters = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (var organisationCentreMaster in organisationCentreMasters)
+            {
+                organisationCentreMaster.CentreAddress = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CentreAddress);
+                organisationCentreMaster.Pincode = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.Pincode);
+                organisationCentreMaster.EmailId = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.EmailId);
+                organisationCentreMaster.CellPhone = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CellPhone);
+                organisationCentreMaster.FaxNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.FaxNumber);
+                organisationCentreMaster.PhoneNumberOffice = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.PhoneNumberOffice);
+                organisationCentreMaster.CINNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CINNumber);
+                organisationCentreMaster.GSTINNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.GSTINNumber);
+                organisationCentreMaster.PanNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.PanNumber);
+                organisationCentreMaster.PFNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.PFNumber);
+                organisationCentreMaster.ESICNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.ESICNumber);
+                organisationCentreMaster.IsDataEncrypted = true;
+            }
 
             int updatedCount = await EncryptDeviceDataDetailsAsync(
                 CancellationToken.None);
