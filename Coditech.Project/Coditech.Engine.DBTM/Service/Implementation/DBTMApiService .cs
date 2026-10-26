@@ -738,7 +738,7 @@ namespace Coditech.API.Service
                 dBTMTraineeDetailsModel.DisplayName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.Custom2) : personData.Custom2;
                 dBTMTraineeDetailsModel.EmailId = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.EmailId) : personData.EmailId;
                 dBTMTraineeDetailsModel.MobileNumber = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.MobileNumber) : personData.MobileNumber;
-                dBTMTraineeDetailsModel.DateOfBirth = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.DateOfBirth) : personData.DateOfBirth;
+                dBTMTraineeDetailsModel.DateOfBirth = string.IsNullOrEmpty(personData.DateOfBirth) ? null : Convert.ToDateTime(personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.DateOfBirth) : personData.DateOfBirth);
                 dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
             }
             return dBTMTraineeDetailsModel;
@@ -774,7 +774,7 @@ namespace Coditech.API.Service
                 person.LastName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.LastName) : dBTMTraineeDetailsModel.LastName;
                 person.EmailId = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.EmailId) : dBTMTraineeDetailsModel.EmailId;
                 person.MobileNumber = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.MobileNumber) : dBTMTraineeDetailsModel.MobileNumber;
-                person.DateOfBirth = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DateOfBirth) : dBTMTraineeDetailsModel.DateOfBirth;
+                person.DateOfBirth = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DateOfBirth.ToString()) : dBTMTraineeDetailsModel.DateOfBirth.ToString();
                 person.PersonTitle = dBTMTraineeDetailsModel.PersonTitle;
                 person.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(dBTMTraineeDetailsModel.DisplayName);
                 person.Custom2 = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DisplayName) : dBTMTraineeDetailsModel.DisplayName;
