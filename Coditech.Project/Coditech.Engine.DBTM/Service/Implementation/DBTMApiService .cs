@@ -451,6 +451,7 @@ namespace Coditech.API.Service
                     }
 
                     trainerNames = string.Join(", ", decryptedNames);
+                    dBTMDashboardModel.TrainerNames = trainerNames;
                 }
             }
             return dBTMDashboardModel;
