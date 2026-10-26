@@ -109,7 +109,7 @@ namespace Coditech.API.Service
             userModel.GeneralTrainerMasterId = generalTrainerMasterId;
             userModel.Custom1 = generalPersonModel.Custom1;
             userModel.CentreName = generalPersonModel.CentreName;
-            userModel.DateOfBirth = generalPersonModel.DateOfBirth;
+            userModel.DateOfBirth = string.IsNullOrEmpty(generalPersonModel.DateOfBirth) ? null : Convert.ToDateTime(generalPersonModel.DateOfBirth);
             userModel.DateOfJoining = userMasterData.CreatedDate.HasValue ? userMasterData.CreatedDate.Value : default(DateTime);
             return userModel;
         }
@@ -155,7 +155,7 @@ namespace Coditech.API.Service
             userModel.MiddleName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MiddleName) : generalPersonModel.MiddleName;
             userModel.LastName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.LastName) : generalPersonModel.LastName;
             userModel.EmailId = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmailId) : generalPersonModel.EmailId;
-            userModel.DateOfBirth = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.DateOfBirth) : generalPersonModel.DateOfBirth;
+            userModel.DateOfBirth = string.IsNullOrEmpty(generalPersonModel.DateOfBirth) ? null : Convert.ToDateTime(generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.DateOfBirth) : generalPersonModel.DateOfBirth);
             userModel.Gender = GetEnumDisplayTextByEnumId(generalPersonModel.GenderEnumId);
             userModel.PhoneNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.PhoneNumber) : generalPersonModel.PhoneNumber;
             userModel.MobileNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MobileNumber) : generalPersonModel.MobileNumber;

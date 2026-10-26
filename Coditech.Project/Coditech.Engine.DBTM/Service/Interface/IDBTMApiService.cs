@@ -26,6 +26,6 @@ namespace Coditech.API.Service
         DBTMBatchModel GetTestListForAssignmentWiseTestingCreatedByTrainer(long generalTrainerMasterId, DateTime assignmentDate, string centreCode);
         List<DBTMGeneralBatchUserModel> GetUserDetailsForAssignmentWiseTesting(long generalTrainerMasterId, int dbtmTestMasterId, DateTime assignmentDate);
         DBTMTraineeDetailsListModel GetTraineeListForAssignmentWiseTesting(long generalTrainerMasterId, string dBTMTestMasterId, string centreCode, DateTime assignmentDate);
-        bool BulkDataEncrypt();
+        Task<bool> BulkDataEncrypt();
     }
 }

@@ -7,6 +7,8 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Data;
 using System.Diagnostics;
@@ -871,7 +873,7 @@ namespace Coditech.API.Service
             return age;
         }
 
-        public bool BulkDataEncrypt()
+        public async Task<bool> BulkDataEncrypt()
         {
             List<GeneralPerson> genaralPersonList = _generalPersonRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
             foreach (GeneralPerson generalPersonModel in genaralPersonList)
@@ -903,7 +905,9 @@ namespace Coditech.API.Service
                 generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
                 generalPersonModel.IsDataEncrypted = true;
             }
-            _generalPersonRepository.BatchUpdate(genaralPersonList);
+            if (genaralPersonList.Count > 0)
+                _generalPersonRepository.BatchUpdate(genaralPersonList);
+
             List<UserMaster> userMasters = _userMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
             foreach (var userMaster in userMasters)
             {
@@ -916,7 +920,8 @@ namespace Coditech.API.Service
                 userMaster.LastName = DataEncryptionHelper.DataEncrypt(userMaster.LastName);
                 userMaster.IsDataEncrypted = true;
             }
-            _userMasterRepository.BatchUpdate(userMasters);
+            if (userMasters.Count > 0)
+                _userMasterRepository.BatchUpdate(userMasters);
 
             List<EmployeeMaster> employeeMasters = _employeeMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
             foreach (var employee in employeeMasters)
@@ -930,17 +935,168 @@ namespace Coditech.API.Service
                 employee.BankIFSCCode = DataEncryptionHelper.DataEncrypt(employee.BankIFSCCode);
                 employee.IsDataEncrypted = true;
             }
-            _employeeMasterRepository.BatchUpdate(employeeMasters);
+            if (employeeMasters.Count > 0)
+                _employeeMasterRepository.BatchUpdate(employeeMasters);
 
-            var deviceDataDetailsList = _dBTMDeviceDataDetailsRepository.Table.ToList();
-            foreach (var item in deviceDataDetailsList)
-            {
-                string parameterValue = item.IsEncrypted ? EncryptionHelper.Decrypt(item.ParameterValue) : item.ParameterValue;
-                item.ParameterValue = DataEncryptionHelper.DataEncrypt(parameterValue);
-            }
-            _dBTMDeviceDataDetailsRepository.BatchUpdate(deviceDataDetailsList);
+
+            int updatedCount = await EncryptDeviceDataDetailsAsync(
+                CancellationToken.None);
 
             return true;
+        }
+
+
+        public async Task<int> EncryptDeviceDataDetailsAsync(
+            CancellationToken cancellationToken = default)
+        {
+            const int batchSize = 1000;
+
+            int totalProcessed = 0;
+            long lastId = 0;
+
+            await using var connection = new SqlConnection("connection string");
+            await connection.OpenAsync(cancellationToken);
+
+            // Create a temporary staging table once per execution.
+            const string createTempTableSql = @"
+        CREATE TABLE #EncryptedBatch
+        (
+            DBTMDeviceDataDetailId INT NOT NULL PRIMARY KEY,
+            ParameterValue NVARCHAR(MAX) NULL
+        );";
+
+            await using (var createCommand =
+                new SqlCommand(createTempTableSql, connection))
+            {
+                await createCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+
+            while (true)
+            {
+                // Fetch only the next batch; do not load all 75k rows.
+                var batch = await _dBTMDeviceDataDetailsRepository.Table
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.DBTMDeviceDataDetailId > lastId &&
+                        (x.Comment3 == null || x.Comment3 != "1"))
+                    .OrderBy(x => x.DBTMDeviceDataDetailId)
+                    .Take(batchSize)
+                    .Select(x => new
+                    {
+                        x.DBTMDeviceDataDetailId,
+                        x.ParameterValue,
+                        x.IsEncrypted
+                    })
+                    .ToListAsync(cancellationToken);
+
+                if (batch.Count == 0)
+                    break;
+
+                lastId = batch[batch.Count - 1].DBTMDeviceDataDetailId;
+
+                var table = new DataTable();
+
+                table.Columns.Add(
+                    "DBTMDeviceDataDetailId", typeof(int));
+
+                table.Columns.Add(
+                    "ParameterValue", typeof(string));
+
+                foreach (var item in batch)
+                {
+                    try
+                    {
+                        string? value = item.ParameterValue;
+
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            // Decrypt first if the existing value is encrypted.
+                            if (item.IsEncrypted)
+                            {
+                                value = EncryptionHelper.Decrypt(value);
+                            }
+
+                            // Encrypt the original plaintext exactly once.
+                            value = DataEncryptionHelper.DataEncrypt(value);
+                        }
+
+                        table.Rows.Add(
+                            item.DBTMDeviceDataDetailId,
+                            (object?)value ?? DBNull.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Replace with your application's ILogger.
+                        Console.Error.WriteLine(
+                            $"Encryption failed for ID " +
+                            $"{item.DBTMDeviceDataDetailId}: {ex.Message}");
+                    }
+                }
+
+                if (table.Rows.Count == 0)
+                    continue;
+
+                // Clear staging data from the previous batch.
+                await using (var truncateCommand =
+                    new SqlCommand(
+                        "TRUNCATE TABLE #EncryptedBatch;",
+                        connection))
+                {
+                    await truncateCommand.ExecuteNonQueryAsync(
+                        cancellationToken);
+                }
+
+                // Bulk insert encrypted values into SQL Server.
+                using (var bulkCopy = new SqlBulkCopy(
+                    connection,
+                    SqlBulkCopyOptions.TableLock,
+                    null))
+                {
+                    bulkCopy.DestinationTableName = "#EncryptedBatch";
+                    bulkCopy.BatchSize = batchSize;
+                    bulkCopy.BulkCopyTimeout = 120;
+
+                    bulkCopy.ColumnMappings.Add(
+                        "DBTMDeviceDataDetailId",
+                        "DBTMDeviceDataDetailId");
+
+                    bulkCopy.ColumnMappings.Add(
+                        "ParameterValue",
+                        "ParameterValue");
+
+                    await bulkCopy.WriteToServerAsync(
+                        table, cancellationToken);
+                }
+
+                // Update all records in this batch with one SQL statement.
+                const string updateSql = @"
+            UPDATE target
+            SET target.ParameterValue = source.ParameterValue,
+                target.IsEncrypted = 1,
+                target.Comment3 = '1'
+            FROM dbo.dBTMDeviceDataDetails AS target
+            INNER JOIN #EncryptedBatch AS source
+                ON source.DBTMDeviceDataDetailId =
+                   target.DBTMDeviceDataDetailId
+            WHERE target.Comment3 IS NULL
+               OR target.Comment3 <> '1';";
+
+                await using (var updateCommand =
+                    new SqlCommand(updateSql, connection))
+                {
+                    updateCommand.CommandTimeout = 120;
+                    try
+                    {
+                        totalProcessed += await updateCommand.ExecuteNonQueryAsync(
+                            cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+
+            return totalProcessed;
         }
     }
 

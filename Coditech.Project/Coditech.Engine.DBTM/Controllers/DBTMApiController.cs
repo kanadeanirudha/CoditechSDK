@@ -580,11 +580,11 @@ namespace Coditech.Engine.DBTM.Controllers
         [Route("/DBTMApi/BulkDataEncrypt")]
         [HttpPost, ValidateModel]
         [Produces(typeof(TrueFalseResponse))]
-        public IActionResult BulkDataEncrypt()
+        public async Task<IActionResult> BulkDataEncrypt()
         {
             try
             {
-                bool status = _dBTMApiService.BulkDataEncrypt();
+                bool status = await _dBTMApiService.BulkDataEncrypt();
 
                 return CreateOKResponse(new TrueFalseResponse
                 {
