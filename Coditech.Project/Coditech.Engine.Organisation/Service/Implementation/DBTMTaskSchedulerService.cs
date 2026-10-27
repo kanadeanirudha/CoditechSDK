@@ -28,6 +28,10 @@ namespace Coditech.API.Service
                     // ExeParameters format: baseUrl,authValue,userId,schedulerCallFor,timeout
                     erpTaskSchedulerModel.ExeParameters = $"{BaseParameter(separator)}{separator}{erpTaskSchedulerModel.SchedulerCallFor}{separator}{ApiSettings.ApiRequestTimeout}";
                     break;
+                case "UpdateTraineeAgeGroups":
+                    // ExeParameters format: baseUrl,authValue,userId,schedulerCallFor,timeout
+                    erpTaskSchedulerModel.ExeParameters = $"{BaseParameter(separator)}{separator}{erpTaskSchedulerModel.SchedulerCallFor}{separator}{ApiSettings.ApiRequestTimeout}";
+                    break;
             }
             _coditechLogging.LogMessage("ExeParameters value: ", CoditechLoggingEnum.Components.ERP.ToString(), TraceLevel.Verbose, erpTaskSchedulerModel?.ExeParameters);
         }

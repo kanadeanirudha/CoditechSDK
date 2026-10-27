@@ -667,7 +667,7 @@ namespace Coditech.API.Service
                 return 0;
             var personIds = trainees.Select(x => x.PersonId).Distinct().ToList();
             var persons = _generalPersonRepository.Table.Where(x => personIds.Contains(x.PersonId)).Select(x => new { x.PersonId, x.DateOfBirth }).ToList();
-            var personDOBLookup = persons.ToDictionary(x => x.PersonId, x => x.DateOfBirth);
+            var personDOBLookup = persons.ToDictionary(x => x.PersonId, x => DataEncryptionHelper.DataDecrypt(x.DateOfBirth));
             var traineesToUpdate = new List<DBTMTraineeDetails>();
             foreach (var trainee in trainees)
             {
