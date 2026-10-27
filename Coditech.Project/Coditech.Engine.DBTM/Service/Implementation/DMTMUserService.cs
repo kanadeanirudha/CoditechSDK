@@ -143,7 +143,7 @@ namespace Coditech.API.Service
             if (personId <= 0)
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(personId);
+            GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
             if (IsNull(generalPersonModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
@@ -151,15 +151,15 @@ namespace Coditech.API.Service
             userModel.UserType = userType;
             userModel.PhotoMediaPath = GetImagePath(generalPersonModel.PhotoMediaId);
             userModel.PersonTitle = generalPersonModel.PersonTitle;
-            userModel.FirstName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.FirstName) : generalPersonModel.FirstName;
-            userModel.MiddleName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MiddleName) : generalPersonModel.MiddleName;
-            userModel.LastName = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.LastName) : generalPersonModel.LastName;
-            userModel.EmailId = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmailId) : generalPersonModel.EmailId;
-            userModel.DateOfBirth = string.IsNullOrEmpty(generalPersonModel.DateOfBirth) ? null : Convert.ToDateTime(generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.DateOfBirth) : generalPersonModel.DateOfBirth);
+            userModel.FirstName = generalPersonModel.FirstName;
+            userModel.MiddleName = generalPersonModel.MiddleName;
+            userModel.LastName = generalPersonModel.LastName;
+            userModel.EmailId = generalPersonModel.EmailId;
+            userModel.DateOfBirth = string.IsNullOrEmpty(generalPersonModel.DateOfBirth) ? null : Convert.ToDateTime(generalPersonModel.DateOfBirth);
             userModel.Gender = GetEnumDisplayTextByEnumId(generalPersonModel.GenderEnumId);
-            userModel.PhoneNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.PhoneNumber) : generalPersonModel.PhoneNumber;
-            userModel.MobileNumber = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.MobileNumber) : generalPersonModel.MobileNumber;
-            userModel.EmergencyContact = generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmergencyContact) : generalPersonModel.EmergencyContact;
+            userModel.PhoneNumber = generalPersonModel.PhoneNumber;
+            userModel.MobileNumber = generalPersonModel.MobileNumber;
+            userModel.EmergencyContact = generalPersonModel.EmergencyContact;
             userModel.MaritalStatus = generalPersonModel.MaritalStatus;
             userModel.BirthMark = generalPersonModel.BirthMark;
             userModel.GeneralOccupationMasterId = generalPersonModel.GeneralOccupationMasterId;
