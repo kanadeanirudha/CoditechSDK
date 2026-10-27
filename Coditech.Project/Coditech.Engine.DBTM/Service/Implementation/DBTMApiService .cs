@@ -972,7 +972,8 @@ namespace Coditech.API.Service
             if (employeeMasters.Count > 0)
                 _employeeMasterRepository.BatchUpdate(employeeMasters);
 
-            List<OrganisationCentreMaster> organisationCentreMasters = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            var _OrganisationCentreMasteRepository = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            List<OrganisationCentreMaster> organisationCentreMasters = _OrganisationCentreMasteRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
             foreach (var organisationCentreMaster in organisationCentreMasters)
             {
                 organisationCentreMaster.CentreAddress = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CentreAddress);
@@ -988,16 +989,16 @@ namespace Coditech.API.Service
                 organisationCentreMaster.ESICNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.ESICNumber);
                 organisationCentreMaster.IsDataEncrypted = true;
             }
+            if (organisationCentreMasters.Count > 0)
+                _OrganisationCentreMasteRepository.BatchUpdate(organisationCentreMasters);
 
-            int updatedCount = await EncryptDeviceDataDetailsAsync(
-                CancellationToken.None);
+            int updatedCount = await EncryptDeviceDataDetailsAsync(CancellationToken.None);
 
             return true;
         }
 
 
-        public async Task<int> EncryptDeviceDataDetailsAsync(
-            CancellationToken cancellationToken = default)
+        public async Task<int> EncryptDeviceDataDetailsAsync(CancellationToken cancellationToken = default)
         {
             const int batchSize = 1000;
 
