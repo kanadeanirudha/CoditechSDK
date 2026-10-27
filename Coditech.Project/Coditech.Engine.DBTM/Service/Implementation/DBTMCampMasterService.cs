@@ -156,6 +156,7 @@ namespace Coditech.API.Service
         #region DBTMCampUser
         public virtual DBTMCampUserListModel GetDBTMCampUserList(int dBTMCampMasterId, string userType, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
+            BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<DBTMCampUserModel> objStoredProc = new CoditechViewRepository<DBTMCampUserModel>(_serviceProvider.GetService<Coditech_Entities>());
@@ -231,7 +232,7 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMCampUserModel> CampList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserList @CentreCode,@GeneralTrainerMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
-            foreach (var item in CampList.Where(x=>x.IsDataEncrypted))
+            foreach (var item in CampList.Where(x => x.IsDataEncrypted))
             {
                 item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
                 item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
