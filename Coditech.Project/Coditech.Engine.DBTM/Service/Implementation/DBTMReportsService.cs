@@ -1074,7 +1074,7 @@ namespace Coditech.API.Service
                 {
                     item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
                     item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
-                    item.DateOfBirth = Convert.ToDateTime(DataEncryptionHelper.DataDecrypt(item.DateOfBirth.ToString()));
+                    item.DateOfBirth = DataEncryptionHelper.DataDecrypt(item.DateOfBirth);
                 }
                 traineeDetaillist.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
                 // Parse trainee ids once and use numeric containment (more efficient than string.Contains in LINQ-to-Entities)

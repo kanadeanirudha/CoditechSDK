@@ -57,6 +57,7 @@ namespace Coditech.API.Service
                 trainer.FirstName = DataEncryptionHelper.DataDecrypt(trainer.FirstName);
                 trainer.LastName = DataEncryptionHelper.DataDecrypt(trainer.LastName);
                 string assignedBy = $"{DataEncryptionHelper.DataDecrypt(trainer.AssignedBy.Split(" ")[0])} {DataEncryptionHelper.DataDecrypt(trainer.AssignedBy.Split(" ")[1])}";
+                trainer.AssignedBy = assignedBy;
             }
 
             DBTMTraineeAssignmentListModel listModel = new DBTMTraineeAssignmentListModel();

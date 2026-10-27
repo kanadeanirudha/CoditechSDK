@@ -11,13 +11,9 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Data;
-using System.IO;
-using System.Text;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
-using DocumentFormat.OpenXml.EMMA;
 
 namespace Coditech.Admin.Agents
 {

@@ -344,8 +344,11 @@ namespace Coditech.API.Service
             return listModel;
         }
 
-        public virtual bool DeleteUserAccount(long entityId, string userType)
+        public virtual bool DeleteUserAccount(ParameterModel parameterModel)
         {
+            string[] values = parameterModel.Ids.Split('|');
+            long entityId = Convert.ToInt64(values[0]);
+            string userType = values[1];
             if (entityId <= 0)
             {
                 throw new CoditechException(ErrorCodes.IdLessThanOne, "Invalid EntityId.");

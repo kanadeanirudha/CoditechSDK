@@ -176,10 +176,7 @@ namespace Coditech.API.Controllers
         {
             try
             {
-                string[] values = parameterModel.Ids.Split('|');
-                long entityId = Convert.ToInt64(values[0]);
-                string userType = values[1];
-                bool isDeleted = _dbtmUserService.DeleteUserAccount(entityId, userType);
+                bool isDeleted = _dbtmUserService.DeleteUserAccount(parameterModel);
                 return isDeleted ? CreateOKResponse(new DBTMUserResponse()) : CreateInternalServerErrorResponse();
             }
             catch (CoditechException ex)
