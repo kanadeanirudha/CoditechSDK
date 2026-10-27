@@ -66,18 +66,9 @@ namespace Coditech.API.Service
             listModel.OrganisationCentrewiseJoiningCodeList = OrganisationCentrewiseJoiningCodeList?.Count > 0 ? OrganisationCentrewiseJoiningCodeList : new List<OrganisationCentrewiseJoiningCodeModel>();
             foreach (var item in OrganisationCentrewiseJoiningCodeList)
             {
-                if (!string.IsNullOrWhiteSpace(item.Custom2))
-                {
-                    var parts = item.Custom2.Split(new[] { ' ' }, 2);
-                    if (parts.Length == 2)
-                    {
-                        item.Custom2 = $"{DataEncryptionHelper.DataDecrypt(parts[0])} {DataEncryptionHelper.DataDecrypt(parts[1])}";
-                    }
-                    else
-                    {
-                        item.Custom2 = DataEncryptionHelper.DataDecrypt(item.Custom2);
-                    }
-                }
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.Custom2 = $"{item.FirstName} {item.LastName}";
             }
             listModel.BindPageListModel(pageListModel);
             return listModel;
