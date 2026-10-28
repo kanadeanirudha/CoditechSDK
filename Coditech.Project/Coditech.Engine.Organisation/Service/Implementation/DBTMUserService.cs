@@ -1726,9 +1726,28 @@ namespace Coditech.API.Service
 
         public override bool UpdatePersonInformation(GeneralPersonModel generalPersonModel)
         {
+            DateTime? dateOfBirth = null;
+            if (DateTime.TryParse(generalPersonModel.DateOfBirth, out DateTime dob))
+            {
+                dateOfBirth = dob;
+            }
             generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
             generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
-            return base.UpdatePersonInformation(generalPersonModel);
+            bool isUpdated = base.UpdatePersonInformation(generalPersonModel);
+            if (isUpdated && string.Equals(generalPersonModel.UserType, UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase) && dateOfBirth.HasValue)
+            {
+                DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonId == generalPersonModel.PersonId);
+                if (trainee != null)
+                {
+                    int ageGroupEnumId = GetAgeGroupEnumIdByDOB(dateOfBirth.Value);
+                    if (ageGroupEnumId > 0 && trainee.AgeGroupEnumId != ageGroupEnumId)
+                    {
+                        trainee.AgeGroupEnumId = ageGroupEnumId;
+                        _dBTMTraineeDetailsRepository.Update(trainee);
+                    }
+                }
+            }
+            return isUpdated;
         }
         #endregion
 
