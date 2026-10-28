@@ -11,10 +11,10 @@
     var logoUrl = Url.Content("~/assets/images/dbtm/applicationlogo.png");
     string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
-    {
-        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
-        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
-    };
+            {
+                ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+                ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
+            };
     var fnameSafe = SanitizeForFilename(Model.FirstName ?? "Trainee");
     var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
     var assessment = Model.AssessmentDate;
@@ -54,7 +54,7 @@
 
     .page {
         /* width: 210mm;
-                                                                                    min-height: 297mm; */
+                                                                                                min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -580,7 +580,7 @@
                     overflow: visible !important;
                 }
                 /* When printing allow the middle column to size naturally and avoid forcing a fixed height
-                                                   which can create large gaps between top and the Performance Report Summary. */
+                                                               which can create large gaps between top and the Performance Report Summary. */
                 .print-selected-report .middle {
                     width: 100% !important;
                     max-width: 100% !important;
@@ -743,7 +743,7 @@
                                                 <div class="info-row"><b>Assessment<br>Location:</b><div class="line"> @Model.AssessmentLocation</div></div>
                                                 <div class="info-row"><b>Athlete /<br>Student Name:</b><div class="line"> @Model.FirstName @Model.LastName</div></div>
                                                 <div class="info-row"><b>Gender:</b><div class="line"> @Model.Gender</div></div>
-                                                <div class="info-row"><b>DOB:</b><div class="line"> @Model.DateOfBirth</div></div>
+                                                <div class="info-row"><b>DOB:</b><div class="line">  @(DateTime.TryParse(Convert.ToString(Model.DateOfBirth), out DateTime dob) ? dob.ToCoditechDateFormat() : "") </div> </div>
                                                 <div class="info-row"><b>Age Group:</b><div class="line"> @Model.AgeGroup</div></div>
                                                 <div class="info-row"><b>Academy<br>Name:</b><div class="line"> @Model.AcademyName</div></div>
                                                 <div class="info-row"><b>Coach Name:</b><div class="line"> @Model.TrainerName</div></div>
