@@ -519,54 +519,60 @@
     }
 
     @@media print {
-        html,
-        body {
+        @@page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+
+        html, body {
+            width: auto !important;
+            min-height: 0 !important;
+            height: auto !important;
             margin: 0 !important;
             padding: 0 !important;
-            width: 210mm !important;
-            min-height: 297mm !important;
+            overflow: visible !important;
             background: #fff !important;
         }
 
-            body * {
-                visibility: hidden !important;
-            }
+        body * {
+            visibility: hidden !important;
+        }
 
-        .print-selected-report,
-        .print-selected-report * {
+        #report, #report * {
             visibility: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
-        .print-selected-report {
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 210mm !important;
+        /* Keep the report in normal document flow so it can continue onto page 2+. */
+        #report {
+            position: static !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
             margin: 0 !important;
-            padding: 10mm 9mm 8mm !important;
-            background: #fff !important;
+            padding: 0 !important;
+            overflow: visible !important;
             box-shadow: none !important;
-            /* allow overflowing content to be visible when printing (charts/tables may exceed fixed heights) */
+            break-after: auto !important;
+            page-break-after: auto !important;
+        }
+
+        #report .report-border {
+            position: static !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            margin: 0 !important;
+            padding: 3mm 4mm !important;
             overflow: visible !important;
             box-sizing: border-box !important;
         }
-            /* Ensure background colors and element colors are preserved when printing */
-            .print-selected-report,
-            .print-selected-report * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-
-                .print-selected-report .report-border {
-                    width: 100% !important;
-                    /* allow report content to grow across pages when needed */
-                    height: auto !important;
-                    min-height: 0 !important;
-                    margin: 0 !important;
-                    box-sizing: border-box !important;
-                    overflow: visible !important;
-                }
 
                 .print-selected-report .top-grid {
                     width: 100% !important;
@@ -595,65 +601,101 @@
                     overflow: visible !important;
                 }
 
-                .print-selected-report .bar-wrap {
-                    height: 155px !important;
-                }
+        #report .info-box,
+        #report .sport-box {
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+        }
 
-                .print-selected-report .radar-wrap {
-                    height: 200px !important;
-                    overflow: visible !important;
-                }
+        #report .bar-wrap { height: 155px !important; }
+        #report .radar-wrap { height: 200px !important; overflow: visible !important; }
+        #report .line-bar-chart-container { height: 175px !important; width: 100% !important; }
+        #report .radar-chart-container { height: 220px !important; width: 100% !important; }
 
-                .print-selected-report table {
-                    max-width: 100% !important;
-                    box-sizing: border-box !important;
-                    page-break-inside: auto !important;
-                }
+        #report table {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+        }
 
-                .print-selected-report canvas,
-                .print-selected-report svg {
-                    max-width: 100% !important;
-                    height: auto !important;
-                }
-                /* avoid breaking performance-pair blocks awkwardly */
-                .print-selected-report .performance-pair,
-                .print-selected-report .section-table {
-                    page-break-inside: avoid !important;
-                }
+        #report tr,
+        #report img,
+        #report canvas,
+        #report svg {
+            max-width: 100% !important;
+        }
 
-                .print-selected-report .line-bar-chart-container {
-                    height: 175px !important;
-                    width: 100% !important;
-                }
+        /* Keep Chart.js canvas inside its print-sized container. Setting canvas
+           height:auto can move the plot/labels onto a separate printed page. */
+        #report canvas {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100% !important;
+        }
 
-                .print-selected-report .radar-chart-container {
-                    height: 220px !important;
-                    width: 100% !important;
-                }
+        #report svg {
+            max-height: 100% !important;
+        }
 
-                .print-selected-report .bar-wrap,
-                .print-selected-report .radar-wrap {
-                    overflow: visible !important;
-                }
-                /* Ensure spacing is preserved when printing */
-                .print-selected-report .performance-report-summary-title {
-                    margin-top: 18px !important;
-                    margin-bottom: 8px !important;
-                }
+        /* Start activity graphs on a fresh page instead of splitting the
+           last section at the bottom edge of page 1. */
+        #report .profile-activity-graphs {
+            break-before: page !important;
+            page-break-before: always !important;
+            overflow: visible !important;
+        }
 
-                .print-selected-report.print-normal-report {
-                    position: fixed !important;
-                    left: 0 !important;
-                    top: 0 !important;
-                    width: 210mm !important;
-                    max-width: 210mm !important;
-                    margin: 0 !important;
-                    box-sizing: border-box !important;
-                    overflow: visible !important;
-                }
+        #report .activity-graph-item,
+        #report .graph-wrapper,
+        #report .activity-graph-row {
+            overflow: visible !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+        }
 
-        .card-header, .toolbar, button, a {
+        #report .line-bar-chart-container {
+            position: relative !important;
+            height: 155px !important;
+            min-height: 155px !important;
+            max-height: 155px !important;
+            width: 100% !important;
+            overflow: visible !important;
+        }
+
+        #report .performance-pair,
+        #report .section-table,
+        #report .graph-wrapper {
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+        }
+
+        #report .performance-report-summary-title {
+            margin-top: 12px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .toolbar, .toolbar *, .card-header, button, a, iframe, .modal {
             display: none !important;
+            visibility: hidden !important;
+        }
+
+        .page-content, .container-fluid, .row, .col-12, .card,
+        .card-body, .dastone-profile {
+            display: block !important;
+            position: static !important;
+            width: auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            box-shadow: none !important;
+            transform: none !important;
         }
     }
 
@@ -669,11 +711,6 @@
 
     .activity-graph-chart canvas {
         max-width: 100%;
-    }
-
-    @@page {
-        size: A4 portrait;
-        margin: 0;
     }
 </style>
 <div class="page-content">
