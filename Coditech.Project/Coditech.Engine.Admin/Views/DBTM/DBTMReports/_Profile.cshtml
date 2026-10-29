@@ -12,10 +12,10 @@
     var logoUrl = Url.Content($"{baseUrl}/assets/images/dbtm/applicationlogo.png");
     string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
-            {
-                ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
-                ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
-            };
+    {
+        ModelPopUpId = $"RemarkPopupId_{Model.DBTMTraineeDetailId}",
+        ModalContentId = $"RemarkContentId_{Model.DBTMTraineeDetailId}"
+    };
     var fnameSafe = SanitizeForFilename(Model.FirstName ?? "Trainee");
     var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
     var assessment = Model.AssessmentDate;
@@ -59,7 +59,7 @@
 
     .page {
         /* width: 210mm;
-                                                                                                min-height: 297mm; */
+            min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -560,9 +560,9 @@
             background: #fff !important;
         }
 
-        body * {
-            visibility: hidden !important;
-        }
+            body * {
+                visibility: hidden !important;
+            }
 
         #report, #report * {
             visibility: visible !important;
@@ -662,7 +662,7 @@
                 max-width: 100% !important;
             }
             /* Keep Chart.js canvas inside its print-sized container. Setting canvas
-                       height:auto can move the plot/labels onto a separate printed page. */
+                                   height:auto can move the plot/labels onto a separate printed page. */
             #report canvas {
                 display: block !important;
                 width: 100% !important;
@@ -674,7 +674,7 @@
                 max-height: 100% !important;
             }
             /* Start activity graphs on a fresh page instead of splitting the
-                       last section at the bottom edge of page 1. */
+                                   last section at the bottom edge of page 1. */
             #report .profile-activity-graphs {
                 break-before: page !important;
                 page-break-before: always !important;
@@ -767,9 +767,7 @@
                                             class="btn btn-success"
                                             data-bs-toggle="modal"
                                             data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
-                                            onclick="DBTMTraineeDetails.GetRemarks(
-                                                                                        'RemarkContentId_@Model.DBTMTraineeDetailId',
-                                                                                        @Model.DBTMTraineeDetailId)">
+                                            onclick="DBTMTraineeDetails.GetRemarks('RemarkContentId_@Model.DBTMTraineeDetailId',@Model.DBTMTraineeDetailId)">
                                         <i class="fa fa-print me-1"></i> Print Report
                                     </button>
                                 }
