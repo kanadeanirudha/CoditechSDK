@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
+using System.IO.Compression;
 using System.Text.RegularExpressions;
 namespace Coditech.Admin.Controllers
 {
@@ -502,6 +503,55 @@ namespace Coditech.Admin.Controllers
             Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/", SameSite = SameSiteMode.Lax });
 
             return File(pdf, "application/pdf", fileName);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadBulkTraineeProfileDetails(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
+        {
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord ?? "batch", reportType);
+            if (list?.DBTMTraineeProfileList == null || list.DBTMTraineeProfileList.Count == 0)
+                return Content("No trainee data found.");
+
+            list.OrderBy = orderBy;
+            using MemoryStream zipStream = new MemoryStream();
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            {
+                int reportIndex = 0;
+                foreach (DBTMReportTraineeProfileModel profile in list.DBTMTraineeProfileList)
+                {
+                    if (profile == null)
+                        continue;
+                    profile.IsGeneratePDFReport = true;
+                    string html = RenderPartialViewToString("~/Views/DBTM/DBTMReports/_Profile.cshtml", profile);
+                    profile.IsGeneratePDFReport = false;
+                    BrowserFetcher browserFetcher = new BrowserFetcher();
+                    await browserFetcher.DownloadAsync();
+                    await using IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+                    await using IPage page = await browser.NewPageAsync();
+                    await page.SetContentAsync(html);
+                    byte[] pdf = await page.PdfDataAsync(new PdfOptions
+                    {
+                        Format = PaperFormat.A4,
+                        PrintBackground = true,
+                        MarginOptions = new MarginOptions
+                        {
+                            Top = "10mm",
+                            Right = "10mm",
+                            Bottom = "10mm",
+                            Left = "10mm"
+                        }
+                    });
+                    string firstName = Regex.Replace(profile.FirstName ?? "Trainee", "[^A-Za-z0-9_-]", "_");
+                    string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
+                    reportIndex++;
+                    string fileName = $"PerformanceReport_{reportIndex}{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "" + lastName)}.pdf";
+                    ZipArchiveEntry reportEntry = archive.CreateEntry(fileName, CompressionLevel.Fastest);
+                    await using Stream reportStream = reportEntry.Open();
+                    await reportStream.WriteAsync(pdf);
+                }
+            }
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/", SameSite = SameSiteMode.Lax });
+            return File(zipStream.ToArray(), "application/zip", "PerformanceReports.zip");
         }
 
         [HttpGet]
