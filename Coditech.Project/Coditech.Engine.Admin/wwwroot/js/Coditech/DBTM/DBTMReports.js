@@ -1040,4 +1040,46 @@ var DBTMReports = {
         }, 500);
         CoditechCommon.DownloadFile(downloadUrl);
     },
+    DownloadBulkTraineeProfileDetails: function () {
+        var reportMode = $('input[name="ProfileReportMode"]:checked').val();
+        var isIndividual = reportMode === "Individual";
+        if (isIndividual) {
+            return;
+        }
+        var generalBatchMasterId = $("#GeneralBatchMasterId").val();
+        var selectedTraineeIds = $("#DBTMTraineeDetailId").val() || [];
+        var orderBy = $("#OrderBy").val();
+        var todate = $("#ToDate").val();
+        var typeOfRecord = "batch";
+        var reportType = "Rank";
+        if (!Array.isArray(selectedTraineeIds)) {
+            selectedTraineeIds = [selectedTraineeIds];
+        }
+        selectedTraineeIds = selectedTraineeIds.filter(function (id) {
+            return id && id !== "0";
+        });
+        if (!generalBatchMasterId || generalBatchMasterId === "0") {
+            CoditechNotification.DisplayNotificationMessage("Please select batch.", "error");
+            return;
+        }
+        if (selectedTraineeIds.length === 0) {
+            CoditechNotification.DisplayNotificationMessage("Please select trainees.", "error");
+            return;
+        }
+        if (!todate) {
+            CoditechNotification.DisplayNotificationMessage("Please select date.", "error");
+            return;
+        }
+        var downloadUrl = "/DBTMReports/DownloadBulkTraineeProfileDetails?"
+            + $.param({
+                generalBatchMasterId: generalBatchMasterId,
+                dbtmTraineeDetailIds: selectedTraineeIds.join(","),
+                orderBy: orderBy,
+                FromDate: todate,
+                ToDate: todate,
+                typeOfRecord: typeOfRecord,
+                reportType: reportType
+            });
+        CoditechCommon.DownloadFile(downloadUrl);
+    },
 };

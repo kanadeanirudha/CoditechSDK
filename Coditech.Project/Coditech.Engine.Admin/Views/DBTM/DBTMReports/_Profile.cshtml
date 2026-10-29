@@ -58,8 +58,6 @@
         }
 
     .page {
-        /* width: 210mm;
-            min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -661,8 +659,7 @@
             #report svg {
                 max-width: 100% !important;
             }
-            /* Keep Chart.js canvas inside its print-sized container. Setting canvas
-                                   height:auto can move the plot/labels onto a separate printed page. */
+            /* Keep Chart.js canvas inside its print-sized container. Setting canvas height:auto can move the plot/labels onto a separate printed page. */
             #report canvas {
                 display: block !important;
                 width: 100% !important;
@@ -673,8 +670,7 @@
             #report svg {
                 max-height: 100% !important;
             }
-            /* Start activity graphs on a fresh page instead of splitting the
-                                   last section at the bottom edge of page 1. */
+            /* Start activity graphs on a fresh page instead of splitting the last section at the bottom edge of page 1. */
             #report .profile-activity-graphs {
                 break-before: page !important;
                 page-break-before: always !important;
@@ -801,6 +797,10 @@
                                                 {
                                                     <img src="@Model.PhotoMediaPath" style="height: 115px; width: 100%; object-fit: cover;" />
                                                 }
+                                                else if (!string.IsNullOrWhiteSpace(Model.Gender) && Model.Gender.Trim().Equals("Female", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <img style="height: 115px;" src="@Url.Content($"{baseUrl}/assets/images/dbtm/femaleavatar.png")" />
+                                                }
                                                 else
                                                 {
                                                     <img style="height: 115px;" src="@Url.Content($"{baseUrl}/assets/images/dbtm/maleavatar.png")" />
@@ -890,7 +890,7 @@
                                                                     @Model.OverallActivityScoreUPDownValue%
                                                                     <span class="down">⬇</span>
                                                                 </td>
-                                                                <td class="improvement-status">Down</td>
+                                                                <td class="improvement-status">Declined</td>
                                                             }
                                                         }
                                                         else
@@ -921,7 +921,10 @@
                                             </div>
 
                                             <div>
-                                                <div class="radar-title">Performance Matrix</div>
+                                                @if (Model.RadarChart == null || !Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <div class="radar-title">Performance Matrix</div>
+                                                }
                                                 <div class="radar-wrap">
                                                     @if (!Model.IsTraineeProfilePerformanceAvailable)
                                                     {
@@ -938,7 +941,10 @@
                                             var performanceList = Model.TraineeProfilePerformanceList ?? new List<DBTMTraineeProfilePerformanceModel>();
                                             var performanceGroups = performanceList.GroupBy(x => x.PerformanceMatrix).OrderBy(x => x.Key).ToList();
                                         }
-                                        <div class="performance-report-summary-title"> Performance Report Summary</div>
+                                        @if (Model.TraineeProfilePerformanceList?.Count > 0)
+                                        {
+                                            <div class="performance-report-summary-title"> Performance Report Summary</div>
+                                        }
                                         @for (int groupIndex = 0; groupIndex < performanceGroups.Count; groupIndex += 2)
                                         {
                                             var firstGroup = performanceGroups[groupIndex];

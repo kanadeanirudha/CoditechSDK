@@ -22,6 +22,16 @@
             padding: 10px !important;
         }
 </style>
+@if (Model?.DBTMTraineeProfileList != null && Model.DBTMTraineeProfileList.Count > 1)
+{
+    <div class="d-flex justify-content-end mb-2">
+        <button type="button"
+                class="btn btn-success"
+                onclick="DBTMReports.DownloadBulkTraineeProfileDetails()">
+            <i class="fa fa-download"></i> Download All
+        </button>
+    </div>
+}
 <div class="accordion" id="traineeAccordion">
 
     @if (Model?.DBTMTraineeProfileList != null && Model.DBTMTraineeProfileList.Any())
