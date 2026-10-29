@@ -1050,9 +1050,8 @@ namespace Coditech.API.Service
                 {
                     FromDate = _dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode).OrderByDescending(x => x.TestPerformedTime).Select(x => x.TestPerformedTime).FirstOrDefault();
                 }
-                generalBatchMasterId = Convert.ToInt64(_dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode && x.TestPerformedTime.Date == FromDate.Date).FirstOrDefault()?.TablePrimaryColumnId);
+                generalBatchMasterId = Convert.ToInt64(_dBTMDeviceDataRepository.Table.Where(x => x.PersonCode == personCode && x.TestPerformedTime.Date == FromDate.Date)?.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.TablePrimaryColumnId);
             }
-
             if (generalBatchMasterId <= 0)
             {
                 return null;
@@ -1216,8 +1215,8 @@ namespace Coditech.API.Service
                         if (graphMasterIds.Count == 0)
                             continue;
                         string dBTMGraphMasterIds = string.Join(",", graphMasterIds);
-                      
-                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty,item.CentreCode, false, typeOfRecord);
+
+                        var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty, item.CentreCode, false, typeOfRecord);
                         foreach (var graphModel in graphList)
                         {
                             graphModel.Custom1 = testDetails.TestName;
@@ -1247,7 +1246,12 @@ namespace Coditech.API.Service
         {
             Dictionary<string, double> performunceMatrixScore = new Dictionary<string, double>();
             // Build arrays for chart: test names and their numeric scores
-            string[] testNames = traineePerformunceList.Select(p => p.TestName ?? string.Empty).ToArray();
+            string[] testNames = traineePerformunceList.Select(p =>
+                                {
+                                    string testName = p.TestName ?? string.Empty;
+                                    int index = testName.IndexOf('(');
+                                    return index >= 0 ? testName.Substring(0, index).Trim() : testName.Trim();
+                                }).ToArray();
             decimal[] scores = traineePerformunceList.Select(p =>
             {
                 if (decimal.TryParse(p.Score, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var sc))

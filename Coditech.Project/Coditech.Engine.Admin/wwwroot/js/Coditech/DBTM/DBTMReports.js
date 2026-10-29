@@ -668,24 +668,24 @@ var DBTMReports = {
         var dbtmTraineeDetailId = $(traineeSelector).val();
         var orderBy = isIndividual ? "" : $("#OrderBy").val();
         var todate = $("#ToDate").val();
+        var fromdate = todate;
+        var typeOfRecord = "batch";
+        var reportType = isIndividual ? "Individual" : "Rank";
         if (Array.isArray(dbtmTraineeDetailId)) {
             dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
         }
         $("#DBTMBatchWiseTraineeProfileDetailsDivId").empty();
         if (!todate) {
-            CoditechNotification.DisplayNotificationMessage(
-                "Please select date.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select date.", "error");
             return;
         }
         if (!dbtmTraineeDetailId) {
-            CoditechNotification.DisplayNotificationMessage(
-                "Please select trainee.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select trainee.", "error");
             return;
         }
         if (!isIndividual &&
             (!generalBatchMasterId || generalBatchMasterId === "0")) {
-            CoditechNotification.DisplayNotificationMessage(
-                "Please select batch.", "error");
+            CoditechNotification.DisplayNotificationMessage("Please select batch.", "error");
             return;
         }
         CoditechCommon.ShowLodder();
@@ -698,14 +698,13 @@ var DBTMReports = {
                 generalBatchMasterId: generalBatchMasterId,
                 dbtmTraineeDetailIds: dbtmTraineeDetailId,
                 orderBy: orderBy,
-                FromDate: todate,
+                FromDate: fromdate,
                 ToDate: todate,
-                reportType: isIndividual ? "Individual" : "Rank"
+                typeOfRecord: typeOfRecord,
+                reportType: reportType
             },
             success: function (data) {
                 $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
-                DBTMReports.LoadTraineeProfileActivityDates();
-                CoditechCommon.HideLodder();
             },
             error: function (xhr) {
                 if (xhr.status === 401 || xhr.status === 403) {
@@ -984,45 +983,61 @@ var DBTMReports = {
         }, 1000);
     },
     ConfirmPrintReport: function (traineeId, modalId) {
-        debugger;
-        try {
-            var remarks = $("#RemarksText").val() || "";
-            $("#printRemarksText").text(remarks);
-
-            if (modalId && $("#" + modalId).length) {
-                $("#" + modalId).modal("hide");
-            } else if ($("#RemarkPopupId").length) {
-                $("#RemarkPopupId").modal("hide");
-            }
-
-            setTimeout(function () {
-                // Prefer selector based on provided modalId, fall back to trainee-specific or generic remark button
-                var selector;
-                if (modalId) {
-                    selector = "button[data-bs-target='#" + modalId + "']";
-                } else {
-                    selector = "button[data-bs-target='#RemarkPopupId_" + traineeId + "'], button[data-bs-target='#RemarkPopupId']";
-                }
-                var $button = $(selector).first();
-
-                if ($button.length && typeof DBTMReports !== "undefined" && DBTMReports.PrintTraineeProfile) {
-                    // Call print using the button so PrintTraineeProfile can find the correct report context
-                    DBTMReports.PrintTraineeProfile($button[0]);
-                } else {
-                    var $report = $("#report");
-                    if ($report.length) {
-                        $report.addClass("print-selected-report print-normal-report");
-                        window.print();
-                        setTimeout(function () {
-                            $report.removeClass("print-selected-report print-normal-report");
-                        }, 1000);
-                    } else {
-                        window.print();
-                    }
-                }
-            }, 300);
-        } catch (e) {
-            console && console.error && console.error('ConfirmPrintReport error', e);
+        var remarks = $("#RemarksText").val() || "";
+        var reportMode = $('input[name="ProfileReportMode"]:checked').val();
+        var isIndividual = reportMode === "Individual";
+        var generalBatchMasterId = isIndividual ? 0 : $("#GeneralBatchMasterId").val();
+        var orderBy = isIndividual ? "" : $("#OrderBy").val();
+        var todate = $("#ToDate").val();
+        var typeOfRecord = "batch";
+        var reportType = isIndividual ? "Individual" : "Rank";
+        if (!todate) {
+            CoditechNotification.DisplayNotificationMessage("Please select date.", "error");
+            return;
         }
+        if (!isIndividual &&
+            (!generalBatchMasterId || generalBatchMasterId === "0")) {
+            CoditechNotification.DisplayNotificationMessage("Please select batch.", "error");
+            return;
+        }
+        if (modalId && $("#" + modalId).length) {
+            var modalElement = document.getElementById(modalId);
+            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+        var downloadUrl = "/DBTMReports/DownloadSingleTraineeProfileDetails?" +
+            $.param({
+                generalBatchMasterId: generalBatchMasterId,
+                dbtmTraineeDetailIds: traineeId,
+                orderBy: orderBy,
+                FromDate: todate,
+                ToDate: todate,
+                typeOfRecord: typeOfRecord,
+                reportType: reportType,
+                remarks: remarks
+            });
+        CoditechCommon.DownloadFile(downloadUrl);
+        document.cookie = "FileDownload=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        var downloadCheckCount = 0;
+        var downloadCheckInterval = setInterval(function () {
+            downloadCheckCount++;
+            var downloadCompleted = document.cookie
+                .split("; ")
+                .some(function (cookie) {
+                    return cookie === "FileDownload=Completed";
+                });
+            if (downloadCompleted) {
+                clearInterval(downloadCheckInterval);
+                document.cookie = "FileDownload=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                CoditechCommon.HideLodder();
+            }
+            if (downloadCheckCount >= 120) {
+                clearInterval(downloadCheckInterval);
+                CoditechCommon.HideLodder();
+            }
+        }, 500);
+        CoditechCommon.DownloadFile(downloadUrl);
     },
 };
