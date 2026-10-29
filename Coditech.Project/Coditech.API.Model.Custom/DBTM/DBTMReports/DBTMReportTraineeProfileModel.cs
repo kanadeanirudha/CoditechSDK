@@ -43,5 +43,6 @@
         public string CentreCode { get; set; } = string.Empty;
         public List<GraphModel> DaywiseReportGraphList { get; set; }
         public bool IsDataEncrypted { get; set; }
+        public bool IsGeneratePDFReport { get; set; }
     }
 }

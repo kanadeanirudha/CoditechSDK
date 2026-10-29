@@ -8,7 +8,8 @@
     string actionName = ViewContext.RouteData.Values["action"].ToString();
     string dashboardUrl = CoditechAdminSettings.DashboardUrl;
     // precompute sanitized printable name and common URLs
-    var logoUrl = Url.Content("~/assets/images/dbtm/applicationlogo.png");
+    string baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}";
+    var logoUrl = Url.Content($"{baseUrl}/assets/images/dbtm/applicationlogo.png");
     string SanitizeForFilename(string s) => Regex.Replace((s ?? string.Empty).Trim(), "[^A-Za-z0-9_\\-]", "_");
     ModelPopUpViewModel remarkPopup = new ModelPopUpViewModel()
             {
@@ -19,6 +20,10 @@
     var lnameSafe = SanitizeForFilename(Model.LastName ?? string.Empty);
     var assessment = Model.AssessmentDate;
     string profilePrintName = $"PerformanceReport_{fnameSafe}{(string.IsNullOrEmpty(lnameSafe) ? string.Empty : "_" + lnameSafe)}";
+}
+@if (Model.IsGeneratePDFReport)
+{
+    <script src="@baseUrl/lib/chart/Chart.min.js"></script>
 }
 <style>
     * {
@@ -500,6 +505,27 @@
         width: 100%;
     }
 
+    .pdf-report .activity-graph-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+        gap: 8px;
+        align-items: start;
+    }
+
+    .pdf-report .activity-graph-chart,
+    .pdf-report .activity-graph-image {
+        min-width: 0;
+    }
+
+    .pdf-report .activity-graph-image {
+        position: static;
+        width: auto;
+    }
+
+    .pdf-report .activity-protocol-img {
+        width: 100%;
+    }
+
     .performance-matrix-group {
         width: 100%;
         margin-bottom: 24px;
@@ -544,7 +570,6 @@
             print-color-adjust: exact !important;
             color-adjust: exact !important;
         }
-
         /* Keep the report in normal document flow so it can continue onto page 2+. */
         #report {
             position: static !important;
@@ -562,121 +587,128 @@
             page-break-after: auto !important;
         }
 
-        #report .report-border {
-            position: static !important;
-            width: 100% !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
-            margin: 0 !important;
-            padding: 3mm 4mm !important;
-            overflow: visible !important;
-            box-sizing: border-box !important;
-        }
+            #report .report-border {
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                margin: 0 !important;
+                padding: 3mm 4mm !important;
+                overflow: visible !important;
+                box-sizing: border-box !important;
+            }
 
-                .print-selected-report .top-grid {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    box-sizing: border-box !important;
-                    grid-template-columns: 25fr 39fr 36fr !important;
-                    gap: 8px !important; /* give space between columns when printing */
-                    column-gap: 8px !important;
-                    height: auto !important;
-                    min-height: 0 !important;
-                    overflow: visible !important;
-                }
-                /* When printing allow the middle column to size naturally and avoid forcing a fixed height
-                                                               which can create large gaps between top and the Performance Report Summary. */
-                .print-selected-report .middle {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    box-sizing: border-box !important;
-                    grid-template-columns: 25fr 35fr 40fr !important;
-                    gap: 8px !important; /* keep consistent spacing in middle section */
-                    column-gap: 8px !important;
-                    height: auto !important;
-                    min-height: 0 !important;
-                    margin-top: 5px !important;
-                    margin-bottom: 0 !important;
-                    overflow: visible !important;
-                }
+            #report .top-grid {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+                grid-template-columns: 25fr 39fr 36fr !important;
+                gap: 6px !important;
+            }
 
-        #report .info-box,
-        #report .sport-box {
-            height: auto !important;
-            min-height: 0 !important;
-            overflow: visible !important;
-        }
+            #report .middle {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                margin-top: 5px !important;
+                margin-bottom: 0 !important;
+                overflow: visible !important;
+                grid-template-columns: 25fr 35fr 40fr !important;
+                gap: 6px !important;
+            }
 
-        #report .bar-wrap { height: 155px !important; }
-        #report .radar-wrap { height: 200px !important; overflow: visible !important; }
-        #report .line-bar-chart-container { height: 175px !important; width: 100% !important; }
-        #report .radar-chart-container { height: 220px !important; width: 100% !important; }
+            #report .info-box,
+            #report .sport-box {
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+            }
 
-        #report table {
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            page-break-inside: auto !important;
-            break-inside: auto !important;
-        }
+            #report .bar-wrap {
+                height: 155px !important;
+            }
 
-        #report tr,
-        #report img,
-        #report canvas,
-        #report svg {
-            max-width: 100% !important;
-        }
+            #report .radar-wrap {
+                height: 200px !important;
+                overflow: visible !important;
+            }
 
-        /* Keep Chart.js canvas inside its print-sized container. Setting canvas
-           height:auto can move the plot/labels onto a separate printed page. */
-        #report canvas {
-            display: block !important;
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 100% !important;
-        }
+            #report .line-bar-chart-container {
+                height: 175px !important;
+                width: 100% !important;
+            }
 
-        #report svg {
-            max-height: 100% !important;
-        }
+            #report .radar-chart-container {
+                height: 220px !important;
+                width: 100% !important;
+            }
 
-        /* Start activity graphs on a fresh page instead of splitting the
-           last section at the bottom edge of page 1. */
-        #report .profile-activity-graphs {
-            break-before: page !important;
-            page-break-before: always !important;
-            overflow: visible !important;
-        }
+            #report table {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
 
-        #report .activity-graph-item,
-        #report .graph-wrapper,
-        #report .activity-graph-row {
-            overflow: visible !important;
-            break-inside: avoid !important;
-            page-break-inside: avoid !important;
-        }
+            #report tr,
+            #report img,
+            #report canvas,
+            #report svg {
+                max-width: 100% !important;
+            }
+            /* Keep Chart.js canvas inside its print-sized container. Setting canvas
+                       height:auto can move the plot/labels onto a separate printed page. */
+            #report canvas {
+                display: block !important;
+                width: 100% !important;
+                height: 100% !important;
+                max-height: 100% !important;
+            }
 
-        #report .line-bar-chart-container {
-            position: relative !important;
-            height: 155px !important;
-            min-height: 155px !important;
-            max-height: 155px !important;
-            width: 100% !important;
-            overflow: visible !important;
-        }
+            #report svg {
+                max-height: 100% !important;
+            }
+            /* Start activity graphs on a fresh page instead of splitting the
+                       last section at the bottom edge of page 1. */
+            #report .profile-activity-graphs {
+                break-before: page !important;
+                page-break-before: always !important;
+                overflow: visible !important;
+            }
 
-        #report .performance-pair,
-        #report .section-table,
-        #report .graph-wrapper {
-            page-break-inside: auto !important;
-            break-inside: auto !important;
-        }
+            #report .activity-graph-item,
+            #report .graph-wrapper,
+            #report .activity-graph-row {
+                overflow: visible !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
 
-        #report .performance-report-summary-title {
-            margin-top: 12px !important;
-            margin-bottom: 8px !important;
-        }
+            #report .line-bar-chart-container {
+                position: relative !important;
+                height: 155px !important;
+                min-height: 155px !important;
+                max-height: 155px !important;
+                width: 100% !important;
+                overflow: visible !important;
+            }
+
+            #report .performance-pair,
+            #report .section-table,
+            #report .graph-wrapper {
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+
+            #report .performance-report-summary-title {
+                margin-top: 12px !important;
+                margin-bottom: 8px !important;
+            }
 
         .toolbar, .toolbar *, .card-header, button, a, iframe, .modal {
             display: none !important;
@@ -718,41 +750,44 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Trainee Profile</h4>
-                        <div class="d-flex gap-2">
-                            @if (Model.IsListView)
-                            {
-                                <a class="btn btn-soft-primary float-end" href="/DBTMTraineeDetails/Cancel?selectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
-                                    <i class="fas fa-arrow-left me-2"></i>Back
-                                </a>
-                            }
-                            @if (Model.DBTMTraineeDetailId > 0)
-                            {
-                                <button type="button"
-                                        class="btn btn-success"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
-                                        onclick="DBTMTraineeDetails.GetRemarks(
-                                        'RemarkContentId_@Model.DBTMTraineeDetailId',
-                                        @Model.DBTMTraineeDetailId)">
-                                    <i class="fa fa-print me-1"></i> Print Report
-                                </button>
-                            }
-                            @if (!Model.IsListView)
-                            {
-                                <!-- BACK BUTTON  -->
-                                <a class="btn btn-sm btn-soft-primary" href="@Url.Action("List", controllerName, new DataTableViewModel { SelectedCentreCode = Model.SelectedCentreCode, SelectedParameter1 = Model.SelectedParameter1 })">
-                                    <i class="fas fa-arrow-left me-2"></i> Back
-                                </a>
-                            }
+                    @if (!Model.IsGeneratePDFReport)
+                    {
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Trainee Profile</h4>
+                            <div class="d-flex gap-2">
+                                @if (Model.IsListView)
+                                {
+                                    <a class="btn btn-soft-primary float-end" href="/DBTMTraineeDetails/Cancel?selectedCentreCode=@Model.SelectedCentreCode&GeneralTrainerMasterId=@Model.SelectedParameter2" role="button">
+                                        <i class="fas fa-arrow-left me-2"></i>Back
+                                    </a>
+                                }
+                                @if (Model.DBTMTraineeDetailId > 0)
+                                {
+                                    <button type="button"
+                                            class="btn btn-success"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#RemarkPopupId_@Model.DBTMTraineeDetailId"
+                                            onclick="DBTMTraineeDetails.GetRemarks(
+                                                                                        'RemarkContentId_@Model.DBTMTraineeDetailId',
+                                                                                        @Model.DBTMTraineeDetailId)">
+                                        <i class="fa fa-print me-1"></i> Print Report
+                                    </button>
+                                }
+                                @if (!Model.IsListView)
+                                {
+                                    <!-- BACK BUTTON  -->
+                                    <a class="btn btn-sm btn-soft-primary" href="@Url.Action("List", controllerName, new DataTableViewModel { SelectedCentreCode = Model.SelectedCentreCode, SelectedParameter1 = Model.SelectedParameter1 })">
+                                        <i class="fas fa-arrow-left me-2"></i> Back
+                                    </a>
+                                }
+                            </div>
                         </div>
-                    </div>
+                    }
                     @if (Model.DBTMTraineeDetailId > 0)
                     {
                         <div class="card-body">
                             <div class="dastone-profile">
-                                <div class="page" id="report" data-printable-name="@profilePrintName">
+                                <div class="page@(Model.IsGeneratePDFReport ? " pdf-report" : string.Empty)" id="report" data-printable-name="@profilePrintName">
                                     <div class="report-border">
                                         <div class="header">
                                             <div class="brand"><img style="height:45px" src="@logoUrl" /></div>
@@ -770,7 +805,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <img style="height: 115px;" src="@Url.Content("~/assets/images/dbtm/maleavatar.png")" />
+                                                    <img style="height: 115px;" src="@Url.Content($"{baseUrl}/assets/images/dbtm/maleavatar.png")" />
                                                 }
                                             </div>
 
@@ -788,25 +823,25 @@
 
                                             <div class="sport-box">
                                                 @{
-                                                    string sportImage = "~/assets/images/dbtm/football.jpg";
+                                                    string sportImage = $"{baseUrl}/assets/images/dbtm/football.jpg";
                                                     if (!string.IsNullOrEmpty(Model.Specialization))
                                                     {
                                                         if (Model.Specialization.StartsWith("Cricket"))
-                                                            sportImage = "~/assets/images/dbtm/cricket.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/cricket.jpg";
                                                         else if (Model.Specialization.StartsWith("Badminton"))
-                                                            sportImage = "~/assets/images/dbtm/badminton.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/badminton.jpg";
                                                         else if (Model.Specialization.StartsWith("Basketball"))
-                                                            sportImage = "~/assets/images/dbtm/basketball.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/basketball.jpg";
                                                         else if (Model.Specialization.StartsWith("Hockey"))
-                                                            sportImage = "~/assets/images/dbtm/hockey.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/hockey.jpg";
                                                         else if (Model.Specialization.StartsWith("Kabaddi"))
-                                                            sportImage = "~/assets/images/dbtm/kabaddi.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/kabaddi.jpg";
                                                         else if (Model.Specialization.StartsWith("Swimming"))
-                                                            sportImage = "~/assets/images/dbtm/swimming.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/swimming.jpg";
                                                         else if (Model.Specialization.StartsWith("Tennis"))
-                                                            sportImage = "~/assets/images/dbtm/tennis.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/tennis.jpg";
                                                         else if (Model.Specialization.StartsWith("Athletics"))
-                                                            sportImage = "~/assets/images/dbtm/athletics.jpg";
+                                                            sportImage = $"{baseUrl}/assets/images/dbtm/athletics.jpg";
                                                     }
                                                 }
                                                 <img class="ball" src="@Url.Content(sportImage)" />
@@ -819,10 +854,10 @@
                                         <div class="middle">
                                             <div class="anthro-area">
                                                 @{
-                                                    string bodyImage = "~/assets/images/dbtm/HeightWeightMale.png";
+                                                    string bodyImage = $"{baseUrl}/assets/images/dbtm/HeightWeightMale.png";
                                                     if (!string.IsNullOrWhiteSpace(Model.Gender) && Model.Gender.Trim().Equals("Female", StringComparison.OrdinalIgnoreCase))
                                                     {
-                                                        bodyImage = "~/assets/images/dbtm/HeightWeightFemale.png";
+                                                        bodyImage = $"{baseUrl}/assets/images/dbtm/HeightWeightFemale.png";
                                                     }
                                                 }
                                                 <img class="body-svg" src="@Url.Content(bodyImage)" />
