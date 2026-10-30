@@ -468,11 +468,12 @@ namespace Coditech.Admin.Controllers
             DBTMReportTraineeProfileModel profile = list.DBTMTraineeProfileList?.FirstOrDefault();
             if (profile == null)
                 return Content("No trainee data found.");
+
+            string datetimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             if (remarks != null)
                 profile.Remarks = remarks;
             profile.IsGeneratePDFReport = true;
             string html = RenderPartialViewToString("~/Views/DBTM/DBTMReports/_Profile.cshtml", profile);
-            profile.IsGeneratePDFReport = false;
             BrowserFetcher browserFetcher = new BrowserFetcher();
             await browserFetcher.DownloadAsync();
 
@@ -494,7 +495,7 @@ namespace Coditech.Admin.Controllers
 
             string firstName = Regex.Replace(profile.FirstName ?? "Trainee", "[^A-Za-z0-9_-]", "_");
             string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
-            string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}.pdf";
+            string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}_{datetimeStamp}.pdf";
             string reportsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PerformanceReports");
             Directory.CreateDirectory(reportsFolder);
             string pdfPath = Path.Combine(reportsFolder, fileName);
@@ -514,6 +515,7 @@ namespace Coditech.Admin.Controllers
 
             list.OrderBy = orderBy;
             using MemoryStream zipStream = new MemoryStream();
+            string datetimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
             {
                 int reportIndex = 0;
@@ -523,7 +525,6 @@ namespace Coditech.Admin.Controllers
                         continue;
                     profile.IsGeneratePDFReport = true;
                     string html = RenderPartialViewToString("~/Views/DBTM/DBTMReports/_Profile.cshtml", profile);
-                    profile.IsGeneratePDFReport = false;
                     BrowserFetcher browserFetcher = new BrowserFetcher();
                     await browserFetcher.DownloadAsync();
                     await using IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
@@ -544,14 +545,14 @@ namespace Coditech.Admin.Controllers
                     string firstName = Regex.Replace(profile.FirstName ?? "Trainee", "[^A-Za-z0-9_-]", "_");
                     string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
                     reportIndex++;
-                    string fileName = $"PerformanceReport_{reportIndex}{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "" + lastName)}.pdf";
+                    string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}_{datetimeStamp}.pdf";
                     ZipArchiveEntry reportEntry = archive.CreateEntry(fileName, CompressionLevel.Fastest);
                     await using Stream reportStream = reportEntry.Open();
                     await reportStream.WriteAsync(pdf);
                 }
             }
             Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/", SameSite = SameSiteMode.Lax });
-            return File(zipStream.ToArray(), "application/zip", "PerformanceReports.zip");
+            return File(zipStream.ToArray(), "application/zip", $"PerformanceReports_{datetimeStamp}.zip");
         }
 
         [HttpGet]

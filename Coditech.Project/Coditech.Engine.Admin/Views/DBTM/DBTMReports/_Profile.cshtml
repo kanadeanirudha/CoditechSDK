@@ -907,7 +907,14 @@
                                                     </tr>
                                                 </table>
 
-                                                <div class="chart-title">Score Chart</div>
+                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <div class="chart-title">Score Chart</div>
+                                                }
+                                                else if (Model.LineBarChart != null)
+                                                {
+                                                    <div class="chart-title">Score Chart</div>
+                                                }
                                                 <div class="bar-wrap">
                                                     @if (!Model.IsTraineeProfilePerformanceAvailable)
                                                     {
@@ -921,7 +928,11 @@
                                             </div>
 
                                             <div>
-                                                @if (Model.RadarChart == null || !Model.IsTraineeProfilePerformanceAvailable)
+                                                @if (!Model.IsTraineeProfilePerformanceAvailable)
+                                                {
+                                                    <div class="radar-title">Performance Matrix</div>
+                                                }
+                                                else if (Model.RadarChart != null)
                                                 {
                                                     <div class="radar-title">Performance Matrix</div>
                                                 }
