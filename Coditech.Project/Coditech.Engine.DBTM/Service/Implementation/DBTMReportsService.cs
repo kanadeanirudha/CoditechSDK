@@ -1682,7 +1682,7 @@ namespace Coditech.API.Service
                                 new RadarGraphsDatasetModel()
                                 {
                                     Label = string.Join(",", keyValuePairs.Select(y=>y.Key)),
-                                    Data = string.Join(",", keyValuePairs.Select(y=>y.Value)),
+                                    Data = string.Join(",", keyValuePairs.Select(y=> Math.Round( y.Value,CustomConstants.GraphListRoundUpValue))),
                                     Color = "rgba(255, 99, 132, 0.2)"
                                 }
                             }
@@ -1704,7 +1704,7 @@ namespace Coditech.API.Service
                             {
                                 new LineBarGraphsDatasetModel()
                                 {
-                                    Label = "Score",
+                                    //Label = "Score",
                                     Data = JsonConvert.SerializeObject(scores),
                                     Color = JsonConvert.SerializeObject(color)
                                 }
