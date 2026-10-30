@@ -51,6 +51,7 @@ namespace Coditech.Admin.Custom.APIController
                 });
             }
 
+            profile.IsGeneratePDFReport = true;
             string html = await RenderPartialViewToString("~/Views/DBTM/DBTMReports/_Profile.cshtml", profile);
 
             return Ok(new
