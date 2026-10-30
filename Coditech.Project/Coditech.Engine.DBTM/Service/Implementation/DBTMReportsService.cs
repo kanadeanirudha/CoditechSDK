@@ -989,6 +989,8 @@ namespace Coditech.API.Service
             DBTMDeviceData deviceData = _dBTMDeviceDataRepository.Table.Where(x => x.DBTMDeviceDataId == dBTMDeviceDataId).FirstOrDefault();
             if (deviceData == null)
                 return model;
+
+            typeOfRecord = deviceData.TypeOfRecord;
             DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonCode == deviceData.PersonCode);
             GeneralPersonModel person = null;
             if (traineeDetails?.PersonId > 0)
