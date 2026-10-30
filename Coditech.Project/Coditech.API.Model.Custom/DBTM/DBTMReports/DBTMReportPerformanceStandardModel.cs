@@ -7,6 +7,7 @@
         public int DBTMTestMasterId { get; set; }
         public string TestCode { get; set; }
         public string TestName { get; set; }
+        public string TestwisePerformanceStandardCategoryName { get; set; }
         public string PerformanceStandardType { get; set; }
         public int Priority { get; set; }
         public double MinValue { get; set; }
