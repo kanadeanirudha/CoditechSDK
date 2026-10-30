@@ -5,6 +5,8 @@
         public int GenderEnumId { get; set; }
         public int AgeGroupEnumId { get; set; }
         public int DBTMTestMasterId { get; set; }
+        public string TestCode { get; set; }
+        public string TestName { get; set; }
         public string PerformanceStandardType { get; set; }
         public int Priority { get; set; }
         public double MinValue { get; set; }

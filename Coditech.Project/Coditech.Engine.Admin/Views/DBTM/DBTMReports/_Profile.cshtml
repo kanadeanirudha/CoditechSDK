@@ -985,7 +985,7 @@
                                                                         <td><b>@item.TestName</b></td>
                                                                         <td>@item.Unit</td>
                                                                         <td>@item.BestValue</td>
-                                                                        <td class="score">
+                                                                        <td class="score @(item.IsUp == true ? "value-green" : item.IsUp == false ? "value-red" : "")">
                                                                             @if (string.IsNullOrEmpty(item.Score))
                                                                             {
                                                                                 <span>NA</span>
@@ -1036,7 +1036,7 @@
                                                                             <td><b>@item.TestName</b></td>
                                                                             <td>@item.Unit</td>
                                                                             <td>@item.BestValue</td>
-                                                                            <td class="score">
+                                                                            <td class="score @(item.IsUp == true ? "value-green" : item.IsUp == false ? "value-red" : "")">
                                                                                 @if (string.IsNullOrEmpty(item.Score))
                                                                                 {
                                                                                     <span>NA</span>
