@@ -183,6 +183,7 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [Obsolete("/DBTMTraineeDetails/GenerateAthletePdfRemark is deprecated.")]
         [Route("/DBTMTraineeDetails/GenerateAthletePdfRemark")]
         [HttpGet]
         [Produces(typeof(DBTMReportsResponse))]
@@ -205,6 +206,7 @@ namespace Coditech.Engine.DBTM.Controllers
             }
         }
 
+        [Obsolete("/DBTMTraineeDetails/GetTraineeProfileHtml is deprecated.")]
         [HttpGet]
         [Route("/DBTMTraineeDetails/GetTraineeProfileHtml")]
         [Produces(typeof(StringResponse))]

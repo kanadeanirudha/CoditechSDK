@@ -705,6 +705,7 @@ var DBTMReports = {
             },
             success: function (data) {
                 $("#DBTMBatchWiseTraineeProfileDetailsDivId").html(data);
+                DBTMReports.LoadTraineeProfileActivityDates();
             },
             error: function (xhr) {
                 if (xhr.status === 401 || xhr.status === 403) {
