@@ -40,7 +40,7 @@ jobs:
   coditech_build:
     runs-on: [self-hosted, Windows, x64, dbtm_production]
     if: github.event.inputs.coditech_build == 'true'
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -93,7 +93,7 @@ jobs:
     runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.mediamanager_api_deploy == 'true'
-
+    
     steps:
 
       - name: Stop MediaManager IIS Site and App Pool
@@ -120,7 +120,7 @@ jobs:
     runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.organisation_api_deploy == 'true'
-
+     
     steps:
       - name: Stop Organisation IIS Site and App Pool
         run: |
@@ -146,7 +146,7 @@ jobs:
     runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.dbtm_api_deploy == 'true'
-
+    
     steps:
       - name: Stop dbtm IIS Site and App Pool
         run: |
@@ -174,7 +174,7 @@ jobs:
     runs-on: [self-hosted, Windows, x64, dbtm_production]
     needs: coditech_build
     if: github.event.inputs.payment_api_deploy == 'true'
-
+   
     steps:
       - name: Stop payment IIS Site and App Pool
         run: |

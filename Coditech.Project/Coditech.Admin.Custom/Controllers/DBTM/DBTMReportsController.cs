@@ -1,12 +1,19 @@
 ﻿using Coditech.Admin.Agents;
+using Coditech.Admin.Utilities;
 using Coditech.Admin.ViewModel;
 using Coditech.Common.API.Model;
 using Coditech.Common.Helper.Utilities;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Coditech.Admin.Utilities;
-using Coditech.Admin.Helpers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
 namespace Coditech.Admin.Controllers
 {
     public class DBTMReportsController : BaseController
@@ -18,10 +25,21 @@ namespace Coditech.Admin.Controllers
         private const string batchwisemultireports = "~/Views/DBTM/DBTMReports/BatchWiseMultiReports.cshtml";
         private const string profiledetailslist = "~/Views/DBTM/DBTMReports/ProfileDetailsList.cshtml";
         private const string campwisemultireports = "~/Views/DBTM/DBTMReports/CampWiseMultiReports.cshtml";
-        public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent)
+        private readonly IRazorViewEngine _razorViewEngine;
+        private readonly ITempDataProvider _tempDataProvider;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public DBTMReportsController(IDBTMReportsAgent dBTMReportsAgent, IDBTMTestAgent dBTMTestAgent, IRazorViewEngine razorViewEngine,
+    ITempDataProvider tempDataProvider,
+    IServiceProvider serviceProvider,
+    IWebHostEnvironment webHostEnvironment)
         {
             _dBTMReportsAgent = dBTMReportsAgent;
             _dBTMTestAgent = dBTMTestAgent;
+            _razorViewEngine = razorViewEngine;
+            _tempDataProvider = tempDataProvider;
+            _serviceProvider = serviceProvider;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         //Batchwise Reports
@@ -436,10 +454,107 @@ namespace Coditech.Admin.Controllers
         [HttpGet]
         public ActionResult GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
         {
-            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord, reportType);
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord ?? "batch", reportType);
             list.OrderBy = orderBy;
             return PartialView("~/Views/DBTM/DBTMReports/_DBTMTraineeDetailsV2.cshtml", list);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadSingleTraineeProfileDetails(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType, string remarks = null)
+        {
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord ?? "batch", reportType);
+            list.OrderBy = orderBy;
+
+            DBTMReportTraineeProfileModel profile = list.DBTMTraineeProfileList?.FirstOrDefault();
+            if (profile == null)
+                return Content("No trainee data found.");
+
+            string datetimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            if (remarks != null)
+                profile.Remarks = remarks;
+            profile.IsGeneratePDFReport = true;
+            string html = RenderPartialViewToString("~/Views/DBTM/DBTMReports/_Profile.cshtml", profile);
+            BrowserFetcher browserFetcher = new BrowserFetcher();
+            await browserFetcher.DownloadAsync();
+
+            await using IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            await using IPage page = await browser.NewPageAsync();
+            await page.SetContentAsync(html);
+            byte[] pdf = await page.PdfDataAsync(new PdfOptions
+            {
+                Format = PaperFormat.A4,
+                PrintBackground = true,
+                MarginOptions = new MarginOptions
+                {
+                    Top = "10mm",
+                    Right = "10mm",
+                    Bottom = "10mm",
+                    Left = "10mm"
+                }
+            });
+
+            string firstName = Regex.Replace(profile.FirstName ?? "Trainee", "[^A-Za-z0-9_-]", "_");
+            string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
+            string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}_{datetimeStamp}.pdf";
+            string reportsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PerformanceReports");
+            Directory.CreateDirectory(reportsFolder);
+            string pdfPath = Path.Combine(reportsFolder, fileName);
+            await System.IO.File.WriteAllBytesAsync(pdfPath, pdf);
+
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/", SameSite = SameSiteMode.Lax });
+
+            return File(pdf, "application/pdf", fileName);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadBulkTraineeProfileDetails(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType)
+        {
+            DBTMReportTraineeProfileListModel list = _dBTMReportsAgent.GetBatchWiseTraineeProfileDetailsListV2(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, typeOfRecord ?? "batch", reportType);
+            if (list?.DBTMTraineeProfileList == null || list.DBTMTraineeProfileList.Count == 0)
+                return Content("No trainee data found.");
+
+            list.OrderBy = orderBy;
+            using MemoryStream zipStream = new MemoryStream();
+            string datetimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            {
+                int reportIndex = 0;
+                foreach (DBTMReportTraineeProfileModel profile in list.DBTMTraineeProfileList)
+                {
+                    if (profile == null)
+                        continue;
+                    profile.IsGeneratePDFReport = true;
+                    string html = RenderPartialViewToString("~/Views/DBTM/DBTMReports/_Profile.cshtml", profile);
+                    BrowserFetcher browserFetcher = new BrowserFetcher();
+                    await browserFetcher.DownloadAsync();
+                    await using IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+                    await using IPage page = await browser.NewPageAsync();
+                    await page.SetContentAsync(html);
+                    byte[] pdf = await page.PdfDataAsync(new PdfOptions
+                    {
+                        Format = PaperFormat.A4,
+                        PrintBackground = true,
+                        MarginOptions = new MarginOptions
+                        {
+                            Top = "10mm",
+                            Right = "10mm",
+                            Bottom = "10mm",
+                            Left = "10mm"
+                        }
+                    });
+                    string firstName = Regex.Replace(profile.FirstName ?? "Trainee", "[^A-Za-z0-9_-]", "_");
+                    string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
+                    reportIndex++;
+                    string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}_{datetimeStamp}.pdf";
+                    ZipArchiveEntry reportEntry = archive.CreateEntry(fileName, CompressionLevel.Fastest);
+                    await using Stream reportStream = reportEntry.Open();
+                    await reportStream.WriteAsync(pdf);
+                }
+            }
+            Response.Cookies.Append("FileDownload", "Completed", new CookieOptions { Path = "/", SameSite = SameSiteMode.Lax });
+            return File(zipStream.ToArray(), "application/zip", $"PerformanceReports_{datetimeStamp}.zip");
+        }
+
         [HttpGet]
         public IActionResult GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId)
         {
@@ -455,7 +570,49 @@ namespace Coditech.Admin.Controllers
             List<DateTime> dates = _dBTMReportsAgent.GetTraineeListActivityDates(traineeIds, generalBatchMasterId);
             return Json(dates);
         }
+        private string RenderPartialViewToString(string viewPath, object model)
+        {
+            ViewData.Model = model;
 
+            var actionContext = new ActionContext(
+                HttpContext,
+                RouteData,
+                ControllerContext.ActionDescriptor);
+
+            var viewResult = _razorViewEngine.GetView(
+                executingFilePath: null,
+                viewPath: viewPath,
+                isMainPage: false);
+
+            if (!viewResult.Success)
+            {
+                throw new InvalidOperationException(
+                    $"Partial view not found: {viewPath}");
+            }
+
+            using var writer = new StringWriter();
+
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                new ModelStateDictionary())
+            {
+                Model = model
+            };
+
+            var tempData = new TempDataDictionary(
+                HttpContext, _tempDataProvider);
+
+            var viewContext = new ViewContext(
+                actionContext,
+                viewResult.View,
+                viewData,
+                tempData,
+                writer,
+                new HtmlHelperOptions());
+
+            viewResult.View.RenderAsync(viewContext);
+
+            return writer.ToString();
+        }
         #endregion
     }
 }
