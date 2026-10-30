@@ -1168,6 +1168,9 @@ namespace Coditech.API.Service
                     .Where(id => id > 0)
                     .Distinct());
                 List<DBTMReportPerformanceStandardModel> dbtmReportPerformanceStandardList = GetReportPerformanceStandardList(ageGroupEnumIds, genderEnumIds, dBTMTestMasterIds, 0);
+                if (dbtmReportPerformanceStandardList?.Count > 0)
+                    dBTMTraineeProfileListModel.DBTMReportPerformanceStandardList = dbtmReportPerformanceStandardList;
+
                 DateTime? overallLastActivityDate = null;
                 List<DBTMTraineeProfilePerformanceModel> traineeLastPerformanceList = GetTraineeLastPerformanceDetails(generalBatchMasterId, out overallLastActivityDate);
                 foreach (var item in traineeDetaillist)
