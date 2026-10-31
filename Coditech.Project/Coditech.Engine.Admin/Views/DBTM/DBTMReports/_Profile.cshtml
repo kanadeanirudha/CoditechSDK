@@ -1183,19 +1183,23 @@
                                                         <div class="performance-standard-section">
                                                             <table class="performance-standard-table">
                                                                 <thead>
-                                                                    <tr>
-                                                                        <th colspan="6">
-                                                                            @testWiseStandards.FirstOrDefault().TestName (@testWiseStandards.FirstOrDefault().TestwisePerformanceStandardCategoryName)
-                                                                        </th>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Rating</th>
-                                                                        <th>Category</th>
-                                                                        <th>Max Value</th>
-                                                                        <th>Min Value</th>
-                                                                        <th>Score Min</th>
-                                                                        <th>Score Max</th>
-                                                                    </tr>
+                                                                    @if (testWiseStandards.Any())
+                                                                    {
+                                                                        <tr>
+                                                                            <th colspan="6">
+                                                                                @testWiseStandards.FirstOrDefault().TestName
+                                                                                (@testWiseStandards.FirstOrDefault().TestwisePerformanceStandardCategoryName)
+                                                                            </th>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th>Rating</th>
+                                                                            <th>Category</th>
+                                                                            <th>Max Value</th>
+                                                                            <th>Min Value</th>
+                                                                            <th>Score Min</th>
+                                                                            <th>Score Max</th>
+                                                                        </tr>
+                                                                    }
                                                                 </thead>
                                                                 <tbody>
                                                                     @foreach (var standard in testWiseStandards)
