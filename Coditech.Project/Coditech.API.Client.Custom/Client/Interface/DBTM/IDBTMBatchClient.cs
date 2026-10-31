@@ -9,7 +9,7 @@ namespace Coditech.API.Client
         /// Get list of DBTMBatchList.
         /// </summary>
         /// <returns>DBTMBatchListResponse</returns>
-        DBTMBatchListResponse GetBatchList(long entityId,string userType);
+        DBTMBatchListResponse GetBatchList(long entityId,string userType, bool isCheckTestPerformed);
         /// <summary>
         /// Get list of GeneralBatchUser.
         /// </summary>
