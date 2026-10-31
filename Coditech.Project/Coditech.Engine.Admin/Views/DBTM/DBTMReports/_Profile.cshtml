@@ -58,8 +58,6 @@
         }
 
     .page {
-        /* width: 210mm;
-                                                                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -726,8 +724,7 @@
             #report svg {
                 max-width: 100% !important;
             }
-            /* Keep Chart.js canvas inside its print-sized container. Setting canvas
-                                                                                               height:auto can move the plot/labels onto a separate printed page. */
+            /* Keep Chart.js canvas inside its print-sized container. Setting canvas height:auto can move the plot/labels onto a separate printed page. */
             #report canvas {
                 display: block !important;
                 width: 100% !important;
@@ -738,8 +735,7 @@
             #report svg {
                 max-height: 100% !important;
             }
-            /* Start activity graphs on a fresh page instead of splitting the
-                                                                                               last section at the bottom edge of page 1. */
+            /* Start activity graphs on a fresh page instead of splitting the last section at the bottom edge of page 1. */
             #report .profile-activity-graphs {
                 break-before: page !important;
                 page-break-before: always !important;
