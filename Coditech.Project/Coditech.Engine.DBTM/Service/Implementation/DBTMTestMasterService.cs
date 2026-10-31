@@ -19,7 +19,8 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<DBTMTestParameterListViewSequence> _dBTMActivityListViewSequenceMasterRepository;
         private readonly ICoditechRepository<MediaDetail> _mediaDetailRepository;
         private readonly ICoditechRepository<DBTMGraphMaster> _dBTMGraphMasterRepository;
-        private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository;
+        private readonly ICoditechRepository<DBTMTestGraph> _dBTMTestGraphRepository; 
+        private readonly ICoditechRepository<DBTMTestGraphOnReport> _dBTMTestGraphOnReportRepository;
         private readonly ICoditechRepository<DBTMPerformanceMatrix> _dBTMPerformanceMatrixRepository;
         private readonly ICoditechRepository<DBTMTestParameterVerticalViewSequence> _dBTMActivityVerticalViewSequenceMasterRepository;
         private readonly ICoditechRepository<DBTMCentreWiseTest> _dBTMCentreWiseTestRepository;
@@ -38,6 +39,7 @@ namespace Coditech.API.Service
             _mediaDetailRepository = new CoditechRepository<MediaDetail>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMGraphMasterRepository = new CoditechRepository<DBTMGraphMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestGraphRepository = new CoditechRepository<DBTMTestGraph>(_serviceProvider.GetService<CoditechCustom_Entities>());
+            _dBTMTestGraphOnReportRepository = new CoditechRepository<DBTMTestGraphOnReport>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMPerformanceMatrixRepository = new CoditechRepository<DBTMPerformanceMatrix>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMCentreWiseTestRepository = new CoditechRepository<DBTMCentreWiseTest>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestWisePerformanceStandardRepository = new CoditechRepository<DBTMTestWisePerformanceStandard>(_serviceProvider.GetService<CoditechCustom_Entities>());
@@ -193,6 +195,7 @@ namespace Coditech.API.Service
             if (IsNotNull(dBTMTestMaster))
             {
                 dBTMTestModel.DBTMSelectedGraph = _dBTMTestGraphRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMGraphMasterId.ToString())?.ToList();
+                dBTMTestModel.DBTMSelectedGraphForReport = _dBTMTestGraphOnReportRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestMasterId)?.Select(y => y.DBTMGraphMasterId.ToString())?.ToList();
             }
             if (dBTMTestModel.TestMediaId > 0)
             {
@@ -270,6 +273,47 @@ namespace Coditech.API.Service
                 if (deleteDBTMTestGraphList?.Count > 0)
                 {
                     _dBTMTestGraphRepository.Delete(deleteDBTMTestGraphList);
+                }
+
+                List<DBTMTestGraphOnReport> deleteDBTMTestGraphOnReportList = null;
+                List<DBTMTestGraphOnReport> insertDBTMTestGraphOnReportList = null;
+                List<DBTMTestGraphOnReport> existingTestGraphOnReportList = _dBTMTestGraphOnReportRepository.Table.Where(x => x.DBTMTestMasterId == dBTMTestModel.DBTMTestMasterId).ToList();
+                foreach (string graphId in dBTMTestModel.DBTMSelectedGraphForReport)
+                {
+                    if (!existingTestGraphOnReportList.Any(x => x.DBTMGraphMasterId.ToString() == graphId))
+                    {
+                        if (IsNull(insertDBTMTestGraphOnReportList))
+                        {
+                            insertDBTMTestGraphOnReportList = new List<DBTMTestGraphOnReport>();
+                        }
+                        insertDBTMTestGraphOnReportList.Add(new DBTMTestGraphOnReport()
+                        {
+                            DBTMTestMasterId = dBTMTestModel.DBTMTestMasterId,
+                            DBTMGraphMasterId = Convert.ToInt32(graphId),
+                        });
+                    }
+                }
+                foreach (DBTMTestGraphOnReport item in existingTestGraphOnReportList)
+                {
+                    if (!dBTMTestModel.DBTMSelectedGraphForReport.Any(x => x == item.DBTMGraphMasterId.ToString()))
+                    {
+                        if (IsNull(deleteDBTMTestGraphOnReportList))
+                        {
+                            deleteDBTMTestGraphOnReportList = new List<DBTMTestGraphOnReport>();
+                        }
+
+                        deleteDBTMTestGraphOnReportList.Add(item);
+                    }
+                }
+
+                if (insertDBTMTestGraphOnReportList?.Count > 0)
+                {
+                    _dBTMTestGraphOnReportRepository.Insert(insertDBTMTestGraphOnReportList);
+                }
+
+                if (deleteDBTMTestGraphList?.Count > 0)
+                {
+                    _dBTMTestGraphOnReportRepository.Delete(deleteDBTMTestGraphOnReportList);
                 }
             }
             else
@@ -671,7 +715,7 @@ namespace Coditech.API.Service
         {
             if (IsNull(model))
                 throw new CoditechException(ErrorCodes.InvalidData, GeneralResources.ModelNotNull);
-            DBTMTestWisePerformanceStandard existing =  _dBTMTestWisePerformanceStandardRepository.Table .FirstOrDefault(x =>  x.DBTMTestWisePerformanceStandardConfigurationId ==  model.DBTMTestWisePerformanceStandardConfigurationId      && x.AgeGroupEnumId == model.AgeGroupEnumId   && x.GenderEnumId == model.GenderEnumId);
+            DBTMTestWisePerformanceStandard existing = _dBTMTestWisePerformanceStandardRepository.Table.FirstOrDefault(x => x.DBTMTestWisePerformanceStandardConfigurationId == model.DBTMTestWisePerformanceStandardConfigurationId && x.AgeGroupEnumId == model.AgeGroupEnumId && x.GenderEnumId == model.GenderEnumId);
             if (IsNull(existing))
             {
                 DBTMTestWisePerformanceStandard entity = model.FromModelToEntity<DBTMTestWisePerformanceStandard>();
@@ -696,7 +740,7 @@ namespace Coditech.API.Service
             }
             return isUpdated;
         }
-     
+
         public virtual DBTMTestwisePerformanceStandardCategoryListModel GetDBTMTestwisePerformanceStandardCategoryList(short dBTMTestwisePerformanceStandardCategoryId)
         {
             List<DBTMTestwisePerformanceStandardCategoryModel> list;
