@@ -1231,6 +1231,7 @@ namespace Coditech.API.Service
                                 }
                             }
                         }
+                        item.TraineeProfilePerformanceStandardList = dbtmReportPerformanceStandardList?.Where(x => x.AgeGroupEnumId == item.AgeGroupEnumId && x.GenderEnumId == item.GenderEnumId).ToList() ?? new List<DBTMReportPerformanceStandardModel>();
                     }
                     if (traineePerformunceList?.Count > 0 && item.IsTraineeProfilePerformanceAvailable)
                         BindBarAndRadarChart(testName, item, traineePerformunceList);
@@ -1257,8 +1258,8 @@ namespace Coditech.API.Service
                         var graphList = TestWiseGraphReportsV2(testDetails.DBTMTestMasterId, item.DBTMTraineeDetailId, dBTMGraphMasterIds, CustomConstants.InstantaneousChart, FromDate, FromDate, 0, string.Empty, item.CentreCode, false, typeOfRecord);
                         foreach (var graphModel in graphList)
                         {
-                            graphModel.Custom1 = testDetails.TestName;
-                            graphModel.Custom2 = testDetails.PerformanceMatrix;
+                            graphModel.Custom1 = $"{testDetails.TestName}";
+                            graphModel.Custom2 = $"{testDetails.PerformanceMatrix}~{testDetails.DBTMTestMasterId}";
                             graphModel.Custom3 = testDetails.ActivityProtocolImagePath;
                             graphModels.Add(graphModel);
                         }
@@ -1719,7 +1720,7 @@ namespace Coditech.API.Service
                             {
                                 new RadarGraphsDatasetModel()
                                 {
-                                    Label = string.Join(",", keyValuePairs.Select(y=>y.Key)),
+                                    Label = "Score",
                                     Data = string.Join(",", keyValuePairs.Select(y=> Math.Round( y.Value,CustomConstants.GraphListRoundUpValue))),
                                     Color = "rgba(255, 99, 132, 0.2)"
                                 }
