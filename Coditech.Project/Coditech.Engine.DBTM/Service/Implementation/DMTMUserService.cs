@@ -49,7 +49,7 @@ namespace Coditech.API.Service
 
             UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x =>
                 (x.UserType == UserTypeEnum.Trainee.ToString() || x.UserType == UserTypeEnum.Employee.ToString()) &&
-                (x.IsDataEncrypted ? x.UserNameHash == encodedUserName : x.UserName == userLoginModel.UserName));
+                (x.IsDataEncrypted ? x.UserNameHash == encodedUserName : x.UserName == userLoginModel.UserName) && x.Password == userLoginModel.Password);
 
             if (IsNull(userMasterData))
                 throw new CoditechException(ErrorCodes.NotFound, "Invalid username or password.");
