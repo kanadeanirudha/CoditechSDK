@@ -58,6 +58,8 @@
         }
 
     .page {
+        /* width: 210mm;
+                                                                        min-height: 297mm; */
         margin: 12px auto;
         background: #fff;
         padding: 10mm 9mm 8mm;
@@ -446,6 +448,71 @@
             text-align: center;
         }
 
+
+    .performance-standard-section {
+        width: 100%;
+        min-width: 0;
+        margin: 20px 0 0 0;
+        padding: 0;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .performance-standard-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 9px;
+    }
+
+        .performance-standard-table th,
+        .performance-standard-table td {
+            border: 1px solid #000;
+            padding: 3px 2px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 9px;
+            line-height: 1.2;
+            font-weight: normal;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+
+        .performance-standard-table thead th {
+            font-weight: 700;
+        }
+
+        .performance-standard-table thead tr:first-child th {
+            background-color: #fff;
+        }
+
+        .performance-standard-table thead tr:nth-child(2) th {
+            background-color: #dbe8ff;
+        }
+
+    #report .performance-standard-section {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-top: 20px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    #report .performance-standard-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 8px !important;
+    }
+
+        #report .performance-standard-table th,
+        #report .performance-standard-table td {
+            padding: 3px 2px !important;
+            font-size: 8px !important;
+            line-height: 1.2 !important;
+            overflow-wrap: anywhere !important;
+        }
+
     .notes {
         border: 1.5px solid #111;
         /* allow notes to expand if content is larger than one line */
@@ -659,7 +726,8 @@
             #report svg {
                 max-width: 100% !important;
             }
-            /* Keep Chart.js canvas inside its print-sized container. Setting canvas height:auto can move the plot/labels onto a separate printed page. */
+            /* Keep Chart.js canvas inside its print-sized container. Setting canvas
+                                                                                               height:auto can move the plot/labels onto a separate printed page. */
             #report canvas {
                 display: block !important;
                 width: 100% !important;
@@ -670,7 +738,8 @@
             #report svg {
                 max-height: 100% !important;
             }
-            /* Start activity graphs on a fresh page instead of splitting the last section at the bottom edge of page 1. */
+            /* Start activity graphs on a fresh page instead of splitting the
+                                                                                               last section at the bottom edge of page 1. */
             #report .profile-activity-graphs {
                 break-before: page !important;
                 page-break-before: always !important;
@@ -1089,7 +1158,7 @@
                                                 @foreach (var matrixGroup in performanceMatrixGroups)
                                                 {
                                                     <div class="performance-matrix-group">
-                                                        <h5 class="performance-matrix-heading">@matrixGroup.Key</h5>
+                                                        <h5 class="performance-matrix-heading">@matrixGroup.Key.Split("~")[0]</h5>
                                                         @foreach (var graph in matrixGroup)
                                                         {
                                                             <div class="activity-graph-item">
@@ -1108,6 +1177,45 @@
                                                                 </div>
                                                             </div>
                                                         }
+                                                        @{
+                                                            var testWiseStandards = Model.TraineeProfilePerformanceStandardList.Where(x => x.DBTMTestMasterId == Convert.ToInt32(@matrixGroup.Key.Split("~")[1])).OrderBy(x => x.Priority).ToList();
+                                                            int testWiseStandardCount = testWiseStandards.Count();
+                                                            var activityWiseScore = Model.TraineeProfilePerformanceList.Where(x => x.DBTMTestMasterId == Convert.ToInt32(matrixGroup.Key.Split("~")[1])).Select(x => x.Score).FirstOrDefault();
+                                                        }
+                                                        <div class="performance-standard-section">
+                                                            <table class="performance-standard-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th colspan="6">
+                                                                            @testWiseStandards.FirstOrDefault().TestName (@testWiseStandards.FirstOrDefault().TestwisePerformanceStandardCategoryName)
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Rating</th>
+                                                                        <th>Category</th>
+                                                                        <th>Max Value</th>
+                                                                        <th>Min Value</th>
+                                                                        <th>Score Min</th>
+                                                                        <th>Score Max</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var standard in testWiseStandards)
+                                                                    {
+                                                                        bool isMatchingScore = decimal.TryParse(activityWiseScore, out decimal score) && score >= Convert.ToDecimal(standard.MinScore) && score <= Convert.ToDecimal(standard.MaxScore);
+                                                                        <tr style="@(isMatchingScore ? "background-color: #8bc88b; font-weight: bold;" : "")">
+                                                                            <td>@testWiseStandardCount</td>
+                                                                            <td>@standard.PerformanceStandardType</td>
+                                                                            <td>@standard.MaxValue</td>
+                                                                            <td>@standard.MinValue</td>
+                                                                            <td>@standard.MinScore</td>
+                                                                            <td>@standard.MaxScore</td>
+                                                                        </tr>
+                                                                        testWiseStandardCount--;
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 }
                                             </div>
