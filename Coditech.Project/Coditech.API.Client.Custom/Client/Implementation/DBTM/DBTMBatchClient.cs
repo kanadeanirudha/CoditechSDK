@@ -15,14 +15,14 @@ namespace Coditech.API.Client
             dBTMBatchEndpoint = new DBTMBatchEndpoint();
         }
         
-        public virtual DBTMBatchListResponse GetBatchList(long entityId, string userType)
+        public virtual DBTMBatchListResponse GetBatchList(long entityId, string userType, bool isCheckTestPerformed)
         {
-            return Task.Run(async () => await DBTMBatchAsync(entityId, userType, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await DBTMBatchAsync(entityId, userType, isCheckTestPerformed, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<DBTMBatchListResponse> DBTMBatchAsync(long entityId, string userType, CancellationToken cancellationToken)
+        public virtual async Task<DBTMBatchListResponse> DBTMBatchAsync(long entityId, string userType, bool isCheckTestPerformed, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMBatchEndpoint.DBTMBatchAsync(entityId, userType);
+            string endpoint = dBTMBatchEndpoint.DBTMBatchAsync(entityId, userType, isCheckTestPerformed);
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

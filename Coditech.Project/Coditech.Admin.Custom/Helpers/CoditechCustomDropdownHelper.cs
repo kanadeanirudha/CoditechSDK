@@ -401,7 +401,8 @@ namespace Coditech.Admin.Helpers
             dropdownList.Add(new SelectListItem() { Text = "-------Select Batch-------", Value = "0" });
             long entityId = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).EntityId;
             string userType = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession).UserType;
-            DBTMBatchListResponse response = new DBTMBatchClient().GetBatchList(entityId, userType);
+            bool isCheckTestPerformed = string.IsNullOrEmpty(dropdownViewModel.Parameter) || Convert.ToBoolean(dropdownViewModel.Parameter);
+            DBTMBatchListResponse response = new DBTMBatchClient().GetBatchList(entityId, userType, isCheckTestPerformed);
             DBTMBatchListModel list = new DBTMBatchListModel() { DBTMBatchList = response.DBTMBatchList };
             foreach (var item in list?.DBTMBatchList.OrderBy(x => x.BatchName))
             {
