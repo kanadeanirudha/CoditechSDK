@@ -6,9 +6,9 @@ namespace Coditech.API.Endpoint
 {
     public class DBTMBatchEndpoint : BaseEndpoint
     {
-        public string DBTMBatchAsync(long entityId, string userType)
+        public string DBTMBatchAsync(long entityId, string userType, bool isCheckTestPerformed)
         {
-            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetBatchList?entityId={entityId}&userType={userType}";
+            string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMApi/GetBatchList?entityId={entityId}&userType={userType}&isCheckTestPerformed={isCheckTestPerformed}";
             return endpoint;
         }
         public string GetDBTMBatchUserListAsync(string selectedCentreCode, long generalTrainerMasterId,int generalBatchMasterId)
