@@ -64,13 +64,19 @@ namespace Coditech.API.Service
             BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
+
+            if (GetSortableField(DynamicClauseHelper.GenerateDynamicOrderByClause(sorts)))
+            {
+                pagingStart = 1;
+                pagingLength = int.MaxValue;
+            }
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", SelectedCentreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@ListType", listType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@PageNo", pagingStart, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@Rows", pagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsList @CentreCode,@GeneralTrainerMasterId,@listType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
@@ -81,10 +87,11 @@ namespace Coditech.API.Service
                 item.EmailId = DataEncryptionHelper.DataDecrypt(item.EmailId);
                 item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
                 item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
-                
+
                 item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
+            dBTMTraineeDetailsList = SortingAndPaginationForEncryptionField(dBTMTraineeDetailsList, pageListModel.OrderBy, pageListModel.PagingStart, pageListModel.PagingLength);
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
             listModel.BindPageListModel(pageListModel);
@@ -457,6 +464,93 @@ namespace Coditech.API.Service
         #endregion
 
         #region private
+        private List<T> SortingAndPaginationForEncryptionField<T>(List<T> items, string orderBy, int pagingStart, int pagingLength)
+        {
+            if (!GetSortableField(orderBy))
+                return items;
+
+            if (items?.Count > 0 && !string.IsNullOrEmpty(orderBy))
+            {
+                string[] orderByParts = orderBy.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string propertyName = orderByParts[0].Trim('[', ']');
+                bool isAscending = orderByParts.Length < 2 || !string.Equals(orderByParts[1], "desc", StringComparison.OrdinalIgnoreCase);
+                System.Reflection.PropertyInfo sortProperty = typeof(T).GetProperty(propertyName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+
+                if (sortProperty != null)
+                {
+                    if (sortProperty.PropertyType == typeof(string))
+                    {
+                        IComparer<string> naturalComparer = Comparer<string>.Create(CompareNaturalStrings);
+                        items = isAscending
+                            ? items.OrderBy(x => sortProperty.GetValue(x)?.ToString(), naturalComparer).ToList()
+                            : items.OrderByDescending(x => sortProperty.GetValue(x)?.ToString(), naturalComparer).ToList();
+                    }
+                    else
+                    {
+                        items = isAscending
+                            ? items.OrderBy(x => sortProperty.GetValue(x)).ToList()
+                            : items.OrderByDescending(x => sortProperty.GetValue(x)).ToList();
+                    }
+                }
+            }
+            return items.Skip((pagingStart - 1) * pagingLength).Take(pagingLength).ToList();
+        }
+
+        private static int CompareNaturalStrings(string first, string second)
+        {
+            if (ReferenceEquals(first, second))
+                return 0;
+            if (first is null)
+                return -1;
+            if (second is null)
+                return 1;
+
+            int firstIndex = 0;
+            int secondIndex = 0;
+
+            while (firstIndex < first.Length && secondIndex < second.Length)
+            {
+                if (char.IsDigit(first[firstIndex]) && char.IsDigit(second[secondIndex]))
+                {
+                    int firstNumberStart = firstIndex;
+                    int secondNumberStart = secondIndex;
+
+                    while (firstIndex < first.Length && char.IsDigit(first[firstIndex]))
+                        firstIndex++;
+                    while (secondIndex < second.Length && char.IsDigit(second[secondIndex]))
+                        secondIndex++;
+
+                    string firstNumber = first[firstNumberStart..firstIndex].TrimStart('0');
+                    string secondNumber = second[secondNumberStart..secondIndex].TrimStart('0');
+
+                    if (firstNumber.Length != secondNumber.Length)
+                        return firstNumber.Length.CompareTo(secondNumber.Length);
+
+                    int numberComparison = string.Compare(firstNumber, secondNumber, StringComparison.Ordinal);
+                    if (numberComparison != 0)
+                        return numberComparison;
+                }
+                else
+                {
+                    int characterComparison = char.ToUpperInvariant(first[firstIndex]).CompareTo(char.ToUpperInvariant(second[secondIndex]));
+                    if (characterComparison != 0)
+                        return characterComparison;
+
+                    firstIndex++;
+                    secondIndex++;
+                }
+            }
+
+            return (first.Length - firstIndex).CompareTo(second.Length - secondIndex);
+        }
+        private bool GetSortableField(string sortBy)
+        {
+            return sortBy?.Replace(" asc", "")?.Replace(" desc", "").ToLowerInvariant() switch
+            {
+                "firstname" or "middlename" or "lastname" or "displayname" or "emailid" or "mobilenumber" => true,
+                _ => false
+            };
+        }
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
         {
             long personId = 0;
@@ -500,6 +594,7 @@ namespace Coditech.API.Service
             return $"{years} years {months} months {days} days";
         }
 
+        [Obsolete]
         private string ImageUrlToBase64(string imageUrl)
         {
             var handler = new HttpClientHandler()
@@ -527,6 +622,7 @@ namespace Coditech.API.Service
             return $"data:{contentType};base64,{base64}";
         }
 
+        [Obsolete]
         private string ConvertFolderPathImageToBase64(string path, string contentType)
         {
             byte[] imageBytes = File.ReadAllBytes(path);
@@ -534,6 +630,7 @@ namespace Coditech.API.Service
             return $"data:{contentType};base64,{base64String}";
         }
 
+        [Obsolete]
         //Template Html Replacement
         private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
         {
@@ -665,7 +762,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
             return html;
         }
-
+        [Obsolete]
         private DataTable GetTraineePerformanceRankingDetails(long generalBatchMasterId, DateTime FromDate, DateTime ToDate, out List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList)
         {
             DataTable dt = new DataTable();
@@ -863,7 +960,7 @@ namespace Coditech.API.Service
                 performanceModel.IsUp = true;
             }
         }
-
+        [Obsolete]
         private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow, string[] testName)
         {
             return new RadarChartModel()
@@ -882,7 +979,7 @@ namespace Coditech.API.Service
                             }
             };
         }
-
+        [Obsolete]
         private string GenerateRadarChartBase64(RadarChartModel model)
         {
             if (model == null || string.IsNullOrWhiteSpace(model.Labels))
