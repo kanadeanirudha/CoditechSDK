@@ -119,7 +119,7 @@ namespace Coditech.Admin.ViewModel
         public List<string> SelectedTrainer { get; set; }
         [Display(Name = "Date Of Birth")]
         [Required]
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         [Display(Name = "Specialization")]
         [Required]
         public int? SpecializationEnumId { get; set; }

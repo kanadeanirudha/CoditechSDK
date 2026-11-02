@@ -14,5 +14,6 @@
         public bool IsAssociated { get; set; }
         public string TestName { get; set; }
         public bool IsAssignmentActive { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

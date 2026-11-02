@@ -45,10 +45,14 @@ namespace Coditech.API.Service
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
             userLoginModel.Password = MD5Hash(userLoginModel.Password);
-            UserMaster userMasterData = _userMasterRepository.Table.Where(x => x.UserName == userLoginModel.UserName && x.Password == userLoginModel.Password && (x.UserType == UserTypeEnum.Trainee.ToString() || x.UserType == UserTypeEnum.Employee.ToString()))?.FirstOrDefault();
+            string encodedUserName = SearchHashHelper.CreateSearchHash(userLoginModel.UserName);
+
+            UserMaster userMasterData = _userMasterRepository.Table.FirstOrDefault(x =>
+                (x.UserType == UserTypeEnum.Trainee.ToString() || x.UserType == UserTypeEnum.Employee.ToString()) &&
+                (x.IsDataEncrypted ? x.UserNameHash == encodedUserName : x.UserName == userLoginModel.UserName) && x.Password == userLoginModel.Password);
 
             if (IsNull(userMasterData))
-                throw new CoditechException(ErrorCodes.NotFound, null);
+                throw new CoditechException(ErrorCodes.NotFound, "Invalid username or password.");
             else if (!userMasterData.IsActive)
                 throw new CoditechException(ErrorCodes.ContactAdministrator, GeneralResources.ErrorMessage_PleaseContactYourAdministrator);
 
@@ -89,7 +93,7 @@ namespace Coditech.API.Service
             userModel.UserMasterId = userMasterData.UserMasterId;
             userModel.EntityId = userMasterData.EntityId;
             userModel.UserType = string.IsNullOrEmpty(generalPersonModel.Custom1) ? userMasterData.UserType : generalPersonModel.Custom1;
-            userModel.EmailId = userMasterData.EmailId;
+            userModel.EmailId = generalPersonModel.EmailId;
             userModel.IsPasswordChange = userMasterData.IsPasswordChange;
             userModel.IsAcceptedTermsAndConditions = userMasterData.IsAcceptedTermsAndConditions;
             userModel.IsTestUser = false;
@@ -105,7 +109,7 @@ namespace Coditech.API.Service
             userModel.GeneralTrainerMasterId = generalTrainerMasterId;
             userModel.Custom1 = generalPersonModel.Custom1;
             userModel.CentreName = generalPersonModel.CentreName;
-            userModel.DateOfBirth = generalPersonModel.DateOfBirth;
+            userModel.DateOfBirth = string.IsNullOrEmpty(generalPersonModel.DateOfBirth) ? null : Convert.ToDateTime(generalPersonModel.DateOfBirth);
             userModel.DateOfJoining = userMasterData.CreatedDate.HasValue ? userMasterData.CreatedDate.Value : default(DateTime);
             return userModel;
         }
@@ -139,7 +143,7 @@ namespace Coditech.API.Service
             if (personId <= 0)
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
-            GeneralPersonModel generalPersonModel = GetGeneralPersonDetails(personId);
+            GeneralPersonModel generalPersonModel = base.GetGeneralPersonDetails(personId);
             if (IsNull(generalPersonModel))
                 throw new CoditechException(ErrorCodes.NullModel, GeneralResources.ModelNotNull);
 
@@ -151,7 +155,7 @@ namespace Coditech.API.Service
             userModel.MiddleName = generalPersonModel.MiddleName;
             userModel.LastName = generalPersonModel.LastName;
             userModel.EmailId = generalPersonModel.EmailId;
-            userModel.DateOfBirth = generalPersonModel.DateOfBirth;
+            userModel.DateOfBirth = string.IsNullOrEmpty(generalPersonModel.DateOfBirth) ? null : Convert.ToDateTime(generalPersonModel.DateOfBirth);
             userModel.Gender = GetEnumDisplayTextByEnumId(generalPersonModel.GenderEnumId);
             userModel.PhoneNumber = generalPersonModel.PhoneNumber;
             userModel.MobileNumber = generalPersonModel.MobileNumber;
@@ -210,21 +214,26 @@ namespace Coditech.API.Service
                 GeneralPerson generalPerson = _generalPersonRepository.Table.Where(x => x.PersonId == personId)?.FirstOrDefault();
                 if (IsNotNull(generalPerson))
                 {
+                    generalPerson.EmailIdSearchTokens = SearchHashHelper.CreateSearchTokens(dbtmUserModel.EmailId);
+                    generalPerson.EmergencyContactSearchTokens = SearchHashHelper.CreateSearchTokens(dbtmUserModel.EmergencyContact);
+                    generalPerson.PhoneNumberSearchTokens = SearchHashHelper.CreateSearchTokens(dbtmUserModel.PhoneNumber);
+
                     generalPerson.MaritalStatus = dbtmUserModel.MaritalStatus;
                     generalPerson.BloodGroup = dbtmUserModel.BloodGroup;
                     generalPerson.BirthMark = dbtmUserModel.BirthMark;
-                    generalPerson.EmailId = dbtmUserModel.EmailId;
                     generalPerson.GeneralOccupationMasterId = dbtmUserModel.GeneralOccupationMasterId;
                     generalPerson.AnniversaryDate = dbtmUserModel.AnniversaryDate;
-                    generalPerson.EmergencyContact = dbtmUserModel.EmergencyContact;
-                    generalPerson.PhoneNumber = dbtmUserModel.PhoneNumber;
+                    generalPerson.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
+                    generalPerson.EmergencyContact = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmergencyContact) : dbtmUserModel.EmergencyContact;
+                    generalPerson.PhoneNumber = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.PhoneNumber) : dbtmUserModel.PhoneNumber;
                     generalPerson.ModifiedBy = dbtmUserModel.ModifiedBy;
                     status = _generalPersonRepository.Update(generalPerson);
                     if (status)
                     {
-                        if (IsNotNull(userMasterData) && userMasterData.EmailId != dbtmUserModel.EmailId)
+                        string emailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
+                        if (IsNotNull(userMasterData) && emailId != dbtmUserModel.EmailId)
                         {
-                            userMasterData.EmailId = dbtmUserModel.EmailId;
+                            userMasterData.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dbtmUserModel.EmailId) : dbtmUserModel.EmailId;
                             userMasterData.ModifiedBy = dbtmUserModel.ModifiedBy;
                             _userMasterRepository.Update(userMasterData);
                         }
@@ -317,6 +326,15 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@JoiningCode", joiningCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMNewRegistrationModel> dBTMNewRegistrationList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetGeneralTrainerByJoiningCodeList @JoiningCode,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
+            if (dBTMNewRegistrationList?.Any() == true)
+            {
+                foreach (var item in dBTMNewRegistrationList?.Where(x => x.IsDataEncrypted))
+                {
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                }
+                dBTMNewRegistrationList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
+            }
             DBTMNewRegistrationListModel listModel = new DBTMNewRegistrationListModel
             {
                 DBTMNewRegistrationList = dBTMNewRegistrationList?.Count > 0 ? dBTMNewRegistrationList : new List<DBTMNewRegistrationModel>()
@@ -324,6 +342,113 @@ namespace Coditech.API.Service
             if (listModel.DBTMNewRegistrationList == null || listModel.DBTMNewRegistrationList.Count == 0)
                 throw new CoditechException(ErrorCodes.InvalidData, "No trainer is associated with this joining code. Please contact your administrator.");
             return listModel;
+        }
+
+        public virtual bool DeleteUserAccount(ParameterModel parameterModel)
+        {
+            string[] values = parameterModel.Ids.Split('|');
+            long entityId = Convert.ToInt64(values[0]);
+            string userType = values[1];
+            if (entityId <= 0)
+            {
+                throw new CoditechException(ErrorCodes.IdLessThanOne, "Invalid EntityId.");
+            }
+            if (string.IsNullOrWhiteSpace(userType))
+            {
+                throw new CoditechException(ErrorCodes.NullModel, "UserType is required.");
+            }
+            bool isTrainee = userType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.OrdinalIgnoreCase);
+            if (!isTrainee)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Unsupported UserType.");
+            }
+            UserMaster userMaster = _userMasterRepository.Table.FirstOrDefault(x => x.EntityId == entityId && x.UserType == userType);
+            if (IsNull(userMaster))
+            {
+                throw new CoditechException(ErrorCodes.NotFound, "User account not found.");
+            }
+            if (userMaster.IsDeleted)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "User account is already deleted.");
+            }
+            long personId = 0;
+            DBTMTraineeDetails trainee = null;
+            if (isTrainee)
+            {
+                trainee = _dbtmTraineeDetailsRepository.Table.FirstOrDefault(x => x.DBTMTraineeDetailId == entityId);
+                if (IsNull(trainee))
+                {
+                    throw new CoditechException(ErrorCodes.NotFound, "Trainee details not found.");
+                }
+                personId = trainee.PersonId;
+            }
+            GeneralPerson generalPerson = _generalPersonRepository.Table.FirstOrDefault(x => x.PersonId == personId);
+            if (IsNull(generalPerson))
+            {
+                throw new CoditechException(ErrorCodes.NotFound, "Person details not found.");
+            }
+            DateTime deletedDate = DateTime.Now;
+            generalPerson.FirstName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("Deleted") : "Deleted";
+            generalPerson.MiddleName = null;
+            generalPerson.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("User") : "User";
+            generalPerson.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
+            generalPerson.MobileNumber = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("0000000000") : "0000000000";
+
+            generalPerson.EmergencyContact = null;
+            generalPerson.EmergencyContactSearchTokens = null;
+            generalPerson.PhoneNumber = null;
+            generalPerson.IndentificationNumber = null;
+            generalPerson.IndentificationNumberSearchTokens = null;
+            generalPerson.AttendanceIntegrationId = null;
+            generalPerson.AttendanceIntegrationIdSearchTokens = null;
+            generalPerson.DateOfBirth = null;
+            generalPerson.Custom2 = null;
+            generalPerson.FirstNameSearchTokens = null;
+            generalPerson.MiddleNameSearchTokens = null;
+            generalPerson.LastNameSearchTokens = null;
+            generalPerson.EmailIdSearchTokens = null;
+            generalPerson.MobileNumberSearchTokens = null;
+            generalPerson.Custom2 = "Deleted User";
+            generalPerson.ModifiedDate = deletedDate;
+            generalPerson.DeletedDate = deletedDate;
+            generalPerson.IsDeleted = true;
+
+            userMaster.UserName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
+            userMaster.Password = MD5Hash("deleteduser");
+            userMaster.UserNameHash = null;
+            userMaster.FirstName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("Deleted") : "Deleted";
+            userMaster.MiddleName = null;
+            userMaster.LastName = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("User") : "User";
+            userMaster.EmailId = generalPerson.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt("deleteduser") : "deleteduser";
+            userMaster.IsActive = false;
+            userMaster.ModifiedDate = deletedDate;
+            userMaster.IsDeleted = true;
+            userMaster.DeletedDate = deletedDate;
+            if (trainee != null)
+            {
+                trainee.IsActive = false;
+                trainee.IsDeleted = true;
+                trainee.ModifiedDate = DateTime.Now;
+            }
+            bool personUpdated = _generalPersonRepository.Update(generalPerson);
+            if (!personUpdated)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Unable to update person details.");
+            }
+            bool userUpdated = _userMasterRepository.Update(userMaster);
+            if (!userUpdated)
+            {
+                throw new CoditechException(ErrorCodes.InvalidData, "Unable to update user account.");
+            }
+            if (trainee != null)
+            {
+                bool traineeUpdated = _dbtmTraineeDetailsRepository.Update(trainee);
+                if (!traineeUpdated)
+                {
+                    throw new CoditechException(ErrorCodes.InvalidData, "Unable to deactivate trainee details.");
+                }
+            }
+            return true;
         }
     }
 }

@@ -1027,7 +1027,7 @@ namespace Coditech.API.Service
             DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonCode == deviceData.PersonCode);
             GeneralPersonModel person = null;
             if (traineeDetails?.PersonId > 0)
-                person = GetGeneralPersonDetails(traineeDetails.PersonId);
+                person = base.GetGeneralPersonDetails(traineeDetails.PersonId);
             model.AthleteName = person != null ? $"{person.FirstName} {person.LastName}" : "N/A";
             model.DateOfBirth = person?.DateOfBirth;
             var testData = _dBTMTestMasterRepository.Table.Where(x => x.TestCode == deviceData.TestCode).Select(x => new { x.DBTMTestMasterId, x.TestName }).FirstOrDefault();
@@ -1089,7 +1089,7 @@ namespace Coditech.API.Service
             }
             if (generalBatchMasterId <= 0)
             {
-                return null;
+                return new DBTMReportTraineeProfileListModel();
             }
 
             bool isAnyActivityPerformed = _dBTMDeviceDataRepository.Table.Any(x => x.TablePrimaryColumnId == generalBatchMasterId && x.TestPerformedTime.Date == FromDate.Date);
@@ -1104,6 +1104,13 @@ namespace Coditech.API.Service
 
             if (traineeDetaillist?.Count > 0)
             {
+                foreach (var item in traineeDetaillist?.Where(x => x.IsDataEncrypted))
+                {
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                    item.DateOfBirth = DataEncryptionHelper.DataDecrypt(item.DateOfBirth);
+                }
+                traineeDetaillist.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
                 // Parse trainee ids once and use numeric containment (more efficient than string.Contains in LINQ-to-Entities)
                 var traineeIds = string.IsNullOrWhiteSpace(dBTMTraineeDetailIds)
                     ? new List<long>()
@@ -1120,7 +1127,7 @@ namespace Coditech.API.Service
                                    select new
                                    {
                                        DBTMTraineeDetailId = gtat.EntityId,
-                                       TrainerName = um.FirstName + " " + um.LastName
+                                       TrainerName = um.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(um.FirstName) + " " + DataEncryptionHelper.DataDecrypt(um.LastName) : um.FirstName + " " + um.LastName
                                    }).ToList();
 
                 var trainerLookup = trainerList
@@ -1382,8 +1389,11 @@ namespace Coditech.API.Service
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
-                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                    x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
+                    x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
+                    x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
                 });
+                traineeProfilePerformanceRankDataList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.TestCode).ToList();
 
                 var testList = traineeProfilePerformanceRankDataList
                                .Select(x => new
@@ -1425,7 +1435,7 @@ namespace Coditech.API.Service
 
                     DataRow dr = dt.NewRow();
                     dr["DBTMTraineeDetailId"] = traineeProfile.DBTMTraineeDetailId;
-                    dr["Name"] = traineeProfile.Name;
+                    dr["Name"] = $"{traineeProfile.FirstName} {traineeProfile.LastName}";
 
                     var traineeProfileList = traineeProfilePerformanceRankDataList.Where(x => x.DBTMTraineeDetailId == traineeId);
 
@@ -1588,8 +1598,11 @@ namespace Coditech.API.Service
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
-                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                    x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
+                    x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
+                    x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
                 });
+                traineeProfilePerformanceRankDataList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.TestCode).ToList();
 
                 var testList = traineeProfilePerformanceRankDataList
                                .Select(x => new
@@ -1787,6 +1800,15 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             dBTMReportsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTestWiseReportsList @DBTMTestMasterId,@DBTMTraineeDetailId,@FromDate,@ToDate,@GeneralTrainerMasterId,@CentreCode,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            dBTMReportsList?.Where(x => x.IsEncrypted || x.IsDataEncrypted)?.ToList()?.ForEach(x =>
+            {
+                x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
+                x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
+                x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
+                x.IsDataEncrypted = false;
+                x.IsEncrypted = false;
+            });
+            dBTMReportsList = dBTMReportsList?.OrderByDescending(x => x.TestPerformedTime).ThenBy(x => x.FirstName).ThenBy(x => x.LastName)?.ToList();
             return dBTMReportsList;
         }
 
@@ -1820,9 +1842,11 @@ namespace Coditech.API.Service
 
         private void ReportsListDecryption(List<DBTMReportsModel> dBTMReportsList)
         {
-            dBTMReportsList?.ForEach(x =>
+            dBTMReportsList?.Where(x => x.IsEncrypted || x.IsDataEncrypted)?.ToList()?.ForEach(x =>
             {
-                x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
+                x.FirstName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) : x.FirstName;
+                x.LastName = x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.LastName) : x.LastName;
             });
         }
 
@@ -2393,8 +2417,8 @@ namespace Coditech.API.Service
                  where gbu.GeneralBatchMasterId == generalBatchMasterId && um.UserType == UserTypeEnum.Trainee.ToString()
                  select new GeneralBatchUserModel
                  {
-                     FirstName = um.FirstName,
-                     LastName = um.LastName,
+                     FirstName = um.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(um.FirstName) : um.FirstName,
+                     LastName = um.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(um.LastName) : um.LastName,
                      EntityId = um.EntityId
                  }).ToList();
 

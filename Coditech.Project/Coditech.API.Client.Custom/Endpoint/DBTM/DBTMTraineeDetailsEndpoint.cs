@@ -18,9 +18,6 @@ namespace Coditech.API.Endpoint
         public string UpdateDBTMTraineeOtherDetailsAsync() =>
                $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/UpdateDBTMTraineeOtherDetails";
 
-        public string DeleteDBTMTraineeDetailsAsync() =>
-                  $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/DeleteDBTMTraineeDetails";
-
         public string GetTraineeActivitiesListAsync(string personCode, int numberOfDaysRecord, IEnumerable<string> expand, IEnumerable<FilterTuple> filter, IDictionary<string, string> sort, int? pageIndex, int? pageSize)
         {
             string endpoint = $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMTraineeDetails/GetTraineeActivitiesList?personCode={personCode}&numberOfDaysRecord={numberOfDaysRecord}{BuildEndpointQueryString(true, expand, filter, sort, pageIndex, pageSize)}";
@@ -57,6 +54,10 @@ namespace Coditech.API.Endpoint
         public string UploadBulkUpdateTraineeFromFileAsync()
         {
             return $"{CoditechCustomAdminSettings.CoditechOrganisationApiRootUri}/DBTMUser/UploadBulkUpdateTraineeFromFile";
+        }
+        public string DeleteUserAccountAsync()
+        {
+            return $"{CoditechCustomAdminSettings.CoditechDBTMApiRootUri}/DBTMUser/DeleteUserAccount";
         }
     }
 }

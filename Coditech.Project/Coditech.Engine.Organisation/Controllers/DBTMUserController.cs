@@ -131,5 +131,27 @@ namespace Coditech.API.Controllers
                 return CreateInternalServerErrorResponse(new DBTMTraineeUploadResponse { HasError = true, ErrorMessage = ex.Message });
             }
         }
+
+        [Route("/DBTMUser/UpdateTraineeAgeGroups")]
+        [HttpPost]
+        [Produces(typeof(TrueFalseResponse))]
+        public virtual IActionResult UpdateTraineeAgeGroups()
+        {
+            try
+            {
+                int updatedCount = _dbtmUserService.UpdateTraineeAgeGroups();
+                return CreateOKResponse(new TrueFalseResponse { IsSuccess = true });
+            }
+            catch (CoditechException ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMUser", TraceLevel.Warning);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message, ErrorCode = ex.ErrorCode });
+            }
+            catch (Exception ex)
+            {
+                _coditechLogging.LogMessage(ex, "DBTMUser", TraceLevel.Error);
+                return CreateInternalServerErrorResponse(new TrueFalseResponse { HasError = true, ErrorMessage = ex.Message });
+            }
+        }
     }
 }

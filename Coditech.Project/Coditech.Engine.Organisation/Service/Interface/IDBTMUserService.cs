@@ -11,5 +11,6 @@ namespace Coditech.API.Service
         DBTMTraineeUploadModel DownloadTraineeUploadTemplate(string centreCode, long trainerId, string userType, int count, long entityId);
         DBTMTraineeUploadModel DownloadBulkUpdateTemplate(long generalBatchMasterId, string orderBy);
         DBTMTraineeUploadModel UploadBulkUpdateTraineeFromFile(IFormFile file);
+        int UpdateTraineeAgeGroups();
     }
 }

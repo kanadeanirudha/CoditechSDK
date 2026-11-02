@@ -30,7 +30,6 @@ namespace Coditech.API.Service
         private readonly ICoditechRepository<GeneralTrainerMaster> _generalTrainerMasterRepository;
         private readonly ICoditechRepository<GeneralBatchMaster> _generalBatchMasterRepository;
         private readonly ICoditechRepository<GeneralBatchUser> _generalBatchUserRepository;
-        private readonly ICoditechRepository<DBTMBatchActivity> _dbtmBatchActivityRepository;
         private readonly IConverter _converter;
         private readonly ICoditechRepository<DBTMCentreWiseSetting> _dBTMCentreWiseSettingRepository;
 
@@ -45,11 +44,10 @@ namespace Coditech.API.Service
             _dBTMDeviceDataRepository = new CoditechRepository<DBTMDeviceData>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _dBTMTestMasterRepository = new CoditechRepository<DBTMTestMaster>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalEnumaratorMasterRepository = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>());
-            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>()); ;
+            _generalTraineeAssociatedToTrainerRepository = new CoditechRepository<GeneralTraineeAssociatedToTrainer>(_serviceProvider.GetService<Coditech_Entities>());
             _userMasterRepository = new CoditechRepository<UserMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalTrainerMasterRepository = new CoditechRepository<GeneralTrainerMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _dBTMCentreWiseSettingRepository = new CoditechRepository<DBTMCentreWiseSetting>(_serviceProvider.GetService<CoditechCustom_Entities>());
-            _dbtmBatchActivityRepository = new CoditechRepository<DBTMBatchActivity>(_serviceProvider.GetService<CoditechCustom_Entities>());
             _generalBatchMasterRepository = new CoditechRepository<GeneralBatchMaster>(_serviceProvider.GetService<Coditech_Entities>());
             _generalBatchUserRepository = new CoditechRepository<GeneralBatchUser>(_serviceProvider.GetService<Coditech_Entities>());
         }
@@ -63,25 +61,59 @@ namespace Coditech.API.Service
                 filters.RemoveAll(x => x.FilterName == FilterKeys.IsActive);
                 listType = $"and IsActive={isActive}";
             }
+            BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
+
+            if (GetSortableField(DynamicClauseHelper.GenerateDynamicOrderByClause(sorts)))
+            {
+                pagingStart = 1;
+                pagingLength = int.MaxValue;
+            }
             CoditechViewRepository<DBTMTraineeDetailsModel> objStoredProc = new CoditechViewRepository<DBTMTraineeDetailsModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@CentreCode", SelectedCentreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@ListType", listType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@PageNo", pagingStart, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@Rows", pagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsList @CentreCode,@GeneralTrainerMasterId,@ListType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
-            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsList @CentreCode,@GeneralTrainerMasterId,@listType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 7, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in dBTMTraineeDetailsList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.EmailId = DataEncryptionHelper.DataDecrypt(item.EmailId);
+                item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
 
+                item.EmailId = MaskData(item.EmailId, MaskType.Email);
+                item.MobileNumber = MaskData(item.MobileNumber, MaskType.Mobile);
+            }
+            dBTMTraineeDetailsList = SortingAndPaginationForEncryptionField(dBTMTraineeDetailsList, pageListModel);
+            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
 
+        protected override bool GetSortableField(string sortBy)
+        {
+            if (base.GetSortableField(sortBy))
+            {
+                return true;
+            }
+            else
+            {
+                sortBy = sortBy?.Replace(" asc", "")?.Replace(" desc", "").ToLowerInvariant();
+                return sortBy switch
+                {
+                    "displayname" => true,
+                    _ => false
+                };
+            }
+        }
         //Get DBTM Trainee Other Details
         public DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId)
         {
@@ -346,7 +378,21 @@ namespace Coditech.API.Service
             CoditechViewRepository<DBTMTraineeProfileModel> objStoredProc = new CoditechViewRepository<DBTMTraineeProfileModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@DBTMTraineeDetailIds", dBTMTraineeDetailIds, ParameterDirection.Input, DbType.String);
             List<DBTMTraineeProfileModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeDetailsListByIds @DBTMTraineeDetailIds")?.ToList();
-
+            if (list?.Count > 0)
+            {
+                foreach (var item in list?.Where(x => x.IsDataEncrypted))
+                {
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.MiddleName = DataEncryptionHelper.DataDecrypt(item.MiddleName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                    item.EmailId = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.EmailId), MaskType.Mobile);
+                    item.MobileNumber = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.MobileNumber), MaskType.Mobile);
+                    item.PhoneNumber = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.PhoneNumber), MaskType.Mobile);
+                    item.EmergencyContact = HelperUtility.MaskData(DataEncryptionHelper.DataDecrypt(item.EmergencyContact), MaskType.Mobile);
+                    item.DateOfBirth = DataEncryptionHelper.DataDecrypt(item.DateOfBirth);
+                }
+                list.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
+            }
             if (list?.Count > 0)
             {
                 var trainerList = from gtat in _generalTraineeAssociatedToTrainerRepository.Table
@@ -361,7 +407,7 @@ namespace Coditech.API.Service
                                   select new
                                   {
                                       DBTMTraineeDetailId = gtat.EntityId,
-                                      TrainerName = um.FirstName + " " + um.LastName
+                                      TrainerName = $"{DataEncryptionHelper.DataDecrypt(um.FirstName)} {DataEncryptionHelper.DataDecrypt(um.LastName)}"
                                   };
                 List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList = null;
                 DataTable dt = GetTraineePerformanceRankingDetails(generalBatchMasterId, FromDate, ToDate, out traineeProfilePerformanceList);
@@ -434,6 +480,7 @@ namespace Coditech.API.Service
         #endregion
 
         #region private
+
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
         {
             long personId = 0;
@@ -477,6 +524,7 @@ namespace Coditech.API.Service
             return $"{years} years {months} months {days} days";
         }
 
+        [Obsolete]
         private string ImageUrlToBase64(string imageUrl)
         {
             var handler = new HttpClientHandler()
@@ -504,6 +552,7 @@ namespace Coditech.API.Service
             return $"data:{contentType};base64,{base64}";
         }
 
+        [Obsolete]
         private string ConvertFolderPathImageToBase64(string path, string contentType)
         {
             byte[] imageBytes = File.ReadAllBytes(path);
@@ -511,6 +560,7 @@ namespace Coditech.API.Service
             return $"data:{contentType};base64,{base64String}";
         }
 
+        [Obsolete]
         //Template Html Replacement
         private string ReplaceTraineeTemplate(string html, DBTMTraineeProfileModel profile, string remarks, string centreName)
         {
@@ -558,7 +608,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#Graph#", radarImage, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, profile.FirstName, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, profile.LastName, html);
-            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, profile.DateOfBirth?.ToString("dd-MMM-yyyy"), html);
+            html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.DOB, !string.IsNullOrWhiteSpace(profile.DateOfBirth) ? Convert.ToDateTime(profile.DateOfBirth).ToString("dd-MMM-yyyy") : string.Empty, html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.JoiningDate, profile.DateOfJoining?.ToString("dd-MMM-yyyy"), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Weight, profile.Weight.ToString(), html);
             html = ReplaceTokenWithMessageText(EmailTemplateTokenCustomConstant.Height, profile.Height.ToString(), html);
@@ -642,7 +692,7 @@ namespace Coditech.API.Service
             html = ReplaceTokenWithMessageText("#htmlclose#", "</html>", html);
             return html;
         }
-
+        [Obsolete]
         private DataTable GetTraineePerformanceRankingDetails(long generalBatchMasterId, DateTime FromDate, DateTime ToDate, out List<DBTMTraineeProfilePerformanceModel> traineeProfilePerformanceList)
         {
             DataTable dt = new DataTable();
@@ -659,7 +709,7 @@ namespace Coditech.API.Service
             {
                 traineeProfilePerformanceRankDataList.ForEach(x =>
                 {
-                    x.ParameterValue = x.IsEncrypted ? EncryptionHelper.Decrypt(x.ParameterValue) : x.ParameterValue;
+                    x.ParameterValue = x.IsEncrypted ? DataEncryptionHelper.DataDecrypt(x.ParameterValue) : x.ParameterValue;
                 });
 
                 var testList = traineeProfilePerformanceRankDataList
@@ -692,7 +742,7 @@ namespace Coditech.API.Service
 
                     DataRow dr = dt.NewRow();
                     dr["DBTMTraineeDetailId"] = traineeProfile.DBTMTraineeDetailId;
-                    dr["Name"] = traineeProfile.Name;
+                    dr["Name"] = $"{traineeProfile.FirstName} {traineeProfile.LastName}";
 
                     var traineeProfileList = traineeProfilePerformanceRankDataList.Where(x => x.DBTMTraineeDetailId == traineeId);
 
@@ -840,7 +890,7 @@ namespace Coditech.API.Service
                 performanceModel.IsUp = true;
             }
         }
-
+        [Obsolete]
         private RadarChartModel BindRadarChartDetails(DataTable dt, DataRow dataRow, string[] testName)
         {
             return new RadarChartModel()
@@ -859,7 +909,7 @@ namespace Coditech.API.Service
                             }
             };
         }
-
+        [Obsolete]
         private string GenerateRadarChartBase64(RadarChartModel model)
         {
             if (model == null || string.IsNullOrWhiteSpace(model.Labels))
