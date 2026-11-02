@@ -95,8 +95,9 @@ namespace Coditech.API.Controllers
 
         [HttpPost]
         [Route("/DBTMUser/UploadTrainee")]
+        [Consumes("multipart/form-data")]
         [Produces(typeof(DBTMTraineeUploadResponse))]
-        public IActionResult UploadTrainee([FromForm] IFormFile file)
+        public IActionResult UploadTrainee(IFormFile file)
         {
             try
             {
@@ -114,8 +115,9 @@ namespace Coditech.API.Controllers
         }
         [HttpPost]
         [Route("/DBTMUser/UploadBulkUpdateTraineeFromFile")]
+        [Consumes("multipart/form-data")]
         [Produces(typeof(DBTMTraineeUploadResponse))]
-        public IActionResult UploadBulkUpdateTraineeFromFile([FromForm] IFormFile file)
+        public IActionResult UploadBulkUpdateTraineeFromFile(IFormFile file)
         {
             try
             {
