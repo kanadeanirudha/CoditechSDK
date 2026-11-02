@@ -61,7 +61,7 @@ namespace Coditech.API.Service
                 filters.RemoveAll(x => x.FilterName == FilterKeys.IsActive);
                 listType = $"and IsActive={isActive}";
             }
-            BindSearchFilters(filters);
+            base.BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
 
@@ -88,16 +88,32 @@ namespace Coditech.API.Service
                 item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
                 item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
 
-                item.EmailId = HelperUtility.MaskData(item.EmailId, MaskType.Email);
-                item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+                item.EmailId = MaskData(item.EmailId, MaskType.Email);
+                item.MobileNumber = MaskData(item.MobileNumber, MaskType.Mobile);
             }
-            dBTMTraineeDetailsList = SortingAndPaginationForEncryptionField(dBTMTraineeDetailsList, pageListModel.OrderBy, pageListModel.PagingStart, pageListModel.PagingLength);
+            dBTMTraineeDetailsList = SortingAndPaginationForEncryptionField(dBTMTraineeDetailsList, pageListModel);
             DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
             listModel.BindPageListModel(pageListModel);
             return listModel;
         }
 
+        protected override bool GetSortableField(string sortBy)
+        {
+            if (base.GetSortableField(sortBy))
+            {
+                return true;
+            }
+            else
+            {
+                sortBy = sortBy?.Replace(" asc", "")?.Replace(" desc", "").ToLowerInvariant();
+                return sortBy switch
+                {
+                    "displayname" => true,
+                    _ => false
+                };
+            }
+        }
         //Get DBTM Trainee Other Details
         public DBTMTraineeDetailsModel GetDBTMTraineeOtherDetails(long dBTMTraineeDetailId)
         {
@@ -464,93 +480,7 @@ namespace Coditech.API.Service
         #endregion
 
         #region private
-        private List<T> SortingAndPaginationForEncryptionField<T>(List<T> items, string orderBy, int pagingStart, int pagingLength)
-        {
-            if (!GetSortableField(orderBy))
-                return items;
 
-            if (items?.Count > 0 && !string.IsNullOrEmpty(orderBy))
-            {
-                string[] orderByParts = orderBy.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                string propertyName = orderByParts[0].Trim('[', ']');
-                bool isAscending = orderByParts.Length < 2 || !string.Equals(orderByParts[1], "desc", StringComparison.OrdinalIgnoreCase);
-                System.Reflection.PropertyInfo sortProperty = typeof(T).GetProperty(propertyName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
-
-                if (sortProperty != null)
-                {
-                    if (sortProperty.PropertyType == typeof(string))
-                    {
-                        IComparer<string> naturalComparer = Comparer<string>.Create(CompareNaturalStrings);
-                        items = isAscending
-                            ? items.OrderBy(x => sortProperty.GetValue(x)?.ToString(), naturalComparer).ToList()
-                            : items.OrderByDescending(x => sortProperty.GetValue(x)?.ToString(), naturalComparer).ToList();
-                    }
-                    else
-                    {
-                        items = isAscending
-                            ? items.OrderBy(x => sortProperty.GetValue(x)).ToList()
-                            : items.OrderByDescending(x => sortProperty.GetValue(x)).ToList();
-                    }
-                }
-            }
-            return items.Skip((pagingStart - 1) * pagingLength).Take(pagingLength).ToList();
-        }
-
-        private static int CompareNaturalStrings(string first, string second)
-        {
-            if (ReferenceEquals(first, second))
-                return 0;
-            if (first is null)
-                return -1;
-            if (second is null)
-                return 1;
-
-            int firstIndex = 0;
-            int secondIndex = 0;
-
-            while (firstIndex < first.Length && secondIndex < second.Length)
-            {
-                if (char.IsDigit(first[firstIndex]) && char.IsDigit(second[secondIndex]))
-                {
-                    int firstNumberStart = firstIndex;
-                    int secondNumberStart = secondIndex;
-
-                    while (firstIndex < first.Length && char.IsDigit(first[firstIndex]))
-                        firstIndex++;
-                    while (secondIndex < second.Length && char.IsDigit(second[secondIndex]))
-                        secondIndex++;
-
-                    string firstNumber = first[firstNumberStart..firstIndex].TrimStart('0');
-                    string secondNumber = second[secondNumberStart..secondIndex].TrimStart('0');
-
-                    if (firstNumber.Length != secondNumber.Length)
-                        return firstNumber.Length.CompareTo(secondNumber.Length);
-
-                    int numberComparison = string.Compare(firstNumber, secondNumber, StringComparison.Ordinal);
-                    if (numberComparison != 0)
-                        return numberComparison;
-                }
-                else
-                {
-                    int characterComparison = char.ToUpperInvariant(first[firstIndex]).CompareTo(char.ToUpperInvariant(second[secondIndex]));
-                    if (characterComparison != 0)
-                        return characterComparison;
-
-                    firstIndex++;
-                    secondIndex++;
-                }
-            }
-
-            return (first.Length - firstIndex).CompareTo(second.Length - secondIndex);
-        }
-        private bool GetSortableField(string sortBy)
-        {
-            return sortBy?.Replace(" asc", "")?.Replace(" desc", "").ToLowerInvariant() switch
-            {
-                "firstname" or "middlename" or "lastname" or "displayname" or "emailid" or "mobilenumber" => true,
-                _ => false
-            };
-        }
         private GeneralPersonModel GetDBTMGeneralPersonDetailsByEntityType(long entityId, string entityType)
         {
             long personId = 0;
