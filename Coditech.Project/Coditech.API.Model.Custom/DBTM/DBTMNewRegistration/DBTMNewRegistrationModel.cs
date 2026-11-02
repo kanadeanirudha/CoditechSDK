@@ -66,5 +66,6 @@ namespace Coditech.Common.API.Model
         public long GeneralTrainerMasterId { get; set; }
         public bool IsPasswordUserGenerated { get; set; }
         public int AgeGroupEnumId { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

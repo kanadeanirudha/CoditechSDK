@@ -11,13 +11,9 @@ using Coditech.Common.Logger;
 using Coditech.Resources;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Data;
-using System.IO;
-using System.Text;
 using System.Diagnostics;
 
 using static Coditech.Common.Helper.HelperUtility;
-using DocumentFormat.OpenXml.EMMA;
 
 namespace Coditech.Admin.Agents
 {
@@ -68,7 +64,6 @@ namespace Coditech.Admin.Agents
             DBTMTraineeDetailsListModel dBTMTraineeDetailsList = new DBTMTraineeDetailsListModel { DBTMTraineeDetailsList = response?.DBTMTraineeDetailsList };
             DBTMTraineeDetailsListViewModel listViewModel = new DBTMTraineeDetailsListViewModel();
             listViewModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.DBTMTraineeDetailsList?.ToViewModel<DBTMTraineeDetailsViewModel>().ToList();
-
             SetListPagingData(listViewModel.PageListViewModel, response, dataTableModel, listViewModel.DBTMTraineeDetailsList.Count, BindColumns());
             return listViewModel;
         }
@@ -171,15 +166,20 @@ namespace Coditech.Admin.Agents
         }
 
         //Delete DBTM Trainee Details .
-        public virtual bool DeleteDBTMTraineeDetails(string dBTMTraineeDetailIds, out string errorMessage)
+        public virtual bool DeleteUserAccount(long entityId, out string errorMessage)
         {
             errorMessage = GeneralResources.ErrorFailedToDelete;
-
+            string userType = UserTypeEnum.Trainee.ToString();
             try
             {
                 _coditechLogging.LogMessage("Agent method execution started.", "DBTMTraineeDetails", TraceLevel.Info);
-                TrueFalseResponse trueFalseResponse = _dBTMTraineeDetailsClient.DeleteDBTMTraineeDetails(new ParameterModel { Ids = dBTMTraineeDetailIds });
-                return trueFalseResponse.IsSuccess;
+                TrueFalseResponse response = _dBTMTraineeDetailsClient.DeleteUserAccount(new ParameterModel { Ids = $"{entityId}|{userType}" });
+                if (response == null || response.HasError)
+                {
+                    errorMessage = response?.ErrorMessage ?? GeneralResources.ErrorFailedToDelete;
+                    return false;
+                }
+                return true;
             }
             catch (CoditechException ex)
             {
@@ -218,7 +218,7 @@ namespace Coditech.Admin.Agents
 
             SortCollection sortlist = SortingData(dataTableModel.SortByColumn = string.IsNullOrEmpty(dataTableModel.SortByColumn) ? "" : dataTableModel.SortByColumn, dataTableModel.SortBy);
 
-            GeneralTraineeAssociatedToTrainerListResponse response = _generalTrainerClient.GetAssociatedTrainerList(null, 0, true, dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString(), personId, null, filters, sortlist, dataTableModel.PageIndex, int.MaxValue);
+            GeneralTraineeAssociatedToTrainerListResponse response = _generalTrainerClient.GetAssociatedTrainerList(null, 0, true, dBTMTraineeDetailId, UserTypeEnum.Trainee.ToString(), personId, null, filters, sortlist, dataTableModel.PageIndex, dataTableModel.PageSize);
             GeneralTraineeAssociatedToTrainerListModel associatedTrainerList = new GeneralTraineeAssociatedToTrainerListModel { AssociatedTrainerList = response?.AssociatedTrainerList };
             GeneralTraineeAssociatedToTrainerListViewModel listViewModel = new GeneralTraineeAssociatedToTrainerListViewModel();
             listViewModel.AssociatedTrainerList = associatedTrainerList?.AssociatedTrainerList?.ToViewModel<GeneralTraineeAssociatedToTrainerViewModel>().ToList();

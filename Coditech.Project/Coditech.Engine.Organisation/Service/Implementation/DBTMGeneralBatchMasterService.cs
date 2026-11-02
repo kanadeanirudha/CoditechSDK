@@ -52,6 +52,12 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<GeneralBatchModel> batchList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCalendarBatches @CentreCode, @UserMasterId, @StartDate, @EndDate, @WhereClause, @Rows, @PageNo, @Order_BY, @RowsCount OUT", 8, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in batchList)
+            {
+                item.FirstName = item.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(item.FirstName) : item.FirstName;
+                item.LastName = item.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(item.LastName) : item.LastName;
+                item.AssignedBy = $"{item.FirstName} {item.LastName}";
+            }
             GeneralBatchListModel listModel = new GeneralBatchListModel();
             listModel.GeneralBatchList = batchList?.Count > 0 ? batchList : new List<GeneralBatchModel>();
             return listModel;
@@ -125,8 +131,12 @@ namespace Coditech.API.Service
             {
                 generalBatchModel.Custom1 = dbtmGeneralBatchMaster.BatchLocation;
             }
-            string trainerName = _userMasterRepository.Table.Where(x => x.UserMasterId == generalBatchModel.CreatedBy).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
-            generalBatchModel.AssignedBy = trainerName;
+            var trainer = _userMasterRepository.Table.Where(x => x.UserMasterId == generalBatchModel.CreatedBy).Select(x => new { x.FirstName, x.LastName, x.IsDataEncrypted }).FirstOrDefault();
+            if (trainer != null)
+            {
+                generalBatchModel.AssignedBy = trainer.IsDataEncrypted ? $"{DataEncryptionHelper.DataDecrypt(trainer.FirstName)} {DataEncryptionHelper.DataDecrypt(trainer.LastName)}"
+                                                                       : $"{trainer.FirstName} {trainer.LastName}";
+            }
             return generalBatchModel;
         }
 
@@ -141,7 +151,7 @@ namespace Coditech.API.Service
             bool isGeneralBatchUpdated = base.UpdateGeneralBatch(generalBatchModel);
             if (isGeneralBatchUpdated)
             {
-                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = _dBTMGeneralBatchMasterRepository.Table .FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId);
+                DBTMGeneralBatchMaster dbtmGeneralBatchMaster = _dBTMGeneralBatchMasterRepository.Table.FirstOrDefault(x => x.GeneralBatchMasterId == generalBatchModel.GeneralBatchMasterId);
                 if (!string.IsNullOrWhiteSpace(generalBatchModel.Custom1))
                 {
                     if (dbtmGeneralBatchMaster != null)
@@ -259,6 +269,7 @@ namespace Coditech.API.Service
         }
         public override GeneralBatchUserListModel GetGeneralBatchUserList(int generalBatchMasterId, string userType, FilterCollection filters, NameValueCollection sorts, NameValueCollection expands, int pagingStart, int pagingLength)
         {
+            BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
             CoditechViewRepository<GeneralBatchUserModel> objStoredProc = new CoditechViewRepository<GeneralBatchUserModel>(_serviceProvider.GetService<Coditech_Entities>());
@@ -270,6 +281,14 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<GeneralBatchUserModel> batchList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserAssociatedList @GeneralBatchMasterId,@UserType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in batchList.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
+
+                item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
+            }
             GeneralBatchUserListModel listModel = new GeneralBatchUserListModel();
 
             listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList : new List<GeneralBatchUserModel>();
@@ -303,8 +322,15 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<GeneralBatchUserModel> batchList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMBatchUserList @CentreCode,@GeneralTrainerMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in batchList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.MobileNumber = DataEncryptionHelper.DataDecrypt(item.MobileNumber);
+                item.MobileNumber = MaskData(item.MobileNumber, MaskType.Mobile);
+            }
             GeneralBatchUserListModel listModel = new GeneralBatchUserListModel();
-            listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList : new List<GeneralBatchUserModel>();
+            listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<GeneralBatchUserModel>();
             return listModel;
         }
         public bool ConvertCampUserToBatchUser(long dBTMTraineeDetailId)

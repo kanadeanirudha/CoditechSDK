@@ -19,12 +19,13 @@
         public string PhotoMediaPath { get; set; }
         public string PhotoMediaFileName { get; set; }
         public long PersonId { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string EmailId { get; set; }
         public string PhoneNumber { get; set; }
         public string CallingCode { get; set; }
         public string MobileNumber { get; set; }
         public int AdminRoleMasterId { get; set; }
         public long UserMasterId { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

@@ -25,5 +25,6 @@
         public long DBTMTraineeDetailId { get; set; }
         public int AgeGroupEnumId { get; set; }
         public int GenderEnumId { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

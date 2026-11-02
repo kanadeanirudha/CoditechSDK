@@ -3,14 +3,12 @@ using Coditech.API.Data;
 using Coditech.Common.API;
 using Coditech.Common.API.Model;
 using Coditech.Common.Exceptions;
+using Coditech.Common.Helper;
 using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.ExtendedProperties;
 using Newtonsoft.Json;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -113,21 +111,7 @@ namespace Coditech.API.Service
                 base.InsertPersonDetails(generalPersonModel, settingMasterList);
             }
         }
-        public override bool UpdatePersonInformation(GeneralPersonModel generalPersonModel)
-        {
-            bool isUpdated = base.UpdatePersonInformation(generalPersonModel);
-            if (isUpdated && generalPersonModel.UserType == UserTypeEnum.Trainee.ToString())
-            {
-                DBTMTraineeDetails traineeDetails = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonId == generalPersonModel.PersonId);
-                if (traineeDetails != null)
-                {
-                    int calculatedAgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
-                    traineeDetails.AgeGroupEnumId = calculatedAgeGroupEnumId;
-                    _dBTMTraineeDetailsRepository.Update(traineeDetails);
-                }
-            }
-            return isUpdated;
-        }
+
         protected override bool ValidateUserwiseGeneralPerson(GeneralPersonModel generalPersonModel, ref string errorMessage, ref int generalEnumaratorId)
         {
             if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))
@@ -189,7 +173,7 @@ namespace Coditech.API.Service
             generalPersonModel.PersonCode = GenerateRegistrationCode(GeneralRunningNumberForCustomEnum.DBTMTraineeRegistration.ToString(), generalPersonModel.SelectedCentreCode);
             if (dBTMCustomNewRegistrationModel.AgeGroupEnumId <= 0)
             {
-                dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(generalPersonModel.DateOfBirth);
+                dBTMCustomNewRegistrationModel.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(DateTime.Parse(DataEncryptionHelper.DataDecrypt(generalPersonModel.DateOfBirth)));
             }
             DBTMTraineeDetails dBTMTraineeDetails = new DBTMTraineeDetails()
             {
@@ -218,7 +202,7 @@ namespace Coditech.API.Service
                     {
                         string subject = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.CentreName, !string.IsNullOrEmpty(generalPersonModel.CentreName) ? generalPersonModel.CentreName : GetOrganisationCentreNameByCentreCode(generalPersonModel.SelectedCentreCode), emailTemplateModel.Subject);
                         string messageText = ReplaceDBTMTraineeEmailTemplate(generalPersonModel, emailTemplateModel.EmailTemplate);
-                        _coditechEmail.SendEmail(generalPersonModel.SelectedCentreCode, generalPersonModel.EmailId, "", subject, messageText, true);
+                        _coditechEmail.SendEmail(generalPersonModel.SelectedCentreCode, generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.EmailId) : generalPersonModel.EmailId, "", subject, messageText, true);
                     }
                 }
                 catch (Exception ex)
@@ -230,8 +214,8 @@ namespace Coditech.API.Service
         private string ReplaceDBTMTraineeEmailTemplate(GeneralPersonModel generalPersonModel, string emailTemplate)
         {
             string messageText = emailTemplate;
-            messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, generalPersonModel.FirstName, messageText);
-            messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, generalPersonModel.LastName, messageText);
+            messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.FirstName, generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.FirstName) : generalPersonModel.FirstName, messageText);
+            messageText = ReplaceTokenWithMessageText(EmailTemplateTokenConstant.LastName, generalPersonModel.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(generalPersonModel.LastName) : generalPersonModel.LastName, messageText);
             return ReplaceEmailTemplateFooter(generalPersonModel.SelectedCentreCode, messageText);
         }
 
@@ -282,6 +266,8 @@ namespace Coditech.API.Service
             {
                 generalPersonModel.Custom2 = $"{generalPersonModel.FirstName.ToFirstLetterCapital()} {generalPersonModel.LastName.ToFirstLetterCapital()}";
             }
+            generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
+            generalPersonModel.Custom2 = IsDataEncrypted() ? DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2) : generalPersonModel.Custom2;
             generalPersonModel = base.InsertPersonInformation(generalPersonModel, customerData);
             if (!generalPersonModel.HasError)
             {
@@ -471,7 +457,7 @@ namespace Coditech.API.Service
             string fileUserName = "TraineeTemplate";
             if (userType == CustomConstants.DBTMCentreOwner)
             {
-                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
+                fileUserName = _userMasterRepository.Table.Where(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Employee.ToString()).Select(x => x.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(x.FirstName) + "_" + DataEncryptionHelper.DataDecrypt(x.LastName) : x.FirstName + "_" + x.LastName).FirstOrDefault() ?? "CentreOwner";
             }
             else
             {
@@ -658,6 +644,50 @@ namespace Coditech.API.Service
 
         #endregion
 
+        public virtual int UpdateTraineeAgeGroups()
+        {
+            var ageGroups =
+            (
+                from gm in _generalEnumaratorMasterRepository.Table
+                join gg in _generalEnumaratorGroupRepository.Table
+                    on gm.GeneralEnumaratorGroupId equals gg.GeneralEnumaratorGroupId
+                where gg.EnumGroupCode == "AgeGroup" && gm.IsActive
+                orderby gm.SequenceNumber
+                select new
+                {
+                    EnumId = gm.GeneralEnumaratorId,
+                    EnumValue = Convert.ToInt32(gm.EnumValue)
+                }
+            ).ToList();
+            if (ageGroups.Count == 0)
+                return 0;
+            var configuredAgeGroups = ageGroups.Select(x => (x.EnumId, x.EnumValue)).ToList();
+            var trainees = _dBTMTraineeDetailsRepository.Table.Where(x => x.IsActive).ToList();
+            if (trainees.Count == 0)
+                return 0;
+            var personIds = trainees.Select(x => x.PersonId).Distinct().ToList();
+            var persons = _generalPersonRepository.Table.Where(x => personIds.Contains(x.PersonId)).Select(x => new { x.PersonId, x.DateOfBirth }).ToList();
+            var personDOBLookup = persons.ToDictionary(x => x.PersonId, x => DataEncryptionHelper.DataDecrypt(x.DateOfBirth));
+            var traineesToUpdate = new List<DBTMTraineeDetails>();
+            foreach (var trainee in trainees)
+            {
+                if (!personDOBLookup.TryGetValue(trainee.PersonId, out var dob) || string.IsNullOrWhiteSpace(dob) || !DateTime.TryParse(dob, out DateTime dobDate))
+                {
+                    continue;
+                }
+                int calculatedAgeGroupEnumId = DBTMCustomHelper.GetAgeGroupEnumIdByDOB(dobDate, configuredAgeGroups);
+                if (calculatedAgeGroupEnumId > 0 && trainee.AgeGroupEnumId != calculatedAgeGroupEnumId)
+                {
+                    trainee.AgeGroupEnumId = calculatedAgeGroupEnumId;
+                    traineesToUpdate.Add(trainee);
+                }
+            }
+            if (traineesToUpdate.Count > 0)
+            {
+                _dBTMTraineeDetailsRepository.BatchUpdate(traineesToUpdate);
+            }
+            return traineesToUpdate.Count;
+        }
         #region Private Methods
         private DBTMTraineeUploadModel BuildUploadResult(DataTable dt, int success, DataTable failedTable = null)
         {
@@ -876,15 +906,15 @@ namespace Coditech.API.Service
                     hasError = true;
                 }
             }
-            if (!string.IsNullOrWhiteSpace(email))
-            {
-                bool isEmailExists = CheckEmailAlreadyExists(email);
-                if (isEmailExists)
-                {
-                    row[ExcelTemplateColumns.EmailAddress] = "Email Address already exists";
-                    hasError = true;
-                }
-            }
+            //if (!string.IsNullOrWhiteSpace(email))
+            //{
+            //    bool isEmailExists = CheckEmailAlreadyExists(email);
+            //    if (isEmailExists)
+            //    {
+            //        row[ExcelTemplateColumns.EmailAddress] = "Email Address already exists";
+            //        hasError = true;
+            //    }
+            //}
             if (string.IsNullOrWhiteSpace(gender))
             {
                 row[ExcelTemplateColumns.Gender] = "Gender is empty";
@@ -1030,7 +1060,7 @@ namespace Coditech.API.Service
                 MobileNumber = GetValue(row, ExcelTemplateColumns.MobileNumber),
                 CallingCode = rawCallingCode,
                 GenderEnumId = GetEnumIdByEnumCode(GetValue(row, ExcelTemplateColumns.Gender), DropdownTypeEnum.Gender.ToString()),
-                DateOfBirth = Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)),
+                DateOfBirth = Convert.ToDateTime(GetValue(row, ExcelTemplateColumns.DateOfBirth)).ToString("yyyy-MM-dd"),
                 Custom1 = JsonConvert.SerializeObject(customModel)
             };
             DBTMRegisterTrainee(model);
@@ -1281,13 +1311,6 @@ namespace Coditech.API.Service
         {
             return _dBTMDeviceRegistrationDetailsRepository.Table.Any(x => x.DBTMDeviceMasterId == dBTMDeviceMasterId);
         }
-        private List<GeneralRunningNumbers> GetGeneralRunningNumbersList(string centreCode)
-        {
-            List<string> runningNumnereList = ("EmployeeRegistration,DBTMTraineeRegistration").Split(",").ToList();
-            List<int> generalEnumaratorIdList = new CoditechRepository<GeneralEnumaratorMaster>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => runningNumnereList.Contains(x.EnumName))?.Select(x => x.GeneralEnumaratorId)?.ToList();
-            List<GeneralRunningNumbers> generalRunningNumbersList = new CoditechRepository<GeneralRunningNumbers>(_serviceProvider.GetService<Coditech_Entities>()).Table.Where(x => x.CentreCode == centreCode && generalEnumaratorIdList.Contains(x.KeyFieldEnumId))?.ToList();
-            return generalRunningNumbersList;
-        }
         private void ValidateCentreUserLimit(string centreCode, string registrationType)
         {
             // Get centre settings
@@ -1341,26 +1364,58 @@ namespace Coditech.API.Service
             return DBTMCustomHelper.GetAgeGroupEnumIdByDOB(dob, ageGroups.Select(x => (x.EnumId, x.EnumValue)).ToList());
         }
 
-        private bool CheckEmailAlreadyExists(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-            email = email.Trim();
-            return _generalPersonRepository.Table.Any(x => x.EmailId != null && x.EmailId.ToLower() == email.ToLower());
-        }
+        //private bool CheckEmailAlreadyExists(string email)
+        //{
+        //    if (string.IsNullOrWhiteSpace(email))
+        //        return false;
+        //    email = email.Trim();
+        //    return _generalPersonRepository.Table.Any(x => x.EmailId != null && x.EmailId.ToLower() == email.ToLower());
+        //}
         private bool CheckMobileAlreadyExists(string mobile)
         {
             if (string.IsNullOrWhiteSpace(mobile))
                 return false;
             mobile = mobile.Trim();
-            return _generalPersonRepository.Table.Any(x => x.MobileNumber != null && x.MobileNumber == mobile);
+            string encodedmobile = SearchHashHelper.CreateSearchHash(mobile);
+
+            return _userMasterRepository.Table.Any(x => (x.UserType == UserTypeEnum.Trainee.ToString()) &&
+                                                       (x.IsDataEncrypted ? x.UserNameHash == encodedmobile : x.UserName == mobile));
         }
         private List<DBTMTraineeBulkUpdateModel> GetBulkUpdateTraineeList(long generalBatchMasterId, string orderBy)
         {
             CoditechViewRepository<DBTMTraineeBulkUpdateModel> objStoredProc = new CoditechViewRepository<DBTMTraineeBulkUpdateModel>(_serviceProvider.GetService<CoditechCustom_Entities>());
             objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@OrderBy", orderBy, ParameterDirection.Input, DbType.String);
-            return objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeBulkUpdateList @GeneralBatchMasterId,@OrderBy")?.ToList();
+            List<DBTMTraineeBulkUpdateModel> list = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeBulkUpdateList @GeneralBatchMasterId,@OrderBy")?.ToList();
+            if (list != null)
+            {
+                foreach (var item in list?.Where(x => x.IsDataEncrypted))
+                {
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                    item.MiddleName = DataEncryptionHelper.DataDecrypt(item.MiddleName);
+                    item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                    item.EmailAddress = DataEncryptionHelper.DataDecrypt(item.EmailAddress);
+                    item.DateOfBirth = DataEncryptionHelper.DataDecrypt(item.DateOfBirth);
+                }
+                return orderBy switch
+                {
+                    "FirstNameAsc" =>
+                        list.OrderBy(x => x.FirstName).ToList(),
+
+                    "FirstNameDesc" =>
+                        list.OrderByDescending(x => x.FirstName).ToList(),
+
+                    "LastNameAsc" =>
+                        list.OrderBy(x => x.LastName).ToList(),
+
+                    "LastNameDesc" =>
+                        list.OrderByDescending(x => x.LastName).ToList(),
+
+                    _ => list
+                };
+            }
+            return list;
         }
         private void GenerateBulkUpdateTemplateExcel(GeneralTemplateModel template, List<DBTMTraineeBulkUpdateModel> traineeList, string filePath)
         {
@@ -1451,9 +1506,9 @@ namespace Coditech.API.Service
                     }
                     else if (header.HeaderCode == ExcelTemplateColumns.DateOfBirth)
                     {
-                        if (trainee.DateOfBirth.HasValue)
+                        if (!string.IsNullOrEmpty(trainee.DateOfBirth))
                         {
-                            cell.Value = trainee.DateOfBirth.Value;
+                            cell.Value = trainee.DateOfBirth;
                             cell.Style.DateFormat.Format = "yyyy-MM-dd";
                         }
                         cell.Style.Protection.Locked = false;
@@ -1484,7 +1539,7 @@ namespace Coditech.API.Service
                 ExcelTemplateColumns.DisplayName => trainee.DisplayName,
                 ExcelTemplateColumns.EmailAddress => trainee.EmailAddress,
                 ExcelTemplateColumns.Gender => trainee.Gender,
-                ExcelTemplateColumns.DateOfBirth => trainee.DateOfBirth?.ToString("yyyy-MM-dd"),
+                ExcelTemplateColumns.DateOfBirth => trainee.DateOfBirth,
                 ExcelTemplateColumns.HeightCm => trainee.HeightCm?.ToString(),
                 ExcelTemplateColumns.WeightKg => trainee.WeightKg?.ToString(),
                 ExcelTemplateColumns.Specialization => trainee.Specialization,
@@ -1574,44 +1629,40 @@ namespace Coditech.API.Service
                         row[ExcelTemplateColumns.ErrorMessage] = $"GeneralPerson not found for PersonCode '{personCode}'.";
                         continue;
                     }
-                    GeneralPersonModel model = generalPerson.FromEntityToModel<GeneralPersonModel>();
-                    model.EntityId = trainee.DBTMTraineeDetailId;
-                    model.UserType = UserTypeEnum.Trainee.ToString();
-                    model.IsActive = trainee.IsActive;
                     string traineeTitle = GetValue(row, ExcelTemplateColumns.TraineeTitle);
                     if (!string.IsNullOrWhiteSpace(traineeTitle))
                     {
-                        model.PersonTitle = traineeTitle;
+                        generalPerson.PersonTitle = traineeTitle;
                     }
                     string firstName = GetValue(row, ExcelTemplateColumns.FirstName);
                     if (!string.IsNullOrWhiteSpace(firstName))
                     {
-                        model.FirstName = firstName;
+                        generalPerson.FirstName = firstName;
                     }
                     string middleName = GetValue(row, ExcelTemplateColumns.MiddleName);
                     if (!string.IsNullOrWhiteSpace(middleName))
                     {
-                        model.MiddleName = middleName;
+                        generalPerson.MiddleName = middleName;
                     }
                     string lastName = GetValue(row, ExcelTemplateColumns.LastName);
                     if (!string.IsNullOrWhiteSpace(lastName))
                     {
-                        model.LastName = lastName;
+                        generalPerson.LastName = lastName;
                     }
                     string displayName = GetValue(row, ExcelTemplateColumns.DisplayName);
                     if (!string.IsNullOrWhiteSpace(displayName))
                     {
-                        model.Custom2 = displayName;
+                        generalPerson.Custom2 = displayName;
                     }
                     string email = GetValue(row, ExcelTemplateColumns.EmailAddress);
                     if (!string.IsNullOrWhiteSpace(email))
                     {
-                        model.EmailId = email;
+                        generalPerson.EmailId = email;
                     }
                     string gender = GetValue(row, ExcelTemplateColumns.Gender);
                     if (!string.IsNullOrWhiteSpace(gender))
                     {
-                        model.GenderEnumId = GetEnumIdByEnumCode(gender, DropdownTypeEnum.Gender.ToString());
+                        generalPerson.GenderEnumId = GetEnumIdByEnumCode(gender, DropdownTypeEnum.Gender.ToString());
                     }
                     string dateOfBirth = GetValue(row, ExcelTemplateColumns.DateOfBirth);
                     if (!string.IsNullOrWhiteSpace(dateOfBirth))
@@ -1621,9 +1672,9 @@ namespace Coditech.API.Service
                             row[ExcelTemplateColumns.ErrorMessage] = "Date Of Birth is invalid.";
                             continue;
                         }
-                        model.DateOfBirth = dobDate;
+                        generalPerson.DateOfBirth = Convert.ToString(dobDate);
                     }
-                    bool personUpdated = UpdatePersonInformation(model);
+                    bool personUpdated = UpdateBulkPersonInformation(generalPerson, trainee.DBTMTraineeDetailId);
                     if (!personUpdated)
                     {
                         row[ExcelTemplateColumns.ErrorMessage] = $"Unable to update PersonCode '{personCode}'.";
@@ -1647,7 +1698,8 @@ namespace Coditech.API.Service
                         string specializationName = _generalEnumaratorMasterRepository.Table.Where(x => x.EnumDisplayText == specialization).Select(x => x.EnumName).FirstOrDefault();
                         trainee.SpecializationEnumId = GetEnumIdByEnumCode(specializationName, DropdownCustomTypeEnum.TraineeSpecialization.ToString());
                     }
-                    trainee.SchoolName = GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub);                  
+                    trainee.AgeGroupEnumId = GetAgeGroupEnumIdByDOB(Convert.ToDateTime(dateOfBirth));
+                    trainee.SchoolName = GetValue(row, ExcelTemplateColumns.SchoolOrCollegeOrClub);
                     trainee.ModifiedDate = DateTime.Now;
                     _dBTMTraineeDetailsRepository.Update(trainee);
                     success++;
@@ -1665,9 +1717,70 @@ namespace Coditech.API.Service
             return BuildUploadResult(dt, success);
         }
 
+        public override GeneralPersonModel GetPersonInformation(long personId)
+        {
+            GeneralPersonModel generalPersonModel = base.GetPersonInformation(personId);
+            generalPersonModel.Custom2 = DataEncryptionHelper.DataDecrypt(generalPersonModel.Custom2);
+            return generalPersonModel;
+        }
+
+        public override bool UpdatePersonInformation(GeneralPersonModel generalPersonModel)
+        {
+            DateTime? dateOfBirth = null;
+            if (DateTime.TryParse(generalPersonModel.DateOfBirth, out DateTime dob))
+            {
+                dateOfBirth = dob;
+            }
+            generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
+            generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
+            bool isUpdated = base.UpdatePersonInformation(generalPersonModel);
+            if (isUpdated && string.Equals(generalPersonModel.UserType, UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase) && dateOfBirth.HasValue)
+            {
+                DBTMTraineeDetails trainee = _dBTMTraineeDetailsRepository.Table.FirstOrDefault(x => x.PersonId == generalPersonModel.PersonId);
+                if (trainee != null)
+                {
+                    int ageGroupEnumId = GetAgeGroupEnumIdByDOB(dateOfBirth.Value);
+                    if (ageGroupEnumId > 0 && trainee.AgeGroupEnumId != ageGroupEnumId)
+                    {
+                        trainee.AgeGroupEnumId = ageGroupEnumId;
+                        _dBTMTraineeDetailsRepository.Update(trainee);
+                    }
+                }
+            }
+            return isUpdated;
+        }
         #endregion
 
         #region Protected Method
+        private bool UpdateBulkPersonInformation(GeneralPerson generalPerson, long entityId)
+        {
+            generalPerson.FirstNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPerson.FirstName);
+            generalPerson.MiddleNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPerson.MiddleName);
+            generalPerson.LastNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPerson.LastName);
+            generalPerson.DateOfBirthSearchTokens = SearchHashHelper.CreateSearchTokens(generalPerson.DateOfBirth);
+            generalPerson.EmailIdSearchTokens = SearchHashHelper.CreateSearchTokens(generalPerson.EmailId);
+            generalPerson.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPerson.Custom2);
+
+            generalPerson.FirstName = DataEncryptionHelper.DataEncrypt(generalPerson.FirstName);
+            generalPerson.MiddleName = DataEncryptionHelper.DataEncrypt(generalPerson.MiddleName);
+            generalPerson.LastName = DataEncryptionHelper.DataEncrypt(generalPerson.LastName);
+            generalPerson.EmailId = DataEncryptionHelper.DataEncrypt(generalPerson.EmailId);
+            generalPerson.IsMinor = IsMinor(generalPerson.DateOfBirth);
+            generalPerson.DateOfBirth = DataEncryptionHelper.DataEncrypt(generalPerson.DateOfBirth);
+            generalPerson.Custom2 = DataEncryptionHelper.DataEncrypt(generalPerson.Custom2);
+            //Update General Person
+            bool isPersonUpdated = _generalPersonRepository.Update(generalPerson);
+            if (isPersonUpdated)
+            {
+                UserMaster userMaster = _userMasterRepository.Table.FirstOrDefault(x => x.EntityId == entityId && x.UserType == UserTypeEnum.Trainee.ToString());
+                userMaster.FirstName = generalPerson.FirstName;
+                userMaster.MiddleName = generalPerson.MiddleName;
+                userMaster.LastName = generalPerson.LastName;
+                userMaster.EmailId = generalPerson.EmailId;
+                UpdateUserMasterDetails(userMaster);
+            }
+            return isPersonUpdated;
+        }
         protected override void UpdateIsActiveFlagForUserType(GeneralPersonModel generalPersonModel)
         {
             if (generalPersonModel.UserType.Equals(UserTypeEnum.Trainee.ToString(), StringComparison.InvariantCultureIgnoreCase))

@@ -166,14 +166,14 @@ namespace Coditech.API.Client
             }
         }
 
-        public virtual TrueFalseResponse DeleteDBTMTraineeDetails(ParameterModel body)
+        public virtual TrueFalseResponse DeleteUserAccount(ParameterModel body)
         {
-            return Task.Run(async () => await DeleteDBTMTraineeDetailsAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await DeleteUserAccountAsync(body, CancellationToken.None)).GetAwaiter().GetResult();
         }
 
-        public virtual async Task<TrueFalseResponse> DeleteDBTMTraineeDetailsAsync(ParameterModel body, CancellationToken cancellationToken)
+        public virtual async Task<TrueFalseResponse> DeleteUserAccountAsync(ParameterModel body, CancellationToken cancellationToken)
         {
-            string endpoint = dBTMTraineeDetailsEndpoint.DeleteDBTMTraineeDetailsAsync();
+            string endpoint = dBTMTraineeDetailsEndpoint.DeleteUserAccountAsync();
             HttpResponseMessage response = null;
             var disposeResponse = true;
             try

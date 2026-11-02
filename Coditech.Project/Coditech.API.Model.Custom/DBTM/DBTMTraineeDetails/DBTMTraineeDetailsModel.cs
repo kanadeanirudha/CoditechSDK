@@ -36,5 +36,6 @@
         public string PersonTitle { get; set; }
         public DateTime? UpdatedWeightDate { get; set; }
         public DateTime? UpdatedHeightDate { get; set; }
+        public bool IsDataEncrypted { get; set; }
     }
 }

@@ -7,6 +7,8 @@ using Coditech.Common.Helper.Utilities;
 using Coditech.Common.Logger;
 using Coditech.Common.Service;
 using Coditech.Resources;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Data;
 using System.Diagnostics;
@@ -152,7 +154,7 @@ namespace Coditech.API.Service
                                 string paramCodeStr = Convert.ToString(item.ParameterCode);
                                 string parameterCode = int.TryParse(paramCodeStr, out int parameterCodeInt) ? ((TestParameterCode)parameterCodeInt).ToString() : paramCodeStr;
                                 string parameterValue = item.ParameterValue.ToString() ?? string.Empty;
-                                string encryptedValue = EncryptionHelper.Encrypt(parameterValue);
+                                string encryptedValue = DataEncryptionHelper.DataEncrypt(parameterValue);
 
                                 detailList.Add(new DBTMDeviceDataDetails
                                 {
@@ -263,7 +265,7 @@ namespace Coditech.API.Service
                                        GeneralBatchMasterId = b.GeneralBatchMasterId,
                                        BatchName = u.EntityId == entityId
                                            ? $"{b.BatchName}(Self)"
-                                           : $"{b.BatchName}({u.FirstName} {u.LastName})",
+                                           : u.IsDataEncrypted ? $"{b.BatchName}({DataEncryptionHelper.DataDecrypt(u.FirstName)} {DataEncryptionHelper.DataDecrypt(u.LastName)})" : $"{b.BatchName}({u.FirstName} {u.LastName})",
                                        BatchStartTime = b.BatchStartTime
                                    }).ToList();
 
@@ -324,7 +326,18 @@ namespace Coditech.API.Service
                 objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
                 List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserListForAPI @GeneralBatchMasterId,@RowsCount OUT", 1, out pageListModel.TotalRowCount)?.ToList();
 
-                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
+                foreach (var item in generalBatchUserList?.Where(x => x.IsDataEncrypted))
+                {
+                    item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                    item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                    item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                    string fullName = $"{item.FirstName} {item.LastName}";
+                    string displayName = item.DisplayName == fullName ? string.Empty : item.DisplayName ?? fullName;
+                    item.DisplayName = displayName;
+                }
+                generalBatchUserList = generalBatchUserList.Count > 0 ? generalBatchUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMGeneralBatchUserModel>();
+
+                dBTMBatchModel.DBTMGeneralBatchUserModel = generalBatchUserList;
             }
             return dBTMBatchModel;
         }
@@ -338,7 +351,17 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMGeneralBatchUserModel> generalBatchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserListForAPI_V2 @GeneralBatchMasterId,@DBTMTestMasterId,@RowsCount OUT", 2, out pageListModel.TotalRowCount)?.ToList();
-            generalBatchUserList = generalBatchUserList ?? new List<DBTMGeneralBatchUserModel>();
+
+            foreach (var item in generalBatchUserList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                string fullName = $"{item.FirstName} {item.LastName}";
+                string displayName = item.DisplayName == fullName ? string.Empty : item.DisplayName ?? fullName;
+                item.DisplayName = displayName;
+            }
+            generalBatchUserList = generalBatchUserList.Count > 0 ? generalBatchUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMGeneralBatchUserModel>();
             return generalBatchUserList;
         }
         #endregion
@@ -396,6 +419,41 @@ namespace Coditech.API.Service
             dataset.Tables[0].TableName = "TraineeDetails";
             ConvertDataTableToList dataTable = new ConvertDataTableToList();
             dBTMDashboardModel = dataTable.ConvertDataTable<DBTMMobileTraineeDashboardModel>(dataset.Tables["TraineeDetails"])?.FirstOrDefault();
+            if (!string.IsNullOrEmpty(dBTMDashboardModel.TrainerNames))
+            {
+                string trainerNames = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(dBTMDashboardModel.TrainerNames))
+                {
+                    var trainerList = dBTMDashboardModel.TrainerNames.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                    var decryptedNames = new List<string>();
+
+                    foreach (string item in trainerList)
+                    {
+                        string[] name = item.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                        if (name.Length == 0)
+                            continue;
+
+                        string firstName = name[0];
+                        string lastName = name.Length > 1 ? string.Join(" ", name.Skip(1)) : string.Empty;
+
+                        // Decrypt only if the names are encrypted.
+                        firstName = DataEncryptionHelper.DataDecrypt(firstName);
+
+                        if (!string.IsNullOrWhiteSpace(lastName))
+                        {
+                            lastName = DataEncryptionHelper.DataDecrypt(lastName);
+                        }
+
+                        decryptedNames.Add($"{firstName} {lastName}".Trim());
+                    }
+
+                    trainerNames = string.Join(", ", decryptedNames);
+                    dBTMDashboardModel.TrainerNames = trainerNames;
+                }
+            }
             return dBTMDashboardModel;
         }
         #endregion
@@ -408,9 +466,14 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@DBTMTestMasterIds", dBTMTestMasterIds, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@GeneralTrainerMasterId", generalTrainerMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListByActivityIds @CentreCode,@DBTMTestMasterIds,@GeneralTrainerMasterId,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
-            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
+            List<DBTMTraineeDetailsModel> dBTMTraineeDetailsList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeListByActivityIds @CentreCode,@DBTMTestMasterIds,@GeneralTrainerMasterId,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in dBTMTraineeDetailsList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+            }
 
+            DBTMTraineeDetailsListModel listModel = new DBTMTraineeDetailsListModel();
             listModel.DBTMTraineeDetailsList = dBTMTraineeDetailsList?.Count > 0 ? dBTMTraineeDetailsList : new List<DBTMTraineeDetailsModel>();
             return listModel;
         }
@@ -448,7 +511,6 @@ namespace Coditech.API.Service
         public string GetCentreWiseJoiningCode(string centreCode, int joiningCodeTypeEnumId)
         {
             string joiningCode = _organisationCentrewiseJoiningCodeRepository.Table.Where(x => x.CentreCode == centreCode && x.JoiningCodeTypeEnumId == joiningCodeTypeEnumId && !x.IsExpired).Select(x => x.JoiningCode).FirstOrDefault();
-
             return joiningCode ?? string.Empty;
         }
 
@@ -503,8 +565,9 @@ namespace Coditech.API.Service
                                    {
                                        DBTMCampMasterId = b.DBTMCampMasterId,
                                        CampName = u.EntityId == entityId
-                                           ? $"{b.CampName}"
-                                           : $"{b.CampName}({u.FirstName} {u.LastName})",
+                                                  ? $"{b.CampName}(Self)"
+                                                  : u.IsDataEncrypted ? $"{b.CampName}({DataEncryptionHelper.DataDecrypt(u.FirstName)} {DataEncryptionHelper.DataDecrypt(u.LastName)})" : $"{b.CampName}({u.FirstName} {u.LastName})",
+
                                    })
                                    .OrderBy(b => b.CampName, StringComparer.OrdinalIgnoreCase).ToList();
                 }
@@ -564,7 +627,19 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMGeneralBatchUserModel> campUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserListForAPI @DBTMcampMasterId,@DBTMTestMasterId,@UserType,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
-            campUserList = campUserList ?? new List<DBTMGeneralBatchUserModel>();
+            foreach (var item in campUserList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                string displayName = string.IsNullOrEmpty(item.DisplayName) ? $"{item.FirstName} {item.LastName}"
+                                                                               : item.DisplayName == $"{item.FirstName} {item.LastName}"
+                                                                            ? $"{item.FirstName} {item.LastName}"
+                                                                               : item.DisplayName;
+                item.DisplayName = displayName;
+            }
+            campUserList = campUserList.Count > 0 ? campUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMGeneralBatchUserModel>();
+
             return campUserList;
         }
         #endregion
@@ -691,13 +766,13 @@ namespace Coditech.API.Service
 
             if (personData != null)
             {
-                dBTMTraineeDetailsModel.FirstName = personData.FirstName;
-                dBTMTraineeDetailsModel.MiddleName = personData.MiddleName;
-                dBTMTraineeDetailsModel.LastName = personData.LastName;
-                dBTMTraineeDetailsModel.DisplayName = personData.Custom2;
-                dBTMTraineeDetailsModel.EmailId = personData.EmailId;
-                dBTMTraineeDetailsModel.MobileNumber = personData.MobileNumber;
-                dBTMTraineeDetailsModel.DateOfBirth = personData.DateOfBirth;
+                dBTMTraineeDetailsModel.FirstName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.FirstName) : personData.FirstName;
+                dBTMTraineeDetailsModel.MiddleName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.MiddleName) : personData.MiddleName;
+                dBTMTraineeDetailsModel.LastName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.LastName) : personData.LastName;
+                dBTMTraineeDetailsModel.DisplayName = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.Custom2) : personData.Custom2;
+                dBTMTraineeDetailsModel.EmailId = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.EmailId) : personData.EmailId;
+                dBTMTraineeDetailsModel.MobileNumber = personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.MobileNumber) : personData.MobileNumber;
+                dBTMTraineeDetailsModel.DateOfBirth = string.IsNullOrEmpty(personData.DateOfBirth) ? null : Convert.ToDateTime(personData.IsDataEncrypted ? DataEncryptionHelper.DataDecrypt(personData.DateOfBirth) : personData.DateOfBirth);
                 dBTMTraineeDetailsModel.PersonTitle = personData.PersonTitle;
             }
             return dBTMTraineeDetailsModel;
@@ -728,14 +803,15 @@ namespace Coditech.API.Service
 
             if (person != null)
             {
-                person.FirstName = dBTMTraineeDetailsModel.FirstName;
-                person.MiddleName = dBTMTraineeDetailsModel.MiddleName;
-                person.LastName = dBTMTraineeDetailsModel.LastName;
-                person.EmailId = dBTMTraineeDetailsModel.EmailId;
-                person.MobileNumber = dBTMTraineeDetailsModel.MobileNumber;
-                person.DateOfBirth = dBTMTraineeDetailsModel.DateOfBirth;
+                person.FirstName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.FirstName) : dBTMTraineeDetailsModel.FirstName;
+                person.MiddleName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.MiddleName) : dBTMTraineeDetailsModel.MiddleName;
+                person.LastName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.LastName) : dBTMTraineeDetailsModel.LastName;
+                person.EmailId = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.EmailId) : dBTMTraineeDetailsModel.EmailId;
+                person.MobileNumber = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.MobileNumber) : dBTMTraineeDetailsModel.MobileNumber;
+                person.DateOfBirth = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DateOfBirth.ToString()) : dBTMTraineeDetailsModel.DateOfBirth.ToString();
                 person.PersonTitle = dBTMTraineeDetailsModel.PersonTitle;
-                person.Custom2 = dBTMTraineeDetailsModel.DisplayName;
+                person.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(dBTMTraineeDetailsModel.DisplayName);
+                person.Custom2 = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.DisplayName) : dBTMTraineeDetailsModel.DisplayName;
                 _generalPersonRepository.Update(person);
             }
 
@@ -746,10 +822,10 @@ namespace Coditech.API.Service
             if (userMaster != null)
             {
                 userMaster.IsActive = dBTMTraineeDetailsModel.IsActive;
-                userMaster.FirstName = dBTMTraineeDetailsModel.FirstName;
-                userMaster.MiddleName = dBTMTraineeDetailsModel.MiddleName;
-                userMaster.LastName = dBTMTraineeDetailsModel.LastName;
-                userMaster.EmailId = dBTMTraineeDetailsModel.EmailId;
+                userMaster.FirstName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.FirstName) : dBTMTraineeDetailsModel.FirstName;
+                userMaster.MiddleName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.MiddleName) : dBTMTraineeDetailsModel.MiddleName;
+                userMaster.LastName = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.LastName) : dBTMTraineeDetailsModel.LastName;
+                userMaster.EmailId = person.IsDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMTraineeDetailsModel.EmailId) : dBTMTraineeDetailsModel.EmailId;
                 _userMasterRepository.Update(userMaster);
             }
             return true;
@@ -778,7 +854,19 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@DBTMTestMasterId", dbtmTestMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@AssignmentDate", assignmentDate, ParameterDirection.Input, DbType.DateTime);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMGeneralBatchUserModel> assignmentUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetUserDetailsForAssignmentWiseTesting @GeneralTrainerMasterId,@DBTMTestMasterId,@AssignmentDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMGeneralBatchUserModel> assignmentUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMUserDetailsForAssignmentWiseTesting @GeneralTrainerMasterId,@DBTMTestMasterId,@AssignmentDate,@RowsCount OUT", 3, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in assignmentUserList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+                item.DisplayName = DataEncryptionHelper.DataDecrypt(item.DisplayName);
+                string displayName = string.IsNullOrEmpty(item.DisplayName) ? $"{item.FirstName} {item.LastName}"
+                                                                               : item.DisplayName == $"{item.FirstName} {item.LastName}"
+                                                                            ? $"{item.FirstName} {item.LastName}"
+                                                                               : item.DisplayName;
+                item.DisplayName = displayName;
+            }
+            assignmentUserList?.OrderBy(x => x.FirstName).ThenBy(x => x.LastName)?.ToList();
             assignmentUserList = assignmentUserList ?? new List<DBTMGeneralBatchUserModel>();
             return assignmentUserList;
         }
@@ -791,7 +879,13 @@ namespace Coditech.API.Service
             objStoredProc.SetParameter("@CentreCode", centreCode, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@AssignmentDate", assignmentDate, ParameterDirection.Input, DbType.DateTime);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<DBTMTraineeDetailsModel> traineeList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetTraineeListForAssignmentWiseTesting @GeneralTrainerMasterId,@DBTMTestMasterId,@CentreCode,@AssignmentDate,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            List<DBTMTraineeDetailsModel> traineeList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMTraineeListForAssignmentWiseTesting @GeneralTrainerMasterId,@DBTMTestMasterId,@CentreCode,@AssignmentDate,@RowsCount OUT", 4, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in traineeList?.Where(x => x.IsDataEncrypted))
+            {
+                item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
+                item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
+            }
+            traineeList?.OrderBy(x => x.FirstName).ThenBy(x => x.LastName)?.ToList();
             traineeList = traineeList ?? new List<DBTMTraineeDetailsModel>();
             return new DBTMTraineeDetailsListModel
             {
@@ -811,6 +905,249 @@ namespace Coditech.API.Service
                 age--;
             }
             return age;
+        }
+
+        public async Task<bool> BulkDataEncrypt()
+        {
+            List<GeneralPerson> genaralPersonList = _generalPersonRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (GeneralPerson generalPersonModel in genaralPersonList)
+            {
+                generalPersonModel.FirstNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.FirstName);
+                generalPersonModel.MiddleNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.MiddleName);
+                generalPersonModel.LastNameSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.LastName);
+                generalPersonModel.DateOfBirthSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.DateOfBirth);
+                generalPersonModel.EmailIdSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.EmailId);
+                generalPersonModel.PhoneNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.PhoneNumber);
+                generalPersonModel.MobileNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.MobileNumber);
+                generalPersonModel.EmergencyContactSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.EmergencyContact);
+                generalPersonModel.IndentificationNumberSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.IndentificationNumber);
+                generalPersonModel.AttendanceIntegrationIdSearchTokens = SearchHashHelper.CreateSearchTokens(generalPersonModel.AttendanceIntegrationId);
+                generalPersonModel.CustomSearchTokens2 = SearchHashHelper.CreateSearchTokens(generalPersonModel.Custom2);
+
+                // Personal Details
+                generalPersonModel.FirstName = DataEncryptionHelper.DataEncrypt(generalPersonModel.FirstName);
+                generalPersonModel.MiddleName = DataEncryptionHelper.DataEncrypt(generalPersonModel.MiddleName);
+                generalPersonModel.LastName = DataEncryptionHelper.DataEncrypt(generalPersonModel.LastName);
+                generalPersonModel.EmailId = DataEncryptionHelper.DataEncrypt(generalPersonModel.EmailId);
+                generalPersonModel.PhoneNumber = DataEncryptionHelper.DataEncrypt(generalPersonModel.PhoneNumber);
+                generalPersonModel.MobileNumber = DataEncryptionHelper.DataEncrypt(generalPersonModel.MobileNumber);
+                generalPersonModel.EmergencyContact = DataEncryptionHelper.DataEncrypt(generalPersonModel.EmergencyContact);
+                generalPersonModel.IndentificationNumber = DataEncryptionHelper.DataEncrypt(generalPersonModel.IndentificationNumber);
+                generalPersonModel.AttendanceIntegrationId = DataEncryptionHelper.DataEncrypt(generalPersonModel.AttendanceIntegrationId);
+                generalPersonModel.IsMinor = HelperUtility.IsMinor(generalPersonModel.DateOfBirth);
+                generalPersonModel.DateOfBirth = DataEncryptionHelper.DataEncrypt(generalPersonModel.DateOfBirth);
+                generalPersonModel.Custom2 = DataEncryptionHelper.DataEncrypt(generalPersonModel.Custom2);
+                generalPersonModel.IsDataEncrypted = true;
+            }
+            if (genaralPersonList.Count > 0)
+                _generalPersonRepository.BatchUpdate(genaralPersonList);
+
+            List<UserMaster> userMasters = _userMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (var userMaster in userMasters)
+            {
+                userMaster.UserNameHash = SearchHashHelper.CreateSearchHash(userMaster.UserName);
+
+                userMaster.UserName = DataEncryptionHelper.DataEncrypt(userMaster.UserName);
+                userMaster.EmailId = DataEncryptionHelper.DataEncrypt(userMaster.EmailId);
+                userMaster.FirstName = DataEncryptionHelper.DataEncrypt(userMaster.FirstName);
+                userMaster.MiddleName = DataEncryptionHelper.DataEncrypt(userMaster.MiddleName);
+                userMaster.LastName = DataEncryptionHelper.DataEncrypt(userMaster.LastName);
+                userMaster.IsDataEncrypted = true;
+            }
+            if (userMasters.Count > 0)
+                _userMasterRepository.BatchUpdate(userMasters);
+
+            List<EmployeeMaster> employeeMasters = _employeeMasterRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (var employee in employeeMasters)
+            {
+                employee.PANCardNumber = DataEncryptionHelper.DataEncrypt(employee.PANCardNumber);
+                employee.UANNumber = DataEncryptionHelper.DataEncrypt(employee.UANNumber);
+                employee.PassportNumber = DataEncryptionHelper.DataEncrypt(employee.PassportNumber);
+                employee.AdharCardNumber = DataEncryptionHelper.DataEncrypt(employee.AdharCardNumber);
+                employee.BankAccountNumber = DataEncryptionHelper.DataEncrypt(employee.BankAccountNumber);
+                employee.BankName = DataEncryptionHelper.DataEncrypt(employee.BankName);
+                employee.BankIFSCCode = DataEncryptionHelper.DataEncrypt(employee.BankIFSCCode);
+                employee.IsDataEncrypted = true;
+            }
+            if (employeeMasters.Count > 0)
+                _employeeMasterRepository.BatchUpdate(employeeMasters);
+
+            var _OrganisationCentreMasteRepository = new CoditechRepository<OrganisationCentreMaster>(_serviceProvider.GetService<Coditech_Entities>());
+            List<OrganisationCentreMaster> organisationCentreMasters = _OrganisationCentreMasteRepository.Table.Where(x => !x.IsDataEncrypted)?.ToList();
+            foreach (var organisationCentreMaster in organisationCentreMasters)
+            {
+                organisationCentreMaster.CentreAddress = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CentreAddress);
+                organisationCentreMaster.Pincode = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.Pincode);
+                organisationCentreMaster.EmailId = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.EmailId);
+                organisationCentreMaster.CellPhone = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CellPhone);
+                organisationCentreMaster.FaxNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.FaxNumber);
+                organisationCentreMaster.PhoneNumberOffice = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.PhoneNumberOffice);
+                organisationCentreMaster.CINNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.CINNumber);
+                organisationCentreMaster.GSTINNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.GSTINNumber);
+                organisationCentreMaster.PanNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.PanNumber);
+                organisationCentreMaster.PFNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.PFNumber);
+                organisationCentreMaster.ESICNumber = DataEncryptionHelper.DataEncrypt(organisationCentreMaster.ESICNumber);
+                organisationCentreMaster.IsDataEncrypted = true;
+            }
+            if (organisationCentreMasters.Count > 0)
+                _OrganisationCentreMasteRepository.BatchUpdate(organisationCentreMasters);
+
+            int updatedCount = await EncryptDeviceDataDetailsAsync(CancellationToken.None);
+
+            return true;
+        }
+
+
+        public async Task<int> EncryptDeviceDataDetailsAsync(CancellationToken cancellationToken = default)
+        {
+            const int batchSize = 1000;
+
+            int totalProcessed = 0;
+            long lastId = 0;
+
+            await using var connection = new SqlConnection("connection string");
+            await connection.OpenAsync(cancellationToken);
+
+            // Create a temporary staging table once per execution.
+            const string createTempTableSql = @"
+        CREATE TABLE #EncryptedBatch
+        (
+            DBTMDeviceDataDetailId INT NOT NULL PRIMARY KEY,
+            ParameterValue NVARCHAR(MAX) NULL
+        );";
+
+            await using (var createCommand =
+                new SqlCommand(createTempTableSql, connection))
+            {
+                await createCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+
+            while (true)
+            {
+                // Fetch only the next batch; do not load all 75k rows.
+                var batch = await _dBTMDeviceDataDetailsRepository.Table
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.DBTMDeviceDataDetailId > lastId &&
+                        (x.Comment3 == null || x.Comment3 != "1"))
+                    .OrderBy(x => x.DBTMDeviceDataDetailId)
+                    .Take(batchSize)
+                    .Select(x => new
+                    {
+                        x.DBTMDeviceDataDetailId,
+                        x.ParameterValue,
+                        x.IsEncrypted
+                    })
+                    .ToListAsync(cancellationToken);
+
+                if (batch.Count == 0)
+                    break;
+
+                lastId = batch[batch.Count - 1].DBTMDeviceDataDetailId;
+
+                var table = new DataTable();
+
+                table.Columns.Add(
+                    "DBTMDeviceDataDetailId", typeof(int));
+
+                table.Columns.Add(
+                    "ParameterValue", typeof(string));
+
+                foreach (var item in batch)
+                {
+                    try
+                    {
+                        string? value = item.ParameterValue;
+
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            // Decrypt first if the existing value is encrypted.
+                            if (item.IsEncrypted)
+                            {
+                                value = EncryptionHelper.Decrypt(value);
+                            }
+
+                            // Encrypt the original plaintext exactly once.
+                            value = DataEncryptionHelper.DataEncrypt(value);
+                        }
+
+                        table.Rows.Add(
+                            item.DBTMDeviceDataDetailId,
+                            (object?)value ?? DBNull.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Replace with your application's ILogger.
+                        Console.Error.WriteLine(
+                            $"Encryption failed for ID " +
+                            $"{item.DBTMDeviceDataDetailId}: {ex.Message}");
+                    }
+                }
+
+                if (table.Rows.Count == 0)
+                    continue;
+
+                // Clear staging data from the previous batch.
+                await using (var truncateCommand =
+                    new SqlCommand(
+                        "TRUNCATE TABLE #EncryptedBatch;",
+                        connection))
+                {
+                    await truncateCommand.ExecuteNonQueryAsync(
+                        cancellationToken);
+                }
+
+                // Bulk insert encrypted values into SQL Server.
+                using (var bulkCopy = new SqlBulkCopy(
+                    connection,
+                    SqlBulkCopyOptions.TableLock,
+                    null))
+                {
+                    bulkCopy.DestinationTableName = "#EncryptedBatch";
+                    bulkCopy.BatchSize = batchSize;
+                    bulkCopy.BulkCopyTimeout = 120;
+
+                    bulkCopy.ColumnMappings.Add(
+                        "DBTMDeviceDataDetailId",
+                        "DBTMDeviceDataDetailId");
+
+                    bulkCopy.ColumnMappings.Add(
+                        "ParameterValue",
+                        "ParameterValue");
+
+                    await bulkCopy.WriteToServerAsync(
+                        table, cancellationToken);
+                }
+
+                // Update all records in this batch with one SQL statement.
+                const string updateSql = @"
+            UPDATE target
+            SET target.ParameterValue = source.ParameterValue,
+                target.IsEncrypted = 1,
+                target.Comment3 = '1'
+            FROM dbo.dBTMDeviceDataDetails AS target
+            INNER JOIN #EncryptedBatch AS source
+                ON source.DBTMDeviceDataDetailId =
+                   target.DBTMDeviceDataDetailId
+            WHERE target.Comment3 IS NULL
+               OR target.Comment3 <> '1';";
+
+                await using (var updateCommand =
+                    new SqlCommand(updateSql, connection))
+                {
+                    updateCommand.CommandTimeout = 120;
+                    try
+                    {
+                        totalProcessed += await updateCommand.ExecuteNonQueryAsync(
+                            cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+
+            return totalProcessed;
         }
     }
 
@@ -835,7 +1172,6 @@ namespace Coditech.API.Service
         Velocity = 17,
         Vo2Max = 18
     }
-
 
 }
 
