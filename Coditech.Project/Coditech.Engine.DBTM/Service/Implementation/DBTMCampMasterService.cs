@@ -159,12 +159,17 @@ namespace Coditech.API.Service
             BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
+            if (GetSortableField(DynamicClauseHelper.GenerateDynamicOrderByClause(sorts)))
+            {
+                pagingStart = 1;
+                pagingLength = int.MaxValue;
+            }
             CoditechViewRepository<DBTMCampUserModel> objStoredProc = new CoditechViewRepository<DBTMCampUserModel>(_serviceProvider.GetService<Coditech_Entities>());
             objStoredProc.SetParameter("@DBTMCampMasterId", dBTMCampMasterId, ParameterDirection.Input, DbType.Int64);
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@Rows", pagingLength, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@PageNo", pagingStart, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
             List<DBTMCampUserModel> CampList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMCampUserAssociatedList @DBTMCampMasterId,@UserType,@WhereClause,@Rows,@PageNo,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
@@ -176,6 +181,7 @@ namespace Coditech.API.Service
 
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
+            CampList = SortingAndPaginationForEncryptionField(CampList, pageListModel);
 
             DBTMCampUserListModel listModel = new DBTMCampUserListModel();
 

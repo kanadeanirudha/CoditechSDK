@@ -61,7 +61,7 @@ namespace Coditech.API.Service
                 filters.RemoveAll(x => x.FilterName == FilterKeys.IsActive);
                 listType = $"and IsActive={isActive}";
             }
-            base.BindSearchFilters(filters);
+            BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
 
