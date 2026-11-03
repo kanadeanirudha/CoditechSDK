@@ -497,7 +497,7 @@ namespace Coditech.Admin.Controllers
             string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
             string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}_{datetimeStamp}.pdf";
             string reportsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PerformanceReports");
-            if (!Directory.Exists(reportsFolder)) 
+            if (!Directory.Exists(reportsFolder))
                 Directory.CreateDirectory(reportsFolder);
             string pdfPath = Path.Combine(reportsFolder, fileName);
             await System.IO.File.WriteAllBytesAsync(pdfPath, pdf);

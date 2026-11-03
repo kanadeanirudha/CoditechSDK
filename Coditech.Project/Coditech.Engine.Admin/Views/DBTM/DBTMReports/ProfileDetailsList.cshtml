@@ -5,6 +5,7 @@
     DropdownViewModel traineeDropdownn = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.BatchWiseUser.ToString(), DropdownName = "DBTMTraineeDetailId", DropdownSelectedValue = Model.DBTMTraineeDetailId.ToString(), IsCustomDropdown = true, ChangeEvent = "DBTMReports.GetBatchWiseTraineeProfileDetailsList('" + Model.GeneralBatchMasterId + "')" };
     DropdownViewModel orderByDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.OrderBy.ToString(), DropdownName = "OrderBy", DropdownSelectedValue = Model.OrderBy, IsCustomDropdown = true };
     DropdownViewModel individualTraineeDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.DBTMTraineeList.ToString(), DropdownName = "IndividualDBTMTraineeDetailId", IsCustomDropdown = true, ExcludedValues = new[] { "0" } };
+    DropdownViewModel campDropdown = new DropdownViewModel() { DropdownType = DropdownCustomTypeEnum.CampWiseReports.ToString(), DropdownName = "DBTMCampMasterId", IsCustomDropdown = true, ChangeEvent = "DBTMReports.GetCampUserListByCampId()" };
 }
 <!-- Page Content-->
 <div class="page-content mt-5">
@@ -22,12 +23,29 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-1">
+                                <label class="required">Report For</label>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="ProfileReportFor" class="form-control">
+                                    <option value="Batch" selected>Batch</option>
+                                    <option value="Camp">Camp</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-1" id="BatchListLabel">
                                 <label class="required">Batch List</label>
                             </div>
                             <div class="col-md-4" id="BatchListWrapper">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", batchDropdown)
+                            </div>
+                            <div class="col-md-1" id="CampListLabel">
+                                <label class="required">Camp List</label>
+                            </div>
+                            <div class="col-md-4" id="CampListWrapper">
+                                @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", campDropdown)
                             </div>
                             <div class="col-md-1" id="TraineeListLabel">
                                 <label class="required">Trainee List</label>
@@ -37,11 +55,23 @@
                                     @Html.ListBoxFor(x => x.CustomDropdownSelectedValue1, new SelectList(Model.CustomDropdownList1, "Value", "Text"), new { @class = "selectpicker form-control", id = "DBTMTraineeDetailId", multiple = "multiple", data_live_search = "true" })
                                 </div>
                             </div>
-                            <div class="col-md-1" id="IndividualTraineeListLabel" style="display:none;">
+                            <div class="col-md-1" id="IndividualTraineeListLabel">
                                 <label class="required">Trainee List</label>
                             </div>
-                            <div class="col-md-6" id="IndividualTraineeListWrapper" style="display:none;">
+                            <div class="col-md-6" id="IndividualTraineeListWrapper">
                                 @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", individualTraineeDropdown)
+                            </div>
+                            <div class="col-md-1" id="CampTraineeListLabel">
+                                <label class="required">Trainee List</label>
+                            </div>
+
+                            <div class="col-md-6" id="CampTraineeListWrapper">
+                                <div class="mb-3 multiselect-dropdown">
+                                    <select id="CampDBTMTraineeDetailId"
+                                            class="selectpicker form-control"
+                                            data-live-search="true"
+                                            disabled></select>
+                                </div>
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label">Date</label>
@@ -152,6 +182,7 @@
     <script>
         $(document).ready(function () {
             $('#DBTMTraineeDetailId').selectpicker();
+            $("#CampDBTMTraineeDetailId").selectpicker();
             $("#DBTMTraineeDetailId")
                 .prop("disabled", true)
                 .selectpicker('refresh');
@@ -185,17 +216,25 @@
                              selectedWithoutAll.length === totalOptions);
                 $select.selectpicker('refresh');
             });
-
         });
-
         function ApplyProfileReportMode() {
             var reportMode = $('input[name="ProfileReportMode"]:checked').val();
+            var reportFor = $("#ProfileReportFor").val();
             var isIndividual = reportMode === "Individual";
-            $("#BatchListLabel, #BatchListWrapper, #TraineeListLabel, #TraineeListWrapper") .toggle(!isIndividual);
-            $("#IndividualTraineeListLabel, #IndividualTraineeListWrapper").toggle(isIndividual);
+            var isBatch = reportFor === "Batch";
+            var isCamp = reportFor === "Camp";
+            $("#BatchListLabel, #BatchListWrapper, #TraineeListLabel, #TraineeListWrapper").toggle(isBatch && !isIndividual);
+            $("#IndividualTraineeListLabel, #IndividualTraineeListWrapper").toggle(isBatch && isIndividual);
+            $("#CampListLabel, #CampListWrapper").toggle(isCamp && !isIndividual);
+            $("#CampTraineeListLabel, #CampTraineeListWrapper").toggle(isCamp);
             $("#OrderByLabel, #OrderByWrapper").toggle(!isIndividual);
+            var $campTrainee = $("#CampDBTMTraineeDetailId");
+            if (isCamp) {
+                $campTrainee.prop("multiple", !isIndividual);
+                $campTrainee.selectpicker("refresh");
+            }
             var $individualTrainee = $("#IndividualDBTMTraineeDetailId");
-            if ($individualTrainee.length) {
+            if (isBatch && isIndividual && $individualTrainee.length) {
                 $individualTrainee.selectpicker();
                 $individualTrainee.prop("disabled", false);
                 $individualTrainee.selectpicker("refresh");
@@ -205,13 +244,18 @@
             if ($("#ToDate").hasClass("hasDatepicker")) {
                 $("#ToDate").datepicker("refresh");
             }
-            DBTMReports.LoadTraineeProfileActivityDates();
+            if (isBatch && isIndividual) {
+                DBTMReports.LoadTraineeProfileActivityDates();
+            }
         }
         $(document).ready(function () {
-            $('input[name="ProfileReportMode"]').on("change", function () {
-                ApplyProfileReportMode();
-            });
+               $('input[name="ProfileReportMode"]').on("change", function () {
             ApplyProfileReportMode();
+        });
+        $("#ProfileReportFor").on("change", function () {
+            ApplyProfileReportMode();
+        });
+        ApplyProfileReportMode();
         });
     </script>
 }
