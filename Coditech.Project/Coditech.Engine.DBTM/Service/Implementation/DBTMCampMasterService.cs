@@ -247,7 +247,10 @@ namespace Coditech.API.Service
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
 
-            DBTMCampUserListModel listModel = new DBTMCampUserListModel();
+            DBTMCampUserListModel listModel = new DBTMCampUserListModel()
+            {
+                DBTMCampUserList = CampList
+            };
             listModel.DBTMCampUserList = listModel.DBTMCampUserList.Count > 0 ? listModel.DBTMCampUserList.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList() : new List<DBTMCampUserModel>();
 
             return listModel;
