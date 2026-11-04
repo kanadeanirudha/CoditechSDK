@@ -539,7 +539,7 @@ namespace Coditech.API.Service
             bool isDataEncrypted = IsDataEncrypted();
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster()
             {
-                CentreCode = GenerateCentreCode(8),
+                CentreCode = GenerateUniqueCentreCode(),
                 OrganisationId = 1,
                 CentreName = dBTMNewRegistrationModel.CentreName,
                 HoCoRoScFlag = "CO",
@@ -558,6 +558,17 @@ namespace Coditech.API.Service
             return organisationCentreMaster;
         }
 
+        private string GenerateUniqueCentreCode()
+        {
+            string centreCode;
+            do
+            {
+                centreCode = GenerateCentreCode(8);
+            }
+            while (_organisationCentreMasterRepository.Table.Any(x => x.CentreCode == centreCode));
+
+            return centreCode;
+        }
         // Generates a random string with a given size.
         private string GenerateCentreCode(short size, bool lowerCase = false)
         {
