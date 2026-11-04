@@ -139,6 +139,10 @@ namespace Coditech.Admin.Helpers
             {
                 GetDBTMTraineeBulkUpdateOrderByList(dropdownViewModel, dropdownList);
             }
+            else if (Equals(dropdownViewModel.DropdownType, DropdownCustomTypeEnum.CampWiseUser.ToString()))
+            {
+                CampWiseUser(dropdownViewModel, dropdownList);
+            }
             dropdownViewModel.DropdownList = dropdownList;
             return dropdownViewModel;
         }
@@ -896,6 +900,27 @@ namespace Coditech.Admin.Helpers
                 Value = "LastNameDesc",
                 Selected = selectedValue == "LastNameDesc"
             });
+        }
+        private static void CampWiseUser(DropdownViewModel dropdownViewModel, List<SelectListItem> dropdownList)
+        {
+            if (dropdownViewModel.IsRequired)
+                dropdownList.Add(new SelectListItem { Value = "0", Text = "All" });
+            else
+                dropdownList.Add(new SelectListItem { Value = "0", Text = GeneralResources.SelectLabel });
+            if (!string.IsNullOrEmpty(dropdownViewModel.Parameter) && dropdownViewModel.Parameter != "0")
+            {
+                long dBTMCampMasterId = Convert.ToInt64(dropdownViewModel.Parameter);
+                DBTMCampUserListResponse response = new DBTMReportsClient().GetCampWiseUser(dBTMCampMasterId);
+                foreach (var item in response?.DBTMCampUserList?.OrderBy(x => x.FirstName))
+                {
+                    dropdownList.Add(new SelectListItem
+                    {
+                        Text = $"{item.FirstName} {item.LastName}",
+                        Value = item.EntityId.ToString(),
+                        Selected = dropdownViewModel.DropdownSelectedValue == item.EntityId.ToString()
+                    });
+                }
+            }
         }
     }
 }

@@ -26,6 +26,6 @@ namespace Coditech.API.Service
         DBTMReportsListModel AssignmentWiseMultipleReports(string dBTMTestMasterIds, long generalTrainerMasterId, DateTime fromDate, DateTime toDate, bool isMobileRequest);
         DBTMReportsListModel AssignmentWiseMultipleReportsV2(string dBTMTestMasterIds, string dBTMTraineeDetailIds, long generalTrainerMasterId, DateTime fromDate, DateTime toDate, bool isMobileRequest);
         DBTMReportTraineeProfileListModel GetProfileDetailsList(long generalBatchMasterId, string dBTMTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType);
-
+        public DBTMCampUserListModel GetCampWiseUser(long dBTMCampMasterId);
     }
 }

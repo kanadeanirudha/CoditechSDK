@@ -182,9 +182,10 @@ namespace Coditech.API.Service
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
             CampList = SortingAndPaginationForEncryptionField(CampList, pageListModel);
-
-            DBTMCampUserListModel listModel = new DBTMCampUserListModel();
-
+            DBTMCampUserListModel listModel = new DBTMCampUserListModel()
+            {
+                DBTMCampUserList = CampList
+            };
             listModel.DBTMCampUserList = CampList?.Count > 0 ? CampList : new List<DBTMCampUserModel>();
             listModel.BindPageListModel(pageListModel);
 

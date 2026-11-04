@@ -2393,6 +2393,29 @@ namespace Coditech.API.Service
 
             return model;
         }
+        public DBTMCampUserListModel GetCampWiseUser(long dBTMCampMasterId)
+        {
+            DBTMCampUserListModel model = new DBTMCampUserListModel();
+            var campTraineeIds = _dBTMCampUserRepository.Table.Where(x => x.DBTMCampMasterId == dBTMCampMasterId && x.UserType == UserTypeEnum.Trainee.ToString()).Select(x => x.EntityId).ToList();
+            var traineeDetailsList = _dBTMTraineeDetailsRepository.Table.Where(x => campTraineeIds.Contains(x.DBTMTraineeDetailId) && x.IsActive).ToList();
+            List<DBTMCampUserModel> traineeList = new List<DBTMCampUserModel>();
+            foreach (var trainee in traineeDetailsList)
+            {
+                GeneralPersonModel generalPerson = base.GetGeneralPersonDetails(trainee.PersonId);
+
+                if (generalPerson != null)
+                {
+                    traineeList.Add(new DBTMCampUserModel
+                    {
+                        EntityId = trainee.DBTMTraineeDetailId,
+                        FirstName = generalPerson.FirstName,
+                        LastName = generalPerson.LastName
+                    });
+                }
+            }
+            model.DBTMCampUserList = traineeList.OrderBy(x => x.FirstName).ToList();
+            return model;
+        }
 
         private void CreateExcelWorkbook(DBTMReportsListModel dBTMReportsListModel, string filePath)
         {

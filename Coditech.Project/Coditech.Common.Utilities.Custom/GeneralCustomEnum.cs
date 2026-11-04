@@ -40,6 +40,7 @@
         DBTMTestwisePerformanceStandardCategory,
         DBTMQRPrintingTemplateCode,
         DBTMTraineeBulkUpdateOrderBy,
+        CampWiseUser,
     }
     public enum DashboardFormCustomEnum
     {
