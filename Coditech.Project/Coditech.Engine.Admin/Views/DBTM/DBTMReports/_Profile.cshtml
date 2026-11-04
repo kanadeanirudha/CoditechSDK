@@ -1205,9 +1205,17 @@
                                                                     }
                                                                 </thead>
                                                                 <tbody>
+                                                                    @{
+                                                                        bool scoreMatched = false;
+                                                                        bool isValidScore = decimal.TryParse(activityWiseScore, out decimal score);
+                                                                    }
                                                                     @foreach (var standard in testWiseStandards)
                                                                     {
-                                                                        bool isMatchingScore = decimal.TryParse(activityWiseScore, out decimal score) && score >= Convert.ToDecimal(standard.MinScore) && score <= Convert.ToDecimal(standard.MaxScore);
+                                                                        bool isMatchingScore = !scoreMatched && isValidScore && score >= Convert.ToDecimal(standard.MinScore) &&  score <= Convert.ToDecimal(standard.MaxScore);
+                                                                        if (isMatchingScore)
+                                                                        {
+                                                                            scoreMatched = true;
+                                                                        }
                                                                         <tr style="@(isMatchingScore ? "background-color: #8bc88b; font-weight: bold;" : "")">
                                                                             <td>@testWiseStandardCount</td>
                                                                             <td>@standard.PerformanceStandardType</td>
