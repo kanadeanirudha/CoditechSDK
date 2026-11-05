@@ -741,11 +741,16 @@ var DBTMReports = {
                 success: function (data) {
                     $("#DBTMTestMasterId").html(data);
                     $('#DBTMTestMasterId').selectpicker('refresh');
-                    DBTMReports.LoadCampActivityPerformedDates();
-                    CoditechCommon.HideLodder();
+                    DBTMReports.LoadCampProfileActivityDates();
                 },
-                error: function () {
-                    CoditechNotification.DisplayNotificationMessage("Failed to load activity.", "error");
+                error: function (xhr) {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        location.reload();
+                        return;
+                    }
+                    CoditechNotification.DisplayNotificationMessage( "Failed to load activity.", "error" );
+                },
+                complete: function () {
                     CoditechCommon.HideLodder();
                 }
             });
