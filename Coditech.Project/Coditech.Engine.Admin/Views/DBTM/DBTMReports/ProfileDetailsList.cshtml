@@ -70,7 +70,9 @@
                                     <select id="CampDBTMTraineeDetailId"
                                             class="selectpicker form-control"
                                             data-live-search="true"
-                                            disabled></select>
+                                            multiple="multiple"
+                                            disabled>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-1">
@@ -183,14 +185,10 @@
         $(document).ready(function () {
             $('#DBTMTraineeDetailId').selectpicker();
             $("#CampDBTMTraineeDetailId").selectpicker();
-            $("#DBTMTraineeDetailId")
-                .prop("disabled", true)
-                .selectpicker('refresh');
+            $("#DBTMTraineeDetailId").prop("disabled", true).selectpicker('refresh');
             $("#GeneralBatchMasterId").on("change", function () {
                 var batchId = $(this).val();
-                $("#DBTMTraineeDetailId")
-                    .prop("disabled", !batchId)
-                    .selectpicker('refresh');
+                $("#DBTMTraineeDetailId").prop("disabled", !batchId).selectpicker('refresh');
             });
              $("#IndividualDBTMTraineeDetailId")
             .off("changed.bs.select.profileActivityDates")
@@ -204,17 +202,26 @@
                 var allValue = "0";
                 var totalOptions = $select.find('option').length - 1;
                 if (clickedIndex === 0) {
-                    $select.find('option')
-                           .prop('selected', isSelected);
+                    $select.find('option').prop('selected', isSelected);
                     $select.selectpicker('refresh');
                     return;
                 }
-                var selectedWithoutAll =
-                    selectedValues.filter(v => v !== allValue);
-                $select.find('option[value="0"]')
-                       .prop('selected',
-                             selectedWithoutAll.length === totalOptions);
+                var selectedWithoutAll = selectedValues.filter(v => v !== allValue);
+                $select.find('option[value="0"]').prop('selected', selectedWithoutAll.length === totalOptions);
                 $select.selectpicker('refresh');
+            });
+            $("#CampDBTMTraineeDetailId").off("changed.bs.select").on("changed.bs.select", function (e, clickedIndex, isSelected) {
+                var $select = $(this);
+                var selectedValues = $select.val() || [];
+                var totalOptions = $select.find("option").length - 1;
+                if (clickedIndex === 0) {
+                    $select.find("option").prop("selected", isSelected);
+                }
+                else {
+                    var selectedWithoutAll = selectedValues.filter(x => x !== "0");
+                    $select.find('option[value="0"]').prop("selected", selectedWithoutAll.length === totalOptions);
+                }
+                $select.selectpicker("refresh");
             });
         });
         function ApplyProfileReportMode() {
@@ -224,27 +231,19 @@
             var isBatch = reportFor === "Batch";
             var isCamp = reportFor === "Camp";
             $("#BatchListLabel, #BatchListWrapper, #TraineeListLabel, #TraineeListWrapper").toggle(isBatch && !isIndividual);
-            $("#IndividualTraineeListLabel, #IndividualTraineeListWrapper").toggle(isBatch && isIndividual);
+            $("#IndividualTraineeListLabel, #IndividualTraineeListWrapper").toggle(isIndividual);
             $("#CampListLabel, #CampListWrapper").toggle(isCamp && !isIndividual);
-            $("#CampTraineeListLabel, #CampTraineeListWrapper").toggle(isCamp);
+            $("#CampTraineeListLabel, #CampTraineeListWrapper").toggle(isCamp && !isIndividual);
             $("#OrderByLabel, #OrderByWrapper").toggle(!isIndividual);
-            var $campTrainee = $("#CampDBTMTraineeDetailId");
-            if (isCamp) {
-                $campTrainee.prop("multiple", !isIndividual);
-                $campTrainee.selectpicker("refresh");
-            }
             var $individualTrainee = $("#IndividualDBTMTraineeDetailId");
-            if (isBatch && isIndividual && $individualTrainee.length) {
-                $individualTrainee.selectpicker();
-                $individualTrainee.prop("disabled", false);
-                $individualTrainee.selectpicker("refresh");
-            }
+            $individualTrainee.prop("disabled", !isIndividual);
+            $individualTrainee.selectpicker("refresh");
             $("#DBTMBatchWiseTraineeProfileDetailsDivId").empty();
             activityPerformedDates = [];
             if ($("#ToDate").hasClass("hasDatepicker")) {
                 $("#ToDate").datepicker("refresh");
             }
-            if (isBatch && isIndividual) {
+            if (isIndividual) {
                 DBTMReports.LoadTraineeProfileActivityDates();
             }
         }

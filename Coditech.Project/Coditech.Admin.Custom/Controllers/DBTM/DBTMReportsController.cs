@@ -443,6 +443,19 @@ namespace Coditech.Admin.Controllers
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
         }
+
+        [HttpGet]
+        public IActionResult GetCampUserListByCampId(int dBTMCampMasterId)
+        {
+            DropdownViewModel campTraineeDropdownn = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.CampWiseUser.ToString(),
+                DropdownName = "CampDBTMTraineeDetailId",
+                Parameter = dBTMCampMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", campTraineeDropdownn);
+        }
         [HttpGet]
         public ActionResult GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
         {

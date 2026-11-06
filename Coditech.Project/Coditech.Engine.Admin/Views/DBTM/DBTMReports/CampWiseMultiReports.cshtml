@@ -104,12 +104,12 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
-            DBTMReports.LoadCampActivityPerformedDates();
+            DBTMReports.LoadCampProfileActivityDates();
             $("#DBTMTestMasterId").on("changed.bs.select", function () {
-                DBTMReports.LoadCampActivityPerformedDates();
+                DBTMReports.LoadCampProfileActivityDates();
             });
             $("#DBTMCampMasterId").change(function () {
-                DBTMReports.LoadCampActivityPerformedDates();
+                DBTMReports.LoadCampProfileActivityDates();
             });
         });
     </script>

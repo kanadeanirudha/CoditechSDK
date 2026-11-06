@@ -22,5 +22,6 @@ namespace Coditech.API.Client
         List<string> GetCampActivityPerformedDates(string dBTMTestMasterIds, int dBTMCampMasterId);
         List<string> GetTraineeListActivityDates(string dBTMTraineeDetailIds, int generalBatchMasterId);
         DBTMReportTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsListV2(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate, string typeOfRecord, string reportType);
+        DBTMCampUserListResponse GetCampWiseUser(long dBTMCampMasterId);
     }
 }

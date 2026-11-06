@@ -33,7 +33,8 @@
                     <div class="card">
                         <div class="card-header">
                             <span class="card-title">Trainee Assignment List</span>
-                            <a class=" btn btn-sm btn-soft-primary float-end" href="/@controllerName/Create?custom=@Model.Custom4" role="button"><i class="fas fa-plus me-2"></i>Add Assignment</a>
+                            <a class="btn btn-sm btn-soft-primary float-end"
+                               href="@Url.Action("Create", controllerName, new { SelectedCentreCode = Model.SelectedCentreCode, GeneralTrainerMasterId = Model.SelectedParameter1, custom4 = Model.Custom4 })" role="button">  <i class="fas fa-plus me-2"></i>Add Assignment </a>
                         </div>
                         <div class="card-header">
                             <div class="row">
