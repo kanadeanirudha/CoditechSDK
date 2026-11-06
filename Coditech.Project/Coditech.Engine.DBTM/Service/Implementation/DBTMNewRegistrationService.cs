@@ -536,23 +536,21 @@ namespace Coditech.API.Service
 
         private OrganisationCentreMaster InsertOrganisationCentreMaster(DBTMNewRegistrationModel dBTMNewRegistrationModel, DateTime currentDate)
         {
-            bool isDataEncrypted = IsDataEncrypted();
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster()
             {
-                CentreCode = GenerateUniqueCentreCode(),
+                CentreCode = GenerateCentreCode(8),
                 OrganisationId = 1,
                 CentreName = dBTMNewRegistrationModel.CentreName,
                 HoCoRoScFlag = "CO",
+                EmailId = dBTMNewRegistrationModel.EmailId,
+                PhoneNumberOffice = dBTMNewRegistrationModel.MobileNumber,
+                CellPhone = dBTMNewRegistrationModel.MobileNumber,
+                CentreAddress = dBTMNewRegistrationModel.AddressLine1 + " " + dBTMNewRegistrationModel.AddressLine2,
                 GeneralCityMasterId = dBTMNewRegistrationModel.GeneralCityMasterId,
+                Pincode = dBTMNewRegistrationModel.Pincode,
                 TimeZone = "Asia/Kolkata",
                 CreatedDate = currentDate,
-                ModifiedDate = currentDate,
-                IsDataEncrypted = isDataEncrypted,
-                EmailId = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.EmailId) : dBTMNewRegistrationModel.EmailId,
-                PhoneNumberOffice = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.MobileNumber) : dBTMNewRegistrationModel.MobileNumber,
-                CellPhone = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.MobileNumber) : dBTMNewRegistrationModel.MobileNumber,
-                CentreAddress = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.AddressLine1 + " " + dBTMNewRegistrationModel.AddressLine2) : dBTMNewRegistrationModel.AddressLine1 + " " + dBTMNewRegistrationModel.AddressLine2,
-                Pincode = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.Pincode): dBTMNewRegistrationModel.Pincode
+                ModifiedDate = currentDate
             };
             _organisationCentreMasterRepository.Insert(organisationCentreMaster);
             return organisationCentreMaster;
