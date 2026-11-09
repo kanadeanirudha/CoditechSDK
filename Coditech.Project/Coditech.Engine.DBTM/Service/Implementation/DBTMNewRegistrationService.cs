@@ -538,7 +538,7 @@ namespace Coditech.API.Service
         {
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster()
             {
-                CentreCode = GenerateCentreCode(8),
+                CentreCode = GenerateUniqueCentreCode(),
                 OrganisationId = 1,
                 CentreName = dBTMNewRegistrationModel.CentreName,
                 HoCoRoScFlag = "CO",
