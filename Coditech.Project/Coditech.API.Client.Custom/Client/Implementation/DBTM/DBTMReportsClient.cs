@@ -649,6 +649,40 @@ namespace Coditech.API.Client
                     response?.Dispose();
             }
         }
+        public virtual DBTMCampUserListResponse GetCampWiseUser(long dBTMCampMasterId)
+        {
+            return Task.Run(async () => await GetCampWiseUserAsync(dBTMCampMasterId, CancellationToken.None)).GetAwaiter().GetResult();
+        }
+        public virtual async Task<DBTMCampUserListResponse> GetCampWiseUserAsync(long dBTMCampMasterId, CancellationToken cancellationToken)
+        {
+            string endpoint = dBTMReportsEndpoint.GetCampWiseUserAsync(dBTMCampMasterId);
+            HttpResponseMessage response = null;
+            try
+            {
+                ApiStatus status = new ApiStatus();
+                response = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
+                var headers_ = BindHeaders(response);
+                var status_ = (int)response.StatusCode;
+                if (status_ == 200)
+                {
+                    var objectResponse = await ReadObjectResponseAsync<DBTMCampUserListResponse>(response, headers_, cancellationToken).ConfigureAwait(false);
+                    return objectResponse.Object ?? new DBTMCampUserListResponse();
+                }
+                else if (status_ == 204)
+                {
+                    return new DBTMCampUserListResponse();
+                }
+                else
+                {
+                    UpdateApiStatus(null, status, response);
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+                }
+            }
+            finally
+            {
+                response?.Dispose();
+            }
+        }
         public virtual DBTMTraineeProfileListResponse GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
         {
             return Task.Run(async () => await GetBatchWiseTraineeProfileDetailsAsync(generalBatchMasterId, dbtmTraineeDetailIds, orderBy, FromDate, ToDate, CancellationToken.None)).GetAwaiter().GetResult();
@@ -803,9 +837,9 @@ namespace Coditech.API.Client
                     response.Dispose();
             }
         }
-        public virtual DBTMTestWiseReportsListResponse CampWiseMultipleReportsFile(string dBTMTestMasterIds,int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType)
+        public virtual DBTMTestWiseReportsListResponse CampWiseMultipleReportsFile(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType)
         {
-            return Task.Run(async () => await CampWiseMultipleReportsFileAsync( dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode, reportType, CancellationToken.None)).GetAwaiter().GetResult();
+            return Task.Run(async () => await CampWiseMultipleReportsFileAsync(dBTMTestMasterIds, dBTMCampMasterId, fromDate, toDate, entityId, userType, centreCode, reportType, CancellationToken.None)).GetAwaiter().GetResult();
         }
         public virtual async Task<DBTMTestWiseReportsListResponse> CampWiseMultipleReportsFileAsync(string dBTMTestMasterIds, int dBTMCampMasterId, DateTime fromDate, DateTime toDate, long entityId, string userType, string centreCode, string reportType, CancellationToken cancellationToken)
         {
@@ -871,9 +905,9 @@ namespace Coditech.API.Client
                 }
                 else
                 {
-                    string responseData = response.Content == null? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    string responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     UpdateApiStatus(null, status, response);
-                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode );
+                    throw new CoditechException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                 }
             }
             finally

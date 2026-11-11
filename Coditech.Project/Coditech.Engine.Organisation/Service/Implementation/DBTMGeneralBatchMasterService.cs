@@ -272,16 +272,23 @@ namespace Coditech.API.Service
             BindSearchFilters(filters);
             //Bind the Filter, sorts & Paging details.
             PageListModel pageListModel = new PageListModel(filters, sorts, pagingStart, pagingLength);
+
+            if (GetSortableField(DynamicClauseHelper.GenerateDynamicOrderByClause(sorts)))
+            {
+                pagingStart = 1;
+                pagingLength = int.MaxValue;
+            }
+            //Bind the Filter, sorts & Paging details.
             CoditechViewRepository<GeneralBatchUserModel> objStoredProc = new CoditechViewRepository<GeneralBatchUserModel>(_serviceProvider.GetService<Coditech_Entities>());
             objStoredProc.SetParameter("@GeneralBatchMasterId", generalBatchMasterId, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@UserType", userType, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@WhereClause", pageListModel?.SPWhereClause, ParameterDirection.Input, DbType.String);
-            objStoredProc.SetParameter("@PageNo", pageListModel.PagingStart, ParameterDirection.Input, DbType.Int32);
-            objStoredProc.SetParameter("@Rows", pageListModel.PagingLength, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@PageNo", pagingStart, ParameterDirection.Input, DbType.Int32);
+            objStoredProc.SetParameter("@Rows", pagingLength, ParameterDirection.Input, DbType.Int32);
             objStoredProc.SetParameter("@Order_BY", pageListModel.OrderBy, ParameterDirection.Input, DbType.String);
             objStoredProc.SetParameter("@RowsCount", pageListModel.TotalRowCount, ParameterDirection.Output, DbType.Int32);
-            List<GeneralBatchUserModel> batchList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserAssociatedList @GeneralBatchMasterId,@UserType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
-            foreach (var item in batchList.Where(x => x.IsDataEncrypted))
+            List<GeneralBatchUserModel> batchUserList = objStoredProc.ExecuteStoredProcedureList("Coditech_GetDBTMGeneralBatchUserAssociatedList @GeneralBatchMasterId,@UserType,@WhereClause,@PageNo,@Rows,@Order_BY,@RowsCount OUT", 6, out pageListModel.TotalRowCount)?.ToList();
+            foreach (var item in batchUserList.Where(x => x.IsDataEncrypted))
             {
                 item.FirstName = DataEncryptionHelper.DataDecrypt(item.FirstName);
                 item.LastName = DataEncryptionHelper.DataDecrypt(item.LastName);
@@ -289,9 +296,11 @@ namespace Coditech.API.Service
 
                 item.MobileNumber = HelperUtility.MaskData(item.MobileNumber, MaskType.Mobile);
             }
+            batchUserList = SortingAndPaginationForEncryptionField(batchUserList, pageListModel);
+
             GeneralBatchUserListModel listModel = new GeneralBatchUserListModel();
 
-            listModel.GeneralBatchUserList = batchList?.Count > 0 ? batchList : new List<GeneralBatchUserModel>();
+            listModel.GeneralBatchUserList = batchUserList?.Count > 0 ? batchUserList : new List<GeneralBatchUserModel>();
             listModel.BindPageListModel(pageListModel);
 
             if (generalBatchMasterId > 0)

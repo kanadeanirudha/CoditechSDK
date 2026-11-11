@@ -443,6 +443,19 @@ namespace Coditech.Admin.Controllers
             };
             return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", traineeDropdownn);
         }
+
+        [HttpGet]
+        public IActionResult GetCampUserListByCampId(int dBTMCampMasterId)
+        {
+            DropdownViewModel campTraineeDropdownn = new DropdownViewModel
+            {
+                DropdownType = DropdownCustomTypeEnum.CampWiseUser.ToString(),
+                DropdownName = "CampDBTMTraineeDetailId",
+                Parameter = dBTMCampMasterId.ToString(),
+                IsCustomDropdown = true
+            };
+            return PartialView("~/Views/Shared/Control/_DropdownList.cshtml", campTraineeDropdownn);
+        }
         [HttpGet]
         public ActionResult GetBatchWiseTraineeProfileDetailsList(long generalBatchMasterId, string dbtmTraineeDetailIds, string orderBy, DateTime FromDate, DateTime ToDate)
         {
@@ -497,7 +510,7 @@ namespace Coditech.Admin.Controllers
             string lastName = Regex.Replace(profile.LastName ?? string.Empty, "[^A-Za-z0-9_-]", "_");
             string fileName = $"PerformanceReport_{firstName}{(string.IsNullOrEmpty(lastName) ? string.Empty : "_" + lastName)}_{datetimeStamp}.pdf";
             string reportsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PerformanceReports");
-            if (!Directory.Exists(reportsFolder)) 
+            if (!Directory.Exists(reportsFolder))
                 Directory.CreateDirectory(reportsFolder);
             string pdfPath = Path.Combine(reportsFolder, fileName);
             await System.IO.File.WriteAllBytesAsync(pdfPath, pdf);

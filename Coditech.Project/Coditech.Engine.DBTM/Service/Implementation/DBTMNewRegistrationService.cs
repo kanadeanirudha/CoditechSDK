@@ -536,28 +536,38 @@ namespace Coditech.API.Service
 
         private OrganisationCentreMaster InsertOrganisationCentreMaster(DBTMNewRegistrationModel dBTMNewRegistrationModel, DateTime currentDate)
         {
-            bool isDataEncrypted = IsDataEncrypted();
+            bool isDataEncrypted = base.IsDataEncrypted();
             OrganisationCentreMaster organisationCentreMaster = new OrganisationCentreMaster()
             {
-                CentreCode = GenerateCentreCode(8),
+                CentreCode = GenerateUniqueCentreCode(),
                 OrganisationId = 1,
                 CentreName = dBTMNewRegistrationModel.CentreName,
                 HoCoRoScFlag = "CO",
-                GeneralCityMasterId = dBTMNewRegistrationModel.GeneralCityMasterId,
-                TimeZone = "Asia/Kolkata",
-                CreatedDate = currentDate,
-                ModifiedDate = currentDate,
-                IsDataEncrypted = isDataEncrypted,
                 EmailId = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.EmailId) : dBTMNewRegistrationModel.EmailId,
                 PhoneNumberOffice = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.MobileNumber) : dBTMNewRegistrationModel.MobileNumber,
                 CellPhone = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.MobileNumber) : dBTMNewRegistrationModel.MobileNumber,
-                CentreAddress = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.AddressLine1 + " " + dBTMNewRegistrationModel.AddressLine2) : dBTMNewRegistrationModel.AddressLine1 + " " + dBTMNewRegistrationModel.AddressLine2,
-                Pincode = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.Pincode): dBTMNewRegistrationModel.Pincode
+                CentreAddress = isDataEncrypted ? DataEncryptionHelper.DataEncrypt($"{dBTMNewRegistrationModel.AddressLine1} {dBTMNewRegistrationModel.AddressLine2}") : $"{dBTMNewRegistrationModel.AddressLine1} {dBTMNewRegistrationModel.AddressLine2}",
+                GeneralCityMasterId = dBTMNewRegistrationModel.GeneralCityMasterId,
+                Pincode = isDataEncrypted ? DataEncryptionHelper.DataEncrypt(dBTMNewRegistrationModel.Pincode) : dBTMNewRegistrationModel.Pincode,
+                TimeZone = "Asia/Kolkata",
+                CreatedDate = currentDate,
+                ModifiedDate = currentDate
             };
             _organisationCentreMasterRepository.Insert(organisationCentreMaster);
             return organisationCentreMaster;
         }
 
+        private string GenerateUniqueCentreCode()
+        {
+            string centreCode;
+            do
+            {
+                centreCode = GenerateCentreCode(8);
+            }
+            while (_organisationCentreMasterRepository.Table.Any(x => x.CentreCode == centreCode));
+
+            return centreCode;
+        }
         // Generates a random string with a given size.
         private string GenerateCentreCode(short size, bool lowerCase = false)
         {

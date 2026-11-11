@@ -56,7 +56,7 @@
                                 </div>
                                 @if (Model.TicketMasterId > 0)
                                 {
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-4">
                                         <div class="mb-3">
                                             @Html.LabelFor(x => x.TicketStatusEnumId, new { @class = "form-label" })
                                             @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
@@ -70,7 +70,7 @@
                                         </div>
                                     </div>
                                 }
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="mb-3">
                                         @Html.LabelFor(x => x.TicketPriorityEnumId, new { @class = "form-label" })
                                         @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
@@ -80,6 +80,19 @@
                                    GroupCode = DropdownTypeEnum.TicketPriority.ToString()
                                })
                                         @Html.ValidationMessageFor(x => x.TicketPriorityEnumId)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        @Html.LabelFor(x => x.TicketProblemTypeEnumId, new { @class = "form-label required" })
+
+                                        @Html.Partial("~/Views/Shared/Control/_DropdownList.cshtml", new DropdownViewModel()
+                               {
+                                   DropdownSelectedValue = Model.TicketProblemTypeEnumId.ToString(),
+                                   DropdownName = "TicketProblemTypeEnumId",
+                                   GroupCode = DropdownTypeEnum.TicketProblemType.ToString()
+                               })
+                                        @Html.ValidationMessageFor(x => x.TicketProblemTypeEnumId)
                                     </div>
                                 </div>
 
@@ -135,15 +148,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-

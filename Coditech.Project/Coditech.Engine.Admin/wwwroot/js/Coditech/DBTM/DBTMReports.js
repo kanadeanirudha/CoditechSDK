@@ -662,30 +662,40 @@ var DBTMReports = {
 
     GetBatchWiseTraineeProfileDetailsListV2: function () {
         var reportMode = $('input[name="ProfileReportMode"]:checked').val();
+        var reportFor = $("#ProfileReportFor").val();
         var isIndividual = reportMode === "Individual";
-        var generalBatchMasterId = isIndividual ? 0 : $("#GeneralBatchMasterId").val();
-        var traineeSelector = isIndividual ? "#IndividualDBTMTraineeDetailId" : "#DBTMTraineeDetailId";
-        var dbtmTraineeDetailId = $(traineeSelector).val();
+        var isCamp = reportFor === "Camp";
+        var isBatch = reportFor === "Batch";
+        var campId = (isCamp && !isIndividual) ? $("#DBTMCampMasterId").val() : 0;
+        var generalBatchMasterId = isIndividual ? 0 : (isCamp ? campId : $("#GeneralBatchMasterId").val());
+        var traineeSelector = isIndividual ? "#IndividualDBTMTraineeDetailId" : (isCamp ? "#CampDBTMTraineeDetailId" : "#DBTMTraineeDetailId");
+        var dbtmTraineeDetailIds = $(traineeSelector).val();
         var orderBy = isIndividual ? "" : $("#OrderBy").val();
         var todate = $("#ToDate").val();
         var fromdate = todate;
-        var typeOfRecord = "batch";
+        var typeOfRecord = isCamp ? "Camp" : "batch";
         var reportType = isIndividual ? "Individual" : "Rank";
-        if (Array.isArray(dbtmTraineeDetailId)) {
-            dbtmTraineeDetailId = dbtmTraineeDetailId.join(",");
+        if (Array.isArray(dbtmTraineeDetailIds)) {
+            dbtmTraineeDetailIds = dbtmTraineeDetailIds.join(",");
         }
         $("#DBTMBatchWiseTraineeProfileDetailsDivId").empty();
         if (!todate) {
-            CoditechNotification.DisplayNotificationMessage("Please select date.", "error");
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select date.", "error");
             return;
         }
-        if (!dbtmTraineeDetailId) {
-            CoditechNotification.DisplayNotificationMessage("Please select trainee.", "error");
+        if (!dbtmTraineeDetailIds) {
+            CoditechNotification.DisplayNotificationMessage(
+                "Please select trainee.", "error");
             return;
         }
-        if (!isIndividual &&
+        if (isBatch && !isIndividual &&
             (!generalBatchMasterId || generalBatchMasterId === "0")) {
             CoditechNotification.DisplayNotificationMessage("Please select batch.", "error");
+            return;
+        }
+        if (isCamp && !isIndividual && (!campId || campId === "0")) {
+            CoditechNotification.DisplayNotificationMessage("Please select camp.", "error");
             return;
         }
         CoditechCommon.ShowLodder();
@@ -696,7 +706,7 @@ var DBTMReports = {
             url: "/DBTMReports/GetBatchWiseTraineeProfileDetailsListV2",
             data: {
                 generalBatchMasterId: generalBatchMasterId,
-                dbtmTraineeDetailIds: dbtmTraineeDetailId,
+                dbtmTraineeDetailIds: dbtmTraineeDetailIds,
                 orderBy: orderBy,
                 FromDate: fromdate,
                 ToDate: todate,
@@ -731,11 +741,16 @@ var DBTMReports = {
                 success: function (data) {
                     $("#DBTMTestMasterId").html(data);
                     $('#DBTMTestMasterId').selectpicker('refresh');
-                    DBTMReports.LoadCampActivityPerformedDates();
-                    CoditechCommon.HideLodder();
+                    DBTMReports.LoadCampProfileActivityDates();
                 },
-                error: function () {
-                    CoditechNotification.DisplayNotificationMessage("Failed to load activity.", "error");
+                error: function (xhr) {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        location.reload();
+                        return;
+                    }
+                    CoditechNotification.DisplayNotificationMessage( "Failed to load activity.", "error" );
+                },
+                complete: function () {
                     CoditechCommon.HideLodder();
                 }
             });
@@ -826,35 +841,33 @@ var DBTMReports = {
             CoditechNotification.DisplayNotificationMessage("Please select activity.", "error");
         }
     },
-    LoadCampActivityPerformedDates: function () {
-        var dBTMTestMasterIds = $("#DBTMTestMasterId").val();
+    LoadCampProfileActivityDates: function () {
         var campId = $("#DBTMCampMasterId").val();
-        if (!dBTMTestMasterIds || dBTMTestMasterIds.length === 0 || !campId) {
-            activityPerformedDates = [];
-            $("#FromDate,#ToDate").datepicker("refresh");
+        activityPerformedDates = [];
+        $("#ToDate").datepicker("refresh");
+        if (!campId || campId === "0") {
             return;
-        }
-        if (!Array.isArray(dBTMTestMasterIds)) {
-            dBTMTestMasterIds = [dBTMTestMasterIds];
         }
         $.ajax({
             type: "GET",
+            cache: false,
             url: "/DBTMReports/GetCampActivityPerformedDates",
             data: {
-                dBTMTestMasterIds: dBTMTestMasterIds.join(","),
+                dBTMTestMasterIds: "0",
                 dBTMCampMasterId: campId
             },
             success: function (data) {
-                activityPerformedDates = (data || []).map(function (d) {
-                    return d.split('T')[0];
+                activityPerformedDates = (data || []).map(function (date) {
+                    return date.split("T")[0];
                 });
-                if (!activityPerformedDates || activityPerformedDates.length === 0) {
-                    CoditechNotification.DisplayNotificationMessage("Camp has never been tested.", "error");
-                }
-                $("#FromDate,#ToDate").datepicker("refresh");
+                $("#ToDate").datepicker("refresh");
             },
-            error: function () {
+            error: function (xhr) {
                 activityPerformedDates = [];
+                $("#ToDate").datepicker("refresh");
+                if (xhr.status === 401 || xhr.status === 403) {
+                    location.reload();
+                }
             }
         });
     },
@@ -1082,5 +1095,41 @@ var DBTMReports = {
                 reportType: reportType
             });
         CoditechCommon.DownloadFile(downloadUrl);
+    },
+    GetCampUserListByCampId: function () {
+        var campId = $("#DBTMCampMasterId").val();
+        var $trainee = $("#CampDBTMTraineeDetailId");
+        $trainee.empty();
+        $("#DBTMBatchWiseTraineeProfileDetailsDivId").empty();
+        if (!campId || campId === "0") {
+            $trainee.prop("disabled", true).selectpicker("refresh");
+            activityPerformedDates = [];
+            $("#ToDate").datepicker("refresh");
+            return;
+        }
+        CoditechCommon.ShowLodder();
+        $.ajax({
+            type: "GET",
+            cache: false,
+            dataType: "html",
+            url: "/DBTMReports/GetCampUserListByCampId",
+            data: { dBTMCampMasterId: campId },
+            success: function (data) {
+                $trainee.html(data);
+                $trainee.prop("disabled", false);
+                $trainee.selectpicker("refresh");
+                DBTMReports.LoadCampProfileActivityDates();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401 || xhr.status === 403) {
+                    location.reload();
+                    return;
+                }
+                CoditechNotification.DisplayNotificationMessage("Failed to load Camp trainees.", "error");
+            },
+            complete: function () {
+                CoditechCommon.HideLodder();
+            }
+        });
     },
 };

@@ -61,22 +61,21 @@ namespace Coditech.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create(string custom4, string ispopup = "", string istrainer = "")
+        public ActionResult Create(string custom4, string SelectedCentreCode, string GeneralTrainerMasterId, string ispopup = "", string istrainer = "")
         {
             UserModel userModel = SessionHelper.GetDataFromSession<UserModel>(AdminConstants.UserDataSession);
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = new DBTMTraineeAssignmentViewModel
             {
-                SelectedCentreCode = userModel.SelectedCentreCode,
+                SelectedCentreCode = !string.IsNullOrEmpty(SelectedCentreCode) ? SelectedCentreCode : userModel.SelectedCentreCode,
+                GeneralTrainerMasterId = !string.IsNullOrEmpty(GeneralTrainerMasterId) ? Convert.ToInt64(GeneralTrainerMasterId) : userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
                 SelectedTrainee = new List<string>(),
-                Custom4 = custom4,
-                GeneralTrainerMasterId = userModel.Custom1 == CustomConstants.DBTMTrainer || userModel.Custom1 == CustomConstants.DBTMCentreOwner ? (JsonConvert.DeserializeObject<DBTMCustomUserModel>(userModel.Custom3 ?? string.Empty)?.GeneralTrainerMasterId ?? 0) : 0,
+                Custom4 = custom4
             };
-
             dBTMTraineeAssignmentViewModel.AllTraineeList = CoditechCustomDropdownHelper.GeneralDropdownList(new DropdownViewModel
             {
                 DropdownType = DropdownCustomTypeEnum.TraineeDetailsListByDBTMTrainer.ToString(),
                 Parameter = $"{dBTMTraineeAssignmentViewModel.SelectedCentreCode}~{dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId}"
-            }).DropdownList?.Where(x => x.Value != "")?.ToList();
+            }).DropdownList?.Where(x => x.Value != "").ToList();
             BindCentrewsieActivity(dBTMTraineeAssignmentViewModel);
             ViewBag.IsPopup = ispopup;
             ViewBag.IsTrainer = istrainer;
@@ -133,7 +132,7 @@ namespace Coditech.Admin.Controllers
         {
             DBTMTraineeAssignmentViewModel dBTMTraineeAssignmentViewModel = _dBTMTraineeAssignmentAgent.GetDBTMTraineeAssignment(dBTMTraineeAssignmentUserId);
             dBTMTraineeAssignmentViewModel.SelectedCentreCode = SelectedCentreCode;
-            dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId =  Convert.ToInt64(GeneralTrainerMasterId);
+            dBTMTraineeAssignmentViewModel.GeneralTrainerMasterId = Convert.ToInt64(GeneralTrainerMasterId);
             dBTMTraineeAssignmentViewModel.Custom4 = custom4;
             ViewBag.IsPopup = ispopup;
             ViewBag.IsTrainer = istrainer;
