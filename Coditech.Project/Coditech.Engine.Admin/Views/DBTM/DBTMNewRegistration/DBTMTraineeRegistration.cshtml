@@ -18,7 +18,7 @@
             <a class="nav-link fw-semibold" href="/dbtmnewregistration/centreregistration" role="tab">Device/Centre Registration</a>
         </li>
         <li class="nav-item">
-            @* <a class="nav-link fw-semibold" href="/dbtmnewregistration/individualRegistration" role="tab">Individual Registration</a> *@
+            <a class="nav-link fw-semibold" href="/dbtmnewregistration/individualRegistration" role="tab">Individual Registration</a>
         </li>
     </ul>
     <!-- Tab panes -->
@@ -33,7 +33,7 @@
                 }
                 string buttonText = trainersLoaded ? "Change" : "Join";
                 string clickHandler = trainersLoaded ? "ChangeJoinningCode()" : "GetTrainerDropdownByJoiningCode()";
-                string labelText = trainersLoaded ? "Loaded" : " ";          
+                string labelText = trainersLoaded ? "Loaded" : " ";
                 <div class="row">
                     @if (!string.IsNullOrEmpty(Model.JoiningCode) && Model.AllTrainerList != null && Model.AllTrainerList.Any())
                     {
@@ -70,14 +70,14 @@
                                 @Html.LabelFor(x => x.SelectedTrainer, new { @class = "form-label required" })
 
                                 @Html.ListBoxFor(m => m.SelectedTrainer,
-                                    new SelectList(Model.AllTrainerList, "Value", "Text"),
-                                    new
-                                    {
-                                        @class = "selectpicker form-control",
-                                        multiple = "multiple",
-                                        data_live_search = "true",
-                                        disabled = "disabled"   // makes dropdown readonly
-                                    })
+                                         new SelectList(Model.AllTrainerList, "Value", "Text"),
+                                         new
+                                         {
+                                             @class = "selectpicker form-control",
+                                             multiple = "multiple",
+                                             data_live_search = "true",
+                                             disabled = "disabled"   // makes dropdown readonly
+                                         })
 
                                 @Html.ValidationMessageFor(x => x.SelectedTrainer)
 
