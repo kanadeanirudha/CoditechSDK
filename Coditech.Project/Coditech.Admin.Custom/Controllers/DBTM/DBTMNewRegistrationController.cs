@@ -107,10 +107,10 @@ namespace Coditech.Admin.Controllers
             {
                 dBTMNewRegistrationViewModel.ErrorMessage = "Please accept Terms And Conditions.";
             }
-            else if (string.IsNullOrWhiteSpace(dBTMNewRegistrationViewModel.Custom4))
-            {
-                dBTMNewRegistrationViewModel.ErrorMessage = "Total Number Of Trainee is required";
-            }
+            //else if (string.IsNullOrWhiteSpace(dBTMNewRegistrationViewModel.Custom4))
+            //{
+            //    dBTMNewRegistrationViewModel.ErrorMessage = "Total Number Of Trainee is required";
+            //}
             else
             {
                 ModelState.Remove("DeviceSerialCode");
